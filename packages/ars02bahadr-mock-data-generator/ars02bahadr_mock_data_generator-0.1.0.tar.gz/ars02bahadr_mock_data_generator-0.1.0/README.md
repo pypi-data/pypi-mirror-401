@@ -1,0 +1,209 @@
+# MockDataGenerator 🚀
+
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://badge.fury.io/py/mock-data-generator.svg)](https://pypi.org/project/mock-data-generator/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Django](https://img.shields.io/badge/Django-092E20?style=flat&logo=django)](https://www.djangoproject.com/)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask)](https://flask.palletsprojects.com/)
+
+A powerful, developer-friendly Python library for generating realistic mock data from complex Python models. Supports FastAPI (Pydantic), Django ORM, and Flask (SQLAlchemy) frameworks while preserving intricate relationships like One-to-One, One-to-Many, Many-to-Many, and recursive self-references.
+
+## ✨ Key Features
+
+- **🔧 Framework Support**: Full compatibility with FastAPI (Pydantic models), Django ORM, and SQLAlchemy declarative models
+- **🔗 Relationship Management**: Automatically resolves foreign key relationships, ensuring data consistency across tables
+- **🎯 Smart Data Types**: Recognizes and generates appropriate data for fields like Turkish phone numbers, IBAN, UUID, EmailStr, HttpUrl, and more
+- **🔄 Recursive Relationships**: Handles self-referencing structures (e.g., Manager → Employee, Parent → Category)
+- **📤 Flexible Output**: Exports generated data directly to JSON files
+- **🌍 Localization**: Supports multiple locales (tr_TR, en_US, etc.) for culturally appropriate data
+- **🎮 Interactive Mode**: CLI with interactive prompts for customization
+- **⚡ Fast & Efficient**: Optimized generation algorithms for large datasets
+
+## 📦 Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+
+### Install from Source
+```bash
+git clone https://github.com/yourusername/mock-data-generator.git
+cd mock-data-generator
+pip install -r requirements.txt
+```
+
+### Optional Dependencies
+For full framework support, install optional packages:
+```bash
+pip install django sqlalchemy  # For Django and SQLAlchemy models
+```
+
+### Project Structure
+```
+mock-data-generator/
+├── mock_generator/
+│   ├── __init__.py
+│   ├── cli.py                 # Command-line interface
+│   ├── scanner.py             # Model file scanning
+│   ├── analyzer.py            # Model analysis
+│   ├── generator.py           # Mock data generation
+│   ├── relationship_resolver.py # Relationship handling
+│   ├── exporters.py           # Data export utilities
+│   └── field_mappers/         # Framework-specific mappers
+│       ├── django_mapper.py
+│       ├── pydantic_mapper.py
+│       └── sqlalchemy_mapper.py
+├── examples/                  # Usage examples
+│   ├── django_example/
+│   ├── fastapi_example/
+│   └── sqlalchemy_example/
+├── pyproject.toml             # Project configuration
+├── requirements.txt           # Dependencies
+└── README.md
+```
+
+## 🚀 Usage
+
+### Command Line Interface
+
+Generate mock data from your model files:
+
+```bash
+python -m mock_generator.cli generate --file path/to/your/models.py --locale tr_TR --interactive
+```
+
+#### CLI Options
+- `--file`: Path to your model file (required)
+- `--output`: Output directory (default: `./output`)
+- `--interactive`: Enable interactive mode for customization
+- `--locale`: Data locale (default: `en_US`, supports `tr_TR`, etc.)
+
+### Example Usage Scenarios
+
+#### 1. FastAPI (Pydantic) Models
+
+**models.py**
+```python
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+
+class Department(BaseModel):
+    id: int
+    name: str
+    budget: float
+
+class Employee(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    department_id: int
+    salary: Optional[float] = None
+```
+
+**Generate Data:**
+```bash
+python -m mock_generator.cli generate --file models.py --locale tr_TR
+```
+
+#### 2. Django ORM Models
+
+**models.py**
+```python
+from django.db import models
+
+class OrgDivision(models.Model):
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+
+class StaffAssociate(models.Model):
+    name = models.CharField(max_length=100)
+    division = models.ForeignKey(OrgDivision, on_delete=models.CASCADE)
+    supervisor = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+
+class EnterpriseTask(models.Model):
+    title = models.CharField(max_length=200)
+    assignees = models.ManyToManyField(StaffAssociate)
+    division = models.ForeignKey(OrgDivision, on_delete=models.CASCADE)
+```
+
+**Generate Data:**
+```bash
+python -m mock_generator.cli generate --file models.py --locale tr_TR --interactive
+```
+
+This handles complex relationships: StaffAssociate belongs to OrgDivision, has a supervisor (self-reference), and participates in Many-to-Many relationships with EnterpriseTask.
+
+#### 3. Flask/SQLAlchemy Models
+
+**models.py**
+```python
+from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy.orm import declarative_base, relationship
+
+Base = declarative_base()
+
+class CloudServer(Base):
+    __tablename__ = 'servers'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    ip_address = Column(String(15))
+
+class Tag(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+
+class BackupLog(Base):
+    __tablename__ = 'backup_logs'
+    id = Column(Integer, primary_key=True)
+    server_id = Column(Integer, ForeignKey('servers.id'))
+    tag_id = Column(Integer, ForeignKey('tags.id'))
+    size_gb = Column(Float)
+```
+
+**Generate Data:**
+```bash
+python -m mock_generator.cli generate --file models.py --locale tr_TR
+```
+
+## 📊 Generated Output
+
+The tool generates JSON files for each model, preserving relationships:
+
+```json
+{
+  "OrgDivision": [
+    {"id": 1, "name": "Engineering", "parent_id": null},
+    {"id": 2, "name": "Backend", "parent_id": 1}
+  ],
+  "StaffAssociate": [
+    {"id": 1, "name": "Ahmet Yılmaz", "division_id": 1, "supervisor_id": null},
+    {"id": 2, "name": "Mehmet Kaya", "division_id": 2, "supervisor_id": 1}
+  ],
+  "EnterpriseTask": [
+    {"id": 1, "title": "Implement API", "division_id": 1, "assignees": [1, 2]}
+  ]
+}
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Faker](https://faker.readthedocs.io/) for realistic data generation
+- [Click](https://click.palletsprojects.com/) for CLI framework
+- [Rich](https://rich.readthedocs.io/) for beautiful terminal output
+- [Pydantic](https://pydantic-docs.helpmanual.io/) for data validation
+
+---
+
+## Türkçe Özet
+
+MockDataGenerator, FastAPI (Pydantic), Django ve Flask (SQLAlchemy) modellerinden otomatik olarak ilişkisel mock veriler üreten güçlü bir Python kütüphanesidir. One-to-One, One-to-Many, Many-to-Many ve kendi kendine referanslı yapıları koruyarak JSON formatında veri üretir. CLI arayüzü ile kolay kullanım sağlar ve Türkçe dahil çeşitli dillerde lokalize veri desteği sunar.
