@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "speedyeda"
+version = "0.1.1"
+description = "🚀 One-line data exploration for developers & data scientists"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Dawit Worku", email = "dawitworkujima@gmail.com"}
+]
+keywords = ["data", "eda", "exploratory", "analysis", "visualization", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "tabulate>=0.9.0",
+    "rich>=13.0.0",
+    "openpyxl>=3.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+fasteda = "fasteda.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Dawaman43/fasteda"
+Documentation = "https://github.com/Dawaman43/fasteda#readme"
+Repository = "https://github.com/Dawaman43/fasteda"
+Issues = "https://github.com/Dawaman43/fasteda/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fasteda"]

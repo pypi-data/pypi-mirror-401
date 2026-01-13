@@ -1,0 +1,163 @@
+{
+  "basic_info": {
+    "shape": "(15, 6)",
+    "rows": 15.0,
+    "columns": 6.0,
+    "column_names": [
+      "product",
+      "category",
+      "price",
+      "quantity",
+      "revenue",
+      "rating"
+    ],
+    "memory_usage": 2376.0
+  },
+  "statistics": {
+    "price": {
+      "count": 15.0,
+      "mean": 161.32333333333324,
+      "std": 270.3779541590588,
+      "min": 5.99,
+      "25%": 17.99,
+      "50%": 29.99,
+      "75%": 174.99,
+      "max": 999.99,
+      "mode": 29.99,
+      "skewness": 2.5255651683816835,
+      "kurtosis": 6.756277064088887
+    },
+    "quantity": {
+      "count": 15.0,
+      "mean": 18.6,
+      "std": 13.286943107534446,
+      "min": 3.0,
+      "25%": 9.0,
+      "50%": 15.0,
+      "75%": 23.5,
+      "max": 50.0,
+      "mode": 15.0,
+      "skewness": 1.1252063019475846,
+      "kurtosis": 0.9536440478456765
+    },
+    "revenue": {
+      "count": 15.0,
+      "mean": 1165.8139999999996,
+      "std": 1330.0912247758476,
+      "min": 299.5,
+      "25%": 419.765,
+      "50%": 499.8,
+      "75%": 1199.935,
+      "max": 4999.95,
+      "mode": 449.85,
+      "skewness": 2.1284091359711383,
+      "kurtosis": 4.393612829214068
+    },
+    "rating": {
+      "count": 15.0,
+      "mean": 4.3533333333333335,
+      "std": 0.3248442850410171,
+      "min": 3.8,
+      "25%": 4.15,
+      "50%": 4.4,
+      "75%": 4.55,
+      "max": 4.9,
+      "mode": 4.2,
+      "skewness": -0.035220771433514604,
+      "kurtosis": -0.759385930703163
+    }
+  },
+  "missing_values": {
+    "column": {},
+    "missing_count": {},
+    "missing_percent": {}
+  },
+  "data_types": {
+    "type_distribution": {
+      "float64": 3.0,
+      "object": 2.0,
+      "int64": 1.0
+    },
+    "numeric_columns": [
+      "price",
+      "quantity",
+      "revenue",
+      "rating"
+    ],
+    "categorical_columns": [
+      "product",
+      "category"
+    ],
+    "datetime_columns": [],
+    "numeric_count": 4.0,
+    "categorical_count": 2.0,
+    "datetime_count": 0.0
+  },
+  "correlations": {
+    "correlation_matrix": [
+      {
+        "price": 1.0,
+        "quantity": -0.5472119863994347,
+        "revenue": 0.9531940885478674,
+        "rating": 0.3746112522349416
+      },
+      {
+        "price": -0.5472119863994347,
+        "quantity": 1.0,
+        "revenue": -0.533015907893758,
+        "rating": -0.6533543729713908
+      },
+      {
+        "price": 0.9531940885478674,
+        "quantity": -0.533015907893758,
+        "revenue": 1.0,
+        "rating": 0.3981796402076343
+      },
+      {
+        "price": 0.3746112522349416,
+        "quantity": -0.6533543729713908,
+        "revenue": 0.3981796402076343,
+        "rating": 1.0
+      }
+    ],
+    "high_correlations": [
+      {
+        "column1": "price",
+        "column2": "revenue",
+        "correlation": 0.9531940885478674
+      }
+    ]
+  },
+  "categorical_insights": {
+    "product": {
+      "unique_count": 15.0,
+      "top_values": {
+        "Laptop": 1.0,
+        "Mouse": 1.0,
+        "Keyboard": 1.0,
+        "Monitor": 1.0,
+        "Desk Chair": 1.0,
+        "Standing Desk": 1.0,
+        "Notebook": 1.0,
+        "Pen Set": 1.0,
+        "Coffee Mug": 1.0,
+        "Water Bottle": 1.0
+      },
+      "most_common": "Laptop",
+      "most_common_count": 1.0
+    },
+    "category": {
+      "unique_count": 5.0,
+      "top_values": {
+        "Electronics": 6.0,
+        "Furniture": 3.0,
+        "Office Supplies": 3.0,
+        "Kitchen": 2.0,
+        "Decor": 1.0
+      },
+      "most_common": "Electronics",
+      "most_common_count": 6.0
+    }
+  },
+  "fun_mode": false
+}
