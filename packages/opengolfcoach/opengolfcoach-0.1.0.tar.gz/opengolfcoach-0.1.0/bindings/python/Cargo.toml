@@ -1,0 +1,15 @@
+[package]
+name = "opengolfcoach-python"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+readme = "README.md"
+
+[lib]
+name = "opengolfcoach"
+crate-type = ["cdylib"]
+
+[dependencies]
+opengolfcoach = { path = "../../core" }
+pyo3 = { version = "0.20", features = ["extension-module", "generate-import-lib"] }
+serde_json = "1.0"
