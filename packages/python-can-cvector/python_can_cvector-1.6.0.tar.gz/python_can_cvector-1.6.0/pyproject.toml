@@ -1,0 +1,74 @@
+[build-system]
+requires = ["scikit-build-core", "cython"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "python-can-cvector"
+description = 'A partly cythonized version of the python-can VectorBus'
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "LGPL v3" }
+keywords = [
+  "python-can",
+  "CAN",
+  "vector",
+  "cython",
+]
+authors = [
+  { name = "Artur Drogunow", email = "artur.drogunow@zf.com" },
+]
+classifiers = [
+  "Programming Language :: Cython",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Programming Language :: Python :: Free Threading :: 1 - Unstable",
+  "Operating System :: Microsoft :: Windows",
+  "Intended Audience :: Developers",
+]
+dependencies = [ "python-can==4.*" ]
+dynamic = [ "version" ]
+
+[project.optional-dependencies]
+dev = [
+    "black==24.4.*",
+    "cibuildwheel",
+    "mypy==1.10.*",
+]
+
+[project.entry-points."can.interface"]
+cvector = "can_cvector.cvector:CVectorBus"
+
+[project.urls]
+Documentation = "https://github.com/zariiii9003/python-can-cvector#readme"
+Issues = "https://github.com/zariiii9003/python-can-cvector/issues"
+Source = "https://github.com/zariiii9003/python-can-cvector"
+Homepage = "https://github.com/zariiii9003/python-can-cvector"
+
+[tool.scikit-build]
+cmake.version = ">=3.30.3,<4.2"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["src/can_cvector/_version.py"]
+wheel.exclude = ["**.pyx", "**.pxd"]
+wheel.packages = ["src/can_cvector"]
+
+[tool.setuptools_scm]  # Section required
+write_to = "src/can_cvector/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v"
+testpaths = ["tests"]
+
+[tool.cibuildwheel]
+test-requires = "pytest"
+test-command = "pytest {project}/tests"
+build-frontend = "build[uv]"
+enable = ["cpython-freethreading", "pypy"]
