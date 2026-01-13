@@ -1,0 +1,225 @@
+Metadata-Version: 2.4
+Name: langvision
+Version: 0.1.50
+Summary: Efficient LoRA Fine-Tuning for Vision LLMs with advanced CLI and model zoo
+Author-email: Pritesh Raj <priteshraj10@gmail.com>
+Maintainer-email: Pritesh Raj <priteshraj10@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/langtrain-ai/langvision
+Project-URL: Documentation, https://github.com/langtrain-ai/langvision/tree/main/docs
+Project-URL: Repository, https://github.com/langtrain-ai/langvision
+Project-URL: Bug Tracker, https://github.com/langtrain-ai/langvision/issues
+Project-URL: Source Code, https://github.com/langtrain-ai/langvision
+Project-URL: Changelog, https://github.com/langtrain-ai/langvision/blob/main/CHANGELOG.md
+Keywords: vision,transformer,lora,fine-tuning,deep-learning,computer-vision
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Image Processing
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: torch>=1.10.0
+Requires-Dist: torchvision>=0.11.0
+Requires-Dist: numpy>=1.21.0
+Requires-Dist: tqdm>=4.62.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: matplotlib>=3.5.0
+Requires-Dist: pillow>=8.3.0
+Requires-Dist: timm>=0.6.0
+Requires-Dist: transformers>=4.20.0
+Requires-Dist: toml>=0.10.0
+Requires-Dist: scikit-learn>=1.0.0
+Requires-Dist: pandas>=1.3.0
+Requires-Dist: opencv-python-headless>=4.5.0
+Requires-Dist: wandb>=0.13.0
+Requires-Dist: rich>=13.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.8.0; extra == "dev"
+Requires-Dist: black>=22.0.0; extra == "dev"
+Requires-Dist: isort>=5.10.0; extra == "dev"
+Requires-Dist: flake8>=5.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: pre-commit>=2.20.0; extra == "dev"
+Requires-Dist: bandit>=1.7.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=5.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "docs"
+Requires-Dist: myst-parser>=0.18.0; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints>=1.19.0; extra == "docs"
+Provides-Extra: examples
+Requires-Dist: jupyter>=1.0.0; extra == "examples"
+Requires-Dist: ipywidgets>=7.6.0; extra == "examples"
+Requires-Dist: tensorboard>=2.9.0; extra == "examples"
+Requires-Dist: wandb>=0.13.0; extra == "examples"
+Provides-Extra: gpu
+Requires-Dist: torch>=1.10.0; extra == "gpu"
+Requires-Dist: torchvision>=0.11.0; extra == "gpu"
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/langtrain-ai/langvision/main/static/langvision-black.png" alt="Langvision" width="400" />
+
+<h3>Fine-tune Vision LLMs with ease</h3>
+
+<p>
+  <strong>Train LLaVA, Qwen-VL, and other vision models in minutes.</strong><br>
+  The simplest way to create custom multimodal AI.
+</p>
+
+<p>
+  <a href="https://www.producthunt.com/products/langtrain-2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1049974&theme=light" alt="Product Hunt" width="200" /></a>
+</p>
+
+<p>
+  <a href="https://pypi.org/project/langvision/"><img src="https://img.shields.io/pypi/v/langvision.svg?style=for-the-badge&logo=pypi&logoColor=white" alt="PyPI" /></a>
+  <a href="https://pepy.tech/project/langvision"><img src="https://img.shields.io/pepy/dt/langvision?style=for-the-badge&logo=python&logoColor=white&label=downloads" alt="Downloads" /></a>
+  <a href="https://github.com/langtrain-ai/langvision/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License" /></a>
+</p>
+
+<p>
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#features">Features</a> •
+  <a href="#supported-models">Models</a> •
+  <a href="https://langtrain.xyz/docs">Docs</a>
+</p>
+
+</div>
+
+---
+
+## ⚡ Quick Start
+
+### 1-Click Install (Recommended)
+The fastest way to get started. Installs Langvision in an isolated environment.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/langtrain-ai/langvision/main/scripts/install.sh | bash
+```
+
+### Or using pip
+```bash
+pip install langvision
+```
+
+Fine-tune a vision model in **3 lines**:
+
+```python
+from langvision import LoRATrainer
+
+trainer = LoRATrainer(model_name="llava-hf/llava-1.5-7b-hf")
+trainer.train_from_file("image_data.jsonl")
+```
+
+Your custom vision model is ready.
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🖼️ **Multimodal Training**
+Train on images + text together. Perfect for VQA, image captioning, and visual reasoning.
+
+### 🎯 **Smart Defaults**
+Optimized configurations for each model architecture. Just point and train.
+
+### 💾 **Efficient Memory**
+LoRA + 4-bit quantization = Train 13B vision models on a single 24GB GPU.
+
+</td>
+<td width="50%">
+
+### 🔧 **Battle-Tested**
+Production-ready code used by teams building real-world vision applications.
+
+### 🌐 **All Major Models**
+LLaVA, Qwen-VL, CogVLM, InternVL, and more. Full compatibility.
+
+### ☁️ **Deploy Anywhere**
+Export to GGUF, ONNX, or deploy directly to Langtrain Cloud.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🤖 Supported Models
+
+| Model | Parameters | Memory Required |
+|-------|-----------|-----------------|
+| LLaVA 1.5 | 7B, 13B | 8GB, 16GB |
+| Qwen-VL | 7B | 8GB |
+| CogVLM | 17B | 24GB |
+| InternVL | 6B, 26B | 8GB, 32GB |
+| Phi-3 Vision | 4.2B | 6GB |
+
+---
+
+## 📖 Full Example
+
+```python
+from langvision import LoRATrainer
+from langvision.config import TrainingConfig, LoRAConfig
+
+# Configure training
+config = TrainingConfig(
+    num_epochs=3,
+    batch_size=2,
+    learning_rate=2e-4,
+    lora=LoRAConfig(rank=16, alpha=32)
+)
+
+# Initialize trainer
+trainer = LoRATrainer(
+    model_name="llava-hf/llava-1.5-7b-hf",
+    output_dir="./my-vision-model",
+    config=config
+)
+
+# Train on image-text data
+trainer.train_from_file("training_data.jsonl")
+```
+
+---
+
+## 📝 Data Format
+
+```jsonl
+{"image": "path/to/image1.jpg", "conversations": [{"from": "human", "value": "What's in this image?"}, {"from": "assistant", "value": "A cat sitting on a couch."}]}
+```
+
+---
+
+## 🤝 Community
+
+<p align="center">
+  <a href="https://discord.gg/langtrain">Discord</a> •
+  <a href="https://twitter.com/langtrainai">Twitter</a> •
+  <a href="https://langtrain.xyz">Website</a>
+</p>
+
+---
+
+<div align="center">
+
+**Built with ❤️ by [Langtrain AI](https://langtrain.xyz)**
+
+*Making vision AI accessible to everyone.*
+
+</div>
