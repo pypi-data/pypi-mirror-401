@@ -1,0 +1,26 @@
+# !IMMUTABLE
+# Antigravity Global Engineering Standards
+
+## 1. Architectural Integrity & Readability
+* **Flatten Logic:** Use guard clauses and early returns. No function or method should exceed a cyclomatic complexity that requires more than 3 levels of indentation.
+* **Function Atomicity:** Functions must do one thing. If a function requires a "Step 1, Step 2" comment structure, it must be decomposed into smaller, private sub-routines.
+* **Declarative Naming:** Variable names must describe *intent*, not *data type*. (e.g., `remaining_retries` instead of `retry_int`).
+* **No Magic Constants:** All non-trivial literal values (strings, numbers, timeouts) must be defined as named constants at the top of the scope or in a configuration module.
+
+## 2. The Documentation Lifecycle
+* **Documentation-as-Code:** For every new module, class, or public API added, create or update a corresponding markdown document.
+* **Index Maintenance:** Automatically update the project's primary entry point (e.g., `README.md` or `/docs/index.md`) whenever new documentation files are generated to ensure discoverability.
+* **Periodical Audit:** Once per session, scan the existing documentation against the source code. If the code logic has drifted from the written docs, prioritize updating the docs or the code to ensure 1:1 parity.
+
+## 3. Verification & Testing Rigor
+* **The Testing Mandate:** No logic change is considered "complete" without accompanying automated tests. 
+* **Multi-Layer Testing:**
+    * **Unit:** Verify logic in isolation (mock external resources).
+    * **Integration:** Verify the "handshake" between internal modules or external services.
+    * **Regression:** Every bug fix must include a test case that reproduces the failure state before the fix is applied.
+* **Environmental Verification:** Use available skills (Browser/Terminal) to verify that the project builds and runs in its target environment before signaling task completion.
+
+## 4. Safety & Error Handling
+* **Defensive Programming:** Explicitly handle potential null/nil/None values and out-of-bounds errors.
+* **No Silent Failures:** Every "catch" or "except" block must either recover the state, re-throw with context, or log a meaningful error. Never leave an error block empty.
+* **Resource Management:** Ensure all opened resources (files, sockets, database connections) are explicitly closed or managed via the language's standard lifecycle tools (e.g., context managers, RAII).
