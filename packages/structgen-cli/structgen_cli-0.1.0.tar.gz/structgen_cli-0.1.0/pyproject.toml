@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "structgen-cli"
+version = "0.1.0"
+description = "Generate folder and file structures from pasted tree input"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.scripts]
+structgen = "structgen.cli:main"
+
+[tool.setuptools]
+packages = ["structgen"]
