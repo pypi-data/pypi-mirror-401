@@ -1,0 +1,111 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#                              AI-CLI CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────────
+#                                 MODÈLE & API
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Modèle LLM par défaut (sera téléchargé automatiquement si absent)
+default_model: phi3.5
+
+# URL du serveur Ollama
+ollama_url: http://localhost:11434
+
+# Timeout des requêtes HTTP (secondes)
+request_timeout: 60
+
+# ─────────────────────────────────────────────────────────────────────────────────
+#                           PARAMÈTRES DE GÉNÉRATION
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Température: 0.0 = déterministe, 1.0 = créatif, 2.0 = très aléatoire
+temperature: 0.7
+
+# Nombre maximum de tokens en sortie (0 = illimité)
+max_output_length: 2048
+
+# Top-p (nucleus sampling): probabilité cumulative des tokens considérés
+top_p: 0.9
+
+# Pénalité de répétition: évite les répétitions (1.0 = désactivé)
+repeat_penalty: 1.1
+
+# ─────────────────────────────────────────────────────────────────────────────────
+#                              GESTION DU CONTEXTE
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Nombre de messages à garder intacts avant résumé automatique
+summary_threshold: 5
+
+# Répertoire de stockage des données utilisateur
+history_dir: ~/.ai-cli
+
+# ─────────────────────────────────────────────────────────────────────────────────
+#                           PROMPTS SYSTÈME (Qualité++)
+# ─────────────────────────────────────────────────────────────────────────────────
+
+prompts:
+  # Génération de titre pour les sessions sauvegardées
+  title_generation: |
+    Génère un titre court (3-5 mots) résumant le SUJET PRINCIPAL de cette discussion.
+    
+    RÈGLES STRICTES:
+    - Réponds UNIQUEMENT avec le titre, rien d'autre
+    - Pas de guillemets, pas de ponctuation finale
+    - Le titre doit refléter le sujet concret de la discussion
+    - Si on parle d'une personne, inclure son nom
+    - Si on parle d'un concept, le nommer
+    
+    Exemples de bons titres:
+    - "Paul Biya Président Cameroun"
+    - "Différences Docker Podman"
+    - "Algorithme Tri Rapide"
+    
+    Discussion à titrer:
+    {content}
+
+  # Résumé de l'historique pour libérer du contexte
+  summarization: |
+    Tu es un assistant spécialisé dans la synthèse de conversations.
+    Résume de façon CONCISE mais COMPLÈTE les points clés suivants:
+    - Les questions principales de l'utilisateur
+    - Les informations importantes données
+    - Les décisions ou conclusions atteintes
+    
+    Format: Un paragraphe fluide de 2-4 phrases maximum.
+    
+    Échange à résumer:
+    {content}
+
+  # Prompt système injecté avec la mémoire utilisateur
+  memory_prefix: |
+    MÉMOIRE PERSONNELLE ET CONTEXTE UTILISATEUR (PRIORITÉ ABSOLUE)
+    Tes connaissances générales sont secondaires par rapport aux faits suivants concernant l'utilisateur.
+    Tu DOIS les utiliser pour personnaliser tes réponses.
+
+    FAITS MÉMORISÉS SUR L'UTILISATEUR :
+    {memory}
+
+    INSTRUCTION : Si on te demande ce que tu sais, cite ces faits.
+    INSTRUCTION : Ne dis JAMAIS que tu n'as pas de mémoire si ces faits sont présents.
+    INSTRUCTION : Incorpore ces informations naturellement.
+
+  # Messages d'interface
+  welcome_message: "🤖 Bienvenue dans AI-CLI !"
+  interactive_info: "Mode Interactif • Modèle: {model} • /help pour l'aide"
+  goodbye_message: "👋 À bientôt !"
+
+# ─────────────────────────────────────────────────────────────────────────────────
+#                                 INTERFACE
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Style du prompt utilisateur
+user_style:
+  border_color: cyan
+  title: "👤 Vous"
+
+# Style de la réponse IA
+ai_style:
+  border_color: green
+  title_template: "🤖 {model}"
