@@ -1,0 +1,58 @@
+#
+
+name: Run tests with `uv`
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  uv-test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    environment:
+      name: test
+    strategy:
+      matrix:
+        python-version: [3.12, 3.13, 3.14]
+        redis-version: [6, 7]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          # python-version-file: "pyproject.toml"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+        # TODO Better to use --locked for author control over versions?
+        # run: uv sync --locked --all-extras --dev
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.8.1
+        with:
+          redis-version: ${{ matrix.redis-version }}
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=atdata --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          # file: ./coverage.xml # Claude hallucination -- fascinating!
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+
+#
