@@ -1,0 +1,47 @@
+[project]
+name = "assembly-api-client"
+version = "1.2.1"
+description = "A Python client for the Korean National Assembly Open API"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "httpx>=0.24.0",
+    "openpyxl>=3.1.0",
+    "pydantic>=2.0.0",
+    "tenacity>=8.0.0",
+    "platformdirs>=3.0.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+]
+authors = [
+    { name = "StatPan", email = "statpan@naver.com" }
+]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/assembly_client"]
+
+[tool.semantic_release]
+version_variables = [
+    "src/assembly_client/__init__.py:__version__",
+    "pyproject.toml:version"
+]
+commit_parser = "angular"
+build_command = "uv build"
+
+[tool.semantic_release.branches.master]
+match = "(master|main)"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true

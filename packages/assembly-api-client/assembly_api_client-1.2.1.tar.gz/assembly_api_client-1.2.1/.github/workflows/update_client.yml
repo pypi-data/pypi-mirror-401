@@ -1,0 +1,99 @@
+name: Update API Client
+
+on:
+  schedule:
+    # Run every day at midnight KST (15:00 UTC previous day)
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Choose runner manually (optional)'
+        type: choice
+        default: 'auto'
+        options:
+          - auto
+          - self-hosted
+          - ubuntu-latest
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.set-runner.outputs.runner }}
+    steps:
+      - name: Determine runner
+        id: set-runner
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          SELECTED_RUNNER="ubuntu-latest"
+          if [ "${{ github.event.inputs.runner }}" != "" ] && [ "${{ github.event.inputs.runner }}" != "auto" ]; then
+            SELECTED_RUNNER="${{ github.event.inputs.runner }}"
+          else
+            ONLINE_RUNNER=$(gh api repos/${{ github.repository }}/actions/runners --jq '.runners[] | select(.labels[].name=="self-hosted" and .status=="online") | .name' | head -n 1)
+            if [ ! -z "$ONLINE_RUNNER" ]; then
+              SELECTED_RUNNER="self-hosted"
+            fi
+          fi
+          echo "runner=$SELECTED_RUNNER" >> $GITHUB_OUTPUT
+
+  update-client:
+    needs: setup
+    runs-on: ${{ needs.setup.outputs.runner }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fix git safe directory
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.11'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca
+
+      - name: Install Dependencies
+        run: |
+          uv pip install --system -e .
+          uv pip install --system httpx openpyxl pydantic tenacity typer rich platformdirs
+
+      - name: Run Update Script
+        env:
+          ASSEMBLY_API_KEY: ${{ secrets.ASSEMBLY_API_KEY }}
+        run: |
+          chmod +x scripts/update_client.sh
+          ./scripts/update_client.sh
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Bump Version
+        if: steps.git-check.outputs.changes == 'true'
+        id: bump-version
+        run: |
+          python scripts/bump_version.py
+          NEW_VERSION=$(grep -oP 'version = "\K[^"]+' pyproject.toml)
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.git-check.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676
+        with:
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          commit-message: "feat: update api client specs to v${{ steps.bump-version.outputs.new_version }}"
+          title: "Update API Client Specs to v${{ steps.bump-version.outputs.new_version }}"
+          body: |
+            This PR updates the API client with the latest specifications from the National Assembly Open API.
+            
+            - Synced latest master list
+            - Downloaded new/updated specs
+            - Regenerated Enums and Pydantic Models
+            - **Version bumped to ${{ steps.bump-version.outputs.new_version }}**
+          branch: update-api-specs
