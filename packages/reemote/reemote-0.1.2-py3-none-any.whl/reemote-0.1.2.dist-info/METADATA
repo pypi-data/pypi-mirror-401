@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: reemote
+Version: 0.1.2
+Summary: An API for controlling remote systems.
+Author-email: Kim Jarvis <kim.jarvis@tpfsystems.com>
+Maintainer-email: Kim Jarvis <kim.jarvis@tpfsystems.com>
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+License-Expression: MIT
+License-File: LICENSE
+Requires-Dist: asyncssh>=2.21.1
+Requires-Dist: coverage>=7.13.0
+Requires-Dist: fastapi[standard]>=0.123.5
+Requires-Dist: mkdocs>=1.6.1
+Requires-Dist: mkdocs-material>=9.7.1
+Requires-Dist: pydantic>=2.12.5
+Requires-Dist: pytest>=9.0.1
+Requires-Dist: pytest-asyncio>=1.3.0
+Requires-Dist: ruff>=0.14.9
+Requires-Dist: uvicorn>=0.38.0
+Project-URL: Bug Tracker, https://github.com/kimjarvis/reemote/issues
+Project-URL: Documentation, https://reemote.org/
+Project-URL: Homepage, http://reemote.org/
+Project-URL: Source Code, https://github.com/kimjarvis/reemote
+
+# Reemote
+
+An API for controlling remote systems.
+
+For a detailed description refer to the [Reemote home page](https://reemote.org/).
+
+## Installation
+
+Install the module with pip:
+
+```bash
+pip install reemote
+```
+
+## Installing the ReST API
+
+The optional ReST API can be installed with pipx.
+
+```bash
+python3 -m venv myenv
+source myenv/bin/activate
+pipx install reemote
+```
+
+## Starting the ReST API server
+
+The server runs on the local host.
+
+```bash
+reemote --port=8001 
+```
+
+Parameter, such as the port number, are passed to [uvicorn](https://uvicorn.dev/#command-line-options) except:
+
+* `--inventory`: The inventory file path (optional).
+* `--logging`: The logging file path (optional).
+
+When the server is running the API documentation can be found at http://localhost:8001/redoc and the Swagger UI can be found a http://localhost:8001/docs.
