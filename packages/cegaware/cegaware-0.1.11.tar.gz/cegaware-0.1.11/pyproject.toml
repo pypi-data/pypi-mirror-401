@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cegaware"
+version = "0.1.11"
+description = "Cegaware Python SDK"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name="Cegaware", email="contact@cegaware.com" }
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent"
+]
+
+dependencies = [
+    "requests",
+    "strenum"
+]
+
+[project.urls]
+Homepage = "https://www.cegaware.com"
+
+[tool.setuptools.packages.find]
+where = ["src"]

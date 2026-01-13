@@ -1,0 +1,23 @@
+# Include license and documentation
+include LICENSE
+include README.md
+include CLIENT_INSTALLATION_GUIDE.md
+
+# Include all Python source files
+recursive-include src *.py
+
+# Exclude unnecessary files
+recursive-exclude * __pycache__
+recursive-exclude * *.pyc
+recursive-exclude * *.pyo
+recursive-exclude * *.log
+
+# Exclude internal and development files
+exclude .gitignore
+exclude .env
+exclude *.env
+exclude *.pem
+exclude *.key
+
+# Include example notebooks
+recursive-include examples *.ipynb
