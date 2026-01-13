@@ -1,0 +1,73 @@
+# GotoShare SDK
+
+A股数据自托管服务客户端，与tushare接口完全兼容。
+
+## 特性
+
+- ✅ 与tushare API接口兼容，无需修改现有代码
+- ✅ 无调用频率限制
+- ✅ 支持Token认证
+- ✅ 返回pandas DataFrame
+
+## 安装
+
+```bash
+pip install gotoshare
+```
+
+## 快速开始
+
+```python
+import gotoshare as gs
+
+# 创建API实例（需要服务端地址和Token）
+pro = gs.pro_api('http://your-server:9468', token='your_api_token')
+
+# 获取股票列表
+df = pro.stock_basic(list_status='L')
+print(df.head())
+
+# 获取日线行情
+df = pro.daily(ts_code='000001.SZ', start_date='20240101', end_date='20240601')
+print(df)
+
+# 获取周线行情
+df = pro.weekly(ts_code='000001.SZ', start_date='20240101')
+
+# 获取月线行情
+df = pro.monthly(ts_code='000001.SZ')
+
+# 获取每日指标
+df = pro.daily_basic(ts_code='000001.SZ', start_date='20240101')
+```
+
+## API接口
+
+| 方法 | 说明 | 参数 |
+|------|------|------|
+| `stock_basic()` | 股票列表 | ts_code, exchange, list_status, fields |
+| `daily()` | 日线行情 | ts_code, trade_date, start_date, end_date |
+| `weekly()` | 周线行情 | ts_code, trade_date, start_date, end_date |
+| `monthly()` | 月线行情 | ts_code, trade_date, start_date, end_date |
+| `daily_basic()` | 每日指标 | ts_code, trade_date, start_date, end_date |
+
+## 从tushare迁移
+
+只需修改一行代码：
+
+```python
+# 原来的tushare代码
+# import tushare as ts
+# pro = ts.pro_api('your_tushare_token')
+
+# 改为gotoshare
+import gotoshare as gs
+pro = gs.pro_api('http://your-server:9468', token='your_api_token')
+
+# 其他代码完全不用改！
+df = pro.daily(ts_code='000001.SZ', start_date='20240101')
+```
+
+## License
+
+MIT
