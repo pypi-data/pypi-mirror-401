@@ -1,0 +1,23 @@
+# Mortalite Hesapla
+## Proje Geliştiricisi
+Dilara Eslem Emelek
+## Projenin Amacı ve Kapsamı
+Mortalite tablosu yaş girdiginizde o yıl icin girdiginiz yaş dogrultusundaki ölme olasılıgının(qx), hayatta kalma olasılıgının(px), yaşayan kişi sayısının(lx), ölen kişi sayısının(dx), yaşam yılının(Dx), kalan toplam yaşam yılını(Nx), sağ kalma oranı(Sx), ölüm yoğunlugunu(Mx), ömür beklentisinin(Rx) bilgilerini ekrana vermektedir.
+## Kurulum Ve Çalıştırma Adımları
+Projenin kurulumu için paketi projeye dahil edin.
+
+pip install mortalite_tablosu
+
+Fonksiyonu kullanabilmek için dosyanıza import edin.
+
+import mortalite_tablosu
+
+## Örnek Kullanım
+
+Fonksiyonu kullanın.
+
+mortalite_tablosu.hesapla_mortalite_tablosu()
+
+## Fonksiyonların Kısa Acıklaması
+
+hesapla_mortalite_tablosu fonksiyonunu kullandığınızda kullanıcıdan bir yaş aralığı girmesi istenir. Girilen Yaş aralığına göre ise mortalite değerlerini hesaplayarak ekrana yazdırır.
