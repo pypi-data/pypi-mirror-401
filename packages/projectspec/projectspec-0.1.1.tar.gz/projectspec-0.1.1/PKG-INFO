@@ -1,0 +1,250 @@
+Metadata-Version: 2.4
+Name: projectspec
+Version: 0.1.1
+Summary: Machine-readable specs that link intent to code, with tooling to surface drift
+Project-URL: Homepage, https://github.com/codewithcheese/projectspec
+Project-URL: Documentation, https://github.com/codewithcheese/projectspec#readme
+Project-URL: Repository, https://github.com/codewithcheese/projectspec
+Project-URL: Issues, https://github.com/codewithcheese/projectspec/issues
+Author: codewithcheese
+License-Expression: MIT
+Keywords: ai-agents,drift,intent,reconciliation,specification
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Quality Assurance
+Requires-Python: >=3.10
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: scriv>=1.8.0
+Provides-Extra: dev
+Requires-Dist: mypy; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Requires-Dist: scriv[toml]; extra == 'dev'
+Provides-Extra: validation
+Requires-Dist: jsonschema>=4.0; extra == 'validation'
+Description-Content-Type: text/markdown
+
+# Project Spec
+
+<!-- @documents feature:documentation/readme-project
+  - Explains what ProjectSpec is in one concrete sentence
+  - Describes the problem being solved (implicit knowledge, AI agents, specification rot)
+  - Lists prerequisites and installation steps
+  - Provides quick start with example reconciliation output shown
+  - Lists key capabilities (validation, file checking, coverage verification, relationship graphs)
+  - Explains core concepts (spec as contract, reconciliation, human authority over spec)
+  - Includes visual diagram of the reconciliation loop
+  - Shows basic workflow for adding specs to an existing project
+  - Links to detailed documentation organized by purpose
+  - Indicates project status and maturity level
+-->
+
+**Machine-readable specs that link intent to code, with tooling to surface drift.**
+
+Software is full of implicit knowledge—what the system *should* do versus what it *does*. This gap becomes critical when AI agents enter the picture: an agent can't distinguish between a test that's wrong and a test that's protecting something important. Without explicit intent, agents silently regress functionality, drift from requirements, and lose context between sessions.
+
+Project Spec solves this by declaring intent in YAML specs, linking those declarations bidirectionally to code via markers, and running reconciliation to surface gaps.
+
+**[Read the manifesto →](MANIFESTO.md)** for the full philosophy and motivation.
+
+---
+
+## Prerequisites
+
+- Python 3.10+
+
+## Installation
+
+```bash
+# Install from source (PyPI coming soon)
+git clone https://github.com/codewithcheese/projectspec.git
+pip install ./projectspec[validation]
+```
+
+## Quick Start
+
+```bash
+# Run reconciliation on the example project
+cd projectspec/examples/taskflow
+projectspec reconcile
+```
+
+Example output:
+
+```
+Reconciliation complete: 3/5 features OK
+  (1 planned features skipped)
+
+spec/capabilities/auth.yaml:
+  user-authentication/password-reset: [ERROR] Path does not exist
+    → tests/api/test_password_reset.py
+
+Unlinked files (not referenced in any spec):
+  src/api/routes/teams.py
+```
+
+The output shows:
+- **OK** - Features where all linked files exist
+- **ERROR** - Missing implementation or test files
+- **WARNING** - Missing documentation files
+- **Planned** - Features with `status: planned` (skipped)
+- **Unlinked** - Files not referenced by any spec
+
+## What You Get
+
+- **Schema validation** - Specs validated against JSON Schema defined in KindDefinitions
+- **File existence checking** - Verify `implementedIn`, `testedIn`, `documentedIn` paths exist
+- **Coverage verification** - Match `@implements`, `@tests`, `@documents` markers to acceptance criteria
+- **Relationship graphs** - Track dependencies, detect cycles, validate entity references
+- **JSON output** - Machine-readable results for CI integration (`--format json`)
+- **Custom kinds** - Define domain-specific entity types (not just Capability/Feature)
+- **GitHub Action** - Run reconciliation and spec review on PRs with comments and labels
+
+## CI Integration
+
+Add ProjectSpec checks to your GitHub workflow:
+
+```yaml
+# .github/workflows/projectspec.yml
+name: Projectspec
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: codewithcheese/projectspec/.github/actions/projectspec@main
+```
+
+On PRs, this posts a comment summarizing spec changes and adds severity labels (`spec-info`, `spec-warning`). See the [CI Integration Guide](docs/howto-ci-integration.md) for configuration options.
+
+## How It Works
+
+```
+┌─────────────────┐
+│   SPEC FILES    │ ← Human-controlled source of truth
+│   (yaml)        │
+└────────┬────────┘
+         │
+         │ declares
+         ▼
+┌─────────────────┐      ┌─────────────────┐
+│  CAPABILITIES   │ ───► │ IMPLEMENTATION  │
+│  (what it does) │      │ (code, tests,   │
+│                 │ ◄─── │  docs)          │
+└─────────────────┘      └─────────────────┘
+         │                        │
+         └────────┬───────────────┘
+                  │
+                  ▼
+         ┌─────────────────┐
+         │ RECONCILIATION  │ ← Surface drift, resolve intentionally
+         │ (diff spec vs   │
+         │  reality)       │
+         └─────────────────┘
+```
+
+Code links back to specs via markers:
+
+```python
+"""
+@implements feature:auth/login
+  - User can log in with email and password
+  - Invalid credentials return 401
+"""
+def login(email: str, password: str) -> Token:
+    ...
+```
+
+## Adding Specs to Your Project
+
+1. **Create spec directory structure:**
+   ```
+   your-project/
+   ├── spec/
+   │   ├── kinds/           # Copy from examples or define your own
+   │   │   ├── capability.yaml
+   │   │   └── feature.yaml
+   │   └── capabilities/    # Your specs go here
+   │       └── auth.yaml
+   └── src/
+   ```
+
+2. **Write your first spec:**
+   ```yaml
+   apiVersion: projectspec/v1alpha1
+   kind: Feature
+   metadata:
+     name: auth/login
+   spec:
+     status: implemented
+     acceptance:
+       - User can log in with email and password
+       - Invalid credentials return 401
+     implementedIn:
+       - src/auth/login.py
+     testedIn:
+       - tests/test_auth.py
+   ```
+
+3. **Add markers to your code:**
+   ```python
+   # src/auth/login.py
+   """
+   @implements feature:auth/login
+     - User can log in with email and password
+     - Invalid credentials return 401
+   """
+   ```
+
+4. **Run reconciliation:**
+   ```bash
+   projectspec reconcile
+   ```
+
+## Core Concepts
+
+**Spec as contract** - The spec is a machine-readable agreement, not documentation that rots. Every statement is verifiable: "feature is implemented" → linked files exist.
+
+**Reconciliation** - Drift between spec and reality is expected. The goal isn't to prevent drift—it's to surface it and resolve it intentionally.
+
+**Human authority over spec** - Agents implement what specs say; changing specs requires human approval. This prevents agents from "solving" problems by redefining them away.
+
+## Documentation
+
+**Understand the concepts:**
+- [About](docs/about.md) - Core principles and rationale
+- [Methodology](docs/methodology.md) - Reconciliation loop and workflow
+- [Schema Design](docs/schema-design.md) - Why specs are structured this way
+
+**Reference:**
+- [Spec Format](docs/spec-format.md) - How to write spec files
+- [Entity Model](docs/entity-model.md) - Entity categories and relationships
+- [Defining Kinds](docs/kinds.md) - How to create custom KindDefinitions
+
+**Working with specs:**
+- [Agent Guidelines](docs/agent-guidelines.md) - How AI agents should interact with specs
+- [CI Integration](docs/howto-ci-integration.md) - Add ProjectSpec checks to GitHub Actions
+- [Worked Example](docs/worked-example.md) - The taskflow example explained
+
+## Status
+
+This is an early exploration of the methodology. The format and tooling will evolve.
+
+Current limitations:
+- No watch mode for continuous reconciliation
+- Limited adapter support (Python, Markdown)
+- No IDE integration yet
