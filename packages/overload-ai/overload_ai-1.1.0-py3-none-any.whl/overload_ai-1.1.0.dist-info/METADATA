@@ -1,0 +1,87 @@
+Metadata-Version: 2.4
+Name: overload-ai
+Version: 1.1.0
+Summary: AI-powered Python bug identification client
+Author-email: Chisom life eke <your.email@example.com>
+Maintainer-email: Chisom life eke <your.email@example.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/QRTQuick/overload
+Project-URL: Documentation, https://github.com/QRTQuick/overload#readme
+Project-URL: Repository, https://github.com/QRTQuick/overload.git
+Project-URL: Issues, https://github.com/QRTQuick/overload/issues
+Project-URL: Changelog, https://github.com/QRTQuick/overload/blob/main/CHANGELOG.md
+Keywords: python,ai,bug-detection,static-analysis,linting
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.25.0
+Dynamic: license-file
+
+# Overload AI Client
+
+AI-powered Python bug identification client library.
+
+## Installation
+
+```bash
+pip install overload-ai
+```
+
+## Usage
+
+```python
+from overload_ai import analyze_code
+
+# Analyze code string
+code = """
+def divide(a, b):
+    return a / b
+
+result = divide(10, 0)
+"""
+
+bugs = analyze_code(code)
+for bug in bugs:
+    print(f"{bug['severity']}: {bug['description']}")
+```
+
+### File Analysis
+
+You can also analyze Python files directly:
+
+```python
+from overload import analyze_code
+
+# Analyze a Python file
+bugs = analyze_code("my_script.py")
+for bug in bugs:
+    print(f"{bug['severity']}: {bug['description']}")
+```
+
+## Features
+
+- Detect syntax bugs, runtime exceptions, logic flaws, security vulnerabilities
+- Simple API with automatic file/code detection
+- Custom timeout and error handling
+
+## Configuration
+
+Set environment variables:
+
+- `OVERLOAD_BASE_URL`: Custom API base URL (default: https://overload-api.onrender.com)
+- `OVERLOAD_API_KEY`: API key if required (future feature)
+
+## License
+
+MIT License
