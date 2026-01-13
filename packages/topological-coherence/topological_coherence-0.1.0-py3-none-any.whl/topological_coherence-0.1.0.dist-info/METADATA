@@ -1,0 +1,80 @@
+Metadata-Version: 2.4
+Name: topological-coherence
+Version: 0.1.0
+Summary: Toroidal attention constraints for reducing LLM hallucination
+Project-URL: Homepage, https://github.com/Paraxiom/topological-coherence
+Project-URL: Documentation, https://paraxiom.org/presentations/coherence.html
+Project-URL: Repository, https://github.com/Paraxiom/topological-coherence
+Project-URL: Paper, https://doi.org/10.5281/zenodo.18187835
+Author-email: Sylvain Cormier <sylvain@paraxiom.io>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: attention,hallucination,llm,machine-learning,tonnetz,topology,transformer
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.9
+Requires-Dist: numpy>=1.21.0
+Requires-Dist: torch>=2.0.0
+Provides-Extra: demo
+Requires-Dist: gradio>=4.0.0; extra == 'demo'
+Provides-Extra: dev
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Description-Content-Type: text/markdown
+
+---
+title: Topological Coherence
+emoji: 🔮
+colorFrom: purple
+colorTo: blue
+sdk: gradio
+sdk_version: 4.44.0
+app_file: app.py
+pinned: false
+license: apache-2.0
+short_description: Geometric constraints reduce LLM hallucination
+---
+
+# Topological Constraints for Coherent Language Models
+
+**Why Geometry Prevents Hallucination**
+
+*Sylvain Cormier | Paraxiom Research | January 2026*
+
+## Key Result
+
+- **40% lower semantic drift** than baseline attention
+- **28x lower drift** than random sparsity (negative control)
+- Proves: **topology matters, not just compute reduction**
+
+## Abstract
+
+Residual geometry determines whether reasoning is stable. We show that transformer latent dynamics, operating on unconstrained vector spaces, lack the conserved quantities necessary for bounded inference.
+
+Toroidal (periodic) constraints on attention provide a spectral gap guarantee that suppresses non-resonant modes, reducing semantic drift.
+
+## Links
+
+- [Paper (Zenodo)](https://doi.org/10.5281/zenodo.18187835)
+- [Code (GitHub)](https://github.com/Paraxiom/topological-coherence)
+- [Rust Crate](https://crates.io/crates/topological-coherence)
+
+## Citation
+
+```bibtex
+@misc{cormier2026topological,
+  author = {Cormier, Sylvain},
+  title = {Topological Constraints for Coherent Language Models},
+  year = {2026},
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.18187835}
+}
+```
