@@ -1,0 +1,390 @@
+Metadata-Version: 2.4
+Name: githubclitool
+Version: 1.0.1
+Summary: ght: Github CLI Tool
+Author: Trần Hạo Nguyên || Bugdev
+Author-email: haonguyen2100hn@gmail.com
+Keywords: github,cli,tool,repo,security
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: keywords
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Github-Tool
+
+## English
+
+A lightweight Python CLI for managing GitHub repositories via GitHub REST API: list repos, create repos, rename repos, delete repos (single or bulk by selecting indexes), set topics, manage collaborators, and set default branch.
+
+---
+
+### Features
+- **Account info**: show current authenticated user
+- **List repos**: list repositories for user or organization
+- **Create repo**: create user/org repos (public/private), optional description, auto-init, gitignore, license
+- **Rename repo**
+- **Delete repo**
+  - **Single delete** by `owner repo`
+  - **Bulk delete** using `delete --input` then select numbers like `1 4 5-8`
+- **Topics**: set repository topics
+- **Collaborators**: add/remove with permissions
+- **Default branch**: set default branch name
+
+---
+
+## Vietnamese (Tiếng Việt)
+
+Tool CLI Python quản lý GitHub repo qua GitHub REST API: liệt kê repo, tạo repo, đổi tên, xóa (1 repo hoặc xóa hàng loạt bằng chọn số), set topics, quản lý collaborator, set default branch.
+
+---
+
+# 1) Requirements / Yêu cầu
+- **Python**: 3.9+ (khuyến nghị 3.10+)
+- **Dependency**: `requests`
+- **GitHub Personal Access Token (PAT)**
+
+## Token scopes (quan trọng)
+- Repo cá nhân:
+  - `repo` (quyền thao tác repo private/public)
+  - `delete_repo` (để xóa repo)
+- Nếu thao tác **Organization**:
+  - Có thể cần thêm quyền liên quan admin org tùy cấu hình org
+  - Token phải thuộc user có quyền trong org
+
+---
+
+# 2) Install / Cài đặt
+
+## Windows
+Cài Python: https://www.python.org/downloads/
+
+Cài requests:
+```bash
+pip install requests
+```
+
+## Linux / macOS
+Ubuntu/Debian:
+```bash
+sudo apt install python3 python3-pip
+pip3 install requests
+```
+
+---
+
+# 3) Setup Token / Thiết lập Token
+
+## Windows PowerShell
+```powershell
+$env:GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxx"
+```
+
+Kiểm tra:
+```powershell
+echo $env:GITHUB_TOKEN
+```
+
+## Windows CMD
+```cmd
+set GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxx
+```
+
+Kiểm tra:
+```cmd
+echo %GITHUB_TOKEN%
+```
+
+## Linux / macOS (bash/zsh)
+```bash
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxx
+```
+
+Kiểm tra:
+```bash
+echo $GITHUB_TOKEN
+```
+
+## Using --token (không set env)
+Bạn có thể truyền token trực tiếp:
+```bash
+python githubtool.py --token ghp_xxx me
+```
+
+---
+
+# 4) Basic Usage / Cách chạy
+
+## Windows
+```bash
+python githubtool.py <command> [options]
+```
+
+## Linux / macOS
+```bash
+python3 githubtool.py <command> [options]
+```
+
+Xem help:
+```bash
+python githubtool.py -h
+python githubtool.py <command> -h
+```
+
+---
+
+# 5) Commands / Lệnh
+
+## 5.1) me
+**English:** Show current authenticated GitHub user info.  
+**VN:** Hiển thị thông tin tài khoản GitHub đang đăng nhập (token).
+
+```bash
+python githubtool.py me
+```
+
+Output (example):
+```json
+{
+  "login": "YourUser",
+  "id": 123456,
+  "html_url": "https://github.com/YourUser"
+}
+```
+
+---
+
+## 5.2) list
+**English:** List repositories by scope.  
+**VN:** Liệt kê repo theo scope.
+
+### List user repos
+```bash
+python githubtool.py list
+python githubtool.py list --scope user --limit 50
+```
+
+### List org repos
+```bash
+python githubtool.py list --scope org:MyOrg
+python githubtool.py list --scope org:MyOrg --limit 200
+```
+
+Notes:
+- `--limit` giới hạn số repo in ra (không ảnh hưởng server, chỉ cắt kết quả sau khi lấy).
+
+---
+
+## 5.3) create
+**English:** Create a repository (user or org).  
+**VN:** Tạo repo (user hoặc org).
+
+### Create public repo
+```bash
+python githubtool.py create myRepo --public
+```
+
+### Create private repo
+```bash
+python githubtool.py create mySecretRepo --private
+```
+
+### Create with description
+```bash
+python githubtool.py create apiServer --public --desc "Backend API service"
+```
+
+### Create in organization
+```bash
+python githubtool.py create webApp --org MyOrg --private --desc "Internal web app"
+```
+
+### Disable auto init (no README/.gitignore/license)
+```bash
+python githubtool.py create emptyRepo --public --no-init
+```
+
+### With gitignore and license
+```bash
+python githubtool.py create botApi --public --gitignore Python --license mit
+```
+
+Parameters:
+- `--public` / `--private`: chọn visibility
+- `--desc`: mô tả repo (GitHub Description)
+- `--org`: tạo repo trong org
+- `--no-init`: tắt auto init (mặc định auto init bật)
+- `--gitignore`: template name (ví dụ `Python`, `Node`, ...)
+- `--license`: license template (ví dụ `mit`, `apache-2.0`, ...)
+
+---
+
+## 5.4) rename
+**English:** Rename a repository.  
+**VN:** Đổi tên repo.
+
+```bash
+python githubtool.py rename OwnerName oldRepo newRepo
+```
+
+---
+
+## 5.5) delete (single)
+**English:** Delete a repository by owner/repo.  
+**VN:** Xóa 1 repo theo `owner repo`.
+
+```bash
+python githubtool.py delete OwnerName repoName --yes
+```
+
+Nếu không dùng `--yes`, tool sẽ yêu cầu confirm.
+
+---
+
+## 5.6) delete --input (bulk select)
+**English:** Show repo list, then delete selected indexes.  
+**VN:** Hiển thị danh sách repo, sau đó chọn số để xóa hàng loạt.
+
+```bash
+python githubtool.py delete --input --yes
+```
+
+Scope org:
+```bash
+python githubtool.py delete --input --yes --scope org:MyOrg
+```
+
+Chọn:
+- Cách 1: `1 4 5 6 8`
+- Cách 2: `1,4,5,6,8`
+- Cách 3: range `5-12`
+- Kết hợp: `1 3-5 9`
+
+Lưu ý an toàn:
+- Xóa repo là **không khôi phục** dễ dàng. Token cần quyền `delete_repo`.
+- Nếu không dùng `--yes`, tool sẽ bắt gõ `DELETE` để tiếp tục.
+
+---
+
+## 5.7) topics
+**English:** Set repository topics.  
+**VN:** Set topics cho repo.
+
+```bash
+python githubtool.py topics OwnerName repoName python bot api
+```
+
+---
+
+## 5.8) add-collab
+**English:** Add collaborator with permission.  
+**VN:** Thêm collaborator và set quyền.
+
+```bash
+python githubtool.py add-collab OwnerName repoName SomeUser --perm push
+```
+
+Permissions:
+- `pull`, `triage`, `push`, `maintain`, `admin`
+
+---
+
+## 5.9) remove-collab
+**English:** Remove collaborator.  
+**VN:** Xóa collaborator.
+
+```bash
+python githubtool.py remove-collab OwnerName repoName SomeUser
+```
+
+---
+
+## 5.10) default-branch
+**English:** Set default branch name.  
+**VN:** Set default branch.
+
+```bash
+python githubtool.py default-branch OwnerName repoName main
+```
+
+---
+
+# 6) Common Problems / Lỗi thường gặp
+
+## Missing token
+Error:
+```
+Missing token. Use --token or set GITHUB_TOKEN/GH_TOKEN
+```
+
+Fix:
+- PowerShell phải dùng:
+  ```powershell
+  $env:GITHUB_TOKEN="ghp_xxx"
+  ```
+- CMD phải dùng:
+  ```cmd
+  set GITHUB_TOKEN=ghp_xxx
+  ```
+- Hoặc truyền thẳng `--token ghp_xxx`
+
+## 401 Bad credentials
+- Token sai / hết hạn / bị revoke
+- Chưa cấp đúng scope
+- Dùng fine-grained token nhưng chưa cấp quyền repo tương ứng
+
+## 403 Forbidden
+- Thiếu quyền (đặc biệt `delete_repo` khi xóa)
+- Repo thuộc org nhưng token không có quyền trong org
+
+## 404 Not Found
+- Sai owner/repo
+- Repo private nhưng token không có quyền access
+
+---
+
+# 7) Security / Bảo mật
+- Không commit token vào repo
+- Không paste token lên public chat/log
+- Nếu lộ token: revoke ngay ở GitHub settings
+
+---
+
+# 8) Quick Cheatsheet
+```bash
+python githubtool.py me
+python githubtool.py list --scope user --limit 50
+python githubtool.py list --scope org:MyOrg --limit 200
+python githubtool.py create myRepo --public --desc "demo"
+python githubtool.py rename Owner oldName newName
+python githubtool.py topics Owner repo python api bot
+python githubtool.py add-collab Owner repo User --perm push
+python githubtool.py remove-collab Owner repo User
+python githubtool.py default-branch Owner repo main
+python githubtool.py delete Owner repo --yes
+python githubtool.py delete --input --yes
+```
+
+---
+
+## License
+Public tool by Bugdev - Not business tool..!
