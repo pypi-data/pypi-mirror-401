@@ -1,0 +1,27 @@
+Metadata-Version: 2.4
+Name: abbrcompress
+Version: 0.1.0
+Summary: Token-saving abbreviation compressor for OpenAI LLM prompts
+Author: Louis Mai
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: tiktoken
+
+# abbrcompress
+
+Token-saving abbreviation compression for OpenAI LLM prompts.
+
+## Install
+
+```bash
+pip install abbrcompress
+uv pip install abbrcompress
+
+## Usage
+
+from abbrcompress import AbbrCompressor
+
+compressor = AbbrCompressor()
+abbrs, _ = compressor.build_abbreviations(text)
+compressed = compressor.compress_prompt(text)
+
