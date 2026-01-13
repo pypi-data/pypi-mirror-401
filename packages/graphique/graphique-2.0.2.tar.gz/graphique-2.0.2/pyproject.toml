@@ -1,0 +1,66 @@
+[project]
+name = "graphique"
+version = "2.0.2"
+description = "GraphQL service for python dataframes and parquet datasets."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [{name = "Aric Coady", email = "aric.coady@gmail.com"}]
+keywords = ["graphql", "arrow", "parquet"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Database :: Database Engines/Servers",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pyarrow>=20",
+    "strawberry-graphql[asgi,cli]>=0.288",
+    "ibis-framework>=10.7",
+    "pyarrow-hotfix",
+    "isodate>=0.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/coady/graphique"
+Documentation = "https://coady.github.io/graphique"
+Changelog = "https://github.com/coady/graphique/blob/main/CHANGELOG.md"
+Issues = "https://github.com/coady/graphique/issues"
+
+[project.optional-dependencies]
+server = ["uvicorn[standard]", "duckdb"]
+cli = ["tqdm"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["I"]
+
+[tool.ty.rules]
+# unused-ignore-comment = "error"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-type-form = "ignore"
+possibly-missing-attribute = "ignore"
+unresolved-attribute = "ignore"
+unresolved-import = "ignore"
+
+[tool.coverage.run]
+source = ["graphique"]
+branch = true
+omit = ["graphique/shell.py"]
+
+[dependency-groups]
+dev = ["pytest-cov", "uvicorn[standard]", "duckdb"]
+docs = ["mkdocstrings[python]", "mkdocs-jupyter"]
