@@ -1,0 +1,144 @@
+Metadata-Version: 2.4
+Name: surfscraphb
+Version: 0.0.1
+Summary: Scrape surf  conditions from surf-report.com
+Author: MISSONGO Aimé Blanchard, Hippolyte SODJINOU
+License: MIT License
+        
+        Copyright (c) 2026
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction...
+        
+Project-URL: Homepage, https://github.com/Hippolyte90/surf-scrap-pack/tree/main/surf_project
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests
+Requires-Dist: beautifulsoup4
+Requires-Dist: lxml
+Requires-Dist: pandas
+Dynamic: license-file
+
+# Surf Scrap - `surfscraphb`
+
+**surfscraphb** is a Python package that allows you to extract surf conditions  
+from **surf-report.com** and save them into a CSV file for further analysis or dashboard creation.
+
+This package was developed as part of a data analysis project to help surf
+schools identify the best moments to practice surfing during the week.
+
+[![PyPI version](https://badge.fury.io/py/surfscraphb.svg)](https://badge.fury.io/py/surfscraphb)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+---
+
+## Features
+
+- Scrapes surf conditions from surf-report.com
+- Works with multiple surf spots (Lacanau, Carcans, Moliets, etc.)
+- Extracts:
+  - Day
+  - Hour
+  - Wave size
+  - Wind speed (km/h)
+  - Wind direction
+- Saves the data as a CSV file
+- Returns a pandas DataFrame for immediate use
+- Simple API with **one main function**
+
+---
+
+## Installation
+
+Install the package from PyPI:
+
+
+```bash
+pip install surfscraphb
+```
+---
+
+## Quick Start
+
+```python
+from surfscraphb import scrape_surf_report
+
+scrape_surf_report(
+    "https://www.surf-report.com/meteo-surf/carcans-plage-s1013.html",
+    "carcans.csv"
+)
+```
+After execution, a file `carcans.csv` will be created in your working directory. You can change the name `carcans.csv` to an other one.
+---
+
+## Function Documentation
+
+`scrape_surf_report(url, output_csv)`
+
+Scrapes surf conditions from a surf-report.com page and saves the data to a CSV file.
+
+***Parameters:***
+
+| ***Name***   |***Type***| ***Description***                     |
+| ------------ | ---------| --------------------------------------|
+| `url`        | `str`    | URL of the surf-report page           |
+| `output_csv` | `str`    | Path where the CSV file will be saved |
+
+***Returns***
+
+- `pandas.DataFrame` containing the extracted surf conditions.
+
+---
+
+## Output Data Format
+
+The generated CSV file contains the following columns:
+
+| ***Column***       | ***Description***        |
+| ------------------ | ------------------------ |
+| Day                | Day of the forecast      |
+| Hour               | Time of the forecast     |
+| Wave_size_m        | Wave size range (meters) |
+| Wind_speed_km_h    | Wind speed (km/h)        |
+| Wind_direction     | Wind direction           |
+
+---
+
+## Notes & Limitations
+
+- The package relies on the current HTML structure of surf-report.com.
+- If the website structure changes, the scraper may require updates.
+- This project is intended for educational and analytical purposes.
+
+## Dependencies
+
+- Python ≥ 3.12
+- requests
+- beautifulsoup4
+- pandas
+
+All dependencies are automatically installed via `pip`.
+
+
+## Licence
+
+This project is licensed under the MIT License.
+You are free to use, modify, and distribute it.
+
+---
+
+## Useful Links
+ PyPI : [https://pypi.org/project/surfscraphb/](https://pypi.org/project/surfscraphb/)
+
+## Authors
+
+- MISSONGO Aimé Blanchard
+- Hippolyte SODJINOU
+
+
+
