@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "ndimpute"
+version = "0.1.0"
+description = "A package for imputing arbitrarily censored data"
+authors = ["Luke Fullard"]
+readme = "README.md"
+repository = "https://github.com/LukeAFullard/ndimpute"
+homepage = "https://github.com/LukeAFullard/ndimpute"
+packages = [{include = "ndimpute", from = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+numpy = ">=1.24.0"
+pandas = ">=2.0.0"
+scipy = ">=1.13.0"
+matplotlib = {version = "*", optional = true}
+seaborn = {version = "*", optional = true}
+
+[tool.poetry.extras]
+viz = ["matplotlib", "seaborn"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+matplotlib = "*"
+seaborn = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
