@@ -1,0 +1,1 @@
+"""TXT writer (MVP skeleton)."""
