@@ -1,0 +1,107 @@
+Metadata-Version: 2.4
+Name: sqlite-cache-storage
+Version: 1.0.2
+Summary: SQLite cache storage for botasaurus.
+Home-page: https://github.com/omkarcloud/botasaurus
+Author: Chetan Jain
+Author-email: 53407137+Chetan11-dev@users.noreply.github.com
+License: MIT
+Keywords: sqlite,sqlite-cache-storage,cache,botasaurus,sqlite3
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-python
+Dynamic: summary
+
+# sqlite-cache-storage
+
+SQLite cache storage backend for botasaurus.
+
+## Installation
+
+```bash
+pip install sqlite-cache-storage
+```
+
+## Usage
+
+### With decorators like `@task`, `@request`, `@browser`
+
+```python
+from sqlite_cache_storage import SqliteCacheStorage
+from botasaurus.task import task
+from datetime import timedelta
+
+# Create storage instance
+sqlite_storage = SqliteCacheStorage(
+    db_path="cache.db"
+)
+
+@task(cache=True, expires_in=timedelta(days=1), cache_storage=sqlite_storage)
+def my_scraper(data):
+    # scraping logic
+    return result
+```
+
+### With `@cache` decorator
+
+```python
+from sqlite_cache_storage import SqliteCacheStorage
+from botasaurus.decorator_helpers import cache
+from datetime import timedelta
+
+# Create storage instance
+sqlite_storage = SqliteCacheStorage(
+    db_path="cache.db"
+)
+
+# Use the decorator
+@cache(expires_in=timedelta(days=1), cache_storage=sqlite_storage)
+def my_function(data):
+    # time-consuming operation
+    return result
+```
+
+
+## API
+
+### SqliteCacheStorage
+
+```python
+SqliteCacheStorage(
+    db_path: str = 'cache.db',
+    table_name: str = 'botasaurus_cache'
+)
+```
+
+#### Methods
+
+- `get(func_name, key_data, expires_in=None)` - Get cached value. Returns `{"data": value}` or `None`
+- `put(func_name, key_data, data)` - Store value in cache
+- `delete(func_name, key_data)` - Delete cached value
+
+## License
+
+MIT
+
+
+
