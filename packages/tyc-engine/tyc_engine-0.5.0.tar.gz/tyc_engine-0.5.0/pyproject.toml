@@ -1,0 +1,17 @@
+[project]
+name = "tyc-engine"          # только маленькие буквы, цифры, '-' или '_'
+version = "0.5.0"            # версия проекта
+description = "Lоl"
+authors = [
+  { name = "TYC", email = "dema29992@gmail.com" }
+]
+dependencies = [
+    'pygame',
+]            # список зависимостей
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+tyc-engine = "TYC_ENGINE.cli:main"
