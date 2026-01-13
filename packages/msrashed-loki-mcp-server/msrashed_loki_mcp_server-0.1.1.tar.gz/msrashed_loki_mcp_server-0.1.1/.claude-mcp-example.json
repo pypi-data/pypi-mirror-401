@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "loki": {
+      "command": "loki-mcp-server",
+      "env": {
+        "LOKI_URL": "http://localhost:3100"
+      }
+    },
+    "loki-with-auth": {
+      "command": "loki-mcp-server",
+      "env": {
+        "LOKI_URL": "https://loki.example.com",
+        "LOKI_TOKEN": "your_bearer_token_here"
+      }
+    },
+    "loki-multi-tenant": {
+      "command": "loki-mcp-server",
+      "env": {
+        "LOKI_URL": "https://loki.example.com",
+        "LOKI_TOKEN": "your_bearer_token_here",
+        "LOKI_ORG_ID": "tenant1"
+      }
+    },
+    "loki-basic-auth": {
+      "command": "loki-mcp-server",
+      "env": {
+        "LOKI_URL": "https://loki.example.com",
+        "LOKI_USERNAME": "admin",
+        "LOKI_PASSWORD": "secret"
+      }
+    }
+  }
+}
