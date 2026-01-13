@@ -1,0 +1,92 @@
+Metadata-Version: 2.4
+Name: expand-fab
+Version: 0.1.1
+Summary: You can create a floating action button that can be expanded.
+Author-email: Arief Minardi <ariefminardi005@gmail.com>
+Project-URL: Repository, https://github.com/arief05652/expand-fab
+Project-URL: Issues, https://github.com/arief05652/expand-fab/issues
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: flet>=0.80.0
+Dynamic: license-file
+
+# 🚀 EXPAND FAB
+
+![PyPI - Downloads](https://img.shields.io/pypi/dw/expand-fab)
+![PyPI - Version](https://img.shields.io/pypi/v/expand-fab)
+
+#### [en_translate](README_en.md)
+
+**expand-fab** adalah implementasi **Expandable Floating Action Button (FAB)** untuk **Flet**, 
+Library ini memungkinkan kamu membuat **Floating Action Button dengan banyak aksi (speed dial)**, lengkap dengan animasi, overlay, label, dan event handler — langsung dari Python.
+
+---
+
+## ✨ Fitur Utama
+
+* 🚀 **Expandable / Speed Dial FAB**
+* ➕ Support **multiple child actions**
+* 🎨 Icon & active icon (atau custom widget)
+* 🏷️ Label & custom label widget
+* 🎬 Animasi & curve configurable
+* 🔌 Terintegrasi langsung dengan **Flet custom control**
+* 💙 API simpel & terasa “Flutter-like”
+* 🖥️ Support multi-platform:
+  * Android 🟢
+  * Linux 🟢
+  * Windows (untested)
+  * macOS (untested)
+  * Web 🟢
+
+## 📦 Instalasi
+
+```bash
+uv add expand-fab
+```
+
+## 🤖 Requirements
+
+* **Python** `3.12`
+* **Flet** `0.80.0`
+
+> [!WARNING]
+> ⚠️ Library ini **hanya kompatibel** dengan Python `>= 3.12` dan Flet `0.80.0`.
+
+
+## 🚀 Contoh Penggunaan
+
+> [!NOTE]
+> Make sure to **build your project first** before running it. Why? Because Flet needs to register the fonts into the Flutter dependencies beforehand.
+
+```python
+def fab_open(e):
+  print(e.data)
+
+def fab_child_tap(e):
+  print(e.data)
+
+page.floating_action_button = ef.FloatingActionButton(
+    icon=ft.Icons.ADD,
+    active_icon=ft.Icons.CLOSE,
+    children=[
+        ef.FabChild(
+          child=ft.Icons.BOOK,
+          label="Book",
+          on_tap=fab_child_tap,
+        ),
+        ef.FabChild(
+          child=ft.Icons.MEDIATION,
+          label="Mediation",
+          on_tap=fab_child_tap,
+        ),
+    ],
+    on_open=fab_open,
+)  # type: ignore
+```
+
+## 🖼️ Screen Shoot
+
+![image](assets/img-1.jpeg)
+
+<p align="center">I hope this project is useful 🥰</p>
