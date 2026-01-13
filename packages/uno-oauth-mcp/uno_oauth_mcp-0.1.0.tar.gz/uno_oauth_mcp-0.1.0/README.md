@@ -1,0 +1,225 @@
+# Uno OAuth MCP
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/pypi/v/uno-oauth-mcp.svg)](https://pypi.org/project/uno-oauth-mcp/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**让 MCP Server 快速接入 [mcpmarket.cn](https://mcpmarket.cn) OAuth 认证。**
+
+## ✨ 特性
+
+- 🔐 **开箱即用** - 几行代码接入 OAuth 认证
+- 🎯 **双模式支持** - FastMCP（简洁）和 底层 Server（灵活）
+- ⚡ **高性能** - 内置 Token 缓存（LRU + TTL）
+- 📋 **标准规范** - 自动生成 RFC 9728/8414 well-known 端点
+
+## 📦 安装
+
+```bash
+pip install uno-oauth-mcp
+```
+
+或使用 uv：
+
+```bash
+uv add uno-oauth-mcp
+```
+
+## 🚀 快速开始
+
+### 方式一：基于 FastMCP（推荐新手）
+
+FastMCP 是官方提供的高层封装，API 更简洁：
+
+```python
+from uno_oauth_mcp import UnoOAuthMCP
+
+# 创建带 OAuth 的 MCP Server
+mcp = UnoOAuthMCP(name="My Server", port=8080)
+
+@mcp.tool()
+def hello(name: str) -> str:
+    """向用户问好"""
+    return f"Hello, {name}!"
+
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """计算两个数的和"""
+    return a + b
+
+# 运行
+mcp.run(transport="streamable-http")
+```
+
+### 方式二：基于底层 Server（更灵活）
+
+底层 Server 提供更完整的 MCP 协议控制：
+
+```python
+import mcp.types as types
+from uno_oauth_mcp import UnoOAuthServer
+
+# 创建带 OAuth 的 Server
+server = UnoOAuthServer(name="My Server", port=8080)
+
+@server.list_tools()
+async def list_tools():
+    return [
+        types.Tool(
+            name="hello",
+            description="向用户问好",
+            inputSchema={
+                "type": "object",
+                "properties": {"name": {"type": "string"}},
+                "required": ["name"]
+            }
+        )
+    ]
+
+@server.call_tool()
+async def call_tool(name: str, arguments: dict):
+    if name == "hello":
+        return [types.TextContent(type="text", text=f"Hello, {arguments['name']}!")]
+    return []
+
+# 运行
+server.run()
+```
+
+## 🆚 两种方式对比
+
+| 特性 | UnoOAuthMCP (FastMCP) | UnoOAuthServer (底层 Server) |
+|------|----------------------|------------------------------|
+| **适合人群** | 新手、快速开发 | 需要完整控制的开发者 |
+| **API 风格** | 装饰器 + 类型推断 | 显式定义 MCP 类型 |
+| **工具定义** | `@mcp.tool()` 自动推断 | 手动构建 `types.Tool` |
+| **灵活性** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **代码量** | 更少 | 稍多 |
+
+## 🔧 配置选项
+
+```python
+# FastMCP 方式
+mcp = UnoOAuthMCP(
+    name="My Server",                    # Server 名称
+    port=8080,                           # 监听端口
+    host="0.0.0.0",                      # 监听地址
+    mcpmarket_url="https://mcpmarket.cn", # 认证服务器
+    required_scopes=["read", "write"],   # OAuth scopes
+    cache_ttl=300,                       # Token 缓存时间（秒）
+    # 生产环境需要指定外部访问 URL
+    # resource_server_url="https://my-mcp.example.com",
+)
+
+# 底层 Server 方式
+server = UnoOAuthServer(
+    name="My Server",
+    port=8080,
+    mcp_path="/mcp",                     # MCP 端点路径
+    # ... 其他参数同上
+)
+```
+
+## 🌐 自动注册的端点
+
+SDK 会自动注册以下端点：
+
+| 端点 | 描述 |
+|------|------|
+| `/.well-known/oauth-protected-resource` | OAuth 资源服务器元数据 (RFC 9728) |
+| `/.well-known/oauth-authorization-server` | OAuth 授权服务器元数据 (RFC 8414) |
+| `/mcp` | MCP 协议端点（需认证） |
+| `/health` | 健康检查 |
+| `/` | 服务器信息 |
+
+## 🔐 认证流程
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  MCP Client  │     │ Your Server  │     │ mcpmarket.cn │
+│(Cursor/Claude)│    │              │     │              │
+└──────┬───────┘     └──────┬───────┘     └──────┬───────┘
+       │                    │                    │
+       │ 1. 访问 MCP 端点   │                    │
+       │ ─────────────────> │                    │
+       │                    │                    │
+       │ 2. 401 + well-known│                    │
+       │ <───────────────── │                    │
+       │                    │                    │
+       │ 3. OAuth 授权      │                    │
+       │ ──────────────────────────────────────> │
+       │                    │                    │
+       │ 4. 获取 Token      │                    │
+       │ <────────────────────────────────────── │
+       │                    │                    │
+       │ 5. 带 Token 访问   │                    │
+       │ ─────────────────> │                    │
+       │                    │ 6. 验证 Token      │
+       │                    │ ─────────────────> │
+       │                    │ 7. 验证成功        │
+       │                    │ <───────────────── │
+       │ 8. MCP 响应        │                    │
+       │ <───────────────── │                    │
+```
+
+## 📚 更多示例
+
+### 带资源的 Server
+
+```python
+from uno_oauth_mcp import UnoOAuthMCP
+
+mcp = UnoOAuthMCP(name="Resource Server")
+
+@mcp.tool()
+def get_data(key: str) -> str:
+    return f"Data for {key}"
+
+@mcp.resource("config://app")
+def get_config() -> str:
+    return '{"version": "1.0.0"}'
+
+@mcp.resource("data://{item_id}")
+def get_item(item_id: str) -> str:
+    return f'{{"id": "{item_id}"}}'
+
+mcp.run(transport="streamable-http")
+```
+
+### 使用原生 Server + create_oauth_starlette_app
+
+```python
+from mcp.server.lowlevel import Server
+from uno_oauth_mcp import create_oauth_starlette_app
+import uvicorn
+
+server = Server("my-server")
+
+@server.list_tools()
+async def list_tools():
+    return [...]
+
+# 创建带 OAuth 的 Starlette 应用
+app = create_oauth_starlette_app(server, port=8080)
+
+# 可以添加自定义路由
+# from starlette.routing import Route
+# app.routes.append(Route("/custom", ...))
+
+uvicorn.run(app, host="0.0.0.0", port=8080)
+```
+
+## 🔗 相关资源
+
+- [MCPMarket](https://mcpmarket.cn) - MCP Server 市场
+- [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
+- [RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728) - OAuth Protected Resource Metadata
+- [RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414) - OAuth Authorization Server Metadata
+
+## 📄 许可证
+
+MIT License
+
+---
+
+Made with ❤️ by [MCPMarket](https://mcpmarket.cn)
