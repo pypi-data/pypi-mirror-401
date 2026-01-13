@@ -1,0 +1,60 @@
+# Session Enrichment Prompt
+# This prompt analyzes grouped captures to create meaningful session summaries.
+# The {variables} are replaced at runtime with actual session data.
+# Edit this to change how sessions are summarized.
+
+Analyze this work session and provide insights.
+
+## Session Details
+- Duration: {duration_minutes} minutes
+- Category: {category}
+- Apps Used: {apps_used}
+- Activities:
+{capture_timeline}
+
+## User's Analysis Goals
+{goal_context}
+
+## What to Provide
+
+1. **summary**: 2-3 sentences describing what was accomplished
+   - Be specific about tasks completed
+   - Mention key files, features, or topics worked on
+   - Note any problems solved or progress made
+
+2. **learnings**: Key insights or patterns (or empty string if none)
+   - New concepts explored
+   - Technical discoveries
+   - Workflow patterns noticed
+
+3. **focus_score**: 0.0 to 1.0
+   - 1.0 = Single task, deep focus, no switching
+   - 0.7+ = Mostly focused with minor diversions
+   - 0.5 = Mixed focus, some task switching
+   - <0.5 = Fragmented, frequent context switches
+
+## Output Format
+
+Return ONLY valid JSON:
+{
+  "summary": "Brief 2-3 sentence summary of what was accomplished",
+  "learnings": "Key insights, patterns, or learnings (or empty string if none)",
+  "focus_score": 0.0-1.0
+}
+
+## Edge Cases
+
+### Very Short Sessions (< 3 minutes)
+- Keep summary brief: "Quick check-in on [app/task]"
+- Don't over-analyze minimal activity
+- Focus score should reflect actual switching, not penalize brevity
+
+### Interrupted Sessions
+- If the capture timeline shows gaps > 5 minutes mid-session, acknowledge it
+- Note potential interruptions: "Session included a break or interruption"
+- Adjust focus_score down slightly for fragmented sessions
+
+### Single-App Deep Work
+- If all captures are in the same app with minimal task changes: high focus score (0.85+)
+- Note the focused nature: "Deep work session with sustained focus"
+
