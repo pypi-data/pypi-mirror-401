@@ -1,0 +1,100 @@
+electrokinetic
+==============
+
+|PyPI| |Documentation Status| |PyPI - License|
+
+A Python package to assist in the study of electrokinetic phenomena in
+colloidal suspensions. The code is being developed by `Paul J.M. van
+Kan <http://vankanscientific.nl>`__ for the MUDNET group at Delft
+Technical University and DELTARES, The Netherlands. The **electrokinetic** package
+can be used under the conditions of the GPLv3 license.
+
+Features
+--------
+
+* Basic classes for binary electrolytes.
+* Basic classes for colloidal systems with particles.
+* Basic functions for calculation of ion vibration potential (IVP).
+
+Installation
+------------
+
+To use the package `electrokinetic`, install it in a Python environment:
+
+.. code-block:: console
+
+    (env) pip install electrokinetic
+
+or
+
+.. code-block:: console
+
+    (env) conda install electrokinetic
+
+This should
+automatically install the dependency packages ``matplotlib`` , ``scipy``
+and ``pandas``, if they haven't been installed already. If you are
+installing by hand, ensure that these packages are installed as well.
+
+Example use
+-----------
+
+.. code:: python
+
+   import numpy as np
+
+   from electrokinetic.constants import *
+   from electrokinetic.electrolytes import Electrolyte
+   from electrokinetic.particles import Particle
+   from electrokinetic.file_utils import load_config
+
+   import matplotlib
+   import matplotlib.pyplot as plt
+   from pathlib import Path
+
+   matplotlib.use("QtAgg")
+   DATADIR = Path(__file__).parent
+
+   el = Electrolyte.from_yaml(str(DATADIR / "cegm.yaml"))
+   el.calc_kappa()
+
+   param = load_config(str(DATADIR / "cegm.yaml"))
+   part = Particle.from_dict(param["particles"][0])
+
+   zeta_zero = BOLTZ_T / (el.z_plus * E_CHARGE)
+   print(f"zeta_zero: {1000 * zeta_zero} mV")
+   psi_zero = 0.5 * zeta_zero
+
+electrokinetic pages
+--------------------
+
+-  `PyPi <https://pypi.org/project/electrokinetic/>`__: electrokinetic Python package
+-  `BitBucket <https://bitbucket.org/deltares/electrokinetic/>`__: electrokinetic source code
+-  `ReadTheDocs <https://electrokinetic.readthedocs.io/>`__: electrokinetic documentation
+
+Author and license
+------------------
+
+-  Author: Paul J.M. van Kan
+-  Contact: pjm@vankanscientific.nl
+-  License: `GPLv3 <https://www.gnu.org/licenses/gpl.html>`__
+
+References
+----------
+
+-  ...
+
+.. |PyPi| image:: https://img.shields.io/pypi/v/electrokinetic
+   :alt: PyPI
+
+.. |PyPI - Downloads| image:: https://img.shields.io/pypi/dm/electrokinetic
+   :alt: PyPI - Downloads
+
+.. |PyPi Status| image:: https://img.shields.io/pypi/status/electrokinetic
+   :alt: PyPI - Status
+
+.. |Documentation Status| image:: https://readthedocs.org/projects/electrokinetic/badge/?version=latest
+   :target: https://edumud.readthedocs.io/en/latest/?badge=latest
+
+.. |PyPI - License| image:: https://img.shields.io/pypi/l/electrokinetic
+   :alt: PyPI - License
