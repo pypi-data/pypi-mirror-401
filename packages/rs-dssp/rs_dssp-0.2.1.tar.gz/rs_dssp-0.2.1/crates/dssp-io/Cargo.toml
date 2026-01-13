@@ -1,0 +1,19 @@
+[package]
+name = "dssp-io"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "I/O library for DSSP (PDB, mmCIF, DSSP formats)"
+keywords = ["protein", "pdb", "cif", "dssp"]
+categories = ["science", "parser-implementations"]
+
+[dependencies]
+dssp-core = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+approx = { workspace = true }

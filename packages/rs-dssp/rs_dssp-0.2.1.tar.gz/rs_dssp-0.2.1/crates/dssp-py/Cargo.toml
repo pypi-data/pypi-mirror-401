@@ -1,0 +1,21 @@
+[package]
+name = "dssp-py"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Python bindings for rs-dssp"
+keywords = ["protein", "secondary-structure", "dssp", "python"]
+categories = ["science", "api-bindings"]
+readme = "README.md"
+
+[lib]
+name = "rs_dssp"
+crate-type = ["cdylib"]
+
+[dependencies]
+dssp-core = { workspace = true }
+dssp-io = { workspace = true }
+pyo3 = { workspace = true }
+numpy = { workspace = true }
+rayon = { workspace = true }
