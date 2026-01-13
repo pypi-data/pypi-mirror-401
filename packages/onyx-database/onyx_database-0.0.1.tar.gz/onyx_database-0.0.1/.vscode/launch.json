@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "debug example",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "ONYX_DEBUG": "true"
+      },
+      "justMyCode": true,
+      "preLaunchTask": "onyx: prep"
+    }
+  ]
+}
