@@ -1,0 +1,75 @@
+# elliptical-distribution-toolkit project configuration
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+#------------------------------------------------------------------------------
+# project details
+
+[project]
+name = "elliptical-distribution-toolkit"
+version = "0.2.0"
+description = "Tools related to multivariate elliptical distributions"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">= 3.10"
+authors = [{email = "jaydamask@buell-lane-press.co"}]
+
+dependencies = [
+    "numpy",
+    "scipy",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+dev = ["setuptools", "bump-my-version"]
+testing = ["unittest2"]
+
+#------------------------------------------------------------------------------
+
+[tool.bumpversion]
+current_version = "0.2.0"
+commit = false
+tag = false
+message = "Version updated from {current_version} to {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "setup.py"
+
+[[tool.bumpversion.files]]
+filename = "src/elliptical_distribution_toolkit/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "conda-forge.recipe/meta.yaml"
+
+[tool.black]
+line-length = 80
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312', 'py313']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.DS_Store
+  | \.coverage
+  | \.dockerignore
+  | \.experimental
+  | \.git
+  | \.gitattributes
+  | \.gitignore
+  | \.gitlab-ci.yml
+  | \.idea
+  | LICENSE
+  | MANIFEST.in
+  | README.md
+  | conda-forge.recipe
+  | data
+  | dist
+  | doc
+  | images
+)/
+'''
+
+
+
