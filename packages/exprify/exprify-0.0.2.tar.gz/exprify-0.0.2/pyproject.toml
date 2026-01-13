@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exprify"
+version = "0.0.2"
+requires-python = ">=3.11"
+authors = [
+  {name = "Julius Park", email = "juliusgeo@gmail.com"},
+]
+maintainers = [
+  {name = "Julius Park", email = "juliusgeo@gmail.com"},
+]
+description = "Translates Python programs using statements into expressions"
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+keywords = ["expressions", "transpiler", "list comprehension"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14"
+]
+dependencies = [
+  "python-minifier"
+]
+
+[tool.ruff]
+exclude = ["exprify/__init__.py"]
+
+[project.scripts]
+exprify = "exprify.__main__:main"
