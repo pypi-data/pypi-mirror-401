@@ -1,0 +1,260 @@
+{# Breadcrumb navigation -#}
+{% include '_breadcrumb.j2' ignore missing -%}
+
+# {{ role_name }}
+
+{% if role_description %}
+{{ role_description }}
+{% endif %}
+
+**Generated:** {{ generation_date.strftime('%Y-%m-%d %H:%M') }} | **Version:** {{ generator_version }}
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+{% if has_variables %}- [Variables](#variables){% endif %}
+{% if has_tags %}- [Tags](#tags){% endif %}
+{% if role.handlers %}- [Handlers](#handlers){% endif %}
+{% if has_todos %}- [TODOs](#todos){% endif %}
+{% if has_examples %}- [Examples](#examples){% endif %}
+{% if role.existing_docs %}- [Documentation](#documentation){% endif %}
+{% if custom_data and custom_data.cross_references and (custom_data.cross_references.depends_on or custom_data.cross_references.parent_collection or custom_data.cross_references.see_also) %}- [Related Documentation](#related-documentation){% endif %}
+
+---
+
+## Overview
+
+**Role Name:** {{ role_name | markdown_escape }}
+
+{% if role.metadata.author %}**Author:** {{ role.metadata.author | markdown_escape }}{% endif %}
+
+{% if role.metadata.license %}**License:** {{ role.metadata.license }}{% endif %}
+
+{% if role.metadata.platforms %}
+**Platforms:**
+{% for platform in role.metadata.platforms %}
+- {{ platform.name }}{% if platform.versions %} ({{ platform.versions | join(', ') }}){% endif %}
+{% endfor %}
+{% endif %}
+
+{% if role.metadata.dependencies %}
+**Dependencies:**
+{% for dep in role.metadata.dependencies %}
+- `{{ dep }}`
+{% endfor %}
+{% endif %}
+
+---
+
+{% if has_variables %}
+## Variables
+
+{% if variable_count == 0 %}
+No variables defined.
+{% else %}
+{{ variable_count }} variable(s) defined:
+
+{% for var in role.variables %}
+### `{{ var.name | markdown_escape }}`
+
+{% if var.description %}{{ var.description }}{% endif %}
+
+- **Type:** `{{ var.type if var.type else 'any' }}`
+- **Required:** {{ 'Yes' if var.required else 'No' }}
+- **Value:** `{{ var.value | string | markdown_escape }}`
+{% if var.file_path %}- **Source:** `{{ var.file_path }}:{{ var.line_number }}`{% endif %}
+
+{% endfor %}
+{% endif %}
+{% endif %}
+
+---
+
+{% if has_tags %}
+## Tags
+
+{% if tag_count == 0 %}
+No tags defined.
+{% else %}
+{{ tag_count }} tag(s) available:
+
+{% for tag in role.tags %}
+### `{{ tag.name | markdown_escape }}`
+
+{% if tag.description %}{{ tag.description }}{% endif %}
+
+- **Usage Count:** {{ tag.usage_count }}
+- **Locations:**
+{% for location in tag.file_locations %}
+  - `{{ location }}`
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+{% endif %}
+
+---
+
+{% if role.handlers %}
+## Handlers
+
+{% set handler_count = role.handlers | length %}
+{% if handler_count == 0 %}
+No handlers defined.
+{% else %}
+{{ handler_count }} handler(s) available:
+
+{% for handler in role.handlers %}
+### `{{ handler.name | markdown_escape }}`
+
+{% if handler.tags %}
+- **Tags:** {% for tag in handler.tags %}`{{ tag }}`{% if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+{% if handler.listen %}
+- **Listen:** {% for listen_name in handler.listen %}`{{ listen_name | markdown_escape }}`{% if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+- **Source:** `{{ handler.file_path }}:{{ handler.line_number }}`
+
+{% endfor %}
+{% endif %}
+{% endif %}
+
+---
+
+{% if has_todos %}
+## TODOs
+
+{% if todo_count == 0 %}
+No TODOs found.
+{% else %}
+{{ todo_count }} TODO(s):
+
+{% for todo in role.todos %}
+- {{ todo.priority | format_priority }} **{{ todo.description | markdown_escape }}** (`{{ todo.file_path }}:{{ todo.line_number }}`)
+{% endfor %}
+{% endif %}
+{% endif %}
+
+---
+
+{% if has_examples %}
+## Examples
+
+{% if example_count == 0 %}
+No examples provided.
+{% else %}
+{{ example_count }} example(s):
+
+{% for example in role.examples %}
+### {{ example.title | markdown_escape }}
+
+{% if example.description %}{{ example.description }}{% endif %}
+
+{{ example.code | code_fence(example.language) }}
+
+{% endfor %}
+{% endif %}
+{% endif %}
+
+---
+
+{% if role.existing_docs %}
+## Documentation
+
+{% if role.existing_docs.readme_content %}
+### README
+{% if role.existing_docs.readme_format %}
+*Format: {{ role.existing_docs.readme_format | upper }}*
+{% endif %}
+
+{{ role.existing_docs.readme_content }}
+
+---
+{% endif %}
+
+{% if role.existing_docs.license_content %}
+### License
+
+{% if role.existing_docs.license_type %}
+**License Type:** {{ role.existing_docs.license_type }}
+{% endif %}
+
+```
+{{ role.existing_docs.license_content }}
+```
+
+---
+{% endif %}
+
+{% if role.existing_docs.templates_list %}
+### Templates
+
+Available Jinja2 templates:
+{% for template in role.existing_docs.templates_list %}
+- `{{ template }}`
+{% endfor %}
+
+---
+{% endif %}
+
+{% if role.existing_docs.files_list %}
+### Static Files
+
+Available static files:
+{% for file in role.existing_docs.files_list %}
+- `{{ file }}`
+{% endfor %}
+
+---
+{% endif %}
+{% endif %}
+
+---
+
+{# Cross-References (T027: Add cross-reference sections to templates) #}
+{% if custom_data and custom_data.cross_references %}
+{% set xrefs = custom_data.cross_references %}
+
+{% if xrefs.depends_on or xrefs.parent_collection or xrefs.see_also %}
+## Related Documentation
+
+{% if xrefs.depends_on %}
+### Dependencies
+
+This role depends on:
+{% for dep in xrefs.depends_on %}
+- [{{ dep.link.text }}]({{ dep.link.target }})
+{% endfor %}
+
+{% endif %}
+
+{% if xrefs.parent_collection %}
+### Parent Collection
+
+This role is part of: [{{ xrefs.parent_collection.name }}]({{ xrefs.parent_collection.link.target }})
+
+{% endif %}
+
+{% if xrefs.see_also %}
+### See Also
+
+Related roles you might find useful:
+{% for related in xrefs.see_also %}
+- [{{ related.name }}]({{ related.link.target }}){% if related.shared_tags %} (common tags: {{ related.shared_tags | join(', ') }}){% endif %}
+{% endfor %}
+
+{% endif %}
+
+---
+
+{% endif %}
+{% endif %}
+
+{# Sibling navigation #}
+{% include '_siblings.j2' ignore missing %}
+
+---
+
+*Documentation generated by ansible-doctor-enhanced v{{ generator_version }}*

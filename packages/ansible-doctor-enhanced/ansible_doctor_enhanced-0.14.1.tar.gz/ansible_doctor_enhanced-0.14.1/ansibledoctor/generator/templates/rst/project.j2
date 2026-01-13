@@ -1,0 +1,54 @@
+{% if t is defined %}
+{% set project_title = t('project.title') %}
+{% else %}
+{% set project_title = project.name or title %}
+{% endif %}
+{{ project_title | rst_escape }}
+{{ "=" * (project_title | rst_escape | length) }}
+
+{% set arch_header = t('architecture.header') if t is defined else 'Architecture' %}
+{{ arch_header | rst_escape }}
+{{ '-' * (arch_header | rst_escape | length) }}
+
+.. mermaid::
+
+   graph TD
+       A[{{ project.name or title }}] --> B[Roles ({{ roles | length }})]
+       A --> C[Collections ({{ collections | length }})]
+       A --> D[Playbooks ({{ project.playbooks | length }})]
+       A --> E[Inventory ({{ project.inventory | length }})]
+
+{% if roles %}
+{% set roles_header = t('roles.header') if t is defined else 'Roles' %}
+{{ roles_header | rst_escape }}
+{{ '-' * (roles_header | rst_escape | length) }}
+
+{% for role in roles %}
+- {{ role.name }}
+{% endfor %}
+{% endif %}
+
+{% if collections %}
+{% set collections_header = t('collections.header') if t is defined else 'Collections' %}
+{{ collections_header | rst_escape }}
+{{ '-' * (collections_header | rst_escape | length) }}
+
+{% for collection in collections %}
+- {{ collection.name }}
+{% endfor %}
+{% endif %}
+{% if license_badge_url %}
+.. image:: {{ license_badge_url }}
+
+{% endif %}
+
+{% if project.existing_docs and project.existing_docs.readme_content %}
+{% set docs_header = 'Existing Documentation' %}
+{{ docs_header | rst_escape }}
+{{ '-' * (docs_header | rst_escape | length) }}
+
+::
+
+    {{ project.existing_docs.readme_content | rst_escape | indent(3, True) }}
+
+{% endif %}

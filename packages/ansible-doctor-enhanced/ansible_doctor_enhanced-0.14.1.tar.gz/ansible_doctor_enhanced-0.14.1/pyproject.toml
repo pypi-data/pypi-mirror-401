@@ -1,0 +1,202 @@
+[tool.poetry]
+name = "ansible-doctor-enhanced"
+version = "0.14.1"
+description = "Enhanced Ansible role documentation generator with annotation support, logging, error handling, and reporting"
+authors = ["Cédric Thédrez <kamicth@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/K4M1coder/ansible-doctor-enhanced"
+repository = "https://github.com/K4M1coder/ansible-doctor-enhanced"
+keywords = ["ansible", "documentation", "parser", "roles", "annotations"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+packages = [{include = "ansibledoctor"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ruamel-yaml = "^0.18.0"
+pydantic = "^2.0"
+click = "^8.1.0"
+structlog = "^24.0.0"
+pathspec = "^0.12.0"
+jinja2 = "^3.1.0"
+watchdog = "^6.0.0"
+packaging = "^24.0"
+pyyaml = "^6.0.3"
+babel = "^2.17.0"
+ansible-core = ">=2.14,<2.18"
+ansible-creator = "^25.12.0"
+ansible = "<12.0.0"
+jsonschema = "^4.0"
+requests = "^2.28"
+beautifulsoup4 = "^4.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
+hypothesis = "^6.92.0"
+mypy = "^1.8.0"
+black = "^24.0.0"
+isort = "^5.13.0"
+ruff = "^0.5.3"
+html5lib = "^1.1"
+docutils = "^0.20"
+pre-commit = "^3.4.0"
+ghapi = "^1.0.8"
+tomli = "^2.0"
+types-pyyaml = "^6.0.12.20250915"
+types-requests = "^2.32"
+types-beautifulsoup4 = "^4.12"
+md-toc = "^9.0.0"
+coverage = "^7.13.1"
+
+[tool.poetry.scripts]
+ansible-doctor-enhanced = "ansibledoctor.cli:main"
+ansibledoctor = "ansibledoctor.cli:main"
+
+## Note: the old `[tool.poetry.dev-dependencies]` is deprecated; dev dependencies are
+## declared in the `[tool.poetry.group.dev.dependencies]` section above. The tomli
+## package was moved into the new dev group and thus the deprecated section is removed.
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+exclude = [
+    "tests/",
+    "scripts/",
+    "demo/",
+]
+# Temporarily relaxed for gradual typing adoption
+disallow_untyped_defs = false  # Was true - allow untyped defs for now
+disallow_incomplete_defs = false  # Was true - allow incomplete defs for now
+check_untyped_defs = true
+disallow_untyped_decorators = false  # Was true - Click decorators cause issues
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "normal"
+strict_optional = true
+strict_equality = true
+
+# Ignore specific modules that have type issues
+[[tool.mypy.overrides]]
+module = [
+    "ansibledoctor.cli.*",
+    "ansibledoctor.generator.renderers",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "bs4.*",
+    "pytest.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.unit.test_link_models",
+    "tests.unit.test_link_parser",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+ignore_errors = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --cov=ansibledoctor --cov-report=term-missing --cov-report=html --ignore=tests/fixtures --basetemp=tests/tmp"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# Use tests/tmp/ for all temporary test files
+tmp_path_retention_count = 3
+tmp_path_retention_policy = "failed"
+
+# Configure basetemp to use tests/tmp/ directory
+# This puts all pytest temp files (tmp_path fixtures) in tests/tmp/
+# instead of system temp directory or project root
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "I001",  # Import sorting - handled by isort
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**/*.py" = ["B017"]  # Allow pytest.raises(Exception) in tests
+
+[tool.coverage.run]
+source = ["ansibledoctor"]
+omit = ["*/tests/*", "*/__pycache__/*", "*/venv/*"]
+data_file = "tests/tmp/.coverage"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "tests/tmp/htmlcov"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
