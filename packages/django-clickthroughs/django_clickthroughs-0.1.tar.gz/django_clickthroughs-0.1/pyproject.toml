@@ -1,0 +1,32 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+  "hatchling",
+]
+
+[project]
+name = "django-clickthroughs"
+version = "0.1"
+authors = [
+  { name="Simon Harding", email="github@pointbeing.net" },
+]
+description = "A Django clickthroughs app"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "django>=5.0.6",
+]
+
+[project.urls]
+#Documentation = "https://django-clickthroughs.readthedocs.io/"
+Homepage = "https://github.com/simonharris/django-clickthroughs"
+Issues = "https://github.com/simonharris/django-clickthroughs/issues"
+Source = "https://github.com/simonharris/django-clickthroughs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["clickthroughs"]

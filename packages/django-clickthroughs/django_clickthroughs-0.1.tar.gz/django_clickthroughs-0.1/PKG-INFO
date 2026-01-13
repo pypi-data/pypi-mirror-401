@@ -1,0 +1,38 @@
+Metadata-Version: 2.4
+Name: django-clickthroughs
+Version: 0.1
+Summary: A Django clickthroughs app
+Project-URL: Homepage, https://github.com/simonharris/django-clickthroughs
+Project-URL: Issues, https://github.com/simonharris/django-clickthroughs/issues
+Project-URL: Source, https://github.com/simonharris/django-clickthroughs
+Author-email: Simon Harding <github@pointbeing.net>
+License-File: LICENSE
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.8
+Requires-Dist: django>=5.0.6
+Description-Content-Type: text/markdown
+
+# django-clickthroughs
+
+Logging and reporting for outbound links, with ability to configure in extra
+parameters such as affiliate tags.
+
+
+## Installation notes
+
+ - add `clickthroughs` to `INSTALLED_APPS`
+ - add `urls.py` entry (pick your own URL space)
+ - run migrations: `python manage.py migrate clickthroughs`
+
+
+## Usage notes
+
+```
+{% load click_tags %}
+
+<a href="{% clickthrough 'https://example.com' %}">Visit Example</a>
+
+```
+
