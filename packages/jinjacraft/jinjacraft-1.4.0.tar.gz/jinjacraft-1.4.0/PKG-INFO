@@ -1,0 +1,137 @@
+Metadata-Version: 2.4
+Name: jinjacraft
+Version: 1.4.0
+Summary: Python command-line tool to generates text files based on Jinja2 template and YAML data file.
+License: MIT
+License-File: LICENCE
+Keywords: jinja2,yaml,template,command-line
+Author: Steve De Jongh
+Author-email: dejongh.st@gmail.com
+Requires-Python: >=3.9
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Text Processing :: General
+Classifier: Topic :: Utilities
+Requires-Dist: jinja2 (>=3.1.2,<4.0.0)
+Requires-Dist: pytest (>=7.4.0,<8.0.0)
+Requires-Dist: pyyaml (>=6.0.1,<7.0.0)
+Project-URL: Bug Tracker, https://github.com/sdejongh/jinjacraft/issues
+Project-URL: Repository, https://github.com/sdejongh/jinjacraft
+Description-Content-Type: text/markdown
+
+![Python](https://img.shields.io/pypi/pyversions/jinjacraft)
+# JINJACRAFT
+
+JinjaCraft is a simple Python command-line tool which can generate text file based on a Jinja2 template
+and a YAML data file.
+
+## Requirements
+
+Python 3.9 or higher
+
+## Installation
+
+Using pip:
+```bash
+pip install jinjacraft
+```
+
+Using pipx (recommended for CLI tools):
+```bash
+pipx install jinjacraft
+```
+
+## Usage
+```
+usage: jinjacraft [-h] [-g TEMPLATE] [-f] [-o OUTPUT_FILE] [data_file] [template_file]
+
+Generate text files from Jinja2 templates and YAML data
+
+positional arguments:
+  data_file             YAML data file path
+  template_file         Jinja2 template file path
+
+options:
+  -h, --help            show this help message and exit
+  -g TEMPLATE, --generate-model TEMPLATE
+                        Generate a model YAML file from a Jinja2 template
+  -f, --force           Overwrite existing output file
+  -o OUTPUT_FILE, --output_file OUTPUT_FILE
+                        Output file path
+```
+
+## Features
+
+### Data Validation
+
+JinjaCraft validates your YAML data against the template before rendering:
+
+- **Missing variables**: If a variable is used in the template but not defined in the YAML file, an error is returned and rendering is aborted.
+- **Unused variables**: If a variable is defined in the YAML file but not used in the template, a warning is displayed but rendering continues.
+
+### Model Generation
+
+Generate a model YAML file from a Jinja2 template to see which variables are expected:
+
+```bash
+jinjacraft -g template.jinja2
+```
+
+This creates `template.yaml` with placeholders and type comments:
+
+```yaml
+title: "<title>"  # string
+tasks:  # list
+  - name: "<name>"  # string
+    completed: "<completed>"  # truthy value (boolean, string, number)
+```
+
+Use `-o` to specify a custom output file, and `-f` to overwrite an existing file:
+
+```bash
+jinjacraft -g template.jinja2 -o model.yaml -f
+```
+
+## Example
+
+### YAML file
+```yaml
+title: Hello World
+tasks:
+  - name: First task
+    completed: True
+  - name: Second task
+    completed: False
+
+```
+
+### Template file
+```jinja2
+Document: {{ title }}
+Tasks:
+{% for task in tasks %}- {{ task.name }} ({% if task.completed %}completed{% else %}not completed{% endif %})
+{%  endfor %}
+```
+
+### Command line
+```bash
+jinjacraft data.yaml template.jinja2 -o outputfile.txt
+```
+
+### Output file content
+```
+Document: Hello World
+Tasks:
+- First task (completed)
+- Second task (not completed)
+```
+
