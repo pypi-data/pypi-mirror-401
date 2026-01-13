@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=65.5.0","wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autonomous_recovery_agent"
+version = "1.0.0"
+description = "Autonomous Recovery Agent - Self-healing for Flask + MongoDB applications"
+authors = [
+  { name="Autonomous Recovery Team", email="support@autonomous-recovery.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "Flask>=2.0.0",
+  "pymongo>=4.0.0",
+  "psutil>=5.9.0",
+  "pydantic>=2.0.0",
+  "requests>=2.28.0",
+  "python-dotenv>=0.20.0",
+  "click>=8.1.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
