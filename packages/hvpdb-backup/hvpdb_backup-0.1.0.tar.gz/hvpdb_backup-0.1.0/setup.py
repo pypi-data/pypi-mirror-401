@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-backup', version='0.1.0', description='Backup & Restore Plugin for HVPDB', packages=find_packages(), install_requires=['hvpdb'], entry_points={'hvpdb.plugins': ['backup = hvpdb_backup:app']})
