@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PORTify-knocker"
+version = "0.1.0"
+dependencies = [
+	"spotipy",
+	"typing_extensions",
+	"pydantic",
+	"pydantic_settings",
+	"setuptools",
+]
+requires-python = ">3.8"
+authors = [
+	{name = "LavaTime", email = "amitkeren9@gmail.com"},
+]
+description = "Open and close firewall ports using Spotify's current played track"
+readme = "README.md"
+license-files = ["LICENSE"]
+keywords = ["spotify", "port", "knocking", "firewall", "open", "close", "song", "track", "playing"]
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Programming Language :: Python"
+]
+
+[tool.setuptools]
+py-modules = ["PORTify"]
+packages = ["libs"]
+
+[project.scripts]
+portify = "PORTify:main"
+
+[tool.mypy]
+plugins = ['pydantic.mypy']
