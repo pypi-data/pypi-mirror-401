@@ -1,0 +1,334 @@
+"""
+Tests for the data models
+"""
+
+from datetime import datetime
+
+from nebula import (
+    Collection,
+    FileContent,
+    Memory,
+    MemoryResponse,
+    SearchResult,
+)
+
+
+class TestMemory:
+    """Test cases for Memory model (write-only model)"""
+
+    def test_memory_creation(self):
+        """Test creating a Memory instance for writing"""
+        memory = Memory(
+            collection_id="collection-123",
+            content="Test memory content",
+            metadata={"test": "value"},
+        )
+
+        assert memory.collection_id == "collection-123"
+        assert memory.content == "Test memory content"
+        assert memory.metadata == {"test": "value"}
+        assert memory.role is None
+        assert memory.memory_id is None
+        assert memory.authority is None
+
+    def test_memory_creation_with_role(self):
+        """Test creating a conversation Memory instance"""
+        memory = Memory(
+            collection_id="collection-123",
+            content="Hello!",
+            role="user",
+            metadata={"session": "abc"},
+        )
+
+        assert memory.collection_id == "collection-123"
+        assert memory.content == "Hello!"
+        assert memory.role == "user"
+        assert memory.metadata == {"session": "abc"}
+
+    def test_memory_creation_with_memory_id(self):
+        """Test creating a Memory for appending to existing memory"""
+        memory = Memory(
+            collection_id="collection-123",
+            content="Additional content",
+            memory_id="existing-memory-123",
+        )
+
+        assert memory.collection_id == "collection-123"
+        assert memory.content == "Additional content"
+        assert memory.memory_id == "existing-memory-123"
+
+    def test_memory_from_file_helper(self, tmp_path):
+        """Test Memory.from_file helper"""
+        p = tmp_path / "test.txt"
+        p.write_text("file content")
+
+        memory = Memory.from_file(p, collection_id="c1", metadata={"m": 1})
+
+        assert memory.collection_id == "c1"
+        assert len(memory.content) == 1
+        assert isinstance(memory.content[0], FileContent)
+        assert memory.content[0].data is not None
+        assert memory.metadata == {"m": 1}
+
+    def test_memory_file_static_helper(self):
+        """Test Memory.File static helper"""
+        # We can't easily test file reading without a real file,
+        # but we can verify it's the right alias.
+        assert Memory.File == FileContent.from_path
+
+    def test_memory_from_dict(self):
+        """Test creating Memory from dictionary (legacy Memory behavior)"""
+        data = {
+            "id": "memory-123",
+            "content": "Test memory content",
+            "metadata": {"test": "value"},
+            "created_at": "2024-01-01T12:00:00Z",
+            "updated_at": "2024-01-02T12:00:00Z",
+            "collection_ids": ["collection-1", "collection-2"],
+        }
+
+        memory = Memory.from_dict(data)
+
+        assert memory.id == "memory-123"
+        assert memory.content == "Test memory content"
+        assert memory.metadata == {"test": "value"}
+        assert isinstance(memory.created_at, datetime)
+        assert isinstance(memory.updated_at, datetime)
+        assert memory.collection_ids == ["collection-1", "collection-2"]
+
+    def test_memory_from_dict_with_datetime_objects(self):
+        """Test creating Memory from dictionary with datetime objects"""
+        created_at = datetime(2024, 1, 1, 12, 0, 0)
+        updated_at = datetime(2024, 1, 2, 12, 0, 0)
+
+        data = {
+            "id": "memory-123",
+            "content": "Test memory content",
+            "metadata": {"test": "value"},
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }
+
+        memory = Memory.from_dict(data)
+
+        assert memory.created_at == created_at
+        assert memory.updated_at == updated_at
+
+    def test_memory_from_dict_without_optional_fields(self):
+        """Test creating Memory from dictionary without optional fields"""
+        data = {
+            "id": "memory-123",
+            "content": "Test memory content",
+        }
+
+        memory = Memory.from_dict(data)
+
+        assert memory.id == "memory-123"
+        assert memory.content == "Test memory content"
+        assert memory.metadata == {}
+        assert memory.created_at is None
+        assert memory.updated_at is None
+
+    def test_memory_to_dict(self):
+        """Test converting Memory to dictionary"""
+        created_at = datetime(2024, 1, 1, 12, 0, 0)
+        updated_at = datetime(2024, 1, 2, 12, 0, 0)
+
+        memory = Memory(
+            memory_id="memory-123",
+            content="Test memory content",
+            metadata={"test": "value"},
+            created_at=created_at,
+            updated_at=updated_at,
+            collection_ids=["collection-1"],
+        )
+
+        data = memory.to_dict()
+
+        assert data["id"] == "memory-123"
+        assert data["content"] == "Test memory content"
+        assert data["metadata"] == {"test": "value"}
+        assert data["created_at"] == "2024-01-01T12:00:00"
+        assert data["updated_at"] == "2024-01-02T12:00:00"
+        assert data["collection_ids"] == ["collection-1"]
+
+    def test_memory_to_dict_with_none_dates(self):
+        """Test converting Memory to dictionary with None dates"""
+        memory = Memory(
+            memory_id="memory-123",
+            content="Test memory content",
+        )
+
+        data = memory.to_dict()
+
+        assert data["created_at"] is None
+        assert data["updated_at"] is None
+
+
+class TestCollection:
+    """Test cases for Collection model"""
+
+    def test_collection_creation(self):
+        """Test creating a Collection instance"""
+        collection = Collection(
+            id="cluster-123",
+            name="Test Cluster",
+            description="Test Description",
+            metadata={"test": "value"},
+            created_at=datetime(2024, 1, 1, 12, 0, 0),
+            memory_count=5,
+            owner_id="owner-123",
+        )
+
+        assert collection.id == "cluster-123"
+        assert collection.name == "Test Cluster"
+        assert collection.description == "Test Description"
+        assert collection.metadata == {"test": "value"}
+        assert collection.created_at == datetime(2024, 1, 1, 12, 0, 0)
+        assert collection.memory_count == 5
+        assert collection.owner_id == "owner-123"
+
+    def test_collection_from_dict(self):
+        """Test creating Collection from dictionary"""
+        data = {
+            "id": "cluster-123",
+            "name": "Test Cluster",
+            "description": "Test Description",
+            "engram_count": 5,
+            "owner_id": "owner-123",
+            "created_at": "2024-01-01T12:00:00Z",
+            "updated_at": "2024-01-02T12:00:00Z",
+        }
+
+        collection = Collection.from_dict(data)
+
+        assert collection.id == "cluster-123"
+        assert collection.name == "Test Cluster"
+        assert collection.description == "Test Description"
+        assert isinstance(collection.created_at, datetime)
+        assert isinstance(collection.updated_at, datetime)
+        assert collection.memory_count == 5
+        assert collection.owner_id == "owner-123"
+
+    def test_collection_from_dict_without_optional_fields(self):
+        """Test creating Collection from dictionary without optional fields"""
+        data = {
+            "id": "cluster-123",
+            "name": "Test Cluster",
+        }
+
+        collection = Collection.from_dict(data)
+
+        assert collection.id == "cluster-123"
+        assert collection.name == "Test Cluster"
+        assert collection.description is None
+        assert collection.created_at is None
+        assert collection.updated_at is None
+        assert collection.memory_count == 0
+        assert collection.owner_id is None
+
+    def test_collection_to_dict(self):
+        """Test converting Collection to dictionary"""
+        created_at = datetime(2024, 1, 1, 12, 0, 0)
+        updated_at = datetime(2024, 1, 2, 12, 0, 0)
+
+        collection = Collection(
+            id="cluster-123",
+            name="Test Cluster",
+            description="Test Description",
+            metadata={"test": "value"},
+            created_at=created_at,
+            updated_at=updated_at,
+            memory_count=5,
+            owner_id="owner-123",
+        )
+
+        data = collection.to_dict()
+
+        assert data["id"] == "cluster-123"
+        assert data["name"] == "Test Cluster"
+        assert data["description"] == "Test Description"
+        assert data["metadata"] == {"test": "value"}
+        assert data["created_at"] == "2024-01-01T12:00:00"
+        assert data["updated_at"] == "2024-01-02T12:00:00"
+        assert data["memory_count"] == 5
+        assert data["owner_id"] == "owner-123"
+
+
+class TestSearchResult:
+    """Test cases for SearchResult model"""
+
+    def test_search_result_creation(self):
+        """Test creating a SearchResult instance"""
+        result = SearchResult(
+            id="result-123",
+            content="Search result content",
+            score=0.95,
+            metadata={"test": "value"},
+            memory_id="memory-123",
+        )
+
+        assert result.id == "result-123"
+        assert result.content == "Search result content"
+        assert result.score == 0.95
+        assert result.metadata == {"test": "value"}
+        assert result.memory_id == "memory-123"
+
+    def test_search_result_from_dict(self):
+        """Test creating SearchResult from dictionary"""
+        data = {
+            "id": "result-123",
+            "content": "Search result content",
+            "score": 0.95,
+            "metadata": {"test": "value"},
+            "memory_id": "memory-123",
+        }
+
+        result = SearchResult.from_dict(data)
+
+        assert result.id == "result-123"
+        assert result.content == "Search result content"
+        assert result.score == 0.95
+        assert result.metadata == {"test": "value"}
+        assert result.memory_id == "memory-123"
+
+    def test_search_result_from_dict_without_optional_fields(self):
+        """Test creating SearchResult from dictionary without optional fields"""
+        data = {
+            "id": "result-123",
+            "content": "Search result content",
+        }
+
+        result = SearchResult.from_dict(data)
+
+        assert result.id == "result-123"
+        assert result.content == "Search result content"
+        assert result.score == 0.0
+        assert result.metadata == {}
+        assert result.memory_id is None
+
+
+class TestMemoryResponse:
+    """Test cases for MemoryResponse (retrieval result)"""
+
+    def test_memory_response_from_dict(self):
+        data = {
+            "query": "test query",
+            "entities": [
+                {
+                    "entity_id": "e1",
+                    "entity_name": "E1",
+                    "activation_score": 1.0,
+                    "traversal_depth": 0,
+                }
+            ],
+            "facts": [],
+            "utterances": [],
+            "fact_to_chunks": {},
+            "entity_to_facts": {},
+            "retrieved_at": "2024-01-01T12:00:00Z",
+        }
+        res = MemoryResponse.from_dict(data, query="override")
+        assert res.query == "test query"  # prioritized from data
+        assert len(res.entities) == 1
+        assert res.entities[0]["entity_name"] == "E1"
