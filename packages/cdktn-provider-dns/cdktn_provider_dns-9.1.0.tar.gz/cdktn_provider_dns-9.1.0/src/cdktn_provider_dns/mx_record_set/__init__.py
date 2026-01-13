@@ -1,0 +1,805 @@
+r'''
+# `dns_mx_record_set`
+
+Refer to the Terraform Registry for docs: [`dns_mx_record_set`](https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set).
+'''
+from pkgutil import extend_path
+__path__ = extend_path(__path__, __name__)
+
+import abc
+import builtins
+import datetime
+import enum
+import typing
+
+import jsii
+import publication
+import typing_extensions
+
+import typeguard
+from importlib.metadata import version as _metadata_package_version
+TYPEGUARD_MAJOR_VERSION = int(_metadata_package_version('typeguard').split('.')[0])
+
+def check_type(argname: str, value: object, expected_type: typing.Any) -> typing.Any:
+    if TYPEGUARD_MAJOR_VERSION <= 2:
+        return typeguard.check_type(argname=argname, value=value, expected_type=expected_type) # type:ignore
+    else:
+        if isinstance(value, jsii._reference_map.InterfaceDynamicProxy): # pyright: ignore [reportAttributeAccessIssue]
+           pass
+        else:
+            if TYPEGUARD_MAJOR_VERSION == 3:
+                typeguard.config.collection_check_strategy = typeguard.CollectionCheckStrategy.ALL_ITEMS # type:ignore
+                typeguard.check_type(value=value, expected_type=expected_type) # type:ignore
+            else:
+                typeguard.check_type(value=value, expected_type=expected_type, collection_check_strategy=typeguard.CollectionCheckStrategy.ALL_ITEMS) # type:ignore
+
+from .._jsii import *
+
+import cdktf as _cdktf_9a9027ec
+import constructs as _constructs_77d1e7e8
+
+
+class MxRecordSet(
+    _cdktf_9a9027ec.TerraformResource,
+    metaclass=jsii.JSIIMeta,
+    jsii_type="@cdktn/provider-dns.mxRecordSet.MxRecordSet",
+):
+    '''Represents a {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set dns_mx_record_set}.'''
+
+    def __init__(
+        self,
+        scope: _constructs_77d1e7e8.Construct,
+        id: builtins.str,
+        *,
+        zone: builtins.str,
+        mx: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union["MxRecordSetMx", typing.Dict[builtins.str, typing.Any]]]]] = None,
+        name: typing.Optional[builtins.str] = None,
+        ttl: typing.Optional[jsii.Number] = None,
+        connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+        count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+        depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+        for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+        lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+        provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+        provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+    ) -> None:
+        '''Create a new {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set dns_mx_record_set} Resource.
+
+        :param scope: The scope in which to define this construct.
+        :param id: The scoped construct ID. Must be unique amongst siblings in the same scope
+        :param zone: DNS zone the record set belongs to. It must be an FQDN, that is, include the trailing dot. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#zone MxRecordSet#zone}
+        :param mx: mx block. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#mx MxRecordSet#mx}
+        :param name: The name of the record set. The ``zone`` argument will be appended to this value to create the full record path. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#name MxRecordSet#name}
+        :param ttl: The TTL of the record set. Defaults to ``3600``. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#ttl MxRecordSet#ttl}
+        :param connection: 
+        :param count: 
+        :param depends_on: 
+        :param for_each: 
+        :param lifecycle: 
+        :param provider: 
+        :param provisioners: 
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__1c61bbf109bc6510c757a4fda039f75de67820a7078a76a707ab987fe1c28300)
+            check_type(argname="argument scope", value=scope, expected_type=type_hints["scope"])
+            check_type(argname="argument id", value=id, expected_type=type_hints["id"])
+        config = MxRecordSetConfig(
+            zone=zone,
+            mx=mx,
+            name=name,
+            ttl=ttl,
+            connection=connection,
+            count=count,
+            depends_on=depends_on,
+            for_each=for_each,
+            lifecycle=lifecycle,
+            provider=provider,
+            provisioners=provisioners,
+        )
+
+        jsii.create(self.__class__, self, [scope, id, config])
+
+    @jsii.member(jsii_name="generateConfigForImport")
+    @builtins.classmethod
+    def generate_config_for_import(
+        cls,
+        scope: _constructs_77d1e7e8.Construct,
+        import_to_id: builtins.str,
+        import_from_id: builtins.str,
+        provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+    ) -> _cdktf_9a9027ec.ImportableResource:
+        '''Generates CDKTF code for importing a MxRecordSet resource upon running "cdktf plan ".
+
+        :param scope: The scope in which to define this construct.
+        :param import_to_id: The construct id used in the generated config for the MxRecordSet to import.
+        :param import_from_id: The id of the existing MxRecordSet that should be imported. Refer to the {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#import import section} in the documentation of this resource for the id to use
+        :param provider: ? Optional instance of the provider where the MxRecordSet to import is found.
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__217d681f62a65398777103b49549ba7d7101df63cb19e52085081f9539bd2c1c)
+            check_type(argname="argument scope", value=scope, expected_type=type_hints["scope"])
+            check_type(argname="argument import_to_id", value=import_to_id, expected_type=type_hints["import_to_id"])
+            check_type(argname="argument import_from_id", value=import_from_id, expected_type=type_hints["import_from_id"])
+            check_type(argname="argument provider", value=provider, expected_type=type_hints["provider"])
+        return typing.cast(_cdktf_9a9027ec.ImportableResource, jsii.sinvoke(cls, "generateConfigForImport", [scope, import_to_id, import_from_id, provider]))
+
+    @jsii.member(jsii_name="putMx")
+    def put_mx(
+        self,
+        value: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union["MxRecordSetMx", typing.Dict[builtins.str, typing.Any]]]],
+    ) -> None:
+        '''
+        :param value: -
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__d072d8ed980b5bc7528ab7b3bdf260dcd7f9a7c462d22169de575777c2c490cb)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        return typing.cast(None, jsii.invoke(self, "putMx", [value]))
+
+    @jsii.member(jsii_name="resetMx")
+    def reset_mx(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetMx", []))
+
+    @jsii.member(jsii_name="resetName")
+    def reset_name(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetName", []))
+
+    @jsii.member(jsii_name="resetTtl")
+    def reset_ttl(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetTtl", []))
+
+    @jsii.member(jsii_name="synthesizeAttributes")
+    def _synthesize_attributes(self) -> typing.Mapping[builtins.str, typing.Any]:
+        return typing.cast(typing.Mapping[builtins.str, typing.Any], jsii.invoke(self, "synthesizeAttributes", []))
+
+    @jsii.member(jsii_name="synthesizeHclAttributes")
+    def _synthesize_hcl_attributes(self) -> typing.Mapping[builtins.str, typing.Any]:
+        return typing.cast(typing.Mapping[builtins.str, typing.Any], jsii.invoke(self, "synthesizeHclAttributes", []))
+
+    @jsii.python.classproperty
+    @jsii.member(jsii_name="tfResourceType")
+    def TF_RESOURCE_TYPE(cls) -> builtins.str:
+        return typing.cast(builtins.str, jsii.sget(cls, "tfResourceType"))
+
+    @builtins.property
+    @jsii.member(jsii_name="id")
+    def id(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "id"))
+
+    @builtins.property
+    @jsii.member(jsii_name="mx")
+    def mx(self) -> "MxRecordSetMxList":
+        return typing.cast("MxRecordSetMxList", jsii.get(self, "mx"))
+
+    @builtins.property
+    @jsii.member(jsii_name="mxInput")
+    def mx_input(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List["MxRecordSetMx"]]]:
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List["MxRecordSetMx"]]], jsii.get(self, "mxInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="nameInput")
+    def name_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "nameInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="ttlInput")
+    def ttl_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "ttlInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="zoneInput")
+    def zone_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "zoneInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="name")
+    def name(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "name"))
+
+    @name.setter
+    def name(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__e63c1f6f2164ad85601052b732664819537bb8f40d84e24a34c2bb0dc4d62646)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "name", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="ttl")
+    def ttl(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "ttl"))
+
+    @ttl.setter
+    def ttl(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__638fdcc3ee3e38cc0bd5b606c4738d374a60a73cebcae5e6fbe3f2fa885d545f)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "ttl", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="zone")
+    def zone(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "zone"))
+
+    @zone.setter
+    def zone(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__6afa5f626bf0649afb219c190a13acae4aaa0dac933f668bc4616599baff43c5)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "zone", value) # pyright: ignore[reportArgumentType]
+
+
+@jsii.data_type(
+    jsii_type="@cdktn/provider-dns.mxRecordSet.MxRecordSetConfig",
+    jsii_struct_bases=[_cdktf_9a9027ec.TerraformMetaArguments],
+    name_mapping={
+        "connection": "connection",
+        "count": "count",
+        "depends_on": "dependsOn",
+        "for_each": "forEach",
+        "lifecycle": "lifecycle",
+        "provider": "provider",
+        "provisioners": "provisioners",
+        "zone": "zone",
+        "mx": "mx",
+        "name": "name",
+        "ttl": "ttl",
+    },
+)
+class MxRecordSetConfig(_cdktf_9a9027ec.TerraformMetaArguments):
+    def __init__(
+        self,
+        *,
+        connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+        count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+        depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+        for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+        lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+        provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+        provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+        zone: builtins.str,
+        mx: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union["MxRecordSetMx", typing.Dict[builtins.str, typing.Any]]]]] = None,
+        name: typing.Optional[builtins.str] = None,
+        ttl: typing.Optional[jsii.Number] = None,
+    ) -> None:
+        '''
+        :param connection: 
+        :param count: 
+        :param depends_on: 
+        :param for_each: 
+        :param lifecycle: 
+        :param provider: 
+        :param provisioners: 
+        :param zone: DNS zone the record set belongs to. It must be an FQDN, that is, include the trailing dot. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#zone MxRecordSet#zone}
+        :param mx: mx block. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#mx MxRecordSet#mx}
+        :param name: The name of the record set. The ``zone`` argument will be appended to this value to create the full record path. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#name MxRecordSet#name}
+        :param ttl: The TTL of the record set. Defaults to ``3600``. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#ttl MxRecordSet#ttl}
+        '''
+        if isinstance(lifecycle, dict):
+            lifecycle = _cdktf_9a9027ec.TerraformResourceLifecycle(**lifecycle)
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__9f16c1d8ac864a26631ec60abbd42c47cd1244b735cff4435ad01110ceaee80d)
+            check_type(argname="argument connection", value=connection, expected_type=type_hints["connection"])
+            check_type(argname="argument count", value=count, expected_type=type_hints["count"])
+            check_type(argname="argument depends_on", value=depends_on, expected_type=type_hints["depends_on"])
+            check_type(argname="argument for_each", value=for_each, expected_type=type_hints["for_each"])
+            check_type(argname="argument lifecycle", value=lifecycle, expected_type=type_hints["lifecycle"])
+            check_type(argname="argument provider", value=provider, expected_type=type_hints["provider"])
+            check_type(argname="argument provisioners", value=provisioners, expected_type=type_hints["provisioners"])
+            check_type(argname="argument zone", value=zone, expected_type=type_hints["zone"])
+            check_type(argname="argument mx", value=mx, expected_type=type_hints["mx"])
+            check_type(argname="argument name", value=name, expected_type=type_hints["name"])
+            check_type(argname="argument ttl", value=ttl, expected_type=type_hints["ttl"])
+        self._values: typing.Dict[builtins.str, typing.Any] = {
+            "zone": zone,
+        }
+        if connection is not None:
+            self._values["connection"] = connection
+        if count is not None:
+            self._values["count"] = count
+        if depends_on is not None:
+            self._values["depends_on"] = depends_on
+        if for_each is not None:
+            self._values["for_each"] = for_each
+        if lifecycle is not None:
+            self._values["lifecycle"] = lifecycle
+        if provider is not None:
+            self._values["provider"] = provider
+        if provisioners is not None:
+            self._values["provisioners"] = provisioners
+        if mx is not None:
+            self._values["mx"] = mx
+        if name is not None:
+            self._values["name"] = name
+        if ttl is not None:
+            self._values["ttl"] = ttl
+
+    @builtins.property
+    def connection(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, _cdktf_9a9027ec.WinrmProvisionerConnection]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("connection")
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, _cdktf_9a9027ec.WinrmProvisionerConnection]], result)
+
+    @builtins.property
+    def count(
+        self,
+    ) -> typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("count")
+        return typing.cast(typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]], result)
+
+    @builtins.property
+    def depends_on(
+        self,
+    ) -> typing.Optional[typing.List[_cdktf_9a9027ec.ITerraformDependable]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("depends_on")
+        return typing.cast(typing.Optional[typing.List[_cdktf_9a9027ec.ITerraformDependable]], result)
+
+    @builtins.property
+    def for_each(self) -> typing.Optional[_cdktf_9a9027ec.ITerraformIterator]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("for_each")
+        return typing.cast(typing.Optional[_cdktf_9a9027ec.ITerraformIterator], result)
+
+    @builtins.property
+    def lifecycle(self) -> typing.Optional[_cdktf_9a9027ec.TerraformResourceLifecycle]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("lifecycle")
+        return typing.cast(typing.Optional[_cdktf_9a9027ec.TerraformResourceLifecycle], result)
+
+    @builtins.property
+    def provider(self) -> typing.Optional[_cdktf_9a9027ec.TerraformProvider]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("provider")
+        return typing.cast(typing.Optional[_cdktf_9a9027ec.TerraformProvider], result)
+
+    @builtins.property
+    def provisioners(
+        self,
+    ) -> typing.Optional[typing.List[typing.Union[_cdktf_9a9027ec.FileProvisioner, _cdktf_9a9027ec.LocalExecProvisioner, _cdktf_9a9027ec.RemoteExecProvisioner]]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("provisioners")
+        return typing.cast(typing.Optional[typing.List[typing.Union[_cdktf_9a9027ec.FileProvisioner, _cdktf_9a9027ec.LocalExecProvisioner, _cdktf_9a9027ec.RemoteExecProvisioner]]], result)
+
+    @builtins.property
+    def zone(self) -> builtins.str:
+        '''DNS zone the record set belongs to. It must be an FQDN, that is, include the trailing dot.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#zone MxRecordSet#zone}
+        '''
+        result = self._values.get("zone")
+        assert result is not None, "Required property 'zone' is missing"
+        return typing.cast(builtins.str, result)
+
+    @builtins.property
+    def mx(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List["MxRecordSetMx"]]]:
+        '''mx block.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#mx MxRecordSet#mx}
+        '''
+        result = self._values.get("mx")
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List["MxRecordSetMx"]]], result)
+
+    @builtins.property
+    def name(self) -> typing.Optional[builtins.str]:
+        '''The name of the record set.
+
+        The ``zone`` argument will be appended to this value to create the full record path.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#name MxRecordSet#name}
+        '''
+        result = self._values.get("name")
+        return typing.cast(typing.Optional[builtins.str], result)
+
+    @builtins.property
+    def ttl(self) -> typing.Optional[jsii.Number]:
+        '''The TTL of the record set. Defaults to ``3600``.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#ttl MxRecordSet#ttl}
+        '''
+        result = self._values.get("ttl")
+        return typing.cast(typing.Optional[jsii.Number], result)
+
+    def __eq__(self, rhs: typing.Any) -> builtins.bool:
+        return isinstance(rhs, self.__class__) and rhs._values == self._values
+
+    def __ne__(self, rhs: typing.Any) -> builtins.bool:
+        return not (rhs == self)
+
+    def __repr__(self) -> str:
+        return "MxRecordSetConfig(%s)" % ", ".join(
+            k + "=" + repr(v) for k, v in self._values.items()
+        )
+
+
+@jsii.data_type(
+    jsii_type="@cdktn/provider-dns.mxRecordSet.MxRecordSetMx",
+    jsii_struct_bases=[],
+    name_mapping={"exchange": "exchange", "preference": "preference"},
+)
+class MxRecordSetMx:
+    def __init__(self, *, exchange: builtins.str, preference: jsii.Number) -> None:
+        '''
+        :param exchange: The FQDN of the mail exchange, include the trailing dot. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#exchange MxRecordSet#exchange}
+        :param preference: The preference for the record. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#preference MxRecordSet#preference}
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__a34d124885e612b8a52cea8b9a7f3c1cd40d6bfd5d78f7d3c4b5b17d3248f675)
+            check_type(argname="argument exchange", value=exchange, expected_type=type_hints["exchange"])
+            check_type(argname="argument preference", value=preference, expected_type=type_hints["preference"])
+        self._values: typing.Dict[builtins.str, typing.Any] = {
+            "exchange": exchange,
+            "preference": preference,
+        }
+
+    @builtins.property
+    def exchange(self) -> builtins.str:
+        '''The FQDN of the mail exchange, include the trailing dot.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#exchange MxRecordSet#exchange}
+        '''
+        result = self._values.get("exchange")
+        assert result is not None, "Required property 'exchange' is missing"
+        return typing.cast(builtins.str, result)
+
+    @builtins.property
+    def preference(self) -> jsii.Number:
+        '''The preference for the record.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/dns/3.4.3/docs/resources/mx_record_set#preference MxRecordSet#preference}
+        '''
+        result = self._values.get("preference")
+        assert result is not None, "Required property 'preference' is missing"
+        return typing.cast(jsii.Number, result)
+
+    def __eq__(self, rhs: typing.Any) -> builtins.bool:
+        return isinstance(rhs, self.__class__) and rhs._values == self._values
+
+    def __ne__(self, rhs: typing.Any) -> builtins.bool:
+        return not (rhs == self)
+
+    def __repr__(self) -> str:
+        return "MxRecordSetMx(%s)" % ", ".join(
+            k + "=" + repr(v) for k, v in self._values.items()
+        )
+
+
+class MxRecordSetMxList(
+    _cdktf_9a9027ec.ComplexList,
+    metaclass=jsii.JSIIMeta,
+    jsii_type="@cdktn/provider-dns.mxRecordSet.MxRecordSetMxList",
+):
+    def __init__(
+        self,
+        terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+        terraform_attribute: builtins.str,
+        wraps_set: builtins.bool,
+    ) -> None:
+        '''
+        :param terraform_resource: The parent resource.
+        :param terraform_attribute: The attribute on the parent resource this class is referencing.
+        :param wraps_set: whether the list is wrapping a set (will add tolist() to be able to access an item via an index).
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__8062ba0b760fdfb169645bf1350ecee5708eec43bf1d9cd32a60926746640f8b)
+            check_type(argname="argument terraform_resource", value=terraform_resource, expected_type=type_hints["terraform_resource"])
+            check_type(argname="argument terraform_attribute", value=terraform_attribute, expected_type=type_hints["terraform_attribute"])
+            check_type(argname="argument wraps_set", value=wraps_set, expected_type=type_hints["wraps_set"])
+        jsii.create(self.__class__, self, [terraform_resource, terraform_attribute, wraps_set])
+
+    @jsii.member(jsii_name="get")
+    def get(self, index: jsii.Number) -> "MxRecordSetMxOutputReference":
+        '''
+        :param index: the index of the item to return.
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__d567e26bbe07db83d0dc2dc615beb4b00935051a91af3b62ec3a764eddbed80e)
+            check_type(argname="argument index", value=index, expected_type=type_hints["index"])
+        return typing.cast("MxRecordSetMxOutputReference", jsii.invoke(self, "get", [index]))
+
+    @builtins.property
+    @jsii.member(jsii_name="terraformAttribute")
+    def _terraform_attribute(self) -> builtins.str:
+        '''The attribute on the parent resource this class is referencing.'''
+        return typing.cast(builtins.str, jsii.get(self, "terraformAttribute"))
+
+    @_terraform_attribute.setter
+    def _terraform_attribute(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__ae67a5172d91138afaba7354b7f476b08f579fb1236d04ad1ee374ff0474d02e)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "terraformAttribute", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="terraformResource")
+    def _terraform_resource(self) -> _cdktf_9a9027ec.IInterpolatingParent:
+        '''The parent resource.'''
+        return typing.cast(_cdktf_9a9027ec.IInterpolatingParent, jsii.get(self, "terraformResource"))
+
+    @_terraform_resource.setter
+    def _terraform_resource(self, value: _cdktf_9a9027ec.IInterpolatingParent) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__a785286a45279c2387445da7042ec6f93aa736f4e4acd784c2b9a7871b1f9c43)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "terraformResource", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="wrapsSet")
+    def _wraps_set(self) -> builtins.bool:
+        '''whether the list is wrapping a set (will add tolist() to be able to access an item via an index).'''
+        return typing.cast(builtins.bool, jsii.get(self, "wrapsSet"))
+
+    @_wraps_set.setter
+    def _wraps_set(self, value: builtins.bool) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__322089d0014face71ea05fb830571d3bccfdd101f280850b1eec29d19c93aea0)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "wrapsSet", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="internalValue")
+    def internal_value(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[MxRecordSetMx]]]:
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[MxRecordSetMx]]], jsii.get(self, "internalValue"))
+
+    @internal_value.setter
+    def internal_value(
+        self,
+        value: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[MxRecordSetMx]]],
+    ) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__2a0e0b6f8af9f8242054c9b09bfb6bd0ba804e3af830f8b5d7bf882269513b53)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "internalValue", value) # pyright: ignore[reportArgumentType]
+
+
+class MxRecordSetMxOutputReference(
+    _cdktf_9a9027ec.ComplexObject,
+    metaclass=jsii.JSIIMeta,
+    jsii_type="@cdktn/provider-dns.mxRecordSet.MxRecordSetMxOutputReference",
+):
+    def __init__(
+        self,
+        terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+        terraform_attribute: builtins.str,
+        complex_object_index: jsii.Number,
+        complex_object_is_from_set: builtins.bool,
+    ) -> None:
+        '''
+        :param terraform_resource: The parent resource.
+        :param terraform_attribute: The attribute on the parent resource this class is referencing.
+        :param complex_object_index: the index of this item in the list.
+        :param complex_object_is_from_set: whether the list is wrapping a set (will add tolist() to be able to access an item via an index).
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__641470cb8e98d995cd8dd45772b2376945c9841f2f3286e9d5c902e61bd53b4f)
+            check_type(argname="argument terraform_resource", value=terraform_resource, expected_type=type_hints["terraform_resource"])
+            check_type(argname="argument terraform_attribute", value=terraform_attribute, expected_type=type_hints["terraform_attribute"])
+            check_type(argname="argument complex_object_index", value=complex_object_index, expected_type=type_hints["complex_object_index"])
+            check_type(argname="argument complex_object_is_from_set", value=complex_object_is_from_set, expected_type=type_hints["complex_object_is_from_set"])
+        jsii.create(self.__class__, self, [terraform_resource, terraform_attribute, complex_object_index, complex_object_is_from_set])
+
+    @builtins.property
+    @jsii.member(jsii_name="exchangeInput")
+    def exchange_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "exchangeInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="preferenceInput")
+    def preference_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "preferenceInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="exchange")
+    def exchange(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "exchange"))
+
+    @exchange.setter
+    def exchange(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__ec3fdf68302a5b869ea0fd1610d1b3a317d853cd79a8155e5dca392139236550)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "exchange", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="preference")
+    def preference(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "preference"))
+
+    @preference.setter
+    def preference(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__8795df92edc8376df4c7bb89bba6c28073db475aef9b0044876c6f7d7ddcee7b)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "preference", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="internalValue")
+    def internal_value(
+        self,
+    ) -> typing.Optional[typing.Union[MxRecordSetMx, _cdktf_9a9027ec.IResolvable]]:
+        return typing.cast(typing.Optional[typing.Union[MxRecordSetMx, _cdktf_9a9027ec.IResolvable]], jsii.get(self, "internalValue"))
+
+    @internal_value.setter
+    def internal_value(
+        self,
+        value: typing.Optional[typing.Union[MxRecordSetMx, _cdktf_9a9027ec.IResolvable]],
+    ) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__8d66bb6e138eadb6c7524b7fd91c55d6f3df0dd414a9651770439dd58759eba3)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "internalValue", value) # pyright: ignore[reportArgumentType]
+
+
+__all__ = [
+    "MxRecordSet",
+    "MxRecordSetConfig",
+    "MxRecordSetMx",
+    "MxRecordSetMxList",
+    "MxRecordSetMxOutputReference",
+]
+
+publication.publish()
+
+def _typecheckingstub__1c61bbf109bc6510c757a4fda039f75de67820a7078a76a707ab987fe1c28300(
+    scope: _constructs_77d1e7e8.Construct,
+    id: builtins.str,
+    *,
+    zone: builtins.str,
+    mx: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[MxRecordSetMx, typing.Dict[builtins.str, typing.Any]]]]] = None,
+    name: typing.Optional[builtins.str] = None,
+    ttl: typing.Optional[jsii.Number] = None,
+    connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+    count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+    depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+    for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+    lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+    provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+    provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__217d681f62a65398777103b49549ba7d7101df63cb19e52085081f9539bd2c1c(
+    scope: _constructs_77d1e7e8.Construct,
+    import_to_id: builtins.str,
+    import_from_id: builtins.str,
+    provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__d072d8ed980b5bc7528ab7b3bdf260dcd7f9a7c462d22169de575777c2c490cb(
+    value: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[MxRecordSetMx, typing.Dict[builtins.str, typing.Any]]]],
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__e63c1f6f2164ad85601052b732664819537bb8f40d84e24a34c2bb0dc4d62646(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__638fdcc3ee3e38cc0bd5b606c4738d374a60a73cebcae5e6fbe3f2fa885d545f(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__6afa5f626bf0649afb219c190a13acae4aaa0dac933f668bc4616599baff43c5(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__9f16c1d8ac864a26631ec60abbd42c47cd1244b735cff4435ad01110ceaee80d(
+    *,
+    connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+    count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+    depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+    for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+    lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+    provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+    provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+    zone: builtins.str,
+    mx: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[MxRecordSetMx, typing.Dict[builtins.str, typing.Any]]]]] = None,
+    name: typing.Optional[builtins.str] = None,
+    ttl: typing.Optional[jsii.Number] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__a34d124885e612b8a52cea8b9a7f3c1cd40d6bfd5d78f7d3c4b5b17d3248f675(
+    *,
+    exchange: builtins.str,
+    preference: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__8062ba0b760fdfb169645bf1350ecee5708eec43bf1d9cd32a60926746640f8b(
+    terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+    terraform_attribute: builtins.str,
+    wraps_set: builtins.bool,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__d567e26bbe07db83d0dc2dc615beb4b00935051a91af3b62ec3a764eddbed80e(
+    index: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__ae67a5172d91138afaba7354b7f476b08f579fb1236d04ad1ee374ff0474d02e(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__a785286a45279c2387445da7042ec6f93aa736f4e4acd784c2b9a7871b1f9c43(
+    value: _cdktf_9a9027ec.IInterpolatingParent,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__322089d0014face71ea05fb830571d3bccfdd101f280850b1eec29d19c93aea0(
+    value: builtins.bool,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__2a0e0b6f8af9f8242054c9b09bfb6bd0ba804e3af830f8b5d7bf882269513b53(
+    value: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[MxRecordSetMx]]],
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__641470cb8e98d995cd8dd45772b2376945c9841f2f3286e9d5c902e61bd53b4f(
+    terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+    terraform_attribute: builtins.str,
+    complex_object_index: jsii.Number,
+    complex_object_is_from_set: builtins.bool,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__ec3fdf68302a5b869ea0fd1610d1b3a317d853cd79a8155e5dca392139236550(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__8795df92edc8376df4c7bb89bba6c28073db475aef9b0044876c6f7d7ddcee7b(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__8d66bb6e138eadb6c7524b7fd91c55d6f3df0dd414a9651770439dd58759eba3(
+    value: typing.Optional[typing.Union[MxRecordSetMx, _cdktf_9a9027ec.IResolvable]],
+) -> None:
+    """Type checking stubs"""
+    pass
