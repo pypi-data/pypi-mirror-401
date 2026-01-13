@@ -1,0 +1,91 @@
+Metadata-Version: 2.4
+Name: optimi_lab
+Version: 0.1.0
+Author-email: Mingyang Bao <mingyangbob@gmail.com>
+Maintainer-email: Mingyang Bao <mingyangbob@gmail.com>
+License: Apache-2.0
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: rtoml
+Requires-Dist: matplotlib
+Requires-Dist: numpy
+Requires-Dist: pint
+Requires-Dist: pydantic
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+Requires-Dist: pandas
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: pytest-mock; extra == "dev"
+Requires-Dist: pytest-xdist; extra == "dev"
+Requires-Dist: coverage[toml]; extra == "dev"
+Requires-Dist: pdoc; extra == "dev"
+Requires-Dist: commitizen; extra == "dev"
+Requires-Dist: pre-commit; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+
+# OPT-LAB
+
+An extensible optimization toolbox for prototyping evolutionary and surrogate-based
+optimization workflows.
+
+## Overview
+
+OPT-LAB provides implementations and utilities for evolutionary algorithms, surrogate models,
+and sensitivity analysis. It is intended for researchers and practitioners who need a
+lightweight framework for experiments and benchmarking.
+
+## Key Features
+
+- Multi-objective and single-objective optimization algorithms
+- Surrogate modeling utilities and model selection helpers
+- Built-in logging and experiment output management
+- Examples and tests for reproducibility
+
+## Installation
+
+Recommended: install from source (development mode).
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/DawnEver/opt-lab.git
+cd opt-lab
+```
+
+2. Create and activate a virtual environment, uv is recommanded:
+```bash
+uv venv
+# or use venv
+pip -m venv .venv
+```
+
+3. Install the package
+```bash
+uv pip install -e . # for normal user
+uv pip install -e ".[dev]" # for developer
+```
+## Usage
+
+Typical steps:
+
+1. Define an objective function.
+2. Configure an optimizer (algorithm, population size, termination criteria).
+3. Run the optimizer and inspect outputs in the `output/` directory.
+
+See `examples/` for concrete usage examples.
+
+
+## Contributing
+
+Contributions are welcome — please open an issue to discuss large changes before submitting
+a pull request. Add tests for new features and follow the existing code style.
+
+## License
+
+This project is licensed under the Apache License 2.0 — see the `LICENSE` file for details.
+
+## Contact
+
+For questions or collaboration, open an issue or contact the maintainers through the repository.
