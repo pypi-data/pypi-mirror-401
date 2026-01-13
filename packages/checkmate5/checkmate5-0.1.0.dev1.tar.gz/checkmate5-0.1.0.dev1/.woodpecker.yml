@@ -1,0 +1,69 @@
+# .woodpecker.yml
+labels:
+  platform: linux/amd64
+
+steps:
+  # 1. BUILD STAGE
+  build_package:
+    image: python:3.13 # Recommended: 3.13 is stable; use 3.14 if you need experimental
+    commands:
+      - pip install --upgrade pip
+      - pip install build
+      - python -m build
+    when:
+      - event: tag
+      - event: push
+        branch: main
+
+  # 2. PUBLISH STAGE (PyPI)
+  publish_to_pypi:
+    image: python:3.13
+    environment:
+      PYPI_TOKEN:
+        from_secret: pypi_token
+    commands:
+      - pip install twine
+      - export TWINE_USERNAME="__token__"
+      - export TWINE_PASSWORD=$PYPI_TOKEN
+      - python -m twine upload --verbose dist/*
+    when:
+      - event: tag
+      - event: push
+        branch: main
+
+  # 3. DOCKER STAGE (Using Kaniko)
+  # This avoids the "privileged" error and is standard for Codeberg
+  docker_publish:
+    image: woodpecker-plugins/kaniko
+    settings:
+      repo: tcosolutions/betterscan-worker-cli
+      username:
+        from_secret: dockerhub_username
+      password:
+        from_secret: dockerhub_token
+      # Automatically handles tagging: 
+      # Pushes to main -> 'latest'
+      # Git tag -> 'v1.0.0'
+      tags: ${CI_COMMIT_TAG:-latest}
+    when:
+      - event: tag
+      - event: push
+        branch: main
+
+  # 4. CLEANUP STAGE
+  docker_hub_cleanup:
+    image: alpine:latest
+    environment:
+      DOCKERHUB_USERNAME:
+        from_secret: dockerhub_username
+      DOCKERHUB_TOKEN:
+        from_secret: dockerhub_token
+    commands:
+      - apk add --no-cache curl jq
+      - |
+        TOKEN=$(curl -s -H "Content-Type: application/json" -X POST \
+          -d "{\"username\": \"$DOCKERHUB_USERNAME\", \"password\": \"$DOCKERHUB_TOKEN\"}" \
+          https://hub.docker.com/v2/users/login/ | jq -r .token)
+        
+        # This checks if the login works; you can expand the script as needed
+        if
