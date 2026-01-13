@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
+
+[project]
+name = "ZenAuth"
+dynamic = ["version"]
+description = "A user authentication and management library."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Yusuke KITAGAWA", email = "tonosama_kaeru@icloud.com" }]
+dependencies = [
+    "zenhtml",
+    "pyyaml",
+    "passlib[bcrypt]",
+    "sqlalchemy",
+    "typing-extensions",
+    "fastapi",
+    "pydantic",
+    "pydantic-settings",
+    "requests",
+    "python-jose",
+    "python-dotenv",
+    "bcrypt<4.0.0",
+    "uvicorn",
+    "python-multipart",
+]
+
+[project.urls]
+Homepage = "https://github.com/MeiRakuPapa/ZenAuth"
+
+[tool.setuptools]
+packages = { find = { where = ["src"], namespaces = true } }
+
+[tool.setuptools_scm]
+# Version is derived from git tags.
+# Tag format examples:
+# - v1.2.3
+# - v1.2.3.post1
+# - v1.2.3rc1
+# Monorepo: allow discovering .git from a subdirectory checkout.
+search_parent_directories = true
+write_to = "src/zen_auth/_version.py"
+tag_regex = "^v(?P<version>\\d+(?:\\.\\d+)*(?:a\\d+|b\\d+|rc\\d+)?(?:\\.post\\d+)?(?:\\.dev\\d+)?)$"
+# Bump to the next patch version when building on commits after the latest tag.
+# Example: v0.1.0 + 1 commit => 0.1.1.dev1
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+write_to_template = "__version__ = '{version}'\n"
