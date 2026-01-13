@@ -1,0 +1,576 @@
+Metadata-Version: 2.4
+Name: vidscribe
+Version: 0.1.6
+Summary: CLI tool for automatic video summarization using Whisper and LLMs
+Project-URL: Homepage, https://github.com/yeyuan98/video_summarizer
+Project-URL: Repository, https://github.com/yeyuan98/video_summarizer
+Project-URL: Issues, https://github.com/yeyuan98/video_summarizer/issues
+Author: yeyuan98
+License: CC-BY-NC-ND-4.0
+License-File: LICENSE.md
+Keywords: cli,summarization,transcription,video,whisper
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.12
+Requires-Dist: click
+Requires-Dist: docker
+Requires-Dist: httpx
+Requires-Dist: loguru
+Requires-Dist: moviepy
+Requires-Dist: mutagen
+Requires-Dist: openai
+Requires-Dist: pydantic
+Requires-Dist: pydantic-settings
+Requires-Dist: python-dotenv
+Requires-Dist: rich-click
+Requires-Dist: yt-dlp
+Description-Content-Type: text/markdown
+
+# Video Summarizer
+
+A CLI tool for automatic video summarization using local Whisper transcription and LLM-based summarization.
+
+## Features
+
+- **Local Transcription**: Uses Whisper models via Speaches Docker container
+- **LLM Summarization**: Configurable LLM API (OpenAI-compatible)
+- **Video Platform Support**: Downloads from YouTube, Bilibili, and 1000+ sites via yt-dlp
+- **Rich CLI**: Beautiful terminal output with rich-click
+
+## Installation
+
+### Install from Release (Recommended)
+
+Download the built `.whl` file from the Releases page and install:
+
+```bash
+pip install /path/to/video_summarizer-latest-wheel.whl
+```
+
+### Install from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/vidscribe.git
+cd video_summarizer
+
+# Install with uv
+uv pip install -e ".[dev]"
+
+# Or with pip
+pip install -e ".[dev]"
+```
+
+## Prerequisites
+
+### Python
+- Python 3.12+
+
+### Docker
+- Docker Desktop or Docker Engine (for Speaches container)
+- Verify installation: `docker ps`
+
+### FFmpeg and FFplay (Required)
+
+MoviePy requires FFmpeg and FFplay for audio/video processing.
+
+**Installation:**
+- **macOS**: `brew install ffmpeg`
+- **Ubuntu/Debian**: `sudo apt install ffmpeg`
+- **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH
+
+**Configuration (Recommended):**
+
+The recommended way to configure FFmpeg is to provide the full paths to the executables in your `.env` file (run `vidscribe getenv` to create one, see Configuration section below):
+
+```bash
+# Example Windows paths (NO quotes needed)
+FFMPEG_BINARY=C:/ffmpeg/bin/ffmpeg.exe
+FFPLAY_BINARY=C:/ffmpeg/bin/ffplay.exe
+
+# Example macOS/Linux paths
+FFMPEG_BINARY=/usr/local/bin/ffmpeg
+FFPLAY_BINARY=/usr/local/bin/ffplay
+
+# Or use auto-detect (default - searches PATH)
+FFMPEG_BINARY=auto-detect
+FFPLAY_BINARY=auto-detect
+```
+
+### FFprobe (Optional)
+
+FFprobe is used for accurate audio duration detection to determine when to use chunking. It is **not required** for basic operation.
+
+**How duration detection works:**
+1. **ffprobe** (most accurate, if available)
+2. **mutagen library** (already installed, reads file metadata)
+3. **fallback estimation** (only if both methods above fail)
+
+**Only configure FFprobe if you encounter issues with:**
+- Inaccurate duration detection
+- Unnecessary audio chunking on shorter files
+
+**Configuration (if needed):**
+```bash
+# Same approach as FFmpeg/FFplay
+FFPROBE_BINARY=/usr/local/bin/ffprobe
+# or
+FFPROBE_BINARY=auto-detect
+```
+
+Note: FFprobe is included with FFmpeg, so if you've installed FFmpeg you likely already have it.
+
+## Quick Start
+
+```bash
+# Step 1: Create .env configuration file
+vidscribe getenv
+
+# Step 2: Edit .env and set your API key
+#    At minimum, configure: OPENAI_API_KEY=your-key-here
+
+# Step 3: Start summarizing!
+vidscribe input.mp4
+vidscribe https://www.youtube.com/watch?v=xxx
+
+# Optional: List available Whisper models
+vidscribe list-models
+```
+
+**First-time setup:** Run `vidscribe getenv` in your working directory to create a `.env` file from the template. Then edit `.env` to configure your API keys and settings.
+
+## CLI Commands
+
+### Global Options
+
+These options can be used with any command:
+
+- `--config PATH` - Path to custom configuration file (default: `.env` in current directory)
+- `--verbose` - Enable verbose/debug logging for troubleshooting
+
+### Main Commands
+
+#### `getenv` - Create .env configuration file
+
+```bash
+vidscribe getenv
+```
+
+Creates a `.env` file in your current directory from the built-in template. This is the recommended way to set up your configuration.
+
+**Behavior:**
+- Creates `.env` if it doesn't exist
+- If `.env` exists, prompts to overwrite or cancel
+- Template includes all available configuration options with comments
+
+**Example output:**
+```
+Reading .env.example template from package...
+Creating .env file at: /path/to/.env
+✓ .env file created successfully!
+
+Next steps:
+1. Edit .env and configure your API keys and settings
+2. Set OPENAI_API_KEY to your actual API key
+3. Adjust other settings as needed
+```
+
+**After running `getenv`:**
+- Edit `.env` to set your `OPENAI_API_KEY`
+- Configure other settings as needed (FFmpeg paths, model, etc.)
+
+---
+
+#### `summarize` - Summarize a video
+
+```bash
+vidscribe INPUT [OPTIONS]
+```
+
+**Arguments:**
+- `INPUT` - Video file path or URL
+
+**Options:**
+- `-o, --output PATH` - Save summary to file
+- `--summary-style STYLE` - Style: brief, detailed, bullet-points, concise
+- `--model MODEL` - Override LLM model
+- `--save-transcript` - Also save raw transcript
+
+**Examples:**
+```bash
+# Basic usage
+vidscribe video.mp4
+vidscribe https://www.youtube.com/watch?v=xxx
+
+# Save outputs with custom options
+vidscribe video.mp4 --save-transcript --output summary.md
+vidscribe video.mp4 --summary-style bullet-points
+
+# Use custom config and verbose logging
+vidscribe input.mp4 --config /path/to/custom.env --verbose
+```
+
+#### `list-models` - List available Whisper models
+
+```bash
+vidscribe list-models
+```
+
+Lists currently downloaded and all available Whisper models.
+
+### Container Management Commands
+
+- `container-start` - Start Speaches container
+- `container-stop` - Stop Speaches container
+- `container-status` - Check container status
+
+**Note:** Container is auto-managed during summarization.
+
+## Configuration
+
+**Getting started:** Run `vidscribe getenv` in your working directory to create a `.env` file from the template. This is the recommended way to set up your configuration.
+
+The `.env` file contains all configuration options with inline comments. Below, we explain certain parameters in more detail.
+
+### 1. Dependency Configuration
+
+#### FFmpeg/FFplay (Required)
+
+MoviePy requires FFmpeg and FFplay for audio/video processing.
+
+**Configuration Options:**
+- `FFMPEG_BINARY=auto-detect` (default) - Automatically find ffmpeg
+- `FFMPEG_BINARY=ffmpeg-imageio` - Use imageio's bundled ffmpeg
+- `FFMPEG_BINARY=/path/to/ffmpeg` - Use custom binary path
+- `FFPLAY_BINARY=auto-detect` (default) - Automatically find ffplay
+- `FFPLAY_BINARY=/path/to/ffplay` - Use custom binary path
+
+#### FFprobe (Optional)
+
+FFprobe is used for accurate audio duration detection. It is **not required** for basic operation.
+
+**Configuration Options:**
+- `FFPROBE_BINARY=auto-detect` (default) - Automatically find ffprobe in PATH
+- `FFPROBE_BINARY=/path/to/ffprobe` - Use custom binary path
+
+**How duration detection works:**
+1. **ffprobe** (most accurate, if available)
+2. **mutagen library** (already installed, reads file metadata)
+3. **fallback estimation** (only if both methods above fail)
+
+**Why configure FFprobe:**
+- Most accurate duration detection
+- Prevents unnecessary chunking on shorter files
+- Recommended for files with variable bitrates
+
+---
+
+### 2. Transcription Configuration
+
+#### Whisper Model
+
+**`SPEACHES_MODEL`** - Controls which Whisper model to use for transcription.
+
+**Recommended models:**
+- `Systran/faster-distil-whisper-medium.en` - Best balance of speed and accuracy
+- `Systran/faster-distil-whisper-small.en` - Faster, may skip some words
+
+**Model categories:**
+- **Distil models** (smaller, fastest): `distil-whisper-*`
+- **Faster models** (distilled, fast): `faster-distil-whisper-*`
+- **Standard models** (original, slower): `faster-whisper-*`, `whisper-*`
+
+Use `vidscribe list-models` to see all available models.
+
+#### Response Format
+
+**`SPEACHES_RESPONSE_FORMAT`** controls the format sent to the Whisper API.
+
+- Default: `verbose_json`
+- Note: The tool currently only uses the text portion of the response, so saved transcripts are always plain text regardless of this setting
+- Options: `verbose_json`, `json`, `text`, `srt`, `vtt`
+
+#### Voice Activity Detection (VAD)
+
+**`SPEACHES_VAD_FILTER=true`** enables VAD to filter out non-speech audio.
+
+- Useful for videos with background noise or music
+- May improve accuracy but adds processing time
+
+#### Language Forcing
+
+**`SPEACHES_LANGUAGE=en`** forces specific language detection.
+
+- Useful when you know the language in advance
+- Supports all languages supported by Whisper (e.g., en, zh, es, fr, de, ja)
+- If not set, Whisper auto-detects the language
+
+#### Audio Chunking
+
+For long audio files, the transcriber automatically splits audio into chunks.
+
+**Settings:**
+- `SPEACHES_CHUNK_DURATION_SEC=90` - Duration of each chunk in seconds (default: 90)
+- `SPEACHES_CHUNK_DURATION_THRESHOLD=180` - Files longer than this use chunking (default: 180s)
+- `SPEACHES_CHUNK_OVERLAP_SEC=0` - Overlap between chunks (default: 0, currently disabled)
+
+**How chunking works:**
+1. Audio duration is detected (using ffprobe/mutagen)
+2. If duration > threshold, audio is split into chunks using ffmpeg
+3. Each chunk is transcribed separately
+4. Results are combined into a single transcript
+
+**When to adjust:**
+- Increase `SPEACHES_CHUNK_DURATION_SEC` for faster processing (may hit API limits)
+- Decrease `SPEACHES_CHUNK_DURATION_THRESHOLD` to force chunking for shorter files
+- Large files (>30 minutes) may benefit from smaller chunks (30-45 seconds)
+
+---
+
+### 3. LLM Summarization Configuration
+
+#### API Settings
+
+**`OPENAI_API_BASE`** - API endpoint for LLM requests.
+
+**Custom LLM Providers:**
+- Allows using OpenAI-compatible APIs
+- Examples:
+  - Local LLMs: `http://localhost:11434/v1` (Ollama)
+  - Third-party providers: Set their base URL
+- Combine with `OPENAI_MODEL` to use custom models
+
+**`OPENAI_API_KEY`** - Your API key for the LLM provider.
+
+**`OPENAI_MODEL`** - LLM model to use for summarization.
+
+- Default: `gpt-4o`
+- Can override with `--model` CLI option
+
+#### Generation Settings
+
+**`OPENAI_MAX_TOKENS`** - Maximum tokens in the summary response (default: 2000)
+
+**`OPENAI_TEMPERATURE`** - Controls randomness in generation (default: 0.7)
+
+- Lower (0.0-0.3): More focused, deterministic
+- Higher (0.7-1.0): More creative, varied
+
+**`OPENAI_SUMMARY_STYLE`** - Default summary style (default: `concise`)
+
+- Options: `brief`, `detailed`, `bullet-points`, `concise`
+- Can override with `--summary-style` CLI option
+
+**`OPENAI_MAX_TRANSCRIPT_LENGTH`** - Maximum transcript length to process (default: 128000)
+
+- Transcripts longer than this will be truncated before summarization
+
+## Troubleshooting
+
+### "ffprobe not found" Warning
+
+**Problem:** Warning about ffprobe being unavailable.
+
+**Solutions:**
+1. Install FFmpeg (includes ffprobe):
+   - macOS: `brew install ffmpeg`
+   - Ubuntu: `sudo apt install ffmpeg`
+   - Windows: Download from https://ffmpeg.org/download.html
+
+2. Set custom path in `.env`:
+   ```bash
+   FFPROBE_BINARY=/path/to/ffprobe
+   ```
+
+3. Verify installation: `ffprobe -version`
+
+**You can ignore ffprobe warning if you are not having issues with chunking.**
+
+### Transcription Fails on Long Files
+
+**Problem:** Transcription fails or times out on long audio.
+
+**Solutions:**
+1. Reduce chunk size: `SPEACHES_CHUNK_DURATION_SEC=30`
+2. Lower threshold: `SPEACHES_CHUNK_DURATION_THRESHOLD=60`
+3. Check available disk space for temporary chunk files
+4. Ensure ffprobe is configured for accurate duration detection
+
+### Container Won't Start
+
+**Problem:** Docker container fails to start.
+
+**Solutions:**
+1. Verify Docker is running: `docker ps`
+2. Check logs: `docker logs speaches`
+3. Restart: `vidscribe container-stop && vidscribe container-start`
+4. Change port in `.env`: `SPEACHES_CONTAINER_PORT=8001`
+
+### Model Download Slow
+
+**Problem:** First model download takes a long time.
+
+**Solutions:**
+1. Pre-download with: `vidscribe list-models`
+2. Check network connection to HuggingFace Hub
+
+### OpenAI API Errors
+
+**Problem:** Summarization fails with API errors.
+
+**Solutions:**
+1. Verify API key in `.env`: `OPENAI_API_KEY=your-key`
+2. Check API base URL for custom providers
+3. Verify model name: `OPENAI_MODEL=your-custom-model`
+
+## GPU Support
+
+Vidscribe supports GPU-accelerated transcription using NVIDIA GPUs and CUDA-enabled Speaches containers. This can significantly speed up transcription, especially for longer videos.
+
+### Quick Start
+
+**Use GPU via CLI flag:**
+```bash
+vidscribe --gpu video.mp4
+vidscribe --gpu container-start
+```
+
+**Use GPU via environment variable:**
+```bash
+# Add to .env
+SPEACHES_USE_GPU=true
+
+# Then run normally
+vidscribe video.mp4
+```
+
+### Prerequisites
+
+To use GPU support, you need:
+1. **NVIDIA GPU** - A compatible GPU with CUDA support
+2. **NVIDIA GPU Drivers** - Latest drivers installed
+3. **NVIDIA Container Toolkit** - Installed and configured for Docker
+
+### Full Documentation
+
+For detailed installation instructions, configuration options, and troubleshooting, see [GPU.md](GPU.md).
+
+### Configuration Options
+
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `SPEACHES_USE_GPU` | `false` | Enable GPU support |
+| `SPEACHES_GPU_CONTAINER_IMAGE` | `ghcr.io/speaches-ai/speaches:latest-cuda` | CUDA-enabled container image |
+
+### Verification
+
+Vidscribe will automatically check GPU availability when you use the `--gpu` flag and provide helpful error messages if GPU support is not properly configured.
+
+You can also manually verify:
+```bash
+# Check NVIDIA drivers
+nvidia-smi
+
+# Check Docker GPU support
+docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
+```
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Install dependencies
+make sync
+
+# Install pre-commit hooks
+make pre-commit
+```
+
+### Make Commands
+
+```bash
+make help           # Show all available commands
+make sync           # Sync dependencies using uv
+make install        # Install package in development mode
+make test           # Run all tests with coverage
+make test-unit      # Run unit tests only
+make test-integration # Run integration tests only
+make test-fast      # Run fast tests only (exclude slow)
+make lint           # Run linter (ruff)
+make format         # Format code with ruff
+make type-check     # Run type checker (mypy)
+make check          # Run all checks (lint, type-check, test)
+make clean          # Clean build artifacts
+make build          # Build package (wheel and tar.gz)
+make run            # Run the CLI via uv
+```
+
+### Running Tests
+
+The project uses pytest with coverage reporting:
+
+```bash
+# Run all tests
+make test
+
+# Run specific test categories
+make test-unit              # Unit tests only
+make test-integration       # Integration tests only
+make test-fast              # Fast tests (exclude slow)
+
+# View coverage report
+open htmlcov/index.html     # After running tests
+```
+
+## Release & CI
+
+The project uses GitHub Actions for automated release builds:
+
+- **Automatic Builds**: On release publication, the workflow automatically builds the package
+- **Package Upload**: Built packages (`.whl` and `.tar.gz`) are uploaded to the release assets
+- **Mirrors**: Uses Aliyun mirrors for faster builds in China
+- **Python Version**: Targets Python 3.12+
+
+To create a release:
+1. Update version in `pyproject.toml`
+2. Create a new release on GitHub
+3. The workflow builds and uploads packages automatically
+
+## Project Structure
+
+```
+video_summarizer/
+├── video_summarizer/       # Main package
+│   ├── cli/               # CLI interface (rich-click commands)
+│   ├── config/            # Configuration management (Pydantic settings)
+│   ├── core/              # Base classes and abstractions
+│   ├── scraper/           # Video downloading (yt-dlp integration)
+│   ├── summarizer/        # LLM summarization (OpenAI API)
+│   ├── transcriber/       # Audio transcription (Speaches/Whisper)
+│   └── utils/             # Utilities (logging, errors, types)
+├── tests/                 # Test suite (pytest)
+├── .github/workflows/     # GitHub Actions CI/CD
+├── pyproject.toml         # Project configuration and dependencies
+├── Makefile               # Development task automation
+└── README.md              # This file
+```
+
+## License
+
+This project is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+**Summary:**
+- ✓ You are free to:
+  - **Share** — copy and redistribute the material in any medium or format
+
+- ✗ You must:
+  - **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made
+
+- ✗ You may not:
+  - **NonCommercial** — You may not use the material for commercial purposes
+  - **NoDerivatives** — If you remix, transform, or build upon the material, you may not distribute the modified material
+
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/
