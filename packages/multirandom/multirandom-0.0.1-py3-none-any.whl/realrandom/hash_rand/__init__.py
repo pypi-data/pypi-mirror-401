@@ -1,0 +1,2 @@
+import original_random
+import sha_rand as sha_random
