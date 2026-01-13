@@ -1,0 +1,22 @@
+{#
+    basic/search.html
+    ~~~~~~~~~~~~~~~~~
+
+    Template for the search page.
+
+    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "basic/search.html" %}
+
+{# Override searchbox block to add custom UI styling #}
+{% block searchbox %}
+<form action="" method="get">
+  <div class="ui action left icon input" id="search-input">
+    <i class="search icon"></i>
+    <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search...">
+    <button type="submit" class="ui teal button">{{ _('search') }}</button>
+  </div>
+  <span id="search-progress" style="padding-left: 10px"></span>
+</form>
+{% endblock %}

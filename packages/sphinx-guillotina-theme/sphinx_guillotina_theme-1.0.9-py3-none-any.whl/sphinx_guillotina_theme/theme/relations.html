@@ -1,0 +1,26 @@
+{#
+    basic/relations.html
+    ~~~~~~~~~~~~~~~~~~~~
+
+    Sphinx sidebar template: relation links.
+
+    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+
+{%- if next %}
+<div class="sidebar-relation next-topic">
+  <h4>Next topic</h4>
+  <p class="topless"><a href="{{ next.link|e }}"
+                        title="{{ _('next chapter') }}">{{ next.title|striptags|safe }}</a></p>
+</div>
+{%- endif %}
+
+{%- if prev %}
+<div class="sidebar-relation prev-topic">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="{{ prev.link|e }}"
+                        title="{{ _('previous chapter') }}">{{ prev.title|striptags|safe }}</a></p>
+</div>
+{%- endif %}
+
