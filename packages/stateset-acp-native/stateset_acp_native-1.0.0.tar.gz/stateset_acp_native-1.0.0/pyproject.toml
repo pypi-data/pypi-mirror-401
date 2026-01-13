@@ -1,0 +1,42 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "stateset-acp-native"
+version = "1.0.0"
+description = "Native Python bindings for StateSet ACP Handler (PyO3)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "StateSet", email = "support@stateset.io"}
+]
+keywords = [
+    "stateset",
+    "acp",
+    "native",
+    "rust",
+    "pyo3",
+    "checkout"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+]
+
+[project.urls]
+Homepage = "https://github.com/stateset/stateset-acp-handler"
+Repository = "https://github.com/stateset/stateset-acp-handler"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "python"
+module-name = "stateset_acp_native"

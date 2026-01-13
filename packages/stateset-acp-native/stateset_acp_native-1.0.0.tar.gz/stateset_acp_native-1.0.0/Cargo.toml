@@ -1,0 +1,28 @@
+[package]
+name = "acp-python"
+version = "1.0.0"
+edition = "2021"
+description = "Python PyO3 bindings for StateSet ACP Handler"
+license = "MIT"
+readme = "README.md"
+
+[lib]
+name = "stateset_acp_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+once_cell = "1.19"
+pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
+
+[profile.release]
+lto = true
+strip = "symbols"
+
+# Standalone package - not part of root workspace
+[workspace]
