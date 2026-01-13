@@ -1,0 +1,82 @@
+# AutoRAG Configuration Template
+# Copy this to config.yaml and fill in your values
+
+# Database connection - Choose ONE of the following configurations:
+
+# Option 1: Supabase Storage (default)
+database:
+  type: supabase  # Options: supabase, mongodb, postgresql
+  url: https://your-project.supabase.co
+  key: your-supabase-anon-key
+  bucket: pdf           # Storage bucket name
+  folder: pdf           # Folder path within bucket
+  # For table-based storage (legacy): use 'table' instead of bucket/folder
+
+# Option 2: MongoDB (uncomment and configure)
+# database:
+#   type: mongodb
+#   connection_string: mongodb://localhost:27017
+#   database: your_database_name
+#   collection: documents
+#   text_column: content    # Field containing document text (default: content)
+#   id_column: _id          # Field containing unique ID (default: _id)
+
+# Option 3: PostgreSQL (uncomment and configure)
+# database:
+#   type: postgresql
+#   host: localhost
+#   port: 5432
+#   database: your_database_name
+#   table: documents
+#   user: your_username
+#   password: your_password
+#   text_column: content    # Column containing document text (default: content)
+#   id_column: id           # Column containing unique ID (default: id)
+
+# LLM Configuration
+llm:
+  provider: groq          # Options: groq, openai, openrouter, 169pi
+  model: null             # null = use provider default:
+                          #   groq: llama-3.3-70b-versatile
+                          #   openai: gpt-4o-mini
+                          #   openrouter: meta-llama/llama-3.3-70b-instruct
+                          #   169pi: alpie-32b
+
+# API keys for external services
+api_keys:
+  # LLM provider keys (only the key for your selected provider is required)
+  groq: your-groq-api-key           # Required if llm.provider=groq
+  openai: your-openai-api-key       # Required if llm.provider=openai
+  openrouter: your-openrouter-key   # Required if llm.provider=openrouter
+  169pi: your-169pi-api-key         # Required if llm.provider=169pi
+  # NOTE: No vector store API key needed - using local ChromaDB
+
+# Optimization settings
+optimization:
+  strategy: bayesian      # Options: grid, bayesian
+  num_experiments: 5
+  test_questions: 5
+
+# RAG Optimization Parameters
+# ===========================
+# AutoRAG tests combinations of these parameters to find your optimal config.
+# More values = more thorough testing but longer runtime.
+rag:
+  # INDEXING PARAMETERS (expensive - each combo requires re-indexing)
+  # Tip: Start with single values, expand after initial results
+  chunk_size: [500]                    # Characters per chunk. Try: [256, 500, 1024]
+  chunk_overlap: [50]                  # Overlap between chunks. Try: [25, 50, 100]
+  embedding_model:                     # HuggingFace sentence-transformers models
+    - all-MiniLM-L6-v2                 # 384 dim, fast (default)
+    # - all-mpnet-base-v2              # 768 dim, better quality
+    # - paraphrase-MiniLM-L6-v2        # 384 dim, paraphrase-focused
+  
+  # QUERY PARAMETERS (fast - tested on each indexed config)
+  top_k: [3, 5, 10]                    # Documents to retrieve per query
+  temperature: [0.3, 0.7, 1.0]         # LLM creativity (0=focused, 1=creative)
+
+# Evaluation settings
+evaluation:
+  method: custom          # Options: custom, ragas
+                          #   custom: Built-in token-optimized evaluator
+                          #   ragas: Official RAGAS library (requires: pip install ragas)

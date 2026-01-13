@@ -1,0 +1,36 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: autorag_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Celery worker for background optimization tasks
+  # NOTE: For local development, you may want to run the worker directly:
+  #   celery -A autorag.tasks.celery_app worker -Q autorag_tasks --loglevel=info
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autorag_worker
+    command: celery -A autorag.tasks.celery_app worker -Q autorag_tasks --loglevel=info
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro  # Mount config file
+      - ./reports:/app/reports             # Mount reports for progress/results
+    restart: unless-stopped
+
+volumes:
+  redis_data:
