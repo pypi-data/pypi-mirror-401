@@ -1,0 +1,66 @@
+"""{{ module_name }} 相关的请求和响应模型"""
+from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
+
+class {{ class_name }}CreateRequest(BaseModel):
+    """创建{{ module_name }}请求"""
+    # TODO: 添加字段定义
+    # name: str = Field(..., description="名称")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [{}]
+        }
+    }
+
+
+class {{ class_name }}UpdateRequest(BaseModel):
+    """更新{{ module_name }}请求"""
+    # TODO: 添加字段定义（使用 Optional）
+    # name: Optional[str] = Field(None, description="名称")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [{}]
+        }
+    }
+
+
+class {{ class_name }}Response(BaseModel):
+    """{{ module_name }}响应"""
+    id: int
+    create_time: datetime
+    # TODO: 添加字段定义
+    # name: str
+
+    model_config = {
+        "from_attributes": True,
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "create_time": "2024-01-01T00:00:00",
+                }
+            ]
+        }
+    }
+
+
+class {{ class_name }}ListResponse(BaseModel):
+    """{{ module_name }}列表响应"""
+    total: int
+    items: list[{{ class_name }}Response]
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "total": 0,
+                    "items": []
+                }
+            ]
+        }
+    }

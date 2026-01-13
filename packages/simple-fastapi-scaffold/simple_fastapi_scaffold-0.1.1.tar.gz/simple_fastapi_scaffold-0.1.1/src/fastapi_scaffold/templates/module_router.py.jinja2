@@ -1,0 +1,91 @@
+"""{{ module_name }} 路由"""
+from typing import Optional
+from fastapi import HTTPException
+from common.base_router import NO_AUTH, ApiRouter
+from common.entity.base_response import BaseResponse
+from common.entity.schemas.{{ module_name }} import (
+    {{ class_name }}CreateRequest,
+    {{ class_name }}UpdateRequest,
+    {{ class_name }}Response,
+    {{ class_name }}ListResponse,
+)
+from models.{{ module_name }} import {{ class_name }}
+
+# 默认所有路由需要认证
+router = ApiRouter(prefix="/api/v1/{{ module_name }}", tags=["{{ module_name }}"])
+
+
+@router.post("", response_model=BaseResponse[{{ class_name }}Response], dependencies=NO_AUTH)
+async def create_{{ module_name }}(request: {{ class_name }}CreateRequest):
+    """创建{{ module_name }}"""
+    # TODO: 添加业务逻辑
+    new_item = await {{ class_name }}.create()
+    item_response = {{ class_name }}Response(
+        id=new_item.id,
+        create_time=new_item.create_time,
+    )
+    return BaseResponse(code=0, message="创建成功", data=item_response)
+
+
+@router.get("/list", response_model=BaseResponse[{{ class_name }}ListResponse])
+async def get_{{ module_name }}_list(skip: int = 0, limit: int = 10):
+    """获取{{ module_name }}列表"""
+    items = await {{ class_name }}.get_all(skip=skip, limit=limit)
+    total = await {{ class_name }}.count()
+
+    item_responses = [
+        {{ class_name }}Response(id=item.id, create_time=item.create_time)
+        for item in items
+    ]
+
+    return BaseResponse(
+        code=0,
+        message="获取列表成功",
+        data={{ class_name }}ListResponse(total=total, items=item_responses)
+    )
+
+
+@router.get("/{{ module_name }}_id", response_model=BaseResponse[{{ class_name }}Response])
+async def get_{{ module_name }}({{ module_name }}_id: int):
+    """获取单个{{ module_name }}"""
+    item = await {{ class_name }}.get_by_id({{ module_name }}_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="{{ module_name }}不存在")
+
+    item_response = {{ class_name }}Response(
+        id=item.id,
+        create_time=item.create_time,
+    )
+
+    return BaseResponse(code=0, message="获取成功", data=item_response)
+
+
+@router.put("/{{ module_name }}_id", response_model=BaseResponse[{{ class_name }}Response])
+async def update_{{ module_name }}({{ module_name }}_id: int, request: {{ class_name }}UpdateRequest):
+    """更新{{ module_name }}"""
+    item = await {{ class_name }}.get_by_id({{ module_name }}_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="{{ module_name }}不存在")
+
+    # TODO: 添加更新逻辑
+    updated_item = await {{ class_name }}.update_by_id({{ module_name }}_id)
+    item_response = {{ class_name }}Response(
+        id=updated_item.id,
+        create_time=updated_item.create_time,
+    )
+
+    return BaseResponse(code=0, message="更新成功", data=item_response)
+
+
+@router.delete("/{{ module_name }}_id", response_model=BaseResponse[dict])
+async def delete_{{ module_name }}({{ module_name }}_id: int):
+    """删除{{ module_name }}"""
+    item = await {{ class_name }}.get_by_id({{ module_name }}_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="{{ module_name }}不存在")
+
+    deleted = await {{ class_name }}.delete_by_id({{ module_name }}_id)
+    if deleted:
+        return BaseResponse(code=0, message="删除成功", data={"deleted": True})
+
+    raise HTTPException(status_code=500, detail="删除失败")
