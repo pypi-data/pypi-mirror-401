@@ -1,0 +1,567 @@
+/* HPC Monitor TUI Stylesheet
+ * Based on TEXTUAL_STYLING_COOKBOOK.md patterns
+ */
+
+/* Border Variables */
+$border-style: round;
+$border-blurred: $primary-background-lighten-3;
+$border: $primary-lighten-3;
+$border-disabled: $panel;
+
+/* Scrollbar Colors */
+$scrollbar: $primary;
+$scrollbar-hover: $primary-lighten-3;
+$scrollbar-active: $primary-lighten-3;
+$scrollbar-background: $primary-muted;
+
+/* Reset default dimming and set scrollbar defaults */
+* {
+    scrollbar-size: 1 1;
+    scrollbar-color: $scrollbar;
+    scrollbar-background: $scrollbar-background;
+    scrollbar-color-hover: $scrollbar-hover;
+    scrollbar-color-active: $scrollbar-active;
+}
+
+/* Header and Footer - transparent to blend with terminal */
+Header {
+    background: transparent;
+    color: $foreground;
+}
+
+HeaderTitle {
+    background: transparent;
+    color: $foreground;
+}
+
+/* Custom footer (not using Textual's Footer widget for ANSI transparency) */
+#footer {
+    dock: bottom;
+    height: 1;
+    background: transparent;
+}
+
+#footer > * {
+    background: transparent;
+}
+
+.footer-key {
+    color: $primary;
+    text-style: bold;
+    width: auto;
+    padding: 0 0;
+}
+
+.footer-label {
+    color: $foreground;
+    width: auto;
+    padding: 0 1;
+}
+
+/* Base panel styling */
+.panel {
+    background: transparent;
+    border: $border-style $border-blurred;
+    border-subtitle-background: $border-blurred;
+    opacity: 1 !important;
+    background-tint: transparent !important;
+}
+
+.panel:focus-within {
+    border: $border-style $border;
+    border-subtitle-background: $border;
+}
+
+/* Hide utility */
+.hidden {
+    display: none;
+}
+
+/* ============================================
+   Tabbed Content Styling
+   ============================================ */
+
+TabbedContent {
+    height: 1fr;
+    background: transparent;
+}
+
+/* Content switcher between tabs and panes */
+ContentSwitcher {
+    background: transparent;
+}
+
+/* Tab bar container */
+Tabs {
+    dock: top;
+    background: transparent;
+}
+
+/* Tab underline bar - muted when unfocused */
+Underline > .underline--bar {
+    color: $primary-darken-2;
+    background: $background-lighten-1;
+}
+
+/* Tab underline bar - bright when focused */
+Tabs:focus-within Underline > .underline--bar {
+    color: $primary;
+}
+
+Underline:ansi > .underline--bar {
+    background: $background-lighten-1;
+}
+
+/* Individual tab styling
+ * Note: This styles Textual's standard Tab widget.
+ * Rovr uses custom TablineTab widgets - if using custom widgets,
+ * adjust selectors accordingly.
+ */
+Tab {
+    padding: 0 2;
+    color: $foreground-darken-1;
+    background: transparent;
+    /* Transparency reset pattern - prevents default dimming */
+    opacity: 1 !important;
+    background-tint: transparent !important;
+    text-opacity: 1 !important;
+    tint: transparent !important;
+}
+
+Tab:hover {
+    background: $boost;
+    color: $foreground;
+}
+
+Tab:hover:ansi {
+    background: transparent;
+}
+
+Tab:focus {
+    /* Override default focus highlight */
+    background: transparent;
+    text-style: none;
+}
+
+/* Active tab: muted when tab bar unfocused, bright when focused */
+Tab.-active {
+    background: $primary-darken-2;
+    color: $background;
+    text-style: bold;
+}
+
+/* Active tab brightens when tab bar has focus */
+Tabs:focus-within Tab.-active {
+    background: $primary;
+    color: $background;
+}
+
+Tab.-active:hover,
+Tab.-active:focus {
+    background: $primary;
+    color: $background;
+}
+
+/* Tab pane content areas */
+TabPane {
+    padding: 1 1;
+    background: transparent;
+    /* Transparency reset */
+    opacity: 1 !important;
+    background-tint: transparent !important;
+}
+
+/* Placeholder styling for empty tab content */
+#active-placeholder,
+#completed-placeholder {
+    width: 100%;
+    height: 100%;
+    content-align: center middle;
+    color: $foreground-darken-2;
+}
+
+/* ============================================
+   Job Table Styling
+   ============================================ */
+
+JobTable {
+    height: 1fr;
+    background: transparent;
+    /* Transparency reset */
+    opacity: 1 !important;
+    background-tint: transparent !important;
+    /* Match border title style with filter panels */
+    border: $border-style $border-blurred;
+    border-title-color: $primary;
+    border-title-background: transparent;
+    /* Add padding inside the border (horizontal only, vertical not possible in half-rows) */
+    padding: 0 2;
+}
+
+/* DataTable header row */
+JobTable > .datatable--header {
+    background: transparent;
+    color: $primary;
+    text-style: bold;
+}
+
+/* DataTable cells */
+JobTable > .datatable--header-cell {
+    background: transparent;
+    color: $primary;
+}
+
+/* Cursor/selected row */
+JobTable > .datatable--cursor {
+    background: $primary;
+    color: $background;
+}
+
+/* Hover state */
+JobTable > .datatable--hover {
+    background: $surface;
+}
+
+/* Zebra striping - odd rows */
+JobTable > .datatable--odd-row {
+    background: transparent;
+}
+
+/* Zebra striping - even rows */
+JobTable > .datatable--even-row {
+    background: $background-lighten-1;
+}
+
+/* When table has focus */
+JobTable:focus {
+    border: $border-style $border;
+}
+
+/* When table doesn't have focus - already handled by default */
+
+/* Empty table message */
+.job-table-empty {
+    width: 100%;
+    height: 100%;
+    content-align: center middle;
+    color: $foreground-darken-2;
+}
+
+/* ============================================
+   Filter Status Line & Popups
+   ============================================ */
+
+#active-content {
+    height: 1fr;
+    background: transparent;
+}
+
+/* Filter status bar with bordered panels */
+FilterStatusLine {
+    height: 3;
+    width: 100%;
+    background: transparent;
+    padding: 0 0;
+    overflow: hidden;
+}
+
+/* Filter panels (Status, Queue) */
+FilterPanel {
+    height: 3;
+    width: auto;
+    min-width: 14;
+    padding: 0 1;
+    margin: 0 1 0 0;
+    content-align: center middle;
+    background: transparent;
+    border: round $border-blurred;
+    border-title-color: $primary;
+    border-title-background: transparent;
+}
+
+FilterPanel:focus {
+    border: round $border;
+}
+
+#search-container {
+    width: 1fr;
+    height: 3;
+    margin: 0;
+    padding: 0 1;
+    background: transparent;
+    border: round $border-blurred;
+    border-title-color: $primary;
+    border-title-background: transparent;
+}
+
+#search-container > Input {
+    background: transparent;
+    border: none;
+    width: 100%;
+    height: 1;
+}
+
+/* Search box highlights when focused */
+#search-container:focus-within {
+    border: round $border;
+}
+
+/* ============================================
+   Detail Panel
+   ============================================ */
+
+DetailPanel {
+    height: auto;
+    min-height: 8;
+    max-height: 12;
+    background: transparent;
+    border: round $border-blurred;
+    border-title-color: $primary;
+    border-title-background: transparent;
+    padding: 0 1;
+    margin-top: 1;
+}
+
+DetailPanel:focus-within {
+    border: round $border;
+}
+
+#detail-content {
+    height: auto;
+    background: transparent;
+}
+
+.detail-row {
+    height: 1;
+    background: transparent;
+}
+
+.detail-label {
+    width: 12;
+    color: $primary;
+    background: transparent;
+}
+
+.detail-value {
+    width: 1fr;
+    background: transparent;
+}
+
+#detail-buttons {
+    height: 3;
+    background: transparent;
+    margin-top: 1;
+}
+
+#detail-buttons > Button {
+    margin-right: 1;
+    min-width: 12;
+    background: transparent;
+    border: round $border-blurred;
+    color: $foreground;
+    text-style: none;
+}
+
+#detail-buttons > Button:hover {
+    background: transparent;
+    border: round $border;
+    color: $primary;
+    text-style: bold;
+}
+
+#detail-buttons > Button:focus {
+    background: transparent;
+    border: round $primary;
+    color: $primary;
+    text-style: bold;
+}
+
+#detail-buttons > Button.-disabled {
+    color: $foreground-darken-2;
+    border: round $border-disabled;
+    text-style: none;
+}
+
+/* Cancel button - error styling only on hover/focus */
+#detail-buttons > #btn-cancel:hover {
+    border: round $error;
+    color: $error;
+}
+
+#detail-buttons > #btn-cancel:focus {
+    border: round $error;
+    color: $error;
+}
+
+#no-selection {
+    height: 100%;
+    width: 100%;
+    content-align: center middle;
+    color: $foreground-darken-2;
+    background: transparent;
+}
+
+/* ============================================
+   Confirm Modal Screen
+   ============================================ */
+
+ConfirmScreen {
+    align: center middle;
+    background: transparent;
+}
+
+#confirm-dialog {
+    width: auto;
+    height: auto;
+    min-width: 30;
+    max-width: 80;
+    background: transparent;
+    border: round $primary;
+    border-title-color: $primary;
+    padding: 1 2;
+}
+
+#confirm-message {
+    width: auto;
+    height: auto;
+    background: transparent;
+    text-align: left;
+    margin-bottom: 1;
+    padding: 0 1;
+}
+
+#confirm-buttons {
+    width: 100%;
+    height: 3;
+    align: center middle;
+    background: transparent;
+}
+
+#confirm-hint {
+    width: 100%;
+    height: 1;
+    text-align: center;
+    color: $foreground-darken-2;
+    background: transparent;
+}
+
+#confirm-buttons > Button {
+    margin: 0 1;
+    min-width: 10;
+    background: transparent;
+    border: round $border-blurred;
+    color: $foreground;
+    text-style: none;
+}
+
+#confirm-buttons > Button:hover {
+    background: transparent;
+    border: round $border;
+    color: $primary;
+    text-style: bold;
+}
+
+#confirm-buttons > Button:focus {
+    background: transparent;
+    border: round $primary;
+    color: $primary;
+    text-style: bold;
+}
+
+/* Confirm button - error styling only on hover/focus (destructive action) */
+#confirm-buttons > #btn-confirm:hover {
+    border: round $error;
+    color: $error;
+}
+
+#confirm-buttons > #btn-confirm:focus {
+    border: round $error;
+    color: $error;
+}
+
+/* ============================================
+   Log Viewer Modal
+   ============================================ */
+
+LogViewerScreen {
+    align: center middle;
+    background: transparent;
+}
+
+#log-viewer-dialog {
+    width: 90%;
+    height: 90%;
+    background: transparent;
+    border: round $primary;
+    border-title-color: $primary;
+    padding: 0 1;
+}
+
+#log-viewer-path {
+    width: 100%;
+    height: 1;
+    background: transparent;
+    color: $foreground-darken-1;
+    text-style: italic;
+    padding: 0 1;
+}
+
+#log-viewer-content {
+    width: 100%;
+    height: 1fr;
+    background: transparent;
+    border: none;
+}
+
+/* TextArea internal styling */
+#log-viewer-content > .text-area--cursor {
+    background: $primary;
+    color: $background;
+}
+
+#log-viewer-hint {
+    width: 100%;
+    height: 1;
+    text-align: center;
+    color: $foreground-darken-2;
+    background: transparent;
+}
+
+/* ============================================
+   Job Details Modal
+   ============================================ */
+
+JobDetailsScreen {
+    align: center middle;
+    background: transparent;
+}
+
+#job-details-dialog {
+    width: 80%;
+    height: 80%;
+    background: transparent;
+    border: round $primary;
+    border-title-color: $primary;
+    padding: 0 1;
+}
+
+#job-details-content {
+    width: 100%;
+    height: 1fr;
+    background: transparent;
+    border: none;
+}
+
+/* TextArea internal styling */
+#job-details-content > .text-area--cursor {
+    background: $primary;
+    color: $background;
+}
+
+#job-details-hint {
+    width: 100%;
+    height: 1;
+    text-align: center;
+    color: $foreground-darken-2;
+    background: transparent;
+}
