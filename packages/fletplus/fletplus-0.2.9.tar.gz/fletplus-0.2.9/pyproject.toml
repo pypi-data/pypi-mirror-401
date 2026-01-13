@@ -1,0 +1,135 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "wheel",
+    "maturin>=1.7",
+    "pyrust-native>=0.0.2",
+]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "fletplus"
+version = "0.2.9"
+description = "Componentes visuales avanzados y herramientas mejoradas para Flet en Python."
+authors = [
+  { name = "Adolfo González", email = "adolfogonzal@gmail.com" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+  "flet>=0.27.0",
+  "click>=8.1",
+  "watchdog>=3.0",
+  "websockets>=12.0",
+  "httpx>=0.28",
+]
+
+
+# ------------ ENTRYPOINTS CLI ------------
+[project.scripts]
+fletplus = "fletplus.cli.main:app"
+fletplus-demo = "fletplus_demo:main"
+
+
+# ------------ LINKS ------------
+[project.urls]
+Homepage = "https://github.com/Alphonsus411/fletplus"
+Source = "https://github.com/Alphonsus411/fletplus"
+Documentation = "https://github.com/Alphonsus411/fletplus#readme"
+
+
+# ------------ OPTIONAL SPEEDUPS (Cython) ------------
+[project.optional-dependencies]
+speedups = ["cython>=3.0"]
+rust = ["pyrust-native>=0.0.2", "maturin>=1.7"]
+dev = [
+  "pytest>=7.4,<9",
+  "ruff>=0.5,<1",
+  "black>=24.0,<25",
+  "mypy>=1.7,<2",
+]
+qa = [
+  "bandit>=1.7.8,<2",
+  "pip-audit>=2.7,<3",
+  "safety>=2.3,<3",
+]
+
+
+# ------------ PACKAGE DISCOVERY ------------
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fletplus*", "fletplus_demo*"]
+exclude = ["tests*", "tools*", "coverage*", "docs*"]
+
+
+# ------------ PACKAGE DATA ------------
+[tool.setuptools.package-data]
+"fletplus.router" = ["router_cy.c"]
+"fletplus.router.router_pr_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.router.router_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.animation.listeners_pr_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.components.charts.line_chart_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.components.command_palette_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.components.responsive_grid_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.components.smart_table_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.themes.token_merge_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.themes.palette_flatten_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.themes.theme_merge_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.http.disk_cache_pr_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.state.signal_pr_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.utils.responsive_manager_rs" = ["Cargo.toml", "Cargo.lock", "src/*.rs"]
+"fletplus.http" = ["disk_cache.c"]
+"fletplus.state" = ["state.c"]
+"fletplus.utils" = ["responsive_manager.c"]
+
+
+[tool.pyrust-native]
+modules = [
+  { name = "fletplus.router.router_pr_rs", manifest-path = "fletplus/router/router_pr_rs/Cargo.toml" },
+  { name = "fletplus.router.router_rs", manifest-path = "fletplus/router/router_rs/Cargo.toml" },
+  { name = "fletplus.animation.listeners_pr_rs", manifest-path = "fletplus/animation/listeners_pr_rs/Cargo.toml" },
+  { name = "fletplus.animation.listeners_rs", manifest-path = "fletplus/animation/listeners_rs/Cargo.toml" },
+  { name = "fletplus.components.smart_table_rs", manifest-path = "fletplus/components/smart_table_rs/Cargo.toml" },
+  { name = "fletplus.components.responsive_grid_rs", manifest-path = "fletplus/components/responsive_grid_rs/Cargo.toml" },
+  { name = "fletplus.components.command_palette_rs", manifest-path = "fletplus/components/command_palette_rs/Cargo.toml" },
+  { name = "fletplus.components.charts.line_chart_rs", manifest-path = "fletplus/components/charts/line_chart_rs/Cargo.toml" },
+  { name = "fletplus.themes.token_merge_rs", manifest-path = "fletplus/themes/token_merge_rs/Cargo.toml" },
+  { name = "fletplus.themes.palette_flatten_rs", manifest-path = "fletplus/themes/palette_flatten_rs/Cargo.toml" },
+  { name = "fletplus.themes.theme_merge_rs", manifest-path = "fletplus/themes/theme_merge_rs/Cargo.toml" },
+  { name = "fletplus.http.disk_cache_pr_rs", manifest-path = "fletplus/http/disk_cache_pr_rs/Cargo.toml" },
+  { name = "fletplus.utils.breakpoint_rs", manifest-path = "fletplus/utils/breakpoint_rs/Cargo.toml" },
+  { name = "fletplus.utils.responsive_manager_rs", manifest-path = "fletplus/utils/responsive_manager_rs/Cargo.toml" },
+  { name = "fletplus.state.signal_pr_rs", manifest-path = "fletplus/state/signal_pr_rs/Cargo.toml" },
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+skip-string-normalization = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_unused_ignores = true
+warn_redundant_casts = true
+mypy_path = "fletplus"
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.bandit]
+# Excluir bindings nativos generados (.rs/.c) y carpetas de tests/entornos virtuales.
+exclude = [
+  "fletplus/**/_rs",
+  "fletplus/**/*.c",
+  "tests",
+  "venv",
+  ".venv",
+]
