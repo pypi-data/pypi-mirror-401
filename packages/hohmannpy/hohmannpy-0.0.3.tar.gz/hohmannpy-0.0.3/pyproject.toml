@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hohmannpy"
+version = "0.0.3"
+description = "An open-source library designed for rapid spacecraft design and iteration."
+readme = "README.md"
+license = {text = "GPL-3.0"}
+authors = [{name = "Nicholas Hirsch"}]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pygfx",
+    "pandas",
+    "imageio",
+    "pylinalg"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hohmannpy*"]
