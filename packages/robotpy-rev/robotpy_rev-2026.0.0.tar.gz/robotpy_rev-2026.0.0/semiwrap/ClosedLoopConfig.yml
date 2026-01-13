@@ -1,0 +1,40 @@
+extra_includes:
+- rev/DetachedEncoder.h
+
+classes:
+  rev::spark::ClosedLoopConfig:
+    base_qualnames:
+      BaseConfig: rev::BaseConfig
+    attributes:
+      maxMotion:
+      feedForward:
+    methods:
+      ClosedLoopConfig:
+      Apply:
+        overloads:
+          ClosedLoopConfig&:
+          MAXMotionConfig&:
+          FeedForwardConfig&:
+      Pidf:
+      Pid:
+      P:
+      I:
+      D:
+      VelocityFF:
+      DFilter:
+      IZone:
+      MinOutput:
+      MaxOutput:
+      OutputRange:
+      IMaxAccum:
+      PositionWrappingEnabled:
+      PositionWrappingMinInput:
+      PositionWrappingMaxInput:
+      PositionWrappingInputRange:
+      SetFeedbackSensor:
+        overloads:
+          FeedbackSensor:
+          FeedbackSensor, int:
+          FeedbackSensor, rev::detached::DetachedEncoder&:
+      Flatten:
+      AllowedClosedLoopError:
