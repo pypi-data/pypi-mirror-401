@@ -1,0 +1,1 @@
+"""Domain manifests and enforcement infrastructure."""
