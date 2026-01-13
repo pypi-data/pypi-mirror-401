@@ -1,0 +1,203 @@
+# skill-audit
+
+🔒 Security auditing CLI for AI agent skills.
+
+AI agents increasingly use "skills" - modular packages containing instructions and executable code that extend an agent's capabilities. These skills can execute code on your machine, making them a significant security risk if not properly vetted.
+
+**skill-audit** helps you audit skills before trusting them.
+
+## Features
+
+- 🔍 **Prompt Injection Detection** - Scans skill descriptions for jailbreak patterns and manipulation attempts
+- 🔑 **Secret Scanning** - Finds hardcoded API keys, tokens, and credentials (via trufflehog/gitleaks)
+- 🐚 **Shell Script Analysis** - Checks bash scripts for dangerous patterns (via shellcheck)
+- 🐍 **Code Security** - Analyzes Python/JS code for security issues (via semgrep)
+- 📄 **SARIF Output** - CI/CD ready output format for GitHub Actions integration
+- 🔌 **Extensible** - Plugin architecture for custom scanners
+
+## Installation
+
+### macOS
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/markpors/skill-audit
+cd skill-audit
+
+# 2. Create virtual environment and install
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+# 3. Install security tools (recommended)
+brew install shellcheck semgrep trufflehog
+
+# Note: gitleaks is an alternative to trufflehog (only need one)
+# brew install gitleaks
+
+# 4. Verify installation
+skill-audit check-tools
+```
+
+**Add to your shell profile** (optional, for global access):
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+alias skill-audit="source ~/dev/skill-audit/.venv/bin/activate && skill-audit"
+```
+
+### Linux
+
+```bash
+# 1. Clone and install
+git clone https://github.com/markpors/skill-audit
+cd skill-audit
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+# 2. Install security tools
+pip install semgrep
+sudo apt install shellcheck  # Debian/Ubuntu
+# For trufflehog: https://github.com/trufflesecurity/trufflehog#installation
+```
+
+### From PyPI (coming soon)
+
+```bash
+pip install skill-audit
+```
+
+## Usage
+
+### Basic Audit
+
+```bash
+# Audit a skill directory
+skill-audit audit ./my-skill/
+
+# Audit a specific file
+skill-audit audit ./my-skill/SKILL.md
+```
+
+### Output Formats
+
+```bash
+# Pretty terminal output (default)
+skill-audit audit ./my-skill/
+
+# JSON output
+skill-audit audit ./my-skill/ --format json
+
+# SARIF output (for CI/CD)
+skill-audit audit ./my-skill/ --format sarif -o results.sarif
+```
+
+### Check Available Tools
+
+```bash
+skill-audit check-tools
+```
+
+### Strict Mode
+
+```bash
+# Fail on warnings (not just errors)
+skill-audit audit ./my-skill/ --strict
+```
+
+## What It Checks
+
+### Prompt/Instruction Analysis
+- Jailbreak patterns ("ignore previous instructions", "DAN mode", etc.)
+- Role manipulation attempts ("you are root", "pretend to be admin")
+- Data exfiltration instructions
+- Safety bypass attempts
+
+### Code Analysis
+- Hardcoded secrets and credentials
+- Dangerous shell patterns (`rm -rf`, `eval`, etc.)
+- Arbitrary code execution risks
+- Subprocess injection vulnerabilities
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Passed - no errors found |
+| 1 | Failed - errors found (or warnings in strict mode) |
+| 2 | Error - tool execution failed |
+
+## CI/CD Integration
+
+### GitHub Actions
+
+```yaml
+- name: Audit Skills
+  run: |
+    pip install skill-audit
+    skill-audit audit ./skills/ --format sarif -o results.sarif
+    
+- name: Upload SARIF
+  uses: github/codeql-action/upload-sarif@v2
+  with:
+    sarif_file: results.sarif
+```
+
+## Development
+
+```bash
+# Clone and install in dev mode
+git clone https://github.com/markpors/skill-audit
+cd skill-audit
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Lint
+ruff check src/
+```
+
+## Limitations
+
+**skill-audit is a static analysis tool. It cannot catch everything.**
+
+### What it CAN detect:
+- Known jailbreak patterns and prompt injection attempts
+- Hardcoded secrets and credentials
+- Dangerous code patterns (eval, exec, shell injection)
+- Common shell script vulnerabilities
+
+### What it CANNOT detect:
+- **Obfuscated malware** — encoded, encrypted, or cleverly hidden payloads
+- **Novel attack patterns** — zero-day techniques not in our ruleset
+- **Contextual intent** — a "File Deleter" skill legitimately needs to delete files
+- **Indirect prompt injection** — malicious content injected via external data sources
+- **Runtime behavior** — dynamic code generation, network calls at runtime
+- **Supply chain attacks** — compromised dependencies of the skill itself
+
+### False positives
+Some legitimate skills may trigger warnings. For example:
+- A password manager skill will "access credentials" — that's its job
+- A cleanup utility will use `rm` commands
+- An API client will contain endpoint URLs
+
+Use `--strict` mode thoughtfully, and review warnings in context.
+
+## Disclaimer
+
+**⚠️ THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.**
+
+skill-audit is a security scanning tool, not a guarantee of safety. 
+
+- A **passing audit does not mean a skill is safe**. It only means no known issues were detected.
+- A **failing audit does not mean a skill is malicious**. It may be a false positive.
+- **Always review skills manually** before granting them access to sensitive systems.
+- **Do not rely solely on this tool** for security decisions in production environments.
+- The authors are **not responsible** for any damage caused by skills that pass or fail audits.
+
+Use at your own risk. When in doubt, don't install the skill.
+
+## License
+
+MIT
