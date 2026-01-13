@@ -1,0 +1,56 @@
+name: Tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+    name: Run pytest
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        dbt-version: ["1.8.0", "1.9.0", "1.10.0", "1.10.17", "1.11.2"]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.1.0
+        with:
+          python-version: "${{ matrix.python-version }}"
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Install uv
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt uv
+          uv --version
+
+      - name: Install required packages
+        run: | # install dev and openai extras to be able to parse manifest and run all tests
+          uv sync --extra dev --extra openai
+
+      - name: Install dbt-core
+        run: |
+          uv pip install dbt-core==${{ matrix.dbt-version }}
+
+      - name: Parse manifest
+        run: |
+          uv run dbt parse --project-dir demo_duckdb --profiles-dir demo_duckdb -t test
+
+      - name: Run pytest
+        run: |
+          uv run pytest
+
+      - name: Run integration tests
+        working-directory: demo_duckdb
+        run: |
+          bash -x integration_tests.sh
