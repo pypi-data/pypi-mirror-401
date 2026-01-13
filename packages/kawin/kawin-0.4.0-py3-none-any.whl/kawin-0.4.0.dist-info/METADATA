@@ -1,0 +1,55 @@
+Metadata-Version: 2.4
+Name: kawin
+Version: 0.4.0
+Summary: Tool for simulating precipitation using the KWN model coupled with Calphad.
+Author-email: Nicholas Ury <nury12n@gmail.com>
+License: MIT
+Project-URL: Homepage, https://kawin.org
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: matplotlib>=3.3
+Requires-Dist: numpy>=2.0
+Requires-Dist: pycalphad>=0.11
+Requires-Dist: scipy
+Requires-Dist: setuptools_scm[toml]>=6.0
+Dynamic: license-file
+
+# kawin
+
+Python implementation of the Kampmann-Wagner Numerical (KWN) model to predict precipitate nucleation and growth behavior. This package couples with pycalphad to perform thermodynamic and kinetic calculations.
+
+Notes
+-----
+There has been a lot of changes in the API. Please check the examples for further details.
+If you still have issues setting up a simulation, feel free to open an issue.
+
+Installation
+------------
+Installing through pip:
+
+```
+pip install kawin
+```
+
+Development version:
+
+```
+git clone https://github.com/materialsgenomefoundation/kawin
+cd kawin
+pip install -e .
+```
+
+Examples
+--------
+Examples on Jupyter notebooks can be found on [NBViewer](https://nbviewer.org/github/materialsgenomefoundation/kawin/tree/main/examples/).
+
+Dependencies
+------------
+numpy, scipy, matplotlib, pycalphad
