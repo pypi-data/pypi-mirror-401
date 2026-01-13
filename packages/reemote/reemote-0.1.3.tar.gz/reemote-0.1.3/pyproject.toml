@@ -1,0 +1,39 @@
+[project]
+name = "reemote"
+version = "0.1.3"
+description = "An API for controlling remote systems."
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Kim Jarvis", email = "kim.jarvis@tpfsystems.com"}
+]
+maintainers = [
+    {name = "Kim Jarvis", email = "kim.jarvis@tpfsystems.com"}
+]
+requires-python = ">=3.13"
+dependencies = [
+    "asyncssh>=2.21.1",
+    "coverage>=7.13.0",
+    "fastapi[standard]>=0.123.5",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.1",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.1",
+    "pytest-asyncio>=1.3.0",
+    "ruff>=0.14.9",
+    "uvicorn>=0.38.0",
+]
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project.urls]
+Homepage = "http://reemote.org/index.html"
+Documentation = "https://reemote.org/redoc-static.html"
+"Source Code" = "https://github.com/kimjarvis/reemote"
+"Bug Tracker" = "https://github.com/kimjarvis/reemote/issues"
+
+[project.scripts]
+reemote = "reemote.module:main"
+
