@@ -1,0 +1,374 @@
+from __future__ import annotations
+import warnings
+from dataclasses import dataclass, field
+from functools import cached_property
+from typing import Literal
+
+import numpy as np
+import skimage as ski
+from cellpose.utils import outlines_list
+
+from .channels import Channel
+from .typing import BoolArray, Int64Array, ScalarArray
+
+OutlineExtractorMethod = Literal["cellpose", "skimage"]
+
+DEFAULT_CELL_PROPERTY_NAMES = [
+    "label",
+    "centroid",
+    "area",
+    "area_convex",
+    "perimeter",
+    "eccentricity",
+    "solidity",
+    "axis_major_length",
+    "axis_minor_length",
+    "orientation",
+    "moments_hu",
+    "inertia_tensor",
+    "inertia_tensor_eigvals",
+]
+
+DEFAULT_INTENSITY_PROPERTY_NAMES = [
+    "intensity_mean",
+    "intensity_max",
+    "intensity_min",
+    "intensity_std",
+]
+
+
+class CellposeOutlineExtractor:
+    """Extract cell outlines using Cellpose's outlines_list function."""
+
+    def extract_outlines(self, label_image: Int64Array) -> list[ScalarArray]:
+        """Extract outlines from label image."""
+        return outlines_list(label_image, multiprocessing=False)
+
+
+class SkimageOutlineExtractor:
+    """Extract cell outlines using scikit-image's find_contours."""
+
+    def extract_outlines(self, label_image: Int64Array) -> list[ScalarArray]:
+        """Extract outlines from label image."""
+        # Get unique cell IDs (excluding background)
+        unique_labels = np.unique(label_image)
+        unique_labels = unique_labels[unique_labels > 0]
+
+        outlines = []
+        for cell_id in unique_labels:
+            cell_mask = (label_image == cell_id).astype(np.uint8)
+            contours = ski.measure.find_contours(cell_mask, level=0.5)
+            if contours:
+                main_contour = max(contours, key=len)
+                outlines.append(main_contour)
+            else:
+                outlines.append(np.array([]))
+        return outlines
+
+
+@dataclass
+class MaskProcessor:
+    """Process segmentation masks by removing edge cells and ensuring consecutive labels.
+
+    Args:
+        remove_edge_cells: Whether to remove cells touching image borders.
+    """
+
+    remove_edge_cells: bool = True
+
+    def process_mask(self, mask_image: ScalarArray) -> Int64Array:
+        """Process a mask image by optionally removing edge cells and ensuring consecutive labels.
+
+        Args:
+            mask_image: Input mask array where each cell has a unique label.
+
+        Returns:
+            Processed label image with consecutive labels starting from 1.
+        """
+        _label_image = mask_image.copy()
+        if self.remove_edge_cells:
+            _label_image = ski.segmentation.clear_border(_label_image)
+
+        # Ensure consecutive labels
+        _label_image = ski.measure.label(_label_image).astype(np.int64)  # type: ignore
+        return _label_image
+
+
+@dataclass
+class SegmentationMask:
+    """Container for segmentation mask data and feature extraction.
+
+    Args:
+        mask_image: 2D integer array where each cell has a unique label (background=0).
+        intensity_image_dict: Optional dict mapping Channel enums to 2D intensity arrays.
+            Each intensity array must have the same shape as mask_image.
+            Channel names will be used as suffixes for intensity properties.
+            Example: {Channel.DAPI: [M x N], Channel.FITC: [M x N]}
+        remove_edge_cells: Whether to remove cells touching image borders.
+        outline_extractor: Outline extraction method ("cellpose" or "skimage").
+        property_names: List of property names to compute. If None, uses default property names.
+        intensity_property_names: List of intensity property names to compute.
+            If None, uses default intensity properties when intensity_image_dict is provided.
+    """
+
+    mask_image: ScalarArray
+    intensity_image_dict: dict[Channel, ScalarArray] | None = None
+    remove_edge_cells: bool = True
+    outline_extractor: OutlineExtractorMethod = "cellpose"
+    property_names: list[str] | None = field(default=None)
+    intensity_property_names: list[str] | None = field(default=None)
+
+    def __post_init__(self):
+        """Validate inputs and create processors."""
+        # Validate mask_image
+        if not isinstance(self.mask_image, np.ndarray):
+            raise TypeError("mask_image must be a numpy array")
+        if self.mask_image.ndim != 2:
+            raise ValueError("mask_image must be a 2D array")
+        if self.mask_image.min() < 0:
+            raise ValueError("mask_image must have non-negative values")
+
+        # Validate intensity_image dict if provided
+        if self.intensity_image_dict is not None:
+            if not isinstance(self.intensity_image_dict, dict):
+                raise TypeError(
+                    "intensity_image_dict must be a dict mapping Channel enums to 2D arrays"
+                )
+            for channel, intensities in self.intensity_image_dict.items():
+                if not isinstance(intensities, np.ndarray):
+                    raise TypeError(f"Intensity image for '{channel.name}' must be a numpy array")
+                if intensities.ndim != 2:
+                    raise ValueError(f"Intensity image for '{channel.name}' must be 2D")
+                if intensities.shape != self.mask_image.shape:
+                    raise ValueError(
+                        f"Intensity image for '{channel.name}' must have same shape as mask_image"
+                    )
+
+        # Set default property names if none provided
+        if self.property_names is None:
+            self.property_names = DEFAULT_CELL_PROPERTY_NAMES.copy()
+
+        # Set default intensity property names if intensity images provided
+        if self.intensity_property_names is None:
+            if self.intensity_image_dict:
+                self.intensity_property_names = DEFAULT_INTENSITY_PROPERTY_NAMES.copy()
+            else:
+                self.intensity_property_names = []
+
+        # Create mask processor
+        self._mask_processor = MaskProcessor(remove_edge_cells=self.remove_edge_cells)
+
+        # Create outline extractor
+        if self.outline_extractor == "cellpose":
+            self._outline_extractor = CellposeOutlineExtractor()
+        else:  # Must be "skimage" due to Literal type
+            self._outline_extractor = SkimageOutlineExtractor()
+
+    @cached_property
+    def label_image(self) -> Int64Array:
+        """Get processed label image with consecutive labels."""
+        return self._mask_processor.process_mask(self.mask_image)
+
+    @cached_property
+    def num_cells(self) -> int:
+        """Get the number of cells in the mask."""
+        return int(self.label_image.max())
+
+    @cached_property
+    def cell_outlines(self) -> list[ScalarArray]:
+        """Extract cell outlines using the configured outline extractor."""
+        if self.num_cells == 0:
+            return []
+
+        return self._outline_extractor.extract_outlines(self.label_image)
+
+    @cached_property
+    def cell_properties(self) -> dict[str, ScalarArray]:
+        """Extract cell property values using regionprops.
+
+        Extracts both morphological properties (area, perimeter, etc.) and intensity-based
+        properties (mean, max, min intensity) for each channel if intensity images are provided.
+
+        For multichannel intensity images, property names are suffixed with the channel name:
+        - Channel.DAPI: "intensity_mean_DAPI"
+        - Channel.FITC: "intensity_mean_FITC"
+
+        Returns:
+            Dictionary mapping property names to arrays of values (one per cell).
+        """
+        if self.num_cells == 0:
+            empty_props = (
+                {property_name: np.array([]) for property_name in self.property_names}
+                if self.property_names
+                else {}
+            )
+            # Add empty intensity properties if requested
+            if self.intensity_image_dict and self.intensity_property_names:
+                for channel in self.intensity_image_dict:
+                    for prop_name in self.intensity_property_names:
+                        empty_props[f"{prop_name}_{channel.name}"] = np.array([])
+            return empty_props
+
+        # Extract morphological properties (no intensity image needed)
+        properties = ski.measure.regionprops_table(
+            self.label_image,
+            properties=self.property_names,
+            extra_properties=[circularity, volume],
+        )
+
+        # Extract intensity properties for each channel
+        if self.intensity_image_dict and self.intensity_property_names:
+            for channel, intensities in self.intensity_image_dict.items():
+                channel_props = ski.measure.regionprops_table(
+                    self.label_image,
+                    intensity_image=intensities,
+                    properties=self.intensity_property_names,
+                )
+                # Add channel suffix to property names
+                for prop_name, prop_values in channel_props.items():
+                    properties[f"{prop_name}_{channel.name}"] = prop_values
+
+        return properties
+
+    @cached_property
+    def centroids_yx(self) -> ScalarArray:
+        """Get cell centroids as (y, x) coordinates.
+
+        Extracts centroid coordinates from cell properties and returns them as a 2D array
+        where each row represents one cell's centroid in (y, x) format.
+
+        Returns:
+            Array of shape (num_cells, 2) with centroid coordinates.
+            Each row is [y_coordinate, x_coordinate] for one cell.
+            Returns empty array if "centroid" is not included in property_names.
+
+        Note:
+            If "centroid" is not in property_names, issues a warning and returns an empty array.
+        """
+        if self.property_names and "centroid" not in self.property_names:
+            warnings.warn(
+                "Centroid property not available. Include 'centroid' in property_names "
+                "to get centroid coordinates. Returning empty array.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return np.array([]).reshape(0, 2)
+
+        yc = self.cell_properties["centroid-0"]
+        xc = self.cell_properties["centroid-1"]
+        return np.array([yc, xc], dtype=float).T
+
+    def convert_properties_to_microns(
+        self,
+        pixel_size_um: float,
+    ) -> dict[str, ScalarArray]:
+        """Convert cell properties from pixels to microns.
+
+        Applies appropriate scaling factors based on the dimensionality of each property:
+            - Linear measurements (1D): multiplied by pixel_size_um
+            - Area measurements (2D): multiplied by pixel_size_um²
+            - Volume measurements (3D): multiplied by pixel_size_um³
+            - Dimensionless properties: unchanged
+
+        Args:
+            pixel_size_um: Pixel size in microns.
+
+        Returns:
+            Dictionary with the same keys as cell_properties but with values
+            converted to micron units where applicable.
+
+        Note:
+            Properties like 'label', 'circularity', 'eccentricity', 'solidity',
+            and 'orientation' are dimensionless and remain unchanged.
+            Intensity properties (intensity_mean, intensity_max, etc.) are also
+            dimensionless and remain unchanged.
+            Tensor properties (inertia_tensor, inertia_tensor_eigvals) are scaled
+            as 2D quantities (pixel_size_um²).
+        """
+        # Define which properties need which scaling
+        linear_properties = {
+            "perimeter",
+            "axis_major_length",
+            "axis_minor_length",
+            "centroid-0",
+            "centroid-1",
+        }
+        area_properties = {"area", "area_convex"}
+        volume_properties = {"volume"}
+        tensor_properties = {"inertia_tensor", "inertia_tensor_eigvals"}
+
+        converted = {}
+        for prop_name, prop_values in self.cell_properties.items():
+            if prop_name in linear_properties:
+                converted[prop_name] = prop_values * pixel_size_um
+            elif prop_name in area_properties:
+                converted[prop_name] = prop_values * (pixel_size_um**2)
+            elif prop_name in volume_properties:
+                converted[prop_name] = prop_values * (pixel_size_um**3)
+            elif prop_name in tensor_properties:
+                converted[prop_name] = prop_values * (pixel_size_um**2)
+            else:
+                # Intensity-related, dimensionless, or label - no conversion
+                converted[prop_name] = prop_values
+
+        return converted
+
+
+def circularity(region_mask: BoolArray) -> float:
+    """Calculate the circularity of a cell region.
+
+    Circularity is a shape metric that quantifies how close a shape is to a perfect circle.
+    It is computed as (4π * area) / perimeter², ranging from 0 to 1, where 1 represents
+    a perfect circle and lower values indicate more elongated or irregular shapes.
+
+    Args:
+        region_mask: Boolean mask of the cell region.
+
+    Returns:
+        Circularity value between 0 and 1. Returns 0 if perimeter is zero.
+    """
+    # regionprops expects a labeled image, so convert the mask (0/1)
+    labeled_mask = region_mask.astype(np.int64, copy=False)
+
+    # Compute standard region properties on this mask
+    props = ski.measure.regionprops(labeled_mask)[0]
+    area = float(props.area)
+    perimeter = float(props.perimeter)
+
+    if perimeter == 0.0:
+        return 0.0
+
+    return (4.0 * np.pi * area) / (perimeter**2)
+
+
+def volume(region_mask: BoolArray) -> float:
+    """Estimate the volume of a cell region.
+
+    Volume is estimated by fitting an ellipse to the cell region and treating it as
+    a prolate spheroid (ellipsoid of revolution). The ellipsoid is formed by rotating
+    the fitted ellipse around its major axis, with volume = (4/3)π * a * b^2, where
+    a is the semi-major axis and b is the semi-minor axis.
+
+    Args:
+        region_mask: Boolean mask of the cell region.
+
+    Returns:
+        Estimated volume in cubic pixels. Returns 0 if axis lengths cannot be computed.
+    """
+    # regionprops expects a labeled image, so convert the mask (0/1)
+    labeled_mask = region_mask.astype(np.int64, copy=False)
+
+    # Compute standard region properties on this mask
+    props = ski.measure.regionprops(labeled_mask)[0]
+    major_axis = float(props.axis_major_length)
+    minor_axis = float(props.axis_minor_length)
+
+    if major_axis == 0.0 or minor_axis == 0.0:
+        return 0.0
+
+    # Convert to semi-axes (regionprops returns full lengths)
+    semi_major = major_axis / 2.0
+    semi_minor = minor_axis / 2.0
+
+    # Volume of prolate spheroid: (4/3) * π * a * b * b
+    return (4.0 / 3.0) * np.pi * semi_major * semi_minor * semi_minor
