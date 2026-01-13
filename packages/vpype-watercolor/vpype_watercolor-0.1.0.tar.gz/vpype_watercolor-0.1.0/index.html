@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watercolor Layout Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 1.5rem;
+        }
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-group label {
+            font-weight: 500;
+        }
+        .control-group input[type="number"] {
+            width: 80px;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        button.primary {
+            background: #2563eb;
+            color: white;
+        }
+        button.primary:hover {
+            background: #1d4ed8;
+        }
+        button.secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        button.secondary:hover {
+            background: #d1d5db;
+        }
+        button.danger {
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+        }
+        button.danger:hover {
+            background: #dc2626;
+        }
+        .canvas-container {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+            overflow: auto;
+        }
+        #canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        .rect-list {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .rect-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .rect-list th, .rect-list td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .rect-list th {
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+        .rect-list tr:last-child td {
+            border-bottom: none;
+        }
+        .rect-list input[type="number"] {
+            width: 70px;
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .rect-list input[type="color"] {
+            width: 50px;
+            height: 28px;
+            padding: 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .rect-list select {
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .hidden-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Watercolor Layout Editor</h1>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Canvas Width (mm):</label>
+            <input type="number" id="canvasWidth" value="367" min="1">
+        </div>
+        <div class="control-group">
+            <label>Canvas Height (mm):</label>
+            <input type="number" id="canvasHeight" value="210" min="1">
+        </div>
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="showGrid" checked>
+                Show Grid
+            </label>
+        </div>
+        <button class="primary" onclick="addRectangle()">Add Rectangle</button>
+        <button class="secondary" onclick="uploadSvg()">Upload SVG</button>
+        <button class="secondary" onclick="downloadSvg()">Download SVG</button>
+        <input type="file" id="fileInput" accept=".svg" class="hidden-input" onchange="handleFileUpload(event)">
+    </div>
+
+    <div class="canvas-container">
+        <svg id="canvas"></svg>
+    </div>
+
+    <div class="rect-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Color</th>
+                    <th>Hex</th>
+                    <th>X (mm)</th>
+                    <th>Y (mm)</th>
+                    <th>Width (mm)</th>
+                    <th>Height (mm)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="rectList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let state = {
+            canvasWidth: 367,
+            canvasHeight: 210,
+            showGrid: true,
+            rectangles: []
+        };
+
+        function initDefaultTemplate() {
+            state.rectangles = [
+                // Paint trays - Column 1 (left)
+                { type: 'paint', fill: '#704214', x: 1, y: 3, width: 28, height: 17 },
+                { type: 'paint', fill: '#ab4e52', x: 1, y: 22, width: 28, height: 17 },
+                { type: 'paint', fill: '#000000', x: 1, y: 41, width: 28, height: 17 },
+                { type: 'paint', fill: '#cc7722', x: 1, y: 59, width: 28, height: 17 },
+                { type: 'paint', fill: '#00a550', x: 1, y: 78, width: 28, height: 17 },
+                { type: 'paint', fill: '#003153', x: 1, y: 97, width: 28, height: 17 },
+                // Paint trays - Column 2 (right)
+                { type: 'paint', fill: '#228b22', x: 31, y: 3, width: 28, height: 17 },
+                { type: 'paint', fill: '#120a8f', x: 31, y: 22, width: 28, height: 17 },
+                { type: 'paint', fill: '#960018', x: 31, y: 41, width: 28, height: 17 },
+                { type: 'paint', fill: '#fff44f', x: 31, y: 59, width: 28, height: 17 },
+                { type: 'paint', fill: '#e3a857', x: 31, y: 78, width: 28, height: 17 },
+                { type: 'paint', fill: '#e30022', x: 31, y: 97, width: 28, height: 17 },
+                // Water tray
+                { type: 'water', fill: '#aaddff', x: 1, y: 116, width: 58, height: 58 },
+                // Paper area (A4 landscape)
+                { type: 'paper', fill: '#ffffff', x: 70, y: 0, width: 297, height: 210 },
+            ];
+        }
+
+        function render() {
+            renderCanvas();
+            renderRectList();
+        }
+
+        function renderCanvas() {
+            const svg = document.getElementById('canvas');
+            const w = state.canvasWidth;
+            const h = state.canvasHeight;
+
+            svg.setAttribute('width', (w / 10) + 'cm');
+            svg.setAttribute('height', (h / 10) + 'cm');
+            svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+            let html = '';
+
+            // Background
+            html += `<rect x="0" y="0" width="${w}" height="${h}" fill="#e0e0e0"/>`;
+
+            // Grid
+            if (state.showGrid) {
+                html += '<g class="grid">';
+                // 10mm major grid
+                for (let x = 0; x <= w; x += 10) {
+                    html += `<line x1="${x}" y1="0" x2="${x}" y2="${h}" stroke="#999" stroke-width="0.3"/>`;
+                }
+                for (let y = 0; y <= h; y += 10) {
+                    html += `<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="#999" stroke-width="0.3"/>`;
+                }
+                html += '</g>';
+            }
+
+            // Rectangles
+            state.rectangles.forEach((rect, i) => {
+                const stroke = rect.type === 'paper' ? '#000000' : 'none';
+                const strokeWidth = rect.type === 'paper' ? '0.5' : '0';
+                html += `<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" fill="${rect.fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/>`;
+            });
+
+            svg.innerHTML = html;
+        }
+
+        function renderRectList() {
+            const tbody = document.getElementById('rectList');
+            let html = '';
+
+            state.rectangles.forEach((rect, i) => {
+                const colorDisabled = rect.type !== 'paint' ? 'disabled' : '';
+
+                const hexDisplay = rect.type === 'paint' ? rect.fill : '-';
+
+                html += `<tr>
+                    <td>
+                        <select onchange="updateType(${i}, this.value)">
+                            <option value="water" ${rect.type === 'water' ? 'selected' : ''}>Water</option>
+                            <option value="paper" ${rect.type === 'paper' ? 'selected' : ''}>Paper</option>
+                            <option value="paint" ${rect.type === 'paint' ? 'selected' : ''}>Paint</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="color" value="${rect.fill}" onchange="updateColor(${i}, this.value)" ${colorDisabled}>
+                    </td>
+                    <td style="font-family: monospace; font-size: 0.9em;">
+                        ${hexDisplay}
+                    </td>
+                    <td>
+                        <input type="number" value="${rect.x}" onchange="updateX(${i}, this.value)">
+                    </td>
+                    <td>
+                        <input type="number" value="${rect.y}" onchange="updateY(${i}, this.value)">
+                    </td>
+                    <td>
+                        <input type="number" value="${rect.width}" min="1" onchange="updateWidth(${i}, this.value)">
+                    </td>
+                    <td>
+                        <input type="number" value="${rect.height}" min="1" onchange="updateHeight(${i}, this.value)">
+                    </td>
+                    <td>
+                        <button class="danger" onclick="deleteRect(${i})">Delete</button>
+                    </td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function updateType(index, type) {
+            state.rectangles[index].type = type;
+            if (type === 'water') {
+                state.rectangles[index].fill = '#aaddff';
+            } else if (type === 'paper') {
+                state.rectangles[index].fill = '#ffffff';
+            }
+            render();
+        }
+
+        function updateColor(index, color) {
+            state.rectangles[index].fill = color;
+            render();
+        }
+
+        function updateX(index, x) {
+            state.rectangles[index].x = parseInt(x);
+            render();
+        }
+
+        function updateY(index, y) {
+            state.rectangles[index].y = parseInt(y);
+            render();
+        }
+
+        function updateWidth(index, width) {
+            state.rectangles[index].width = Math.max(1, parseInt(width));
+            render();
+        }
+
+        function updateHeight(index, height) {
+            state.rectangles[index].height = Math.max(1, parseInt(height));
+            render();
+        }
+
+        function addRectangle() {
+            state.rectangles.push({
+                type: 'paint',
+                fill: '#ff0000',
+                x: 10,
+                y: 10,
+                width: 20,
+                height: 15
+            });
+            render();
+        }
+
+        function deleteRect(index) {
+            state.rectangles.splice(index, 1);
+            render();
+        }
+
+        function uploadSvg() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseSvg(e.target.result);
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function parseSvg(svgString) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, 'image/svg+xml');
+            const svg = doc.querySelector('svg');
+
+            if (!svg) {
+                alert('Invalid SVG file');
+                return;
+            }
+
+            // Parse viewBox for dimensions
+            const viewBox = svg.getAttribute('viewBox');
+            if (viewBox) {
+                const parts = viewBox.split(/\s+/);
+                if (parts.length >= 4) {
+                    state.canvasWidth = parseInt(parts[2]);
+                    state.canvasHeight = parseInt(parts[3]);
+                    document.getElementById('canvasWidth').value = state.canvasWidth;
+                    document.getElementById('canvasHeight').value = state.canvasHeight;
+                }
+            }
+
+            // Parse rectangles
+            state.rectangles = [];
+            const rects = svg.querySelectorAll('rect');
+
+            rects.forEach(rect => {
+                const x = Math.round(parseFloat(rect.getAttribute('x')) || 0);
+                const y = Math.round(parseFloat(rect.getAttribute('y')) || 0);
+                const width = Math.round(parseFloat(rect.getAttribute('width')) || 0);
+                const height = Math.round(parseFloat(rect.getAttribute('height')) || 0);
+                const fill = rect.getAttribute('fill') || '#cccccc';
+                const id = rect.getAttribute('id');
+
+                // Skip background rect (full canvas size)
+                if (x === 0 && y === 0 && width === state.canvasWidth && height === state.canvasHeight) {
+                    return;
+                }
+
+                let type = 'paint';
+                if (id === 'water') type = 'water';
+                else if (id === 'paper') type = 'paper';
+
+                state.rectangles.push({ type, fill, x, y, width, height });
+            });
+
+            render();
+        }
+
+        function downloadSvg() {
+            const w = state.canvasWidth;
+            const h = state.canvasHeight;
+
+            let svg = `<svg width="${w/10}cm" height="${h/10}cm" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">\n`;
+            svg += `  <rect x="0" y="0" width="${w}" height="${h}" fill="#e0e0e0"/>\n`;
+
+            state.rectangles.forEach(rect => {
+                const id = rect.type === 'water' ? ' id="water"' : (rect.type === 'paper' ? ' id="paper"' : '');
+                const stroke = rect.type === 'paper' ? ' stroke="#000000" stroke-width="0.5"' : '';
+                svg += `  <rect${id} x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" fill="${rect.fill}"${stroke}/>\n`;
+            });
+
+            svg += '</svg>\n';
+
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'layout.svg';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Event listeners for canvas size
+        document.getElementById('canvasWidth').addEventListener('change', function() {
+            state.canvasWidth = Math.max(1, parseInt(this.value) || 367);
+            this.value = state.canvasWidth;
+            render();
+        });
+
+        document.getElementById('canvasHeight').addEventListener('change', function() {
+            state.canvasHeight = Math.max(1, parseInt(this.value) || 210);
+            this.value = state.canvasHeight;
+            render();
+        });
+
+        document.getElementById('showGrid').addEventListener('change', function() {
+            state.showGrid = this.checked;
+            render();
+        });
+
+        // Initialize
+        initDefaultTemplate();
+        render();
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+[project]
+name = "vpype-watercolor"
+version = "0.1.0"
+description = "vpype plugin for watercolor plotting"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "vpype>=1.14",
+    "click",
+    "svgelements",
+]
+
+[project.entry-points."vpype.plugins"]
+watercolor = "vpype_watercolor:watercolor"
+
+[project.scripts]
+vpype-merge-debug = "vpype_watercolor:merge_debug_cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
