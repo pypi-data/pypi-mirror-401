@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: sberzvuk_api
+Version: 1.0.2
+Summary: Asynchronous wrapper for SberZvuk API
+Home-page: https://github.com/Lincoln-Continental/SberZvuk_API
+Author: $10,000 Lincoln Continental
+License: MIT
+Description-Content-Type: text/markdown
+Requires-Dist: aiohttp
+Dynamic: author
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: summary
+
+## ▌ Asynchronous wrapper for SberZvuk API
+
+
+> No official documentation provided
+
+## ▌ Installation & Usage
+
+Install the library using pip:
+
+```pip install sberzvuk-api```
+
+### Example usage:
+
+```
+from sberzvuk-api.client import ZvukAPI
+
+
+async def main():
+    api = await ZvukAPI.create() # or pass your token
+
+    # searching and gathering info about particular track
+    search_result = await api.search_all("after the burial")
+    
+    track_id = search_result[0]['id']
+    track_info = await api.get_full_track(track_id)
+
+    # download track by track id
+    download_url = await api.get_stream_url(track_id)
+    await api.download_track(download_url[0])
+
+    # gathering info about playlist and album
+    playlist = await api.get_playlist(8198049)
+    album = await api.get_album(674861, with_artists=False, with_tracks=True)
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+```
+
+#### ▌ Comments
+Zvuk API is represented using GraphQL, but the wrapper queries get all available data so it kinda loses sense. If you need specific data from api 
+you should modify queries in queries.py file to retrieve only what you need in your realization.
+
+
+---
+Thanks for GraphQL schema to [Aiving](https://github.com/Aiving)
