@@ -1,0 +1,68 @@
+Metadata-Version: 2.4
+Name: preloop
+Version: 0.8.0
+Summary: Preloop - Event-driven AI automation platform with built-in human-in-the-loop safety
+Author-email: Dimitris Moraitis <dimitris@spacecode.ai>, Yannis Chatzikonstantinou <yannis@spacecode.ai>
+Requires-Python: >=3.11
+License-File: LICENSE
+Requires-Dist: anthropic>=0.72.0
+Requires-Dist: uvicorn[standard]>=0.36.0
+Requires-Dist: fastapi>=0.115.13
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: greenlet>=3.0.0
+Requires-Dist: psycopg[binary]>=3.1.12
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: pgvector>=0.2.0
+Requires-Dist: pydantic>=2.4.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: pydantic[email]>=2.4.0
+Requires-Dist: python-jose>=3.3.0
+Requires-Dist: passlib[bcrypt]>=1.7.4
+Requires-Dist: bcrypt<4.1.0
+Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: httpx[http2]>=0.24.1
+Requires-Dist: tenacity>=8.2.3
+Requires-Dist: python-json-logger>=2.0.0
+Requires-Dist: jinja2>=3.1.2
+Requires-Dist: aiosmtplib>=2.0.2
+Requires-Dist: loguru>=0.7.3
+Requires-Dist: aiohttp>=3.9.0
+Requires-Dist: sentry-sdk[fastapi]>=2.9.0
+Requires-Dist: pyinstrument>=4.6.2
+Requires-Dist: nats-py>=2.6.0
+Requires-Dist: stripe>=12.4.0
+Requires-Dist: fastmcp>=2.13.0
+Requires-Dist: aiodocker>=0.21.0
+Requires-Dist: kubernetes_asyncio>=30.5.0
+Requires-Dist: cel-python>=0.1.0
+Requires-Dist: python-dotenv>=1.2.1
+Requires-Dist: alembic>=1.10.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: openai>=1.75.0
+Requires-Dist: asyncpg>=0.29.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: python-gitlab>=4.0.0
+Requires-Dist: APScheduler>=3.0.0
+Requires-Dist: pytz>=2025.2
+Requires-Dist: jira>=3.8.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.1; extra == "dev"
+Requires-Dist: pytest-mock>=3.12.0; extra == "dev"
+Requires-Dist: python-dotenv>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.7.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: mypy>=1.5.1; extra == "dev"
+Requires-Dist: pymdown-extensions>=10.0; extra == "dev"
+Requires-Dist: pre-commit>=4.2.0; extra == "dev"
+Requires-Dist: ruff>=0.11.3; extra == "dev"
+Requires-Dist: httpx>=0.24.1; extra == "dev"
+Requires-Dist: playwright>=1.30.0; extra == "dev"
+Requires-Dist: mcp>=1.0.0; extra == "dev"
+Provides-Extra: ai-providers
+Requires-Dist: anthropic>=0.39.0; extra == "ai-providers"
+Requires-Dist: google-generativeai>=0.8.0; extra == "ai-providers"
+Provides-Extra: push-notifications
+Requires-Dist: firebase-admin>=6.0.0; extra == "push-notifications"
+Dynamic: license-file
