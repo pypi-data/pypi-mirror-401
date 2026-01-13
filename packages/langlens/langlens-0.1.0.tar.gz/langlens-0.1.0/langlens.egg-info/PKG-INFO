@@ -1,0 +1,179 @@
+Metadata-Version: 2.4
+Name: langlens
+Version: 0.1.0
+Summary: A visual tracer and debugger for LangChain and LangGraph
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: langchain-core
+Provides-Extra: demo
+Requires-Dist: langchain[google-genai]>=1.2.2; extra == "demo"
+Requires-Dist: langchain-ollama>=1.0.1; extra == "demo"
+Requires-Dist: langgraph-cli[inmem]>=0.4.11; extra == "demo"
+Requires-Dist: langchain-groq>=1.1.1; extra == "demo"
+Requires-Dist: python-dotenv; extra == "demo"
+Dynamic: license-file
+
+<p align="center">
+  <img src="web-ui/static/logo.svg" alt="LangLens Logo" width="400">
+</p>
+
+# LangLens
+
+**Node-Level Observability for LangChain and LangGraph.**
+
+LangLens is a lightweight visual tracer and debugger designed specifically for LLM-powered applications. It captures detailed execution logs from your agents and chains, allowing you to inspect every LLM call, tool execution, and state transition with precision.
+
+![LangLens Screenshot](assests/screenshoot.png)
+
+---
+
+## ✨ Features
+
+- 🔍 **Interactive Trace Viewer**: Explore complex workflows through a rich graphical interface.
+- 🧩 **Node-Level Granularity**: Deep dive into individual chain runs, LLM inputs/outputs, and tool executions.
+- 💻 **VS Code Extension**: Debug your traces directly inside VS Code with a custom editor experience.
+- 🚀 **CLI Tool**: Quickly host a local viewer for any `.langlens` file.
+- 🔌 **Seamless Integration**: Add observability to your existing projects with a single line of code.
+
+---
+
+## 🏗️ How it Works
+
+LangLens bridges the gap between your LLM execution and visual debugging:
+
+```mermaid
+graph TD
+    subgraph "Capture Phase"
+    A[LLM App] -- "1. LangChain Callbacks" --> B(LangLens Handler)
+    B -- "2. Stream Events" --> C[[.langlens file]]
+    end
+
+    subgraph "Visualization Phase"
+    C -- "3a. CLI Server" --> D[Web Browser]
+    C -- "3b. Custom Editor" --> E[VS Code IDE]
+
+    D --> F{Interactive UI}
+    E --> F
+
+    F -- "4. Inspect Nodes" --> G[Observability & Debugging]
+    end
+```
+
+1. **Capture**: The `LangLensCallbackHandler` hooks into LangChain's event system to record starts, ends, and errors of every chain, tool, and LLM call.
+2. **Storage**: Events are serialized and saved into a `.langlens` file (JSONL format), providing a portable trace of the entire execution.
+3. **Visualization**:
+   - The **CLI Tool** launches a local Python server that hosts a Svelte-based frontend.
+   - The **VS Code Extension** registers as a custom editor for `.langlens` files, embedding the same Svelte UI directly into your workspace.
+4. **Debugging**: Use the interactive graph to navigate complex agentic workflows and inspect raw inputs/outputs at any level of the tree.
+
+---
+
+## 📦 Installation
+
+Since LangLens is currently in development and not yet published to PyPI or the VS Code Marketplace, you can install it from source.
+
+### 1. Build the Web UI
+
+The Python viewer and VS Code extension both require the bundled Web UI.
+
+```bash
+# Build the UI and copy assets to the Python/VS Code directories
+./build_ui.sh
+```
+
+### 2. Python Package
+
+Install the package in editable mode from the root directory:
+
+```bash
+pip install -e .
+```
+
+### 3. VS Code Extension
+
+To use the extension locally:
+
+1. Open the `/vscode-extension` folder in VS Code.
+2. Run `pnpm install`.
+3. Press `F5` to start a new Extension Development Host window with the extension loaded.
+
+## 📦 Packaging and Releases
+
+To build both the Python package and the VS Code extension for distribution, you can use the provided script:
+
+```bash
+./scripts/package.sh
+```
+
+This will:
+
+1. Build the Web UI.
+2. Generate Python `.whl` and `.tar.gz` files in `dist/`.
+3. Generate a VS Code `.vsix` file in `dist/`.
+
+### Continuous Integration
+
+This project includes a GitHub Action workflow in `.github/workflows/release.yml`. When you push a tag (e.g., `v0.1.0`), it will automatically:
+
+- Build all packages.
+- Create a GitHub Release with the artifacts attached.
+
+## 🚀 Quick Start
+
+### 1. Integrate the Callback
+
+Add the `LangLensCallbackHandler` to your LangChain or LangGraph execution config.
+
+```python
+from langlens import LangLensCallbackHandler
+from langchain_openai import ChatOpenAI
+
+# Initialize the handler (creates a logs.langlens file)
+handler = LangLensCallbackHandler(filename="logs.langlens")
+
+# Attach it to your run
+llm = ChatOpenAI()
+config = {"callbacks": [handler]}
+response = llm.invoke("How does a sunrise look from Mars?", config=config)
+```
+
+### 2. Visualize the Trace
+
+#### Option A: Using the CLI
+
+Run the following command to start a local server and open the viewer in your browser:
+
+```bash
+langlens visualize logs.langlens
+```
+
+#### Option B: Using VS Code
+
+Simply open any `.langlens` file. The **LangLens Viewer** will automatically render the interactive trace.
+
+## 🛠️ Development
+
+### Building the Web UI
+
+The UI is built with Svelte and Tailwind CSS.
+
+```bash
+cd web-ui
+pnpm install
+pnpm build
+```
+
+### Building the VS Code Extension
+
+```bash
+cd vscode-extension
+pnpm install
+pnpm run package
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
