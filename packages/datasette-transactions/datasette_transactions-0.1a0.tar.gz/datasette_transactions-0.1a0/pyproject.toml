@@ -1,0 +1,40 @@
+[project]
+name = "datasette-transactions"
+version = "0.1a0"
+description = "API for executing multiple queries within a transaction"
+readme = "README.md"
+authors = [{name = "Datasette"}]
+license = "Apache-2.0"
+classifiers=[
+    "Framework :: Datasette"
+]
+requires-python = ">=3.10"
+dependencies = [
+    "datasette>=1.0a22",
+    "httpx>=0.25"
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[project.urls]
+Homepage = "https://github.com/datasette/datasette-transactions"
+Changelog = "https://github.com/datasette/datasette-transactions/releases"
+Issues = "https://github.com/datasette/datasette-transactions/issues"
+CI = "https://github.com/datasette/datasette-transactions/actions"
+
+[project.entry-points.datasette]
+transactions = "datasette_transactions"
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+
