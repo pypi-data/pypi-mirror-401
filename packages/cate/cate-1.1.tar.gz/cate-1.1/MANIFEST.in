@@ -1,0 +1,12 @@
+include CONTRIBUTING.rst
+include CONTRIBUTORS.rst
+include Changelog.rst
+include LICENSE.rst
+include README.rst
+
+graft doc/
+graft tests/
+
+global-exclude *.py[co]
+global-exclude .*_cache/**
+global-exclude .coverage htmlcov/**
