@@ -1,0 +1,48 @@
+
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "schema-classifier"
+version = "1.0.1"
+description = "Detect and infer schemas from files/dirs/DataFrames; emit YAML/JSON/TXT/Spark StructType"
+authors = [{name = "Aashish Kumar"}]
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["schema", "classifier", "parquet", "csv", "json", "delta", "iceberg", "hudi", "avro", "orc", "xml", "ndjson"]
+# Dependencies: keep light; heavy DF deps as extras
+dependencies = [
+  "pyarrow>=12",
+  "fastavro>=1.7",
+  "zstandard>=0.20",
+  "charset-normalizer>=3.0",
+  "PyYAML>=6.0",
+  "pyorc==0.10.0",
+  "anyio>=3.6",
+  "pandas>=1.5",
+  "pyspark>=3.3,<3.6",
+]
+
+[project.optional-dependencies]
+# DataFrame support made optional to avoid heavy installs by default
+dataframe = [
+  "pandas>=1.5",
+  "pyspark>=3.3,<3.6",
+]
+# optional for ORC
+orc = [
+  
+]
+
+[project.scripts]
+schema-detect = "pyschemaclassifier.cli:main"
+schema-verify = "pyschemaclassifier.cli_verify:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+

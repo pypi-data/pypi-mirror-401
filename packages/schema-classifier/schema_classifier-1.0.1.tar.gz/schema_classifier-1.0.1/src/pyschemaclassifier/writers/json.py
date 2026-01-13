@@ -1,0 +1,1 @@
+"""JSON writer (MVP skeleton)."""
