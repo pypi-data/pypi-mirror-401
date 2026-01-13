@@ -1,0 +1,97 @@
+Metadata-Version: 2.4
+Name: quits
+Version: 0.4.1
+Summary: A modular Qldpc code circUIT Simulator
+Author-email: Mingyu Kang <mingyu.kang@duke.edu>, Yingjia Lin <yingjia.lin@duke.edu>, Hanwen Yao <hanwen.yao@duke.edu>, Mert Gökduman <mert.gokduman@duke.edu>
+License: MIT License
+        
+        Copyright (c) 2026 Mingyu Kang
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Homepage, https://github.com/mkangquantum/quits.git
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: scipy>=1.9.3
+Requires-Dist: matplotlib
+Requires-Dist: stim>=1.13.0
+Requires-Dist: networkx>=2.8.8
+Requires-Dist: ldpc>=2.1.2
+Dynamic: license-file
+
+> 🚀 **New Release Available!**
+>**v0.4.0** - Canonical logical codewords of HGP code fixed - please check the release note if you have already been using QUITS. `gf2_util.py` and test functions added. [Check out the latest release notes »](https://github.com/mkangquantum/quits/releases/tag/v0.4.0)
+> 
+>**v0.3.0** - Logical codewords of HGP and BPC codes are now given in the "canonical" form. [Check out the latest release notes »](https://github.com/mkangquantum/quits/releases/tag/v0.3.0)
+> 
+> **v0.2.0** - base matrices of QLP codes can now be polynomial entries. [Check out the latest release notes »](https://github.com/mkangquantum/quits/releases/tag/v0.2.0)
+> 
+> **v0.1.0** – important bug is fixed, so please check the release note if you have already been using QUITS.
+> [Check out the release notes »](https://github.com/mkangquantum/quits/releases/tag/v0.1.0)
+
+
+# QUITS: A modular Qldpc code circUIT Simulator
+
+QUITS is a modular and flexible circuit-level simulator for quantum low-density parity check (QLDPC) codes. Its design allows users to freely combine LDPC code constructions, syndrome extraction circuits, decoding algorithms, and noise models, enabling comprehensive and customizable studies of the performance of QLDPC codes under circuit-level noise. QUITS supports several leading QLDPC families, including 
+- HyperGraph Product (HGP) codes 
+- Quasi-cyclic Lifted Product (QLP) codes, and 
+- Balanced Product Cyclic (BPC) codes. 
+
+Check out [arXiv:2504.02673](https://arxiv.org/abs/2504.02673) for a detailed description of our package. 
+
+QUITS is best used together with the following libraries:
+- [Stim](https://github.com/quantumlib/Stim) (fast stabilizer circuit simulator) 
+- [LDPC](https://github.com/quantumgizmos/ldpc) (BP-OSD, BP-LSD decoders for QLDPC codes)
+
+See [doc/intro.ipynb](https://github.com/mkangquantum/quits/blob/main/doc/intro.ipynb) to get started!
+
+Since the release of QUITS, we acknowledge the feedback and suggestions from Ryan Tiew, Josias Old, and qodesign that helped improve the package. If you’re working on QLDPC codes, decoders, or noise modeling, it'd be great if you could try QUITS, file issues, or contribute features. Let’s build better tools for scalable, fault-tolerant quantum computing together ⚛️
+
+## License
+This project is licensed under the MIT License.
+
+## Installation
+
+To install this package from GitHub, run installation command
+   ```
+   pip install quits
+   ```
+
+## How to Cite Our Work
+
+If you use our work in your research, please cite it using the following reference:
+
+```bibtex
+@article{Kang2025quitsmodularqldpc,
+  doi = {10.22331/q-2025-12-05-1931},
+  url = {https://doi.org/10.22331/q-2025-12-05-1931},
+  title = {{QUITS}: {A} modular {Q}ldpc code circ{UIT} {S}imulator},
+  author = {Kang, Mingyu and Lin, Yingjia and Yao, Hanwen and G{\"{o}}kduman, Mert and Meinking, Arianna and Brown, Kenneth R.},
+  journal = {{Quantum}},
+  issn = {2521-327X},
+  publisher = {{Verein zur F{\"{o}}rderung des Open Access Publizierens in den Quantenwissenschaften}},
+  volume = {9},
+  pages = {1931},
+  month = dec,
+  year = {2025}
+}
