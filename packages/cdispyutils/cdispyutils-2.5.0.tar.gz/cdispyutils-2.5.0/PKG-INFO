@@ -1,0 +1,26 @@
+Metadata-Version: 2.4
+Name: cdispyutils
+Version: 2.5.0
+Summary: This package includes several utility Python tools for the Gen3 stack.
+License: Apache-2.0
+License-File: LICENSE
+License-File: NOTICE
+Author: CTDS UChicago
+Author-email: cdis@uchicago.edu
+Requires-Python: >=3.13,<4
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Provides-Extra: profiling
+Provides-Extra: uwsgi
+Requires-Dist: Flask
+Requires-Dist: PyJWT
+Requires-Dist: Werkzeug ; extra == "profiling"
+Requires-Dist: cdiserrors
+Requires-Dist: cdislogging
+Requires-Dist: matplotlib ; extra == "profiling"
+Requires-Dist: numpy ; extra == "profiling"
+Requires-Dist: prometheus-client
+Requires-Dist: requests
+Requires-Dist: uwsgi ; extra == "uwsgi"
