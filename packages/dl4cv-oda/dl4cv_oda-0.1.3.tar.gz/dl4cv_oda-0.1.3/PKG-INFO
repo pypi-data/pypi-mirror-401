@@ -1,0 +1,118 @@
+Metadata-Version: 2.4
+Name: dl4cv-oda
+Version: 0.1.3
+Summary: Coconut tree detection from drone imagery
+Author: krschap
+License: MIT
+Keywords: aerial-imagery,object-detection,remote-sensing,yolo
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.11
+Requires-Dist: geomltoolkits>=0.4.2
+Requires-Dist: geopandas>=1.1.2
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: pillow>=10.0.0
+Requires-Dist: pyyaml>=6.0.3
+Requires-Dist: rasterio>=1.3.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: shapely>=2.1.2
+Requires-Dist: typer>=0.12.0
+Requires-Dist: ultralytics>=8.3.250
+Provides-Extra: dev
+Requires-Dist: commitizen>=3.0.0; extra == 'dev'
+Requires-Dist: ipykernel>=7.1.0; extra == 'dev'
+Requires-Dist: jupyter>=1.0.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.3.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Object Detection on Aerial Imagery for Coconut Trees Detection
+
+Coconut tree detection from drone imagery using YOLOv8, Yolov12, and RT_DERT models with OpenStreetMap labels and OpenAerialMap imagery.
+
+## Overview
+
+- OpenStreetMap point data: bounding boxes with buffer zones
+- Tile large aerial imagery (256×256 at 9cm/pixel): [Source](https://map.openaerialmap.org/#/-175.34221936224426,-21.095929709180027,15/square/20002233030/5a28640ebac48e5b1c58a81d?_k=4yyxj6) 
+- Convert geographic coordinates to YOLO format
+- Train multiple models of YOLOv8 (nano, small, medium) on coconut trees from Kolovai, Tonga
+- Train Yolov12 and also RT-DERT.
+
+**Source**: World Bank - Automated Feature Detection of Aerial Imagery from the South Pacific
+
+## Data
+
+**Statistics**:
+- **Original**: 10,631 trees (Coconut: 10,092 | Mango: 261 | Banana: 181 | Papaya: 97)
+- **Target**: Coconut trees only
+- **Tiles**: 256×256px at zoom 19, EPSG:4326
+- **Train/Val**: 441 / 167 tiles (80/20 stratified split), but we did later 70,20,10 for train, val, test for hyperparameter tuning and improve model accuracy.
+
+## Structure
+
+```
+data/
+├── raw/                # OAM imagery + OSM points
+├── chips/              # 256×256 tiles (.tif)
+├── labels/             # Per-tile annotations (.geojson)
+└── yolo/
+    ├── train/          # Training data (.png + .txt)
+    ├── val/            # Validation data
+    └── config.yaml     # YOLO config
+
+notebooks/
+├── experiment.ipynb         # including the dl4cv-oda package and all functions
+```
+
+## Setup
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+git clone https://github.com/kshitijrajsharma/dl4cv-object-detection-on-aerial-imagery
+cd dl4cv-object-detection-on-aerial-imagery
+uv sync
+```
+
+## Development ( version bump)
+
+```bash
+uv sync --extra dev
+cz bump
+git push --tags
+```
+
+## Workflow
+<img width="2833" height="1411" alt="image" src="https://github.com/user-attachments/assets/523f03b8-ff87-4c02-8c14-12c70e20e69f" />
+
+
+**1. Clean OSM Data** : Filter coconut trees, generate buffered bounding boxes
+
+**2. Tile Imagery** : Create 256×256 tiles, clip labels to tile extents
+
+**3. YOLO Conversion** : Transform coordinates (EPSG:4326 : pixels : normalized [0,1])
+
+```python
+row, col = src.index(lon, lat)  # rasterio
+x_norm = col / img_width
+y_norm = row / img_height
+```
+
+**4. Train** : YOLOv8n, 100 epochs, batch 16
+
+```python snapshot
+from ultralytics import YOLO
+model = YOLO('yolov8n.pt')
+model.train(data='data/yolo/config.yaml', epochs=100, imgsz=256, batch=16)
+```
+
+## References
+
+- [OpenAerialMap](https://openaerialmap.org/)
+- [OpenStreetMap](https://www.openstreetmap.org/)
+- [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics)
+- [uv Package Manager](https://github.com/astral-sh/uv)
