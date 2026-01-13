@@ -1,0 +1,54 @@
+[project]
+name = "rune"
+version = "0.8.0"
+description = "A local-first, client-side encrypted secrets manager for developers."
+authors = [{ name = "sawsent" }]
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+
+dependencies = [
+    "typer>=0.12",
+    "pyperclip>=1.8",
+    "platformdirs>=4.0",
+    "cryptography>=41.0",
+]
+
+keywords = [
+    "secrets",
+    "encryption",
+    "cli",
+    "vault",
+    "credentials",
+    "security",
+    "developer-tools",
+    "devops",
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+
+    "License :: OSI Approved :: Apache Software License",
+
+    "Topic :: Security :: Cryptography",
+    "Topic :: Utilities",
+]
+
+[project.scripts]
+rune = "rune.bootstrap:main"
+
+[project.urls]
+Homepage = "https://github.com/sawsent/rune"
+Repository = "https://github.com/sawsent/rune"
+Issues = "https://github.com/sawsent/rune/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
