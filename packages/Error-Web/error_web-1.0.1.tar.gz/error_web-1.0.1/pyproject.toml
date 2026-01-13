@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Error_Web"
+version = "1.0.1"
+description = "Gestionnaire universel d'erreurs Flask avec descriptions pédagogiques"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["flask>=2.0"]
+
+[tool.setuptools]
+packages = ["error_web"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+error_web = ["templates/errors/*.html"]
