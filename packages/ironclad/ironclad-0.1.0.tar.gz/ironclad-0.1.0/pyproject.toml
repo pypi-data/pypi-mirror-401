@@ -1,0 +1,125 @@
+[build-system]
+requires = ["hatchling>=1.28.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ironclad"
+version = "0.1.0"
+description = "Runtime contracts and predicate-based validation for Python."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE.md" }
+authors = [{ name = "Zentiph (Gavin Borne)", email = "zentiphdev@gmail.com" }]
+keywords = ["contracts", "validation", "types", "runtime", "predicates"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/zentiph/ironclad"
+Repository = "https://github.com/zentiph/ironclad"
+Issues = "https://github.com/zentiph/ironclad/issues"
+Documentation = "https://zentiph.github.io/ironclad"
+Changelog = "https://github.com/zentiph/ironclad/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  "mypy",
+  "build",
+  "twine",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]",
+  "pygments",
+  "pymdown-extensions",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ironclad"]
+only-packages = true
+
+[tool.hatch.build.targets.sdist]
+include = ["ironclad", "LICENSE.md", "README.md", "pyproject.toml"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+# Very strict, but with a few sensible ignores below.
+lint.select = [
+  "F",
+  "E",
+  "W",    # pyflakes/pycodestyle
+  "I",    # isort (imports)
+  "N",    # pep8-naming
+  "UP",   # pyupgrade
+  "B",    # bugbear
+  "A",    # builtins (no shadowing)
+  "C4",   # comprehensions
+  "T20",  # no print()
+  "RET",  # return rules
+  "SIM",  # simplify
+  "PTH",  # prefer pathlib
+  "ERA",  # eradicate commented-out code
+  "PL",   # some pylint-like checks (non-overlapping)
+  "RUF",  # ruff rules
+  "ANN",  # type annotation coverage
+  "FBT",  # boolean-arg trap
+  "PIE",  # misc improvements
+  "PERF", # performance
+  "S",    # security (flake8-bandit subset)
+  "DTZ",  # timezone-aware datetimes
+  "TC",   # type-checking-only imports
+  "D",    # pydocstyle
+  "ISC",  # implicit string concat
+  "Q",    # quotes consistency
+]
+lint.ignore = [
+  "D203",
+  "D212",    # prefer 'no-blank-line-before-class' and one style of summary lines
+  "ANN401",  # allow typing.Any in some APIs
+  "PLR2004", # magic-numbers: allow (Pylint handles design limits)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "D", "ANN", "T20", "PLR0913"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+show_error_codes = true
+pretty = true
+
+# So tests don’t get in the way:
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = false
+disallow_untyped_defs = false
