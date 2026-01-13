@@ -1,0 +1,274 @@
+Metadata-Version: 2.4
+Name: snapdepdoc
+Version: 0.1.0
+Summary: Snapshot your dependencies, access version-perfect documentation - An MCP server for AI development assistance
+Project-URL: Homepage, https://github.com/thec0dewriter/docs_mcp
+Project-URL: Repository, https://github.com/thec0dewriter/docs_mcp
+Project-URL: Issues, https://github.com/thec0dewriter/docs_mcp/issues
+Author: SnapDepDoc contributors
+License: MIT
+License-File: LICENSE
+Keywords: ai-assistant,dependencies,documentation,mcp,package-manager,snapdepdoc
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Software Development :: Libraries
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp[cli]>=1.2.0
+Requires-Dist: packaging>=24.0
+Requires-Dist: toml>=0.10.2
+Provides-Extra: dev
+Requires-Dist: black>=24.0.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.23.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.3.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# SnapDepDoc
+
+[![CI](https://github.com/thec0dewriter/docs_mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/thec0dewriter/docs_mcp/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/snapdepdoc.svg)](https://badge.fury.io/py/snapdepdoc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Snapshot your dependencies, access version-perfect documentation** 
+
+An MCP (Model Context Protocol) server that parses project definition files and exposes library documentation with the correct versions for AI development assistance.
+
+> **📖 New to SnapDepDoc?** Check out the [Getting Started Guide](GETTING_STARTED.md) for a complete walkthrough!
+
+## 🚀 Features
+
+- **Multi-format support**: Parse `pyproject.toml`, `package.json`, `pom.xml`, `build.gradle`, `build.sbt`, and more
+- **Version-aware documentation**: Fetch documentation for the exact versions specified in your project
+- **Tool-based interface**: Expose project information through MCP tools
+- **Resource access**: Provide dependency documentation as MCP resources
+- **8 Ecosystem Support**: Python, Node.js, Java/Maven, Gradle, Scala/SBT, Rust, Go, and Ruby
+
+## Supported Project Types
+
+- **Python**: `pyproject.toml`, `requirements.txt`, `setup.py`
+- **Node.js**: `package.json`, `package-lock.json`
+- **Java**: `pom.xml` (Maven), `build.gradle` (Gradle)
+- **Scala**: `build.sbt` (SBT)
+- **Rust**: `Cargo.toml`
+- **Go**: `go.mod`
+- **Ruby**: `Gemfile`
+
+## 📦 Installation
+
+### From PyPI (when released)
+
+```bash
+# Using pip
+pip install snapdepdoc
+
+# Using uv (recommended)
+uv pip install snapdepdoc
+```
+
+### From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/thec0dewriter/docs_mcp.git
+cd docs_mcp
+
+# Using uv (recommended)
+uv pip install -e .
+
+# Or using pip
+pip install -e .
+```
+
+## 🎯 Quick Start
+
+### 1. Install the package
+```bash
+pip install snapdepdoc
+```
+
+### 2. Configure your MCP client
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+```json
+{
+  "mcpServers": {
+    "snapdepdoc": {
+      "command": "snapdepdoc"
+    }
+  }
+}
+```
+
+**VS Code** (`.vscode/mcp.json` in your project):
+```json
+{
+  "servers": {
+    "snapdepdoc": {
+      "type": "stdio",
+      "command": "snapdepdoc"
+    }
+  }
+}
+```
+
+### 3. Start using it!
+
+Ask your AI assistant:
+- "What project files are in my directory?"
+- "What are the dependencies in my pyproject.toml?"
+- "Where can I find documentation for FastAPI version 0.104.0?"
+
+See the [examples directory](examples/) for more usage scenarios.
+
+## 🛠️ Usage
+
+### As an MCP Server
+
+#### Development Setup (from source)
+
+Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "snapdepdoc": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/docs_mcp",
+        "run",
+        "snapdepdoc"
+      ]
+    }
+  }
+}
+```
+
+Or in VS Code (`.vscode/mcp.json`):
+
+```json
+{
+  "servers": {
+    "snapdepdoc": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/docs_mcp",
+        "run",
+        "snapdepdoc"
+      ]
+    }
+  }
+}
+```
+
+#### Installed via pip
+
+```json
+{
+  "mcpServers": {
+    "snapdepdoc": {
+      "command": "snapdepdoc"
+    }
+  }
+}
+```
+
+## 📚 Available Tools
+
+The server exposes the following MCP tools:
+
+- **`list_project_files`**: Discover project definition files in a directory
+- **`parse_dependencies`**: Extract dependencies from project files with versions
+- **`get_documentation_url`**: Get documentation URLs for specific library versions
+- **`search_api_documentation`**: Search for API documentation within libraries
+
+## 📖 Available Resources
+
+MCP resources for direct access:
+
+- **`dependencies://{project_path}`**: List all dependencies with versions from a project
+- **`docs://{library}@{version}`**: Access documentation for a specific library version
+  - Examples: `docs://fastapi@0.104.0`, `docs://npm:react@18.2.0`, `docs://mvn:org.springframework:spring-core@6.0.0`
+
+## 🏗️ Supported Ecosystems
+
+| Ecosystem | Project Files | Documentation Sources |
+|-----------|---------------|----------------------|
+| **Python** | `pyproject.toml`, `requirements.txt`, `setup.py` | PyPI, ReadTheDocs |
+| **Node.js** | `package.json`, `package-lock.json` | npm registry |
+| **Java/Maven** | `pom.xml` | Maven Central, Javadoc |
+| **Gradle** | `build.gradle`, `build.gradle.kts` | Maven Central |
+| **Scala/SBT** | `build.sbt` | Maven Central, Scaladoc |
+| **Rust** | `Cargo.toml` | crates.io |
+| **Go** | `go.mod` | pkg.go.dev |
+| **Ruby** | `Gemfile` | RubyGems |
+
+## 🔧 Development
+
+```bash
+# Install development dependencies
+uv pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+black .
+ruff check --fix .
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
+
+## 📝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🗺️ Roadmap
+
+- [ ] Add more ecosystem support (PHP Composer, .NET NuGet, etc.)
+- [ ] Implement caching for documentation URLs
+- [ ] Add support for private package registries
+- [ ] Enhance search functionality with fuzzy matching
+- [ ] Add support for monorepo structures
+- [ ] Integration with more MCP clients
+
+## 🐛 Troubleshooting
+
+### Server not starting
+- Ensure Python 3.10+ is installed
+- Verify the installation: `snapdepdoc --help`
+- Check MCP client logs for error messages
+
+### Dependencies not parsing correctly
+- Ensure your project file is valid and properly formatted
+- Check the [examples](examples/) directory for reference formats
+
+### Documentation URLs not found
+- Some packages may not have standard documentation URLs
+- Verify the package name and version are correct
+- Check your internet connection for API requests
+
+For more issues, please check our [GitHub Issues](https://github.com/thec0dewriter/docs_mcp/issues).
+
+## 📚 Learn More
+
+- **[Getting Started Guide](GETTING_STARTED.md)** - Complete walkthrough for new users
+- **[Examples](examples/)** - Usage examples for all supported ecosystems
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[Release Guide](RELEASE.md)** - For maintainers releasing new versions
+- **[Publishing Guide](PUBLISHING.md)** - How to publish to PyPI
+- **[Changelog](CHANGELOG.md)** - Version history and updates
+- **[MCP Documentation](https://modelcontextprotocol.io/)** - Learn about Model Context Protocol
