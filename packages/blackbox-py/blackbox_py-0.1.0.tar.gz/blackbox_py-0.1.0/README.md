@@ -1,0 +1,39 @@
+# blackbox-py
+
+Lightweight Python wrapper for the BlackBox HTTP API, mirroring the official JS client endpoints.
+
+## Install
+```bash
+pip install -e .
+```
+
+## Quickstart
+```python
+from blackbox_py import BlackBoxClient, BlackBoxError
+
+client = BlackBoxClient(url="http://127.0.0.1", port=8080)
+
+try:
+    print(client.health())
+    client.create_index({"name": "demo", "schema": {"fields": {"title": "text"}}})
+    client.index_document("demo", {"title": "hello"})
+    result = client.search("demo", {"q": "hello", "mode": "bm25"})
+    print(result)
+except BlackBoxError as exc:
+    print("Request failed:", exc)
+```
+
+## Common calls
+- Health/config: `health()`, `metrics()`, `prometheus_metrics()`, `config()`
+- Indexes: `create_index(body)`, `list_indexes()`
+- Snapshots/shipping: `save_snapshot(path=None)`, `load_snapshot(path=None)`, `ship_plan()`, `ship_apply(path)`, `ship_fetch_apply(base)`
+- Documents: `index_document(index, doc)`, `bulk_index(index, docs, continue_on_error=True)`, `get_document(index, id)`, `replace_document(index, id, doc)`, `update_document(index, id, doc)`, `delete_document(index, id)`
+- Search/stored: `search(index, params)`, `stored_match(index, field=..., value=...)`
+- Custom templates: `list_custom_templates()`, `get_custom_template(name)`, `put_custom_template(name, template)`, `execute_custom_template(name, params=None)`
+
+## Tests
+Install dev deps and run:
+```bash
+pip install -e .[dev]
+pytest
+```
