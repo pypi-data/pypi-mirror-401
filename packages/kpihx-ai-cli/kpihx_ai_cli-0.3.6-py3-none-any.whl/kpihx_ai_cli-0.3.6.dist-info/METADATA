@@ -1,0 +1,460 @@
+Metadata-Version: 2.4
+Name: kpihx-ai-cli
+Version: 0.3.6
+Summary: Un client CLI intelligent pour Ollama avec gestion d'historique et mémoire persistante
+Project-URL: Homepage, https://github.com/KpihX/ai-cli
+Project-URL: Repository, https://github.com/KpihX/ai-cli
+Project-URL: Issues, https://github.com/KpihX/ai-cli/issues
+Author-email: KAMDEM POUOKAM Ivann Harold <kapoivha@gmail.com>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: ai,chatbot,cli,llm,ollama,terminal
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.11
+Requires-Dist: prompt-toolkit>=3.0.52
+Requires-Dist: pyyaml>=6.0.3
+Requires-Dist: requests>=2.32.5
+Requires-Dist: rich>=14.2.0
+Requires-Dist: typer>=0.21.1
+Description-Content-Type: text/markdown
+
+<p align="center">
+  <img src="docs/assets/banner.png" alt="AI-CLI Banner" width="600"/>
+</p>
+
+<h1 align="center">AI-CLI 🤖</h1>
+
+<p align="center">
+  <strong>Un client CLI intelligent, modulaire et puissant pour interagir avec Ollama</strong>
+</p>
+
+<p align="center">
+  <a href="#-installation">Installation</a> •
+  <a href="#-fonctionnalités">Fonctionnalités</a> •
+  <a href="#-utilisation">Utilisation</a> •
+  <a href="#-configuration">Configuration</a> •
+  <a href="#-architecture">Architecture</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"/>
+  <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"/>
+  <img src="https://img.shields.io/badge/tests-46%20passed-brightgreen.svg" alt="Tests"/>
+  <img src="https://img.shields.io/badge/ollama-compatible-orange.svg" alt="Ollama"/>
+</p>
+
+---
+
+## ✨ Fonctionnalités
+
+<table>
+<tr>
+<td width="50%">
+
+### 🧠 Mémoire Persistante
+L'agent apprend de vous et se souvient entre les sessions grâce à `AI_CLI.md`.
+
+### 📁 Historique Complet
+Toutes vos discussions sauvegardées automatiquement en JSON avec support UTF-8.
+
+### ✂️ Résumé Intelligent
+Compressez les longues discussions sans perdre le contexte avec `/resume`.
+
+</td>
+<td width="50%">
+
+### ⌨️ Interface Avancée
+Auto-complétion, suggestions, rendu Markdown en temps réel avec Rich.
+
+### ⚙️ 100% Configurable
+Personnalisez chaque prompt et paramètre dans `config.yaml`.
+
+### 🔄 Auto-gestion Ollama
+Détecte, démarre et télécharge les modèles automatiquement.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📦 Installation
+
+### Prérequis
+
+- **Python 3.11+**
+- **[Ollama](https://ollama.ai/)** installé et fonctionnel
+
+### 🚀 Installation Rapide
+
+<table>
+<tr>
+<td>
+
+**Depuis PyPI (Recommandé)**
+
+```bash
+pipx install ai-cli
+# ou
+pip install ai-cli
+```
+
+</td>
+<td>
+
+**Depuis les sources**
+
+```bash
+git clone https://github.com/KpihX/ai-cli.git
+cd ai-cli
+pipx install .
+# ou: uv tool install .
+```
+
+</td>
+</tr>
+</table>
+
+### 🛠️ Mode Développement
+
+```bash
+# Cloner et installer en mode développement
+git clone https://github.com/KpihX/ai-cli.git
+cd ai-cli
+uv sync --dev
+
+# Exécuter les tests (43 tests)
+uv run pytest tests/ -v
+```
+
+---
+
+## 🚀 Utilisation
+
+### Commandes de Base
+
+| Commande | Description |
+|----------|-------------|
+| `ai-cli -i` | Mode interactif (conversation continue) |
+| `ai-cli -p "Question"` | Question rapide (one-shot) |
+| `ai-cli -l` | Lister les modèles disponibles |
+| `ai-cli -d llama3.2` | Changer le modèle par défaut |
+| `ai-cli -m mistral -i` | Utiliser un modèle spécifique |
+
+### Commandes Interactives (Slash Commands)
+
+Une fois en mode interactif, vous avez accès à ces commandes :
+
+| Commande | Description | Exemple |
+|----------|-------------|---------|
+| `/help` | 📚 Affiche l'aide complète | `/help` |
+| `/new` | 🆕 Sauvegarde et nouvelle discussion | `/new` |
+| `/old` | 📂 Charger ou supprimer une discussion | `/old` → `d 1` pour supprimer |
+| `/memory` | 🧠 Gérer la mémoire (voir/add/delete) | `/memory add J'aime Python` |
+| `/resume` | 📝 Résume l'historique | `/resume` |
+| `/settings` | ⚙️ Paramètres (modèle, température) | `/settings` |
+| `/clear` | 🧹 Efface l'écran | `/clear` |
+| `/exit` | 👋 Sauvegarde et quitte | `/exit` ou `Ctrl+D` |
+
+### 💬 Exemple de Session
+
+```
+$ ai-cli -i
+
+╭──────────────────────────────────────────────────────╮
+│              Bienvenue dans AI-CLI !                 │
+╰──────────────────────────────────────────────────────╯
+
+┌─────────────────────────────────────────────────────────────┐
+│ Index │ Titre                         │ Date               │
+├───────┼───────────────────────────────┼────────────────────┤
+│ 1     │ Discussion sur Python         │ 20260110_143052    │
+│ 2     │ Aide DevOps avec Docker       │ 20260109_221015    │
+└─────────────────────────────────────────────────────────────┘
+Utilisez /old pour charger une ancienne discussion.
+
+Mode Interactif avec phi3.5. Tapez /exit pour quitter.
+
+Vous > Quelle est la différence entre Docker et Podman ?
+
+╭─── AI (phi3.5) ────────────────────────────────────────────────────────╮
+│ ## Docker vs Podman                                                    │
+│                                                                        │
+│ **1. Architecture**                                                    │
+│ - Docker: daemon central (`dockerd`) qui gère tous les conteneurs      │
+│ - Podman: **daemonless**, chaque conteneur est un processus enfant     │
+│                                                                        │
+│ **2. Sécurité**                                                        │
+│ - Docker: nécessite root par défaut                                    │
+│ - Podman: **rootless** par défaut, plus sécurisé                       │
+│                                                                        │
+│ **3. Compatibilité**                                                   │
+│ - Les deux utilisent les mêmes images OCI                              │
+│ - `alias docker=podman` fonctionne dans la plupart des cas             │
+╰────────────────────────────────────────────────────────────────────────╯
+
+Vous > /save L'utilisateur s'intéresse à Docker et Podman
+[green]Information sauvegardée dans AI_CLI.md.[/green]
+
+Vous > /exit
+Sauvegarde de la discussion...
+Proposition de titre : Docker vs Podman Comparison
+Session enregistrée sous : Docker vs Podman Comparison
+```
+
+---
+
+## ⚙️ Configuration
+
+Le fichier `config.yaml` permet de tout personnaliser :
+
+```yaml
+# ═══════════════════════════════════════════════════════════
+#                    CONFIGURATION AI-CLI
+# ═══════════════════════════════════════════════════════════
+
+# Modèle LLM utilisé par défaut
+default_model: phi3.5
+
+# URL du serveur Ollama
+ollama_url: http://localhost:11434
+
+# Nombre de messages à garder avant résumé automatique
+summary_threshold: 5
+
+# Timeout des requêtes HTTP (secondes)
+request_timeout: 30
+
+# Répertoire de stockage des données
+history_dir: ~/.ai-cli
+
+# ─────────────────────────────────────────────────────────────
+#                    PROMPTS PERSONNALISABLES
+# ─────────────────────────────────────────────────────────────
+prompts:
+  # Génération automatique de titre pour les sessions
+  title_generation: >
+    Génère un titre court (3-5 mots max) pour cette discussion.
+    Réponds UNIQUEMENT avec le titre:
+    {content}
+
+  # Résumé de l'historique pour /resume
+  summarization: >
+    Résume de façon concise les points clés de cet échange
+    pour servir de contexte historique:
+    {content}
+
+  # Injection de la mémoire utilisateur
+  memory_prefix: "Voici ce que tu sais sur l'utilisateur: {memory}"
+
+  # Message d'accueil
+  welcome_message: "Bienvenue dans AI-CLI !"
+  
+  # Info mode interactif
+  interactive_info: "Mode Interactif avec {model}. Tapez /exit pour quitter."
+```
+
+---
+
+## 🏗️ Architecture
+
+```
+ai-cli/
+├── 📁 src/ai_cli/
+│   ├── main.py           # 🎯 Point d'entrée CLI + boucle REPL
+│   ├── ollama_client.py  # 🦙 Client API Ollama (stream/sync)
+│   └── storage.py        # 💾 Persistance (sessions + mémoire)
+├── 📁 tests/
+│   ├── test_main.py      # ✅ Tests CLI (12 tests)
+│   ├── test_client.py    # ✅ Tests Ollama (16 tests)
+│   └── test_storage.py   # ✅ Tests Storage (15 tests)
+├── 📁 docs/assets/
+│   └── banner.png        # 🖼️ Banner du projet
+├── config.yaml           # ⚙️ Configuration par défaut
+├── pyproject.toml        # 📦 Métadonnées du package
+└── README.md             # 📚 Documentation
+```
+
+### Flux de Données
+
+```mermaid
+flowchart LR
+    subgraph User["👤 Utilisateur"]
+        A[Terminal]
+    end
+    
+    subgraph CLI["🖥️ AI-CLI"]
+        B[main.py<br/>REPL Loop]
+        C[ollama_client.py<br/>Stream/Sync]
+        D[storage.py<br/>Persistence]
+    end
+    
+    subgraph Backend["🦙 Ollama"]
+        E[LLM API]
+        F[phi3.5 / llama3.2 / ...]
+    end
+    
+    subgraph Storage["📁 ~/.ai-cli/"]
+        G[sessions/*.json]
+        H[AI_CLI.md]
+    end
+    
+    A -->|prompt| B
+    B -->|API call| C
+    C -->|HTTP POST| E
+    E -->|inference| F
+    F -->|stream| E
+    E -->|chunks| C
+    C -->|content| B
+    B -->|Rich render| A
+    B <-->|save/load| D
+    D <-->|read/write| G
+    D <-->|memory| H
+```
+
+### Modules Détaillés
+
+<table>
+<tr>
+<th>Module</th>
+<th>Classes/Fonctions</th>
+<th>Responsabilité</th>
+</tr>
+<tr>
+<td><code>ollama_client.py</code></td>
+<td>
+
+- `OllamaClient`
+- `OllamaConnectionError`
+- `chat_stream()` / `chat_sync()`
+- `generate_title()` / `summarize()`
+
+</td>
+<td>Communication avec l'API Ollama, gestion du streaming et des erreurs réseau</td>
+</tr>
+<tr>
+<td><code>storage.py</code></td>
+<td>
+
+- `StorageManager`
+- `StorageError`
+- `save_session()` / `load_session()`
+- `save_memory()` / `get_memory()`
+
+</td>
+<td>Persistance JSON des sessions et gestion de la mémoire Markdown</td>
+</tr>
+<tr>
+<td><code>main.py</code></td>
+<td>
+
+- `SessionState`
+- `load_config()`
+- `run_interactive()`
+- `handle_save_and_exit()`
+
+</td>
+<td>Point d'entrée, boucle REPL, routage des commandes slash</td>
+</tr>
+</table>
+
+---
+
+## 📊 Tests
+
+Le projet est couvert par **46 tests unitaires** organisés en classes :
+
+```bash
+# Exécuter tous les tests
+uv run pytest tests/ -v
+
+# Avec couverture de code
+uv run pytest tests/ --cov=ai_cli --cov-report=html
+
+# Tests spécifiques
+uv run pytest tests/test_client.py -v  # Tests Ollama
+uv run pytest tests/test_storage.py -v # Tests Storage
+```
+
+### Couverture des Tests
+
+| Module | Tests | Catégories |
+|--------|-------|------------|
+| `main.py` | 12 | Config, SessionState, Slash commands, Input handling |
+| `ollama_client.py` | 16 | Stream, Sync, is_running, Erreurs réseau, Backward compat |
+| `storage.py` | 18 | CRUD, Delete, Unicode, JSON corrompu, Memory modes, Init |
+
+---
+
+## 📁 Fichiers de Données
+
+| Chemin | Description | Format |
+|--------|-------------|--------|
+| `~/.ai-cli/sessions/` | Historique des discussions | JSON |
+| `~/.ai-cli/AI_CLI.md` | Mémoire persistante de l'agent | Markdown |
+| `~/.ai-cli/config.yaml` | Configuration utilisateur (optionnel) | YAML |
+
+### Structure d'une Session
+
+```json
+{
+    "title": "Discussion sur Python",
+    "timestamp": "20260110_143052",
+    "messages": [
+        {"role": "system", "content": "Voici ce que tu sais..."},
+        {"role": "user", "content": "Explique les décorateurs"},
+        {"role": "assistant", "content": "Les décorateurs en Python..."}
+    ]
+}
+```
+
+---
+
+## 🤝 Contribution
+
+Les contributions sont bienvenues ! Pour contribuer :
+
+1. **Fork** le projet
+2. **Créer** une branche (`git checkout -b feature/ma-feature`)
+3. **Committer** vos changements (`git commit -m 'Add: ma feature'`)
+4. **Pousser** (`git push origin feature/ma-feature`)
+5. **Ouvrir** une Pull Request
+
+### Guidelines
+
+- Respecter le style de code existant
+- Ajouter des tests pour les nouvelles fonctionnalités
+- Mettre à jour la documentation si nécessaire
+
+---
+
+## 📜 Licence
+
+```
+MIT License
+
+Copyright (c) 2026 KAMDEM POUOKAM Ivann Harold
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software...
+```
+
+Voir le fichier [LICENSE](LICENSE) pour le texte complet.
+
+---
+
+<p align="center">
+  <strong>Fait avec ❤️ et 🐍 Python</strong>
+  <br/>
+  <a href="https://github.com/KpihX">@KpihX</a>
+</p>
