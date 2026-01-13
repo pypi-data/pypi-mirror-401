@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        args: ["--output-format=github"]
+      - id: ruff-format
+        name: ruff (format)
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest (run fast tests)
+        entry: env DOCKER_COMPOSE_AUTOSTART=false uv run pytest tests/test_notifications.py tests/test_cli_utils.py -v
+        language: system
+        pass_filenames: false
+        files: ^(src/|tests/|pyproject\.toml)
+        types: [python]
+
+# Install with: pre-commit install
+# Run on all files: pre-commit run --all-files

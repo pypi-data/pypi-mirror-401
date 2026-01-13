@@ -1,0 +1,54 @@
+site_name: desto
+site_description: "desto — tmux session manager"
+site_url: https://desto.readthedocs.io/en/latest/
+docs_dir: docs
+watch:
+  - README.md
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+  - User Guide:
+      - CLI: user-guide/cli.md
+      - Favorites: user-guide/favorites.md
+  - Reference:
+      - Configuration: reference/configuration.md
+  - Community:
+      - Contributing: community/CONTRIBUTING.md
+      - Security: community/SECURITY.md
+      - Code of Conduct: community/CODE_OF_CONDUCT.md
+
+exclude_docs: |
+  includes/*
+
+theme:
+  name: material
+  custom_dir: theme
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.details
+  - pymdownx.snippets:
+      check_paths: true
+      base_path:
+        - docs
+        - .
+  - pymdownx.pathconverter:
+      base_path: docs
+
+extra:
+  repo_url: https://github.com/kalfasyan/desto
+
+plugins:
+  - search
+  - include-markdown
+  - htmlproofer:
+      raise_error: true
+      ignore_urls:
+        - localhost
+        - pyproject.toml
