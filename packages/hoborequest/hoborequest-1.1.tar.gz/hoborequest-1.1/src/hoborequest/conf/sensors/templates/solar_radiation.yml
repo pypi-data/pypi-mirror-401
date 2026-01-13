@@ -1,0 +1,33 @@
+schema: hobo-sensor
+sn: 20735863-1
+active: True
+long_name: solar_irradiance
+standard_name: solar_irradiance
+
+# Sensor install / specs
+sensor_type: silicon pyranometer
+model: HOBO S-LIB-M003
+lat: 38.043
+lat_units: degrees_north
+lon: 78.562
+lon_units: degrees_east
+height: 1.0
+height_units: m
+angle: 0.0
+angle_units: degrees
+altitude: 3.0
+altitude_units: m
+battery_level_max: 4.2
+battery_level_min: 3.0
+battery_units: v
+accuracy: "+-10 W m-2"
+resolution: "1.25 W m-2"
+drift: "< +-2% per year"
+datasheet: https://www.onsetcomp.com/datasheet/S-LIB-M003
+
+# Measurement specs
+measurement_type: Solar Radiation
+measurement_min: 0.0
+measurement_max: 1280.0
+measurement_units: W m-2
+missing_values: -999.9

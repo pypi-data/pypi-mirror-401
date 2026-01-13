@@ -1,0 +1,56 @@
+# HDF file (root) metadata, CF-compliant
+schema: hobo-general
+schema_version: 1.0
+Conventions: "CF-1.8"
+title: "NSF Project: Understanding the Changing Natural-Built Landscape in an Arctic Community: An integrated sensor network in Utqiagvik, Alaska"
+institution: "U. of Virginia / U. of Notre Dame / National Science Foundation, Navigating the New Arctic program."
+source: "surface atmospheric observations."
+references: "https://www.nsf.gov/awardsearch/showAward?AWD_ID=2022639"
+authors: "LF Murillo, John Readey, Mirella Shaban, Howard Epstein"
+authors_contact: lfrmurillo@nd.edu
+comment: ""
+history: ""
+last_updated_data: 0
+last_updated_metadata: 0
+license: "CC-BY 4.0 International"
+
+# Variables
+measurement_types:
+  description: "enum values for sensor measurements"
+  values:
+    # 0-indexed list
+    # OK to add new types, but not to remove or re-order
+    - Unknown
+    - Temperature
+    - RH
+    - Solar Radiation
+    - Pressure
+    - Rain
+    - Dew Point
+    - Water Content
+    - Wind Direction
+    - Wind Speed
+    - Gust Speed
+    - depth
+    - Battery
+    - Battery Level
+    - Scaled Series
+
+data_type_id:
+  description: "enum values for data type IDs"
+  values:
+    # 0-indexed list
+    - Unknown
+    - Normal # non-statistical data, typical for most sensors
+    - Minimum # stat value: min
+    - Maximum
+    - Average 
+    - Standard Deviation
+
+# Tables
+loggers:
+  description: "table of logger stations"
+sensors:
+  description: "table of sensors"
+data:
+  description: "table of measurements"

@@ -1,0 +1,138 @@
+<entry id="air_temperature">
+<canonical_units>K</canonical_units>
+<grib>11 E130</grib>
+<amip>ta</amip>
+<description>
+Air temperature is the bulk temperature of the air, not the surface (skin) temperature.
+</description>
+</entry>
+
+<entry id="altitude">
+<canonical_units>m</canonical_units>
+<grib>8</grib>
+<amip/>
+<description>
+Altitude is the (geometric) height above the geoid, which is the reference geopotential surface. The geoid is similar to mean sea level.
+</description>
+</entry>
+
+<entry id="mass_concentration_of_pm10_ambient_aerosol_particles_in_air">
+<canonical_units>kg m-3</canonical_units>
+<grib/>
+<amip/>
+<description>
+Mass concentration means mass per unit volume and is used in the construction mass_concentration_of_X_in_Y, where X is a material constituent of Y. A chemical species denoted by X may be described by a single term such as "nitrogen" or a phrase such as "nox_expressed_as_nitrogen". "Aerosol" means the system of suspended liquid or solid particles in air (except cloud droplets) and their carrier gas, the air itself. "Ambient_aerosol" means that the aerosol is measured or modelled at the ambient state of pressure, temperature and relative humidity that exists in its immediate environment. "Ambient aerosol particles" are aerosol particles that have taken up ambient water through hygroscopic growth. The extent of hygroscopic growth depends on the relative humidity and the composition of the particles. "Pm10 aerosol" means atmospheric particulate compounds with an aerodynamic diameter of less than or equal to 10 micrometers. To specify the relative humidity and temperature at which the particle size applies, provide scalar coordinate variables with the standard names of, respectively, "relative_humidity" and "air_temperature."
+</description>
+</entry>
+
+<entry id="mass_concentration_of_pm1_ambient_aerosol_particles_in_air">
+<canonical_units>kg m-3</canonical_units>
+<grib/>
+<amip/>
+<description>
+Mass concentration means mass per unit volume and is used in the construction mass_concentration_of_X_in_Y, where X is a material constituent of Y. A chemical species denoted by X may be described by a single term such as "nitrogen" or a phrase such as "nox_expressed_as_nitrogen". "Aerosol" means the system of suspended liquid or solid particles in air (except cloud droplets) and their carrier gas, the air itself. "Ambient_aerosol" means that the aerosol is measured or modelled at the ambient state of pressure, temperature and relative humidity that exists in its immediate environment. "Ambient aerosol particles" are aerosol particles that have taken up ambient water through hygroscopic growth. The extent of hygroscopic growth depends on the relative humidity and the composition of the particles. "Pm1 aerosol" means atmospheric particulate compounds with an aerodynamic diameter of less than or equal to 1 micrometer. To specify the relative humidity and temperature at which the particle size applies, provide scalar coordinate variables with the standard names of "relative_humidity" and "air_temperature".
+</description>
+</entry>
+
+<entry id="mass_concentration_of_pm2p5_ambient_aerosol_particles_in_air">
+<canonical_units>kg m-3</canonical_units>
+<grib/>
+<amip/>
+<description>
+Mass concentration means mass per unit volume and is used in the construction mass_concentration_of_X_in_Y, where X is a material constituent of Y. A chemical species denoted by X may be described by a single term such as "nitrogen" or a phrase such as "nox_expressed_as_nitrogen". "Aerosol" means the system of suspended liquid or solid particles in air (except cloud droplets) and their carrier gas, the air itself. "Ambient_aerosol" means that the aerosol is measured or modelled at the ambient state of pressure, temperature and relative humidity that exists in its immediate environment. "Ambient aerosol particles" are aerosol particles that have taken up ambient water through hygroscopic growth. The extent of hygroscopic growth depends on the relative humidity and the composition of the particles. "Pm2p5 aerosol" means atmospheric particulate compounds with an aerodynamic diameter of less than or equal to 2.5 micrometers. To specify the relative humidity and temperature at which the particle size applies, provide scalar coordinate variables with the standard names of "relative_humidity" and "air_temperature."
+</description>
+</entry>
+
+<entry id="rainfall_amount">
+<canonical_units>kg m-2</canonical_units>
+<grib/>
+<amip/>
+<description>"Amount" means mass per unit area.</description>
+</entry>
+
+<entry id="rainfall_flux">
+<canonical_units>kg m-2 s-1</canonical_units>
+<grib/>
+<amip/>
+<description>
+In accordance with common usage in geophysical disciplines, "flux" implies per unit area, called "flux density" in physics.
+</description>
+</entry>
+
+<entry id="rainfall_rate">
+<canonical_units>m s-1</canonical_units>
+<grib/>
+<amip/>
+<description/>
+</entry>
+
+<entry id="reference_epoch">
+<canonical_units>s</canonical_units>
+<grib/>
+<amip/>
+<description>
+The period of time over which a parameter has been summarised (usually by averaging) in order to provide a reference (baseline) against which data has been compared. When a coordinate, scalar coordinate, or auxiliary coordinate variable with this standard name has bounds, then the bounds specify the beginning and end of the time period over which the reference was determined. If the reference represents an instant in time, rather than a period, then bounds may be omitted. It is not the time for which the actual measurements are valid; the standard name of time should be used for that.
+</description>
+</entry>
+
+<entry id="relative_humidity">
+<canonical_units>1</canonical_units>
+<grib>52 E157</grib>
+<amip>hur</amip>
+<description/>
+</entry>
+
+<entry id="solar_irradiance">
+<canonical_units>W m-2</canonical_units>
+<grib/>
+<amip/>
+<description>
+The quantity with standard name solar_irradiance, often called Total Solar Irradiance (TSI), is the radiation from the sun integrated over the whole electromagnetic spectrum and over the entire solar disk. The quantity applies outside the atmosphere, by default at a distance of one astronomical unit from the sun, but a coordinate or scalar coordinate variable of distance_from_sun can be used to specify a value other than the default. "Irradiance" means the power per unit area (called radiative flux in other standard names), the area being normal to the direction of flow of the radiant energy.
+</description>
+</entry>
+
+<entry id="soil_moisture_content_at_field_capacity">
+<canonical_units>kg m-2</canonical_units>
+<grib/>
+<amip>mrsofc</amip>
+<description>
+"moisture" means water in all phases contained in soil. "Content" indicates a quantity per unit area. The "soil content" of a quantity refers to the vertical integral from the surface down to the bottom of the soil model. For the content between specified levels in the soil, standard names including content_of_soil_layer are used. The field capacity of soil is the maximum content of water it can retain against gravitational drainage.
+</description>
+</entry>
+
+<entry id="soil_temperature">
+<canonical_units>K</canonical_units>
+<grib>85</grib>
+<amip/>
+<description>
+Soil temperature is the bulk temperature of the soil, not the surface (skin) temperature. "Soil" means the near-surface layer where plants sink their roots. For subsurface temperatures that extend beneath the soil layer or in areas where there is no surface soil layer, the standard name solid_earth_subsurface_temperature should be used.
+</description>
+</entry>
+
+<entry id="wind_from_direction">
+<canonical_units>degree</canonical_units>
+<grib>31</grib>
+<amip/>
+<description>
+Wind is defined as a two-dimensional (horizontal) air velocity vector, with no vertical component. (Vertical motion in the atmosphere has the standard name upward_air_velocity.) In meteorological reports, the direction of the wind vector is usually (but not always) given as the direction from which it is blowing (wind_from_direction) (westerly, northerly, etc.). In other contexts, such as atmospheric modelling, it is often natural to give the direction in the usual manner of vectors as the heading or the direction to which it is blowing (wind_to_direction) (eastward, southward, etc.) "from_direction" is used in the construction X_from_direction and indicates the direction from which the velocity vector of X is coming.
+</description>
+</entry>
+
+<entry id="wind_speed">
+<canonical_units>m s-1</canonical_units>
+<grib>32</grib>
+<amip/>
+<description>
+Speed is the magnitude of velocity. Wind is defined as a two-dimensional (horizontal) air velocity vector, with no vertical component. (Vertical motion in the atmosphere has the standard name upward_air_velocity.) The wind speed is the magnitude of the wind velocity.
+</description>
+</entry>
+
+<entry id="wind_speed_of_gust">
+<canonical_units>m s-1</canonical_units>
+<grib/>
+<amip/>
+<description>
+Speed is the magnitude of velocity. Wind is defined as a two-dimensional (horizontal) air velocity vector, with no vertical component. (Vertical motion in the atmosphere has the standard name upward_air_velocity.) The wind speed is the magnitude of the wind velocity. A gust is a sudden brief period of high wind speed. In an observed timeseries of wind speed, the gust wind speed can be indicated by a cell_methods of maximum for the time-interval. In an atmospheric model which has a parametrised calculation of gustiness, the gust wind speed may be separately diagnosed from the wind speed.
+</description>
+</entry>
+
