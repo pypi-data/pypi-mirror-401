@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ts-smali"
+description = "Smali grammar for tree-sitter"
+version = "1.0.0"
+keywords = ["incremental", "parsing", "tree-sitter", "smali"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Software Development :: Compilers",
+  "Topic :: Text Processing :: Linguistic",
+  "Typing :: Typed"
+]
+requires-python = ">=3.8"
+license.text = "MIT"
+readme = "README.md"
+
+[project.urls]
+Homepage = "https://git.sr.ht/~yotam/tree-sitter-smali"
+
+[project.optional-dependencies]
+core = ["tree-sitter~=0.21"]
+
+[project.scripts]
+ts-smali-highlights = "tree_sitter_smali.cli:print_highlights"
+
+[tool.cibuildwheel]
+# Build for Python 3.8+ on all platforms
+# Using abi3 (stable ABI) means wheels built with 3.8 work for all 3.8+ versions
+# Base Python version is 3.8 to avoid version dependency issues
+build = [
+    "cp38-*",  # Python 3.8 (base version)
+    "cp39-*",  # Python 3.9
+    "cp310-*", # Python 3.10
+    "cp311-*", # Python 3.11
+    "cp312-*", # Python 3.12
+    "cp313-*", # Python 3.13
+]
+build-frontend = "build"
+# Skip musl Linux (Alpine) and 32-bit architectures
+skip = "*-musllinux_* pp* *-win32"
+# Use manylinux2014 for better compatibility
+manylinux-x86_64-image = "manylinux2014"
+manylinux-i686-image = "manylinux2014"
+# Tests are run separately in CI, not during wheel building
+# test-command = "pytest test/test_tree_snapshot.py -v"
+# test-requires = ["pytest", "tree-sitter>=0.21"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+norecursedirs = [".git", "venv", "node_modules"]

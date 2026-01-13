@@ -1,0 +1,9 @@
+# Include the queries directory in source distributions
+# This is needed because queries/ is at the root, not inside the package directory
+graft queries
+
+# Include source files needed for building the C extension
+include src/parser.c
+include src/scanner.c
+include src/tree_sitter/*.h
+include bindings/python/tree_sitter_smali/*.c
