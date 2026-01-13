@@ -1,0 +1,106 @@
+Metadata-Version: 2.4
+Name: openrt
+Version: 0.0.2
+Summary: An Open-Source Red Teaming Framework for Large Language Models (LLMs) and Vision-Language Models (VLMs)
+Home-page: https://github.com/AI45Lab/OpenRT
+Author: OpenRT Team
+Author-email: 24110240013@m.fudan.edu.cn
+License: AGPLv3
+Project-URL: Bug Reports, https://github.com/AI45Lab/OpenRT/issues
+Project-URL: Source, https://github.com/AI45Lab/OpenRT
+Project-URL: Documentation, https://github.com/AI45Lab/OpenRT/wiki
+Project-URL: Changelog, https://github.com/AI45Lab/OpenRT/CHANGELOG.md
+Keywords: ai,security,red-teaming,llm,vlm,jailbreak,attack,evaluation,nlp,computer-vision,machine-learning,prompt-engineering,adversarial,robustness,safety
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Testing
+Classifier: Natural Language :: English
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: openai>=2.8.1
+Requires-Dist: openai-agents>=0.6.1
+Requires-Dist: nest-asyncio>=1.6.0
+Requires-Dist: aiofiles>=25.1.0
+Requires-Dist: python-dotenv>=1.2.1
+Requires-Dist: pandas>=2.2.3
+Requires-Dist: matplotlib>=3.7.0
+Requires-Dist: seaborn>=0.13.0
+Requires-Dist: protobuf>=6.0.0
+Requires-Dist: tiktoken>=0.12.0
+Requires-Dist: sentencepiece>=0.2.0
+Requires-Dist: Pillow>=12.0.0
+Requires-Dist: tqdm>=4.67.1
+Requires-Dist: torch>=2.0.0
+Requires-Dist: torchvision>=0.15.0
+Requires-Dist: transformers>=4.30.0
+Requires-Dist: diffusers>=0.21.0
+Requires-Dist: accelerate>=0.20.0
+Requires-Dist: sentence-transformers>=2.7.0
+Requires-Dist: spacy>=3.7.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=6.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.2.0; extra == "docs"
+Requires-Dist: myst-parser>=1.0.0; extra == "docs"
+Provides-Extra: test
+Requires-Dist: pytest>=7.0.0; extra == "test"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0.0; extra == "test"
+Provides-Extra: all
+Requires-Dist: pytest>=7.0.0; extra == "all"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "all"
+Requires-Dist: black>=23.0.0; extra == "all"
+Requires-Dist: flake8>=6.0.0; extra == "all"
+Requires-Dist: mypy>=1.0.0; extra == "all"
+Requires-Dist: sphinx>=6.0.0; extra == "all"
+Requires-Dist: sphinx-rtd-theme>=1.2.0; extra == "all"
+Requires-Dist: myst-parser>=1.0.0; extra == "all"
+Requires-Dist: pytest-cov>=4.0.0; extra == "all"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+
+OpenRT is a comprehensive framework for red teaming LLMs and VLMs with 30+ attack methods.
+
+Features:
+- 30+ attack methods (black-box and white-box)
+- Multi-modal support (text and image attacks)
+- Modular plugin architecture
+- Configuration-driven experiments
+- Multiple evaluation strategies
+- Registry-based component loading
+
+The framework follows a modular design with:
+- Attack implementations (AutoDAN, GeneticAttack, DeepInception, etc.)
+- Model integrations (OpenAI API, custom base_url support)
+- Dataset handlers (StaticDataset, JSONLDataset)
+- Evaluators (KeywordEvaluator, LLMEvaluator)
+- Strategy patterns (Advancers, Propagators, Judges)
