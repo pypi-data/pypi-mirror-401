@@ -1,0 +1,40 @@
+Metadata-Version: 2.4
+Name: bw-converter-python
+Version: 0.0.1
+Summary: A simple package to convert color images to black and white
+Project-URL: Homepage, https://github.com/example/bw-converter-python
+Project-URL: Bug Tracker, https://github.com/example/bw-converter-python/issues
+Author-email: Example Author <author@example.com>
+License-File: LICENSE
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
+Requires-Dist: pillow
+Description-Content-Type: text/markdown
+
+# Black and White Image Converter
+
+A simple Python package to convert color images to black and white.
+
+## Installation
+
+```bash
+pip install bw-converter-python
+```
+
+## Usage
+
+### Command Line
+
+```bash
+bw-converter input_image.jpg output_image.jpg
+```
+
+### Python
+
+```python
+from bw_converter.converter import process_image
+
+process_image("input.jpg", "output.jpg")
+```
