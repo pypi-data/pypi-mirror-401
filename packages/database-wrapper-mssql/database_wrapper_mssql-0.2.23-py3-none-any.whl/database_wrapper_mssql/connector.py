@@ -1,0 +1,116 @@
+from typing import Any, NotRequired, TypedDict, cast
+
+from pymssql import Connection as MssqlConnection
+from pymssql import Cursor as MssqlCursor
+from pymssql import connect as MssqlConnect
+
+from database_wrapper import DatabaseBackend
+
+
+class MssqlConfig(TypedDict):
+    hostname: str
+    port: NotRequired[str]
+    username: str
+    password: str
+    database: str
+    tds_version: NotRequired[str]
+    kwargs: NotRequired[dict[str, Any]]
+
+
+class MssqlTypedDictCursor(MssqlCursor):
+    def fetchone(self) -> dict[str, Any] | None:
+        return super().fetchone()  # type: ignore
+
+    def fetchall(self) -> list[dict[str, Any]]:
+        return super().fetchall()  # type: ignore
+
+    def __iter__(self) -> "MssqlTypedDictCursor":
+        return self
+
+    def __next__(self) -> dict[str, Any]:
+        return super().__next__()  # type: ignore
+
+
+class Mssql(DatabaseBackend):
+    """
+    Mssql database backend
+
+    :param config: Configuration for Mssql
+    :type config: MssqlConfig
+
+    Defaults:
+        port = 1433
+        tds_version = 7.0
+    """
+
+    config: MssqlConfig
+
+    connection: MssqlConnection
+    cursor: MssqlTypedDictCursor
+
+    ##################
+    ### Connection ###
+    ##################
+
+    def open(self) -> None:
+        self.logger.debug("Connecting to DB")
+
+        # Set defaults
+        if "port" not in self.config or not self.config["port"]:
+            self.config["port"] = "1433"
+
+        if "tds_version" not in self.config or not self.config["tds_version"]:
+            self.config["tds_version"] = "7.0"
+
+        if "kwargs" not in self.config or not self.config["kwargs"]:
+            self.config["kwargs"] = {}
+
+        self.connection = MssqlConnect(
+            server=self.config["hostname"],
+            user=self.config["username"],
+            password=self.config["password"],
+            database=self.config["database"],
+            port=self.config["port"],
+            tds_version="7.0",
+            as_dict=True,
+            timeout=self.connection_timeout,
+            login_timeout=self.connection_timeout,
+            **self.config["kwargs"],
+        )
+        self.cursor = cast(MssqlTypedDictCursor, self.connection.cursor(as_dict=True))
+
+    def ping(self) -> bool:
+        try:
+            self.cursor.execute("SELECT 1")
+            self.cursor.fetchone()
+        except Exception as e:
+            self.logger.debug(f"Error while pinging the database: {e}")
+            return False
+
+        return True
+
+    ############
+    ### Data ###
+    ############
+
+    def last_insert_id(self) -> int:
+        assert self.cursor, "Cursor is not initialized"
+        return self.cursor.lastrowid
+
+    def affected_rows(self) -> int:
+        assert self.cursor, "Cursor is not initialized"
+        return self.cursor.rowcount
+
+    def commit(self) -> None:
+        """Commit DB queries"""
+        assert self.connection, "Connection is not initialized"
+
+        self.logger.debug("Commit DB queries")
+        self.connection.commit()
+
+    def rollback(self) -> None:
+        """Rollback DB queries"""
+        assert self.connection, "Connection is not initialized"
+
+        self.logger.debug("Rollback DB queries")
+        self.connection.rollback()
