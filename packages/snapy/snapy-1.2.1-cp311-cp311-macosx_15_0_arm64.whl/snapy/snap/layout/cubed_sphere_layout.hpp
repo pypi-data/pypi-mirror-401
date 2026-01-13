@@ -1,0 +1,117 @@
+#pragma once
+
+// snap
+#include "layout.hpp"
+
+namespace snap {
+
+enum { SIDE_L = 0, SIDE_R = 1, SIDE_B = 2, SIDE_T = 3 };
+
+struct CSEdge {
+  int nface; /* neighbor face id [0..5] */
+  int nside; /* neighbor side id (LEFT/RIGHT/BOTTOM/TOP) */
+  int rev;   /* 0: preserve along-edge index, 1: reverse */
+};
+
+struct CSVel {
+  int idx; /* velocity component index */
+  int sgn; /* velocity component sign: +1 or -1 */
+};
+
+extern const char CS_FACE_NAMES[6][3];
+extern const CSEdge CS_FACE_EDGES[6][4];
+extern const CSVel CS_G2L_VEL[6][3];
+extern const CSVel CS_L2G_VEL[6][3];
+
+//! Given CS_G2L_VEL, populate CS_L2G_VEL
+void populate_cs_l2g_vel(CSVel l2g[6][3]);
+
+class CubedSphereLayoutImpl
+    : public torch::nn::Cloneable<CubedSphereLayoutImpl>,
+      public LayoutImpl {
+ public:
+  //! Constructor to initialize the layers
+  CubedSphereLayoutImpl() = default;
+  CubedSphereLayoutImpl(const LayoutOptions &opts) : LayoutImpl(opts) {
+    options->type("cubed-sphere");
+    reset();
+  }
+  void reset() override;
+
+  ~CubedSphereLayoutImpl() = default;
+  void pretty_print(std::ostream &os) const override;
+
+  int pxy() const { return options->px(); }
+
+  int rank_of(std::tuple<int, int, int> iloc) const override;
+  std::tuple<int, int, int> loc_of(int global_rank) const override;
+
+  int neighbor_rank(std::tuple<int, int, int> iloc,
+                    std::tuple<int, int, int> offset) const override;
+
+  void serialize(MeshBlockImpl const *pmb, Variables &vars,
+                 SyncOptions const &opts) override;
+
+  void deserialize(MeshBlockImpl const *pmb, Variables &vars,
+                   SyncOptions const &opts) const override;
+
+  //! \brief Perform ghost zone exchange
+  /*!
+   * Needs specialization because cubed sphere layout will not have
+   * two ranks execute exchange two along sides, which is possible in slab
+   * layout with periodic boundary and with exactly two meshblocks
+   * next to each other.
+   * Therefore, send_id and recv_id do not need special treatment.
+   * Infact, calculating a matching send_id and recv_id is challenging.
+   */
+  void forward(MeshBlockImpl const *pmb, Variables &vars,
+               SyncOptions const &opts,
+               std::vector<c10::intrusive_ptr<c10d::Work>> &works) override;
+
+ private:
+  //! \brief Interpolate transmitted variable to local ghost zones
+  void _interpolate_to_local(MeshBlockImpl const *pmb,
+                             std::tuple<int, int, int> offset,
+                             torch::Tensor var) const;
+
+  //! \brief Global rank layout: face-major, Z-order within face
+  int _global_rank_from_face_local(int face, int r_local) const {
+    int P = pxy() * pxy();
+    return face * P + r_local;
+  }
+
+  //! \brief Reverse: get (face, r_local) from global rank */
+  void _global_rank_to_face_local(int grank, int *face, int *r_local) const {
+    int P = pxy() * pxy();
+    *face = grank / P;
+    *r_local = grank % P;
+  }
+
+  //! \brief map local (rx,ry) to per-face Z-order rank */
+  int _face_local_rank(int rx, int ry) const {
+    return _rankof[linear_index2(pxy(), pxy(), ry, rx)];
+  }
+
+  //! \brief Edge stepping helper
+  /*!
+   * Move off the face by one tile in (dx,dy) \in {-1,0,1}^2.
+   * Returns neighbor (nface, nrank) or (-1, -1) on error (should not happen on
+   * a closed cube).
+   *
+   * Logic:
+   * - If inside same face: trivial offset of (rx,ry).
+   * - If crossing a single edge (|dx|+|dy|==1): use edge table to decide
+   *    neighbor face & side, compute the along-edge index (pos), reverse if
+   *    needed, and place at neighbor border.
+   * - If crossing a corner (|dx|==1 && |dy|==1): do it in two hops.
+   *    (dx,0) and (0,dy) through the intermediate face.
+   *    If across a panel boundary, do first step inside the panel
+   *    and second step outside. This mirrors typical ghost-corner
+   *    exchange.
+   */
+  void _step_one(int face, int rx, int ry, int dx, int dy, int *out_face,
+                 int *out_rx, int *out_ry) const;
+};
+TORCH_MODULE(CubedSphereLayout);
+
+}  // namespace snap
