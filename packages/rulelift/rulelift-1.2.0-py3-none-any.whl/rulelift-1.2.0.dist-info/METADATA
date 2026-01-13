@@ -1,0 +1,587 @@
+Metadata-Version: 2.4
+Name: rulelift
+Version: 1.2.0
+Summary: A tool for analyzing rule effectiveness in credit risk management
+Home-page: https://github.com/aialgorithm/rulelift
+Author: aialgorithm
+Author-email: aialgorithm@example.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas<=2.3.3,>=1.0.0
+Requires-Dist: numpy<=2.4.0,>=1.18.0
+Requires-Dist: scikit-learn<=1.8.0,>=0.24.0
+Requires-Dist: matplotlib<=3.10.8,>=3.3.0
+Requires-Dist: seaborn<=0.13.2,>=0.11.0
+Requires-Dist: networkx<=3.6.1,>=2.5.0
+Requires-Dist: graphviz<1.0.0,>=0.16
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# rulelift - 信用风险规则有效性分析工具
+
+## 项目概述
+
+rulelift 是一个用于信用风险管理中策略规则自动挖掘、有效性分析及监控的 Python 工具包。
+- 实时评估监控上线规则的效度；
+- 自动化挖掘高价值的规则；
+
+## 核心价值
+
+在风控领域，规则系统因其配置便利和强解释性而广泛应用，但面临规则效果监控难、优化难的挑战。rulelift 提供了全面的解决方案：
+
+- **规则评估**：解决规则拦截样本无标签的问题，借助客户评级分布差异，推算逾期率、召回率、精确率、lift 值等核心指标
+- **实时监控**：支持基于生产数据的规则效果分析
+- **规则挖掘**：自动从数据中挖掘有效的风控规则
+- **策略优化**：评估策略组合效果，计算两两规则间的增益
+- **可视化展示**：直观呈现规则效果和关系
+- **成本效益高**：无需分流测试，基于规则命中用户记录即可评估规则效果
+
+它帮助风控团队评估规则的实际效果，识别冗余规则，优化策略组合，提高风险控制能力。
+
+## 完整的安装使用方法
+
+### 使用 pip 安装（推荐）
+
+```bash
+pip install rulelift
+```
+
+### 从源码安装
+
+```bash
+git clone https://github.com/aialgorithm/rulelift.git
+cd rulelift
+pip install -e .
+```
+
+## 快速开始
+
+### 1. 基本导入
+
+```python
+from rulelift import (
+    load_example_data, preprocess_data,
+    SingleFeatureRuleMiner, MultiFeatureRuleMiner, TreeRuleExtractor,
+    VariableAnalyzer, analyze_rules, calculate_strategy_gain
+)
+```
+
+### 2. 加载示例数据
+
+```python
+# 加载示例数据
+df = load_example_data('feas_target.csv')
+
+# 数据预处理
+df = preprocess_data(df)
+```
+
+## 核心功能
+
+### 1. 树规则提取（TreeRuleExtractor）
+
+TreeRuleExtractor 是一个统一的树模型规则提取类，支持多种算法（DT、RF、CHI2、XGB、ISF）。
+
+#### 1.1 支持的算法
+
+| 算法 | 说明 | 适用场景 |
+|------|------|----------|
+| `dt` | 决策树（Decision Tree） | 快速生成规则，适合初步探索 |
+| `rf` | 随机森林（Random Forest） | 规则稳定性好，适合生产环境 |
+| `chi2` | 卡方决策树（Chi-square Decision Tree） | 适合分类特征较多的场景 |
+| `xgb` | XGBoost（梯度提升树） | 规则精度高，适合复杂场景 |
+| `isf` | 孤立森林（Isolation Forest） | 异常检测，适合挖掘异常规则 |
+
+#### 1.2 基本使用
+
+```python
+from rulelift import TreeRuleExtractor
+
+# 初始化树规则提取器
+tree_miner = TreeRuleExtractor(
+    df, 
+    target_col='ISBAD', 
+    exclude_cols=['ID', 'CREATE_TIME'],
+    algorithm='rf',  # 使用随机森林算法
+    max_depth=5,
+    n_estimators=10,
+    test_size=0.3,
+    random_state=42
+)
+
+# 训练模型
+train_acc, test_acc = tree_miner.train()
+print(f"训练集准确率: {train_acc:.4f}")
+print(f"测试集准确率: {test_acc:.4f}")
+
+# 提取规则
+rules = tree_miner.extract_rules()
+print(f"提取的规则数量: {len(rules)}")
+
+# 获取规则DataFrame
+rules_df = tree_miner.get_rules_as_dataframe(deduplicate=True, sort_by_lift=True)
+print(rules_df.head())
+```
+
+#### 1.3 特征趋势过滤（feature_trends）
+
+`feature_trends` 参数用于根据特征与目标标签的正负相关性过滤不符合业务解释性的规则。
+
+**参数说明**：
+- `feature_trends`: Dict[str, int]，键为特征名，值为 1（正相关）或 -1（负相关）
+  - **正相关（值为1）**：特征数值越大，目标标签（违约概率）越高
+    - 只保留包含该特征**大于（>）**某阈值的规则
+    - 剔除包含该特征**小于等于（<=）**某阈值的规则
+  - **负相关（值为-1）**：特征数值越小，目标标签（违约概率）越高
+    - 只保留包含该特征**小于等于（<=）**某阈值的规则
+    - 剔除包含该特征**大于（>）**某阈值的规则
+
+**使用示例**：
+
+```python
+# 使用特征趋势过滤
+tree_miner = TreeRuleExtractor(
+    df, 
+    target_col='ISBAD', 
+    exclude_cols=['ID', 'CREATE_TIME'],
+    algorithm='rf',
+    feature_trends={
+        'ALI_FQZSCORE': -1,      # 负相关：分数越低，违约概率越高
+        'BAIDU_FQZSCORE': -1,    # 负相关：分数越低，违约概率越高
+        'NUMBER OF LOAN APPLICATIONS TO PBOC': 1  # 正相关：申请次数越多，违约概率越高
+    }
+)
+
+# 提取规则（会自动过滤不符合业务解释性的规则）
+rules = tree_miner.extract_rules()
+```
+
+**过滤效果示例**：
+
+不使用 `feature_trends`：
+```
+Rule 1: ALI_FQZSCORE <= 860.0000  # 可能不符合业务解释性
+Rule 2: BAIDU_FQZSCORE > 327.0000  # 可能不符合业务解释性
+Rule 3: NUMBER OF LOAN APPLICATIONS TO PBOC <= 35.0000  # 可能不符合业务解释性
+```
+
+使用 `feature_trends`：
+```
+Rule 1: ALI_FQZSCORE <= 860.0000  # 负相关，保留<=
+Rule 2: BAIDU_FQZSCORE <= 535.0000  # 负相关，保留<=
+Rule 3: NUMBER OF LOAN APPLICATIONS TO PBOC > 2.0000  # 正相关，保留>
+```
+
+#### 1.4 常用参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|----------|------|
+| `algorithm` | str | `'dt'` | 算法类型：'dt'、'rf'、'chi2'、'xgb'、'isf' |
+| `max_depth` | int | `5` | 决策树最大深度 |
+| `min_samples_split` | int | `10` | 分裂节点所需的最小样本数 |
+| `min_samples_leaf` | int | `5` | 叶子节点的最小样本数 |
+| `n_estimators` | int | `10` | 随机森林中树的数量 |
+| `max_features` | str | `'sqrt'` | 每棵树分裂时考虑的最大特征数：'sqrt'或'log2' |
+| `test_size` | float | `0.3` | 测试集比例 |
+| `random_state` | int | `42` | 随机种子 |
+| `feature_trends` | Dict[str, int] | `None` | 特征与目标标签的正负相关性字典 |
+
+#### 1.5 输出示例
+
+```python
+# 打印Top 5规则
+for i, rule in enumerate(rules[:5]):
+    print(f"\n=== Rule {i+1} ===")
+    print(f"规则描述: {rule['rule']}")
+    print(f"预测类别: {rule['class_name']} (概率: {rule['class_probability']:.4f})")
+    print(f"样本数量: {rule['sample_count']}")
+    print(f"重要性: {rule['importance']:.2f}")
+```
+
+---
+
+### 2. 单特征规则挖掘（SingleFeatureRuleMiner）
+
+用于对数据各特征的不同阈值进行效度分布分析。
+
+#### 2.1 基本使用
+
+```python
+from rulelift import SingleFeatureRuleMiner
+
+# 初始化单特征规则挖掘器
+sf_miner = SingleFeatureRuleMiner(
+    df, 
+    exclude_cols=['ID', 'CREATE_TIME'],
+    target_col='ISBAD'
+)
+
+# 分析单个特征
+feature = 'ALI_FQZSCORE'
+metrics_df = sf_miner.calculate_single_feature_metrics(feature, num_bins=20)
+print(f"\n=== {feature} 分箱分析 ===")
+print(metrics_df.head())
+
+# 获取Top规则
+top_rules = sf_miner.get_top_rules(feature=feature, top_n=5, metric='lift', min_samples=10)
+print(f"\n=== Top 5规则 ===")
+print(top_rules[['rule_description', 'lift', 'badrate', 'selected_samples']])
+```
+
+#### 2.2 可视化
+
+```python
+# 绘制特征指标分布图
+plt = sf_miner.plot_feature_metrics(feature, metric='lift')
+plt.savefig(f'{feature}_lift_distribution.png', dpi=300, bbox_inches='tight')
+plt.close()
+```
+
+#### 2.3 常用参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|----------|------|
+| `exclude_cols` | List[str] | `None` | 排除的字段名列表 |
+| `target_col` | str | `'ISBAD'` | 目标字段名 |
+| `num_bins` | int | `20` | 分箱数量 |
+| `min_samples` | int | `10` | 最小样本数过滤 |
+| `min_lift` | float | `1.1` | 最小lift值过滤 |
+
+#### 2.4 输出示例
+
+```
+=== Top 5规则 ===
+                           rule_description      lift  badrate  selected_samples
+0  ALI_FQZSCORE <= 665.0000  2.174292  0.666667              51
+1  ALI_FQZSCORE <= 688.5000  2.087320  0.640000              75
+2  ALI_FQZSCORE <= 705.0000  1.993101  0.611111             108
+3  ALI_FQZSCORE <= 725.0000  1.928934  0.580000             150
+4  ALI_FQZSCORE <= 745.0000  1.867925  0.555556             180
+```
+
+---
+
+### 3. 多特征交叉规则挖掘（MultiFeatureRuleMiner）
+
+用于生成双特征交叉分析结果，支持自定义分箱阈值、自动分箱、卡方分箱等多种分箱策略。
+
+#### 3.1 基本使用
+
+```python
+from rulelift import MultiFeatureRuleMiner
+
+# 初始化多特征规则挖掘器
+multi_miner = MultiFeatureRuleMiner(df, target_col='ISBAD')
+
+# 生成交叉规则
+feature1 = 'ALI_FQZSCORE'
+feature2 = 'BAIDU_FQZSCORE'
+cross_rules = multi_miner.get_cross_rules(
+    feature1, feature2, 
+    top_n=10, 
+    metric='lift',
+    min_samples=10,  # 最小样本数过滤
+    min_lift=1.1     # 最小lift值过滤
+)
+print(f"\n=== 交叉规则Top 10 ===")
+print(cross_rules[['rule_description', 'lift', 'badrate', 'count']].head())
+
+# 绘制交叉热力图
+plt = multi_miner.plot_cross_heatmap(feature1, feature2, metric='lift')
+plt.savefig('cross_feature_heatmap.png', dpi=300, bbox_inches='tight')
+plt.close()
+```
+
+#### 3.2 常用参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|----------|------|
+| `target_col` | str | `'ISBAD'` | 目标字段名 |
+| `top_n` | int | `10` | 返回的规则数量 |
+| `metric` | str | `'lift'` | 排序指标：'lift'、'badrate'等 |
+| `min_samples` | int | `10` | 最小样本数过滤 |
+| `min_lift` | float | `1.1` | 最小lift值过滤 |
+| `max_unique_threshold` | int | `5` | 最大允许的唯一值数量阈值 |
+| `custom_bins1` | List[float] | `None` | 第一个特征的自定义分箱阈值 |
+| `custom_bins2` | List[float] | `None` | 第二个特征的自定义分箱阈值 |
+| `binning_method` | str | `'quantile'` | 分箱方法：'quantile'（等频）或'chi2'（卡方） |
+
+#### 3.3 输出示例
+
+```
+=== 交叉规则Top 10 ===
+                                        rule_description  lift  badrate  count
+0  ALI_FQZSCORE = (780.0, 805.0] AND ...  27.0      27.0      0
+1  ALI_FQZSCORE = (805.0, 870.0] AND ...  23.0      23.0      0
+2  ALI_FQZSCORE = (705.0, 745.0] AND ...  21.0      21.0      0
+3  ALI_FQZSCORE = (745.0, 780.0] AND ...  19.0      19.0      0
+4  ALI_FQZSCORE = (665.0, 705.0] AND ...  18.0      18.0      0
+```
+
+---
+
+### 4. 变量分析（VariableAnalyzer）
+
+支持对特征变量进行全面的效度分析和分箱分析，帮助风控团队识别重要变量，优化特征工程。
+
+#### 4.1 基本使用
+
+```python
+from rulelift import VariableAnalyzer
+
+# 初始化变量分析器
+var_analyzer = VariableAnalyzer(
+    df, 
+    exclude_cols=['ID', 'CREATE_TIME'], 
+    target_col='ISBAD'
+)
+
+# 分析所有变量的效度指标
+var_metrics = var_analyzer.analyze_all_variables()
+print("\n=== 所有变量效度指标 ===")
+print(var_metrics)
+
+# 分析单个变量的分箱情况
+feature = 'ALI_FQZSCORE'
+bin_analysis = var_analyzer.analyze_single_variable(feature, n_bins=10)
+print(f"\n=== {feature} 分箱分析 ===")
+print(bin_analysis)
+
+# 可视化变量分箱结果
+plt = var_analyzer.plot_variable_bins(feature, n_bins=10)
+plt.savefig(f'{feature}_bin_analysis.png', dpi=300, bbox_inches='tight')
+plt.close()
+```
+
+#### 4.2 常用参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|----------|------|
+| `exclude_cols` | List[str] | `None` | 排除的字段名列表 |
+| `target_col` | str | `'ISBAD'` | 目标字段名 |
+| `n_bins` | int | `10` | 分箱数量 |
+
+#### 4.3 输出示例
+
+```
+=== 所有变量效度指标 ===
+        variable        iv        ks        auc  missing_rate  single_value_rate  min_value  max_value  median_value  mean_diff  corr_with_target  psi
+0  ALI_FQZSCORE  0.456789  0.452345  0.723456      0.012345      0.0456789      0.987654      0.723456      0.012345      0.456789      0.012345
+1  BAIDU_FQZSCORE  0.3456789  0.3456789  0.678901      0.023456      0.056789      0.976543      0.678901      0.023456      0.3456789      0.023456
+```
+
+---
+
+### 5. 规则效度分析（analyze_rules）
+
+解决规则拦截样本无标签的问题，借助客户评级分布差异，推算逾期率、召回率、精确率、lift 值等核心指标。
+
+#### 5.1 基本使用
+
+```python
+from rulelift import analyze_rules
+
+# 分析规则效度
+result = analyze_rules(
+    df, 
+    rule_col='RULE',
+    user_id_col='USER_ID',
+    user_level_badrate_col='USER_LEVEL_BADRATE',
+    user_target_col='USER_TARGET',
+    hit_date_col='HIT_DATE'
+)
+
+print("\n=== 规则效度分析结果 ===")
+print(result[['RULE', 'actual_lift', 'actual_badrate', 'actual_recall', 'f1']].head())
+```
+
+#### 5.2 常用参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|----------|------|
+| `rule_col` | str | `'RULE'` | 规则字段名 |
+| `user_id_col` | str | `'USER_ID'` | 用户编号字段名 |
+| `user_level_badrate_col` | str | `None` | 用户评级坏账率字段名（可选） |
+| `user_target_col` | str | `None` | 用户实际逾期字段名（可选） |
+| `hit_date_col` | str | `None` | 命中日期字段名（可选，用于命中率监控） |
+| `metrics` | list | `None` | 指定要计算的指标列表（可选） |
+| `include_stability` | bool | `True` | 是否包含稳定性指标 |
+
+#### 5.3 输出示例
+
+```
+=== 规则效度分析结果 ===
+         RULE  actual_lift  actual_badrate  actual_recall        f1
+0  rule1     2.3456789      0.3456789      0.456789  0.3456789
+1  rule2     2.123456      0.234567       0.3456789  0.234567
+2  rule3     1.987654      0.123456       0.234567  0.123456
+```
+
+---
+
+### 6. 策略增益计算（calculate_strategy_gain）
+
+评估策略组合效果，计算两两规则间的增益。
+
+#### 6.1 基本使用
+
+```python
+from rulelift import calculate_strategy_gain
+
+# 定义两个策略组
+strategy1 = ['rule1', 'rule2']
+strategy2 = ['rule1', 'rule2', 'rule3']
+
+# 计算策略增益（strategy1 到 strategy2 的额外价值）
+gain = calculate_strategy_gain(
+    df, 
+    strategy1, 
+    strategy2, 
+    user_target_col='USER_TARGET'
+)
+print(f"\n策略增益: {gain:.4f}")
+```
+
+#### 6.2 常用参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|----------|------|
+| `strategy1` | list | - | 基础策略规则列表 |
+| `strategy2` | list | - | 增强策略规则列表 |
+| `user_target_col` | str | `None` | 用户实际逾期字段名（可选） |
+| `user_level_badrate_col` | str | `None` | 用户评级坏账率字段名（可选） |
+
+---
+
+## 核心指标说明
+
+### 规则评估指标
+
+| 指标 | 定义 | 最佳范围 | 意义 |
+|------|------|----------|------|
+| `actual_lift` | 规则命中样本逾期率 / 总样本逾期率 | > 1.0 | 规则的风险区分能力，值越大效果越好 |
+| `f1` | 2*(精确率*召回率)/(精确率+召回率) | 0-1 | 综合评估规则的精确率和召回率 |
+| `actual_badrate` | 规则命中样本中的逾期比例 | 依业务场景而定 | 规则直接拦截的坏客户比例 |
+| `actual_recall` | 规则命中的坏客户 / 总坏客户 | 0-1 | 规则对坏客户的覆盖能力 |
+| `hit_rate_cv` | 命中率变异系数 = 标准差/均值 | < 0.2 | 规则命中率的稳定性，值越小越稳定 |
+| `max_correlation_value` | 与其他规则的最大相关系数 | < 0.5 | 规则的独立性，值越小独立性越好 |
+
+### 变量分析指标
+
+| 指标 | 定义 | 最佳范围 | 意义 |
+|------|------|----------|------|
+| `iv` | 信息值(Information Value) | > 0.1 | 变量的预测能力，值越大预测能力越强 |
+| `ks` | KS统计量 | > 0.2 | 变量对好坏客户的区分能力，值越大区分能力越强 |
+| `auc` | 曲线下面积 | > 0.6 | 变量的整体预测能力，值越大预测能力越强 |
+| `badrate` | 分箱中的坏客户比例 | 依业务场景而定 | 分箱的风险水平 |
+| `cum_badrate` | 累积坏客户比例 | 依业务场景而定 | 累积分箱的风险水平 |
+
+---
+
+## 最佳实践
+
+1. **数据准备**：
+   - 确保数据包含唯一的用户标识和规则名称
+   - 实际逾期字段（USER_TARGET）应为 0/1 格式
+   - 评级坏账率字段（USER_LEVEL_BADRATE）应为数值型
+
+2. **分场景使用**：
+   - **开发测试阶段**：使用决策树规则提取和单/多特征规则挖掘生成候选规则
+   - **生产监控阶段**：使用 analyze_rules 定期评估规则效果，关注 lift 值和命中率稳定性
+
+3. **规则优化建议**：
+   - 保留 lift 值 > 1.2 的规则
+   - 移除命中率变异系数 > 0.5 的不稳定规则
+   - 合并或移除相关系数 > 0.8 的冗余规则
+   - 综合考虑 f1 分数，平衡精确率和召回率
+
+4. **特征趋势过滤**：
+   - 使用 `feature_trends` 参数确保规则符合业务解释性
+   - 正相关特征（如申请次数）：只保留大于阈值的规则
+   - 负相关特征（如信用分）：只保留小于等于阈值的规则
+
+5. **策略组合**：
+   - 使用 calculate_strategy_gain 评估不同策略组合的效果
+   - 优先添加 lift 值高且与现有规则相关性低的规则
+   - 定期评估策略整体效果，及时调整规则组合
+
+---
+
+## 版本信息
+
+当前版本：1.2.0
+
+## 更新日志
+
+### v1.2.0 (2025-01-10)
+- **新增特征趋势过滤功能**：TreeRuleExtractor 支持 `feature_trends` 参数
+  - 正相关特征（值为1）：只保留大于阈值的规则
+  - 负相关特征（值为-1）：只保留小于等于阈值的规则
+  - 提升规则的业务解释性
+- **优化孤立森林规则提取**：基于树结构提取规则，支持多特征组合
+- **优化SingleFeatureRuleMiner**：过滤极端值阈值，避免无意义规则
+- **优化MultiFeatureRuleMiner**：添加最小样本数和lift值过滤
+- **优化规则DataFrame输出**：支持按lift倒序排序
+- **删除变量分析中的损失率指标**：专注于核心效度指标
+- **完善文档**：更新所有功能的使用示例、结果示例及常用参数介绍
+- **修复已知问题**：解决所有已知bug和性能问题
+
+### v1.1.5 (2025-12-23)
+- 新增变量分析模块，支持IV、KS、AUC等指标计算
+- 实现单变量等频分箱分析功能
+- 新增策略自动挖掘功能
+- 优化决策树规则显示，加入 lift 值和拦截用户数等指标
+- 新增两两策略增益计算功能
+- 优化代码质量，修复所有已知问题
+
+### v1.0.0 (2025-12-17)
+- 新增命中率变异系数（hit_rate_cv）用于监控规则稳定性
+- 新增 F1 分数计算，综合评估规则效果
+- 优化规则相关性分析，新增最大相关性指标
+- 改进命中率计算逻辑
+- 完善文档，新增技术原理和缺陷分析
+
+---
+
+## 许可证
+
+MIT License
+
+---
+
+## 项目地址
+
+- GitHub: https://github.com/aialgorithm/rulelift
+- PyPI: https://pypi.org/project/rulelift/
+
+---
+
+## 联系方式
+
+作者: aialgorithm
+邮箱: 15880982687@qq.com
+
+---
+
+## 贡献指南
+
+欢迎提交 Issue 和 Pull Request！如果您有任何建议或问题，请通过 GitHub Issues 反馈。
+
+---
+
+**开始使用 rulelift 优化您的风控规则系统吧！** 🚀
