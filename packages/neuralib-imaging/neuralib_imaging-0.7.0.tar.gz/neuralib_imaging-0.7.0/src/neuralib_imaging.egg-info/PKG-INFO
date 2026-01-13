@@ -1,0 +1,40 @@
+Metadata-Version: 2.4
+Name: neuralib-imaging
+Version: 0.7.0
+Summary: Tools for cellular imaging and widefield imaging
+Author-email: Yu-Ting Wei <ytsimon2004@gmail.com>
+License: BSD-3-Clause
+Project-URL: Homepage, https://github.com/ytsimon2004/neuralib2
+Project-URL: Documentation, https://neuralib2.readthedocs.io/en/latest/index.html
+Project-URL: Repository, https://github.com/ytsimon2004/neuralib2
+Project-URL: Issues, https://github.com/ytsimon2004/neuralib2/issues
+Keywords: Parser,Segmentation,Morphology
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering
+Classifier: Intended Audience :: Science/Research
+Classifier: Typing :: Typed
+Requires-Python: <3.13,>=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: neuralib-utils[all]>=0.7.0
+Requires-Dist: numpy
+Requires-Dist: numba
+Requires-Dist: matplotlib
+Provides-Extra: cascade
+Requires-Dist: ruamel.yaml; extra == "cascade"
+Requires-Dist: tensorflow; extra == "cascade"
+Provides-Extra: widefield
+Requires-Dist: napari; extra == "widefield"
+Requires-Dist: bokeh; extra == "widefield"
+Requires-Dist: scikit-learn; extra == "widefield"
+Provides-Extra: all
+Requires-Dist: neuralib-imaging[cascade]; extra == "all"
+Requires-Dist: neuralib-imaging[widefield]; extra == "all"
+Provides-Extra: test
+Requires-Dist: neuralib-imaging[all]; extra == "test"
+Requires-Dist: neuralib-parser[all]; extra == "test"
+Dynamic: license-file
