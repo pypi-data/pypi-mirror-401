@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-migrate', version='0.1.0', description='Schema Migration Plugin for HVPDB', packages=find_packages(), install_requires=['hvpdb'], entry_points={'hvpdb.plugins': ['migrate = hvpdb_migrate:app']})
