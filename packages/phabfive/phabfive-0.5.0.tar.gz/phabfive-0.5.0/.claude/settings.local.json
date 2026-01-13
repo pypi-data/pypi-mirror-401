@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install pytest coverage flake8 tox)",
+      "Bash(uv run tox:*)",
+      "Bash(uv pip install:*)",
+      "Bash(uv run:*)",
+      "WebFetch(domain:phorge.domain.tld)",
+      "Bash(yq '.')",
+      "Bash(yq:*)",
+      "Bash(gh pr list:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

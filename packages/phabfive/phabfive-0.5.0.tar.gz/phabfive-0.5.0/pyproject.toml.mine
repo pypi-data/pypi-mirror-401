@@ -1,0 +1,34 @@
+[project]
+name = "phabfive"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "anyconfig>=0.10.0",
+    "appdirs",
+    "docopt",
+    "jinja2",
+    "phabricator",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+test = [
+    "coverage",
+    "flake8",
+    "pytest",
+    "tox",
+    "tox-gh-actions",
+]
+docs = [
+    "mkdocs",
+]
+
+[dependency-groups]
+dev = [
+    "anyconfig>=0.14.0",
+    "mkdocs>=1.6.1",
+    "pytest>=8.4.2",
+    "tox>=4.30.2",
+]
