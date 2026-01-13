@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=67"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "katana-meter"
+version = "0.1.2"
+description = "Analyzer-only LUFS / True Peak / ΔE audio meter (Research License)"
+readme = "README.md"
+requires-python = ">=3.9"
+
+license = { file = "LICENSE.txt" }
+
+authors = [
+  { name = "Katana Project" }
+]
+
+classifiers = [
+  "License :: Other/Proprietary License",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Topic :: Multimedia :: Sound/Audio :: Analysis"
+]
+
+[tool.setuptools]
+packages = ["katana_meter"]
+
+[tool.setuptools.package-dir]
+katana_meter = "katana_meter"
+
+[project.scripts]
+katana-meter = "katana_meter.cli:main"

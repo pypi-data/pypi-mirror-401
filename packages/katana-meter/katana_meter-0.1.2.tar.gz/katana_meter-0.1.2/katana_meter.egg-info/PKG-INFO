@@ -1,0 +1,41 @@
+Metadata-Version: 2.4
+Name: katana-meter
+Version: 0.1.2
+Summary: Analyzer-only LUFS / True Peak / ΔE audio meter (Research License)
+Author: Katana Project
+Classifier: License :: Other/Proprietary License
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Multimedia :: Sound/Audio :: Analysis
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# Katana Meter
+
+Katana Meter is a deterministic audio analysis engine designed for
+LUFS, True Peak (sample-based approximation), gain calculation,
+and ΔE (entropy-change) metrics.
+
+It is intended for research, educational use, and technical evaluation.
+The core is dependency-free and focuses on reproducible, transparent results.
+
+---
+
+## Features
+
+- Integrated LUFS (gated, BS.1770-inspired)
+- Sample Peak (dBTP approximation)
+- Gain calculation to target LUFS
+- ΔE entropy-change metric (0.0 – 1.0)
+- Deterministic analysis (same input → same output)
+- WAV native support
+- MP3 / FLAC / AAC / OGG via optional FFmpeg
+
+---
+
+## Installation
+
+```bash
+pip install katana-meter
