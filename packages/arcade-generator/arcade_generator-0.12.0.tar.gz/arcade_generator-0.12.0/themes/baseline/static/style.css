@@ -1,0 +1,93 @@
+/*
+#222831
+#393e46
+#d65a31
+#eeeeee
+*/
+
+html, body {
+  height: 100%; 
+}
+
+body{
+    background-color:#222831;
+    color: #fff;
+    text-rendering: optimizeLegibility !important;
+    font-family: 'Merriweather', serif;
+}
+
+h1{
+    color: #fff;
+}
+
+a{
+    color: #d65a31;
+}
+
+pre{
+    background-color:#393e46;
+    border: solid;
+    border-color: #d65a31;
+    padding:1%;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+
+#post-list{
+    display:flex;
+    flex-wrap:wrap;
+    flex-direction:column;
+}
+
+#back{
+    margin-bottom:1em;
+    margin-left: 0;
+    max-width: 4em;
+    text-decoration:none;
+}
+
+
+@media only screen and (min-width: 900px) {
+    .post-page{
+        display:flex;
+        flex-wrap:wrap;
+        flex-direction:column;
+        justify-content: flex-start;
+        max-width:80%;
+        margin: auto;
+    }
+
+    #index-content{
+        display:flex;
+        flex-wrap:wrap;
+        flex-direction:column;
+    }
+
+}
+
+@media only screen and (max-width: 900px) {
+    .post-page{
+        display:flex;
+        flex-wrap:wrap;
+        flex-direction:column;
+        max-width:95%;
+        margin: auto;
+    }
+
+    #index-content{
+        display:flex;
+        flex-wrap:wrap;
+        flex-direction:column;
+        
+    }
+    #index-content > a{
+        font-size: large;
+    }
+
+    
+}
+
