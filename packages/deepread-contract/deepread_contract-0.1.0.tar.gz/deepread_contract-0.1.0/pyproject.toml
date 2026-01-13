@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deepread-contract"
+version = "0.1.0"
+description = "Biblioteca para validação de documentos e contratos brasileiros"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "BeMonkAI", email = "contato@bemonk.ai" }
+]
+keywords = [
+    "contract",
+    "validation",
+    "cnpj",
+    "brasil",
+    "document",
+    "receita-federal",
+    "pdf",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Legal Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+    "Topic :: Text Processing :: General",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.25.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+ai = [
+    "openai>=1.0.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+deepread-contract = "deepread_contract.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/BeMonkAI/deepread.contract"
+Documentation = "https://github.com/BeMonkAI/deepread.contract#readme"
+Repository = "https://github.com/BeMonkAI/deepread.contract"
+Issues = "https://github.com/BeMonkAI/deepread.contract/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["deepread_contract"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/deepread_contract",
+    "/examples",
+    "/README.md",
+    "/LICENSE",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
