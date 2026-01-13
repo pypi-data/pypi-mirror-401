@@ -1,0 +1,3 @@
+"""Type stubs for tree_sitter_smali."""
+
+def language() -> int: ...
