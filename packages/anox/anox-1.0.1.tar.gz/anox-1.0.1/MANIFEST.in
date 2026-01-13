@@ -1,0 +1,44 @@
+# Include necessary metadata files
+include README.md
+include requirements.txt
+include .env.example
+
+# Include main module
+include main.py
+
+# Exclude local wrapper scripts (these are for development only)
+exclude anox
+exclude anox-usage
+exclude anox_usage_tracker.py
+
+# Exclude test files
+exclude test_*.py
+exclude validate_*.py
+exclude run_tests.sh
+exclude health_check.py
+exclude workspace_examples.py
+
+# Exclude documentation files (only development docs)
+exclude *.md
+include README.md
+
+# Exclude development files
+exclude install.sh
+exclude install_alias.sh
+exclude Dockerfile
+exclude docker-compose.yml
+exclude package.json
+
+# Include all Python files from packages (setuptools will handle package discovery)
+recursive-include * *.py
+
+# But exclude test files within packages
+recursive-exclude * test_*.py
+
+# Exclude compiled Python files and cache directories
+global-exclude */__pycache__
+global-exclude *.py[cod]
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.so
+global-exclude .DS_Store

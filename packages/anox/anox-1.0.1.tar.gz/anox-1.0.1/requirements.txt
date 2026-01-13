@@ -1,0 +1,60 @@
+# Core dependencies for AXON AI Brain
+
+# API and Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+pydantic>=2.5.0
+
+# HTTP client for online models
+httpx>=0.25.0
+aiohttp>=3.9.0
+
+# YAML parsing
+PyYAML>=6.0
+
+# Code analysis and intelligence
+tree-sitter>=0.20.0
+pylint>=3.0.0
+radon>=6.0.0
+
+# Security scanning
+bandit>=1.7.5
+
+# AI Model Support (Primary: Anthropic Claude)
+# Install these for full AI functionality:
+# anthropic>=0.18.0  # Primary model - Anthropic Claude
+# openai>=1.0.0  # Alternative - OpenAI GPT models
+# google-generativeai  # Alternative - Google Gemini
+
+# Model support
+# Note: llama-cpp-python requires separate installation with specific backends
+# Users should install: pip install llama-cpp-python
+# For GPU support: CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
+
+# Terminal UI
+prompt-toolkit>=3.0.0
+rich>=13.7.0
+
+# Ngrok for external access
+pyngrok>=7.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Error tracking
+# Note: If you have compatibility issues with eventlet/trio packages,
+# the application will gracefully handle import errors and continue without Sentry
+sentry-sdk>=1.40.0
+
+# Advanced orchestrator dependencies
+# Optional: Install for specific model format support
+# llama-cpp-python  # For GGUF models
+# openai>=1.0.0  # For OpenAI API
+# anthropic  # For Claude API
+# google-generativeai  # For Gemini API
+# torch  # For PyTorch models
+# tensorflow  # For TensorFlow models
+# onnxruntime  # For ONNX models
+# requests>=2.31.0  # For custom HTTP APIs (usually already installed)
+pick>=2.0.0  # For interactive command menu
