@@ -1,0 +1,11 @@
+include README.md
+include LICENSE
+include pyproject.toml
+
+# Include everything inside the rambot package
+recursive-include rambot *.py
+recursive-include rambot *.json
+
+# Specifically exclude compiled files everywhere
+global-exclude __pycache__
+global-exclude *.py[co]
