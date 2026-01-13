@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nucsoi"
+dynamic = ["version"]
+description = "Nuclease Cleavage Site and Overhang Identification"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Matthew Penner", email = "mp957@cam.ac.uk"}
+]
+maintainers = [
+    {name = "Matthew Penner", email = "mp957@cam.ac.uk"}
+]
+keywords = ["bioinformatics", "nuclease", "cleavage", "sequencing", "coverage", "analysis"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "pandas~=2.3.3",
+    "numpy~=2.2.1",
+    "scipy~=1.15.3",
+    "pyyaml~=6.0.3",
+    "tqdm~=4.67.1",
+    "biopython~=1.85.0",
+    "pysam~=0.23.3",
+    "matplotlib~=3.10.7",
+    "seaborn~=0.13.2",
+    "logomaker~=0.8.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=21.0",
+    "flake8>=3.8",
+    "mypy>=0.800",
+]
+
+[project.urls]
+Homepage = "https://github.com/Matt115A/NuCSOI"
+Documentation = "https://github.com/Matt115A/NuCSOI#readme"
+Repository = "https://github.com/Matt115A/NuCSOI"
+"Bug Tracker" = "https://github.com/Matt115A/NuCSOI/issues"
+
+[project.scripts]
+nucsoi = "nucsoi.nucsoi:main"
+
+[tool.setuptools]
+packages = ["nucsoi"]
+
+[tool.setuptools.package-data]
+nucsoi = ["scripts/*.py"]
+
+[tool.setuptools_scm]
+write_to = "nucsoi/_version.py" 
