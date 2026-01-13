@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=78.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "surf-scrap-hp"
+version = "0.0.2"
+authors = [
+   { name = "MISSONGO Aimé Blanchard" },
+  { name = "Hippolyte SODJINOU" },
+]
+description = "Scrape surf  conditions from surf-report.com"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.12"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "pandas",
+]
+
+[project.urls]
+Homepage = "https://github.com/Hippolyte90/surf-scrap-pack/tree/main/surf_project"
