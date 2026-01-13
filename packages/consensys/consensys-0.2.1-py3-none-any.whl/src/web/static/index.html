@@ -1,0 +1,3386 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSENSYS // Multi-Agent Code Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Prism.js for syntax highlighting - LAZY LOADED for performance -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" /></noscript>
+    <style>
+        /* ============================================
+           CONSENSYS TERMINAL THEME
+           A professional dev tool aesthetic
+           ============================================ */
+
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        :root {
+            /* Terminal color palette */
+            --term-bg: #0a0a0f;
+            --term-bg-elevated: #12121a;
+            --term-bg-panel: #16161f;
+            --term-border: #2a2a3a;
+            --term-border-bright: #3a3a4a;
+            --term-green: #00ff88;
+            --term-green-dim: #00cc6a;
+            --term-amber: #ffaa00;
+            --term-red: #ff4444;
+            --term-cyan: #00d4ff;
+            --term-purple: #aa88ff;
+            --term-text: #e0e0e8;
+            --term-text-dim: #888899;
+            --term-text-muted: #555566;
+        }
+
+        /* Dark mode is primary - light mode is opt-in */
+        html:not(.light) {
+            background: var(--term-bg);
+            color-scheme: dark;
+        }
+
+        /* Monospace everything */
+        body, input, textarea, button, select {
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+        }
+
+        /* Terminal-style code input */
+        .code-input {
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+            tab-size: 4;
+            resize: vertical;
+            line-height: 1.6;
+            letter-spacing: -0.02em;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--term-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--term-border-bright);
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--term-text-muted);
+        }
+
+        /* Severity colors - terminal style */
+        .severity-critical { color: var(--term-red); font-weight: 600; text-transform: uppercase; }
+        .severity-high { color: #ff7744; font-weight: 500; text-transform: uppercase; }
+        .severity-medium { color: var(--term-amber); text-transform: uppercase; }
+        .severity-low { color: var(--term-green); text-transform: uppercase; }
+
+        /* Terminal cursor blink */
+        @keyframes cursor-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .cursor-blink::after {
+            content: '_';
+            animation: cursor-blink 1s infinite;
+            color: var(--term-green);
+        }
+
+        /* Scan line effect for headers */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--term-green), transparent);
+            opacity: 0.3;
+            animation: scanline 3s linear infinite;
+        }
+
+        /* Terminal loading animation */
+        @keyframes terminal-load {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        .terminal-loading {
+            position: relative;
+            overflow: hidden;
+        }
+        .terminal-loading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: var(--term-green);
+            animation: terminal-load 2s ease-in-out infinite;
+        }
+
+        /* Glitch text effect for errors */
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        /* ============================================
+           TERMINAL OUTPUT EFFECTS (V12-004)
+           ============================================ */
+
+        /* Typing effect for streaming content */
+        @keyframes typing-cursor {
+            0%, 100% { border-color: var(--term-green); }
+            50% { border-color: transparent; }
+        }
+
+        .terminal-output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .terminal-line {
+            opacity: 0;
+            transform: translateX(-4px);
+            animation: line-appear 0.15s ease forwards;
+        }
+
+        @keyframes line-appear {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Staggered line animation for terminal feel */
+        .terminal-line:nth-child(1) { animation-delay: 0ms; }
+        .terminal-line:nth-child(2) { animation-delay: 50ms; }
+        .terminal-line:nth-child(3) { animation-delay: 100ms; }
+        .terminal-line:nth-child(4) { animation-delay: 150ms; }
+        .terminal-line:nth-child(5) { animation-delay: 200ms; }
+        .terminal-line:nth-child(6) { animation-delay: 250ms; }
+        .terminal-line:nth-child(7) { animation-delay: 300ms; }
+        .terminal-line:nth-child(8) { animation-delay: 350ms; }
+        .terminal-line:nth-child(9) { animation-delay: 400ms; }
+        .terminal-line:nth-child(10) { animation-delay: 450ms; }
+
+        /* Typing cursor that blinks */
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: var(--term-green);
+            margin-left: 2px;
+            animation: cursor-blink 1s step-end infinite;
+        }
+
+        /* CI/CD Pipeline job status */
+        .pipeline-job {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--term-border);
+            background: var(--term-bg);
+            transition: all 0.2s ease;
+        }
+
+        .pipeline-job.running {
+            border-color: var(--term-amber);
+            background: rgba(255, 170, 0, 0.05);
+        }
+
+        .pipeline-job.running .job-indicator {
+            background: var(--term-amber);
+            animation: pulse 1s ease infinite;
+        }
+
+        .pipeline-job.success {
+            border-color: var(--term-green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .pipeline-job.success .job-indicator {
+            background: var(--term-green);
+        }
+
+        .pipeline-job.pending .job-indicator {
+            background: var(--term-text-muted);
+        }
+
+        .job-indicator {
+            width: 6px;
+            height: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Thinking cursor in agent card */
+        .thinking-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--term-amber);
+            font-size: 0.7rem;
+        }
+
+        .thinking-indicator::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 12px;
+            background: var(--term-amber);
+            animation: cursor-blink 0.8s step-end infinite;
+        }
+
+        /* Terminal output log style */
+        .terminal-log {
+            background: var(--term-bg);
+            border: 1px solid var(--term-border);
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-timestamp {
+            color: var(--term-text-muted);
+            margin-right: 0.5rem;
+        }
+
+        .log-level-info { color: var(--term-cyan); }
+        .log-level-warn { color: var(--term-amber); }
+        .log-level-error { color: var(--term-red); }
+        .log-level-success { color: var(--term-green); }
+
+        /* Progress bar for overall review */
+        .pipeline-progress {
+            height: 3px;
+            background: var(--term-border);
+            overflow: hidden;
+        }
+
+        .pipeline-progress-bar {
+            height: 100%;
+            background: var(--term-green);
+            transition: width 0.3s ease;
+        }
+
+        /* Agent card with terminal output */
+        .agent-terminal {
+            border-left: 2px solid var(--term-border);
+            padding-left: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .agent-terminal.active {
+            border-left-color: var(--term-amber);
+        }
+
+        .agent-terminal.complete {
+            border-left-color: var(--term-green);
+        }
+
+        /* Issue line with severity prefix */
+        .issue-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .issue-prefix {
+            flex-shrink: 0;
+            font-weight: 600;
+            font-size: 0.65rem;
+            padding: 0 0.25rem;
+        }
+
+        .issue-prefix.critical { background: var(--term-red); color: var(--term-bg); }
+        .issue-prefix.high { background: #ff7744; color: var(--term-bg); }
+        .issue-prefix.medium { background: var(--term-amber); color: var(--term-bg); }
+        .issue-prefix.low { background: var(--term-green); color: var(--term-bg); }
+        .glitch-text:hover {
+            animation: glitch 0.3s ease;
+        }
+
+        /* Panel collapsible */
+        .agent-panel {
+            transition: all 0.2s ease;
+        }
+        .agent-panel.collapsed .panel-content {
+            max-height: 0;
+            overflow: hidden;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+        }
+        .agent-panel .panel-content {
+            max-height: 2000px;
+            opacity: 1;
+            transition: all 0.2s ease;
+        }
+        .agent-panel.collapsed .chevron {
+            transform: rotate(-90deg);
+        }
+        .chevron {
+            transition: transform 0.2s ease;
+        }
+
+        /* Loading dots - terminal style */
+        .loading-dots::after {
+            content: '';
+            animation: dots 1s steps(3, end) infinite;
+        }
+        @keyframes dots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+
+        /* Fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.2s ease forwards;
+        }
+
+        /* Fix sections collapsible */
+        .fixes-section .fixes-content {
+            max-height: 2000px;
+            opacity: 1;
+            transition: all 0.2s ease;
+        }
+        .fixes-section.collapsed .fixes-content {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0;
+            opacity: 0;
+        }
+        .fixes-section.collapsed [class*="chevron-"] {
+            transform: rotate(-90deg);
+        }
+        [class*="chevron-"] {
+            transition: transform 0.2s ease;
+        }
+
+        /* Diff View Styles - Terminal aesthetic */
+        .diff-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .diff-side {
+            overflow-x: auto;
+        }
+
+        .diff-header {
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .diff-header-removed {
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--term-red);
+            border-bottom: 1px solid rgba(255, 68, 68, 0.3);
+        }
+
+        .diff-header-added {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--term-green);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .diff-line {
+            display: flex;
+            min-height: 1.5rem;
+        }
+
+        .diff-line-number {
+            flex-shrink: 0;
+            width: 3rem;
+            padding: 0 0.5rem;
+            text-align: right;
+            color: var(--term-text-muted);
+            background: var(--term-bg);
+            border-right: 1px solid var(--term-border);
+            user-select: none;
+        }
+
+        .diff-line-content {
+            flex: 1;
+            padding: 0 0.75rem;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .diff-line-removed {
+            background: rgba(255, 68, 68, 0.1);
+        }
+        .diff-line-removed .diff-line-content {
+            color: var(--term-red);
+        }
+
+        .diff-line-added {
+            background: rgba(0, 255, 136, 0.1);
+        }
+        .diff-line-added .diff-line-content {
+            color: var(--term-green);
+        }
+
+        .diff-line-unchanged {
+            background: var(--term-bg);
+        }
+        .diff-line-unchanged .diff-line-content {
+            color: var(--term-text-dim);
+        }
+
+        .diff-line-empty {
+            background: var(--term-bg-elevated);
+        }
+
+        @media (max-width: 768px) {
+            .diff-container {
+                grid-template-columns: 1fr;
+            }
+            .diff-side {
+                border-bottom: 2px solid var(--term-border);
+            }
+            .diff-side:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* Diff toggle */
+        .diff-toggle-btn.active {
+            background: var(--term-green);
+            color: var(--term-bg);
+            border-color: var(--term-green);
+        }
+
+        .diff-view-wrapper { display: none; }
+        .diff-view-wrapper.visible { display: block; }
+        .code-view-wrapper { display: block; }
+        .code-view-wrapper.hidden { display: none; }
+
+        /* ASCII art styling */
+        .ascii-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.5rem;
+            line-height: 1.1;
+            color: var(--term-green);
+            white-space: pre;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        @media (max-width: 640px) {
+            .ascii-logo {
+                font-size: 0.35rem;
+            }
+        }
+
+        /* Terminal prompt style */
+        .terminal-prompt::before {
+            content: '>';
+            color: var(--term-green);
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Status indicators */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 0;
+        }
+        .status-dot.pending {
+            background: var(--term-amber);
+            animation: pulse 2s ease infinite;
+        }
+        .status-dot.complete {
+            background: var(--term-green);
+        }
+        .status-dot.error {
+            background: var(--term-red);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Toast notifications */
+        .toast {
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--term-border);
+        }
+
+        /* Light mode overrides */
+        .light {
+            --term-bg: #fafafa;
+            --term-bg-elevated: #ffffff;
+            --term-bg-panel: #f5f5f5;
+            --term-border: #e0e0e0;
+            --term-border-bright: #d0d0d0;
+            --term-green: #00aa55;
+            --term-green-dim: #008844;
+            --term-text: #1a1a1a;
+            --term-text-dim: #666666;
+            --term-text-muted: #999999;
+        }
+
+        .light .ascii-logo {
+            text-shadow: none;
+            color: var(--term-green);
+        }
+
+        /* Keyboard shortcut key styling */
+        .shortcut-key {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--term-bg);
+            border: 1px solid var(--term-border);
+            color: var(--term-green);
+        }
+
+        /* Shortcut hint on buttons */
+        .shortcut-hint {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            padding: 0.125rem 0.25rem;
+            margin-left: 0.5rem;
+            background: var(--term-bg);
+            border: 1px solid var(--term-border);
+            color: var(--term-text-muted);
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        *:hover > .shortcut-hint,
+        *:focus > .shortcut-hint {
+            opacity: 1;
+        }
+
+        /* Export dropdown styling */
+        .export-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: var(--term-bg-panel);
+            border: 1px solid var(--term-border);
+            z-index: 60;
+            min-width: 150px;
+        }
+
+        .export-dropdown.hidden {
+            display: none;
+        }
+
+        .export-dropdown button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--term-text-dim);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .export-dropdown button:hover {
+            background: var(--term-bg);
+            color: var(--term-text);
+        }
+
+        /* Prism overrides */
+        pre[class*="language-"],
+        code[class*="language-"] {
+            background: var(--term-bg) !important;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+        }
+
+        /* ============================================
+           SKELETON LOADERS (V12-008)
+           Performance optimization - show loading state
+           ============================================ */
+        @keyframes skeleton-pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--term-border) 25%, var(--term-border-bright) 50%, var(--term-border) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes skeleton-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-text {
+            height: 0.875rem;
+            margin-bottom: 0.5rem;
+            border-radius: 2px;
+        }
+
+        .skeleton-text-sm {
+            height: 0.75rem;
+            margin-bottom: 0.375rem;
+            border-radius: 2px;
+        }
+
+        .skeleton-block {
+            height: 4rem;
+            border-radius: 2px;
+        }
+
+        .skeleton-panel {
+            border: 1px solid var(--term-border);
+            padding: 1rem;
+            background: var(--term-bg-panel);
+        }
+
+        .skeleton-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skeleton-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 2px;
+        }
+
+        .skeleton-title {
+            flex: 1;
+            height: 1rem;
+        }
+
+        .skeleton-badge {
+            width: 3rem;
+            height: 1.25rem;
+        }
+
+        /* Performance: GPU-accelerated animations */
+        .fade-in,
+        .terminal-line,
+        .pipeline-job,
+        .agent-panel {
+            will-change: transform, opacity;
+        }
+
+        /* Performance: Reduce repaints on scroll */
+        .terminal-log,
+        .diff-container,
+        .reviews-container {
+            contain: content;
+        }
+
+        /* Performance: Hardware acceleration for modals */
+        #history-modal,
+        #shortcuts-modal,
+        #share-modal {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen transition-colors" style="background: var(--term-bg); color: var(--term-text);">
+    <!-- Header with ASCII Art -->
+    <header class="border-b sticky top-0 z-40" style="background: var(--term-bg-elevated); border-color: var(--term-border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo Section -->
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:block">
+                        <pre class="ascii-logo"> ██████╗ ██████╗ ███╗   ██╗███████╗███████╗███╗   ██╗███████╗██╗   ██╗███████╗
+██╔════╝██╔═══██╗████╗  ██║██╔════╝██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝██╔════╝
+██║     ██║   ██║██╔██╗ ██║███████╗█████╗  ██╔██╗ ██║███████╗ ╚████╔╝ ███████╗
+██║     ██║   ██║██║╚██╗██║╚════██║██╔══╝  ██║╚██╗██║╚════██║  ╚██╔╝  ╚════██║
+╚██████╗╚██████╔╝██║ ╚████║███████║███████╗██║ ╚████║███████║   ██║   ███████║
+ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚══════╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚══════╝</pre>
+                    </div>
+                    <div class="sm:hidden flex items-center gap-2">
+                        <span class="text-lg font-bold" style="color: var(--term-green);">[</span>
+                        <span class="text-lg font-bold" style="color: var(--term-text);">CONSENSYS</span>
+                        <span class="text-lg font-bold" style="color: var(--term-green);">]</span>
+                    </div>
+                    <div class="hidden lg:block pl-4 border-l" style="border-color: var(--term-border);">
+                        <p class="text-xs" style="color: var(--term-text-dim);">// Multi-Agent AI Code Review</p>
+                        <p class="text-xs" style="color: var(--term-text-muted);">// v0.1.1</p>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center gap-2">
+                    <button id="shortcuts-btn" class="p-2 border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);" title="Keyboard shortcuts (?)">
+                        <span class="text-sm font-bold">?</span>
+                    </button>
+                    <button id="history-btn" class="p-2 border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);" title="History">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                    <button id="theme-toggle" class="p-2 border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);" title="Toggle theme (Ctrl+D)">
+                        <svg class="w-5 h-5 sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg class="w-5 h-5 moon-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    <button id="sound-toggle" class="p-2 border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);" title="Toggle sound effects (Ctrl+M)">
+                        <svg class="w-5 h-5 sound-on-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                        </svg>
+                        <svg class="w-5 h-5 sound-off-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <!-- Input Section -->
+        <div id="input-section" class="border p-4 sm:p-6 mb-6" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+            <!-- Section Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 pb-3 border-b" style="border-color: var(--term-border);">
+                <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-green);">
+                    <span class="mr-2">&gt;</span>
+                    INPUT_CODE
+                </h2>
+                <div class="flex items-center gap-4">
+                    <label class="flex items-center gap-2 text-xs cursor-pointer" style="color: var(--term-text-dim);">
+                        <input type="checkbox" id="quick-mode" class="w-3 h-3 border-2 bg-transparent" style="border-color: var(--term-border); accent-color: var(--term-green);">
+                        <span>--quick</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs cursor-pointer" style="color: var(--term-text-dim);">
+                        <input type="checkbox" id="streaming-mode" checked class="w-3 h-3 border-2 bg-transparent" style="border-color: var(--term-border); accent-color: var(--term-green);">
+                        <span>--stream</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Language selector and code input -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <select id="language-select" class="text-xs px-2 py-1 border bg-transparent focus:outline-none" style="border-color: var(--term-border); color: var(--term-text);">
+                        <option value="python">python</option>
+                        <option value="javascript">javascript</option>
+                        <option value="typescript">typescript</option>
+                        <option value="go">go</option>
+                        <option value="rust">rust</option>
+                        <option value="java">java</option>
+                    </select>
+                    <span id="char-count" class="text-xs" style="color: var(--term-text-muted);">0 chars</span>
+                </div>
+                <textarea
+                    id="code-input"
+                    class="code-input w-full h-48 sm:h-64 p-4 border text-sm focus:outline-none"
+                    style="background: var(--term-bg); border-color: var(--term-border); color: var(--term-text); caret-color: var(--term-green);"
+                    placeholder="# paste code here for review...
+def vulnerable_function():
+    pass"
+                    spellcheck="false"
+                ></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <input
+                    type="text"
+                    id="context-input"
+                    class="flex-1 px-4 py-2 border text-sm focus:outline-none"
+                    style="background: var(--term-bg); border-color: var(--term-border); color: var(--term-text);"
+                    placeholder="--context='optional: describe code purpose'"
+                >
+                <button
+                    id="submit-btn"
+                    class="px-6 py-2 border-2 font-semibold text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    style="background: var(--term-green); border-color: var(--term-green); color: var(--term-bg);"
+                    title="Submit code for review (Ctrl+Enter)"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span>EXECUTE</span>
+                    <span class="shortcut-hint">⌘↵</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Section - CI/CD Pipeline Style -->
+        <div id="status-section" class="hidden mb-6 fade-in">
+            <div class="border" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                <!-- Pipeline Header -->
+                <div class="p-3 border-b flex items-center justify-between" style="border-color: var(--term-border);">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-5 h-5 border-2 animate-spin" style="border-color: var(--term-green); border-top-color: transparent;"></div>
+                        </div>
+                        <div>
+                            <p id="status-text" class="text-xs font-semibold" style="color: var(--term-green);">PIPELINE_RUNNING</p>
+                            <p id="status-detail" class="text-xs" style="color: var(--term-text-muted);">multi-agent code review</p>
+                        </div>
+                    </div>
+                    <span id="pipeline-timer" class="text-xs font-mono" style="color: var(--term-text-muted);">00:00</span>
+                </div>
+                <!-- Progress Bar -->
+                <div class="pipeline-progress">
+                    <div id="pipeline-progress-bar" class="pipeline-progress-bar" style="width: 0%;"></div>
+                </div>
+                <!-- Pipeline Jobs Grid -->
+                <div class="p-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="agent-status-grid">
+                        <!-- Agent job cards rendered by JS -->
+                    </div>
+                </div>
+                <!-- Terminal Log Output -->
+                <div id="terminal-log" class="terminal-log mx-3 mb-3">
+                    <div class="terminal-line" style="animation-delay: 0ms;">
+                        <span class="log-timestamp">[--:--:--]</span>
+                        <span class="log-level-info">[INIT]</span>
+                        <span style="color: var(--term-text-dim);">Starting code review pipeline...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden space-y-6">
+            <!-- Consensus Panel -->
+            <div id="consensus-panel" class="hidden border p-4 sm:p-6 fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b" style="border-color: var(--term-border);">
+                    <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-cyan);">
+                        <span class="mr-2">&gt;</span>
+                        VERDICT
+                    </h2>
+                    <div id="decision-badge" class="px-4 py-1 font-bold text-sm"></div>
+                </div>
+
+                <!-- Vote counts -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="text-center p-3 border" style="border-color: rgba(0, 255, 136, 0.3); background: rgba(0, 255, 136, 0.05);">
+                        <span id="approve-count" class="text-2xl font-bold" style="color: var(--term-green);">0</span>
+                        <p class="text-xs mt-1" style="color: var(--term-green);">APPROVE</p>
+                    </div>
+                    <div class="text-center p-3 border" style="border-color: rgba(255, 68, 68, 0.3); background: rgba(255, 68, 68, 0.05);">
+                        <span id="reject-count" class="text-2xl font-bold" style="color: var(--term-red);">0</span>
+                        <p class="text-xs mt-1" style="color: var(--term-red);">REJECT</p>
+                    </div>
+                    <div class="text-center p-3 border" style="border-color: rgba(255, 170, 0, 0.3); background: rgba(255, 170, 0, 0.05);">
+                        <span id="abstain-count" class="text-2xl font-bold" style="color: var(--term-amber);">0</span>
+                        <p class="text-xs mt-1" style="color: var(--term-amber);">ABSTAIN</p>
+                    </div>
+                </div>
+
+                <!-- Key issues and suggestions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="key-issues" class="hidden">
+                        <h3 class="text-xs font-semibold mb-2 flex items-center" style="color: var(--term-red);">
+                            <span class="mr-2">[!]</span>
+                            KEY_ISSUES
+                        </h3>
+                        <ul id="key-issues-list" class="space-y-1 text-xs" style="color: var(--term-text-dim);"></ul>
+                    </div>
+                    <div id="suggestions" class="hidden">
+                        <h3 class="text-xs font-semibold mb-2 flex items-center" style="color: var(--term-green);">
+                            <span class="mr-2">[+]</span>
+                            SUGGESTIONS
+                        </h3>
+                        <ul id="suggestions-list" class="space-y-1 text-xs" style="color: var(--term-text-dim);"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Panel -->
+            <div id="export-panel" class="hidden border p-4 sm:p-6 fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-purple);">
+                        <span class="mr-2">&gt;</span>
+                        EXPORT
+                    </h2>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="exportAsMarkdown()" class="flex items-center px-3 py-1.5 text-xs font-medium border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);">
+                            <span>--markdown</span>
+                        </button>
+                        <button onclick="exportAsJSON()" class="flex items-center px-3 py-1.5 text-xs font-medium border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);">
+                            <span>--json</span>
+                        </button>
+                        <button onclick="exportAsGitHubIssue()" class="flex items-center px-3 py-1.5 text-xs font-medium border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-text-dim);">
+                            <span>--github</span>
+                        </button>
+                        <button onclick="shareResults()" class="flex items-center px-3 py-1.5 text-xs font-medium border transition-colors hover:border-opacity-100" style="border-color: var(--term-cyan); color: var(--term-cyan);">
+                            <span>--share</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Modal -->
+            <div id="share-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0, 0, 0, 0.8);">
+                <div class="border p-6 max-w-md w-full mx-4" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold" style="color: var(--term-cyan);">&gt; SHARE_RESULTS</h2>
+                        <button onclick="hideShareModal()" class="text-xs" style="color: var(--term-text-dim);">[X]</button>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-xs mb-2" style="color: var(--term-text-dim);">Shareable Link:</label>
+                        <div class="flex items-center gap-2">
+                            <input id="share-url" type="text" readonly class="flex-1 px-3 py-2 text-xs border" style="background: var(--term-bg); border-color: var(--term-border); color: var(--term-text);">
+                            <button onclick="copyShareUrl()" class="px-3 py-2 text-xs border" style="border-color: var(--term-green); color: var(--term-green);">COPY</button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-xs mb-2" style="color: var(--term-text-dim);">QR Code (scan to share):</label>
+                        <div id="qr-code-container" class="flex items-center justify-center p-4" style="background: white;"></div>
+                    </div>
+                    <p class="text-xs" style="color: var(--term-text-dim);">Anyone with this link can view the review results (read-only).</p>
+                </div>
+            </div>
+
+            <!-- Fixes Panel -->
+            <div id="fixes-panel" class="hidden border p-4 sm:p-6 fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b" style="border-color: var(--term-border);">
+                    <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-amber);">
+                        <span class="mr-2">&gt;</span>
+                        SUGGESTED_FIXES
+                    </h2>
+                    <span id="fixes-count" class="px-2 py-0.5 text-xs font-medium" style="background: rgba(255, 170, 0, 0.1); color: var(--term-amber);"></span>
+                </div>
+
+                <!-- Critical Fixes -->
+                <div id="fixes-critical" class="fixes-section hidden mb-3">
+                    <div class="flex items-center justify-between p-2 cursor-pointer border-l-2" style="background: rgba(255, 68, 68, 0.05); border-color: var(--term-red);" onclick="toggleFixesSection('critical')">
+                        <h3 class="text-xs font-semibold flex items-center" style="color: var(--term-red);">
+                            <span class="mr-2">[!!]</span>
+                            CRITICAL
+                            <span id="fixes-critical-count" class="ml-2 px-1.5 py-0.5 text-xs" style="background: rgba(255, 68, 68, 0.2);">0</span>
+                        </h3>
+                        <svg class="chevron-critical w-4 h-4 transition-transform" style="color: var(--term-red);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="fixes-critical-content" class="fixes-content border-l-2 p-3 space-y-3" style="background: var(--term-bg); border-color: var(--term-red);"></div>
+                </div>
+
+                <!-- High Fixes -->
+                <div id="fixes-high" class="fixes-section hidden mb-3">
+                    <div class="flex items-center justify-between p-2 cursor-pointer border-l-2" style="background: rgba(255, 119, 68, 0.05); border-color: #ff7744;" onclick="toggleFixesSection('high')">
+                        <h3 class="text-xs font-semibold flex items-center" style="color: #ff7744;">
+                            <span class="mr-2">[!]</span>
+                            HIGH
+                            <span id="fixes-high-count" class="ml-2 px-1.5 py-0.5 text-xs" style="background: rgba(255, 119, 68, 0.2);">0</span>
+                        </h3>
+                        <svg class="chevron-high w-4 h-4 transition-transform" style="color: #ff7744;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="fixes-high-content" class="fixes-content border-l-2 p-3 space-y-3" style="background: var(--term-bg); border-color: #ff7744;"></div>
+                </div>
+
+                <!-- Medium Fixes -->
+                <div id="fixes-medium" class="fixes-section hidden mb-3">
+                    <div class="flex items-center justify-between p-2 cursor-pointer border-l-2" style="background: rgba(255, 170, 0, 0.05); border-color: var(--term-amber);" onclick="toggleFixesSection('medium')">
+                        <h3 class="text-xs font-semibold flex items-center" style="color: var(--term-amber);">
+                            <span class="mr-2">[*]</span>
+                            MEDIUM
+                            <span id="fixes-medium-count" class="ml-2 px-1.5 py-0.5 text-xs" style="background: rgba(255, 170, 0, 0.2);">0</span>
+                        </h3>
+                        <svg class="chevron-medium w-4 h-4 transition-transform" style="color: var(--term-amber);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="fixes-medium-content" class="fixes-content border-l-2 p-3 space-y-3" style="background: var(--term-bg); border-color: var(--term-amber);"></div>
+                </div>
+
+                <!-- Low Fixes -->
+                <div id="fixes-low" class="fixes-section hidden mb-3">
+                    <div class="flex items-center justify-between p-2 cursor-pointer border-l-2" style="background: rgba(0, 255, 136, 0.05); border-color: var(--term-green);" onclick="toggleFixesSection('low')">
+                        <h3 class="text-xs font-semibold flex items-center" style="color: var(--term-green);">
+                            <span class="mr-2">[-]</span>
+                            LOW
+                            <span id="fixes-low-count" class="ml-2 px-1.5 py-0.5 text-xs" style="background: rgba(0, 255, 136, 0.2);">0</span>
+                        </h3>
+                        <svg class="chevron-low w-4 h-4 transition-transform" style="color: var(--term-green);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="fixes-low-content" class="fixes-content border-l-2 p-3 space-y-3" style="background: var(--term-bg); border-color: var(--term-green);"></div>
+                </div>
+
+                <!-- No Fixes Message -->
+                <div id="no-fixes-msg" class="hidden text-center py-6" style="color: var(--term-text-dim);">
+                    <p class="text-sm" style="color: var(--term-green);">[OK] NO_FIXES_REQUIRED</p>
+                    <p class="text-xs mt-1">all agents found code acceptable</p>
+                </div>
+            </div>
+
+            <!-- Quick Actions Panel -->
+            <div id="quick-actions-panel" class="hidden border p-4 sm:p-6 fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b" style="border-color: var(--term-border);">
+                    <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-cyan);">
+                        <span class="mr-2">&gt;</span>
+                        PATTERNS_DETECTED
+                    </h2>
+                    <span id="quick-actions-count" class="px-2 py-0.5 text-xs font-medium" style="background: rgba(0, 212, 255, 0.1); color: var(--term-cyan);"></span>
+                </div>
+                <p class="text-xs mb-4" style="color: var(--term-text-dim);">
+                    // common security patterns detected - click to view fixes and documentation
+                </p>
+                <div id="quick-actions-container" class="space-y-3"></div>
+            </div>
+
+            <!-- Apply All Fixes Panel -->
+            <div id="apply-fixes-panel" class="hidden border p-4 sm:p-6 fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b" style="border-color: var(--term-border);">
+                    <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-green);">
+                        <span class="mr-2">&gt;</span>
+                        PATCHED_CODE
+                    </h2>
+                    <div class="flex items-center gap-3">
+                        <span id="applied-fixes-count" class="px-2 py-0.5 text-xs font-medium" style="background: rgba(0, 255, 136, 0.1); color: var(--term-green);"></span>
+                        <button onclick="copyAllFixedCode()" id="copy-all-fixes-btn" class="flex items-center px-4 py-1.5 text-xs font-semibold border-2 transition-all" style="background: var(--term-green); border-color: var(--term-green); color: var(--term-bg);">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            COPY
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs mb-4" style="color: var(--term-text-dim);">
+                    // code with all suggested fixes applied
+                </p>
+                <div class="relative">
+                    <pre class="!mt-0 overflow-hidden border" style="border-color: var(--term-border);"><code id="all-fixed-code" class="language-python"></code></pre>
+                </div>
+                <div id="fixes-applied-list" class="mt-4 pt-4 border-t" style="border-color: var(--term-border);">
+                    <h3 class="text-xs font-semibold mb-2 flex items-center" style="color: var(--term-green);">
+                        <span class="mr-2">[+]</span>
+                        APPLIED_FIXES
+                    </h3>
+                    <ul id="fixes-applied-items" class="space-y-1 text-xs" style="color: var(--term-text-dim);"></ul>
+                </div>
+            </div>
+
+            <!-- Agent Reviews -->
+            <div>
+                <h2 class="text-sm font-semibold mb-4 flex items-center pb-3 border-b" style="color: var(--term-purple); border-color: var(--term-border);">
+                    <span class="mr-2">&gt;</span>
+                    AGENT_REVIEWS
+                </h2>
+                <div id="reviews-container" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- Responses Section -->
+            <div id="responses-section" class="hidden">
+                <h2 class="text-sm font-semibold mb-4 flex items-center pb-3 border-b" style="color: var(--term-cyan); border-color: var(--term-border);">
+                    <span class="mr-2">&gt;</span>
+                    AGENT_DISCUSSION
+                </h2>
+                <div id="responses-container" class="space-y-3"></div>
+            </div>
+
+            <!-- Votes Section -->
+            <div id="votes-section" class="hidden">
+                <h2 class="text-sm font-semibold mb-4 flex items-center pb-3 border-b" style="color: var(--term-amber); border-color: var(--term-border);">
+                    <span class="mr-2">&gt;</span>
+                    AGENT_VOTES
+                </h2>
+                <div id="votes-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0, 0, 0, 0.8);">
+        <div class="border max-w-2xl w-full max-h-[85vh] overflow-hidden fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+            <div class="p-4 border-b flex items-center justify-between" style="border-color: var(--term-border);">
+                <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-cyan);">
+                    <span class="mr-2">&gt;</span>
+                    REVIEW_HISTORY
+                </h2>
+                <button id="close-history" class="p-1 transition-colors" style="color: var(--term-text-dim);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="history-list" class="p-4 overflow-y-auto max-h-[calc(85vh-60px)] space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcuts-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0, 0, 0, 0.8);">
+        <div class="border max-w-lg w-full max-h-[85vh] overflow-hidden fade-in" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+            <div class="p-4 border-b flex items-center justify-between" style="border-color: var(--term-border);">
+                <h2 class="text-sm font-semibold flex items-center" style="color: var(--term-green);">
+                    <span class="mr-2">&gt;</span>
+                    KEYBOARD_SHORTCUTS
+                </h2>
+                <button id="close-shortcuts" class="p-1 transition-colors" style="color: var(--term-text-dim);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4 space-y-4 overflow-y-auto max-h-[calc(85vh-60px)]">
+                <!-- Actions -->
+                <div>
+                    <h3 class="text-xs font-semibold mb-2" style="color: var(--term-text-dim);">// ACTIONS</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Submit code for review</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + Enter</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Clear input & focus</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + K</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Show export options</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + E</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Toggle dark/light mode</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + D</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Toggle sound effects</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + M</kbd>
+                        </div>
+                    </div>
+                </div>
+                <!-- Navigation -->
+                <div class="pt-3 border-t" style="border-color: var(--term-border);">
+                    <h3 class="text-xs font-semibold mb-2" style="color: var(--term-text-dim);">// NAVIGATION</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Jump to Input</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + 1</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Jump to Reviews</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + 2</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Jump to Fixes</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + 3</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Jump to Consensus</span>
+                            <kbd class="shortcut-key">⌘/Ctrl + 4</kbd>
+                        </div>
+                    </div>
+                </div>
+                <!-- Other -->
+                <div class="pt-3 border-t" style="border-color: var(--term-border);">
+                    <h3 class="text-xs font-semibold mb-2" style="color: var(--term-text-dim);">// OTHER</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Show shortcuts (this menu)</span>
+                            <kbd class="shortcut-key">?</kbd>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span style="color: var(--term-text);">Close modal / Escape</span>
+                            <kbd class="shortcut-key">Esc</kbd>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center border-t" style="border-color: var(--term-border);">
+        <p class="text-xs" style="color: var(--term-text-muted);">
+            // powered by Claude AI |
+            <a href="https://github.com" class="hover:underline" style="color: var(--term-green);">github</a>
+        </p>
+    </footer>
+
+    <script>
+        // ===================
+        // Performance Metrics (V12-008) - DEV MODE
+        // ===================
+        const PERF_DEV_MODE = localStorage.getItem('perfDebug') === 'true';
+        const perfMetrics = {
+            pageLoad: performance.now(),
+            interactions: [],
+            prismLoaded: false,
+            prismLoadTime: null
+        };
+
+        // Performance logging helper
+        function perfLog(action, startTime, details = {}) {
+            if (!PERF_DEV_MODE) return;
+            const duration = performance.now() - startTime;
+            const entry = {
+                action,
+                duration: Math.round(duration * 100) / 100,
+                timestamp: new Date().toISOString(),
+                ...details
+            };
+            perfMetrics.interactions.push(entry);
+            const color = duration < 100 ? '#00ff88' : duration < 300 ? '#ffaa00' : '#ff4444';
+            console.log(`%c[PERF] ${action}: ${entry.duration}ms`, `color: ${color}; font-weight: bold;`, details);
+            return entry;
+        }
+
+        // Track interaction response times
+        function trackInteraction(name, fn) {
+            const start = performance.now();
+            const result = fn();
+            perfLog(name, start);
+            return result;
+        }
+
+        // Get performance summary
+        function getPerfSummary() {
+            const totalLoad = performance.now() - perfMetrics.pageLoad;
+            const avgInteraction = perfMetrics.interactions.length > 0
+                ? perfMetrics.interactions.reduce((sum, i) => sum + i.duration, 0) / perfMetrics.interactions.length
+                : 0;
+            return {
+                totalLoadTime: Math.round(totalLoad),
+                interactionCount: perfMetrics.interactions.length,
+                avgInteractionTime: Math.round(avgInteraction * 100) / 100,
+                prismLoadTime: perfMetrics.prismLoadTime,
+                slowInteractions: perfMetrics.interactions.filter(i => i.duration > 100)
+            };
+        }
+
+        // Enable perf debug mode: localStorage.setItem('perfDebug', 'true'); location.reload();
+        if (PERF_DEV_MODE) {
+            console.log('%c[PERF] Performance monitoring ENABLED', 'color: #00ff88; font-weight: bold;');
+            console.log('%c[PERF] Use getPerfSummary() to view stats', 'color: #00d4ff;');
+            window.getPerfSummary = getPerfSummary;
+            window.perfMetrics = perfMetrics;
+        }
+
+        // ===================
+        // Lazy Load Prism.js (V12-008)
+        // ===================
+        let prismLoadPromise = null;
+
+        function loadPrism() {
+            if (prismLoadPromise) return prismLoadPromise;
+            if (window.Prism) {
+                perfMetrics.prismLoaded = true;
+                return Promise.resolve();
+            }
+
+            const startTime = performance.now();
+            prismLoadPromise = new Promise((resolve, reject) => {
+                const scripts = [
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js'
+                ];
+
+                let loaded = 0;
+                const loadScript = (src) => {
+                    return new Promise((res, rej) => {
+                        const script = document.createElement('script');
+                        script.src = src;
+                        script.async = true;
+                        script.onload = res;
+                        script.onerror = rej;
+                        document.head.appendChild(script);
+                    });
+                };
+
+                // Load core first, then components
+                loadScript(scripts[0])
+                    .then(() => Promise.all(scripts.slice(1).map(loadScript)))
+                    .then(() => {
+                        perfMetrics.prismLoaded = true;
+                        perfMetrics.prismLoadTime = Math.round(performance.now() - startTime);
+                        if (PERF_DEV_MODE) {
+                            console.log(`%c[PERF] Prism.js loaded: ${perfMetrics.prismLoadTime}ms`, 'color: #00ff88;');
+                        }
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+
+            return prismLoadPromise;
+        }
+
+        // Highlight code with lazy-loaded Prism
+        async function highlightCode(element) {
+            await loadPrism();
+            if (window.Prism && element) {
+                Prism.highlightElement(element);
+            }
+        }
+
+        async function highlightAll() {
+            await loadPrism();
+            if (window.Prism) {
+                Prism.highlightAll();
+            }
+        }
+
+        async function highlightAllUnder(container) {
+            await loadPrism();
+            if (window.Prism && container) {
+                Prism.highlightAllUnder(container);
+            }
+        }
+
+        // ===================
+        // Debounce Utility (V12-008)
+        // ===================
+        function debounce(fn, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        // ===================
+        // State Management
+        // ===================
+        let ws = null;
+        let currentResultsData = null;
+        let wsReviews = [];
+        let wsFixes = [];
+        let wsConsensus = null;
+        // Dark mode is PRIMARY - check if user explicitly set light mode
+        let isDark = localStorage.getItem('theme') !== 'light';
+
+        // Initialize theme - dark is default
+        if (!isDark) {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            document.querySelector('.sun-icon').classList.add('hidden');
+            document.querySelector('.moon-icon').classList.remove('hidden');
+        }
+
+        // ===================
+        // Sound Effects System (V12-006)
+        // ===================
+        let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+        let audioContext = null;
+        let typingSoundEnabled = false; // Typing sounds off by default (optional)
+
+        // Initialize sound icons based on saved preference
+        if (!soundEnabled) {
+            document.querySelector('.sound-on-icon').classList.add('hidden');
+            document.querySelector('.sound-off-icon').classList.remove('hidden');
+        }
+
+        // Lazy-initialize AudioContext (required for browser audio policies)
+        function getAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        // Play a click sound (short, subtle)
+        function playClickSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, ctx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.05);
+
+                gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.05);
+            } catch (e) {
+                console.warn('Sound playback failed:', e);
+            }
+        }
+
+        // Play success chime (ascending notes for APPROVE)
+        function playSuccessSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 (major chord)
+
+                notes.forEach((freq, i) => {
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
+
+                    const startTime = ctx.currentTime + (i * 0.1);
+                    gainNode.gain.setValueAtTime(0, startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + 0.3);
+                });
+            } catch (e) {
+                console.warn('Sound playback failed:', e);
+            }
+        }
+
+        // Play warning tone (descending, minor feel for REJECT)
+        function playWarningSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const notes = [493.88, 392.00, 329.63]; // B4, G4, E4 (descending)
+
+                notes.forEach((freq, i) => {
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
+
+                    const startTime = ctx.currentTime + (i * 0.12);
+                    gainNode.gain.setValueAtTime(0, startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.08, startTime + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + 0.25);
+                });
+            } catch (e) {
+                console.warn('Sound playback failed:', e);
+            }
+        }
+
+        // Play typing sound (optional, very subtle)
+        function playTypingSound() {
+            if (!soundEnabled || !typingSoundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                // Randomize pitch slightly for variety
+                const baseFreq = 200 + Math.random() * 100;
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+
+                gainNode.gain.setValueAtTime(0.02, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.02);
+            } catch (e) {
+                // Silently fail for typing sounds
+            }
+        }
+
+        // Toggle sound on/off
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('soundEnabled', soundEnabled);
+
+            const soundOnIcon = document.querySelector('.sound-on-icon');
+            const soundOffIcon = document.querySelector('.sound-off-icon');
+
+            if (soundEnabled) {
+                soundOnIcon.classList.remove('hidden');
+                soundOffIcon.classList.add('hidden');
+                playClickSound(); // Play a click to confirm sound is on
+                showToast('[OK] sound effects enabled', 'success');
+            } else {
+                soundOnIcon.classList.add('hidden');
+                soundOffIcon.classList.remove('hidden');
+                showToast('[OK] sound effects disabled', 'info');
+            }
+        }
+
+        // ===================
+        // DOM Elements
+        // ===================
+        const codeInput = document.getElementById('code-input');
+        const contextInput = document.getElementById('context-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const quickMode = document.getElementById('quick-mode');
+        const streamingMode = document.getElementById('streaming-mode');
+        const statusSection = document.getElementById('status-section');
+        const statusText = document.getElementById('status-text');
+        const statusDetail = document.getElementById('status-detail');
+        const resultsSection = document.getElementById('results-section');
+        const reviewsContainer = document.getElementById('reviews-container');
+        const consensusPanel = document.getElementById('consensus-panel');
+        const responsesSection = document.getElementById('responses-section');
+        const responsesContainer = document.getElementById('responses-container');
+        const votesSection = document.getElementById('votes-section');
+        const votesContainer = document.getElementById('votes-container');
+        const historyModal = document.getElementById('history-modal');
+        const historyList = document.getElementById('history-list');
+        const languageSelect = document.getElementById('language-select');
+        const charCount = document.getElementById('char-count');
+        const agentStatusGrid = document.getElementById('agent-status-grid');
+
+        // ===================
+        // Agent Configuration - Terminal Colors
+        // ===================
+        const agentConfig = {
+            'SecurityExpert': {
+                color: 'var(--term-red)',
+                bgColor: 'rgba(255, 68, 68, 0.1)',
+                borderColor: 'rgba(255, 68, 68, 0.3)',
+                prefix: '[SEC]'
+            },
+            'PerformanceEngineer': {
+                color: 'var(--term-cyan)',
+                bgColor: 'rgba(0, 212, 255, 0.1)',
+                borderColor: 'rgba(0, 212, 255, 0.3)',
+                prefix: '[PERF]'
+            },
+            'ArchitectureCritic': {
+                color: 'var(--term-purple)',
+                bgColor: 'rgba(170, 136, 255, 0.1)',
+                borderColor: 'rgba(170, 136, 255, 0.3)',
+                prefix: '[ARCH]'
+            },
+            'PragmaticDev': {
+                color: 'var(--term-green)',
+                bgColor: 'rgba(0, 255, 136, 0.1)',
+                borderColor: 'rgba(0, 255, 136, 0.3)',
+                prefix: '[DEV]'
+            },
+        };
+
+        // ===================
+        // Event Listeners
+        // ===================
+        // Debounced character count update (V12-008) - prevents excessive DOM updates
+        const updateCharCount = debounce(() => {
+            const start = performance.now();
+            charCount.textContent = `${codeInput.value.length} chars`;
+            perfLog('charCountUpdate', start);
+        }, 50);
+
+        codeInput.addEventListener('input', () => {
+            updateCharCount();
+            playTypingSound(); // Optional typing sound (disabled by default)
+        });
+
+        // Theme toggle uses the toggleTheme() function defined in keyboard shortcuts section
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            playClickSound();
+            // toggleTheme() is defined later in the file, but hoisted as a function declaration
+            if (typeof toggleTheme === 'function') {
+                toggleTheme();
+            } else {
+                // Fallback in case function isn't available yet
+                isDark = !isDark;
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                    document.querySelector('.sun-icon').classList.remove('hidden');
+                    document.querySelector('.moon-icon').classList.add('hidden');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                    document.querySelector('.sun-icon').classList.add('hidden');
+                    document.querySelector('.moon-icon').classList.remove('hidden');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+        });
+
+        // Sound toggle button
+        document.getElementById('sound-toggle').addEventListener('click', () => {
+            toggleSound();
+        });
+
+        document.getElementById('history-btn').addEventListener('click', async () => {
+            playClickSound();
+            historyModal.classList.remove('hidden');
+            await loadHistory();
+        });
+
+        document.getElementById('close-history').addEventListener('click', () => {
+            historyModal.classList.add('hidden');
+        });
+
+        historyModal.addEventListener('click', (e) => {
+            if (e.target === historyModal) {
+                historyModal.classList.add('hidden');
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            playClickSound();
+            const code = codeInput.value.trim();
+            if (!code) {
+                showToast('ERROR: no code provided', 'error');
+                return;
+            }
+            if (streamingMode.checked) {
+                submitWithWebSocket(code);
+            } else {
+                submitWithAPI(code);
+            }
+        });
+
+        codeInput.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+
+        // ===================
+        // History Functions
+        // ===================
+        async function loadHistory() {
+            historyList.innerHTML = '<div class="text-center py-8"><div class="w-6 h-6 border-2 animate-spin mx-auto" style="border-color: var(--term-green); border-top-color: transparent;"></div><p class="text-xs mt-2" style="color: var(--term-text-dim);">loading...</p></div>';
+
+            try {
+                const res = await fetch('/api/sessions?limit=20');
+                const sessions = await res.json();
+
+                if (sessions.length === 0) {
+                    historyList.innerHTML = '<p class="text-center py-8 text-xs" style="color: var(--term-text-dim);">no history found</p>';
+                    return;
+                }
+
+                historyList.innerHTML = sessions.map(s => `
+                    <div class="p-3 border cursor-pointer transition-colors hover:border-opacity-100" style="background: var(--term-bg); border-color: var(--term-border);" onclick="loadSession('${s.session_id}')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-mono" style="color: var(--term-text-muted);">${s.session_id.slice(0, 8)}</span>
+                            <span class="px-2 py-0.5 text-xs font-bold ${getDecisionClasses(s.final_decision)}">${s.final_decision || 'PENDING'}</span>
+                        </div>
+                        <code class="block text-xs truncate font-mono" style="color: var(--term-text-dim);">${escapeHtml(s.code_preview)}</code>
+                        <p class="text-xs mt-2" style="color: var(--term-text-muted);">${formatDate(s.created_at)}</p>
+                    </div>
+                `).join('');
+            } catch (err) {
+                historyList.innerHTML = '<p class="text-center py-8 text-xs" style="color: var(--term-red);">ERROR: failed to load history</p>';
+            }
+        }
+
+        async function loadSession(sessionId) {
+            historyModal.classList.add('hidden');
+            statusSection.classList.remove('hidden');
+            statusText.textContent = 'LOADING';
+            statusDetail.textContent = 'fetching session data...';
+            resultsSection.classList.add('hidden');
+
+            try {
+                const res = await fetch(`/api/sessions/${sessionId}`);
+                const session = await res.json();
+                displayResults(session);
+                statusSection.classList.add('hidden');
+            } catch (err) {
+                showToast('ERROR: ' + err.message, 'error');
+                statusSection.classList.add('hidden');
+            }
+        }
+
+        // ===================
+        // WebSocket Submission
+        // ===================
+        function submitWithWebSocket(code) {
+            const start = performance.now();
+            resetResults();
+            showSkeletonLoaders(); // Show skeleton while waiting (V12-008)
+            showAgentStatus();
+            statusSection.classList.remove('hidden');
+            resultsSection.classList.remove('hidden');
+            submitBtn.disabled = true;
+            perfLog('submitStart', start, { mode: 'websocket' });
+
+            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${location.host}/ws/review`);
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({
+                    type: 'review',
+                    code: code,
+                    context: contextInput.value || null,
+                    quick: quickMode.checked,
+                }));
+            };
+
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                handleWebSocketMessage(msg);
+            };
+
+            ws.onerror = () => {
+                statusText.textContent = 'CONNECTION_ERROR';
+                statusDetail.textContent = 'retry...';
+                hideSpinner();
+                submitBtn.disabled = false;
+            };
+
+            ws.onclose = () => {
+                submitBtn.disabled = false;
+            };
+        }
+
+        function handleWebSocketMessage(msg) {
+            switch (msg.type) {
+                case 'status':
+                    statusText.textContent = msg.data.message.toUpperCase().replace(/ /g, '_');
+                    break;
+                case 'review':
+                    hideSkeletonLoaders(); // Hide skeleton on first review (V12-008)
+                    updateAgentStatus(msg.data.agent_name, 'complete');
+                    addReviewPanel(msg.data);
+                    wsReviews.push(msg.data);
+                    break;
+                case 'fix':
+                    wsFixes.push(msg.data);
+                    break;
+                case 'response':
+                    addResponsePanel(msg.data);
+                    responsesSection.classList.remove('hidden');
+                    break;
+                case 'vote':
+                    addVotePanel(msg.data);
+                    votesSection.classList.remove('hidden');
+                    break;
+                case 'consensus':
+                    wsConsensus = msg.data;
+                    displayConsensys(msg.data);
+                    break;
+                case 'complete':
+                    stopPipelineTimer();
+                    addLogLine('DONE', 'success', `Pipeline complete - Decision: ${msg.data.decision}`);
+
+                    // Small delay before hiding status to let user see final log
+                    setTimeout(() => {
+                        statusSection.classList.add('hidden');
+                    }, 500);
+
+                    submitBtn.disabled = false;
+
+                    const language = languageSelect.value;
+                    currentResultsData = {
+                        session_id: msg.data.session_id,
+                        decision: msg.data.decision,
+                        reviews: wsReviews,
+                        consensus: wsConsensus,
+                        code: codeInput.value,
+                        language: language,
+                        exportedAt: new Date().toISOString()
+                    };
+
+                    document.getElementById('export-panel').classList.remove('hidden');
+                    displaySuggestedFixes(wsReviews, language);
+                    displayQuickActions(wsReviews);
+                    displayApplyAllFixes(codeInput.value, wsReviews, language);
+                    showToast('[OK] review complete', 'success');
+                    break;
+                case 'error':
+                    statusText.textContent = 'ERROR';
+                    statusDetail.textContent = msg.data.message;
+                    hideSpinner();
+                    submitBtn.disabled = false;
+                    break;
+            }
+        }
+
+        // ===================
+        // API Submission
+        // ===================
+        async function submitWithAPI(code) {
+            const start = performance.now();
+            resetResults();
+            showSkeletonLoaders(); // Show skeleton while waiting (V12-008)
+            statusSection.classList.remove('hidden');
+            resultsSection.classList.remove('hidden');
+            submitBtn.disabled = true;
+            perfLog('submitStart', start, { mode: 'api' });
+
+            try {
+                statusText.textContent = 'SUBMITTING';
+                statusDetail.textContent = 'processing...';
+
+                const res = await fetch('/api/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: code,
+                        context: contextInput.value || null,
+                        quick: quickMode.checked,
+                    }),
+                });
+
+                if (!res.ok) throw new Error('review failed: ' + res.statusText);
+
+                const data = await res.json();
+                hideSkeletonLoaders(); // Remove skeletons before displaying results (V12-008)
+                displayResults(data);
+                perfLog('submitComplete', start, { mode: 'api' });
+                showToast('[OK] review complete', 'success');
+            } catch (err) {
+                statusText.textContent = 'ERROR';
+                statusDetail.textContent = err.message;
+                hideSpinner();
+                hideSkeletonLoaders();
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        // ===================
+        // UI Helpers
+        // ===================
+
+        // Create skeleton loader for review panels (V12-008)
+        function createSkeletonReviewPanel() {
+            return `
+                <div class="skeleton-panel mb-4">
+                    <div class="skeleton-header">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="skeleton skeleton-title" style="width: 60%;"></div>
+                        <div class="skeleton skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 75%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 85%;"></div>
+                    <div class="skeleton skeleton-text-sm" style="width: 50%;"></div>
+                </div>
+            `;
+        }
+
+        function showSkeletonLoaders() {
+            // Show 4 skeleton panels (one per agent)
+            reviewsContainer.innerHTML = [1, 2, 3, 4].map(() => createSkeletonReviewPanel()).join('');
+        }
+
+        function hideSkeletonLoaders() {
+            // Remove skeleton panels when real content arrives
+            const skeletons = reviewsContainer.querySelectorAll('.skeleton-panel');
+            skeletons.forEach(s => s.remove());
+        }
+
+        function resetResults() {
+            reviewsContainer.innerHTML = '';
+            responsesContainer.innerHTML = '';
+            votesContainer.innerHTML = '';
+            consensusPanel.classList.add('hidden');
+            responsesSection.classList.add('hidden');
+            votesSection.classList.add('hidden');
+            agentStatusGrid.innerHTML = '';
+            document.getElementById('export-panel').classList.add('hidden');
+            currentResultsData = null;
+            wsReviews = [];
+            wsFixes = [];
+            wsConsensus = null;
+            document.getElementById('fixes-panel').classList.add('hidden');
+            document.getElementById('no-fixes-msg').classList.add('hidden');
+            ['critical', 'high', 'medium', 'low'].forEach(severity => {
+                document.getElementById(`fixes-${severity}`).classList.add('hidden');
+                document.getElementById(`fixes-${severity}-content`).innerHTML = '';
+            });
+            document.getElementById('apply-fixes-panel').classList.add('hidden');
+            document.getElementById('all-fixed-code').textContent = '';
+            document.getElementById('fixes-applied-items').innerHTML = '';
+            document.getElementById('quick-actions-panel').classList.add('hidden');
+        }
+
+        // Pipeline state
+        let pipelineStartTime = null;
+        let pipelineTimerInterval = null;
+        let completedAgents = 0;
+        const totalAgents = 4;
+
+        function showAgentStatus() {
+            // Reset pipeline state
+            pipelineStartTime = Date.now();
+            completedAgents = 0;
+            updatePipelineProgress(0);
+
+            // Start timer
+            if (pipelineTimerInterval) clearInterval(pipelineTimerInterval);
+            pipelineTimerInterval = setInterval(updatePipelineTimer, 1000);
+            updatePipelineTimer();
+
+            // Reset terminal log
+            const terminalLog = document.getElementById('terminal-log');
+            terminalLog.innerHTML = '';
+            addLogLine('INIT', 'info', 'Initializing code review pipeline...');
+
+            const agents = ['SecurityExpert', 'PerformanceEngineer', 'ArchitectureCritic', 'PragmaticDev'];
+            agentStatusGrid.innerHTML = agents.map((name, idx) => {
+                const config = agentConfig[name];
+                return `
+                    <div id="status-${name}" class="pipeline-job pending" data-agent="${name}">
+                        <div class="job-indicator"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold truncate" style="color: ${config.color};">${config.prefix}</span>
+                                <span class="text-xs" style="color: var(--term-text-muted);">queued</span>
+                            </div>
+                            <div class="thinking-indicator hidden" id="thinking-${name}">analyzing</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Stagger agent start animations
+            setTimeout(() => startAgent('SecurityExpert'), 100);
+            setTimeout(() => startAgent('PerformanceEngineer'), 200);
+            setTimeout(() => startAgent('ArchitectureCritic'), 300);
+            setTimeout(() => startAgent('PragmaticDev'), 400);
+        }
+
+        function startAgent(agentName) {
+            const el = document.getElementById(`status-${agentName}`);
+            const thinking = document.getElementById(`thinking-${agentName}`);
+            const config = agentConfig[agentName];
+
+            if (el) {
+                el.classList.remove('pending');
+                el.classList.add('running');
+                el.querySelector('.text-xs:last-of-type').textContent = 'running';
+            }
+            if (thinking) {
+                thinking.classList.remove('hidden');
+            }
+
+            addLogLine('RUN', 'info', `${config.prefix} Agent started...`);
+        }
+
+        function updateAgentStatus(agentName, status) {
+            const el = document.getElementById(`status-${agentName}`);
+            const thinking = document.getElementById(`thinking-${agentName}`);
+            const config = agentConfig[agentName];
+
+            if (el && status === 'complete') {
+                el.classList.remove('running', 'pending');
+                el.classList.add('success');
+                el.querySelector('.text-xs:last-of-type').textContent = 'done';
+
+                if (thinking) {
+                    thinking.classList.add('hidden');
+                }
+
+                completedAgents++;
+                updatePipelineProgress((completedAgents / totalAgents) * 100);
+                addLogLine('OK', 'success', `${config.prefix} Review complete`);
+
+                // Update status text based on completed agents
+                if (completedAgents < totalAgents) {
+                    document.getElementById('status-text').textContent = `ANALYZING_${completedAgents}/${totalAgents}`;
+                } else {
+                    document.getElementById('status-text').textContent = 'FINALIZING';
+                    addLogLine('SYNC', 'info', 'Building consensus from all reviews...');
+                }
+            }
+        }
+
+        function updatePipelineProgress(percent) {
+            const bar = document.getElementById('pipeline-progress-bar');
+            if (bar) bar.style.width = `${percent}%`;
+        }
+
+        function updatePipelineTimer() {
+            if (!pipelineStartTime) return;
+            const elapsed = Math.floor((Date.now() - pipelineStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const secs = (elapsed % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('pipeline-timer');
+            if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+        }
+
+        function addLogLine(level, type, message) {
+            const terminalLog = document.getElementById('terminal-log');
+            if (!terminalLog) return;
+
+            const now = new Date();
+            const timestamp = now.toTimeString().split(' ')[0];
+            const levelClass = `log-level-${type}`;
+
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="${levelClass}">[${level}]</span>
+                <span style="color: var(--term-text-dim);">${escapeHtml(message)}</span>
+            `;
+            terminalLog.appendChild(line);
+            terminalLog.scrollTop = terminalLog.scrollHeight;
+        }
+
+        function stopPipelineTimer() {
+            if (pipelineTimerInterval) {
+                clearInterval(pipelineTimerInterval);
+                pipelineTimerInterval = null;
+            }
+        }
+
+        function hideSpinner() {
+            const spinner = statusSection.querySelector('.animate-spin');
+            if (spinner) spinner.parentElement.classList.add('hidden');
+            stopPipelineTimer();
+        }
+
+        function displayResults(data) {
+            statusSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+
+            currentResultsData = {
+                ...data,
+                code: data.code || codeInput.value,
+                language: languageSelect.value,
+                exportedAt: new Date().toISOString()
+            };
+
+            document.getElementById('export-panel').classList.remove('hidden');
+            (data.reviews || []).forEach(r => addReviewPanel(r));
+            displaySuggestedFixes(data.reviews || [], languageSelect.value);
+            displayQuickActions(data.reviews || []);
+
+            const originalCode = data.code || codeInput.value;
+            displayApplyAllFixes(originalCode, data.reviews || [], languageSelect.value);
+
+            if (data.responses?.length) {
+                responsesSection.classList.remove('hidden');
+                data.responses.forEach(r => addResponsePanel(r));
+            }
+
+            if (data.votes?.length) {
+                votesSection.classList.remove('hidden');
+                data.votes.forEach(v => addVotePanel(v));
+            }
+
+            if (data.consensus) {
+                displayConsensys(data.consensus);
+            }
+        }
+
+        // ===================
+        // Panel Builders - Terminal Style (V12-004)
+        // ===================
+        function addReviewPanel(review) {
+            const config = agentConfig[review.agent_name] || {
+                color: 'var(--term-text)',
+                bgColor: 'var(--term-bg)',
+                borderColor: 'var(--term-border)',
+                prefix: '[AGT]'
+            };
+            const severityClass = `severity-${(review.severity || 'low').toLowerCase()}`;
+            const severityUpper = (review.severity || 'LOW').toUpperCase();
+
+            // Build terminal-style output lines
+            let outputLines = [];
+
+            // Header line
+            outputLines.push(`<div class="terminal-line" style="color: ${config.color}; font-weight: 600;">$ ${config.prefix.replace('[', '').replace(']', '')}_REVIEW --analyze</div>`);
+
+            // Status line
+            outputLines.push(`<div class="terminal-line"><span style="color: var(--term-text-muted);">├─</span> <span class="${severityClass}">SEVERITY: ${severityUpper}</span> <span style="color: var(--term-text-muted);">|</span> <span style="color: var(--term-cyan);">CONFIDENCE: ${Math.round((review.confidence || 0) * 100)}%</span></div>`);
+
+            // Issues section
+            if (review.issues?.length) {
+                outputLines.push(`<div class="terminal-line"><span style="color: var(--term-text-muted);">├─</span> <span style="color: var(--term-red);">[!] ISSUES_FOUND: ${review.issues.length}</span></div>`);
+                review.issues.forEach((issue, idx) => {
+                    const issueSeverity = (issue.severity || 'low').toLowerCase();
+                    const issueText = escapeHtml(issue.description || issue);
+                    const lineNum = issue.line ? ` <span style="color: var(--term-text-muted);">:${issue.line}</span>` : '';
+                    const prefix = idx === review.issues.length - 1 && !review.suggestions?.length ? '└─' : '│ ';
+                    outputLines.push(`<div class="terminal-line issue-line"><span style="color: var(--term-text-muted);">${prefix}</span><span class="issue-prefix ${issueSeverity}">${issueSeverity.toUpperCase().slice(0,4)}</span> <span style="color: var(--term-text-dim);">${issueText}</span>${lineNum}</div>`);
+                });
+            } else {
+                outputLines.push(`<div class="terminal-line"><span style="color: var(--term-text-muted);">├─</span> <span style="color: var(--term-green);">[✓] NO_ISSUES_DETECTED</span></div>`);
+            }
+
+            // Suggestions section
+            if (review.suggestions?.length) {
+                outputLines.push(`<div class="terminal-line"><span style="color: var(--term-text-muted);">├─</span> <span style="color: var(--term-amber);">[*] SUGGESTIONS: ${review.suggestions.length}</span></div>`);
+                review.suggestions.forEach((suggestion, idx) => {
+                    const prefix = idx === review.suggestions.length - 1 ? '└─' : '│ ';
+                    outputLines.push(`<div class="terminal-line"><span style="color: var(--term-text-muted);">${prefix}</span> <span style="color: var(--term-text-dim);">→ ${escapeHtml(suggestion)}</span></div>`);
+                });
+            }
+
+            // Summary line
+            if (review.summary) {
+                outputLines.push(`<div class="terminal-line" style="margin-top: 4px;"><span style="color: var(--term-text-muted);">// ${escapeHtml(review.summary)}</span></div>`);
+            }
+
+            // Complete marker
+            outputLines.push(`<div class="terminal-line"><span style="color: var(--term-green);">└─ ANALYSIS_COMPLETE</span><span class="typing-cursor"></span></div>`);
+
+            const html = `
+                <div class="agent-panel border overflow-hidden fade-in" style="background: ${config.bgColor}; border-color: ${config.borderColor};">
+                    <div class="p-3 cursor-pointer select-none" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-bold" style="color: ${config.color};">${config.prefix}</span>
+                                <div>
+                                    <h3 class="text-sm font-semibold" style="color: var(--term-text);">${formatAgentName(review.agent_name)}</h3>
+                                    <p class="text-xs">
+                                        <span class="${severityClass}">${severityUpper}</span>
+                                        <span class="mx-1" style="color: var(--term-text-muted);">|</span>
+                                        <span style="color: var(--term-text-dim);">${review.issues?.length || 0} issues</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <svg class="chevron w-4 h-4" style="color: var(--term-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="panel-content px-3 pb-3">
+                        <div class="terminal-output agent-terminal complete" style="background: var(--term-bg); border-color: ${config.borderColor};">
+                            ${outputLines.join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            reviewsContainer.insertAdjacentHTML('beforeend', html);
+
+            // Remove typing cursor after animation completes
+            setTimeout(() => {
+                const cursors = reviewsContainer.querySelectorAll('.typing-cursor');
+                if (cursors.length > 0) {
+                    cursors[cursors.length - 1].remove();
+                }
+            }, 800);
+        }
+
+        function addResponsePanel(response) {
+            const config = agentConfig[response.agent_name] || { color: 'var(--term-text)', prefix: '[AGT]' };
+            const agreementColors = {
+                'AGREE': 'var(--term-green)',
+                'DISAGREE': 'var(--term-red)',
+                'PARTIAL': 'var(--term-amber)'
+            };
+            const agreeColor = agreementColors[response.agreement_level] || agreementColors['PARTIAL'];
+
+            const html = `
+                <div class="border p-3 fade-in" style="background: var(--term-bg); border-color: var(--term-border);">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-semibold" style="color: ${config.color};">${config.prefix} ${formatAgentName(response.agent_name)}</span>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span style="color: var(--term-text-muted);">-></span>
+                            <span style="color: var(--term-text-dim);">${formatAgentName(response.responding_to)}</span>
+                            <span class="px-2 py-0.5 font-bold" style="color: ${agreeColor}; background: ${agreeColor}1a;">${response.agreement_level}</span>
+                        </div>
+                    </div>
+                    ${response.points?.length ? `
+                        <ul class="space-y-1 text-xs" style="color: var(--term-text-dim);">
+                            ${response.points.map(p => `<li class="flex items-start">- ${escapeHtml(p)}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+                </div>
+            `;
+            responsesContainer.insertAdjacentHTML('beforeend', html);
+        }
+
+        function addVotePanel(vote) {
+            const config = agentConfig[vote.agent_name] || { color: 'var(--term-text)', prefix: '[AGT]' };
+            const voteColors = {
+                'APPROVE': 'var(--term-green)',
+                'REJECT': 'var(--term-red)',
+                'ABSTAIN': 'var(--term-amber)'
+            };
+            const voteColor = voteColors[vote.decision] || voteColors['ABSTAIN'];
+
+            const html = `
+                <div class="border p-3 text-center fade-in" style="background: var(--term-bg); border-color: var(--term-border);">
+                    <div class="text-xs font-bold mb-2" style="color: ${config.color};">${config.prefix}</div>
+                    <h4 class="text-xs font-semibold mb-2" style="color: var(--term-text);">${formatAgentName(vote.agent_name)}</h4>
+                    <span class="px-3 py-1 text-xs font-bold inline-block" style="color: var(--term-bg); background: ${voteColor};">${vote.decision}</span>
+                    ${vote.reasoning ? `
+                        <p class="mt-2 text-xs" style="color: var(--term-text-muted);">${escapeHtml(vote.reasoning.slice(0, 80))}${vote.reasoning.length > 80 ? '...' : ''}</p>
+                    ` : ''}
+                </div>
+            `;
+            votesContainer.insertAdjacentHTML('beforeend', html);
+        }
+
+        function displayConsensys(consensus) {
+            consensusPanel.classList.remove('hidden');
+            const decision = consensus.decision;
+            const badge = document.getElementById('decision-badge');
+
+            if (decision === 'APPROVE') {
+                badge.textContent = 'APPROVED';
+                badge.style.background = 'var(--term-green)';
+                badge.style.color = 'var(--term-bg)';
+                consensusPanel.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+                playSuccessSound(); // Play success chime for APPROVE
+            } else if (decision === 'REJECT') {
+                badge.textContent = 'REJECTED';
+                badge.style.background = 'var(--term-red)';
+                badge.style.color = 'var(--term-bg)';
+                consensusPanel.style.borderColor = 'rgba(255, 68, 68, 0.5)';
+                playWarningSound(); // Play warning tone for REJECT
+            } else {
+                badge.textContent = 'REVIEW_NEEDED';
+                badge.style.background = 'var(--term-amber)';
+                badge.style.color = 'var(--term-bg)';
+                consensusPanel.style.borderColor = 'rgba(255, 170, 0, 0.5)';
+                playWarningSound(); // Play warning for review needed
+            }
+
+            document.getElementById('approve-count').textContent = consensus.vote_counts?.APPROVE || 0;
+            document.getElementById('reject-count').textContent = consensus.vote_counts?.REJECT || 0;
+            document.getElementById('abstain-count').textContent = consensus.vote_counts?.ABSTAIN || 0;
+
+            const keyIssues = document.getElementById('key-issues');
+            const keyIssuesList = document.getElementById('key-issues-list');
+            if (consensus.key_issues?.length) {
+                keyIssues.classList.remove('hidden');
+                keyIssuesList.innerHTML = consensus.key_issues.map(i => {
+                    const issueText = typeof i === 'string' ? i : (i.description || JSON.stringify(i));
+                    return `<li class="flex items-start">- ${escapeHtml(issueText)}</li>`;
+                }).join('');
+            } else {
+                keyIssues.classList.add('hidden');
+            }
+
+            const suggestions = document.getElementById('suggestions');
+            const suggestionsList = document.getElementById('suggestions-list');
+            if (consensus.accepted_suggestions?.length) {
+                suggestions.classList.remove('hidden');
+                suggestionsList.innerHTML = consensus.accepted_suggestions.map(s =>
+                    `<li class="flex items-start">+ ${escapeHtml(s)}</li>`
+                ).join('');
+            } else {
+                suggestions.classList.add('hidden');
+            }
+        }
+
+        // ===================
+        // Suggested Fixes Functions
+        // ===================
+        function displaySuggestedFixes(reviews, language) {
+            const fixesPanel = document.getElementById('fixes-panel');
+            const noFixesMsg = document.getElementById('no-fixes-msg');
+
+            ['critical', 'high', 'medium', 'low'].forEach(severity => {
+                document.getElementById(`fixes-${severity}`).classList.add('hidden');
+                document.getElementById(`fixes-${severity}-content`).innerHTML = '';
+            });
+
+            const fixesBySeverity = { critical: [], high: [], medium: [], low: [] };
+            let totalFixes = 0;
+
+            reviews.forEach(review => {
+                if (!review.issues) return;
+                review.issues.forEach(issue => {
+                    const issueObj = typeof issue === 'string' ? { description: issue, severity: 'LOW' } : issue;
+                    if (issueObj.fix) {
+                        const severity = (issueObj.severity || 'LOW').toLowerCase();
+                        if (fixesBySeverity[severity]) {
+                            fixesBySeverity[severity].push({
+                                ...issueObj,
+                                agent_name: review.agent_name
+                            });
+                            totalFixes++;
+                        }
+                    }
+                });
+            });
+
+            if (totalFixes === 0) {
+                fixesPanel.classList.remove('hidden');
+                noFixesMsg.classList.remove('hidden');
+                document.getElementById('fixes-count').textContent = '0 fixes';
+                return;
+            }
+
+            fixesPanel.classList.remove('hidden');
+            noFixesMsg.classList.add('hidden');
+            document.getElementById('fixes-count').textContent = `${totalFixes} fix${totalFixes !== 1 ? 'es' : ''}`;
+
+            Object.entries(fixesBySeverity).forEach(([severity, fixes]) => {
+                if (fixes.length === 0) return;
+
+                const section = document.getElementById(`fixes-${severity}`);
+                const content = document.getElementById(`fixes-${severity}-content`);
+                const countBadge = document.getElementById(`fixes-${severity}-count`);
+
+                section.classList.remove('hidden');
+                countBadge.textContent = fixes.length;
+                content.innerHTML = fixes.map((fix, idx) => createFixCard(fix, language, `${severity}-${idx}`)).join('');
+            });
+
+            highlightAll(); // Lazy-loaded Prism (V12-008)
+        }
+
+        function createFixCard(issue, language, id) {
+            const prismLang = getPrismLanguage(language);
+            const lineInfo = issue.line ? `<span class="text-xs" style="color: var(--term-text-muted);">:${issue.line}</span>` : '';
+            const agentBadge = issue.agent_name ? `<span class="text-xs px-1" style="color: var(--term-text-muted);">[${agentConfig[issue.agent_name]?.prefix || 'AGT'}]</span>` : '';
+            const hasBothCodes = issue.original_code && issue.fix;
+
+            return `
+                <div class="border" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                    <div class="p-3 border-b" style="border-color: var(--term-border);">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex-1">
+                                <p class="text-xs" style="color: var(--term-text);">${escapeHtml(issue.description)}</p>
+                                <div class="flex items-center mt-1 gap-2">${lineInfo}${agentBadge}</div>
+                            </div>
+                            ${hasBothCodes ? `
+                                <button onclick="toggleDiffView('${id}')" id="diff-toggle-${id}" class="diff-toggle-btn flex items-center px-2 py-1 text-xs font-medium border transition-colors" style="border-color: var(--term-border); color: var(--term-text-dim);">
+                                    [DIFF]
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div id="code-view-${id}" class="code-view-wrapper">
+                        ${issue.original_code ? `
+                            <div class="px-3 py-2 border-b" style="background: rgba(255, 68, 68, 0.05); border-color: var(--term-border);">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium" style="color: var(--term-red);">[--] ORIGINAL</span>
+                                </div>
+                                <pre class="!bg-transparent !p-0 !m-0"><code class="language-${prismLang} !bg-transparent">${escapeHtml(issue.original_code)}</code></pre>
+                            </div>
+                        ` : ''}
+                        <div class="px-3 py-2" style="background: rgba(0, 255, 136, 0.05);">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium" style="color: var(--term-green);">[++] FIX</span>
+                                <button onclick="copyFixToClipboard(this, '${id}')" class="text-xs px-2 py-0.5 border transition-colors" style="border-color: var(--term-border); color: var(--term-text-dim);">
+                                    COPY
+                                </button>
+                            </div>
+                            <pre class="!bg-transparent !p-0 !m-0"><code id="fix-code-${id}" class="language-${prismLang} !bg-transparent">${escapeHtml(issue.fix)}</code></pre>
+                        </div>
+                    </div>
+
+                    ${hasBothCodes ? `
+                        <div id="diff-view-${id}" class="diff-view-wrapper border-t" style="border-color: var(--term-border);">
+                            ${createDiffView(issue.original_code, issue.fix, id)}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleDiffView(id) {
+            const codeView = document.getElementById(`code-view-${id}`);
+            const diffView = document.getElementById(`diff-view-${id}`);
+            const toggleBtn = document.getElementById(`diff-toggle-${id}`);
+
+            if (diffView.classList.contains('visible')) {
+                diffView.classList.remove('visible');
+                codeView.classList.remove('hidden');
+                toggleBtn.classList.remove('active');
+            } else {
+                diffView.classList.add('visible');
+                codeView.classList.add('hidden');
+                toggleBtn.classList.add('active');
+            }
+        }
+
+        function createDiffView(originalCode, fixedCode, id) {
+            const originalLines = (originalCode || '').split('\n');
+            const fixedLines = (fixedCode || '').split('\n');
+            const maxLines = Math.max(originalLines.length, fixedLines.length);
+
+            let leftHtml = '';
+            let rightHtml = '';
+
+            for (let i = 0; i < maxLines; i++) {
+                const lineNum = i + 1;
+                const origLine = originalLines[i];
+                const fixLine = fixedLines[i];
+
+                if (origLine !== undefined) {
+                    const lineClass = origLine !== fixLine ? 'diff-line-removed' : 'diff-line-unchanged';
+                    leftHtml += `<div class="diff-line ${lineClass}"><div class="diff-line-number">${lineNum}</div><div class="diff-line-content">${escapeHtml(origLine) || ' '}</div></div>`;
+                } else {
+                    leftHtml += `<div class="diff-line diff-line-empty"><div class="diff-line-number"></div><div class="diff-line-content"></div></div>`;
+                }
+
+                if (fixLine !== undefined) {
+                    const lineClass = fixLine !== origLine ? 'diff-line-added' : 'diff-line-unchanged';
+                    rightHtml += `<div class="diff-line ${lineClass}"><div class="diff-line-number">${lineNum}</div><div class="diff-line-content">${escapeHtml(fixLine) || ' '}</div></div>`;
+                } else {
+                    rightHtml += `<div class="diff-line diff-line-empty"><div class="diff-line-number"></div><div class="diff-line-content"></div></div>`;
+                }
+            }
+
+            return `
+                <div class="diff-container">
+                    <div class="diff-side">
+                        <div class="diff-header diff-header-removed">[--] ORIGINAL</div>
+                        <div class="diff-lines">${leftHtml}</div>
+                    </div>
+                    <div class="diff-side">
+                        <div class="diff-header diff-header-added">[++] FIXED</div>
+                        <div class="diff-lines">${rightHtml}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleFixesSection(severity) {
+            const section = document.getElementById(`fixes-${severity}`);
+            section.classList.toggle('collapsed');
+        }
+
+        function copyFixToClipboard(btn, id) {
+            const codeEl = document.getElementById(`fix-code-${id}`);
+            const text = codeEl ? codeEl.textContent : '';
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'COPIED';
+                btn.style.color = 'var(--term-green)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.color = '';
+                }, 2000);
+            }).catch(() => {
+                showToast('ERROR: copy failed', 'error');
+            });
+        }
+
+        function getPrismLanguage(lang) {
+            const mapping = {
+                'python': 'python',
+                'javascript': 'javascript',
+                'typescript': 'typescript',
+                'go': 'go',
+                'rust': 'rust',
+                'java': 'java'
+            };
+            return mapping[lang] || 'python';
+        }
+
+        // ===================
+        // Apply All Fixes Functions
+        // ===================
+        let allFixedCodeText = '';
+
+        function displayApplyAllFixes(originalCode, reviews, language) {
+            const panel = document.getElementById('apply-fixes-panel');
+            const codeEl = document.getElementById('all-fixed-code');
+            const countBadge = document.getElementById('applied-fixes-count');
+            const fixesList = document.getElementById('fixes-applied-items');
+
+            const fixes = [];
+            reviews.forEach(review => {
+                if (!review.issues) return;
+                review.issues.forEach(issue => {
+                    const issueObj = typeof issue === 'string' ? { description: issue } : issue;
+                    if (issueObj.fix && issueObj.original_code) {
+                        fixes.push({
+                            description: issueObj.description,
+                            original: issueObj.original_code,
+                            fixed: issueObj.fix,
+                            line: issueObj.line,
+                            severity: issueObj.severity || 'LOW',
+                            agent: review.agent_name
+                        });
+                    }
+                });
+            });
+
+            if (fixes.length === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const { fixedCode, appliedFixes } = applyAllFixes(originalCode, fixes);
+
+            if (appliedFixes.length === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            allFixedCodeText = fixedCode;
+            panel.classList.remove('hidden');
+            countBadge.textContent = `${appliedFixes.length} applied`;
+
+            const prismLang = getPrismLanguage(language);
+            codeEl.className = `language-${prismLang}`;
+            codeEl.textContent = fixedCode;
+            highlightCode(codeEl); // Lazy-loaded Prism (V12-008)
+
+            fixesList.innerHTML = appliedFixes.map(fix => `
+                <li class="flex items-start pl-2 border-l" style="border-color: ${getBorderColorForSeverity(fix.severity)};">
+                    <span>+ ${escapeHtml(fix.description)}</span>
+                    ${fix.line ? `<span class="ml-1" style="color: var(--term-text-muted);">:${fix.line}</span>` : ''}
+                </li>
+            `).join('');
+        }
+
+        function applyAllFixes(originalCode, fixes) {
+            const sortedFixes = [...fixes].sort((a, b) => (b.line || 0) - (a.line || 0));
+
+            let currentCode = originalCode;
+            const appliedFixes = [];
+            const appliedOriginals = new Set();
+
+            for (const fix of sortedFixes) {
+                const originalNormalized = fix.original.trim();
+                if (appliedOriginals.has(originalNormalized)) continue;
+
+                if (currentCode.includes(fix.original)) {
+                    currentCode = currentCode.replace(fix.original, fix.fixed);
+                    appliedFixes.push(fix);
+                    appliedOriginals.add(originalNormalized);
+                } else if (currentCode.includes(fix.original.trim())) {
+                    currentCode = currentCode.replace(fix.original.trim(), fix.fixed.trim());
+                    appliedFixes.push(fix);
+                    appliedOriginals.add(originalNormalized);
+                }
+            }
+
+            return { fixedCode: currentCode, appliedFixes };
+        }
+
+        function copyAllFixedCode() {
+            const btn = document.getElementById('copy-all-fixes-btn');
+
+            navigator.clipboard.writeText(allFixedCodeText).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>COPIED`;
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(() => {
+                showToast('ERROR: copy failed', 'error');
+            });
+        }
+
+        // ===================
+        // Quick Actions Functions
+        // ===================
+        const QUICK_ACTION_PATTERNS = {
+            'input-validation': {
+                name: 'Input Validation',
+                color: 'var(--term-cyan)',
+                keywords: ['input', 'validation', 'validate', 'sanitize', 'sanitization', 'user input', 'untrusted'],
+                docs: [
+                    { title: 'OWASP Input Validation', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html' },
+                    { title: 'CWE-20', url: 'https://cwe.mitre.org/data/definitions/20.html' }
+                ],
+                description: 'validate/sanitize all user inputs'
+            },
+            'sql-injection': {
+                name: 'SQL Injection Prevention',
+                color: 'var(--term-red)',
+                keywords: ['sql', 'injection', 'query', 'parameterized', 'prepared statement', 'database', 'execute', 'cursor'],
+                docs: [
+                    { title: 'OWASP SQL Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html' },
+                    { title: 'CWE-89', url: 'https://cwe.mitre.org/data/definitions/89.html' }
+                ],
+                description: 'use parameterized queries'
+            },
+            'xss-prevention': {
+                name: 'XSS Prevention',
+                color: '#ff7744',
+                keywords: ['xss', 'cross-site', 'escape', 'html', 'script', 'output encoding', 'sanitize output'],
+                docs: [
+                    { title: 'OWASP XSS Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html' },
+                    { title: 'CWE-79', url: 'https://cwe.mitre.org/data/definitions/79.html' }
+                ],
+                description: 'escape output to prevent XSS'
+            },
+            'authentication': {
+                name: 'Authentication',
+                color: 'var(--term-purple)',
+                keywords: ['auth', 'password', 'hash', 'bcrypt', 'session', 'token', 'credential', 'login'],
+                docs: [
+                    { title: 'OWASP Auth', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html' },
+                    { title: 'Password Storage', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html' }
+                ],
+                description: 'secure auth and password handling'
+            },
+            'path-traversal': {
+                name: 'Path Traversal Prevention',
+                color: 'var(--term-amber)',
+                keywords: ['path', 'traversal', 'directory', 'file', '../', 'lfi', 'local file'],
+                docs: [
+                    { title: 'OWASP Path Traversal', url: 'https://owasp.org/www-community/attacks/Path_Traversal' },
+                    { title: 'CWE-22', url: 'https://cwe.mitre.org/data/definitions/22.html' }
+                ],
+                description: 'validate file paths'
+            },
+            'command-injection': {
+                name: 'Command Injection Prevention',
+                color: 'var(--term-red)',
+                keywords: ['command', 'injection', 'shell', 'exec', 'system', 'subprocess', 'os.system', 'popen'],
+                docs: [
+                    { title: 'OWASP Command Injection', url: 'https://owasp.org/www-community/attacks/Command_Injection' },
+                    { title: 'CWE-78', url: 'https://cwe.mitre.org/data/definitions/78.html' }
+                ],
+                description: 'avoid shell commands with user input'
+            },
+            'error-handling': {
+                name: 'Error Handling',
+                color: 'var(--term-amber)',
+                keywords: ['error', 'exception', 'try', 'catch', 'handling', 'logging', 'stack trace'],
+                docs: [
+                    { title: 'OWASP Error Handling', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html' },
+                    { title: 'CWE-209', url: 'https://cwe.mitre.org/data/definitions/209.html' }
+                ],
+                description: 'secure error handling'
+            },
+            'cryptography': {
+                name: 'Cryptography',
+                color: 'var(--term-purple)',
+                keywords: ['crypto', 'encrypt', 'decrypt', 'hash', 'md5', 'sha', 'aes', 'rsa', 'key', 'random'],
+                docs: [
+                    { title: 'OWASP Crypto', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html' },
+                    { title: 'CWE-327', url: 'https://cwe.mitre.org/data/definitions/327.html' }
+                ],
+                description: 'use strong modern algorithms'
+            },
+            'secrets-management': {
+                name: 'Secrets Management',
+                color: 'var(--term-red)',
+                keywords: ['secret', 'api key', 'password', 'credential', 'hardcoded', 'environment', 'config'],
+                docs: [
+                    { title: 'OWASP Secrets', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html' },
+                    { title: 'CWE-798', url: 'https://cwe.mitre.org/data/definitions/798.html' }
+                ],
+                description: 'never hardcode credentials'
+            },
+            'access-control': {
+                name: 'Access Control',
+                color: 'var(--term-green)',
+                keywords: ['access', 'authorization', 'permission', 'role', 'privilege', 'admin', 'idor'],
+                docs: [
+                    { title: 'OWASP Access Control', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html' },
+                    { title: 'CWE-284', url: 'https://cwe.mitre.org/data/definitions/284.html' }
+                ],
+                description: 'proper access control checks'
+            }
+        };
+
+        function displayQuickActions(reviews) {
+            const panel = document.getElementById('quick-actions-panel');
+            const container = document.getElementById('quick-actions-container');
+            const countBadge = document.getElementById('quick-actions-count');
+
+            const allIssues = [];
+            reviews.forEach(review => {
+                if (!review.issues) return;
+                review.issues.forEach(issue => {
+                    const issueObj = typeof issue === 'string' ? { description: issue } : issue;
+                    allIssues.push({ ...issueObj, agent_name: review.agent_name });
+                });
+            });
+
+            if (allIssues.length === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const matchedPatterns = {};
+            allIssues.forEach(issue => {
+                const text = `${issue.description || ''} ${issue.fix || ''}`.toLowerCase();
+                Object.entries(QUICK_ACTION_PATTERNS).forEach(([patternId, pattern]) => {
+                    const matches = pattern.keywords.some(kw => text.includes(kw.toLowerCase()));
+                    if (matches) {
+                        if (!matchedPatterns[patternId]) {
+                            matchedPatterns[patternId] = { ...pattern, id: patternId, issues: [] };
+                        }
+                        matchedPatterns[patternId].issues.push(issue);
+                    }
+                });
+            });
+
+            const patternCount = Object.keys(matchedPatterns).length;
+            if (patternCount === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            panel.classList.remove('hidden');
+            countBadge.textContent = `${patternCount} pattern${patternCount !== 1 ? 's' : ''}`;
+            container.innerHTML = Object.entries(matchedPatterns).map(([id, pattern]) => createQuickActionCard(pattern)).join('');
+        }
+
+        function createQuickActionCard(pattern) {
+            const issueCount = pattern.issues.length;
+            return `
+                <div class="border" style="border-color: var(--term-border);">
+                    <div class="flex items-center justify-between p-3 cursor-pointer" style="background: var(--term-bg);" onclick="toggleQuickAction('${pattern.id}')">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold" style="color: ${pattern.color};">[!]</span>
+                            <div>
+                                <h3 class="text-xs font-semibold" style="color: ${pattern.color};">${pattern.name}</h3>
+                                <p class="text-xs" style="color: var(--term-text-muted);">// ${pattern.description}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 text-xs" style="background: ${pattern.color}1a; color: ${pattern.color};">${issueCount}</span>
+                            <svg id="chevron-${pattern.id}" class="w-4 h-4 transition-transform" style="color: var(--term-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="quick-action-content-${pattern.id}" class="hidden border-t" style="border-color: var(--term-border);">
+                        <div class="p-3 border-b" style="background: var(--term-bg-panel); border-color: var(--term-border);">
+                            <h4 class="text-xs font-semibold mb-2" style="color: var(--term-text-muted);">// DOCS</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${pattern.docs.map(doc => `
+                                    <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="text-xs px-2 py-1 border transition-colors hover:border-opacity-100" style="border-color: var(--term-border); color: var(--term-cyan);">
+                                        ${doc.title}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="text-xs font-semibold mb-2" style="color: var(--term-text-muted);">// RELATED_ISSUES</h4>
+                            <div class="space-y-2">
+                                ${pattern.issues.map((issue, idx) => createQuickActionIssue(issue, pattern.id, idx)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createQuickActionIssue(issue, patternId, idx) {
+            const hasFix = issue.fix;
+            const agentBadge = issue.agent_name ? `<span class="text-xs" style="color: var(--term-text-muted);">[${agentConfig[issue.agent_name]?.prefix || 'AGT'}]</span>` : '';
+
+            return `
+                <div class="p-2 border" style="background: var(--term-bg); border-color: var(--term-border);">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <p class="text-xs" style="color: var(--term-text-dim);">${escapeHtml(issue.description)}</p>
+                        ${agentBadge}
+                    </div>
+                    ${hasFix ? `
+                        <div class="mt-2">
+                            <button onclick="toggleQuickActionFix('${patternId}-${idx}')" class="text-xs font-medium flex items-center" style="color: var(--term-green);">
+                                <svg id="fix-chevron-${patternId}-${idx}" class="w-3 h-3 mr-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                view_fix()
+                            </button>
+                            <div id="quick-action-fix-${patternId}-${idx}" class="hidden mt-2">
+                                <pre class="!mt-0 overflow-hidden text-xs border" style="border-color: var(--term-border);"><code class="language-python">${escapeHtml(issue.fix)}</code></pre>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleQuickAction(patternId) {
+            const content = document.getElementById(`quick-action-content-${patternId}`);
+            const chevron = document.getElementById(`chevron-${patternId}`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+                highlightAllUnder(content); // Lazy-loaded Prism (V12-008)
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = '';
+            }
+        }
+
+        function toggleQuickActionFix(fixId) {
+            const fixContent = document.getElementById(`quick-action-fix-${fixId}`);
+            const chevron = document.getElementById(`fix-chevron-${fixId}`);
+
+            if (fixContent.classList.contains('hidden')) {
+                fixContent.classList.remove('hidden');
+                chevron.style.transform = 'rotate(90deg)';
+                highlightAllUnder(fixContent); // Lazy-loaded Prism (V12-008)
+            } else {
+                fixContent.classList.add('hidden');
+                chevron.style.transform = '';
+            }
+        }
+
+        // ===================
+        // Utility Functions
+        // ===================
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return text;
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatAgentName(name) {
+            return name.replace(/([A-Z])/g, ' $1').trim();
+        }
+
+        function formatDate(dateStr) {
+            try {
+                return new Date(dateStr).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function getDecisionClasses(decision) {
+            switch (decision) {
+                case 'APPROVE': return 'background: var(--term-green); color: var(--term-bg);';
+                case 'REJECT': return 'background: var(--term-red); color: var(--term-bg);';
+                default: return 'background: var(--term-amber); color: var(--term-bg);';
+            }
+        }
+
+        function getBorderColorForSeverity(severity) {
+            switch ((severity || '').toLowerCase()) {
+                case 'critical': return 'var(--term-red)';
+                case 'high': return '#ff7744';
+                case 'medium': return 'var(--term-amber)';
+                default: return 'var(--term-green)';
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'var(--term-red)' : type === 'success' ? 'var(--term-green)' : 'var(--term-cyan)';
+            toast.className = 'toast fixed bottom-4 right-4 px-4 py-2 text-xs font-medium z-50 fade-in';
+            toast.style.background = bgColor;
+            toast.style.color = 'var(--term-bg)';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ===================
+        // Export Functions
+        // ===================
+        function exportAsMarkdown() {
+            if (!currentResultsData) {
+                showToast('ERROR: no data', 'error');
+                return;
+            }
+
+            const data = currentResultsData;
+            const timestamp = new Date().toLocaleString();
+            let md = `# CONSENSYS CODE REVIEW REPORT\n\n`;
+            md += `**Generated:** ${timestamp}\n\n`;
+
+            if (data.consensus) {
+                md += `## VERDICT: ${data.consensus.decision || 'PENDING'}\n\n`;
+                md += `| Vote | Count |\n|------|-------|\n`;
+                md += `| APPROVE | ${data.consensus.vote_counts?.APPROVE || 0} |\n`;
+                md += `| REJECT | ${data.consensus.vote_counts?.REJECT || 0} |\n`;
+                md += `| ABSTAIN | ${data.consensus.vote_counts?.ABSTAIN || 0} |\n\n`;
+
+                if (data.consensus.key_issues?.length) {
+                    md += `### KEY ISSUES\n`;
+                    data.consensus.key_issues.forEach(issue => md += `- ${issue}\n`);
+                    md += '\n';
+                }
+
+                if (data.consensus.accepted_suggestions?.length) {
+                    md += `### ACCEPTED SUGGESTIONS\n`;
+                    data.consensus.accepted_suggestions.forEach(s => md += `- ${s}\n`);
+                    md += '\n';
+                }
+            }
+
+            if (data.reviews?.length) {
+                md += `## AGENT REVIEWS\n\n`;
+                data.reviews.forEach(review => {
+                    md += `### ${formatAgentName(review.agent_name)}\n\n`;
+                    md += `**Severity:** ${review.severity || 'LOW'} | **Confidence:** ${Math.round((review.confidence || 0) * 100)}%\n\n`;
+
+                    if (review.issues?.length) {
+                        md += `**Issues:**\n`;
+                        review.issues.forEach(issue => {
+                            const issueObj = typeof issue === 'string' ? { description: issue } : issue;
+                            const lineInfo = issueObj.line ? ` (L${issueObj.line})` : '';
+                            const severity = issueObj.severity ? `[${issueObj.severity}] ` : '';
+                            md += `- ${severity}${issueObj.description}${lineInfo}\n`;
+                            if (issueObj.fix) {
+                                md += `  - **Fix:**\n\`\`\`${data.language || 'text'}\n${issueObj.fix}\n\`\`\`\n`;
+                            }
+                        });
+                        md += '\n';
+                    }
+
+                    if (review.suggestions?.length) {
+                        md += `**Suggestions:**\n`;
+                        review.suggestions.forEach(s => md += `- ${s}\n`);
+                        md += '\n';
+                    }
+
+                    if (review.summary) md += `**Summary:** ${review.summary}\n\n`;
+                    md += '---\n\n';
+                });
+            }
+
+            if (data.code) {
+                md += `## REVIEWED CODE\n\n\`\`\`${data.language || 'text'}\n${data.code}\n\`\`\`\n`;
+            }
+
+            downloadFile(md, 'consensys-review.md', 'text/markdown');
+            showToast('[OK] exported markdown', 'success');
+        }
+
+        function exportAsJSON() {
+            if (!currentResultsData) {
+                showToast('ERROR: no data', 'error');
+                return;
+            }
+
+            const exportData = {
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                verdict: {
+                    decision: currentResultsData.consensus?.decision || 'PENDING',
+                    vote_counts: currentResultsData.consensus?.vote_counts || {},
+                    is_approved: currentResultsData.consensus?.decision === 'APPROVE',
+                    is_rejected: currentResultsData.consensus?.decision === 'REJECT'
+                },
+                summary: {
+                    total_issues: 0, critical_count: 0, high_count: 0, medium_count: 0, low_count: 0, total_fixes: 0
+                },
+                issues: [],
+                fixes: [],
+                reviews: currentResultsData.reviews || [],
+                votes: currentResultsData.votes || [],
+                responses: currentResultsData.responses || [],
+                code: currentResultsData.code || '',
+                language: currentResultsData.language || 'unknown',
+                session_id: currentResultsData.session_id || null
+            };
+
+            (currentResultsData.reviews || []).forEach(review => {
+                if (!review.issues) return;
+                review.issues.forEach(issue => {
+                    const issueObj = typeof issue === 'string' ? { description: issue, severity: 'LOW' } : issue;
+                    const severity = (issueObj.severity || 'LOW').toUpperCase();
+
+                    exportData.issues.push({
+                        description: issueObj.description,
+                        severity: severity,
+                        line: issueObj.line || null,
+                        agent: review.agent_name,
+                        has_fix: !!issueObj.fix
+                    });
+
+                    exportData.summary.total_issues++;
+                    if (severity === 'CRITICAL') exportData.summary.critical_count++;
+                    else if (severity === 'HIGH') exportData.summary.high_count++;
+                    else if (severity === 'MEDIUM') exportData.summary.medium_count++;
+                    else exportData.summary.low_count++;
+
+                    if (issueObj.fix) {
+                        exportData.fixes.push({
+                            issue: issueObj.description,
+                            severity: severity,
+                            line: issueObj.line || null,
+                            original_code: issueObj.original_code || null,
+                            fixed_code: issueObj.fix,
+                            agent: review.agent_name
+                        });
+                        exportData.summary.total_fixes++;
+                    }
+                });
+            });
+
+            downloadFile(JSON.stringify(exportData, null, 2), 'consensys-review.json', 'application/json');
+            showToast('[OK] exported json', 'success');
+        }
+
+        function exportAsGitHubIssue() {
+            if (!currentResultsData) {
+                showToast('ERROR: no data', 'error');
+                return;
+            }
+
+            const data = currentResultsData;
+            const decision = data.consensus?.decision || 'PENDING';
+
+            let body = `## Code Review: ${decision}\n\n`;
+            body += `> Automated review by Consensys multi-agent AI\n\n`;
+
+            if (data.consensus) {
+                body += `### Vote Summary\n`;
+                body += `- APPROVE: **${data.consensus.vote_counts?.APPROVE || 0}**\n`;
+                body += `- REJECT: **${data.consensus.vote_counts?.REJECT || 0}**\n`;
+                body += `- ABSTAIN: **${data.consensus.vote_counts?.ABSTAIN || 0}**\n\n`;
+            }
+
+            const issuesBySeverity = { CRITICAL: [], HIGH: [], MEDIUM: [], LOW: [] };
+            (data.reviews || []).forEach(review => {
+                if (!review.issues) return;
+                review.issues.forEach(issue => {
+                    const issueObj = typeof issue === 'string' ? { description: issue, severity: 'LOW' } : issue;
+                    const severity = (issueObj.severity || 'LOW').toUpperCase();
+                    if (issuesBySeverity[severity]) {
+                        issuesBySeverity[severity].push({ ...issueObj, agent: review.agent_name });
+                    }
+                });
+            });
+
+            let hasIssues = false;
+            Object.entries(issuesBySeverity).forEach(([severity, issues]) => {
+                if (issues.length === 0) return;
+                hasIssues = true;
+
+                body += `### ${severity} Issues (${issues.length})\n\n`;
+                issues.forEach((issue, idx) => {
+                    const lineInfo = issue.line ? ` (L${issue.line})` : '';
+                    body += `**${idx + 1}.** ${issue.description}${lineInfo}\n`;
+                    body += `   - *Agent: ${formatAgentName(issue.agent)}*\n`;
+                    if (issue.fix) {
+                        body += `   - **Fix:**\n\`\`\`${data.language || ''}\n${issue.fix}\n\`\`\`\n`;
+                    }
+                    body += '\n';
+                });
+            });
+
+            if (!hasIssues) body += `### No Issues Found\n\n`;
+
+            if (data.consensus?.accepted_suggestions?.length) {
+                body += `### Accepted Suggestions\n\n`;
+                data.consensus.accepted_suggestions.forEach(s => body += `- [ ] ${s}\n`);
+                body += '\n';
+            }
+
+            body += `---\n**Labels:** \`code-review\`, \`ai-generated\``;
+            if (decision === 'REJECT') body += `, \`needs-work\``;
+
+            downloadFile(body, 'github-issue.md', 'text/markdown');
+            showToast('[OK] exported github issue', 'success');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ===================
+        // Share Functions (V12-007)
+        // ===================
+        const shareModal = document.getElementById('share-modal');
+
+        async function shareResults() {
+            if (!currentResultsData || !currentResultsData.session_id) {
+                showToast('ERROR: no session to share', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/sessions/${currentResultsData.session_id}/share`);
+                if (!response.ok) {
+                    throw new Error('Failed to get share link');
+                }
+
+                const data = await response.json();
+
+                // Set share URL
+                document.getElementById('share-url').value = data.share_url;
+
+                // Set QR code SVG
+                document.getElementById('qr-code-container').innerHTML = data.qr_code_svg;
+
+                // Style the QR code SVG
+                const qrSvg = document.querySelector('#qr-code-container svg');
+                if (qrSvg) {
+                    qrSvg.style.width = '200px';
+                    qrSvg.style.height = '200px';
+                }
+
+                // Show modal
+                shareModal.classList.remove('hidden');
+                playClickSound();
+            } catch (error) {
+                console.error('Share error:', error);
+                showToast('ERROR: ' + error.message, 'error');
+            }
+        }
+
+        function hideShareModal() {
+            shareModal.classList.add('hidden');
+        }
+
+        function copyShareUrl() {
+            const shareUrl = document.getElementById('share-url');
+            shareUrl.select();
+            document.execCommand('copy');
+            showToast('[OK] link copied to clipboard', 'success');
+            playClickSound();
+        }
+
+        // Close share modal on click outside
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) {
+                hideShareModal();
+            }
+        });
+
+        // ===================
+        // Keyboard Shortcuts (V12-005)
+        // ===================
+        const shortcutsModal = document.getElementById('shortcuts-modal');
+        const shortcutsBtn = document.getElementById('shortcuts-btn');
+        const closeShortcuts = document.getElementById('close-shortcuts');
+
+        // Show/hide shortcuts modal
+        function showShortcutsModal() {
+            shortcutsModal.classList.remove('hidden');
+        }
+
+        function hideShortcutsModal() {
+            shortcutsModal.classList.add('hidden');
+        }
+
+        // Shortcuts button click
+        shortcutsBtn.addEventListener('click', showShortcutsModal);
+        closeShortcuts.addEventListener('click', hideShortcutsModal);
+
+        // Click outside modal to close
+        shortcutsModal.addEventListener('click', (e) => {
+            if (e.target === shortcutsModal) {
+                hideShortcutsModal();
+            }
+        });
+
+        // Toggle theme function (extracted for shortcut use)
+        function toggleTheme() {
+            isDark = !isDark;
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                document.querySelector('.sun-icon').classList.remove('hidden');
+                document.querySelector('.moon-icon').classList.add('hidden');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                document.querySelector('.sun-icon').classList.add('hidden');
+                document.querySelector('.moon-icon').classList.remove('hidden');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Jump to section function
+        function jumpToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section && !section.classList.contains('hidden')) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Flash the section briefly
+                section.style.outline = '2px solid var(--term-green)';
+                setTimeout(() => {
+                    section.style.outline = '';
+                }, 500);
+            }
+        }
+
+        // Clear and focus input
+        function clearAndFocusInput() {
+            codeInput.value = '';
+            contextInput.value = '';
+            charCount.textContent = '0 chars';
+            codeInput.focus();
+            showToast('[OK] input cleared', 'success');
+        }
+
+        // Show export panel (scroll to it)
+        function showExportPanel() {
+            const exportPanel = document.getElementById('export-panel');
+            if (exportPanel && !exportPanel.classList.contains('hidden')) {
+                exportPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                exportPanel.style.outline = '2px solid var(--term-green)';
+                setTimeout(() => {
+                    exportPanel.style.outline = '';
+                }, 500);
+            } else {
+                showToast('[INFO] no export available yet - run a review first', 'info');
+            }
+        }
+
+        // Check if any modal is open
+        function isAnyModalOpen() {
+            return !historyModal.classList.contains('hidden') ||
+                   !shortcutsModal.classList.contains('hidden') ||
+                   !shareModal.classList.contains('hidden');
+        }
+
+        // Close all modals
+        function closeAllModals() {
+            historyModal.classList.add('hidden');
+            shortcutsModal.classList.add('hidden');
+            shareModal.classList.add('hidden');
+        }
+
+        // Global keyboard shortcut handler
+        document.addEventListener('keydown', (e) => {
+            // Don't trigger shortcuts when typing in input fields (except for specific ones)
+            const isInputFocused = document.activeElement.tagName === 'INPUT' ||
+                                   document.activeElement.tagName === 'TEXTAREA';
+
+            // Escape key - close any open modal
+            if (e.key === 'Escape') {
+                if (isAnyModalOpen()) {
+                    closeAllModals();
+                    e.preventDefault();
+                }
+                return;
+            }
+
+            // ? key - show shortcuts modal (only when not typing)
+            if (e.key === '?' && !isInputFocused) {
+                showShortcutsModal();
+                e.preventDefault();
+                return;
+            }
+
+            // All other shortcuts require Cmd/Ctrl
+            if (!e.metaKey && !e.ctrlKey) return;
+
+            // Cmd/Ctrl + Enter - submit code (works even in textarea)
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitBtn.click();
+                return;
+            }
+
+            // Cmd/Ctrl + K - clear and focus input
+            if (e.key === 'k' || e.key === 'K') {
+                e.preventDefault();
+                clearAndFocusInput();
+                return;
+            }
+
+            // Cmd/Ctrl + D - toggle dark/light mode
+            if (e.key === 'd' || e.key === 'D') {
+                e.preventDefault();
+                toggleTheme();
+                return;
+            }
+
+            // Cmd/Ctrl + E - show export panel
+            if (e.key === 'e' || e.key === 'E') {
+                e.preventDefault();
+                showExportPanel();
+                return;
+            }
+
+            // Cmd/Ctrl + M - toggle sound effects
+            if (e.key === 'm' || e.key === 'M') {
+                e.preventDefault();
+                toggleSound();
+                return;
+            }
+
+            // Cmd/Ctrl + 1 - jump to input section
+            if (e.key === '1') {
+                e.preventDefault();
+                jumpToSection('input-section');
+                codeInput.focus();
+                return;
+            }
+
+            // Cmd/Ctrl + 2 - jump to reviews
+            if (e.key === '2') {
+                e.preventDefault();
+                const reviewsSection = document.getElementById('results-section');
+                if (reviewsSection && !reviewsSection.classList.contains('hidden')) {
+                    const reviewsContainer = document.getElementById('reviews-container');
+                    if (reviewsContainer) {
+                        reviewsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+                return;
+            }
+
+            // Cmd/Ctrl + 3 - jump to fixes
+            if (e.key === '3') {
+                e.preventDefault();
+                jumpToSection('fixes-panel');
+                return;
+            }
+
+            // Cmd/Ctrl + 4 - jump to consensus
+            if (e.key === '4') {
+                e.preventDefault();
+                jumpToSection('consensus-panel');
+                return;
+            }
+        });
+
+        // ===================
+        // Initialize
+        // ===================
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    isDark = e.matches;
+                    if (isDark) {
+                        document.documentElement.classList.add('dark');
+                        document.documentElement.classList.remove('light');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        document.documentElement.classList.add('light');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
