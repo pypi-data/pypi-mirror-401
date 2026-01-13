@@ -1,0 +1,804 @@
+Metadata-Version: 2.4
+Name: msrashed-prometheus-mcp-server
+Version: 0.1.1
+Summary: Read-only Prometheus MCP server for metrics querying, alerting, and monitoring inspection
+Project-URL: Homepage, https://github.com/msalah-eg/prometheus-mcp-server
+Project-URL: Repository, https://github.com/msalah-eg/prometheus-mcp-server
+Project-URL: Issues, https://github.com/msalah-eg/prometheus-mcp-server/issues
+Author-email: Mohamed Salah <mohamed@buyinggroup.com>
+License: MIT
+License-File: LICENSE
+Keywords: ai,llm,mcp,metrics,model-context-protocol,monitoring,observability,prometheus
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Monitoring
+Requires-Python: >=3.12
+Requires-Dist: click>=8.1.0
+Requires-Dist: fastmcp>=2.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp>=1.24.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: python-dateutil>=2.8.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.24.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: respx>=0.21.0; extra == 'dev'
+Requires-Dist: ruff>=0.8.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Prometheus MCP Server
+
+A read-only Model Context Protocol (MCP) server for [Prometheus](https://prometheus.io/), enabling AI agents like Claude to query metrics, investigate alerts, and analyze monitoring data safely.
+
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![MCP](https://img.shields.io/badge/MCP-1.24.0+-green.svg)](https://github.com/anthropics/mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Features
+
+- **Read-Only Safety**: All operations are read-only. No modifications to Prometheus configuration or data
+- **Comprehensive Query Support**: Execute PromQL instant and range queries
+- **Metadata Discovery**: List metrics, labels, and series
+- **Target Monitoring**: View scrape targets and their health
+- **Alert Investigation**: List active alerts and alert rules
+- **Configuration Inspection**: View Prometheus configuration and runtime info
+- **Multiple Auth Methods**: Support for Bearer tokens and Basic authentication
+- **Type-Safe**: Full type hints for Python 3.12+
+
+## Installation
+
+### Using uv (Recommended)
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd prometheus-mcp-server
+
+# Install with uv
+uv pip install -e .
+
+# Or install from PyPI (when published)
+uv pip install prometheus-mcp-server
+```
+
+### Using pip
+
+```bash
+pip install prometheus-mcp-server
+```
+
+### Using pipx (for CLI usage)
+
+```bash
+pipx install prometheus-mcp-server
+```
+
+## Quick Start
+
+### 1. Set Environment Variables
+
+```bash
+# Prometheus server URL (required)
+export PROM_URL="http://localhost:9090"
+
+# Optional: Bearer token authentication
+export PROM_TOKEN="your_bearer_token"
+
+# Optional: Basic authentication
+export PROM_USERNAME="admin"
+export PROM_PASSWORD="secret"
+
+# Optional: Timeout and SSL settings
+export PROM_TIMEOUT="30"
+export PROM_VERIFY_SSL="true"
+```
+
+### 2. Run the Server
+
+```bash
+# Using stdio transport (default, for Claude Desktop)
+prometheus-mcp-server
+
+# Using HTTP transport
+prometheus-mcp-server --transport http --port 8000
+
+# With custom Prometheus URL
+prometheus-mcp-server --url https://prometheus.example.com
+```
+
+### 3. Configure with Claude Desktop
+
+Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "prometheus": {
+      "command": "prometheus-mcp-server",
+      "env": {
+        "PROM_URL": "http://localhost:9090",
+        "PROM_TOKEN": "optional_bearer_token"
+      }
+    }
+  }
+}
+```
+
+Or with uvx:
+
+```json
+{
+  "mcpServers": {
+    "prometheus": {
+      "command": "uvx",
+      "args": ["prometheus-mcp-server"],
+      "env": {
+        "PROM_URL": "http://localhost:9090"
+      }
+    }
+  }
+}
+```
+
+## Available Tools
+
+### Query Tools
+
+#### `query_instant`
+Execute a PromQL instant query at a single point in time.
+
+```python
+# Check which targets are up
+query_instant(query="up")
+
+# Get API server status
+query_instant(query='up{job="api-server"}', time="now")
+
+# Get current request rate
+query_instant(query="rate(http_requests_total[5m])")
+```
+
+#### `query_range`
+Execute a PromQL query over a time range.
+
+```python
+# Get request rate over last hour
+query_range(
+    query="rate(http_requests_total[5m])",
+    start="now-1h",
+    end="now",
+    step="30s"
+)
+
+# Get CPU usage by instance
+query_range(
+    query="avg(cpu_usage) by (instance)",
+    start="2024-01-15T00:00:00Z",
+    end="2024-01-15T12:00:00Z",
+    step="1m"
+)
+```
+
+#### `query_exemplars`
+Query exemplars for trace correlation.
+
+```python
+query_exemplars(
+    query="http_request_duration_seconds_bucket",
+    start="now-1h",
+    end="now"
+)
+```
+
+### Metadata Discovery Tools
+
+#### `list_metrics`
+List all available metrics.
+
+```python
+# List all metrics
+list_metrics()
+
+# List HTTP-related metrics
+list_metrics(match="http_.*")
+
+# List all counter metrics
+list_metrics(match=".*_total")
+```
+
+#### `get_metric_metadata`
+Get metadata (type, help text) for metrics.
+
+```python
+# Get metadata for a specific metric
+get_metric_metadata(metric="http_requests_total")
+
+# Get metadata for all metrics (limited to 100)
+get_metric_metadata(limit=100)
+```
+
+#### `list_labels`
+List all label names.
+
+```python
+# List all labels
+list_labels()
+
+# List labels for specific job
+list_labels(match=['{job="api"}'])
+```
+
+#### `get_label_values`
+Get all values for a specific label.
+
+```python
+# Get all job names
+get_label_values(label="job")
+
+# Get namespaces in prod cluster
+get_label_values(
+    label="namespace",
+    match=['{cluster="prod"}']
+)
+```
+
+#### `find_series`
+Find time series matching label selectors.
+
+```python
+# Find all series for a job
+find_series(match=['{job="api"}'])
+
+# Find all HTTP metrics in production
+find_series(
+    match=['{__name__=~"http_.*",env="production"}'],
+    start="now-1h",
+    end="now"
+)
+```
+
+### Target & Scrape Tools
+
+#### `list_targets`
+List all scrape targets and their status.
+
+```python
+# List all targets
+list_targets()
+
+# List only active targets
+list_targets(state="active")
+
+# List only dropped targets
+list_targets(state="dropped")
+```
+
+#### `get_targets_metadata`
+Get metadata about metrics from targets.
+
+```python
+# Get metadata for specific target
+get_targets_metadata(match_target='{job="api-server"}')
+
+# Get metadata for specific metric
+get_targets_metadata(metric="http_requests_total")
+```
+
+### Alert Tools
+
+#### `list_alerts`
+List all active alerts (firing and pending).
+
+```python
+list_alerts()
+```
+
+#### `list_rules`
+List all recording and alerting rules.
+
+```python
+# List all rules
+list_rules()
+
+# List only alerting rules
+list_rules(type="alert")
+
+# List only recording rules
+list_rules(type="record")
+```
+
+### Configuration & Status Tools
+
+#### `get_config`
+Get the current Prometheus configuration.
+
+```python
+get_config()
+```
+
+#### `get_flags`
+Get Prometheus runtime flags.
+
+```python
+get_flags()
+```
+
+#### `get_runtime_info`
+Get Prometheus runtime information.
+
+```python
+get_runtime_info()
+```
+
+#### `get_tsdb_stats`
+Get TSDB statistics and cardinality.
+
+```python
+get_tsdb_stats()
+```
+
+#### `check_health`
+Check Prometheus health status.
+
+```python
+check_health()
+```
+
+#### `check_readiness`
+Check if Prometheus is ready to serve queries.
+
+```python
+check_readiness()
+```
+
+## PromQL Query Examples
+
+### Basic Queries
+
+```promql
+# Check target health
+up
+
+# Filter by job
+up{job="api-server"}
+
+# Get metric value
+http_requests_total
+
+# Multiple label filters
+http_requests_total{job="api",status="200"}
+```
+
+### Rate Queries
+
+```promql
+# Request rate over 5 minutes
+rate(http_requests_total[5m])
+
+# Sum rate by status code
+sum(rate(http_requests_total[5m])) by (status)
+
+# Instant rate (more sensitive to spikes)
+irate(cpu_seconds_total[1m])
+```
+
+### Aggregation
+
+```promql
+# Average CPU by instance
+avg(cpu_usage) by (instance)
+
+# Total memory by namespace
+sum(memory_usage) by (namespace)
+
+# Maximum response time by endpoint
+max(response_time) by (endpoint)
+
+# Count of targets by job
+count(up) by (job)
+```
+
+### Advanced Queries
+
+```promql
+# 95th percentile response time
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+# Predict disk usage in 1 hour
+predict_linear(disk_usage[1h], 3600)
+
+# Temperature change over 5 minutes
+delta(cpu_temp[5m])
+
+# Detect rate of increase
+deriv(cpu_temp[5m])
+```
+
+### Time Range Queries
+
+```promql
+# CPU usage increase over last hour vs previous hour
+(avg_over_time(cpu_usage[1h]) - avg_over_time(cpu_usage[1h] offset 1h))
+
+# Compare to last week
+http_requests_total - http_requests_total offset 1w
+```
+
+## Authentication
+
+### Bearer Token Authentication
+
+```bash
+export PROM_URL="https://prometheus.example.com"
+export PROM_TOKEN="your_bearer_token"
+prometheus-mcp-server
+```
+
+### Basic Authentication
+
+```bash
+export PROM_URL="https://prometheus.example.com"
+export PROM_USERNAME="admin"
+export PROM_PASSWORD="secret"
+prometheus-mcp-server
+```
+
+### Kubernetes Service Account Token
+
+```bash
+# Get token from Kubernetes
+TOKEN=$(kubectl get secret -n monitoring prometheus-token -o jsonpath='{.data.token}' | base64 -d)
+
+export PROM_URL="https://prometheus.monitoring.svc.cluster.local:9090"
+export PROM_TOKEN="$TOKEN"
+prometheus-mcp-server
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `PROM_URL` | Prometheus server URL | `http://localhost:9090` | No |
+| `PROMETHEUS_URL` | Alternative to PROM_URL | - | No |
+| `PROM_TOKEN` | Bearer token for auth | - | No |
+| `PROMETHEUS_TOKEN` | Alternative to PROM_TOKEN | - | No |
+| `PROM_USERNAME` | Username for basic auth | - | No |
+| `PROM_PASSWORD` | Password for basic auth | - | No |
+| `PROM_TIMEOUT` | Request timeout (seconds) | `30` | No |
+| `PROM_VERIFY_SSL` | Verify SSL certificates | `true` | No |
+
+### Command-Line Arguments
+
+```bash
+prometheus-mcp-server \
+  --url https://prometheus.example.com \
+  --token your_bearer_token \
+  --timeout 60 \
+  --transport http \
+  --port 8000
+```
+
+Full options:
+
+```
+--url URL                  Prometheus server URL
+--token TOKEN              Bearer token for authentication
+--username USERNAME        Username for basic auth
+--password PASSWORD        Password for basic auth
+--timeout SECONDS          Request timeout in seconds (default: 30)
+--no-verify-ssl            Disable SSL verification (not recommended)
+--transport {stdio,http,sse}  Transport mechanism (default: stdio)
+--host HOST                Host for HTTP/SSE transport (default: 127.0.0.1)
+--port PORT                Port for HTTP/SSE transport (default: 8000)
+```
+
+## Use Cases
+
+### Incident Investigation
+
+Ask questions like:
+- "What's the current CPU usage across all pods?"
+- "Show me the error rate for the API service in the last hour"
+- "Which targets are down right now?"
+- "What alerts are currently firing?"
+
+### Performance Analysis
+
+- "Compare request latency between now and 24 hours ago"
+- "Show me the top 10 endpoints by request volume"
+- "What's the memory usage trend for the worker pods?"
+
+### Capacity Planning
+
+- "What's the 95th percentile response time over the last week?"
+- "Show me the disk usage growth rate"
+- "Which services have the highest cardinality?"
+
+### Alert Analysis
+
+- "Why is the HighMemoryUsage alert firing?"
+- "Show me the history of the DiskSpaceLow alert"
+- "What's the current state of all alerting rules?"
+
+## Architecture
+
+### Project Structure
+
+```
+prometheus-mcp-server/
+├── src/
+│   └── prometheus_mcp_server/
+│       ├── __init__.py          # Package initialization
+│       ├── __main__.py          # CLI entry point
+│       ├── server.py            # FastMCP server setup
+│       ├── tools/
+│       │   ├── __init__.py
+│       │   └── registry.py      # All tool implementations
+│       └── utils/
+│           ├── __init__.py
+│           ├── client.py        # Prometheus HTTP client
+│           └── helpers.py       # Time parsing, formatting
+├── pyproject.toml               # Project configuration
+├── README.md                    # This file
+└── USER_STORIES.md              # Detailed requirements
+```
+
+### Technology Stack
+
+- **MCP Framework**: FastMCP 2.0
+- **HTTP Client**: httpx (async support)
+- **Python**: 3.12+ with full type hints
+- **Authentication**: Bearer token and Basic auth support
+- **Read-Only**: No write operations allowed
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone <repository-url>
+cd prometheus-mcp-server
+
+# Install with dev dependencies using uv
+uv pip install -e ".[dev]"
+
+# Or with pip
+pip install -e ".[dev]"
+```
+
+### Run Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=prometheus_mcp_server
+
+# Run specific test file
+pytest tests/test_client.py
+```
+
+### Code Quality
+
+```bash
+# Format code
+ruff format .
+
+# Lint code
+ruff check .
+
+# Fix linting issues
+ruff check --fix .
+
+# Type checking (if using mypy)
+mypy src/
+```
+
+### Testing with Local Prometheus
+
+```bash
+# Run Prometheus locally with Docker
+docker run -d -p 9090:9090 prom/prometheus
+
+# Test the MCP server
+export PROM_URL="http://localhost:9090"
+prometheus-mcp-server
+```
+
+## Security
+
+### Read-Only Guarantee
+
+This MCP server is designed to be **strictly read-only**:
+
+- Only GET requests and specific read-only POST endpoints are allowed
+- All write operations (PUT, DELETE, PATCH) are blocked
+- No configuration modifications possible
+- No data deletion or manipulation
+
+### Blocked Operations
+
+The following operations are **blocked** by design:
+- Creating or deleting targets
+- Modifying alert rules
+- Changing Prometheus configuration
+- Deleting time series data
+- Administrative operations
+
+### Safe Endpoints Only
+
+Only these endpoint patterns are allowed:
+- `GET /api/v1/*` - All read operations
+- `POST /api/v1/query*` - Query operations only
+- `POST /api/v1/series` - Series discovery only
+- `POST /api/v1/labels` - Label queries only
+- `GET /-/healthy` - Health checks
+- `GET /-/ready` - Readiness checks
+
+## Troubleshooting
+
+### Connection Issues
+
+```bash
+# Test Prometheus connectivity
+curl -s http://localhost:9090/api/v1/query?query=up
+
+# Check with authentication
+curl -H "Authorization: Bearer $PROM_TOKEN" \
+  https://prometheus.example.com/api/v1/query?query=up
+```
+
+### SSL Certificate Issues
+
+```bash
+# Disable SSL verification (not recommended for production)
+export PROM_VERIFY_SSL="false"
+prometheus-mcp-server
+
+# Or use command-line flag
+prometheus-mcp-server --no-verify-ssl
+```
+
+### Timeout Issues
+
+```bash
+# Increase timeout for slow queries
+export PROM_TIMEOUT="60"
+prometheus-mcp-server
+
+# Or use command-line flag
+prometheus-mcp-server --timeout 60
+```
+
+### Debug Mode
+
+Enable debug logging:
+
+```bash
+# Set log level
+export LOG_LEVEL="DEBUG"
+prometheus-mcp-server
+```
+
+## Examples
+
+### Example Configuration Files
+
+#### Claude Desktop Config (macOS)
+
+`~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "prometheus-local": {
+      "command": "prometheus-mcp-server",
+      "env": {
+        "PROM_URL": "http://localhost:9090"
+      }
+    },
+    "prometheus-prod": {
+      "command": "prometheus-mcp-server",
+      "env": {
+        "PROM_URL": "https://prometheus.prod.example.com",
+        "PROM_TOKEN": "prod_bearer_token",
+        "PROM_TIMEOUT": "60"
+      }
+    }
+  }
+}
+```
+
+#### Linux Config
+
+`~/.config/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "prometheus": {
+      "command": "/home/user/.local/bin/prometheus-mcp-server",
+      "env": {
+        "PROM_URL": "http://localhost:9090"
+      }
+    }
+  }
+}
+```
+
+### Example Queries
+
+#### Investigate High Memory Alert
+
+```
+User: "The HighMemoryUsage alert is firing. Help me investigate."
+
+AI uses:
+1. list_alerts() - See all active alerts
+2. query_instant(query='container_memory_usage{job="api"}') - Check current usage
+3. query_range(query='container_memory_usage{job="api"}', start="now-6h", end="now") - See trend
+4. list_rules(type="alert") - Check alert threshold
+```
+
+#### Find Top CPU Consumers
+
+```
+User: "Which pods are using the most CPU?"
+
+AI uses:
+1. query_instant(query='topk(10, rate(container_cpu_usage_seconds_total[5m]))') - Top 10 CPU users
+2. get_label_values(label="pod") - List all pods
+3. query_range(...) - Check trend over time
+```
+
+#### Check Service Health
+
+```
+User: "Is the API service healthy?"
+
+AI uses:
+1. query_instant(query='up{job="api-server"}') - Check if targets are up
+2. list_targets(state="active") - See all active targets
+3. query_instant(query='rate(http_requests_total{job="api",status=~"5.."}[5m])') - Check error rate
+4. list_alerts() - Check for any alerts
+```
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure code passes `ruff` checks
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/your-org/prometheus-mcp-server/issues)
+- **Prometheus Docs**: https://prometheus.io/docs/
+- **PromQL Guide**: https://prometheus.io/docs/prometheus/latest/querying/basics/
+- **MCP Documentation**: https://modelcontextprotocol.io/
+
+## Related Projects
+
+- [Datadog MCP Server](../datadog-mcp-server/) - MCP server for Datadog
+- [Grafana MCP Server](../grafana-mcp-server/) - MCP server for Grafana
+
+## Acknowledgments
+
+- Built with [FastMCP](https://github.com/jlowin/fastmcp)
+- Follows [Model Context Protocol](https://modelcontextprotocol.io/) specification
+- Inspired by the Prometheus community's excellent API design
