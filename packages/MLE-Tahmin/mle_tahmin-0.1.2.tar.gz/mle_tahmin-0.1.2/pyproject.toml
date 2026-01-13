@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MLE-Tahmin"
+version = "0.1.2"
+description = "Aktüerya için MLE parametre tahmin aracı (Gamma, Pareto, Lomax)"
+authors = [
+    { name = "Melih Karagülmez" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas"
+]
+
+[tool.setuptools]
+packages = ["mletahmin"]
