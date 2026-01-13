@@ -1,0 +1,1 @@
+"""YAML writer (MVP skeleton)."""
