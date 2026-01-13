@@ -1,0 +1,40 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: 1.92.0
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang pkg-config libavcodec-dev libavformat-dev libavfilter-dev libavdevice-dev libswresample-dev libswscale-dev
+    - name: Create Python virtual environment
+      run: pip install maturin numpy
+    - name: Build
+      run: cargo build --features ffmpeg --release
+    - name: Run tests
+      run: cargo test --features ffmpeg --release
+    - uses: PyO3/maturin-action@v1
+      with:
+        command: build
+        args: -F python -F ffmpeg -r

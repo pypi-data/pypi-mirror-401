@@ -1,0 +1,15 @@
+[build-system]
+requires = ["maturin>=1.5"]
+build-backend = "maturin"
+
+[project]
+name = "pyaudiostream"
+version = "0.0.2"
+requires-python = ">=3.8"
+dependencies = ["numpy>=1.20"]
+
+[tool.maturin]
+features = ["python", "ffmpeg"]
+module-name = "pyaudiostream"
+
+
