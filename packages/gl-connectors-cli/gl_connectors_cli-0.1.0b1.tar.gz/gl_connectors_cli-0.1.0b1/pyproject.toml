@@ -1,0 +1,42 @@
+[project]
+name = "gl-connectors-cli"
+version = "0.1.0b1"
+description = ""
+authors = [{name = "GL Connectors Team", email="bosa-eng@gdplabs.id"}]
+readme = "README.md"
+requires-python = ">=3.11, <3.14"
+dependencies = [
+    "requests>=2.31.0,<3.0.0",
+    "pydantic>=2.11.7,<3.0.0",
+]
+
+[project.scripts]
+glcon = "gl_connectors_cli.main:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.7",
+    "mypy>=1.17.0",
+    "pre-commit>=4.2.0",
+    "pip-tools>=7.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = ["C901", "E266"]
+select = ["B", "B9", "C", "D", "E", "F", "I", "PL", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "PLR"]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple/"
+priority = "primary"
