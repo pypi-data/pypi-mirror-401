@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tpu-inl"
+version = "0.2.2"
+description = "Cross-platform Integrator Neuron Layer acceleration for TPU, CUDA, AMD, Intel, DirectML"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Pacific Prime", email = "contact@pacific-prime.ai"}
+]
+keywords = ["deep-learning", "pytorch", "tpu", "cuda", "amd", "inference", "acceleration"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.21.0",
+]
+
+[project.optional-dependencies]
+cuda = [
+    "triton>=2.0.0",
+]
+tpu = [
+    "jax[tpu]>=0.4.0",
+]
+amd = [
+    "triton>=2.0.0",
+]
+intel = [
+    "intel-extension-for-pytorch>=2.0.0",
+]
+directml = [
+    "torch-directml>=0.2.0",
+]
+all = [
+    "triton>=2.0.0",
+    "jax>=0.4.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Web3-League/tpu-inl"
+Repository = "https://github.com/Web3-League/tpu-inl"
+Issues = "https://github.com/Web3-League/tpu-inl/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tpu_inl*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
