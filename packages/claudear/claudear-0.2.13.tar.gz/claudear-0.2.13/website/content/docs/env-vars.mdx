@@ -1,0 +1,184 @@
+---
+title: Environment Variables
+description: Complete reference of all environment variables
+section: Reference
+order: 10
+---
+
+# Environment Variables
+
+Complete reference of all environment variables supported by Claudear.
+
+## Linear Integration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `LINEAR_API_KEY` | Yes* | - | Linear API key for authentication |
+| `LINEAR_WEBHOOK_SECRET` | Yes* | - | Secret for webhook signature verification |
+| `LINEAR_TEAM_ID` | Yes* | - | Single team key (e.g., `ENG`) |
+| `LINEAR_TEAM_IDS` | No | - | Multiple teams, comma-separated (e.g., `ENG,INFRA`) |
+
+*Required if using Linear provider
+
+### Per-Team Repository Paths
+
+When using multiple teams, specify a repository for each:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `LINEAR_{TEAM}_REPO` | Yes* | Repository path for team (e.g., `LINEAR_ENG_REPO`) |
+
+*Required when using `LINEAR_TEAM_IDS`
+
+### Linear Workflow States
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LINEAR_STATE_TODO` | `Todo` | State name that triggers task pickup |
+| `LINEAR_STATE_IN_PROGRESS` | `In Progress` | State name while working |
+| `LINEAR_STATE_IN_REVIEW` | `In Review` | State name after PR creation |
+| `LINEAR_STATE_DONE` | `Done` | State name for completion |
+
+## Notion Integration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `NOTION_API_KEY` | Yes* | - | Notion Internal Integration Token |
+| `NOTION_DATABASE_ID` | Yes* | - | Single database ID |
+| `NOTION_DATABASE_IDS` | No | - | Multiple databases, comma-separated |
+| `NOTION_POLL_INTERVAL` | No | `5` | Seconds between polling |
+
+*Required if using Notion provider
+
+### Per-Database Repository Paths
+
+When using multiple databases, specify a repository for each:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NOTION_{DB_ID}_REPO` | Yes* | Repository path for database (uppercase, no hyphens) |
+
+*Required when using `NOTION_DATABASE_IDS`
+
+Example: For database ID `2e4f8bda-3c86-8108-ba21-f53fbb73d9ae`, use:
+```bash
+NOTION_2E4F8BDA3C868108BA21F53FBB73D9AE_REPO=/path/to/repo
+```
+
+### Notion Status Values
+
+Claudear auto-detects common status names (Todo, In Progress, Done, etc.). For custom status names, use per-database overrides:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NOTION_{DB}_STATUS_TODO` | `Todo` | Status that triggers task pickup |
+| `NOTION_{DB}_STATUS_IN_PROGRESS` | `In Progress` | Status while working |
+| `NOTION_{DB}_STATUS_IN_REVIEW` | `In Review` | Status after PR creation |
+| `NOTION_{DB}_STATUS_DONE` | `Done` | Completion status |
+
+Replace `{DB}` with the database ID (uppercase, hyphens removed).
+
+## Repository
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `REPO_PATH` | Yes* | - | Default repository path (single instance) |
+| `GITHUB_TOKEN` | Yes | - | GitHub token for PR creation |
+
+*Required when using single team/database mode. PRs are created against the default branch (`main`).
+
+## Server
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `WEBHOOK_PORT` | No | `8000` | Port for webhook server |
+| `WEBHOOK_HOST` | No | `0.0.0.0` | Host to bind server to |
+
+## ngrok
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `NGROK_AUTHTOKEN` | Yes* | - | ngrok auth token for tunneling |
+
+*Required for Linear provider (webhooks need public URL)
+
+## Task Management
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `MAX_CONCURRENT_TASKS` | No | `5` | Maximum parallel tasks |
+| `COMMENT_POLL_INTERVAL` | No | `30` | Seconds between comment polls |
+| `BLOCKED_TIMEOUT` | No | `3600` | Seconds before blocked task times out |
+
+## Database
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DB_PATH` | No | `claudear.db` | Path to SQLite database |
+
+## Logging
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `LOG_LEVEL` | No | `INFO` | Logging level |
+
+## Example: Full Multi-Provider Configuration
+
+```bash
+# =============================================================================
+# LINEAR PROVIDER - Multiple Teams
+# =============================================================================
+LINEAR_API_KEY=lin_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+LINEAR_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+LINEAR_TEAM_IDS=ENG,INFRA,DESIGN
+
+# Per-team repositories
+LINEAR_ENG_REPO=/Users/dev/engineering-repo
+LINEAR_INFRA_REPO=/Users/dev/infrastructure-repo
+LINEAR_DESIGN_REPO=/Users/dev/design-system-repo
+
+# Linear workflow states (optional - defaults shown)
+LINEAR_STATE_TODO=Todo
+LINEAR_STATE_IN_PROGRESS=In Progress
+LINEAR_STATE_IN_REVIEW=In Review
+LINEAR_STATE_DONE=Done
+
+# =============================================================================
+# NOTION PROVIDER - Multiple Databases
+# =============================================================================
+NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_DATABASE_IDS=abc123,def456
+NOTION_POLL_INTERVAL=5
+
+# Per-database repositories
+NOTION_ABC123_REPO=/Users/dev/project-alpha-repo
+NOTION_DEF456_REPO=/Users/dev/project-beta-repo
+
+# Notion status values (optional - auto-detected by default)
+# Use per-database overrides if needed:
+# NOTION_ABC123_STATUS_TODO=Next Up
+# NOTION_ABC123_STATUS_DONE=Complete
+
+# =============================================================================
+# SHARED SETTINGS
+# =============================================================================
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NGROK_AUTHTOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Task settings
+MAX_CONCURRENT_TASKS=5
+BLOCKED_TIMEOUT=3600
+
+# Server
+WEBHOOK_PORT=8000
+
+# Logging
+LOG_LEVEL=INFO
+```
+
+## Security Notes
+
+- Never commit `.env` files to version control
+- Use secrets management in production
+- Rotate API keys periodically
+- Limit API key permissions to minimum required
