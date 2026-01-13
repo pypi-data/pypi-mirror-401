@@ -1,0 +1,102 @@
+* website: [Website](https://arrizza.com/pyalamake.html)
+* installation: [Common Setup](https://arrizza.com/setup-common.html)
+
+## Summary
+
+This Python module generates a multi-target Makefile for cross-platform projects all of which is compatible with
+JetBrain's Clion IDE.
+
+For example, see gen.py for a Python script (gen.py) that generates:
+
+* two Arduino projects and an Arduino core for them
+* a GTest project to run UTs against an Arduino Project
+* a C/++ project
+* SWIG projects
+* C/C++ shared and static libraries
+* see ```doc/example-makefile.md``` for more details
+
+all into one Makefile, and all recognized by CLion.
+
+See also gen_3cores.py that shows how to build 3 Arduino on 3 different boards in the same project and same Makefile.
+
+## Recent updates
+
+* It now uses arduino-cli. This made the arduino target handling cross-platform (roughly speaking).
+  The gen.py file is the same across all three platforms (ubuntu, macos, win/msys2)
+* Added ./do_test_deps. This does a check of all targets and associated targets
+  to ensure they work independently of each other i.e. the target dependencies are correct.
+* cleaned up this README.md and added more documentation in the ```doc``` directory,
+  for example see ```doc/api.md``` for a list of commands available for use in gen.py
+
+## Why not CMake?
+
+I use JetBrain's CLion. It can handle only a CMake or Makefile based project.
+
+Also, I like to use GTest to UT my Arduino projects (if possible). But CMake can't handle a project that uses
+two compilers i.e. avr-gcc for Arduino and gcc for GTest. It tried some different CMake techniques
+to allow that but they either didn't work or CLion still did not recognize the components being used.
+
+The only option then was to use Python to generate a Makefile that CLion was compatible with.
+
+## Why not ninja instead of make?
+
+Because CLion can't use that to self-configure. CMake in CLion can be configured to use
+Ninja, but the IDE uses CMake to configure itself for the project. Therefore, Makefile.
+
+## Why?
+
+Currently, I have relatively simple projects using one Arduino and some GTest UTs. But I do have some
+projects that could use multiple Arduino's communicating with each other. And possibly some other
+microcontrollers e.g. STM32, ESP32, etc. that communicate with Arduino's or themselves.
+
+CLion can't handle that.
+
+But (finger crossed) I should be able to extend pyalamake to build STM32 and ESP32 targets relatively easily,
+still allow GTests for those microcontrollers, etc.
+
+## Limitations
+
+* See todo.md for more work to be done.
+* tested with an Arduino Nano (boardid: nano-atmega328old),
+  Arduino MegaADK (boardid: megaadk) and Arduino Uno (boardid: uno).
+  Other boards should work correctly, but there is always a possibility it fails.
+* I have not tested using an Arduino programmer
+* I have not tested an app that requires Arduino EEPROM uploads.
+
+## How to use
+
+See ```doc/example-makefile.md``` for detailed explanation of the current makefile.
+
+See ```doc/convert-from-cmake.md``` for examples of converting Arduino cmake into gen.py.
+
+* Check tools/arduino_reqmts.txt for Arduino libraries needed for this project:
+
+```text
+Servo
+```
+
+Run ./do_install to install them:
+
+```bash
+<snip>
+OK   do_arduino_install: install rc=0 Servo
+     do_arduino_install: libraries installed
+ --  1] Name  Installed     Available         Location Description
+ --  2] Servo 1.3.0         -                 user     -
+ --  3] 
+     do_install: arduino_install rc=0
+<snip>     
+```
+
+* run ```./do_gen```.
+  This takes gen.py and uses pyalamake to generate all the defined targets.
+  It will generate two files:
+
+    * Makefile - a top level makefile that handles including the correct
+      makefile for the current OS.
+    * One of Makefile.ubuntu, Makefile.macos, Makefile.win - the OS specific makefile
+
+* run ```make help``` to confirm that all of the targets have been generated
+* run ```make xx``` to run build a specific target.
+* if the target is executable, use ```make xx-run```.
+  See ```doc/example-makefile.md``` for examples of how to add CLI arguments 
