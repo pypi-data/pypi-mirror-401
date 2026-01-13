@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "generate-it"
+version = "0.2.0"
+description = "Terminal credential generator with a curses-based TUI."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "windows-curses; platform_system == 'Windows'",
+  "platformdirs>=3.0.0",
+  "cryptography>=41.0.0",
+  "pyperclip>=1.8.0",
+]
+license = { file = "LICENSE" }
+authors = [{ name = "j-kemble" }]
+keywords = ["password", "passphrase", "username", "curses"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: OS Independent",
+  "Environment :: Console :: Curses",
+  "Intended Audience :: End Users/Desktop",
+  "Topic :: Utilities",
+]
+
+[project.optional-dependencies]
+# Test suite dependencies (not required to run the app).
+test = ["pytest>=7"]
+
+[project.scripts]
+generate-it = "generate_it.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/j-kemble/Generate-It"
+Repository = "https://github.com/j-kemble/Generate-It"
+Issues = "https://github.com/j-kemble/Generate-It/issues"
+
+[tool.setuptools]
+packages = ["generate_it"]
+
+[tool.setuptools.package-data]
+generate_it = ["wordlist.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
