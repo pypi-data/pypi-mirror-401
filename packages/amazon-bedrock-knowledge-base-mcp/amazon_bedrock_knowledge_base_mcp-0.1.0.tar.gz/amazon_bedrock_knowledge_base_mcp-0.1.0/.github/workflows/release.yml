@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Pin workspace to workflow SHA
+        run: git reset --hard ${{ github.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Semantic release
+        id: release
+        uses: python-semantic-release/python-semantic-release@v10.2.0
+        with:
+          github_token: ${{ secrets.RELEASE_TOKEN }}
+          build: false
+
+      - name: Build distributions
+        if: steps.release.outputs.released == 'true'
+        run: uv build
+
+      - name: Publish to PyPI (Trusted Publishing)
+        if: steps.release.outputs.released == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
