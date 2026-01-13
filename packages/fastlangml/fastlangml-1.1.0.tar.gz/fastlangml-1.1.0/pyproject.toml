@@ -1,0 +1,132 @@
+[project]
+name = "fastlangml"
+version = "1.1.0"
+description = "FastLangML: High-accuracy language detection for chat, SMS & conversational text. Ensemble of FastText, Lingua, langdetect, CLD3 with context tracking, code-switching detection & 170+ languages."
+readme = "README.md"
+license = "MIT"
+authors = [{name = "PRajan"}]
+requires-python = ">=3.10,<4.0"
+keywords = [
+    "language-detection",
+    "language-identification",
+    "langid",
+    "detect-language",
+    "nlp",
+    "natural-language-processing",
+    "fasttext",
+    "fasttext-langdetect",
+    "lingua",
+    "lingua-language-detector",
+    "langdetect",
+    "pycld3",
+    "cld3",
+    "text-classification",
+    "conversational-ai",
+    "chatbot",
+    "multilingual",
+    "polyglot",
+    "code-switching",
+    "spanglish",
+    "ensemble",
+    "machine-learning",
+    "sms",
+    "chat",
+    "customer-service",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "cachetools>=5.0.0",
+    "tomli>=2.0.0; python_version < '3.11'",
+]
+
+[project.urls]
+Homepage = "https://github.com/pnrajan/FastLangML"
+Repository = "https://github.com/pnrajan/FastLangML"
+Issues = "https://github.com/pnrajan/FastLangML/issues"
+Documentation = "https://github.com/pnrajan/FastLangML#readme"
+
+[project.scripts]
+fastlangml = "fastlangml.cli.main:main"
+
+[project.optional-dependencies]
+fasttext = ["fasttext-langdetect>=1.0.5", "numpy<2"]
+fastlangid = ["fastlangid>=1.0.11"]
+langdetect = ["langdetect>=1.0.9"]
+lingua = ["lingua-language-detector>=2.0.0"]
+pycld3 = ["pycld3>=0.22"]
+langid = ["langid>=1.1.6"]
+diskcache = ["diskcache>=5.0.0"]
+redis = ["redis>=4.0.0"]
+spacy = ["spacy>=3.5.0"]
+fuzzy = ["rapidfuzz>=3.0.0"]
+toml = ["tomli-w>=1.0.0"]
+all = [
+    "fasttext-langdetect>=1.0.5",
+    "numpy<2",
+    "fastlangid>=1.0.11",
+    "langdetect>=1.0.9",
+    "lingua-language-detector>=2.0.0",
+    "pycld3>=0.22",
+    "langid>=1.1.6",
+    "spacy>=3.5.0",
+    "rapidfuzz>=3.0.0",
+    "diskcache>=5.0.0",
+    "redis>=4.0.0",
+]
+
+[tool.poetry]
+packages = [{include = "fastlangml", from = "src"}]
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0"
+pytest-cov = ">=4.0"
+mypy = ">=1.0"
+ruff = ">=0.1.0"
+twine = ">=4.0"
+build = ">=1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+ignore_missing_imports = true
+disable_error_code = ["import-untyped", "no-untyped-def", "no-untyped-call", "attr-defined", "assignment", "arg-type", "return-value", "dict-item", "name-defined", "unused-ignore"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+markers = [
+    "benchmark: marks tests as benchmark tests (deselect with '-m \"not benchmark\"')",
+]
