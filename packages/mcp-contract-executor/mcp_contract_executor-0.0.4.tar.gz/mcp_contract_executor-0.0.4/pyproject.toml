@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "mcp-contract-executor"
+version = "0.0.4"
+description = "Minimal contract-first MCP server"
+authors = ["Codex Agent <agent@example.com>"]
+readme = "README.md"
+packages = [{ include = "mcp_contract_executor", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mcp = "1.25.0"
+fastmcp = ">=0.3.0,<0.4.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.10"
+
+[tool.poetry.scripts]
+mcp-contract-executor = "mcp_contract_executor.server:run_server"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
