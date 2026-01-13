@@ -1,0 +1,34 @@
+[project]
+name = "replicate-nano-banana-mcp"
+version = "0.1.0"
+description = "MCP server for generating images using Google's Nano Banana Pro model via Replicate"
+readme = "README.md"
+authors = [
+    { name = "sugarforever", email = "william.1022@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.0.0",
+    "replicate>=1.0.0",
+]
+keywords = ["mcp", "replicate", "image-generation", "ai", "nano-banana"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/sugarforever/replicate-nano-banana-mcp"
+Repository = "https://github.com/sugarforever/replicate-nano-banana-mcp"
+
+[project.scripts]
+replicate-nano-banana-mcp = "replicate_nano_banana_mcp.server:main"
+nano-banana-cli = "replicate_nano_banana_mcp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
