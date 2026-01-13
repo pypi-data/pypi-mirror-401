@@ -1,0 +1,106 @@
+graph LR
+    %% Styles
+    classDef Agents fill:#ffeba1,stroke:#d4b106,color:#333;
+    classDef Core fill:#e1f5fe,stroke:#0288d1,color:#333;
+    classDef Services fill:#e8f5e9,stroke:#388e3c,color:#333;
+    classDef Managers fill:#f3e5f5,stroke:#8e24aa,color:#333;
+    classDef Cli fill:#fbe9e7,stroke:#d84315,color:#333;
+    classDef Acp fill:#e0f2f1,stroke:#009688,color:#333;
+    classDef Mcp fill:#fce4ec,stroke:#c2185b,color:#333;
+    classDef Utils fill:#f1f8e9,stroke:#689f38,color:#333;
+    classDef Repositories fill:#fff9c4,stroke:#fbc02d,color:#333;
+    classDef Schemas fill:#e0f7fa,stroke:#00acc1,color:#333;
+    classDef category fill:#fff,stroke:#333,color:#333;
+    subgraph Acp
+    acp_server[server.py]:::Acp
+    acp_client[client.py]:::Acp
+    acp_start_server[start_server.py]:::Acp
+    end
+    subgraph Agents
+    agents_task[task.py]:::Agents
+    agents_documentation[documentation.py]:::Agents
+    agents_execution[execution.py]:::Agents
+    agents_error[error.py]:::Agents
+    agents_coding[coding.py]:::Agents
+    agents_base_agent[base_agent.py]:::Agents
+    agents_orchestrator[orchestrator.py]:::Agents
+    agents_file_modifier[file_modifier.py]:::Agents
+    agents_planning[planning.py]:::Agents
+    end
+    subgraph Benchmarks
+    benchmarks_run_benchmark[run_benchmark.py]:::Benchmarks
+    end
+    subgraph Cli
+    cli_main[main.py]:::Cli
+    end
+    subgraph Context
+    context_project_context[project_context.py]:::Context
+    end
+    subgraph Core
+    core_logging[logging.py]:::Core
+    core_config[config.py]:::Core
+    core_database[database.py]:::Core
+    end
+    subgraph Integrations
+    integrations_git_manager[git_manager.py]:::Integrations
+    end
+    subgraph Managers
+    managers_storage_manager[storage_manager.py]:::Managers
+    managers_project_manager[project_manager.py]:::Managers
+    end
+    subgraph Mcp
+    mcp_server[server.py]:::Mcp
+    end
+    subgraph Models
+    models_database[database.py]:::Models
+    models_db_models[db_models.py]:::Models
+    models_project[project.py]:::Models
+    end
+    subgraph Other
+    main[main.py]:::Other
+    end
+    subgraph Repositories
+    repositories_project[project.py]:::Repositories
+    end
+    subgraph Schemas
+    schemas_project[project.py]:::Schemas
+    end
+    subgraph Services
+    services_llm_service[llm_service.py]:::Services
+    services_prompt_service[prompt_service.py]:::Services
+    services_project[project.py]:::Services
+    end
+    subgraph Ui
+    ui_plan_review[plan_review.py]:::Ui
+    end
+    subgraph Utils
+    utils_token_manager[token_manager.py]:::Utils
+    utils_logger[logger.py]:::Utils
+    utils_validation[validation.py]:::Utils
+    end
+    benchmarks_run_benchmark --> agents_orchestrator
+    acp_start_server --> agents_planning
+    acp_start_server --> agents_coding
+    acp_start_server --> agents_execution
+    acp_start_server --> agents_task
+    acp_start_server --> agents_error
+    acp_start_server --> acp_server
+    managers_storage_manager --> managers_project_manager
+    managers_project_manager --> models_database
+    agents_documentation --> agents_base_agent
+    agents_documentation --> context_project_context
+    agents_documentation --> core_logging
+    agents_error --> services_prompt_service
+    agents_coding --> services_prompt_service
+    agents_coding --> utils_token_manager
+    agents_coding --> core_config
+    agents_base_agent --> core_logging
+    agents_base_agent --> core_config
+    agents_orchestrator --> acp_client
+    agents_planning --> services_prompt_service
+    repositories_project --> schemas_project
+    models_database --> models_db_models
+    cli_main --> context_project_context
+    acp_server --> agents_orchestrator
+    services_project --> schemas_project
+    services_project --> repositories_project
