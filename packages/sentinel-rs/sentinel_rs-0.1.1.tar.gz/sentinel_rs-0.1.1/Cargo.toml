@@ -1,0 +1,16 @@
+[package]
+name = "sentinel-rs"
+version = "0.1.0"
+edition = "2024"
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "sentinel_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.27.0", features = ["extension-module"] }
+rayon = "1.10"
+regex = "1.11"
+memmap2 = "0.9"
