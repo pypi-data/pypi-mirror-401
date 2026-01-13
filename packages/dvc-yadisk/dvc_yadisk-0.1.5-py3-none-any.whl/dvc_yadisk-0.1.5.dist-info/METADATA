@@ -1,0 +1,171 @@
+Metadata-Version: 2.4
+Name: dvc-yadisk
+Version: 0.1.5
+Summary: Yandex Disk remote storage plugin for DVC
+Project-URL: Homepage, https://github.com/suro4ek/dvc-yadisk
+Project-URL: Repository, https://github.com/suro4ek/dvc-yadisk
+Project-URL: Issues, https://github.com/suro4ek/dvc-yadisk/issues
+Author-email: suro4ek <timu.zaxarov@gmail.com>
+License-Expression: Apache-2.0
+License-File: LICENSE
+Keywords: data-version-control,dvc,mlops,storage,yadisk,yandex,yandex-disk
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Requires-Dist: dvc>=3.0.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: yadisk>=3.0.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21; extra == 'dev'
+Requires-Dist: pytest-mock>=3.10; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# dvc-yadisk
+
+Yandex Disk remote storage plugin for [DVC](https://dvc.org) (Data Version Control).
+
+## Installation
+
+```bash
+# Using uv
+uv add dvc-yadisk
+
+# Using pip
+pip install dvc-yadisk
+```
+
+After installation, enable the plugin:
+
+```bash
+# Run the enable script to register the plugin with DVC
+dvc-yadisk-enable
+```
+
+This creates a `sitecustomize.py` file in your Python environment that loads the plugin automatically when DVC starts.
+
+## Configuration
+
+### 1. Get Yandex Disk OAuth Token
+
+1. Go to [Yandex Poginon](https://yandex.ru/dev/disk/poligon)
+2. Create a token
+3. Copy the token
+
+### 2. Configure DVC Remote
+
+```bash
+# Add a Yandex Disk remote
+dvc remote add -d myremote yadisk://my-dvc-data
+
+# Set the OAuth token (use --local to avoid committing token to git)
+dvc remote modify --local myremote token YOUR_OAUTH_TOKEN
+```
+
+Or use environment variable:
+
+```bash
+export YADISK_TOKEN=YOUR_OAUTH_TOKEN
+```
+
+### 3. Use DVC as Normal
+
+```bash
+# Track data
+dvc add data/
+
+# Push to Yandex Disk
+dvc push
+
+# Pull from Yandex Disk
+dvc pull
+```
+
+## Configuration Options
+
+| Option | Environment Variable | Description |
+|--------|---------------------|-------------|
+| `token` | `YADISK_TOKEN` | OAuth access token (required) |
+
+## Example Usage
+
+```python
+from dvc_yadisk import YaDiskFileSystem
+
+# Create filesystem instance
+fs = YaDiskFileSystem(token="your_oauth_token")
+
+# List files
+files = fs.ls("my-folder")
+
+# Check if file exists
+exists = fs.exists("my-folder/data.csv")
+
+# Read file
+data = fs.cat_file("my-folder/data.csv")
+
+# Write file
+fs.pipe_file("my-folder/output.txt", b"Hello, World!")
+```
+
+### Async Usage
+
+```python
+import asyncio
+from dvc_yadisk import get_async_filesystem
+
+async def main():
+    AsyncFS = get_async_filesystem()
+    fs = AsyncFS(token="your_oauth_token")
+
+    # List files
+    files = await fs.ls("my-folder")
+
+    # Read file
+    data = await fs.cat_file("my-folder/data.csv")
+
+asyncio.run(main())
+```
+
+## Limitations
+
+- Maximum file size: 1GB (50GB for Yandex 360 subscribers)
+- Upload URLs are valid for 30 minutes
+- API rate limits apply
+
+## Development
+
+```bash
+# Clone repository
+git clone https://github.com/Suro4ek/dvc-yadisk.git
+cd dvc-yadisk
+
+# Install with dev dependencies
+uv sync --dev
+
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=dvc_yadisk
+
+# Type checking
+uv run mypy src/dvc_yadisk
+
+# Linting
+uv run ruff check src/dvc_yadisk
+```
+
+
+## License
+
+Apache License 2.0
