@@ -1,0 +1,279 @@
+Metadata-Version: 2.4
+Name: telos-tracker
+Version: 0.1.7
+Summary: AI-powered screen time tracker with intelligent activity analysis. Install: pip install telos-tracker && telos setup
+Project-URL: Homepage, https://github.com/yourusername/telos
+Project-URL: Documentation, https://github.com/yourusername/telos#readme
+Project-URL: Repository, https://github.com/yourusername/telos
+Project-URL: Issues, https://github.com/yourusername/telos/issues
+Author-email: Telos Team <hello@telos.app>
+License-Expression: MIT
+Keywords: activity-tracking,ai,gemini,productivity,screen-time,time-management,tracker
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Office/Business
+Classifier: Topic :: System :: Monitoring
+Requires-Python: >=3.8
+Requires-Dist: google-genai>=1.0.0
+Requires-Dist: imagehash>=4.3.1
+Requires-Dist: mss>=9.0.1
+Requires-Dist: pillow>=10.1.0
+Requires-Dist: pynput>=1.7.6
+Requires-Dist: pywin32>=306; sys_platform == 'win32'
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: requests>=2.31.0
+Requires-Dist: rich>=13.7.0
+Requires-Dist: textual>=0.47.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: flake8>=6.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Telos Client (Python)
+
+This is the Telos desktop client - a Python TUI application for tracking screen activity.
+
+## Quick Start
+
+### Option 1: pip install (Recommended)
+
+```bash
+pip install telos-tracker
+telos setup
+telos
+```
+
+Your data is stored in `~/.telos/`.
+
+### Option 2: From Source (Development)
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run setup wizard
+python main.py setup
+
+# Start the TUI
+python main.py
+
+# Run as background service
+python service.py start
+```
+
+## Development
+
+See the main repository README for full documentation: [`../README.md`](../README.md)
+
+## Structure
+
+- `core/` - Core functionality (capture, analysis, database)
+- `tui/` - Terminal user interface (Textual framework)
+- `utils/` - Shared utilities
+- `prompts/` - AI prompts for Gemini
+
+## Configuration
+
+Copy `config.yaml.example` to `config.yaml` and fill in your settings:
+
+```bash
+cp config.yaml.example config.yaml
+# Edit config.yaml with your Gemini API key
+```
+
+Get your Gemini API key from: https://aistudio.google.com/app/apikey
+
+## Features
+
+- 📸 **Automatic Screenshot Capture** - Every 30 seconds (configurable)
+- 🤖 **AI-Powered Analysis** - Gemini Vision understands what you're working on
+- 📊 **Smart Session Building** - Groups activities into meaningful sessions
+- 💬 **AI Chat Interface** - Ask questions about your work patterns
+- 📧 **Daily Email Reports** - Beautiful summaries via Gmail
+- 🖥️ **Terminal UI** - Clean, responsive TUI with real-time updates
+- 🔒 **Privacy-First** - Screenshots analyzed and immediately deleted
+
+## Usage
+
+### TUI Mode (Default)
+```bash
+python main.py
+```
+
+**Keyboard shortcuts:**
+- **D** - Dashboard (main view)
+- **T** - Timeline (session view)
+- **S** - Summary (daily insights)
+- **C** - Settings
+- **A** - AI Chat (query your data)
+- **G** - Edit analysis goals
+- **Q** - Quit
+
+### CLI Commands
+```bash
+python main.py setup              # First-time setup
+python main.py test               # Test capture loop
+python main.py stats              # Show statistics
+python main.py set-goals          # Configure analysis goals
+python main.py build-sessions     # Manual session building
+python main.py generate-summary   # Generate daily summary
+python main.py test-email         # Test email configuration
+```
+
+### Background Service
+
+**Windows:**
+```bash
+python main.py service-console    # Run as daemon (test mode)
+python main.py install-service    # Install Windows service
+python main.py start-service      # Start service
+python main.py stop-service       # Stop service
+```
+
+**macOS:**
+```bash
+python main.py service-console    # Run as daemon (test mode)
+python main.py install-service    # Install LaunchAgent
+python main.py start-service      # Start service
+python main.py stop-service       # Stop service
+python main.py service-status     # Check service status
+```
+
+## Building Standalone Applications
+
+### Windows Build
+
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Build Windows executable and installer
+python build_installer.py
+
+# Output: dist/Telos.exe and TelosSetup-v0.1.0.exe
+```
+
+### macOS Build
+
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Build macOS .app bundle and DMG
+python build_macos.py
+
+# Output: dist/Telos.app and Telos-v0.1.0-beta-macOS.dmg
+```
+
+**macOS Installation:**
+1. Open the DMG file
+2. Drag `Telos.app` to Applications folder
+3. Right-click → Open (first time only, to bypass Gatekeeper)
+4. Grant **Screen Recording** permission when prompted
+5. Grant **Accessibility** permission when prompted
+
+**macOS Permissions:**
+- **Screen Recording** - Required for screenshot capture
+- **Accessibility** - Required for keyboard/mouse activity detection
+
+To grant permissions manually:
+1. Open System Settings → Privacy & Security → Privacy
+2. Select "Screen Recording" → Enable Telos
+3. Select "Accessibility" → Enable Telos
+4. Restart Telos
+
+**Creating an Icon:**
+If you want to customize the macOS icon:
+```bash
+cd macos
+python create_icns.py your-icon.png
+# This creates icon.icns, then rebuild with python build_macos.py
+```
+
+## Technical Details
+
+- **Language:** Python 3.8+
+- **UI Framework:** Textual (async TUI)
+- **Database:** SQLite (3-tier architecture)
+- **AI:** Google Gemini 2.5 Flash
+- **Screenshot:** Pillow + ImageHash (perceptual hashing)
+- **Activity Detection:** pynput (cross-platform)
+
+## Troubleshooting
+
+**"telos is unrecognized" after pip install**
+
+If you get "command not found" or "telos is unrecognized" after installing:
+
+1. **Check if it's installed:**
+   ```bash
+   pip show telos-tracker
+   ```
+
+2. **Try running via Python module:**
+   ```bash
+   python -m telos_tracker.cli help
+   ```
+
+3. **Add Python Scripts to PATH:**
+   - **Windows:** Add `C:\Users\<YourUser>\AppData\Local\Programs\Python\Python3xx\Scripts` to PATH
+   - **Mac/Linux:** Add `~/.local/bin` to PATH in `~/.bashrc` or `~/.zshrc`:
+     ```bash
+     export PATH="$HOME/.local/bin:$PATH"
+     ```
+
+4. **Restart your terminal** after modifying PATH
+
+5. **Or use pipx (recommended for CLI tools):**
+   ```bash
+   pipx install telos-tracker
+   telos help
+   ```
+
+**Configuration Issues**
+- Run `telos setup` (or `python main.py setup`) for guided configuration
+- Check `~/.telos/config.yaml` for correct API key
+
+**API Quota**
+- Free tier: 1500 requests/day
+- Perceptual hashing reduces calls by ~50%
+- Adjust `capture.interval_seconds` in config
+
+**Activity Detection**
+- **macOS**: Grant Screen Recording and Accessibility permissions in System Settings
+  - System Settings → Privacy & Security → Privacy → Screen Recording
+  - System Settings → Privacy & Security → Privacy → Accessibility
+- **Windows**: Run as administrator if needed
+- **Linux**: Check `xinput` permissions
+
+## Status
+
+✅ **Fully Functional** - All features complete and working
+
+This client works standalone with your own Gemini API key. The backend (Node.js) is being built to enable SaaS features (no API key required, cloud sync, etc.).
+
+---
+
+**For Backend Integration:**
+
+Once the backend is deployed, you can configure the client to use it:
+
+```yaml
+# In config.yaml (future)
+backend:
+  enabled: true
+  url: "https://your-backend.run.app"
+```
+
+The client will then upload screenshots to your backend instead of calling Gemini directly, keeping your AI prompts proprietary.
+
