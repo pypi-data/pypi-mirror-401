@@ -1,0 +1,71 @@
+import json
+import setuptools
+
+kwargs = json.loads(
+    """
+{
+    "name": "cdktn-provider-tls",
+    "version": "11.1.0",
+    "description": "Prebuilt tls Provider for Terraform CDK (cdktf)",
+    "license": "MPL-2.0",
+    "url": "https://github.com/cdktn-io/cdktn-provider-tls.git",
+    "long_description_content_type": "text/markdown",
+    "author": "CDK Terrain Maintainers",
+    "bdist_wheel": {
+        "universal": true
+    },
+    "project_urls": {
+        "Source": "https://github.com/cdktn-io/cdktn-provider-tls.git"
+    },
+    "package_dir": {
+        "": "src"
+    },
+    "packages": [
+        "cdktn_provider_tls",
+        "cdktn_provider_tls._jsii",
+        "cdktn_provider_tls.cert_request",
+        "cdktn_provider_tls.data_tls_certificate",
+        "cdktn_provider_tls.data_tls_public_key",
+        "cdktn_provider_tls.locally_signed_cert",
+        "cdktn_provider_tls.private_key",
+        "cdktn_provider_tls.provider",
+        "cdktn_provider_tls.self_signed_cert"
+    ],
+    "package_data": {
+        "cdktn_provider_tls._jsii": [
+            "provider-tls@11.1.0.jsii.tgz"
+        ],
+        "cdktn_provider_tls": [
+            "py.typed"
+        ]
+    },
+    "python_requires": "~=3.9",
+    "install_requires": [
+        "cdktf>=0.21.0, <0.22.0",
+        "constructs>=10.4.2, <11.0.0",
+        "jsii>=1.119.0, <2.0.0",
+        "publication>=0.0.3",
+        "typeguard>=2.13.3,<4.3.0"
+    ],
+    "classifiers": [
+        "Intended Audience :: Developers",
+        "Operating System :: OS Independent",
+        "Programming Language :: JavaScript",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Typing :: Typed",
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved"
+    ],
+    "scripts": []
+}
+"""
+)
+
+with open("README.md", encoding="utf8") as fp:
+    kwargs["long_description"] = fp.read()
+
+
+setuptools.setup(**kwargs)
