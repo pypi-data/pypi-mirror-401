@@ -1,0 +1,22 @@
+[project]
+name = "devtrace"
+version = "0.1.1"
+description = "A terminal-based work logger."
+readme = "README.md"
+authors = [
+    { name = "Satya", email = "satyanarayanprashar73@gmail.com" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "questionary",
+    "pydantic>=2.12.5",
+]
+
+[project.scripts]
+devtrace = "devtrace.main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
