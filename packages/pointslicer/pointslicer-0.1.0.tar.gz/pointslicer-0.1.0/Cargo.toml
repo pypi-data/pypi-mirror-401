@@ -1,0 +1,40 @@
+[workspace]
+members = ["crates/pointslicer-python"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0"
+
+[workspace.dependencies]
+# LAS/LAZ I/O
+las = { version = "0.8", features = ["laz"] }
+
+# GeoPackage and spatial operations
+gpkg = "0.1"
+rusqlite = { version = "0.27", features = ["bundled"] }
+geo = "0.29"
+geo-types = "0.7"
+wkb = "0.7"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Parallel processing
+rayon = "1.11"
+
+# Logging
+env_logger = "0.11"
+log = "0.4"
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Testing
+assert_cmd = "2.0"
+tempfile = "3.8"
+
+# Python bindings
+pyo3 = { version = "0.27", features = ["extension-module"] }
