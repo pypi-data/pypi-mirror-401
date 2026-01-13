@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-observe', version='0.1.0', description='Observability & Metrics Plugin for HVPDB', packages=find_packages(), install_requires=['hvpdb'], entry_points={'hvpdb.plugins': ['observe = hvpdb_observe:app']})
