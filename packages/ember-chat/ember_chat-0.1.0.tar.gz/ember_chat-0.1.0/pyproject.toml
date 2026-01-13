@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ember-chat"
+version = "0.1.0"
+description = "Simple, open and extensible chat server with plugin system"
+readme = "README.md"
+license = "MIT"  # ← SPDX-идентификатор (строка, не таблица!)
+authors = [
+    {name = "sipm1ner", email = "kirillbelakov2222@gmail.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Communications :: Chat",
+    "Topic :: Internet"
+]
+dependencies = [
+    "websockets >= 12.0",
+    "pyyaml >= 6.0"
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/supminer/emberchat"
+Repository = "https://github.com/supminer/emberchat"
+
+[project.scripts]
+ember-chat = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core", "plugins"]
+exclude = ["clients", "aur", "flatpak", "data", "files", "logs"]
