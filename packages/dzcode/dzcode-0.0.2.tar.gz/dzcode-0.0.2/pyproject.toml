@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=59.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dzcode"
+version = "0.0.2"
+description = "</DZ C0de> Helper Package"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+license = "MIT"
+authors = [
+  { name="msdzulqurnain", email="msdzulqurnain@gmail.com" }
+]
+keywords = ["python", "dzcode", "helper", "package", "utils"]
+
+[project.urls]
+Homepage = "https://github.com/msdzulqurnain/dzcode"
+Issues = "https://github.com/msdzulqurnain/dzcode/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
