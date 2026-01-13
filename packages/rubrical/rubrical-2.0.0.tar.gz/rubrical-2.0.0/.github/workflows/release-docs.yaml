@@ -1,0 +1,28 @@
+name: release-docs
+
+on:
+  push:
+    branches: ["main", "docs/*"]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - name: Configure git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Deploy docs
+        run: |
+          pip install -U pip poetry
+          task docs:release

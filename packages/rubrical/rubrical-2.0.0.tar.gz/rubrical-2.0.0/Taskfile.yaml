@@ -1,0 +1,18 @@
+# https://taskfile.dev
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+includes:
+  docker: ./tasks/docker.yaml
+  docs: ./tasks/docs.yaml
+  integration: ./tasks/integration.yaml
+  python: ./tasks/python.yaml
+
+tasks:
+  default:
+    cmds:
+      - task: python:install
+      - task: python:lint
+      - task: python:test

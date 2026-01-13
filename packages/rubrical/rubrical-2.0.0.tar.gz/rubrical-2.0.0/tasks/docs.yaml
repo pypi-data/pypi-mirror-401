@@ -1,0 +1,24 @@
+version: '3'
+
+tasks:
+  serve:
+    desc: Run mkdocs server locally.
+    cmds:
+      - uv run mkdocs serve
+
+  release:
+    desc: Publish docs to Github Pages.
+    cmds:
+      - uv sync --group dev
+      - uv run mkdocs gh-deploy --force
+
+  test:
+    desc: Make sure docs build.
+    cmds:
+      - uv run mkdocs build --strict
+
+  gen:
+    desc: "Generates CLI docs"
+    cmds:
+      - uv run pip install -U typer-cli
+      - uv run typer rubrical/main.py utils docs --output docs/commands.md

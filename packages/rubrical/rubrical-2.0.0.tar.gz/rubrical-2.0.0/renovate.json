@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "schedule": [
+    "every 2 weeks on friday"
+  ],
+  "automerge": true,
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "matchManagers": ["poetry"],
+      "groupName": "Poetry dependencies"
+    }
+  ]
+}
