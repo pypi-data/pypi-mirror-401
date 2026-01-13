@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flowkit-async"
+version = "1.0.0"
+description = "Fluent async workflows with lazy execution for Python"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "FlowKit Contributors", email = "contributors@flowkit.dev"}
+]
+maintainers = [
+    {name = "FlowKit Contributors", email = "contributors@flowkit.dev"}
+]
+keywords = ["async", "workflow", "simplification", "http", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: AsyncIO",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "httpx>=0.28.0",
+    "anyio>=4.0.0",
+]
+
+[project.optional-dependencies]
+fastapi = ["fastapi>=0.104.0"]
+django = ["django>=4.2.0"]
+flask = ["flask>=2.3.0"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "hypothesis>=6.80.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "pre-commit>=3.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/flowkit/flowkit"
+Documentation = "https://flowkit.readthedocs.io"
+Repository = "https://github.com/flowkit/flowkit"
+"Bug Tracker" = "https://github.com/flowkit/flowkit/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+flowkit = ["py.typed"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+select = ["E", "F", "W", "I", "N", "B", "C90", "UP"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=flowkit --cov-report=term-missing --cov-report=html"
+
+[tool.coverage.run]
+source = ["src/flowkit"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "def __repr__", "raise AssertionError"]
