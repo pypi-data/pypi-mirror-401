@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fast_body_tracker"
+version = "0.1.0"
+description = "Fast depth camera body tracker"
+requires-python = ">=3.10"
+authors = [{name = "Ibai Gorordo" }, {name = "Elia Balugani" }]
+license = "MIT"
+
+dependencies = [
+    "opencv-python>=4.5.5",
+    "numpy>=1.22.2",
+    "pyside6>=6.10.0",
+    "vispy>=0.15.2",
+    "matplotlib>=3.10.8",
+    "pynput>=1.8.1",
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+
+[tool.uv]
+managed = true
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fast_body_tracker"]
+exclude = ["fast_body_tracker/tests/**"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/tests", "/examples", "/doc", "/.venv"]
