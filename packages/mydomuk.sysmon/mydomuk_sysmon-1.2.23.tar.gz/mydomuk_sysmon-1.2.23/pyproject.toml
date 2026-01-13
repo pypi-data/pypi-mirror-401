@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "mydomuk.sysmon.includes.constants.SYSMON_VERSION"}
+dependencies = {file = ["requirements.txt"]}
+
+[project]
+name = "mydomuk.sysmon"
+dynamic = ["version", "dependencies"]
+authors = [
+    {name = "Richard Brent"}
+]
+description = "System Monitor Tool using MQTT"
+readme = {file = "README.md", content-type = "text/markdown"}
+keywords = ["MQTT", "monitoring", "mydomuk"]
+classifiers = [
+    "License :: Free For Home Use",
+    "Programming Language :: Python"
+]
+requires-python = ">=3.7"
