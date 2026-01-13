@@ -1,0 +1,47 @@
+from langchain.tools.retriever import create_retriever_tool
+from langchain_community.tools import TavilySearchResults
+from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_core.tools import tool
+
+# Global vector store to avoid reloading (in a real app, manage lifecycle better)
+_vectorstore = None
+
+def _get_vectorstore():
+    global _vectorstore
+    if _vectorstore is None:
+        print("Loading docs for tool...")
+        loader = DirectoryLoader("./data", glob="**/*.pdf", loader_cls=PyPDFLoader)
+        docs = loader.load()
+        if not docs:
+            # Return empty store or handle error
+            print("No docs found.")
+            return None
+            
+        splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        splits = splitter.split_documents(docs)
+        _vectorstore = Chroma.from_documents(splits, OpenAIEmbeddings())
+    return _vectorstore
+
+def get_retriever_tool():
+    vs = _get_vectorstore()
+    if vs:
+        retriever = vs.as_retriever()
+        return create_retriever_tool(
+            retriever,
+            "search_documents",
+            "Searches and returns excerpts from the local PDF documents."
+        )
+    else:
+        # Fallback dummy tool if no docs
+        @tool
+        def dummy_retriever(query: str):
+            """No documents available."""
+            return "No documents found in data directory."
+        return dummy_retriever
+
+def get_search_tool():
+    # Requires TAVILY_API_KEY
+    return TavilySearchResults(max_results=3)

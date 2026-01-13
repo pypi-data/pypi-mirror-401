@@ -1,0 +1,84 @@
+import os
+from dotenv import load_dotenv
+from typing import List
+
+# LangChain Imports
+from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.vectorstores import Chroma
+from langchain_community.retrievers import BM25Retriever
+from langchain.retrievers import EnsembleRetriever, ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import FlashrankRerank
+from langchain.chains import RetrievalQA
+
+def main():
+    load_dotenv()
+    if not os.getenv("OPENAI_API_KEY"):
+        print("Please set OPENAI_API_KEY in .env file")
+        return
+
+    # 1. Load Data
+    print("Loading documents from ./data...")
+    loader = DirectoryLoader("./data", glob="**/*.pdf", loader_cls=PyPDFLoader)
+    docs = loader.load()
+    if not docs:
+        print("No documents found via DirectoryLoader in ./data")
+        return
+    print(f"Loaded {len(docs)} documents.")
+
+    # 2. Split
+    print("Splitting documents...")
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    splits = text_splitter.split_documents(docs)
+
+    # 3. Embeddings & Vector Store (Dense)
+    print("Initializing Vector Store (Dense)...")
+    embedding = OpenAIEmbeddings()
+    vectorstore = Chroma.from_documents(splits, embedding)
+    dense_retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+
+    # 4. BM25 (Sparse)
+    print("Initializing BM25 (Sparse)...")
+    bm25_retriever = BM25Retriever.from_documents(splits)
+    bm25_retriever.k = 5
+
+    # 5. Ensemble (Hybrid)
+    print("Creating Hybrid Retriever...")
+    ensemble_retriever = EnsembleRetriever(
+        retrievers=[bm25_retriever, dense_retriever],
+        weights=[0.5, 0.5]
+    )
+
+    # 6. Reranking using FlashRank
+    print("Setting up Reranker (FlashRank)...")
+    compressor = FlashrankRerank()
+    compression_retriever = ContextualCompressionRetriever(
+        base_compressor=compressor, base_retriever=ensemble_retriever
+    )
+
+    # 7. QA Chain
+    print("Initializing QA Chain...")
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=compression_retriever,
+        return_source_documents=True
+    )
+
+    # 8. Loop
+    while True:
+        query = input("\n[Advanced RAG] Question (q to quit): ")
+        if query.lower() == 'q':
+            break
+        
+        result = qa_chain.invoke({"query": query})
+        print(f"\nAnswer: {result['result']}")
+        print("\nTop Sources (after reranking):")
+        for i, doc in enumerate(result['source_documents']):
+            source = doc.metadata.get('source', 'Unknown')
+            page = doc.metadata.get('page', 'Unknown')
+            print(f" {i+1}. {source} (Page {page})")
+
+if __name__ == "__main__":
+    main()
