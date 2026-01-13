@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pygrs"
+version = "0.1"
+description = "reverse search similiar images across multiple platforms"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+    {name = "bakachii", email = "thebakachii@gmail.com"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.32.5",
+    "beautifulsoup4>=4.14.3",
+    "fake-useragent>=2.2.0",
+    "urllib3>=2.6.3"
+]
+
+[project.urls]
+"Github" = "https://github.com/Bakachii/PyGRS"
+"Issues" = "https://github.com/Bakachii/PyGRS/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pygrs"]
