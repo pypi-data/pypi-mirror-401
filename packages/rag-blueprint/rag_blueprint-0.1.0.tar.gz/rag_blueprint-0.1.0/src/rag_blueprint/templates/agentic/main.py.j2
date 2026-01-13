@@ -1,0 +1,40 @@
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
+from agent import create_rag_agent
+
+def main():
+    load_dotenv()
+    if not os.getenv("OPENAI_API_KEY"):
+        print("Please set OPENAI_API_KEY in .env file")
+        return
+
+    print("Initializing Agent...")
+    app = create_rag_agent()
+
+    print("Agent Ready! (Type 'q' to quit)")
+    
+    while True:
+        query = input("\n[Agent] User: ")
+        if query.lower() == 'q':
+            break
+        
+        # Stream the output
+        print("\n[Agent] Assistant:", end=" ", flush=True)
+        inputs = {"messages": [HumanMessage(content=query)]}
+        for chunk in app.stream(inputs, stream_mode="values"):
+            message = chunk["messages"][-1]
+            # Print only final response usually, or debug steps
+            # Ideally we check if it's an AIMessage
+            pass
+        
+        # Just print final result for simplicity in this blueprint console loop
+        # The above loop is tricky for simple console output of just the answer.
+        # Let's just invoke for simpler display.
+        
+        final_state = app.invoke(inputs)
+        print(final_state["messages"][-1].content)
+
+if __name__ == "__main__":
+    main()

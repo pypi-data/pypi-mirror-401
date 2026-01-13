@@ -1,0 +1,17 @@
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
+from tools import get_retriever_tool, get_search_tool
+
+def create_rag_agent():
+    # 1. Tools
+    retriever_tool = get_retriever_tool()
+    search_tool = get_search_tool()
+    tools = [retriever_tool, search_tool]
+
+    # 2. LLM
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+
+    # 3. Agent (ReAct)
+    agent_executor = create_react_agent(llm, tools)
+    
+    return agent_executor
