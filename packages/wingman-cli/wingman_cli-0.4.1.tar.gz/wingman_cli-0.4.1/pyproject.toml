@@ -1,0 +1,102 @@
+# --- Build System ---
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+# --- Project Configuration ---
+
+[project]
+name = "wingman-cli"
+version = "0.4.1"
+description = "AI-powered TUI coding assistant for the terminal"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Aryan Mahajan", email = "aryan@dedalus.ai" },
+    { name = "Dedalus Labs", email = "oss@dedaluslabs.ai" },
+]
+maintainers = [{ name = "Aryan Mahajan", email = "aryan@dedalus.ai" }]
+keywords = [
+    "ai",
+    "coding",
+    "assistant",
+    "tui",
+    "terminal",
+    "cli",
+    "llm",
+    "gpt",
+    "claude",
+    "gemini",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development",
+    "Topic :: Terminals",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "dedalus-labs>=0.1.1",
+    "textual>=0.50.0",
+    "rich>=13.0.0",
+    "httpx>=0.27.0",
+    "pillow>=10.0.0",
+    "pyyaml>=6.0",
+    "orjson>=3.10",
+    "python-dotenv>=1.0.0",
+]
+
+# --- Project URLs ---
+
+[project.urls]
+Homepage = "https://github.com/dedalus-labs/wingman"
+Repository = "https://github.com/dedalus-labs/wingman"
+Issues = "https://github.com/dedalus-labs/wingman/issues"
+Documentation = "https://github.com/dedalus-labs/wingman#readme"
+
+# --- Project Scripts (CLI Entry Point) ---
+
+[project.scripts]
+wingman = "wingman.app:main"
+
+# --- Optional Dependencies ---
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.14.0",
+    "ty>=0.0.5",
+]
+
+# --- Tool Configuration ---
+
+[tool.uv]
+package = true
+
+[tool.uv.build-backend]
+module-name = "wingman"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
