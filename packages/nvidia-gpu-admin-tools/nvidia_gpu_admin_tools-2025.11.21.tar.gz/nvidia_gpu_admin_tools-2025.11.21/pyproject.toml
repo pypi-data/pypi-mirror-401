@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nvidia-gpu-admin-tools"
+version = "2025.11.21"
+description = "NVIDIA GPU administration and configuration tools for managing Confidential Computing modes and debugging"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "NVIDIA CORPORATION & AFFILIATES"},
+]
+keywords = ["nvidia", "gpu", "admin", "confidential-computing", "cc-mode", "nvlink"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Hardware",
+    "Topic :: System :: Systems Administration",
+]
+
+# No external dependencies - all standard library
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+# CLI entry point is optional - you can use the library programmatically
+# [project.scripts]
+# nvidia-gpu-tools = "cli.main:main"
+
+[project.urls]
+Homepage = "https://github.com/fpolica91/gpu-admin-tools"
+Issues = "https://github.com/fpolica91/gpu-admin-tools/issues"
+Repository = "https://github.com/fpolica91/gpu-admin-tools.git"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cli", "gpu", "pci", "utils"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"nvidia_gpu_tools.py" = "nvidia_gpu_tools.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/cli",
+    "/gpu",
+    "/pci",
+    "/utils",
+    "/nvidia_gpu_tools.py",
+    "/README.md",
+    "/CODE_OF_CONDUCT.md",
+    "/SECURITY.md",
+]
