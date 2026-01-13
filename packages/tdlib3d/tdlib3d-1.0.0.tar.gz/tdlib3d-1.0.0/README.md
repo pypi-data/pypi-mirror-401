@@ -1,0 +1,38 @@
+# 3Dlib (tdlib) 🦆
+A lightweight, hardware-accelerated 3D rendering library for Python built on ModernGL and Pygame.
+
+## Features
+- **Fast Rendering**: Uses ModernGL for low-level GPU access.
+- **Universal Loading**: Support for `.obj`, `.stl`, `.glb`, and more via `trimesh`.
+- **Lighting**: Built-in Phong shading (Ambient + Diffuse).
+- **Textures**: Easy PNG/JPG texture mapping.
+- **Simple API**: Designed to get you rendering in under 50 lines of code.
+
+Code be like:
+import tdlib
+from pyrr import Matrix44
+import pygame
+
+# 1. Initialize the Engine
+engine = tdlib.Renderer(width=800, height=600)
+
+# 2. Load a 3D Model
+# Supports .obj, .glb, .stl
+model = tdlib.load_resource(engine, "assets/duck.obj", texture_path="assets/duck_diffuse.png")
+
+# 3. Main Render Loop
+angle = 0
+while True:
+    engine.clear() # Clears the screen
+    angle += 0.01
+
+    # Define Camera and Transformation
+    model_matrix = Matrix44.from_y_rotation(angle)
+    view_matrix = Matrix44.look_at((3, 3, 3), (0, 0, 0), (0, 1, 0))
+    proj_matrix = Matrix44.perspective_projection(45.0, 800/600, 0.1, 100.0)
+    mvp = proj_matrix * view_matrix * model_matrix
+
+    # Draw the object
+    engine.render_object(model, mvp, model_matrix, light_pos=[5, 5, 5])
+
+    pygame.display.flip()
