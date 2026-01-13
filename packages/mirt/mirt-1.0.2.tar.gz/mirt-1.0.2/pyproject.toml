@@ -1,0 +1,130 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "src"
+module-name = "mirt.mirt_rs"
+bindings = "pyo3"
+
+[project]
+name = "mirt"
+dynamic = ["version"]
+description = "Multidimensional Item Response Theory for Python"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Cameron Lyons", email = "cameron@cameronlyons.com"}
+]
+keywords = [
+    "item response theory",
+    "IRT",
+    "psychometrics",
+    "educational measurement",
+    "latent trait models",
+    "Rasch",
+    "graded response model",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.9",
+]
+
+[project.optional-dependencies]
+pandas = ["pandas>=1.5"]
+polars = ["polars>=0.20"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+    "pandas>=1.5",
+    "polars>=0.20",
+    "maturin>=1.4",
+]
+docs = [
+    "sphinx>=6.0",
+    "sphinx-rtd-theme>=1.0",
+    "numpydoc>=1.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/Cameron-Lyons/mirt"
+Documentation = "https://github.com/Cameron-Lyons/mirt#readme"
+Repository = "https://github.com/Cameron-Lyons/mirt"
+
+[tool.setuptools.dynamic]
+version = {attr = "mirt._version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short -m 'not slow'"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py311", "py312", "py313", "py314"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_ignores = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+# Disabled codes explanation:
+# - import-not-found/import-untyped: optional deps (matplotlib, polars) and scipy stubs
+# - arg-type, return-value, assignment: numpy dtype variance issues common in scientific code
+# - union-attr, attr-defined: numpy array attribute access patterns
+# - override: numpy subclass method signatures
+# - operator, index: numpy indexing/operator overloads
+# - dict-item, list-item: container type variance with numpy arrays
+disable_error_code = [
+    "import-not-found",
+    "import-untyped",
+    "arg-type",
+    "return-value",
+    "assignment",
+    "union-attr",
+    "attr-defined",
+    "override",
+    "operator",
+    "index",
+    "dict-item",
+    "list-item",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+]
