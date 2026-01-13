@@ -1,0 +1,107 @@
+Metadata-Version: 2.4
+Name: claudefucker
+Version: 1.0.1
+Summary: Anthropic格式AI代理服务器 - 将Claude Code请求转换为各厂商格式
+Author-email: python学霸 <contact@example.com>
+Maintainer-email: python学霸 <contact@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/claudefucker
+Project-URL: Documentation, https://github.com/yourusername/claudefucker#readme
+Project-URL: Repository, https://github.com/yourusername/claudefucker
+Project-URL: Issues, https://github.com/yourusername/claudefucker/issues
+Keywords: anthropic,claude,ai,llm,openai,api,proxy,server,flask,chatbot
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Internet :: WWW/HTTP :: HTTP Servers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: flask>=3.0.0
+Requires-Dist: flask-cors>=4.0.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic>=0.7.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: build; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Dynamic: license-file
+
+# claudefucker
+
+Anthropic格式AI代理服务器 - 将Claude Code的Anthropic格式请求转换为各厂商格式
+
+## 安装
+
+```bash
+pip install claudefucker
+```
+
+## 使用
+
+### 启动服务
+
+```bash
+claudefuck
+```
+
+### Claude Code 配置
+
+启动后按照提示选择：
+1. 选择AI厂商（14个主流厂商）
+2. 选择模型
+3. 输入API Key
+
+启动成功后，配置Claude Code：
+
+```
+ANTHROPIC_BASE_URL=http://0.0.0.0:5000
+ANTHROPIC_API_KEY=<你的API Key>
+```
+
+## 支持的厂商
+
+- OpenAI (GPT系列)
+- 豆包（火山引擎）
+- 智谱AI（GLM系列）
+- 通义千问（阿里云）
+- Gemini（Google）
+- 文心一言（百度）
+- 讯飞星火
+- Kimi（月之暗面）
+- Claude（Anthropic）
+- NVIDIA NIM
+- Ollama（本地）
+- MiniMax
+- 零一万物（Yi）
+- DeepSeek
+
+## 特性
+
+- 统一API接口，兼容Anthropic格式
+- 支持14个主流AI厂商
+- 自动识别API Key所属厂商
+- 支持流式和非流式输出
+- 支持手动输入模型名称
+- 共支持106个模型
+
+## 开发
+
+喜欢关注python学霸公众号
+
+## License
+
+MIT

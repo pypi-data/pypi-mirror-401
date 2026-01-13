@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claudefucker"
+version = "1.0.1"
+description = "Anthropic格式AI代理服务器 - 将Claude Code请求转换为各厂商格式"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "python学霸", email = "contact@example.com"}
+]
+maintainers = [
+    {name = "python学霸", email = "contact@example.com"}
+]
+keywords = [
+    "anthropic",
+    "claude",
+    "ai",
+    "llm",
+    "openai",
+    "api",
+    "proxy",
+    "server",
+    "flask",
+    "chatbot",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+
+dependencies = [
+    "flask>=3.0.0",
+    "flask-cors>=4.0.0",
+    "openai>=1.0.0",
+    "anthropic>=0.7.0",
+    "pyyaml>=6.0",
+    "colorama>=0.4.6",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "twine",
+    "pytest>=7.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/claudefucker"
+Documentation = "https://github.com/yourusername/claudefucker#readme"
+Repository = "https://github.com/yourusername/claudefucker"
+Issues = "https://github.com/yourusername/claudefucker/issues"
+
+[project.scripts]
+claudefuck = "claudefucker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["claudefucker*"]
+
+[tool.setuptools.package-data]
+claudefucker = ["*.yaml", "*.yml", "*.json"]
