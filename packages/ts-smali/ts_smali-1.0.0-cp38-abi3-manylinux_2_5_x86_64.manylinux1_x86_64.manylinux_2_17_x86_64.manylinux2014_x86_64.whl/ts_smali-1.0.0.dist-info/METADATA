@@ -1,0 +1,29 @@
+Metadata-Version: 2.1
+Name: ts-smali
+Version: 1.0.0
+Summary: Smali grammar for tree-sitter
+License: MIT
+Project-URL: Homepage, https://git.sr.ht/~yotam/tree-sitter-smali
+Keywords: incremental,parsing,tree-sitter,smali
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Software Development :: Compilers
+Classifier: Topic :: Text Processing :: Linguistic
+Classifier: Typing :: Typed
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: core
+Requires-Dist: tree-sitter~=0.21; extra == "core"
+
+# tree-sitter-smali
+
+[![builds.sr.ht status](https://builds.sr.ht/~yotam/tree-sitter-smali.svg)](https://builds.sr.ht/~yotam/tree-sitter-smali?)
+[![GitHub Build Status](https://github.com/amaanq/tree-sitter-smali/actions/workflows/ci.yml/badge.svg)](https://github.com/amaanq/tree-sitter-smali/actions/workflows/ci.yml)
+[![Discord](https://img.shields.io/discord/1063097320771698699?logo=discord)](https://discord.gg/w7nTvsVJhm)
+
+Smali grammar for [tree-sitter](https://github.com/tree-sitter/tree-sitter).
+
+The Smali syntax is poorly documented so there might be some problems with it
+but the authoritative definition for the syntax is at [JesusFreke/smali](https://github.com/JesusFreke/smali),
+most notably at [smali/src/main/jflex/smaliLexer.jflex](https://github.com/JesusFreke/smali/blob/master/smali/src/main/jflex/smaliLexer.jflex)
