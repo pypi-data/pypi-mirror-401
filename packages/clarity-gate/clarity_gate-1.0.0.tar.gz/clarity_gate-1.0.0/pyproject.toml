@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "clarity-gate"
+version = "1.0.0"
+description = "Pre-ingestion verification for epistemic quality in RAG systems"
+readme = "README.md"
+license = "CC-BY-4.0"
+requires-python = ">=3.9"
+authors = [
+    { name = "Francesco Marinoni Moretto" }
+]
+keywords = [
+    "clarity-gate",
+    "cgd",
+    "sot",
+    "source-of-truth",
+    "epistemic",
+    "verification",
+    "validator",
+    "rag",
+    "llm",
+    "ai-safety",
+    "hallucination",
+    "pre-ingestion",
+    "document-quality"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Text Processing :: Markup",
+    "Typing :: Typed"
+]
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0"
+]
+
+[project.scripts]
+clarity-gate = "clarity_gate.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/frmoretto/clarity-gate"
+Documentation = "https://github.com/frmoretto/clarity-gate/docs"
+Repository = "https://github.com/frmoretto/clarity-gate"
+Issues = "https://github.com/frmoretto/clarity-gate/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/clarity_gate"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
