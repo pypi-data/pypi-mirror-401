@@ -1,0 +1,962 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexAgent</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Markdown 渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- LaTeX 公式渲染 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+
+<body>
+    <!-- Toast 通知容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Alert 对话框 -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-content">
+            <div class="alert-header">
+                <svg class="alert-icon" id="alertIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2"></svg>
+                <h4 id="alertTitle">提示</h4>
+            </div>
+            <div class="alert-body" id="alertBody"></div>
+            <div class="alert-actions">
+                <button class="alert-btn-ok" onclick="closeAlert()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 记忆详情模态框 -->
+    <div class="alert-modal" id="memoryDetailModal">
+        <div class="alert-content" style="min-width:380px;">
+            <div class="alert-header">
+                <svg class="alert-icon info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.4V16a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-1.6c1.2-.6 2-1.9 2-3.4a4 4 0 0 0-4-4V6a4 4 0 0 0-4-4z" />
+                </svg>
+                <h4>记忆详情</h4>
+            </div>
+            <div class="alert-body" style="text-align:left;">
+                <div style="font-size:0.85rem;color:var(--text2);margin-bottom:8px;">内容:</div>
+                <div id="memoryDetailContent"
+                    style="background:var(--card);padding:12px;border-radius:var(--radius-sm);font-size:0.9rem;line-height:1.6;max-height:150px;overflow-y:auto;">
+                </div>
+                <div id="memoryDetailMeta" style="font-size:0.85rem;color:var(--text2);margin-top:12px;"></div>
+            </div>
+            <div class="alert-actions">
+                <button class="alert-btn-ok" style="background:var(--card);color:var(--text);"
+                    onclick="closeMemoryDetail()">关闭</button>
+                <button class="alert-btn-ok" style="background:var(--error);"
+                    onclick="deleteCurrentMemory()">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动端侧边栏遮罩 -->
+    <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"
+                    style="vertical-align: middle; margin-right: 6px;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>角色</h2>
+            <button class="btn-new" onclick="showNewSessionModal()">+ 新建</button>
+        </div>
+        <div class="search-bar">
+            <div class="search-input-wrap">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input type="text" class="search-input" id="sessionSearch" placeholder="搜索..."
+                    oninput="filterPersonaList()">
+            </div>
+            <button class="btn-refresh" id="refreshSessionsBtn" onclick="refreshPersonaList()" title="刷新列表">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <path d="M23 4v6h-6" />
+                    <path d="M1 20v-6h6" />
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+            </button>
+        </div>
+        <div class="persona-list" id="personaList"></div>
+        <div class="sidebar-footer">
+            <button class="btn-settings" onclick="openSettings()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                设置
+            </button>
+        </div>
+    </div>
+    <div class="main">
+        <div class="header">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <h1 id="sessionTitle">NexAgent</h1>
+                <span id="currentPersonaName" style="font-size:0.85rem;color:var(--text2);"></span>
+            </div>
+            <div class="header-right">
+                <div class="dropdown" id="modelDropdown" style="display:none;">
+                    <button class="dropdown-btn" onclick="toggleModelDropdown()">
+                        <span id="currentModelName">选择模型</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                            height="16">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu" id="modelMenu"></div>
+                </div>
+                <!-- 移动端按钮 -->
+                <button class="mobile-header-btn" id="mobileSessionsBtn" onclick="toggleMobileSidebar()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                    <span>会话</span>
+                </button>
+                <button class="mobile-header-btn mobile-settings-btn" id="mobileSettingsBtn" onclick="openSettings()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="messages" id="msgs"></div>
+        <div class="input-area">
+            <div class="input-toolbar">
+                <!-- 用户名 -->
+                <div class="toolbar-dropdown" id="toolbarUserDropdown">
+                    <button class="toolbar-btn" onclick="toggleToolbarDropdown('toolbarUserDropdown')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <span id="toolbarUserName">guest</span>
+                    </button>
+                    <div class="toolbar-dropdown-menu" id="toolbarUserMenu">
+                        <div class="toolbar-dropdown-header">用户名</div>
+                        <div style="padding:10px;">
+                            <input type="text" id="username" placeholder="输入用户名" value="guest"
+                                style="width:100%;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.85rem;"
+                                onchange="updateUserName(this.value)"
+                                onkeyup="if(event.key==='Enter')updateUserName(this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模型选择 -->
+                <div class="toolbar-dropdown" id="toolbarModelDropdown">
+                    <button class="toolbar-btn" onclick="toggleToolbarDropdown('toolbarModelDropdown')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5" />
+                            <path d="M2 12l10 5 10-5" />
+                        </svg>
+                        <span id="toolbarModelName">模型</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12"
+                            height="12">
+                            <polyline points="18 15 12 9 6 15" />
+                        </svg>
+                    </button>
+                    <div class="toolbar-dropdown-menu" id="toolbarModelMenu"></div>
+                </div>
+
+                <!-- 工具列表 -->
+                <div class="toolbar-dropdown" id="toolbarToolsDropdown">
+                    <button class="toolbar-btn"
+                        onclick="toggleToolbarDropdown('toolbarToolsDropdown');loadToolbarTools()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                        </svg>
+                        工具
+                        <span class="badge" id="toolbarToolsCount">0</span>
+                    </button>
+                    <div class="toolbar-dropdown-menu" id="toolbarToolsMenu"></div>
+                </div>
+
+                <!-- 系统提示词开关 -->
+                <button class="toolbar-btn" id="systemPromptToggle" onclick="toggleSystemPrompt()" title="启用/禁用系统提示词">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    系统提示
+                </button>
+
+                <div class="toolbar-divider"></div>
+
+                <!-- 清空消息 -->
+                <button class="toolbar-btn" onclick="clearMsgs()" title="清空当前会话消息">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    清空
+                </button>
+            </div>
+            <div class="input-wrap">
+                <textarea id="inp" placeholder="输入消息..." rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true"></textarea>
+                <button class="send-btn" id="btn" onclick="send()" title="发送">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <path d="M22 2L11 13"/>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑会话弹窗 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3 id="editModalTitle"></h3>
+            <input type="text" id="editSessionName" placeholder="会话名称">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="btn-confirm" onclick="saveSessionName()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建会话弹窗 -->
+    <div class="modal" id="newSessionModal">
+        <div class="modal-content">
+            <h3>新建会话</h3>
+            <label>选择角色卡</label>
+            <div class="custom-select" id="newSessionPersonaSelect">
+                <button class="custom-select-btn" onclick="toggleCustomSelect('newSessionPersonaSelect')">
+                    <span class="custom-select-text">默认（通用助手）</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div class="custom-select-menu" id="newSessionPersonaMenu"></div>
+                <input type="hidden" id="newSessionPersonaValue" value="">
+            </div>
+            <label>会话名称（可选）</label>
+            <input type="text" id="newSessionName" placeholder="留空自动生成">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeNewSessionModal()">取消</button>
+                <button class="btn-confirm" onclick="createNewSession()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="min-width:700px;max-width:900px;padding:0;overflow:hidden;">
+            <div
+                style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                <h3 style="margin:0;font-size:1.1rem;">设置</h3>
+                <button onclick="closeSettings()"
+                    style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="settings-container">
+                <!-- 第一层：导航 -->
+                <div class="settings-nav">
+                    <!-- 关于 -->
+                    <button class="settings-nav-item active" onclick="switchSettingsNav('about')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                        关于
+                    </button>
+                    
+                    <!-- AI与LLM 分组 -->
+                    <div class="settings-nav-group">
+                        <div class="settings-nav-group-title">AI与LLM</div>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('providers')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="8" rx="2" />
+                                <rect x="2" y="14" width="20" height="8" rx="2" />
+                                <circle cx="6" cy="6" r="1" />
+                                <circle cx="6" cy="18" r="1" />
+                            </svg>
+                            服务商
+                        </button>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('personas')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            角色卡
+                        </button>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('tools')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                            </svg>
+                            工具
+                        </button>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('mcp')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                            MCP
+                        </button>
+                    </div>
+                    
+                    <!-- 模型知识 分组 -->
+                    <div class="settings-nav-group">
+                        <div class="settings-nav-group-title">模型知识</div>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('memory')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.4V16a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-1.6c1.2-.6 2-1.9 2-3.4a4 4 0 0 0-4-4V6a4 4 0 0 0-4-4z" />
+                            </svg>
+                            向量记忆
+                        </button>
+                    </div>
+                    
+                    <!-- 应用设置 分组 -->
+                    <div class="settings-nav-group">
+                        <div class="settings-nav-group-title">应用设置</div>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('style')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="13.5" cy="6.5" r="2.5" />
+                                <circle cx="17.5" cy="10.5" r="2.5" />
+                                <circle cx="8.5" cy="7.5" r="2.5" />
+                                <circle cx="6.5" cy="12.5" r="2.5" />
+                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z" />
+                            </svg>
+                            样式与主题
+                        </button>
+                        <button class="settings-nav-item" onclick="switchSettingsNav('openapi')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="2" />
+                                <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
+                            </svg>
+                            API Server
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 第二层：服务商列表 -->
+                <div class="settings-panel" id="panel-providers">
+                    <div class="settings-panel-header">
+                        <h4>服务商管理</h4>
+                        <button class="btn-add-small" onclick="showAddProvider()">+ 添加</button>
+                    </div>
+                    <div class="settings-panel-content" id="providerListPanel"></div>
+                </div>
+
+                <!-- 第二层：工具管理 -->
+                <div class="settings-panel" id="panel-tools">
+                    <div class="settings-panel-header">
+                        <h4>工具管理</h4>
+                        <button class="btn-add-small" onclick="reloadToolsFromSettings()">↻ 重载</button>
+                    </div>
+                    <div class="settings-panel-content" id="toolsListPanel"></div>
+                </div>
+
+                <!-- 第二层：MCP列表 -->
+                <div class="settings-panel" id="panel-mcp">
+                    <div class="settings-panel-header">
+                        <h4>MCP 服务器</h4>
+                        <button class="btn-add-small" onclick="showAddMCPInline()">+ 添加</button>
+                    </div>
+                    <div class="settings-panel-content" id="mcpListPanel"></div>
+                </div>
+
+                <!-- 第二层：角色卡列表 -->
+                <div class="settings-panel" id="panel-personas">
+                    <div class="settings-panel-header">
+                        <h4>角色卡管理</h4>
+                        <button class="btn-add-small" onclick="showAddPersona()">+ 添加</button>
+                    </div>
+                    <div class="settings-panel-content" id="personaListPanel"></div>
+                </div>
+
+                <!-- 第二层：向量记忆 -->
+                <div class="settings-panel" id="panel-memory">
+                    <div class="settings-panel-header">
+                        <h4>向量记忆</h4>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div class="toolbar-dropdown" id="embedModelDropdown" style="position:relative;">
+                                <button class="toolbar-btn" onclick="toggleEmbedModelDropdown(event)"
+                                    style="padding:4px 10px;height:26px;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        width="12" height="12">
+                                        <circle cx="12" cy="12" r="3" />
+                                        <circle cx="12" cy="12" r="8" />
+                                    </svg>
+                                    <span id="embedModelName"
+                                        style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.75rem;">嵌入模型</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        width="10" height="10">
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                </button>
+                                <div class="toolbar-dropdown-menu" id="embedModelMenu"
+                                    style="bottom:auto;top:calc(100% + 6px);z-index:1200;"></div>
+                            </div>
+                            <button class="btn-add-small" onclick="showAddMemory()">+ 添加</button>
+                        </div>
+                    </div>
+                    <div class="settings-panel-content">
+                        <!-- 记忆开关 -->
+                        <div
+                            style="padding:14px;background:var(--card);border-radius:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);">
+                            <div>
+                                <div style="font-weight:500;font-size:0.9rem;">启用向量记忆</div>
+                                <div style="font-size:0.8rem;color:var(--text2);margin-top:4px;">AI 将记住用户的重要信息</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="memoryEnabledToggle"
+                                    onchange="toggleMemoryEnabled(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 记忆列表 -->
+                        <div id="memoryListPanel" style="max-height:280px;overflow-y:auto;"></div>
+                    </div>
+                </div>
+
+                <!-- 第二层：OpenAPI配置列表 -->
+                <div class="settings-panel" id="panel-openapi">
+                    <div class="settings-panel-header">
+                        <h4>OpenAPI配置</h4>
+                        <button class="btn-add-small" onclick="showAddOpenAPIConfig()">+ 添加</button>
+                    </div>
+                    <div class="settings-panel-content" id="openAPIListPanel"></div>
+                </div>
+
+                <!-- 第二层：关于 -->
+                <div class="settings-panel active" id="panel-about">
+                    <div class="settings-panel-header">
+                        <h4>关于 NexAgent</h4>
+                    </div>
+                    <div class="settings-panel-content" style="padding:20px;">
+                        <div style="text-align:center;margin-bottom:24px;">
+                            <div style="font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:8px;">NexAgent</div>
+                            <div style="font-size:0.9rem;color:var(--text2);">版本 <span id="appVersion" style="color:var(--accent);font-weight:500;">-</span></div>
+                        </div>
+                        <div style="background:var(--card);padding:16px;border-radius:var(--radius-sm);margin-bottom:16px;">
+                            <div style="font-size:0.9rem;line-height:1.8;color:var(--text);">
+                                AI 对话框架，支持多服务商、多模型切换、深度思考、工具调用、MCP 服务器、流式输出、多会话管理。
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;font-size:0.85rem;">
+                            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);text-align:center;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="20" height="20" style="margin-bottom:6px;">
+                                    <rect x="2" y="2" width="20" height="8" rx="2" />
+                                    <rect x="2" y="14" width="20" height="8" rx="2" />
+                                </svg>
+                                <div style="color:var(--text2);">多服务商</div>
+                            </div>
+                            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);text-align:center;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="20" height="20" style="margin-bottom:6px;">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                    <path d="M2 17l10 5 10-5" />
+                                    <path d="M2 12l10 5 10-5" />
+                                </svg>
+                                <div style="color:var(--text2);">多模型</div>
+                            </div>
+                            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);text-align:center;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="20" height="20" style="margin-bottom:6px;">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                </svg>
+                                <div style="color:var(--text2);">工具调用</div>
+                            </div>
+                            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);text-align:center;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="20" height="20" style="margin-bottom:6px;">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                                </svg>
+                                <div style="color:var(--text2);">MCP 支持</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二层：样式设置 -->
+                <div class="settings-panel" id="panel-style">
+                    <div class="settings-panel-header">
+                        <h4>样式设置</h4>
+                    </div>
+                    <div class="settings-panel-content" style="padding:16px;">
+                        <!-- 主题选择 -->
+                        <div class="style-section">
+                            <label class="style-label">主题模式</label>
+                            <div class="style-options">
+                                <button class="style-option" id="themeLight" onclick="setThemeMode('light')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        width="20" height="20">
+                                        <circle cx="12" cy="12" r="5" />
+                                        <line x1="12" y1="1" x2="12" y2="3" />
+                                        <line x1="12" y1="21" x2="12" y2="23" />
+                                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                        <line x1="1" y1="12" x2="3" y2="12" />
+                                        <line x1="21" y1="12" x2="23" y2="12" />
+                                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                                    </svg>
+                                    浅色
+                                </button>
+                                <button class="style-option" id="themeDark" onclick="setThemeMode('dark')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        width="20" height="20">
+                                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                    </svg>
+                                    深色
+                                </button>
+                                <button class="style-option" id="themeAuto" onclick="setThemeMode('auto')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        width="20" height="20">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                        <line x1="8" y1="21" x2="16" y2="21" />
+                                        <line x1="12" y1="17" x2="12" y2="21" />
+                                    </svg>
+                                    跟随系统
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 主题色选择 -->
+                        <div class="style-section">
+                            <label class="style-label">主题色</label>
+                            <div class="color-options">
+                                <button class="color-option" style="--color:#6366f1" onclick="setAccentColor('#6366f1')"
+                                    title="靛蓝"></button>
+                                <button class="color-option" style="--color:#8b5cf6" onclick="setAccentColor('#8b5cf6')"
+                                    title="紫色"></button>
+                                <button class="color-option" style="--color:#ec4899" onclick="setAccentColor('#ec4899')"
+                                    title="粉色"></button>
+                                <button class="color-option" style="--color:#ef4444" onclick="setAccentColor('#ef4444')"
+                                    title="红色"></button>
+                                <button class="color-option" style="--color:#f97316" onclick="setAccentColor('#f97316')"
+                                    title="橙色"></button>
+                                <button class="color-option" style="--color:#eab308" onclick="setAccentColor('#eab308')"
+                                    title="黄色"></button>
+                                <button class="color-option" style="--color:#22c55e" onclick="setAccentColor('#22c55e')"
+                                    title="绿色"></button>
+                                <button class="color-option" style="--color:#14b8a6" onclick="setAccentColor('#14b8a6')"
+                                    title="青色"></button>
+                                <button class="color-option" style="--color:#0ea5e9" onclick="setAccentColor('#0ea5e9')"
+                                    title="蓝色"></button>
+                                <button class="color-option custom" id="customColorBtn" onclick="showCustomColorInput()"
+                                    title="自定义颜色">
+                                    <span class="custom-icon">+</span>
+                                </button>
+                            </div>
+                            <!-- 自定义颜色输入区域 -->
+                            <div class="custom-color-input" id="customColorInput" style="display:none;">
+                                <div class="custom-color-preview-box" id="customColorPreviewBox"></div>
+                                <input type="text" id="customColorText" placeholder="#000000" maxlength="7"
+                                    oninput="previewCustomColor(this.value)">
+                                <button class="btn-apply-color" onclick="applyCustomColorFromInput()">应用</button>
+                            </div>
+                        </div>
+
+                        <!-- 字体大小 -->
+                        <div class="style-section">
+                            <label class="style-label">界面字体大小</label>
+                            <div class="style-options">
+                                <button class="style-option" onclick="setFontSize('small')">小</button>
+                                <button class="style-option" onclick="setFontSize('medium')">中</button>
+                                <button class="style-option" onclick="setFontSize('large')">大</button>
+                            </div>
+                        </div>
+
+                        <!-- 助手头像设置 -->
+                        <div class="style-section">
+                            <label class="style-label">助手头像</label>
+                            <div class="style-options" style="flex-direction:column;gap:8px;">
+                                <button class="style-option" id="avatarIcon" onclick="setAvatarMode('icon')" style="justify-content:flex-start;text-align:left;">
+                                    <span>消息图标模式</span>
+                                    <span style="font-size:0.75rem;color:var(--text2);margin-left:8px;">使用消息气泡图标</span>
+                                </button>
+                                <button class="style-option" id="avatarText" onclick="setAvatarMode('text')" style="justify-content:flex-start;text-align:left;">
+                                    <span>文字头像模式</span>
+                                    <span style="font-size:0.75rem;color:var(--text2);margin-left:8px;">显示角色名首字母</span>
+                                </button>
+                                <button class="style-option" id="avatarHide" onclick="setAvatarMode('hide')" style="justify-content:flex-start;text-align:left;">
+                                    <span>隐藏</span>
+                                    <span style="font-size:0.75rem;color:var(--text2);margin-left:8px;">不显示头像</span>
+                                </button>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--text2);margin-top:8px;">自定义头像请在角色卡设置中上传</div>
+                        </div>
+
+                        <!-- 重置按钮 -->
+                        <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+                            <button class="btn-reset-style" onclick="resetStyleSettings()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                    height="16">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                    <path d="M3 3v5h5" />
+                                </svg>
+                                恢复默认设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三层：服务商详情/编辑 -->
+                <div class="settings-detail" id="detail-provider">
+                    <div class="settings-detail-header">
+                        <h4 id="providerDetailTitle">服务商详情</h4>
+                        <button onclick="closeProviderDetail()"
+                            style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="settings-detail-content">
+                        <!-- 查看模式：信息卡片和模型列表 -->
+                        <div id="providerViewMode">
+                            <div class="provider-info-card">
+                                <div class="provider-info-header">
+                                    <div>
+                                        <div class="provider-info-name" id="providerViewName"></div>
+                                        <div class="provider-info-detail" id="providerViewUrl"></div>
+                                        <div class="provider-info-detail" id="providerViewKey"></div>
+                                    </div>
+                                    <button class="btn-edit-small" onclick="switchToProviderEditMode()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            width="12" height="12">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                        编辑
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="model-list-section" style="margin-top:16px;padding-top:0;border-top:none;">
+                                <h5>模型列表
+                                    <div style="display:flex;gap:6px;">
+                                        <button class="btn-outline-small" onclick="showProviderModelsModal()">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                width="12" height="12">
+                                                <rect x="3" y="3" width="7" height="7" />
+                                                <rect x="14" y="3" width="7" height="7" />
+                                                <rect x="14" y="14" width="7" height="7" />
+                                                <rect x="3" y="14" width="7" height="7" />
+                                            </svg>
+                                            浏览
+                                        </button>
+                                        <button class="btn-add-small" onclick="showAddModelForProvider()">+ 添加</button>
+                                    </div>
+                                </h5>
+                                <div id="providerModelsList"></div>
+                            </div>
+                        </div>
+
+                        <!-- 编辑模式：表单 -->
+                        <div id="providerEditMode" style="display:none;">
+                            <div class="settings-form">
+                                <label>服务商ID</label>
+                                <input type="text" id="providerIdInput" placeholder="如: openai">
+                                <label>显示名称</label>
+                                <input type="text" id="providerNameInput" placeholder="如: OpenAI">
+                                <label>API Key</label>
+                                <input type="password" id="providerApiKeyInput" placeholder="sk-...">
+                                <label>Base URL</label>
+                                <input type="text" id="providerBaseUrlInput" placeholder="https://api.openai.com/v1">
+                                <div class="settings-form-actions">
+                                    <button class="btn-cancel" onclick="cancelProviderEdit()">取消</button>
+                                    <button class="btn-confirm" onclick="saveProviderInline()">保存</button>
+                                </div>
+                                <div class="settings-form-actions" id="providerDeleteRow" style="margin-top:8px;">
+                                    <button class="btn-danger full-width" onclick="deleteCurrentProvider()" id="btnDeleteProvider">删除此服务商</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三层：MCP详情/编辑 -->
+                <div class="settings-detail" id="detail-mcp">
+                    <div class="settings-detail-header">
+                        <h4 id="mcpDetailTitle">MCP 服务器</h4>
+                        <button onclick="closeMCPDetail()"
+                            style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="settings-detail-content">
+                        <div class="settings-form">
+                            <label>服务器ID</label>
+                            <input type="text" id="mcpIdInput" placeholder="如: my-mcp">
+                            <label>显示名称</label>
+                            <input type="text" id="mcpNameInput" placeholder="如: 我的MCP">
+                            <label>服务器类型</label>
+                            <select id="mcpTypeInput">
+                                <option value="sse">SSE</option>
+                                <option value="streamable_http">Streamable HTTP</option>
+                            </select>
+                            <label>服务器URL</label>
+                            <input type="text" id="mcpUrlInput" placeholder="http://localhost:3000/mcp">
+                            <label>请求头 (JSON, 可选)</label>
+                            <textarea id="mcpHeadersInput" rows="3"
+                                placeholder='{"Authorization": "Bearer ..."}'></textarea>
+                            <div class="settings-form-actions">
+                                <button class="btn-cancel" onclick="closeMCPDetail()">取消</button>
+                                <button class="btn-confirm" onclick="saveMCPInline()">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三层：角色卡详情/编辑 -->
+                <div class="settings-detail" id="detail-persona">
+                    <div class="settings-detail-header">
+                        <h4 id="personaDetailTitle">角色卡</h4>
+                        <button onclick="closePersonaDetail()"
+                            style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="settings-detail-content">
+                        <div class="settings-form">
+                            <label>角色名称</label>
+                            <input type="text" id="personaNameInput" placeholder="如: Python专家">
+                            
+                            <label>角色头像</label>
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                                <div id="personaAvatarPreview" style="width:48px;height:48px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border);">
+                                    <span id="personaAvatarLetter" style="color:white;font-weight:600;font-size:1rem;">P</span>
+                                </div>
+                                <input type="file" id="personaAvatarUpload" accept="image/*" style="display:none;" onchange="previewPersonaAvatar(this)">
+                                <button class="btn-add-small" onclick="document.getElementById('personaAvatarUpload').click()">上传图片</button>
+                                <button class="btn-add-small" onclick="clearPersonaAvatar()" style="background:transparent;border:1px solid var(--border);color:var(--text2);">清除</button>
+                            </div>
+                            <input type="hidden" id="personaAvatarData">
+                            
+                            <label>系统提示词</label>
+                            <textarea id="personaPromptInput" rows="6" placeholder="你是一个专业的Python开发专家..."></textarea>
+                            <label>最大输出长度 (max_tokens)</label>
+                            <input type="number" id="personaMaxTokensInput" placeholder="留空使用默认值 (4000)">
+                            <label>温度 (temperature: 0-2)</label>
+                            <input type="number" id="personaTemperatureInput" step="0.1" min="0" max="2"
+                                placeholder="留空使用默认值 (0.7)">
+                            <label>Top P (0-1)</label>
+                            <input type="number" id="personaTopPInput" step="0.1" min="0" max="1" placeholder="留空不设置">
+                            <div class="settings-form-actions">
+                                <button class="btn-cancel" onclick="closePersonaDetail()">取消</button>
+                                <button class="btn-danger" onclick="deletePersonaInline()" id="deletePersonaBtn"
+                                    style="display:none;">删除</button>
+                                <button class="btn-confirm" onclick="savePersonaInline()">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三层：模型编辑 -->
+                <div class="settings-detail" id="detail-model">
+                    <div class="settings-detail-header">
+                        <h4 id="modelDetailTitle">模型设置</h4>
+                        <button onclick="closeModelDetail()"
+                            style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="settings-detail-content">
+                        <div class="settings-form">
+                            <label>模型类型</label>
+                            <select id="modelTypeInput" onchange="onModelTypeChange()">
+                                <option value="chat">对话模型</option>
+                                <option value="embedding">嵌入模型</option>
+                            </select>
+                            <label>模型ID</label>
+                            <input type="text" id="modelIdInput" placeholder="如: gpt-4">
+                            <label>显示名称</label>
+                            <input type="text" id="modelDisplayNameInput" placeholder="如: GPT-4">
+                            <div id="modelTagsSection">
+                                <label>模型能力</label>
+                                <div class="tag-checkbox-group" id="modelTagsGroup">
+                                    <div class="tag-checkbox" data-tag="tool"><input type="checkbox" value="tool"><svg
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                        </svg>工具</div>
+                                    <div class="tag-checkbox" data-tag="reasoning"><input type="checkbox"
+                                            value="reasoning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path
+                                                d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.4V16a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-1.6c1.2-.6 2-1.9 2-3.4a4 4 0 0 0-4-4V6a4 4 0 0 0-4-4z" />
+                                        </svg>推理</div>
+                                    <div class="tag-checkbox" data-tag="vision"><input type="checkbox"
+                                            value="vision"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>视觉</div>
+                                </div>
+                            </div>
+                            <div class="settings-form-actions">
+                                <button class="btn-cancel" onclick="closeModelDetail()">取消</button>
+                                <button class="btn-confirm" onclick="saveModelInline()">保存</button>
+                            </div>
+                            <div class="settings-form-actions" id="modelDeleteRow" style="margin-top:8px;display:none;">
+                                <button class="btn-danger full-width" onclick="deleteModelInline()" id="deleteModelBtn">删除此模型</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三层：OpenAPI配置详情 -->
+                <div class="settings-detail" id="detail-openapi">
+                    <div class="settings-detail-header">
+                        <h4 id="openAPIDetailTitle">OpenAPI配置</h4>
+                        <button onclick="closeOpenAPIDetail()" class="btn-text">关闭</button>
+                    </div>
+                    <div class="settings-detail-content">
+                        <div class="settings-form">
+                            <label>API模型ID *</label>
+                            <input type="text" id="openAPIModelIdInput" placeholder="例如: gpt-4">
+
+                            <label>内部模型 *</label>
+                            <div class="select-wrapper">
+                                <select id="openAPIInternalModelSelect">
+                                    <option value="">选择内部模型</option>
+                                </select>
+                            </div>
+
+                            <label>角色卡</label>
+                            <div class="select-wrapper">
+                                <select id="openAPIPersonaSelect">
+                                    <option value="">默认（无角色卡）</option>
+                                </select>
+                            </div>
+
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="openAPIUseSystemPrompt">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">启用系统提示词注入</span>
+                            </label>
+
+                            <div class="settings-form-actions">
+                                <button class="btn-cancel" onclick="closeOpenAPIDetail()">取消</button>
+                                <button class="btn-danger" onclick="deleteOpenAPIConfig()"
+                                    id="deleteOpenAPIBtn">删除</button>
+                                <button class="btn-confirm" onclick="saveOpenAPIConfig()">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3 id="confirmModalTitle"></h3>
+            <p id="confirmText" style="color:var(--text2);margin-bottom:20px"></p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeConfirm()">取消</button>
+                <button class="btn-danger" id="confirmBtn" onclick="doConfirm()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑消息弹窗 -->
+    <div class="modal" id="editMsgModal">
+        <div class="modal-content wide">
+            <h3 id="editMsgModalTitle"></h3>
+            <label>消息内容</label>
+            <textarea id="editMsgContent"
+                style="width:100%;min-height:120px;background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:var(--radius-sm);font-size:0.95rem;resize:vertical;font-family:inherit;"></textarea>
+            <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
+                <button class="btn-cancel" onclick="closeEditMsgModal()">取消</button>
+                <button class="btn-confirm" onclick="saveEditedMsg(false)">仅保存</button>
+                <button class="btn-confirm" style="background:var(--success)"
+                    onclick="saveEditedMsg(true)">保存并重新生成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 供应商模型列表弹窗 -->
+    <div class="modal" id="providerModelsModal">
+        <div class="modal-content"
+            style="min-width:600px;max-width:720px;max-height:85vh;display:flex;flex-direction:column;padding:0;">
+            <!-- 标题栏 -->
+            <div class="modal-header-bar">
+                <h3 id="providerModelsModalTitle">模型列表</h3>
+                <button class="modal-close-btn" onclick="closeProviderModelsModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <!-- 搜索栏 -->
+            <div class="modal-search-bar">
+                <div class="modal-search-wrap">
+                    <svg class="modal-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="text" class="modal-search-input" id="providerModelsSearch" placeholder="搜索模型名称..."
+                        oninput="filterProviderModels()">
+                </div>
+                <button class="modal-search-refresh" id="refreshModelsBtn" onclick="refreshProviderModels()" title="刷新">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <polyline points="23 4 23 10 17 10" />
+                        <polyline points="1 20 1 14 7 14" />
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                </button>
+            </div>
+            <!-- 标签页筛选 -->
+            <div class="modal-filter-tabs">
+                <button class="modal-filter-tab active" data-filter="all" onclick="setModelFilter('all')">全部</button>
+                <button class="modal-filter-tab" data-filter="reasoning"
+                    onclick="setModelFilter('reasoning')">推理</button>
+                <button class="modal-filter-tab" data-filter="vision" onclick="setModelFilter('vision')">视觉</button>
+                <button class="modal-filter-tab" data-filter="tool" onclick="setModelFilter('tool')">工具</button>
+                <button class="modal-filter-tab" data-filter="embedding"
+                    onclick="setModelFilter('embedding')">嵌入</button>
+            </div>
+            <!-- 模型列表 -->
+            <div id="providerModelsListContent" style="flex:1;overflow-y:auto;background:var(--bg);"></div>
+            <!-- 底部状态栏 -->
+            <div class="modal-footer-bar">
+                <span id="providerModelsCount"></span>
+                <button class="modal-action-btn" onclick="closeProviderModelsModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="app.js"></script>
+</body>
+
+</html>
