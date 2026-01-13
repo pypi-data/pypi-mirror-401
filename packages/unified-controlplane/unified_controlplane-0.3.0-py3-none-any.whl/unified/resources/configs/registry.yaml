@@ -1,0 +1,117 @@
+# Registry Configuration
+# See docs/control_plane_spec.md Section 3.1 for schema details.
+
+models:
+  claude-sonnet:
+    provider: anthropic
+    endpoint: null  # Uses SDK default
+    capabilities: [code, reasoning, review, documentation]
+    cost_tier: medium
+    max_tokens: 4096
+    is_local: false
+    adapter: claude
+    model_id: claude-3-sonnet-20240229
+
+  gpt-4:
+    provider: openai
+    endpoint: null  # Uses SDK default
+    capabilities: [code, reasoning, review, documentation]
+    cost_tier: medium
+    max_tokens: 4096
+    is_local: false
+    adapter: openai
+    model_id: gpt-4-turbo
+
+  codex:
+    provider: openai
+    endpoint: null  # Uses SDK default
+    capabilities: [code, reasoning]
+    cost_tier: medium
+    max_tokens: 4096
+    is_local: false
+    adapter: openai
+    model_id: gpt-4
+
+  gemini-pro:
+    provider: google
+    endpoint: null  # Uses SDK default
+    capabilities: [code, reasoning, review]
+    cost_tier: low
+    max_tokens: 8192
+    is_local: false
+    adapter: gemini
+    model_id: gemini-pro
+
+  ollama-llama3:
+    provider: ollama
+    endpoint: http://localhost:11434
+    capabilities: [code, reasoning]
+    cost_tier: free
+    max_tokens: 8192
+    is_local: true
+    adapter: ollama
+    model_id: llama3
+
+  ollama-codellama:
+    provider: ollama
+    endpoint: http://localhost:11434
+    capabilities: [code]
+    cost_tier: free
+    max_tokens: 16384
+    is_local: true
+    adapter: ollama
+    model_id: codellama
+
+tools:
+  run_tests:
+    description: "Run pytest on specified path"
+    module: tools.testing
+    function_name: run_pytest
+    parameters:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to test file or directory
+        verbose:
+          type: boolean
+          default: false
+      required: [path]
+
+  read_file:
+    description: "Read contents of a file"
+    module: tools.files
+    function_name: read_file
+    parameters:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to file
+      required: [path]
+
+skills:
+  review:
+    description: "Run reviewer checklist against work output"
+    template_path: .claude/skills/review.md
+    applicable_to: [code, documentation, architecture]
+
+  decide:
+    description: "Log a decision using the ADR format"
+    template_path: .claude/skills/decide.md
+    applicable_to: [architecture, analysis]
+
+  route:
+    description: "Suggest which model should handle a task"
+    template_path: .claude/skills/route.md
+    applicable_to: [all]
+
+  brief:
+    description: "Create, display, or update a task brief for current work"
+    template_path: .claude/skills/brief.md
+    applicable_to: [all]
+
+  memory:
+    description: "Query or store information in project memory"
+    template_path: .claude/skills/memory.md
+    applicable_to: [all]
