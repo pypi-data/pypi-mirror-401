@@ -1,0 +1,34 @@
+[project]
+name = "flatpak-cargo-generator"
+
+[tool.poetry]
+name = "flatpak-cargo-generator"
+version = "0.1.2"
+description = "Unofficial Pypi distribution of the Flatpak's cargo dependency generator"
+authors = [
+    "Flatpak team",
+]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Unix",
+]
+include = [
+    { path = "flatpak_cargo_generator/*.py", format = ["sdist", "wheel"] },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+aiohttp = "^3.12"
+toml = "^0.10.2"
+
+[tool.poetry.scripts]
+flatpak-cargo-generator = "flatpak_cargo_generator.script:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project.urls]
+Homepage = "https://github.com/flatpak/flatpak-builder-tools"
