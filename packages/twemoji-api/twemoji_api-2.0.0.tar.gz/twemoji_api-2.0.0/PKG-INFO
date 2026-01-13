@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: twemoji-api
+Version: 2.0.0
+Summary: A lightweight utility for resolving emojis into file names, local asset paths, and URLs.
+Author-email: Gustavo Pedroso Bernardes <gpedrosobernardes@gmail.com>
+Project-URL: Homepage, https://github.com/gpedrosobernardes/twemoji_api
+Project-URL: Source, https://github.com/gpedrosobernardes/twemoji_api
+Project-URL: Issues, https://github.com/gpedrosobernardes/twemoji_api/issues
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: emoji-data-python
+Dynamic: license-file
+
+# Twemoji API
+
+![PyPI](https://img.shields.io/pypi/v/twemoji-api)
+![Python](https://img.shields.io/pypi/pyversions/twemoji-api)
+![License](https://img.shields.io/github/license/gpedrosobernardes/twemoji_api)
+![Downloads](https://img.shields.io/pypi/dm/twemoji-api)
+
+A lightweight utility for resolving emojis into local asset paths and Twemoji URLs.
+Supports **PNG** and **SVG** assets.
+
+## Features
+
+* Resolve local Twemoji asset paths
+* Resolve URLs for PNG/SVG assets
+
+## Installation
+
+```bash
+pip install twemoji-api
+```
+
+## Usage
+
+### Basic
+
+```python
+from twemoji_api.api import get_emoji_path, get_emoji_url
+
+print(get_emoji_path("🔥"))
+print(get_emoji_url("🔥"))
+```
+
+## API Reference
+
+### `get_extension_folder(extension)`
+
+Returns the asset folder (`72x72` or `svg`).
+
+### `get_emoji_path(emoji, extension="png")`
+
+Returns the local file path for an emoji.
+
+### `get_emoji_url(emoji, extension="png")`
+
+Returns the Twemoji GitHub URL for the asset.
+
+## License
+
+MIT
+
+## Twemoji Attribution
+
+This project includes graphics from Twemoji.
+Copyright 2019 Twitter, Inc and other contributors.
+Licensed under CC-BY 4.0:
+[https://creativecommons.org/licenses/by/4.0/](https://creativecommons.org/licenses/by/4.0/)
+No changes were made.
