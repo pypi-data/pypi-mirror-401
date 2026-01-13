@@ -1,0 +1,14 @@
+import logging
+import sys
+
+def configure_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler(sys.stderr)]
+    )
+    # Silence some libs if needed
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger("e_stat_dashboard_mcp")
+
