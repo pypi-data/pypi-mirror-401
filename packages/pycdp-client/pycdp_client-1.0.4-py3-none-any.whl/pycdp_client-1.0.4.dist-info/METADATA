@@ -1,0 +1,180 @@
+Metadata-Version: 2.4
+Name: pycdp-client
+Version: 1.0.4
+Summary: Chrome DevTools Protocol 客户端，支持独立使用或与 DrissionPage 配合
+Author: letme58
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/letme58/pycdp
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: websocket-client
+Provides-Extra: drissionpage
+Requires-Dist: DrissionPage; extra == "drissionpage"
+
+# PyCDP - Chrome DevTools Protocol 客户端
+
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+CDP 客户端，自动配置 ChromiumOptions，可直接传给 DrissionPage 的 Chromium。
+
+## 特性
+
+- 自动配置 `--remote-allow-origins=*` 参数
+- 支持绕过反爬的请求（在浏览器上下文中执行）
+- 完整的 IDE 类型提示支持
+
+## 安装
+
+```bash
+pip install pycdp-client
+```
+
+## 快速开始
+
+```python
+from pycdp import CDP
+from DrissionPage import Chromium
+
+cdp = CDP(port=9222)
+page = Chromium(cdp.options).latest_tab
+
+page.get("https://example.com")
+
+# CDP 请求（绕过反爬）
+result = cdp.post('https://api.example.com/data', body={"key": "value"})
+print(result)
+```
+
+## API 文档
+
+### CDP 类
+
+```python
+from pycdp import CDP
+
+cdp = CDP(port=9222)  # 默认端口 9222
+```
+
+#### 属性
+
+| 属性 | 说明 |
+|------|------|
+| `options` | 返回 ChromiumOptions 实例，用于传给 Chromium |
+| `port` | 当前端口号 |
+
+#### 方法
+
+| 方法 | 说明 |
+|------|------|
+| `get(url, headers=None, token_key=None, extra=None)` | GET 请求 |
+| `post(url, body=None, headers=None, token_key=None, extra=None)` | POST 请求 |
+| `put(url, body=None, headers=None, token_key=None, extra=None)` | PUT 请求 |
+| `delete(url, headers=None, token_key=None, extra=None)` | DELETE 请求 |
+| `request(url, method, body, headers, token_key, extra)` | 通用请求 |
+| `run(js, wait=False)` | 执行 JavaScript |
+| `storage(key, value=None, storage='localStorage')` | 操作 Storage |
+| `cookies(name=None)` | 获取 Cookies |
+| `close()` | 关闭连接 |
+
+#### 请求示例
+
+```python
+# GET 请求
+result = cdp.get('https://api.example.com/data')
+
+# POST 请求
+result = cdp.post('https://api.example.com/data', body={"name": "test"})
+
+# 带 token 的请求（自动从 localStorage 获取）
+result = cdp.get('https://api.example.com/user', token_key='ACCESS_TOKEN')
+
+# 带额外请求头
+result = cdp.post('https://api.example.com/data', 
+    body={"key": "value"},
+    extra={"X-Custom-Header": "custom-value"}
+)
+```
+
+#### 执行 JavaScript
+
+```python
+# 同步执行
+title = cdp.run('document.title')
+
+# 异步执行（等待 Promise）
+result = cdp.run('fetch("/api/data").then(r=>r.json())', wait=True)
+```
+
+#### 操作 Storage
+
+```python
+# 获取 localStorage
+token = cdp.storage('token')
+
+# 设置 localStorage
+cdp.storage('token', 'new_value')
+
+# 操作 sessionStorage
+cdp.storage('key', 'value', storage='sessionStorage')
+```
+
+#### 获取 Cookies
+
+```python
+# 获取所有 cookies
+all_cookies = cdp.cookies()
+
+# 获取指定 cookie
+session = cdp.cookies('session_id')
+```
+
+## 完整示例
+
+```python
+from pycdp import CDP
+from DrissionPage import Chromium
+
+# 创建 CDP
+cdp = CDP(port=9222)
+
+# 通过 cdp.options 传给 Chromium
+page = Chromium(cdp.options).latest_tab
+
+# 访问页面
+page.get("https://example.com/login")
+
+# DrissionPage 操作
+page.ele('#username').input('user@example.com')
+page.ele('#password').input('password123')
+page.ele('#login-btn').click()
+
+# CDP 请求获取数据
+result = cdp.get('https://api.example.com/user/profile', token_key='ACCESS_TOKEN')
+print(f"用户信息: {result['data']}")
+
+# 获取 token
+token = cdp.storage('ACCESS_TOKEN')
+print(f"Token: {token}")
+```
+
+## 上下文管理器
+
+```python
+from pycdp import CDP
+
+with CDP(9222) as cdp:
+    result = cdp.get('https://api.example.com/data')
+    print(result)
+```
+
+## 注意事项
+
+1. 使用 `cdp.options` 传给 Chromium，自动配置端口和 `--remote-allow-origins=*`
+2. CDP 请求在浏览器上下文中执行，共享 cookies 和 localStorage
+3. CDP 实例会在 `__del__` 时自动关闭，也可手动调用 `close()`
+
+## License
+
+MIT License
