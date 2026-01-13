@@ -1,0 +1,55 @@
+# General
+node_modules/
+.DS_Store
+.env
+.env.local
+.env.neo4j
+*.log
+.venv-neo4j/
+
+# SvelteKit
+.svelte-kit/
+/build/
+/dist/
+
+# Rust / Tauri
+/target/
+/src-tauri/target/
+apps/bentomail/src/src-tauri/target/
+*.pdb
+*.exe
+*.dll
+
+# IDEs
+.vscode/
+.idea/
+
+# Apps Specific
+apps/*/node_modules/
+apps/*/dist/
+apps/*/.svelte-kit/
+# Monorepo 
+.turbo/ 
+.vercel/ 
+.vercel
+.housekeeping-cache/
+.agent/logs/skill_suggestions.csv
+.agent/graph_sync_cache.json
+.env.vercel.*
+.env*.local
+
+# Python test caches
+.pytest_cache/
+
+# Git worktree management
+.trees/
+
+# Python
+**/__pycache__/
+
+.venv/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal

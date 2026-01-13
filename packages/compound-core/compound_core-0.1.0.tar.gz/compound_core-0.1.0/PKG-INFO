@@ -1,0 +1,50 @@
+Metadata-Version: 2.4
+Name: compound-core
+Version: 0.1.0
+Summary: Core utilities for Compound System agent infrastructure
+Project-URL: Homepage, https://github.com/YourOrg/Compound-System
+Project-URL: Repository, https://github.com/YourOrg/Compound-System
+Project-URL: Issues, https://github.com/YourOrg/Compound-System/issues
+Author-email: Your Organization <maintainers@example.com>
+License: MIT
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.9
+Requires-Dist: aiohttp>=3.9
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.21; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# compound-core
+
+Core utilities for Compound System agent infrastructure.
+
+## Components
+
+- **types** (`compound_core.types`): Shared dataclasses like `AgentPersona` and `AgentResult`.
+- **registry** (`compound_core.registry`): Model resolution and fallback chains.
+- **config** (`compound_core.config`): Centralized limit management.
+- **cache** (`compound_core.cache`): Caching utilities.
+- **paths** (`compound_core.paths`): Path resolution.
+- **interfaces** (`compound_core.interfaces`): Protocol definitions for `PersonaProvider`, `AgentExecutor`, etc.
+
+## Installation
+
+```bash
+pip install compound-core
+```
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest tests/
+```
