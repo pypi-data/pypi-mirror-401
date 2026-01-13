@@ -1,0 +1,107 @@
+"""
+publicdata_ca - A lightweight Python package for discovering, resolving, and downloading Canadian public datasets.
+
+This package provides tools for:
+- Retrieving StatsCan tables
+- Handling CMHC landing-page changes
+- Enforcing reproducible file layouts
+- Generating manifests for downstream analyses
+- Normalizing time, geography, frequency, and units
+"""
+
+__version__ = "0.1.0"
+
+from publicdata_ca.catalog import Catalog
+from publicdata_ca.datasets import (
+    DEFAULT_DATASETS,
+    Dataset,
+    build_dataset_catalog,
+    refresh_datasets,
+)
+from publicdata_ca.http import get_default_headers, retry_request, download_file
+from publicdata_ca.http_cache import (
+    clear_cache_metadata,
+    load_cache_metadata,
+    get_conditional_headers,
+)
+from publicdata_ca.manifest import build_manifest_file, build_run_manifest
+from publicdata_ca.normalize import (
+    NormalizedPeriod,
+    NormalizedGeo,
+    NormalizedUnit,
+    normalize_frequency,
+    parse_date,
+    parse_period,
+    normalize_geo,
+    normalize_unit,
+    normalize_dataset_metadata,
+)
+from publicdata_ca.provider import (
+    Provider,
+    DatasetRef,
+    ProviderRegistry,
+    get_registry,
+    fetch_dataset,
+)
+from publicdata_ca.providers import (
+    StatCanProvider,
+    CMHCProvider,
+    OpenCanadaProvider,
+    CKANProvider,
+    SocrataProvider,
+    SDMXProvider,
+    ValetProvider,
+)
+from publicdata_ca.profiles import (
+    Profile,
+    ProfileDataset,
+    ProfileSearch,
+    load_profile,
+    save_profile,
+    list_profiles,
+    run_profile,
+)
+
+__all__ = [
+    "Catalog",
+    "Dataset",
+    "DEFAULT_DATASETS",
+    "build_dataset_catalog",
+    "build_manifest_file",
+    "build_run_manifest",
+    "retry_request",
+    "get_default_headers",
+    "download_file",
+    "clear_cache_metadata",
+    "load_cache_metadata",
+    "get_conditional_headers",
+    "refresh_datasets",
+    "Provider",
+    "DatasetRef",
+    "ProviderRegistry",
+    "get_registry",
+    "fetch_dataset",
+    "StatCanProvider",
+    "CMHCProvider",
+    "OpenCanadaProvider",
+    "CKANProvider",
+    "SocrataProvider",
+    "SDMXProvider",
+    "ValetProvider",
+    "Profile",
+    "ProfileDataset",
+    "ProfileSearch",
+    "load_profile",
+    "save_profile",
+    "list_profiles",
+    "run_profile",
+    "NormalizedPeriod",
+    "NormalizedGeo",
+    "NormalizedUnit",
+    "normalize_frequency",
+    "parse_date",
+    "parse_period",
+    "normalize_geo",
+    "normalize_unit",
+    "normalize_dataset_metadata",
+]
