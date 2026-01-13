@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>{{ project.name or title }}</title>
+</head>
+<body>
+  <h1>{{ t('project.title') if t is defined else project.name or title }}</h1>
+  {% if license_badge_url %}
+  <p><img src="{{ license_badge_url }}" alt="License Badge"/></p>
+  {% endif %}
+  <h2>{{ t('architecture.header') if t is defined else 'Architecture' }}</h2>
+  <pre><code class="language-mermaid">
+graph TD
+    A[{{ project.name or title }}] --> B[Roles ({{ roles | length }})]
+    A --> C[Collections ({{ collections | length }})]
+    A --> D[Playbooks ({{ project.playbooks | length }})]
+    A --> E[Inventory ({{ project.inventory | length }})]
+  </code></pre>
+  {% if roles %}
+  <h2>{{ t('roles.header') if t is defined else 'Roles' }}</h2>
+  <ul>
+    {% for role in roles %}
+    <li>{{ role.name }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if collections %}
+  <h2>{{ t('collections.header') if t is defined else 'Collections' }}</h2>
+  <ul>
+    {% for collection in collections %}
+    <li>{{ collection.name }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if project.existing_docs and project.existing_docs.readme_content %}
+  <h2>Existing Documentation</h2>
+  <div id="existing-docs">
+    <pre style="white-space: pre-wrap;">{{ project.existing_docs.readme_content | html_escape }}</pre>
+  </div>
+  {% endif %}
+</body>
+</html>
