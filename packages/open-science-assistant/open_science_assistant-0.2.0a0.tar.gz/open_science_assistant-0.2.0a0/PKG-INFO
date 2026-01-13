@@ -1,0 +1,198 @@
+Metadata-Version: 2.4
+Name: open-science-assistant
+Version: 0.2.0a0
+Summary: Open Science Assistant - An extensible AI assistant platform for open science projects
+Project-URL: Homepage, https://github.com/OpenScience-Collective/osa
+Project-URL: Documentation, https://github.com/OpenScience-Collective/osa#readme
+Project-URL: Repository, https://github.com/OpenScience-Collective/osa
+Project-URL: Issues, https://github.com/OpenScience-Collective/osa/issues
+Author: Open Science Collective
+Maintainer-email: Yahya Shirazi <yahya@osc.earth>
+License: MIT
+License-File: LICENSE
+Keywords: ai,assistant,bids,eeglab,hed,langchain,langgraph,open-science
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.11
+Requires-Dist: beautifulsoup4>=4.14.0
+Requires-Dist: fastapi>=0.125.0
+Requires-Dist: httpx>=0.28.0
+Requires-Dist: langchain-anthropic>=1.3.0
+Requires-Dist: langchain-community>=0.4.0
+Requires-Dist: langchain-core>=1.2.0
+Requires-Dist: langchain-litellm>=0.2.0
+Requires-Dist: langchain-openai>=1.1.0
+Requires-Dist: langchain>=1.2.0
+Requires-Dist: langfuse>=3.11.0
+Requires-Dist: langgraph-checkpoint-postgres>=3.0.0
+Requires-Dist: langgraph>=1.0.0
+Requires-Dist: litellm>=1.50.0
+Requires-Dist: lxml>=6.0.0
+Requires-Dist: markdownify>=1.1.0
+Requires-Dist: platformdirs>=4.5.0
+Requires-Dist: psycopg[binary]>=3.3.0
+Requires-Dist: pyalex>=0.19
+Requires-Dist: pydantic-settings>=2.12.0
+Requires-Dist: pydantic>=2.12.0
+Requires-Dist: pygithub>=2.8.0
+Requires-Dist: python-dotenv>=1.2.0
+Requires-Dist: pyyaml>=6.0.3
+Requires-Dist: rich>=14.0.0
+Requires-Dist: typer>=0.20.0
+Requires-Dist: uvicorn[standard]>=0.38.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.19.0; extra == 'dev'
+Requires-Dist: pre-commit>=4.5.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=1.3.0; extra == 'dev'
+Requires-Dist: pytest-cov>=7.0.0; extra == 'dev'
+Requires-Dist: pytest>=9.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.14.0; extra == 'dev'
+Requires-Dist: uv>=0.5.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Open Science Assistant (OSA)
+
+An extensible AI assistant platform for open science projects, built with LangGraph/LangChain and FastAPI.
+
+## Overview
+
+OSA provides domain-specific AI assistants for open science tools with:
+- **HED Assistant**: Hierarchical Event Descriptors for neuroimaging annotation
+- **BIDS Assistant**: Brain Imaging Data Structure (coming soon)
+- **EEGLAB Assistant**: EEG analysis toolbox (coming soon)
+
+Features:
+- Modular tool system for document retrieval, validation, and code execution
+- Multi-source knowledge bases (GitHub, OpenALEX, Discourse forums, mailing lists)
+- Extensible architecture for adding new assistants and tools
+- Production-ready observability via LangFuse
+
+## Installation
+
+```bash
+# From PyPI
+pip install open-science-assistant
+
+# Or with uv (recommended)
+uv pip install open-science-assistant
+```
+
+### Development Setup
+
+```bash
+# Clone and install in development mode
+git clone https://github.com/OpenScience-Collective/osa.git
+cd osa
+uv sync --extra dev
+
+# Install pre-commit hooks
+uv run pre-commit install
+```
+
+## Quick Start
+
+### CLI Usage
+
+```bash
+# Show available assistants
+osa
+
+# Ask the HED assistant a question
+osa hed ask "What is HED?"
+
+# Start an interactive chat session
+osa hed chat
+
+# Show all commands
+osa --help
+osa hed --help
+```
+
+### API Server
+
+```bash
+# Start the API server
+osa serve
+
+# Or with uvicorn directly
+uv run uvicorn src.api.main:app --reload --port 38528
+```
+
+### Configuration
+
+```bash
+# Show current config
+osa config show
+
+# Set API keys for BYOK (Bring Your Own Key)
+osa config set --openrouter-key YOUR_KEY
+
+# Connect to remote server (uses BYOK)
+osa hed ask "What is HED?" --url https://api.osc.earth/osa-dev
+```
+
+### Deployment
+
+OSA can be deployed via Docker:
+
+```bash
+# Pull and run
+docker pull ghcr.io/openscience-collective/osa:latest
+docker run -d --name osa -p 38528:38528 \
+  -e OPENROUTER_API_KEY=your-key \
+  ghcr.io/openscience-collective/osa:latest
+
+# Check health
+curl http://localhost:38528/health
+```
+
+See [deploy/DEPLOYMENT_ARCHITECTURE.md](deploy/DEPLOYMENT_ARCHITECTURE.md) for detailed deployment options including Apache reverse proxy and BYOK configuration.
+
+## Optional: HED Tag Suggestions
+
+The HED assistant can suggest valid HED tags from natural language using the [hed-lsp](https://github.com/hed-standard/hed-lsp) CLI tool.
+
+### Installation
+
+```bash
+# Clone and build hed-lsp
+git clone https://github.com/hed-standard/hed-lsp.git
+cd hed-lsp/server
+npm install
+npm run compile
+```
+
+### Configuration
+
+Set the `HED_LSP_PATH` environment variable:
+
+```bash
+export HED_LSP_PATH=/path/to/hed-lsp
+```
+
+Or install globally:
+
+```bash
+cd hed-lsp/server
+npm link  # Makes hed-suggest available globally
+```
+
+## Development
+
+```bash
+# Run tests with coverage
+uv run pytest --cov
+
+# Format code
+uv run ruff check --fix . && uv run ruff format .
+```
+
+## License
+
+MIT
