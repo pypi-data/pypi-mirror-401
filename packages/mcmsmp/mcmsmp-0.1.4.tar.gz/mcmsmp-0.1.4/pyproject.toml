@@ -1,0 +1,64 @@
+[project]
+name = "mcmsmp"
+version = "0.1.4"
+authors = [
+    {name = "dngynq", email = "dngynq@gmail.com"}
+]
+description = "Python client for Minecraft Management Server Protocol"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["minecraft", "rpc", "websocket", "server-management", "game-server"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Games/Entertainment",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "websockets>=15.0.1",
+    "jsonrpcclient>=4.0.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "flake8>=6.0.0",
+]
+
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/DngYnQ/mcmsmp"
+Repository = "https://github.com/DngYnQ/mcmsmp"
+Documentation = "https://github.com/DngYnQ/mcmsmp#readme"
+Changelog = "https://github.com/DngYnQ/mcmsmp/releases"
+Issues = "https://github.com/DngYnQ/mcmsmp/issues"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mcmsmp*"]
+exclude = ["tests*", "examples*", "documentation*"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
