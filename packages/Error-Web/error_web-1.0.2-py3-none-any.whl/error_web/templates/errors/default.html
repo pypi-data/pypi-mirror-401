@@ -1,0 +1,23 @@
+{% extends "errors/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block color %}
+    {{ '#e74c3c' if code >= 500 else '#f39c12' }}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ code }}</h1>
+    <h2>{{ title }}</h2>
+    <p>{{ message }}</p>
+
+    {% if advice %}
+    <div class="advice-box">
+        <strong>💡 Conseil :</strong> {{ advice }}
+    </div>
+    {% endif %}
+
+    <p>Si le problème persiste, veuillez contacter l'administrateur en précisant l'ID de suivi ci-dessous.</p>
+    
+    <a href="/" class="btn">Retour à l'accueil</a>
+{% endblock %}
