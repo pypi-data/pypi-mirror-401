@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "VertexEngine"
+version = "1.0rc2"
+authors = [
+  { name="Tyrel Miguel", email="annbasilan0828@gmail.com" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+
+dependencies = [
+    "pygame>=2.0",
+    "PyQt6>=6.7"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
