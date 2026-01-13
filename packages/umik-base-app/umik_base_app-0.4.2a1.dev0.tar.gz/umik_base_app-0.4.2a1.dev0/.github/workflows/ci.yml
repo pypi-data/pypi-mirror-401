@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_call:
+
+jobs:
+  test:
+    name: Check and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+      fail-fast: false
+
+    env:
+      UV_CACHE_DIR: /tmp/.uv-cache
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libportaudio2 libsndfile1
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run Linting
+        run: make lint
+
+      - name: Run Spell Check
+        run: make spell-check
+
+      - name: Run Tests with Coverage
+        run: make coverage
+
+      - name: Run Integration TEsts
+        run: make test-integration
