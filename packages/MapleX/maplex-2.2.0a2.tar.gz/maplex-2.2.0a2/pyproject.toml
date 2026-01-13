@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MapleX"
+version = "2.2.0a2"
+description = """
+# MapleX
+
+A Python library for Maple file format operations, with logging and console color utilities
+
+## MapleTree
+
+MapleTree is a powerful Python library designed for reading, editing, and managing Maple file formats. It provides a simple and intuitive interface for developers to work with Maple files, making it easier to manipulate data stored in this format.
+
+## Logger
+
+Logger is a versatile logging utility that allows developers to log messages with different severity levels (INFO, WARNING, ERROR, DEBUG) and customize the output format. It supports logging to both console and file, making it easy to track application behavior and diagnose issues.
+"""
+readme = "README.md"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Ryuji Hazama"}
+]
+dependencies = [
+    "cryptography>=46.0.3",
+    "pydantic>=2.12.5"
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.12"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.urls]
+PyPI = "https://pypi.org/project/MapleX/"
+Homepage = "https://github.com/Ryuji-Hazama"
+Repository = "https://github.com/Ryuji-Hazama/MapleTree"
+Issues = "https://github.com/Ryuji-Hazama/MapleTree/issues"
+YouTube = "https://www.youtube.com/@ryujihazama"
+Instagram = "https://www.instagram.com/ryujihazama/"
