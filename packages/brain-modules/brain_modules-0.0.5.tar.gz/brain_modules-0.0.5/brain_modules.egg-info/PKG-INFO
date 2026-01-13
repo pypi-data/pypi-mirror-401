@@ -1,0 +1,57 @@
+Metadata-Version: 2.4
+Name: brain-modules
+Version: 0.0.5
+Summary: Replicate brain modules' computations with Artificial Neural Networks
+Home-page: https://github.com/NeuroAI-Research/brain-modules
+Author: Ricky Ding
+Author-email: e0134117@u.nus.edu
+License: MIT
+Keywords: neuroscience,neuroAI,artificial-intelligence,neural-networks,cognitive-modeling,brain-modules
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: gymnasium
+Requires-Dist: torch
+Requires-Dist: matplotlib
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+
+## Intro
+
+[My](https://rickyding1997.github.io) approach to `brain simulation`
+
+1. Identify a list of computational modules in the brain
+2. For each module
+    1. Understand what it computes: input -> output
+    2. Get training data (synthetic or real-world)
+    3. Train artificial neural networks to replicate its functionality
+3. Combine modules
+
+Why?
+
+- Biological plausibility is a **trap**, simulating spikes and neurotransmitters does not help us understand how brain generates intelligence
+- Analogy: considering transistor physics is irrelevant to understanding how a computer computes `a + b` -- they are on different **isolated** levels of abstractions, they do not depend on one another to work
+
+- Current works in AI are mainly focused on solving daily-life tasks (text, image/video, game playing) -- I want to use these technologies to understand the brain
+- It is well proven that ANNs can produce intelligence (LLMs, RL agents) -- making them qualified to model modules in the brain
+
+## List of `implemented` modules
+
+```bash
+pip install brain-modules
+```
+
+1. [Hippocampal Place Cells (2014 Nobel Prize)](./docs/hippocampus/1_PlaceCells.md)
