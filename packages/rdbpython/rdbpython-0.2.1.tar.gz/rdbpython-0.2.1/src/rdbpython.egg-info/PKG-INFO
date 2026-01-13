@@ -1,0 +1,104 @@
+Metadata-Version: 2.4
+Name: rdbpython
+Version: 0.2.1
+Summary: Python bindings for RocksDB with Cython
+Author-email: Gor Arakelyan <gorarkln@gmail.com>
+Maintainer-email: Gor Arakelyan <gorarkln@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/everyabc/rdbpy
+Project-URL: Documentation, https://github.com/everyabc/rdbpy#readme
+Project-URL: Repository, https://github.com/everyabc/rdbpy
+Project-URL: Issues, https://github.com/everyabc/rdbpy/issues
+Project-URL: PyPI, https://pypi.org/project/rdbpython/
+Keywords: rocksdb,database,key-value,storage,embedded,cython
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Cython
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Database
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: attrs
+Provides-Extra: dev
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
+Provides-Extra: test
+Requires-Dist: pytest>=7.0.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0.0; extra == "test"
+Requires-Dist: pytest-xdist>=3.0.0; extra == "test"
+Requires-Dist: pytest-timeout>=2.1.0; extra == "test"
+Requires-Dist: pytest-benchmark>=4.0.0; extra == "test"
+Requires-Dist: hypothesis>=6.0.0; extra == "test"
+Provides-Extra: cython
+Requires-Dist: Cython>=3.0.0; extra == "cython"
+Requires-Dist: setuptools>=68.0; extra == "cython"
+Provides-Extra: all
+Requires-Dist: rdbpy[cython,dev,test]; extra == "all"
+Dynamic: license-file
+
+# rdbpy
+
+[![Build Wheels](https://github.com/everyabc/rdbpy/actions/workflows/build.yml/badge.svg)](https://github.com/everyabc/rdbpy/actions/workflows/build.yml)
+[![Tests](https://github.com/everyabc/rdbpy/actions/workflows/test.yml/badge.svg)](https://github.com/everyabc/rdbpy/actions/workflows/test.yml)
+[![PyPI version](https://badge.fury.io/py/rdbpython.svg)](https://pypi.org/project/rdbpython/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/rdbpython.svg)](https://pypi.org/project/rdbpython/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Python bindings for RocksDB with Cython - **batteries included!**
+
+**No RocksDB installation required** - everything is bundled in the wheel for Linux and macOS (Intel + Apple Silicon).
+
+## Installation
+
+```bash
+pip install rdbpython
+```
+
+That's it! No need to install RocksDB or any compression libraries manually.
+
+## Usage
+
+```python
+import rdbpy
+
+# Open database
+options = rdbpy.Options(create_if_missing=True)
+db = rdbpy.DB('/path/to/db', options)
+
+# Put/Get
+db.put(b'key', b'value')
+value = db.get(b'key')
+
+# Iterate
+it = db.iterkeys()
+it.seek_to_first()
+while it.valid():
+    print(it.key())
+    it.next()
+```
+
+## Development
+
+```bash
+# Setup
+make install
+
+# Build
+make build
+
+# Test
+make test
+```
+
+## License
+
+MIT
