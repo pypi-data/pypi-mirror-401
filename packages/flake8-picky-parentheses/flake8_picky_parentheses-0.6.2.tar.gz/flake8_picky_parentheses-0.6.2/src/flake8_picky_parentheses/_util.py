@@ -1,0 +1,73 @@
+# Copyright Rouven Bauer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+from __future__ import annotations
+
+import tokenize
+import typing as t
+
+OPEN_LIST = ["[", "{", "("]
+CLOSE_LIST = ["]", "}", ")"]
+
+
+class ParensCords(t.NamedTuple):
+    open_: tuple[int, int]
+    open_end_col: int
+    replacement: str
+    close: tuple[int, int]
+    token_indexes: tuple[int, int]
+
+
+def find_parens_coords(
+    tokens: list[tokenize.TokenInfo]
+) -> list[ParensCords]:
+    # return parentheses paris in the form
+    # (
+    #   (open_line, open_col),
+    #   open_end_col,
+    #   replacement,
+    #   (close_line, close_col)
+    # )
+    opening_stack: list[tuple[tuple[int, int], int, str, str, int]] = []
+    parentheses_pairs = []
+    last_line = -1
+    for i in range(len(tokens)):
+        first_in_line = last_line != tokens[i].start[0]
+        last_line = tokens[i].end[0]
+        if tokens[i].type == tokenize.OP:
+            if tokens[i].string in OPEN_LIST:
+                if not first_in_line:
+                    opening_stack.append((tokens[i].start, tokens[i].end[1],
+                                          " ", tokens[i].string, i))
+                    continue
+                if tokens[i + 1].start[0] == tokens[i].end[0]:
+                    opening_stack.append((tokens[i].start,
+                                          tokens[i + 1].start[1], "",
+                                          tokens[i].string, i))
+                    continue
+                # there is only this opening parenthesis on this line
+                opening_stack.append((tokens[i].start, len(tokens[i].line) - 2,
+                                      "", tokens[i].string, i))
+
+            if tokens[i].string in CLOSE_LIST:
+                opening = opening_stack.pop()
+                assert (OPEN_LIST.index(opening[3])
+                        == CLOSE_LIST.index(tokens[i].string))
+                token_indexes = (opening[4], i)
+                parentheses_pairs.append(
+                    ParensCords(*opening[0:3], tokens[i].start, token_indexes)
+                )
+
+    return parentheses_pairs
