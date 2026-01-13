@@ -1,0 +1,70 @@
+Metadata-Version: 2.4
+Name: decontaminate
+Version: 0.3.0.post4
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Rust
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Typing :: Typed
+Requires-Dist: pytest>=8.0 ; extra == 'dev'
+Provides-Extra: dev
+License-File: LICENSE
+Summary: Fast contamination detection for ML training data - Python bindings for decon
+Keywords: machine-learning,contamination,detection,llm,evaluation,decontamination,benchmark,data-quality
+Author-email: Allen Institute for AI <decon@allenai.org>
+Maintainer: Vincent Zed
+License-Expression: Apache-2.0
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Changelog, https://github.com/vincentzed/decon/releases
+Project-URL: Documentation, https://github.com/vincentzed/decon/blob/main/doc/python.md
+Project-URL: Homepage, https://github.com/allenai/decon
+Project-URL: Issues, https://github.com/vincentzed/decon/issues
+Project-URL: Repository, https://github.com/vincentzed/decon
+
+# decontaminate
+
+Fast contamination detection for ML training data. Python bindings for [decon](https://github.com/vincentzed/decon).
+
+## Installation
+
+```bash
+pip install decontaminate
+```
+
+## Usage
+
+```python
+import decon
+
+config = decon.Config(
+    training_dir="/path/to/training/data",
+    evals_dir="/path/to/eval/references",
+    report_output_dir="/path/to/output",
+)
+report_dir = decon.detect(config)
+```
+
+## API
+
+The Python API is a thin PyO3 wrapper over the Rust implementation. See [`src/lib.rs`](https://github.com/vincentzed/decon/blob/main/crates/decon-py/src/lib.rs) for all `Config` parameters and available functions:
+
+- `detect()`, `review()`, `compare()`, `evals()`, `server()`
+- `Tokenizer` (encode/decode with cl100k, o200k, etc.)
+- `clean_text()` (text normalization)
+
+## Documentation
+
+Full documentation: https://github.com/vincentzed/decon
+
