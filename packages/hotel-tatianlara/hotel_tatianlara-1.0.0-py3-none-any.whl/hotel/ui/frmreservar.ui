@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>tl_frmReservar</class>
+ <widget class="QDialog" name="tl_frmReservar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>544</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Reserva de Salón</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #BFB4AA;
+}
+
+/* GroupBox con borde */
+QGroupBox {
+    font-weight: bold;
+    color: #59473C;
+    border: 1px solid #8C7A69;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 8px;
+}
+
+/* CAMPOS SIN BORDE */
+QLineEdit,
+QComboBox,
+QSpinBox,
+QDateEdit {
+    background-color: #D9C99A;
+    color: #59473C;
+    border: none;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QGroupBox" name="tl_grpCongreso">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="title">
+        <string>Opciones específicas de Congreso</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Número de Jornadas:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QSpinBox" name="tl_spnJornadas">
+          <property name="toolTip">
+           <string>Número de jornadas</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Habitaciones:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="tl_chkHabitaciones">
+          <property name="toolTip">
+           <string>Habitaciones</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="tl_grpPersona">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="title">
+        <string>Datos de la Persona de Contacto</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;
+</string>
+          </property>
+          <property name="text">
+           <string>Persona: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="tl_txtPersona">
+          <property name="toolTip">
+           <string>Nombre de la persona que realiza la reserva</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #D9C99A;
+color: #59473C;
+border-radius: 4px;
+padding: 2px;
+</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;
+</string>
+          </property>
+          <property name="text">
+           <string>Teléfono:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="tl_txtTelefono">
+          <property name="toolTip">
+           <string>Teléfono de contacto</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #D9C99A;
+color: #59473C;
+border-radius: 4px;
+padding: 2px;
+</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="tl_grpEvento">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="title">
+        <string>Datos del evento</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;
+</string>
+          </property>
+          <property name="text">
+           <string>Fecha: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDateEdit" name="tl_datFecha">
+          <property name="toolTip">
+           <string>Fecha</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #D9C99A;
+color: #59473C;
+border-radius: 4px;
+padding: 2px;
+</string>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QLabel" name="label_4">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;
+</string>
+          </property>
+          <property name="text">
+           <string>Tipo de reserva: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QComboBox" name="tl_cmbTipoReserva">
+          <property name="toolTip">
+           <string>Seleccione el tipo de reserva</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #D9C99A;
+color: #59473C;
+border-radius: 4px;
+padding: 2px;
+</string>
+          </property>
+          <property name="currentText">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="2">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;
+</string>
+          </property>
+          <property name="text">
+           <string>Número de personas: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QSpinBox" name="tl_spnOcupacion">
+          <property name="toolTip">
+           <string>Número de personas</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #D9C99A;
+color: #59473C;
+border-radius: 4px;
+padding: 2px;
+</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0" colspan="2">
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #59473C;
+font-weight: bold;
+</string>
+          </property>
+          <property name="text">
+           <string>Tipo de cocina: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QComboBox" name="tl_cmbTipoCocina">
+          <property name="toolTip">
+           <string>Tipo de cocina</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #D9C99A;
+color: #59473C;
+border-radius: 4px;
+padding: 2px;
+</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>30</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget" native="true">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="tl_btnVolver">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Cancelar y volver a la lista de reservas</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #8C7A69;
+color: #59473C;
+border-radius: 6px;
+padding: 8px;
+</string>
+          </property>
+          <property name="text">
+           <string>Volver</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="tl_btnGuardar">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Guardar la reserva</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #A6935B;
+color: #59473C;
+font-weight: bold;
+border-radius: 6px;
+padding: 8px;
+</string>
+          </property>
+          <property name="text">
+           <string>Reservar</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
