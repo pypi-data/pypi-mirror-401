@@ -1,0 +1,49 @@
+[project]
+name = "hole-fonts"
+version = "2.0.0"
+description = "Professional font library management with metadata extraction, search, and format conversion"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "HOLE Foundation", email = "contact@theholefoundation.org"}
+]
+keywords = ["fonts", "typography", "font-management", "ttf", "otf", "woff2", "font-conversion", "metadata"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+    "Topic :: Text Processing :: Fonts",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "fonttools[woff]>=4.61.1",
+    "click>=8.1.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+    "requests>=2.31.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/The-HOLE-Foundation/hole-fonts"
+Documentation = "https://github.com/The-HOLE-Foundation/hole-fonts#readme"
+Repository = "https://github.com/The-HOLE-Foundation/hole-fonts"
+Issues = "https://github.com/The-HOLE-Foundation/hole-fonts/issues"
+Changelog = "https://github.com/The-HOLE-Foundation/hole-fonts/blob/main/CHANGELOG.md"
+
+[project.scripts]
+hole-fonts = "hole_fonts.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hole_fonts"]
