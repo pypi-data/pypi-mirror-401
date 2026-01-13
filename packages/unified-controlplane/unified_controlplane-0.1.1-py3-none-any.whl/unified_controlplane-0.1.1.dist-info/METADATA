@@ -1,0 +1,231 @@
+Metadata-Version: 2.4
+Name: unified-controlplane
+Version: 0.1.1
+Summary: AI Control Plane for orchestrating models, memory, and evaluation
+Author: Jack Blacketter
+License-Expression: MIT
+License-File: LICENSE
+Requires-Python: >=3.10
+Requires-Dist: anthropic>=0.18
+Requires-Dist: click>=8.0
+Requires-Dist: httpx>=0.25
+Requires-Dist: importlib-resources>=5.0; python_version < '3.11'
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: dev
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Unified
+
+An AI Control Plane for orchestrating models, memory, and evaluation across your projects.
+
+## What is This?
+
+Unified is infrastructure for AI-assisted development. Instead of hardcoding model choices and losing context between sessions, unified provides:
+
+- **Registry** - Catalog of available models, tools, and skills
+- **Router** - Selects the right model based on task type and constraints
+- **Memory** - Persistent storage for decisions, patterns, and project knowledge
+- **Evaluator** - Quality gates that validate AI output against checklists
+- **Audit Log** - Complete record of routing decisions and evaluations
+
+See [docs/concepts.md](docs/concepts.md) for the full mental model.
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/youruser/unified.git
+cd unified
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+**Coming soon:** `pip install unified-controlplane`
+
+## Quick Start
+
+```bash
+# Check system status
+python src/cli.py status
+
+# Route a task to the appropriate model
+python src/cli.py route "Generate unit tests for user authentication" --type code
+
+# Run full control plane loop (dry run with mock output)
+python src/cli.py dry-run "Refactor the payment module" --type code --role lead
+
+# Run with real model (requires API key)
+export ANTHROPIC_API_KEY=your-key-here
+python src/cli.py run "Explain this error message" --type analysis
+```
+
+## CLI Reference
+
+### `route`
+Select the appropriate model for a task without executing.
+
+```bash
+python src/cli.py route "task description" [OPTIONS]
+
+Options:
+  --type TEXT        Task type: code, review, documentation, architecture, analysis
+  --role TEXT        Role: lead, reviewer, advisor
+  -c, --constraint   Constraints: low-cost, fast, high-accuracy, local-only
+  --dry-run          Show decision without executing
+```
+
+### `run`
+Execute the full control plane loop with real model output.
+
+```bash
+python src/cli.py run "task description" [OPTIONS]
+
+Options:
+  --type TEXT        Task type (default: code)
+  --role TEXT        Role (default: lead)
+  -c, --constraint   Constraints (can specify multiple)
+  --model TEXT       Override model selection
+```
+
+### `dry-run`
+Execute full loop with mock output (for testing workflows).
+
+```bash
+python src/cli.py dry-run "task description" [OPTIONS]
+```
+
+### `status`
+Display control plane status: registry contents, memory stats, audit log info.
+
+```bash
+python src/cli.py status [OPTIONS]
+
+Options:
+  --check-health    Verify model availability (may be slow)
+```
+
+### `evaluate`
+Run quality checklists against output.
+
+```bash
+python src/cli.py evaluate [OPTIONS]
+
+Options:
+  --file PATH        File containing output to evaluate
+  --task-type TEXT   Task type for checklist selection
+  --task-brief TEXT  Brief description for alignment checks
+  -c, --checklist    Specific checklist(s) to run
+```
+
+### `config-validate`
+Validate registry configuration.
+
+```bash
+python src/cli.py config-validate [OPTIONS]
+
+Options:
+  --path TEXT    Path to registry.yaml (default: configs/registry.yaml)
+```
+
+## Configuration
+
+### Registry (`configs/registry.yaml`)
+
+Define available models, tools, and skills:
+
+```yaml
+models:
+  claude-sonnet:
+    provider: anthropic
+    capabilities: [code, reasoning, review, documentation]
+    cost_tier: medium
+    is_local: false
+    adapter: claude
+    model_id: claude-3-sonnet-20240229
+
+  ollama-llama3:
+    provider: ollama
+    endpoint: http://localhost:11434
+    capabilities: [code, reasoning]
+    cost_tier: free
+    is_local: true
+    adapter: ollama
+    model_id: llama3
+
+tools:
+  run_tests:
+    description: "Run pytest on specified path"
+    module: tools.testing
+    function_name: run_pytest
+    parameters:
+      type: object
+      properties:
+        path: { type: string }
+      required: [path]
+
+skills:
+  review:
+    description: "Run reviewer checklist against work output"
+    template_path: .claude/skills/review.md
+    applicable_to: [code, documentation, architecture]
+```
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `ANTHROPIC_API_KEY` | API key for Claude models | For Claude adapter |
+| `OLLAMA_HOST` | Ollama endpoint (default: http://localhost:11434) | For Ollama adapter |
+
+## Project Structure
+
+```
+unified/
+├── src/
+│   ├── cli.py              # Command-line interface
+│   ├── core/
+│   │   ├── registry.py     # Model/tool/skill catalog
+│   │   └── memory.py       # Persistent project knowledge
+│   ├── models/
+│   │   ├── base.py         # Abstract ModelAdapter
+│   │   ├── claude.py       # Anthropic Claude adapter
+│   │   └── ollama.py       # Local Ollama adapter
+│   ├── governance/
+│   │   ├── evaluator.py    # Quality checklist runner
+│   │   └── audit.py        # Decision and event logging
+│   ├── supporting/
+│   │   ├── router.py       # Model selection logic
+│   │   └── context.py      # Prompt pack assembly
+│   └── tools/              # Callable tool implementations
+├── configs/
+│   └── registry.yaml       # Model, tool, skill definitions
+├── checklists/             # Quality review templates
+├── memory/                 # Persistent memory storage
+├── audit/                  # Audit log files
+├── tests/                  # Unit tests
+└── docs/                   # Documentation
+```
+
+## Running Tests
+
+```bash
+pytest tests/ -v
+```
+
+## Documentation
+
+- [Conceptual Guide](docs/concepts.md) - Why a control plane? Mental models and workflows
+- [Control Plane Spec](docs/control_plane_spec.md) - Detailed architecture specification
+- [Pip Packaging Plan](docs/pip_packaging_recommendation.md) - Roadmap for standalone distribution
+- [Decision Log](docs/decision_log.md) - Architectural decisions and rationale
+
+## License
+
+MIT
