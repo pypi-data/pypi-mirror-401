@@ -1,0 +1,55 @@
+Metadata-Version: 2.4
+Name: Error_Web
+Version: 1.0.0
+Summary: Gestionnaire universel d'erreurs Flask — pages HTML, JSON et trace ID
+Author-email: GameurYlann <contact@example.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/GameurYlann/error-manager
+Project-URL: Bug Tracker, https://github.com/GameurYlann/error-manager/issues
+Keywords: flask,errors,http,exception,manager,web
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Framework :: Flask
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: flask>=2.0
+
+# Flask Error Manager
+
+Un gestionnaire d’erreurs universel pour Flask, simple à intégrer.
+
+## Installation
+
+```bash
+pip install flask_error_manager
+```
+
+## Utilisation
+
+```python
+from flask import Flask
+from flask_error_manager import init_error_manager
+
+app = Flask(__name__)
+init_error_manager(app)
+
+@app.route("/boom")
+def boom():
+    1 / 0
+
+app.run(port=5000)
+```
+
+## Fonctionnalités
+
+- Gère **toutes** les erreurs (400–599 + exceptions Python)
+- Affiche une **page HTML** stylée si c’est un navigateur
+- Renvoie une **réponse JSON** si c’est une API
+- Génère un **Trace ID** unique pour chaque erreur
+- Permet de surcharger les pages (ex: `templates/errors/404.html`)
+
+Licence MIT.
