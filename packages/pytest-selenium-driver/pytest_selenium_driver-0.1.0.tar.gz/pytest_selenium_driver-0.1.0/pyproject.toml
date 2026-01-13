@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytest-selenium-driver"
+version = "0.1.0"
+description = "A zero-boilerplate Selenium WebDriver fixture for pytest"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Shubham Singh", email = "shubham.fps@gmail.com"},
+]
+keywords = ["pytest", "selenium", "webdriver", "testing", "automation", "browser"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+]
+dependencies = [
+    "pytest>=7.0",
+    "selenium>=4.6",
+    "hypothesis>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest-xdist>=3.0",
+    "black>=22.0",
+    "flake8>=4.0",
+    "mypy>=0.900",
+]
+test = [
+    "pytest-xdist>=3.0",
+    "pytest-cov>=3.0",
+]
+
+[project.entry-points.pytest11]
+selenium_driver = "pytest_selenium_driver.plugin"
+
+[project.urls]
+Homepage = "https://github.com/shubhamfps/pytest-selenium-driver"
+Repository = "https://github.com/shubhamfps/pytest-selenium-driver"
+Issues = "https://github.com/shubhamfps/pytest-selenium-driver/issues"
+Documentation = "https://github.com/shubhamfps/pytest-selenium-driver/blob/main/README.md"
+Changelog = "https://github.com/shubhamfps/pytest-selenium-driver/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pytest_selenium_driver*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.setuptools.package-data]
+pytest_selenium_driver = ["py.typed"]
