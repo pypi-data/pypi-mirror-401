@@ -1,0 +1,98 @@
+Metadata-Version: 2.4
+Name: station-service-sdk
+Version: 2.1.0
+Summary: SDK for building test sequences for Station Service
+Project-URL: Homepage, https://github.com/Soochol/station-service-sdk
+Project-URL: Documentation, https://github.com/Soochol/station-service-sdk#readme
+Project-URL: Repository, https://github.com/Soochol/station-service-sdk
+Author-email: F2X <dev@f2x.com>
+License-Expression: MIT
+Keywords: automation,manufacturing,sequence,testing
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.11
+Requires-Dist: click<9.0,>=8.0
+Requires-Dist: pydantic<3.0,>=2.0
+Requires-Dist: pyyaml<7.0,>=6.0
+Provides-Extra: all
+Requires-Dist: opentelemetry-api<2.0,>=1.20; extra == 'all'
+Requires-Dist: opentelemetry-sdk<2.0,>=1.20; extra == 'all'
+Requires-Dist: prometheus-client<1.0,>=0.17; extra == 'all'
+Provides-Extra: dev
+Requires-Dist: mypy<2.0,>=1.0; extra == 'dev'
+Requires-Dist: pytest-asyncio<1.0,>=0.21; extra == 'dev'
+Requires-Dist: pytest-cov<7.0,>=4.0; extra == 'dev'
+Requires-Dist: pytest<9.0,>=7.0; extra == 'dev'
+Requires-Dist: ruff<1.0,>=0.1.0; extra == 'dev'
+Provides-Extra: metrics
+Requires-Dist: prometheus-client<1.0,>=0.17; extra == 'metrics'
+Provides-Extra: tracing
+Requires-Dist: opentelemetry-api<2.0,>=1.20; extra == 'tracing'
+Requires-Dist: opentelemetry-sdk<2.0,>=1.20; extra == 'tracing'
+Description-Content-Type: text/markdown
+
+# Station Service SDK
+
+SDK for building test sequences for Station Service.
+
+## Installation
+
+```bash
+# From GitHub
+pip install git+https://github.com/Soochol/station-service-sdk.git
+
+# Install Claude Code skill
+station-sdk init
+```
+
+## Quick Start
+
+```python
+from station_service_sdk import SequenceBase, RunResult
+
+class MySequence(SequenceBase):
+    name = "my_sequence"
+    version = "1.0.0"
+    description = "My test sequence"
+
+    async def setup(self) -> None:
+        self.emit_log("info", "Initializing...")
+
+    async def run(self) -> RunResult:
+        self.emit_step_start("test", 1, 1, "Test step")
+        self.emit_measurement("voltage", 3.3, "V")
+        self.emit_step_complete("test", 1, True, 1.0)
+        return {"passed": True, "measurements": {"voltage": 3.3}}
+
+    async def teardown(self) -> None:
+        self.emit_log("info", "Cleanup complete")
+
+if __name__ == "__main__":
+    exit(MySequence.run_from_cli())
+```
+
+## CLI Commands
+
+```bash
+# Initialize Claude Code skill in current project
+station-sdk init
+
+# Force overwrite existing skill
+station-sdk init --force
+
+# Show version
+station-sdk version
+```
+
+## Documentation
+
+After running `station-sdk init`, Claude Code will have access to the SDK development guide at `.claude/skills/sequence-development/SKILL.md`.
+
+## License
+
+MIT
