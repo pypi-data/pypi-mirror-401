@@ -1,0 +1,56 @@
+[project]
+name = "msrashed-prometheus-mcp-server"
+version = "0.1.0"
+description = "Read-only Prometheus MCP server for metrics querying, alerting, and monitoring inspection"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Mohamed Salah", email = "mohamed@buyinggroup.com" }]
+keywords = ["mcp", "prometheus", "monitoring", "observability", "metrics", "llm", "model-context-protocol", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Monitoring",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "mcp>=1.24.0",
+    "fastmcp>=2.0.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.27.0",
+    "python-dateutil>=2.8.0",
+    "click>=8.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/msalah-eg/prometheus-mcp-server"
+Repository = "https://github.com/msalah-eg/prometheus-mcp-server"
+Issues = "https://github.com/msalah-eg/prometheus-mcp-server/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.8.0",
+    "respx>=0.21.0",
+]
+
+[project.scripts]
+prometheus-mcp-server = "prometheus_mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prometheus_mcp_server"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
