@@ -1,0 +1,210 @@
+[build-system]
+requires = ["setuptools>=80.9.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-gitlab-mcp"
+version = "1.0.0"
+description = "Production-ready Model Context Protocol server for GitLab - 87 tools, 14 prompts, 13 resources"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    {name = "Wade Woolwine", email = "wade.woolwine@gmail.com"}
+]
+maintainers = [
+    {name = "Wade Woolwine", email = "wade.woolwine@gmail.com"}
+]
+keywords = [
+    "gitlab",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "llm",
+    "claude",
+    "anthropic",
+    "devops",
+    "ci-cd",
+    "automation",
+    "api-client",
+    "async",
+    "type-safe"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Topic :: System :: Systems Administration",
+    "Framework :: AsyncIO",
+    "Typing :: Typed",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "mcp>=1.25.0",           # Official MCP SDK (latest: 1.25.0, Dec 2025)
+    "python-gitlab>=7.1.0",  # GitLab API client (latest: 7.1.0, Dec 2025)
+    "pydantic>=2.12.5",      # Data validation (latest: 2.12.5, Nov 2025)
+    "python-dotenv>=1.2.1",  # Environment variables (latest: 1.2.1, Oct 2025)
+    "httpx>=0.28.1",         # HTTP client for async (latest: 0.28.1, 2025)
+    "starlette>=0.50.0",     # ASGI framework (latest: 0.50.0, Nov 2025)
+    "uvicorn>=0.40.0",       # ASGI server for HTTP transport (latest: 0.40.0, Jan 2026)
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",         # Testing framework (latest: 9.0.2, Dec 2025)
+    "pytest-cov>=7.0.0",     # Code coverage (latest: 7.0.0, Sep 2025)
+    "pytest-asyncio>=1.3.0", # Async testing (latest: 1.3.0, Nov 2025)
+    "pytest-mock>=3.15.1",   # Mocking (latest: 3.15.1, Sep 2025)
+    "black>=25.12.0",        # Code formatter (latest: 25.12.0, Dec 2025)
+    "ruff>=0.14.10",         # Linter (latest: 0.14.10, Dec 2025)
+    "mypy>=1.19.1",          # Type checker (latest: 1.19.1, Dec 2025)
+    "types-requests",        # Type stubs for requests
+    "pre-commit>=4.0.0",     # Pre-commit hooks (latest: 4.0.0, Dec 2025)
+    "build>=1.2.0",          # PEP 517 build frontend
+    "twine>=6.0.0",          # PyPI upload tool
+]
+
+[project.scripts]
+gitlab-mcp-server = "gitlab_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/wadew/gitlab-mcp"
+Documentation = "https://github.com/wadew/gitlab-mcp#documentation"
+Repository = "https://github.com/wadew/gitlab-mcp.git"
+Issues = "https://github.com/wadew/gitlab-mcp/issues"
+Changelog = "https://github.com/wadew/gitlab-mcp/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["gitlab_mcp*"]
+
+# Black configuration
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# Ruff configuration
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.10"
+exclude = [".venv", "build", "dist"]
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+strict_concatenate = true
+
+[[tool.mypy.overrides]]
+module = "gitlab.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "mcp.*"
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "-q",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src/gitlab_mcp",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests (fast, isolated, mocked dependencies)",
+    "integration: Integration tests (may call real GitLab API)",
+    "e2e: End-to-end tests (full MCP protocol)",
+    "slow: Slow-running tests",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+branch = true
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
