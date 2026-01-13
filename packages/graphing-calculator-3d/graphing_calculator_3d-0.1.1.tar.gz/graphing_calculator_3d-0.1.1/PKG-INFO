@@ -1,0 +1,41 @@
+Metadata-Version: 2.4
+Name: graphing_calculator_3d
+Version: 0.1.1
+Summary: A 3D/4D graphing library using VisPy and SymPy
+Author-email: Yosef Gizachew <yeyeadmss@gmail.com>
+Project-URL: Homepage, https://github.com/yosefgizachew/3D-graphing-calculator
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: sympy
+Requires-Dist: vispy
+Requires-Dist: scikit-image
+Requires-Dist: PyQt5
+
+# 3D Graphing Calculator
+
+A Python library for rendering 3D and 4D mathematical expressions using VisPy.
+
+## Installation
+
+```bash
+pip install graphing_calculator_3d
+```
+
+## Usage
+
+```python
+import sympy as sp
+from graphing_lib import api_contract
+
+x, y, z, t = sp.symbols('x y z t')
+
+# Define a 4D function (animated over t)
+function = x**2 + y**2 + z - 25 + sp.sin(t)
+
+# Plot it
+api_contract.plot(function)
+```
