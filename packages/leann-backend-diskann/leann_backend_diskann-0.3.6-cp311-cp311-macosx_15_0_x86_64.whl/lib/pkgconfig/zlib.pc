@@ -1,0 +1,13 @@
+prefix=/var/folders/l1/d3k2zmyd7f1_0x2k8696xvbw0000gn/T/tmp403i5qin/wheel/platlib
+exec_prefix=/var/folders/l1/d3k2zmyd7f1_0x2k8696xvbw0000gn/T/tmp403i5qin/wheel/platlib
+libdir=${exec_prefix}/lib
+sharedlibdir=${exec_prefix}/lib
+includedir=${exec_prefix}/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.4.1.1
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}
