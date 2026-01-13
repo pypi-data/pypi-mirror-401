@@ -1,0 +1,586 @@
+"""Cross-file import analysis."""
+from __future__ import annotations
+
+from collections import defaultdict
+from dataclasses import dataclass
+from dataclasses import field
+from pathlib import Path
+
+from import_analyzer._data import ImplicitReexport
+from import_analyzer._data import ImportInfo
+from import_analyzer._data import IndirectImport
+from import_analyzer._detection import find_unused_imports
+from import_analyzer._graph import ImportGraph
+
+
+@dataclass
+class CrossFileResult:
+    """Results of cross-file import analysis."""
+
+    # Unused imports per file (after accounting for re-exports)
+    unused_imports: dict[Path, list[ImportInfo]] = field(default_factory=dict)
+
+    # Imports used by other files but not in __all__
+    implicit_reexports: list[ImplicitReexport] = field(default_factory=list)
+
+    # Imports going through re-exporters instead of direct sources
+    indirect_imports: list[IndirectImport] = field(default_factory=list)
+
+    # External module usage across the project: module -> files using it
+    external_usage: dict[str, set[Path]] = field(default_factory=dict)
+
+    # Circular import chains
+    circular_imports: list[list[Path]] = field(default_factory=list)
+
+    # Files that become unreachable when unused imports are removed
+    unreachable_files: set[Path] = field(default_factory=set)
+
+
+class CrossFileAnalyzer:
+    """Analyze imports across multiple files."""
+
+    def __init__(
+        self,
+        graph: ImportGraph,
+        entry_point: Path | None = None,
+        include_same_package_indirect: bool = False,
+    ) -> None:
+        self.graph = graph
+        self.entry_point = entry_point
+        self.include_same_package_indirect = include_same_package_indirect
+
+    def analyze(self) -> CrossFileResult:
+        """Run cross-file analysis.
+
+        Steps:
+        1. Run single-file analysis on each module
+        2. Identify "implicit-reexport-only" imports (__init__.py without __all__)
+        3. Compute full cascade of unused imports (iterate until stable)
+        4. Find implicit re-exports (re-exported but not in __all__)
+        5. Aggregate external module usage
+        6. Find circular imports
+
+        The cascade computation handles:
+        - Re-export chains: A imports X from B (unused in A), B imports X from C
+        - File reachability: removing module imports makes files unreachable
+
+        When a file becomes unreachable from the entry point, imports from that
+        file no longer count as "consumers" of re-exports.
+
+        Note: Imports listed in __all__ are considered "used" (public API) and
+        are never flagged as unused. This matches the behavior of other linters
+        like flake8, ruff, and autoflake.
+        """
+        result = CrossFileResult()
+
+        # Step 1: Get single-file unused imports for each module
+        single_file_unused = self._get_single_file_unused()
+
+        # Step 2: Get "implicit-reexport-only" imports (__init__.py without __all__)
+        implicit_reexport_only = self._get_implicit_reexport_only_imports(
+            single_file_unused,
+        )
+
+        # Step 3: Compute full cascade of unused imports
+        all_removed: dict[Path, set[str]] = defaultdict(set)
+        unreachable_files: set[Path] = set()
+
+        changed = True
+        while changed:
+            changed = False
+
+            # Update file reachability based on removed imports
+            if self.entry_point:
+                unreachable_files = self._find_unreachable_files(all_removed)
+
+            # Find re-exports, excluding unreachable files as consumers
+            reexported = self._find_reexported_imports(
+                removed_imports=all_removed,
+                unreachable_files=unreachable_files,
+            )
+
+            # Check imports that are unused locally
+            for file_path, unused in single_file_unused.items():
+                reexported_names = reexported.get(file_path, set())
+                for imp in unused:
+                    if imp.name not in reexported_names:
+                        if imp.name not in all_removed[file_path]:
+                            all_removed[file_path].add(imp.name)
+                            changed = True
+
+            # Check "implicit-reexport-only" imports (__init__.py without __all__)
+            for file_path, implicit_imports in implicit_reexport_only.items():
+                reexported_names = reexported.get(file_path, set())
+                for imp in implicit_imports:
+                    if imp.name not in reexported_names:
+                        if imp.name not in all_removed[file_path]:
+                            all_removed[file_path].add(imp.name)
+                            changed = True
+
+        # Build unused_imports from the stable removed set
+        for file_path, removed_names in all_removed.items():
+            unused_imports: list[ImportInfo] = []
+
+            # Add from single-file unused
+            for imp in single_file_unused.get(file_path, []):
+                if imp.name in removed_names:
+                    unused_imports.append(imp)
+
+            # Add from implicit-reexport-only
+            for imp in implicit_reexport_only.get(file_path, []):
+                if imp.name in removed_names:
+                    unused_imports.append(imp)
+
+            if unused_imports:
+                # Sort by line number for consistent output
+                unused_imports.sort(key=lambda x: (x.lineno, x.name))
+                result.unused_imports[file_path] = unused_imports
+
+        # Step 5: Find implicit re-exports (using final reexported state)
+        final_reexported = self._find_reexported_imports(
+            removed_imports=all_removed,
+            unreachable_files=unreachable_files,
+        )
+        result.implicit_reexports = self._find_implicit_reexports(final_reexported)
+
+        # Step 6: Aggregate external usage
+        result.external_usage = self._aggregate_external_usage()
+
+        # Step 7: Find circular imports
+        result.circular_imports = self.graph.find_cycles()
+
+        # Step 8: Store truly unreachable files for user warning
+        # Filter to only files that are truly dead code (no reachable ancestors)
+        truly_unreachable = self._filter_truly_unreachable(unreachable_files, all_removed)
+        result.unreachable_files = truly_unreachable - {self.entry_point}
+
+        # Step 9: Find indirect imports (imports through re-exporters)
+        result.indirect_imports = self._find_indirect_imports()
+
+        return result
+
+    def _get_single_file_unused(self) -> dict[Path, list[ImportInfo]]:
+        """Run single-file unused detection on each module."""
+        result: dict[Path, list[ImportInfo]] = {}
+
+        for file_path, module_info in self.graph.nodes.items():
+            try:
+                source = file_path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+
+            unused = find_unused_imports(source)
+            if unused:
+                result[file_path] = unused
+
+        return result
+
+    def _get_implicit_reexport_only_imports(
+        self,
+        single_file_unused: dict[Path, list[ImportInfo]],
+    ) -> dict[Path, list[ImportInfo]]:
+        """Find imports in __init__.py that exist solely for implicit re-export.
+
+        These are imports that:
+        1. Are in an __init__.py file without __all__
+        2. Are not used locally (would be flagged by single-file analysis)
+        3. Are being re-exported to other files
+
+        Unlike explicit __all__ re-exports, these are implicitly available
+        to importers. When no one imports them anymore, they become unused.
+        """
+        result: dict[Path, list[ImportInfo]] = {}
+
+        for file_path, module_info in self.graph.nodes.items():
+            # Only consider __init__.py files without __all__
+            if not module_info.is_package:
+                continue
+            if module_info.exports:  # Has __all__
+                continue
+
+            try:
+                source = file_path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+
+            # Get import names and their ImportInfo objects
+            import_by_name = {imp.name: imp for imp in module_info.imports}
+            defined_names = module_info.defined_names
+
+            # Names already flagged as unused locally
+            unused_locally = {
+                imp.name for imp in single_file_unused.get(file_path, [])
+            }
+
+            # Find candidates: is an import, not defined, not already unused
+            candidates = set(import_by_name.keys()) - defined_names - unused_locally
+
+            if not candidates:
+                continue
+
+            # Check which candidates are actually used locally
+            unused_without_all = find_unused_imports(source, ignore_all=True)
+            unused_without_all_names = {imp.name for imp in unused_without_all}
+
+            # Implicit-reexport-only: would be unused if we checked locally
+            implicit_reexport_names = candidates & unused_without_all_names
+
+            if implicit_reexport_names:
+                implicit_imports = [
+                    import_by_name[name]
+                    for name in implicit_reexport_names
+                    if name in import_by_name
+                ]
+                if implicit_imports:
+                    result[file_path] = implicit_imports
+
+        return result
+
+    def _find_unreachable_files(
+        self,
+        removed_imports: dict[Path, set[str]],
+    ) -> set[Path]:
+        """Find files that become unreachable when certain imports are removed.
+
+        An edge is considered removed when ALL names from that import are removed.
+
+        Returns files with no remaining import edges - used for cascade detection.
+        For user-facing warnings, use _filter_truly_unreachable() to exclude files
+        that could still be accessed via parent package imports.
+        """
+        if not self.entry_point:
+            return set()
+
+        # Build set of excluded edges
+        excluded_edges: set[tuple[Path, str]] = set()
+
+        for edge in self.graph.edges:
+            if edge.is_external or edge.imported is None:
+                continue
+
+            removed_names = removed_imports.get(edge.importer, set())
+            # If all imported names are removed, the edge is removed
+            if edge.names and edge.names <= removed_names:
+                excluded_edges.add((edge.importer, edge.module_name))
+
+        # Find reachable files
+        reachable = self.graph.find_reachable_files(self.entry_point, excluded_edges)
+
+        # Return unreachable files (for cascade detection)
+        return set(self.graph.nodes.keys()) - reachable
+
+    def _filter_truly_unreachable(
+        self,
+        unreachable_files: set[Path],
+        removed_imports: dict[Path, set[str]],
+    ) -> set[Path]:
+        """Filter unreachable files to only those that are truly dead code.
+
+        A file is only "truly unreachable" if:
+        1. It has no remaining import edges pointing to it
+        2. None of its ancestor packages are reachable (because Python allows
+           accessing submodules via attribute access on parent packages, e.g.,
+           `import pkg` then `pkg.submodule.func()`)
+
+        This is used for user-facing warnings about dead code.
+        """
+        if not self.entry_point:
+            return set()
+
+        # Recompute reachable files for ancestor checking
+        excluded_edges: set[tuple[Path, str]] = set()
+        for edge in self.graph.edges:
+            if edge.is_external or edge.imported is None:
+                continue
+            removed_names = removed_imports.get(edge.importer, set())
+            if edge.names and edge.names <= removed_names:
+                excluded_edges.add((edge.importer, edge.module_name))
+
+        reachable = self.graph.find_reachable_files(self.entry_point, excluded_edges)
+
+        # Filter to only files with no reachable ancestors
+        truly_unreachable: set[Path] = set()
+        for file_path in unreachable_files:
+            if not self._has_reachable_ancestor(file_path, reachable):
+                truly_unreachable.add(file_path)
+
+        return truly_unreachable
+
+    def _has_reachable_ancestor(self, file_path: Path, reachable: set[Path]) -> bool:
+        """Check if any ancestor package of file_path is in the reachable set."""
+        # Walk up the directory tree looking for __init__.py files
+        # Use resolve() to ensure consistent path comparison across platforms
+        current = file_path.resolve().parent
+        while current != current.parent:  # Stop at filesystem root
+            init_file = (current / "__init__.py").resolve()
+            if init_file in reachable:
+                return True
+            current = current.parent
+        return False
+
+    def _find_reexported_imports(
+        self,
+        removed_imports: dict[Path, set[str]] | None = None,
+        unreachable_files: set[Path] | None = None,
+    ) -> dict[Path, set[str]]:
+        """Find imports that are re-exported to other files.
+
+        Args:
+            removed_imports: Imports to consider as "virtually removed".
+                When checking if file B's import is re-exported via file A,
+                skip if A's import of that name is in this set.
+            unreachable_files: Files to consider as unreachable from entry point.
+                Imports from these files don't count as consumers.
+
+        Returns a mapping of file -> set of import names that are used
+        by other files importing from this file.
+        """
+        removed = removed_imports or {}
+        unreachable = unreachable_files or set()
+        reexported: dict[Path, set[str]] = defaultdict(set)
+
+        for edge in self.graph.edges:
+            if edge.is_external or edge.imported is None:
+                continue
+
+            # Skip if the importer is unreachable (its imports don't count)
+            if edge.importer in unreachable:
+                continue
+
+            # edge.imported is being imported by edge.importer
+            # edge.names are the names being imported
+            imported_file = edge.imported
+            imported_names = edge.names
+
+            # Filter out names that are "virtually removed" from the importer
+            importer_removed = removed.get(edge.importer, set())
+            active_names = imported_names - importer_removed
+
+            if not active_names:
+                continue
+
+            if imported_file not in self.graph.nodes:
+                continue
+
+            module_info = self.graph.nodes[imported_file]
+
+            # Check which imported names are actually import statements
+            # in the imported file (not defined there)
+            import_names_in_file = {imp.name for imp in module_info.imports}
+            defined_in_file = module_info.defined_names
+
+            for name in active_names:
+                # If the name is an import in the target file (not defined),
+                # then it's being re-exported
+                if name in import_names_in_file and name not in defined_in_file:
+                    reexported[imported_file].add(name)
+
+        return dict(reexported)
+
+    def _find_implicit_reexports(
+        self, reexported: dict[Path, set[str]],
+    ) -> list[ImplicitReexport]:
+        """Find imports that are re-exported but not in __all__."""
+        result: list[ImplicitReexport] = []
+
+        for file_path, reexported_names in reexported.items():
+            if file_path not in self.graph.nodes:
+                continue
+
+            module_info = self.graph.nodes[file_path]
+            exports = module_info.exports  # Names in __all__
+
+            for name in reexported_names:
+                # If re-exported but not in __all__, it's implicit
+                if name not in exports:
+                    # Find which files use this re-exported name
+                    used_by: set[Path] = set()
+                    for edge in self.graph.get_importers(file_path):
+                        if name in edge.names:
+                            used_by.add(edge.importer)
+
+                    result.append(
+                        ImplicitReexport(
+                            source_file=file_path,
+                            import_name=name,
+                            used_by=used_by,
+                        ),
+                    )
+
+        return result
+
+    def _aggregate_external_usage(self) -> dict[str, set[Path]]:
+        """Aggregate which files use which external modules."""
+        usage: dict[str, set[Path]] = defaultdict(set)
+
+        for edge in self.graph.edges:
+            if edge.is_external:
+                usage[edge.module_name].add(edge.importer)
+
+        return dict(usage)
+
+    def _find_indirect_imports(self) -> list[IndirectImport]:
+        """Find imports that go through re-exporters instead of direct sources.
+
+        An indirect import is when file A imports name X from file B,
+        but B doesn't define X - it imports X from file C.
+
+        By default, same-package re-exports are allowed (e.g., pkg/__init__.py
+        re-exporting from pkg/module.py). Use include_same_package_indirect=True
+        to flag those as well.
+        """
+        results: list[IndirectImport] = []
+
+        for edge in self.graph.edges:
+            if edge.is_external or edge.imported is None:
+                continue
+
+            imported_module = self.graph.nodes.get(edge.imported)
+            if not imported_module:
+                continue
+
+            # For each name imported from this module
+            for name in edge.names:
+                # Check if this name is a re-export (import, not definition)
+                if name in imported_module.defined_names:
+                    continue  # Defined here, not indirect
+
+                # Find where this module got the name from (and original name)
+                trace_result = self._trace_import_source(edge.imported, name)
+                if trace_result is None:
+                    continue  # Can't trace
+                original_source, original_name = trace_result
+                if original_source == edge.imported:
+                    continue  # Already at source
+
+                # Check if same-package re-export
+                is_same_pkg = self._is_same_package_reexport(
+                    edge.imported,
+                    original_source,
+                )
+
+                if is_same_pkg and not self.include_same_package_indirect:
+                    continue  # Skip same-package re-exports by default
+
+                # Find the line number for this import
+                lineno = self._find_import_lineno(edge.importer, edge.imported, name)
+
+                results.append(
+                    IndirectImport(
+                        file=edge.importer,
+                        name=name,
+                        original_name=original_name,
+                        lineno=lineno,
+                        current_source=edge.imported,
+                        original_source=original_source,
+                        is_same_package=is_same_pkg,
+                    ),
+                )
+
+        # Sort by file, then line number for consistent output
+        results.sort(key=lambda x: (x.file, x.lineno, x.name))
+        return results
+
+    def _trace_import_source(
+        self,
+        file: Path,
+        name: str,
+    ) -> tuple[Path, str] | None:
+        """Trace an import back to its original definition.
+
+        Follows the import chain until we find a file that actually defines
+        the name (not just re-exports it). Handles aliases along the way.
+
+        Returns:
+            Tuple of (source_file, original_name) where original_name is the
+            name as defined in source_file (may differ from input name if
+            aliases were used in the chain). Returns None if can't trace.
+        """
+        visited: set[Path] = set()
+        current = file
+        current_name = name
+
+        while current not in visited:
+            visited.add(current)
+            module = self.graph.nodes.get(current)
+            if not module:
+                return None
+
+            # If defined here, this is the source
+            if current_name in module.defined_names:
+                return (current, current_name)
+
+            # Find where this module imports the name from
+            found_next = False
+            for imp in module.imports:
+                if imp.name == current_name:
+                    # Follow the original_name if aliased
+                    next_name = imp.original_name
+                    # Find the edge for this import
+                    for edge in self.graph.get_imports(current):
+                        if current_name in edge.names and edge.imported:
+                            current = edge.imported
+                            current_name = next_name
+                            found_next = True
+                            break
+                    break
+
+            if not found_next:
+                return None  # Can't trace further
+
+        return None  # Circular, can't determine
+
+    def _is_same_package_reexport(self, reexporter: Path, source: Path) -> bool:
+        """Check if reexporter is __init__.py re-exporting from its own package.
+
+        Returns True if:
+        1. reexporter is an __init__.py file, AND
+        2. source is within the same package directory
+
+        This pattern is acceptable because __init__.py commonly defines
+        the public API of a package by re-exporting from submodules.
+        """
+        if reexporter.name != "__init__.py":
+            return False
+
+        # Get the package directory (parent of __init__.py)
+        pkg_dir = reexporter.parent.resolve()
+        source_resolved = source.resolve()
+
+        # Check if source is within the package directory
+        try:
+            source_resolved.relative_to(pkg_dir)
+            return True
+        except ValueError:
+            return False
+
+    def _find_import_lineno(
+        self,
+        importer: Path,
+        imported: Path,
+        name: str,
+    ) -> int:
+        """Find the line number of a specific import in a file."""
+        module = self.graph.nodes.get(importer)
+        if not module:
+            return 0
+
+        # Look for the import that matches both the source and name
+        for imp in module.imports:
+            if imp.name == name:
+                # Verify this import is from the right module
+                for edge in self.graph.get_imports(importer):
+                    if edge.imported == imported and name in edge.names:
+                        return imp.lineno
+
+        return 0
+
+
+def analyze_cross_file(
+    graph: ImportGraph,
+    entry_point: Path | None = None,
+    include_same_package_indirect: bool = False,
+) -> CrossFileResult:
+    """Convenience function for cross-file analysis."""
+    analyzer = CrossFileAnalyzer(graph, entry_point, include_same_package_indirect)
+    return analyzer.analyze()
