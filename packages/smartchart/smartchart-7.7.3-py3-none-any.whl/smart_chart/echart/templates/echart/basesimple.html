@@ -1,0 +1,11 @@
+<!doctype html><html><head><title>{{title}}</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge">{{contentrefresh|safe}}
+<link rel="icon"  href="/static/smartui/img/favicon.ico"><link rel="stylesheet" href="/static/smartchart/js/fun.css?_=1"><link rel="stylesheet" href="/static/smartchart/js/smartgrid.css">
+<script src="/static/smartchart/js/jquery.js"></script>
+{% if dev %}<link rel="stylesheet" href="/static/smartchart/js/dev.css?_=3.1"><link rel="stylesheet" href="/static/smartchart/icon/iconfont.css?_=2"><link rel="stylesheet" href="/static/smartchart/editor/modal.css">{% endif %}
+{% block head %}{% endblock %}</head>
+{% autoescape off %}{{linkhead}}{% block body %}{% endblock %}{% endautoescape %}
+</html><script>const dashdt='{{dashdt|safe}}'</script><script src="/static/smartchart/js/fun.js?_=8"></script>
+{{footer|safe}}{% block javascript %}{% endblock %}{% if dev %}<script src="/static/smartchart/js/dev.js?_=9"></script>{% endif %}
+<script>{{echart_main|safe}}</script>
+{% block footer %}{% endblock %}
+<!--powered by smartchart.cn,Designed by JohnYan mailto:84345999@qq.com, https://gitee.com/smartchart/smartchart you need keep this-->

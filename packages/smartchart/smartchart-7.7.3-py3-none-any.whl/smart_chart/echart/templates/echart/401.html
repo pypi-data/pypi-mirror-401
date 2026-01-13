@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>高级设计功能 - SmartChart</title>
+<link rel="stylesheet" href="/static/smartui/fontawesome/css/all.min.css">
+<script src="/static/smartchart/js/jquery.js"></script>
+<script src="/static/smartchart/opt/QRCode.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Microsoft YaHei',sans-serif}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6a11cb 0%,#2575fc 100%);padding:15px;color:#333}
+.container{width:100%;max-width:700px}
+.logo{margin-bottom:20px;text-align:center}
+.logo h1{color:white;font-size:2rem;margin-bottom:5px;text-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.logo p{color:rgba(255,255,255,0.85);font-size:0.9rem}
+.notification-card{background:white;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.15);width:100%;overflow:hidden;margin-bottom:20px;transform:translateY(0);transition:transform 0.3s ease}
+.notification-card:hover{transform:translateY(-3px)}
+.card-header{background:linear-gradient(to right,#ff7e5f,#feb47b);color:white;padding:20px 25px;text-align:center;position:relative}
+.card-header h2{font-size:1.5rem;margin-bottom:5px}
+.card-header p{font-size:0.9rem;opacity:0.9}
+.icon{position:absolute;top:-20px;right:25px;background:white;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+.icon i{font-size:1.5rem;color:#ff7e5f}
+.card-content{padding:30px 25px 25px}
+.feature-list{display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-bottom:20px}
+.feature-item{text-align:center;flex:1;min-width:200px;padding:20px 15px;border-radius:10px;background:#f8f9ff;transition:all 0.3s ease}
+.feature-item:hover{background:#f0f3ff;transform:translateY(-3px)}
+.feature-icon{width:50px;height:50px;background:linear-gradient(135deg,#6a11cb,#2575fc);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.feature-icon i{font-size:1.5rem;color:white}
+.feature-item h4{font-size:1.1rem;margin-bottom:8px;color:#333}
+.feature-item p{color:#666;font-size:0.85rem;line-height:1.4;padding:0 5px}
+.options{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}
+.btn{padding:14px 25px;border-radius:50px;font-size:1rem;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s ease;text-decoration:none;min-width:200px}
+.btn-disable{background:linear-gradient(to right,#6a11cb,#2575fc);color:white;box-shadow:0 4px 12px rgba(106,17,203,0.2)}
+.btn-disable:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(106,17,203,0.3)}
+.btn-activate{background:linear-gradient(to right,#ff7e5f,#feb47b);color:white;box-shadow:0 4px 12px rgba(255,126,95,0.2)}
+.btn-activate:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(255,126,95,0.3)}
+.btn i{margin-right:8px;font-size:1.1rem}
+.note{text-align:center;color:rgba(255,255,255,0.85);font-size:0.85rem;max-width:600px;line-height:1.5;margin-top:10px}
+.note a{color:white;text-decoration:underline;cursor:pointer}
+@media(max-width:768px){.logo h1{font-size:1.8rem}.card-header{padding:20px}.card-header h2{font-size:1.3rem}.feature-item{min-width:100%}.btn{min-width:100%}.card-content{padding:25px 20px 20px}}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,126,95,0.7)}70%{box-shadow:0 0 0 8px rgba(255,126,95,0)}100%{box-shadow:0 0 0 0 rgba(255,126,95,0)}}
+
+/* 激活页面样式 */
+.activation-wrapper{max-width:400px;margin:0 auto;background:white;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:30px;text-align:center}
+.activation-wrapper h1{color:#2575fc;font-size:28px;margin-bottom:10px}
+.activation-wrapper h5{color:#666;margin:15px 0;font-weight:normal;font-size:16px;line-height:1.5}
+.activation-wrapper h5 a{color:#2575fc;text-decoration:none}
+.activation-wrapper h5 a:hover{text-decoration:underline}
+.activation-wrapper img{max-width:100%}
+.activation-group{margin:20px 0;text-align:left}
+.activation-group input{font-size:16px;padding:10px;width:100%;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}
+.activation-group input:focus{border-color:#6a11cb;outline:none}
+.activation-btn-box{margin-top:25px}
+.activation-btn{display:inline-block;padding:10px 20px;margin:5px;border-radius:4px;text-decoration:none;font-weight:bold;transition:all 0.3s;cursor:pointer;border:none}
+.activation-btn-submit{background:#6a11cb;color:white}
+.activation-btn-submit:hover{background:#2575fc}
+.activation-btn-cancel{background:#666;color:white}
+.activation-btn-cancel:hover{background:#444}
+.activation-wrapper .footer-link{margin-top:20px;font-size:14px}
+.activation-wrapper .footer-link a{color:#6a11cb;text-decoration:none}
+.activation-wrapper .footer-link a:hover{text-decoration:underline}
+#qrcode{margin:20px auto;display:flex;justify-content:center}
+#qrcode img{width:150px;height:150px}
+
+/* 模态框样式 */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-content{background:white;border-radius:12px;width:100%;max-width:500px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.3);animation:modalFadeIn 0.3s ease}
+@keyframes modalFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{background:linear-gradient(to right,#6a11cb,#2575fc);color:white;padding:20px 25px;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:1.3rem;display:flex;align-items:center;gap:10px;margin:0}
+.modal-close{background:rgba(255,255,255,0.2);border:none;color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;transition:all 0.3s ease}
+.modal-close:hover{background:rgba(255,255,255,0.3);transform:rotate(90deg)}
+.modal-body{flex:1;padding:30px;overflow-y:auto;background:#f5f5f5}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <h1><i class="fas fa-chart-line"></i> SmartChart</h1>
+        <p>专业智能数据平台</p>
+    </div>
+    <div class="notification-card">
+        <div class="card-header">
+            <div class="icon"><i class="fas fa-crown"></i></div>
+            <h2>高级设计功能</h2>
+            <p>{{ title }}</p>
+        </div>
+        <div class="card-content">
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-palette"></i></div>
+                    <h4>简单高效</h4>
+                    <p>积木式拖拽开发模式，开箱即用，安装简单，依赖少，适应各种平台。真所见即所得的拖拽开发模式，无需在画布上设计。</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                    <h4>全栈支持</h4>
+                    <p>完全真正打通前后端，支持图形数据联动、筛选、钻取，支持几乎常见的所有数据库。数据集即服务，采用低代码快速实现数据服务API开发。</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-shapes"></i></div>
+                    <h4>企业级安全</h4>
+                    <p>支持用户/组功能权限控制，支持行级别/字段级别数据权限控制。支持仪表盘备份恢复快照等，满足企业级的版本控制开发上线流程要求。</p>
+                </div>
+            </div>
+            <div class="options">
+                <button class="btn btn-disable"><i class="fas fa-sliders-h"></i><span id="idstatus">继续使用免费功能</span></button>
+                <button id="activateBtn" class="btn btn-activate pulse"><i class="fas fa-gem"></i>激活高级功能</button>
+            </div>
+        </div>
+    </div>
+    <p class="note">激活高级版可获得所有DIY设计功能，无限制访问，优先技术支持，以及更多专属功能。<br>已有激活码？<span id="activateLink" class="note-link">点击此处激活</span></p>
+</div>
+
+<!-- 激活模态框 -->
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-gem"></i> 激活高级功能</h3>
+            <button id="modalClose" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="activationContent" class="activation-wrapper">
+                <h1><i class="fas fa-chart-line"></i> SmartChart</h1>
+                <h5 id="activationMsg">您可继续使用免费版,专业版需要激活: <a href="https://www.smartchart.cn/blog/article/2021/10/15/68.html" target="_blank">激活说明</a></h5>
+                <h5 id="activationAuthor">
+                    <div><img src="https://www.smartchart.cn/static/images/auth.png" height="150px" alt="授权码"></div>
+                </h5>
+                <center><div id="qrcode"></div></center>
+                <div class="activation-group">
+                    <input id="authkey" style="display: none" placeholder="请输入激活码" required="required" />
+                </div>
+                <div class="activation-btn-box">
+                    <button id='submitup' class="activation-btn activation-btn-submit">激活</button>
+                    <a href="https://qm.qq.com/cgi-bin/qm/qr?k=eC34KwVvEtMvfh8Zyn1RSfYlzZvuvm7i&jump_from=webapi" target="_blank" class="activation-btn activation-btn-cancel">加Q群</a>
+                    <button id='initdb' class="activation-btn activation-btn-submit">组件升级</button>
+                    <h5 class="footer-link"><a href="https://www.smartchart.cn" target="_blank">@smartchart.cn</a></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/static/smartchart/js/qrcode.js"></script>
+</html>

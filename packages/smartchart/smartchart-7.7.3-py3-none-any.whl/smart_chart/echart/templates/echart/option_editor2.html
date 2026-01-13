@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <title>智能仪表盘配置</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="/static/smartui/img/favicon.ico">
+    <link rel="stylesheet" href="/static/smartui/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/smartchart/editor/option.css">
+</head>
+<body>
+<div id="app">
+    <div class="app-container">
+        <div class="main-content"><el-tabs v-model="activeTab"class="custom-tabs">
+        <!--功能中心-->
+            <el-tab-pane name="functions"><span slot="label"><i class="el-icon-s-grid"></i>模板</span><div class="tab-content"><div class="function-grid">
+                <!--CRUD模板卡片-->
+                <div class="function-card crud-card"@click="executeFunction('crud')"><div class="function-icon-wrapper"><i class="el-icon-s-grid function-icon"></i></div><div class="function-title">CRUD模板</div><div class="function-desc">极速表格开发，增删改查一体化管理系统开发</div><div class="crud-features"><span class="crud-badge"><i class="el-icon-circle-plus"></i>新增</span><span class="crud-badge"><i class="el-icon-edit"></i>编辑</span><span class="crud-badge"><i class="el-icon-delete"></i>删除</span><span class="crud-badge"><i class="el-icon-search"></i>查询</span></div></div>
+                <!--Excel模板卡片-->
+                <div class="function-card"@click="executeFunction('excel')"><div class="function-icon-wrapper"><i class="el-icon-document function-icon"></i></div><div class="function-title">Excel模板</div><div class="function-desc">Excel编辑器，公式计算等</div><span class="function-status">单元格填充</span></div>
+                <!--发布上线卡片-->
+                <div class="function-card"@click="executeFunction('online')"><div class="function-icon-wrapper"><i class="el-icon-upload function-icon"></i></div><div class="function-title">发布上线</div><div class="function-desc">将开发环境配置发布</div><div class="crud-features"v-if="comp.mtime1"><span class="crud-badge"v-text="'发布:'+new Date(comp.mtime1*1000).toLocaleString()":style="'background:' + (comp.mtime1 < comp.mtime2 ? 'pink' : '')"></span><span class="crud-badge"v-text="new Date(comp.mtime2*1000).toLocaleString()"></span></div></div></div></div></el-tab-pane>
+            <!--仪表配置中心-->
+            <el-tab-pane name="config"><span slot="label"><i class="el-icon-setting"></i>仪表</span><div class="tab-content">
+                <!--功能开关区域-->
+                <div class="config-section"><div class="section-title"><i class="el-icon-s-operation"></i><span>功能配置</span></div><div class="switch-group"><div v-for="(item, key) in switchConfigs":key="key"class="switch-item"><el-switch v-model="config[key]":active-color="item.activeColor || '#13ce66'":inactive-color="item.inactiveColor || '#ff4949'"></el-switch><div class="switch-label"><span class="label"v-text="item.label"></span><span class="description"v-text="item.description"></span></div><span class="status-badge":class="config[key] ? 'status-on' : 'status-off'"v-text="config[key] ? '已开启' : '已关闭'"></span></div></div></div>
+                <!--主题选择区域-->
+                <div class="config-section"><div class="section-title"><i class="el-icon-s-data"></i><span>主题样式</span></div><div class="theme-group"><div v-for="theme in themes":key="theme.value"class="theme-preview":class="{ active: config.css === theme.value }":style="{ background: theme.preview }"@click="selectTheme(theme.value)"><div class="theme-info"v-text="theme.label"></div></div></div><div class="tips-container"><div class="tips-title"><i class="el-icon-info"></i><span>使用提示</span></div><div class="tips-content">点击主题卡片可实时预览效果，保存配置后主题将应用到整个仪表盘。支持自定义主题文件上传。</div></div></div>
+                <!--操作按钮区域-->
+                <div class="action-buttons"><el-button type="primary"icon="el-icon-check"@click="saveConfig":loading="saving">保存配置</el-button><el-button type="info"icon="el-icon-refresh"@click="resetConfig">恢复默认</el-button><el-button type="success"icon="el-icon-upload"@click="activeTab = 'optionEditor'">高级编辑</el-button></div></div></el-tab-pane>
+            <!--图形主题-->
+            <el-tab-pane name="ecconfig"><span slot="label"><i class="el-icon-s-data"></i>图形</span><div class="tab-content">
+                <!--主题选择区域-->
+                <div class="config-section"><div class="section-title"><i class="el-icon-s-data"></i><span>图形主题样式</span></div><div class="theme-group"><div v-for="theme in ecthemes":key="theme.value"class="theme-preview":class="{ active: config.theme === theme.value }":style="{ background: theme.preview }"@click="selectecTheme(theme.value)"><div class="theme-info"v-text="theme.label"></div></div></div></div>
+                <!--操作按钮区域-->
+                <div class="action-buttons"><el-button type="primary"icon="el-icon-check"@click="saveConfig":loading="saving">保存配置</el-button></div></div></el-tab-pane>
+            <!--常规-->
+            <el-tab-pane name="page1"><span slot="label"><i class="el-icon-s-platform"></i>常规</span><div class="tab-content"><iframe v-if="activeTab === 'page1'"class="iframe-container":src="iframes.page1.src"></iframe></div></el-tab-pane>
+            <!--布局-->
+            <el-tab-pane name="page2"><span slot="label"><i class="el-icon-s-marketing"></i>布局</span><div class="tab-content"><iframe v-if="activeTab === 'page2'"class="iframe-container":src="iframes.page2.src"></iframe></div></el-tab-pane>
+            <!--容器-->
+            <el-tab-pane name="page3"><span slot="label"><i class="el-icon-s-marketing"></i>容器</span><div class="tab-content"><iframe v-if="activeTab === 'page3'"class="iframe-container":src="iframes.page3.src"></iframe></div></el-tab-pane>
+            <!--配置编辑页-->
+            <el-tab-pane name="optionEditor"><span slot="label"><i class="el-icon-edit"></i>配置</span><div class="tab-content"><div class="option-editor-container"><div class="editor-header"><div class="editor-actions"><el-button type="success"icon="el-icon-check"@click="saveOptionConfig":loading="optionSaving"size="small">保存配置</el-button><el-button type="info"icon="el-icon-refresh"@click="formatOptionJson"size="small">格式化</el-button><el-button type="warning"icon="el-icon-document"@click="resetOptionJson"size="small">恢复原始</el-button></div></div><textarea class="code-editor"v-model="optionJson"placeholder="在此处编辑配置选项..."spellcheck="false"></textarea><div class="tips-container"><p>通用数据集:commonds":{"4":"data0"} </p><p>DataV: "dv":2</p><p>动态播放: animate":{"2":{"dataLen":5,"interval":1000,"showtip":1}</p></div></div></div></el-tab-pane>
+        </el-tabs></div>
+    </div>
+</div>
+</body>
+
+<script>
+const dashid = {{ dashid }};
+const initialOptions = {{ option|safe|default:'{}' }};
+const comp = {{ comp|safe }};
+</script>
+<script src="/static/smartui/js/vue.min.js"></script>
+<script src="/static/smartui/elementui/index.js"></script>
+<script src="/static/smartchart/js/jquery.js"></script>
+<script src="/static/smartchart/editor/option_editor.js"></script>
+</html>
