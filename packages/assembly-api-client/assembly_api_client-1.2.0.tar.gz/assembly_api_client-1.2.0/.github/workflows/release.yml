@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Choose runner manually (optional)'
+        type: choice
+        default: 'auto'
+        options:
+          - auto
+          - self-hosted
+          - ubuntu-latest
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.set-runner.outputs.runner }}
+    steps:
+      - name: Determine runner
+        id: set-runner
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          SELECTED_RUNNER="ubuntu-latest"
+          if [ "${{ github.event.inputs.runner }}" != "" ] && [ "${{ github.event.inputs.runner }}" != "auto" ]; then
+            SELECTED_RUNNER="${{ github.event.inputs.runner }}"
+          else
+            ONLINE_RUNNER=$(gh api repos/${{ github.repository }}/actions/runners --jq '.runners[] | select(.labels[].name=="self-hosted" and .status=="online") | .name' | head -n 1)
+            if [ ! -z "$ONLINE_RUNNER" ]; then
+              SELECTED_RUNNER="self-hosted"
+            fi
+          fi
+          echo "runner=$SELECTED_RUNNER" >> $GITHUB_OUTPUT
+
+  release:
+    needs: setup
+    runs-on: ${{ needs.setup.outputs.runner }}
+    concurrency: release
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Fix git safe directory
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.11'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca
+
+      - name: Install Release Tools
+        run: |
+          uv pip install --system python-semantic-release build
+
+      - name: Python Semantic Release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          semantic-release version --vcs-release
+          NEW_TAG=$(git describe --tags --abbrev=0 --exact-match 2>/dev/null || echo "")
+          if [ ! -z "$NEW_TAG" ]; then
+            echo "released=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build package
+        if: steps.release.outputs.released == 'true'
+        run: |
+          uv build
+
+      - name: Upload Artifacts
+        if: steps.release.outputs.released == 'true'
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: [setup, release]
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
