@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "assumeless"
+version = "1.0.0"
+description = "An assumptions-first diagnostic tool that aims to surface dangerous hidden assumptions in code."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+authors = [
+    { name = "Jatin Sharma", email = "huntwter.dev@gmail.com" },
+]
+keywords = ["cli", "static-analysis", "code-quality", "assumptions", "security"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Quality Assurance",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "toml>=0.10.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/huntwter/assumeless"
+Documentation = "https://github.com/huntwter/assumeless/docs"
+Repository = "https://github.com/huntwter/assumeless"
+
+[project.scripts]
+assumeless = "assumeless.cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/assumeless"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+
+[[tool.mypy.overrides]]
+module = "toml"
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
