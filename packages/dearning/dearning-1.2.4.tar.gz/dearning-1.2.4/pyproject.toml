@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dearning"
+version = "1.2.4"
+description = "Libraries untuk membuat AI yang ringan"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "Apache-2.0" }
+authors = [{ name = "Oriza" }]
+requires-python = ">=3.4"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent"
+]
+
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/maker-games"
+Discussion = "https://github.com/maker-games/Dearning/discussions/1"
+Tutorial = "https://github.com/maker-games/Dearning/blob/main/tutorial-dearning"
+
+[project.scripts]
+dearning = "dearning.__main__:main"
