@@ -1,0 +1,40 @@
+[project]
+name = "discordbotlist-py"
+version = "1.0.0"
+description = "Easy to use API wrapper for DiscordBotList in Python"
+readme = "README.md"
+authors = [
+    { name = "Rezn1r", email = "rezn1r@proton.me" },
+]
+license = "MIT"
+requires-python = ">=3.12,<=3.14"
+dependencies = [
+    "aiohttp>=3.13.3",
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Rezn1r/discordbotlist.py"
+"Repository" = "https://github.com/Rezn1r/discordbotlist.py"
+"Issues" = "https://github.com/Rezn1r/discordbotlist.py/issues"
+
+[project.optional-dependencies]
+discord = ["discord>=2.3.2"]
+pycord = []
+
+[dependency-groups]
+dev = [
+    "black>=25.12.0",
+    "git-cliff>=2.11.0",
+    "ruff>=0.14.11",
+]
