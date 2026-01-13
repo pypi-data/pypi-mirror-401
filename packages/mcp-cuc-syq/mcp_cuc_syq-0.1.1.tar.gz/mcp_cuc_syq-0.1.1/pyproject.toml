@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "mcp-cuc-syq"
+version = "0.1.1"
+authors = [
+    "Your Name <your.email@example.com>",
+]
+description = "A time server implemented using FastMCP"
+readme = "README.md"
+license = "MIT"
+packages = [{ include = "time_server.py" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+pytz = "*"
+mcp = "*"
+
+[tool.poetry.scripts]
+time-server = "time_server:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
