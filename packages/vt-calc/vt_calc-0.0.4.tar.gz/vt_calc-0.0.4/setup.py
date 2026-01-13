@@ -1,0 +1,62 @@
+from setuptools import setup, find_packages
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+setup(
+    name="vt-calc",
+    version="0.0.4",
+    author="Vision Token Calculator",
+    description="Calculate the number of tokens used for images in VLMs",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/thisisiron/vision-token-calculator",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    ],
+    python_requires=">=3.8",
+    install_requires=[
+        "torch>=2.0.0",
+        "transformers>=4.30.0,<5.0.0",
+        "Pillow>=9.0.0",
+        "numpy>=1.21.0",
+        "requests>=2.25.0",
+        "av>=10.0.0",
+        "fastapi>=0.104.0",
+        "uvicorn[standard]>=0.24.0",
+        "jinja2>=3.1.0",
+        "python-multipart>=0.0.6",
+        "rich",
+    ],
+    extras_require={
+        "video-advanced": [
+            "decord>=0.6.0",
+            "torchcodec>=0.1.0",
+        ],
+        "test": [
+            "pytest>=7.0.0",
+            "qwen-vl-utils>=0.0.8",
+            "opencv-python>=4.5.0",
+        ],
+        "quality": ["ruff"],
+    },
+    entry_points={
+        "console_scripts": [
+            "vt-calc=vt_calculator.cli.main:main",
+        ],
+    },
+    keywords=[
+        "vision",
+        "tokens",
+        "language model",
+        "multimodal",
+        "ai",
+        "vlm",
+        "vision language model",
+        "vision language model token calculator",
+    ],
+)
