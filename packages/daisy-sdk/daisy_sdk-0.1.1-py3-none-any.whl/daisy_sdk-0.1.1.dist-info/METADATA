@@ -1,0 +1,55 @@
+Metadata-Version: 2.4
+Name: daisy-sdk
+Version: 0.1.1
+Summary: Daisy SDK CLI for auth and image fetch
+Author: Daisy
+License: MIT
+Keywords: daisy,cli,sdk
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests<3.0,>=2.32
+Requires-Dist: tomli-w<2.0,>=1.0
+Requires-Dist: typer<1.0,>=0.12
+Provides-Extra: dev
+Requires-Dist: pytest<9,>=8; extra == "dev"
+Dynamic: license-file
+
+# daisy-sdk
+
+CLI for authenticating with Daisy and running the Daisy image.
+
+## Setup
+
+```bash
+mise install
+uv sync --dev
+```
+
+If `uv` is not installed, you can install it with mise or pipx:
+
+```bash
+# with mise
+mise use -g uv@0.2
+
+# or with pipx
+pipx install uv
+```
+
+## Usage
+
+```bash
+daisy run
+```
+
+Tokens must be stored in `~/.daisy/config.toml`:
+
+```toml
+access_token = "..."
+refresh_token = "..."
+```
+
+On each run, the CLI validates the access token with Supabase; if it is invalid or expired, it refreshes and writes the new tokens back to the same file.
