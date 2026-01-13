@@ -1,0 +1,95 @@
+# Pamela SDK for Python
+
+Official SDK for the Pamela Voice API.
+
+## Installation
+
+```bash
+pip install pamela
+```
+
+## Usage
+
+### Basic Example
+
+```python
+from pamela import PamelaClient
+
+client = PamelaClient(
+    api_key="pk_live_your_api_key_here",
+    base_url="https://api.thisispamela.com",  # Optional
+)
+
+# Create a call
+call = client.create_call(
+    to="+1234567890",
+    task="Order a large pizza for delivery",
+    locale="en-US",
+)
+
+print(f"Call created: {call['id']}")
+
+# Get call status
+status = client.get_call(call["id"])
+print(f"Call status: {status['status']}")
+```
+
+### Webhook Verification
+
+```python
+from flask import Flask, request
+from pamela import verify_webhook_signature
+
+app = Flask(__name__)
+WEBHOOK_SECRET = "your_webhook_secret"
+
+@app.route("/webhooks/pamela", methods=["POST"])
+def handle_webhook():
+    signature = request.headers.get("X-Pamela-Signature")
+    payload = request.json
+
+    if not verify_webhook_signature(payload, signature, WEBHOOK_SECRET):
+        return {"error": "Invalid signature"}, 401
+
+    # Handle webhook event
+    print(f"Webhook event: {payload['event']}")
+    print(f"Call ID: {payload['call_id']}")
+
+    return {"status": "ok"}, 200
+```
+
+### Tool Webhook Handler
+
+```python
+from flask import Flask, request
+from pamela import verify_webhook_signature
+
+app = Flask(__name__)
+WEBHOOK_SECRET = "your_webhook_secret"
+
+@app.route("/webhooks/pamela/tools", methods=["POST"])
+def handle_tool_webhook():
+    signature = request.headers.get("X-Pamela-Signature")
+    payload = request.json
+
+    if not verify_webhook_signature(payload, signature, WEBHOOK_SECRET):
+        return {"error": "Invalid signature"}, 401
+
+    tool_name = payload["tool_name"]
+    arguments = payload["arguments"]
+    call_id = payload["call_id"]
+    correlation_id = payload["correlation_id"]
+
+    # Execute tool based on tool_name
+    if tool_name == "check_order_status":
+        order_id = arguments.get("order_id")
+        result = check_order_status(order_id)
+        return {"result": result}
+
+    return {"error": "Unknown tool"}, 400
+```
+
+## API Reference
+
+See the [Pamela B2B API Documentation](https://docs.thisispamela.com/b2b) for full API reference.
+
