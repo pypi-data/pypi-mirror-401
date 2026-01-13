@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevTrack – API Live Dashboard</title>
+    <script type="module" crossorigin src="./assets/index.Can607VC.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index.D4pIqhp4.css">
+  
+    <script>
+      // API URLs - will be replaced by FastAPI at runtime
+      window.API_URL = window.API_URL || '/__devtrack__/stats';
+      window.TRAFFIC_API_URL = window.TRAFFIC_API_URL || '/__devtrack__/metrics/traffic';
+      window.ERRORS_API_URL = window.ERRORS_API_URL || '/__devtrack__/metrics/errors';
+      window.PERF_API_URL = window.PERF_API_URL || '/__devtrack__/metrics/perf';
+      window.CONSUMERS_API_URL = window.CONSUMERS_API_URL || '/__devtrack__/consumers';
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
