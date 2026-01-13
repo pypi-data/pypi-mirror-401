@@ -1,0 +1,1 @@
+LOAD_WIDGET_ASYNC = True
