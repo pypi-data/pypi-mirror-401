@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package acp_handler.v1;
+
+service AcpHandler {
+  rpc CreateCheckoutSession(CreateCheckoutSessionRequest) returns (CheckoutSession);
+  rpc GetCheckoutSession(GetCheckoutSessionRequest) returns (CheckoutSession);
+  rpc UpdateCheckoutSession(UpdateCheckoutSessionRequest) returns (CheckoutSession);
+  rpc CompleteCheckoutSession(CompleteCheckoutSessionRequest) returns (CheckoutSessionWithOrder);
+  rpc CancelCheckoutSession(CancelCheckoutSessionRequest) returns (CheckoutSession);
+  rpc DelegatePayment(DelegatePaymentRequest) returns (DelegatePaymentResponse);
+}
+
+message GetCheckoutSessionRequest {
+  string session_id = 1;
+}
+
+message CancelCheckoutSessionRequest {
+  string session_id = 1;
+}
+
+message CreateCheckoutSessionRequest {
+  repeated RequestItem items = 1;
+  Customer customer = 2;
+  FulfillmentState fulfillment = 3;
+}
+
+message UpdateCheckoutSessionRequest {
+  string session_id = 1;
+  RequestItemList items = 2;
+  Customer customer = 3;
+  FulfillmentState fulfillment = 4;
+}
+
+message CompleteCheckoutSessionRequest {
+  string session_id = 1;
+  PaymentRequest payment = 2;
+  Customer customer = 3;
+  FulfillmentState fulfillment = 4;
+}
+
+message RequestItemList {
+  repeated RequestItem items = 1;
+}
+
+message RequestItem {
+  string id = 1;
+  int32 quantity = 2;
+}
+
+message PaymentRequest {
+  // If empty, delegated token is not provided.
+  string delegated_token = 1;
+  // If empty, payment method is not provided.
+  string method = 2;
+}
+
+enum CheckoutSessionStatus {
+  CHECKOUT_SESSION_STATUS_UNSPECIFIED = 0;
+  NOT_READY_FOR_PAYMENT = 1;
+  READY_FOR_PAYMENT = 2;
+  COMPLETED = 3;
+  CANCELED = 4;
+}
+
+message CheckoutSession {
+  string id = 1;
+  CheckoutSessionStatus status = 2;
+  repeated LineItem items = 3;
+  Totals totals = 4;
+  FulfillmentState fulfillment = 5;
+  Customer customer = 6;
+  Links links = 7;
+  repeated Message messages = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message CheckoutSessionWithOrder {
+  CheckoutSession session = 1;
+  Order order = 2;
+}
+
+message LineItem {
+  string id = 1;
+  string title = 2;
+  int32 quantity = 3;
+  Money unit_price = 4;
+  string variant_id = 5;
+  string sku = 6;
+  string image_url = 7;
+}
+
+message Money {
+  int64 amount = 1;
+  string currency = 2;
+}
+
+message Totals {
+  Money subtotal = 1;
+  Money tax = 2;
+  Money shipping = 3;
+  Money discount = 4;
+  Money grand_total = 5;
+}
+
+message FulfillmentState {
+  string selected_id = 1;
+  repeated FulfillmentChoice options = 2;
+}
+
+message FulfillmentChoice {
+  string id = 1;
+  string label = 2;
+  Money price = 3;
+  EstimatedDelivery est_delivery = 4;
+}
+
+message EstimatedDelivery {
+  string earliest = 1;
+  string latest = 2;
+}
+
+message Customer {
+  Address billing_address = 1;
+  Address shipping_address = 2;
+}
+
+message Address {
+  string name = 1;
+  string line1 = 2;
+  string line2 = 3;
+  string city = 4;
+  string region = 5;
+  string postal_code = 6;
+  string country = 7;
+  string phone = 8;
+  string email = 9;
+}
+
+message Links {
+  string terms = 1;
+  string privacy = 2;
+  string order_permalink = 3;
+}
+
+enum MessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  INFO = 1;
+  WARNING = 2;
+  ERROR = 3;
+}
+
+message Message {
+  MessageType type = 1;
+  string code = 2;
+  string message = 3;
+  string param = 4;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  PLACED = 1;
+  FAILED = 2;
+  REFUNDED = 3;
+}
+
+message Order {
+  string id = 1;
+  string checkout_session_id = 2;
+  OrderStatus status = 3;
+  string permalink_url = 4;
+}
+
+message DelegatePaymentRequest {
+  PaymentMethod payment_method = 1;
+  Allowance allowance = 2;
+  BillingAddress billing_address = 3;
+  repeated RiskSignal risk_signals = 4;
+  string metadata_json = 5;
+}
+
+message DelegatePaymentResponse {
+  string id = 1;
+  string created = 2;
+  string metadata_json = 3;
+}
+
+message PaymentMethod {
+  string type = 1;
+  string card_number_type = 2;
+  string number = 3;
+  string exp_month = 4;
+  string exp_year = 5;
+  string name = 6;
+  string cvc = 7;
+  string cryptogram = 8;
+  string eci_value = 9;
+  repeated string checks_performed = 10;
+  string iin = 11;
+  string display_card_funding_type = 12;
+  string display_wallet_type = 13;
+  string display_brand = 14;
+  string display_last4 = 15;
+  string metadata_json = 16;
+}
+
+message BillingAddress {
+  string name = 1;
+  string line_one = 2;
+  string line_two = 3;
+  string city = 4;
+  string state = 5;
+  string country = 6;
+  string postal_code = 7;
+}
+
+message Allowance {
+  string reason = 1;
+  int64 max_amount = 2;
+  string currency = 3;
+  string checkout_session_id = 4;
+  string merchant_id = 5;
+  string expires_at = 6;
+}
+
+message RiskSignal {
+  string type = 1;
+  int32 score = 2;
+  string action = 3;
+}
+
