@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tee:*)",
+      "Bash(.venv/bin/claudeutils tokens:*)",
+      "Skill(commit-commands:commit)",
+      "Bash(git mv:*)",
+      "Bash(just lint:*)",
+      "Bash(wc:*)",
+      "Bash(.venv/bin/pytest tests/examples.py -p no:markdown-report)",
+      "Bash(echo:*)",
+      "Bash(.venv/bin/pytest tests/examples.py -q --tb=short --no-header -p no:markdown-report)",
+      "Bash(.venv/bin/pytest tests/examples.py -v --tb=short -p no:markdown-report)",
+      "Bash(PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 just test:*)",
+      "Bash(.venv/bin/pytest --help)",
+      "Bash(.venv/bin/pytest tests/test_output_expectations.py -v)",
+      "Bash(.venv/bin/pytest tests/examples.py)",
+      "Bash(.venv/bin/pytest tests/examples.py -rs)",
+      "Bash(.venv/bin/pytest tests/examples.py -rx)",
+      "Bash(.venv/bin/pytest tests/examples.py -rsx)",
+      "Bash(python scripts/benchmark.py:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(python3 -m pytest:*)",
+      "Bash(ls:*)",
+      "Bash(test:*)",
+      "Bash(grep:*)"
+    ]
+  }
+}
