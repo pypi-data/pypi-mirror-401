@@ -1,0 +1,97 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Eones"
+version = "1.4.1"
+description = "Elegant time manipulation and reasoning library"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE.md"}
+requires-python = ">=3.9"
+authors = [
+    { name = "Rodrigo Ezequiel Roldán", email = "roldriel@gmail.com" }
+]
+keywords = [
+    "datetime",
+    "time",
+    "calendar",
+    "library",
+    "dates",
+    "timezones"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "tzdata"
+]
+
+[project.optional-dependencies]
+docs = ["sphinx", "myst-parser"]
+test = ["pytest", "coverage"]
+
+[project.urls]
+repository = "https://github.com/roldriel/eones"
+documentation = "https://roldriel.github.io/eones/"
+"Bug Tracker" = "https://github.com/roldriel/eones/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.pylint.master]
+ignore = "integrations"
+
+[tool.pylint."messages control"]
+disable = "R0903"
+
+[tool.pylint.format]
+max-line-length = 87
+
+[tool.pylint.reports]
+output-format = "colorized"
+score = true
+
+[tool.pylint.design]
+min-public-methods = 0
+
+[tool.coverage.run]
+source = ["eones"]
+omit = [
+    "*/__init__.py",
+    "tests/*",
+    "setup.py",
+    "src/eones/integrations/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError"
+]
+show_missing = true
+
+[tool.coverage.html]
+directory = "htmlcov"
