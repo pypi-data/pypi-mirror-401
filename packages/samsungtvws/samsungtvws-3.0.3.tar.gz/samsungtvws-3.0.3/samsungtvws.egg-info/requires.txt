@@ -1,0 +1,24 @@
+websocket-client>=0.57.0
+requests>=2.21.0
+
+[async]
+aiohttp>=3.8.1
+websockets>=13
+
+[async:python_version < "3.11"]
+async_timeout>=4.0.3
+
+[cli]
+typer>=0.20
+wakeonlan>=3.0.0
+
+[dev]
+mypy>=1.13
+pre-commit>=3.5
+pytest>=8.3.3
+pytest-asyncio>=0.24
+aioresponses>=0.7.7
+
+[encrypted]
+cryptography>=35.0.0
+py3rijndael>=0.3.3
