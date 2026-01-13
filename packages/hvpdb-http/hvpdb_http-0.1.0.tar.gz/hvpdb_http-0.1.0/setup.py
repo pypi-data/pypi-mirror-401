@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-http', version='0.1.0', description='HTTP API Server Plugin for HVPDB', packages=find_packages(), install_requires=['fastapi', 'uvicorn', 'hvpdb'], entry_points={'hvpdb.plugins': ['http = hvpdb_http:app']})
