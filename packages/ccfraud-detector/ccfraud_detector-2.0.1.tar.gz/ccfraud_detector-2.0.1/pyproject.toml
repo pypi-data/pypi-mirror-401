@@ -1,0 +1,92 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ccfraud-detector"
+version = "2.0.1"
+description = "AI-powered credit card fraud detection using Anthropic Claude"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Ekta Bhatia", email = "ekta.bhatia@gmail.com" },
+    { name = "Aditya Patange", email = "contact.adityapatange@gmail.com" },
+]
+maintainers = [
+    { name = "Ekta Bhatia", email = "ekta.bhatia@gmail.com" },
+    { name = "Aditya Patange", email = "contact.adityapatange@gmail.com" },
+]
+keywords = [
+    "fraud-detection",
+    "credit-card",
+    "anthropic",
+    "claude",
+    "ai",
+    "machine-learning",
+    "fintech",
+    "security",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "anthropic>=0.40.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AdityaPatange1/creditcard_fraud_classifier"
+Documentation = "https://github.com/AdityaPatange1/creditcard_fraud_classifier#readme"
+Repository = "https://github.com/AdityaPatange1/creditcard_fraud_classifier.git"
+Issues = "https://github.com/AdityaPatange1/creditcard_fraud_classifier/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ccfraud_detector"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.env",
+    "/.env.*",
+    "/examples/.env",
+    "*.env",
+    ".git",
+    ".gitignore",
+]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "B", "A", "C4", "SIM", "ARG"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
