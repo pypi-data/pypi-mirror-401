@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ts-kotlin"
+description = "Kotlin grammar for tree-sitter"
+version = "0.0.1"
+keywords = ["incremental", "parsing", "tree-sitter", "kotlin"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Software Development :: Compilers",
+  "Topic :: Text Processing :: Linguistic",
+  "Typing :: Typed"
+]
+requires-python = ">=3.8"
+license.text = "MIT"
+readme = "README.md"
+
+[project.urls]
+Homepage = "https://github.com/tree-sitter/tree-sitter-kotlin"
+
+[project.optional-dependencies]
+core = ["tree-sitter~=0.21"]
+
+[project.scripts]
+ts-kotlin-highlights = "tree_sitter_kotlin.cli:print_highlights"
+
+[tool.cibuildwheel]
+# Build for Python 3.8+ on all platforms
+# Using abi3 (stable ABI) means one wheel works for multiple Python versions
+build = [
+    "cp38-*",  # Python 3.8
+    "cp39-*",  # Python 3.9
+    "cp310-*", # Python 3.10
+    "cp311-*", # Python 3.11
+    "cp312-*", # Python 3.12
+    "cp313-*", # Python 3.13
+]
+build-frontend = "build"
+# Tests are run separately in CI, not during wheel building
+# test-command = "pytest test/test_syntax_tree.py -v"
+# test-requires = ["pytest", "tree-sitter>=0.21"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+norecursedirs = [".git", "venv", "node_modules"]
