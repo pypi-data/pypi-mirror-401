@@ -1,0 +1,99 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "py-soildb"
+  navbar:
+    left:
+      - href: ./index.qmd
+        text: Home
+      - href: src/soildb/index.qmd
+        text: "Reference"
+      - text: "Tutorial"
+        href: tutorial.qmd
+      - text: "Usage"
+        href: usage.qmd
+      - text: "Async Guide"
+        href: async.qmd
+      - text: "API Guide"
+        href: api.qmd
+      - text: "Guides"
+        menu:
+          - text: "Error Handling"
+            href: error-handling.qmd
+          - text: "Troubleshooting"
+            href: troubleshooting.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-copy: true
+
+quartodoc:
+  package: soildb
+  version: "0.3.0.dev0"
+  dir: "src/soildb"
+  sections:
+    - title: "Client"
+      desc: "Classes for interacting with the SDA service."
+      contents:
+        - client.SDAClient
+    - title: "Querying"
+      desc: "Classes and functions for building and executing queries."
+      contents:
+        - query.Query
+        - query_templates
+        - convenience.get_mapunit_by_point
+        - convenience.get_mapunit_by_areasymbol
+        - convenience.get_mapunit_by_bbox
+        - convenience.get_sacatalog
+    - title: "Fluent Query Methods"
+      desc: "Fluent interface methods for building SQL queries."
+      contents:
+        - query.Query.select
+        - query.Query.from_
+        - query.Query.where
+        - query.Query.join
+        - query.Query.inner_join
+        - query.Query.left_join
+        - query.Query.order_by
+        - query.Query.limit
+    - title: "Fetching"
+      desc: "Functions for bulk data fetching."
+      contents:
+        - fetch.fetch_by_keys
+        - fetch.get_mukey_by_areasymbol
+        - fetch.get_cokey_by_mukey
+    - title: "Spatial"
+      desc: "Functions for spatial queries."
+      contents:
+        - spatial.spatial_query
+        - spatial.point_query
+        - spatial.bbox_query
+    - title: "AWDB Integration"
+      desc: "Functions for accessing NRCS monitoring data."
+      contents:
+        - awdb.client.AWDBClient
+        - awdb.convenience.get_monitoring_station_data
+        - awdb.convenience.find_stations_by_criteria
+    - title: "Metadata"
+      desc: "Classes and functions for parsing survey area metadata."
+      contents:
+        - metadata.SurveyMetadata
+        - metadata.parse_survey_metadata
+        - metadata.extract_metadata_summary
+    - title: "Response"
+      desc: "Class for handling responses from the SDA service."
+      contents:
+        - response.SDAResponse
+    - title: "Exceptions"
+      desc: "Custom exception classes."
+      contents:
+        - exceptions.SoilDBError
+        - exceptions.SDAConnectionError
+        - exceptions.SDAQueryError
+        - exceptions.SDAMaintenanceError
+        - exceptions.SDAResponseError
+        - metadata.MetadataParseError

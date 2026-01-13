@@ -1,0 +1,10 @@
+# exceptions.SDAConnectionError { #soildb.exceptions.SDAConnectionError }
+
+```python
+exceptions.SDAConnectionError(message, details=None)
+```
+
+Raised when there are connection issues with the SDA service.
+
+This includes HTTP errors, DNS failures, and other network connectivity problems.
+This does NOT include timeouts (see SDATimeoutError) or maintenance windows (see SDAMaintenanceError).
