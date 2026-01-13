@@ -1,0 +1,25 @@
+[HOBO]
+query_endpoint = https://api.licor.cloud/v1/data
+token = __YOUR_TOKEN_HERE__ 
+start_date_time = 2025-01-01 08:00:00
+end_date_time =
+#start_date_time = 2025-01-01 08:00:00
+#end_date_time = 2025-01-02 08:00:00
+polling_interval_minutes = 60
+max_map_items = 1000000
+max_api_query_items = 99999
+min_api_time_delta_minutes = 5
+max_api_time_delta_minutes = 15
+request_timeout_connection = 30
+request_timeout_read = 90
+
+[HSDS]
+hsds_filename = test.h5
+hsds_endpoint = localhost
+
+[META]
+meta_repo = https://gitlab.com/uva-arc/deployment-metadata
+meta_local_dir = /tmp/
+meta_root_path = alaska/uva-arc.yml
+meta_loggers_dir = alaska/loggers
+meta_sensors_dir = alaska/sensors
