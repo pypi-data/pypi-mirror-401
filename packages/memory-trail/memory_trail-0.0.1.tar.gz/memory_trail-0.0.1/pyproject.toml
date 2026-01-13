@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "memory-trail"
+version = "0.0.1"
+description = "Decision memory and session logging for AI-assisted development - track architectural decisions across sessions"
+readme = "README.md"
+license = "CC-BY-4.0"
+authors = [
+    { name = "Francesco Marinoni Moretto", email = "francesco@fmmconsulting.it" }
+]
+keywords = [
+    "memory-trail",
+    "decision-memory",
+    "session-logging",
+    "ai-development",
+    "architecture-decisions",
+    "adr",
+    "clarity-gate",
+    "llm",
+    "context-management"
+]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/frmoretto/clarity-gate"
+Repository = "https://github.com/frmoretto/clarity-gate"
+Documentation = "https://github.com/frmoretto/clarity-gate"
+Issues = "https://github.com/frmoretto/clarity-gate/issues"
+
+[project.scripts]
+memory-trail = "memory_trail.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/memory_trail"]
