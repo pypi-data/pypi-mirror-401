@@ -1,0 +1,30 @@
+# pyproject.toml
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ddpitools"  # Nom sur PyPI. Doit être unique !
+version = "0.3.3"           # La version de votre package
+authors = [
+  { name="GUY NYAMSI", email="nyamsguy@gmail.com" },
+]
+
+description = "Ce package est conçu pour générer les fonctions de routine de DDPI. Il encapsule le développement pour faciliter l'utilisation des fonctions utiles."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    # Listez ici les dépendances de votre package
+    # ex: "requests>=2.20.0",
+    "requests", "openpyxl", "datetime"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/GuyNYAMSI/outilsddpi"
+"Bug Tracker" = "https://github.com/GuyNYAMSI/ddpitools/issues"
