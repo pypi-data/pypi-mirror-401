@@ -1,0 +1,96 @@
+Metadata-Version: 2.4
+Name: osiris_agent
+Version: 0.1.2
+Summary: OSIRIS agent for ROS2/Humble
+Home-page: https://github.com/nicolaselielll/osiris_agent
+Author: Nicolas Tuomaala
+Author-email: nicolas.tuomaala00@gmail.com
+License: Apache-2.0
+Keywords: ros2 humble agent
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: websockets
+Requires-Dist: psutil
+Provides-Extra: ros
+Requires-Dist: rclpy; extra == "ros"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary
+
+# OSIRIS Agent
+
+![PyPI](https://img.shields.io/pypi/v/osiris_agent.svg)
+![Python](https://img.shields.io/pypi/pyversions/osiris_agent.svg)
+![License](https://img.shields.io/pypi/l/osiris_agent.svg)
+![CI](https://github.com/nicolaselielll/osiris_agent/actions/workflows/ci.yml/badge.svg)
+
+A ROS2 Humble node that bridges your robot to the OSIRIS remote monitoring platform via WebSocket.
+
+## Install
+
+From PyPI:
+```bash
+python -m pip install --upgrade pip
+python -m pip install osiris_agent
+```
+
+Editable / development install:
+```bash
+git clone https://github.com/nicolaselielll/osiris_agent.git
+cd osiris_agent
+python -m pip install -e .
+```
+
+## Quick Start
+
+Set the auth token and run the agent:
+```bash
+export OSIRIS_AUTH_TOKEN="your-robot-token-here"
+agent_node
+```
+
+Verify installation:
+```bash
+python -c "import importlib.metadata as m; print(m.version('osiris_agent'))"
+```
+
+## Usage & Configuration
+
+- Environment: OSIRIS_AUTH_TOKEN — your robot token.
+- Editable install reflects code changes immediately.
+- Common constants are in `osiris_agent/agent_node.py`:
+  - MAX_SUBSCRIPTIONS, ALLOWED_TOPIC_PREFIXES, GRAPH_CHECK_INTERVAL, PARAMETER_REFRESH_INTERVAL, TELEMETRY_INTERVAL
+
+## Badge suggestions
+
+- PyPI: https://img.shields.io/pypi/v/osiris_agent.svg
+- Python versions: https://img.shields.io/pypi/pyversions/osiris_agent.svg
+- License: https://img.shields.io/pypi/l/osiris_agent.svg
+- GitHub Actions CI: https://github.com/<user>/osiris_agent/actions
+
+## Contributing
+
+Open issues and PRs at: https://github.com/nicolaselielll/osiris_agent
+
+## License
+
+Apache-2.0 — see the LICENSE file.
+
+## Changelog
+
+See release notes on GitHub Releases for v0.1.0 and future versions.
