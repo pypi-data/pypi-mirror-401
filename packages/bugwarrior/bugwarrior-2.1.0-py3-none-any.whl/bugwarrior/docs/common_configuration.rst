@@ -1,0 +1,241 @@
+How to Configure
+================
+
+Bugwarrior's configuration file can be written either in `ini <https://en.wikipedia.org/wiki/INI_file#Format>`_ or `toml <https://toml.io>`_ format. See :ref:`the man page <configuration-files>` to determine the name and location of this file.
+
+A basic configuration might look like this:
+
+.. config::
+
+    [general]
+    targets = my_github
+
+    [my_github]
+    service = github
+    github.login = ralphbean
+    github.token = 123456
+    github.username = ralphbean
+
+Main Section
+------------
+
+Your configuration file must include at least a ``[general]`` section including the
+following option:
+
+* ``targets``: A list of *other* section names to use
+  as task sources.
+
+Optional options and their defaults include:
+
+.. config::
+
+    [general]
+
+    # Specify which TaskRC configuration file to use.
+    taskrc = <system default, which is usually ~/.taskrc>
+
+    # Set to true to shorten links.
+    shorten = False
+
+    # When false, links are appended as an annotation.
+    inline_links = True
+
+    # When true will include a link to the ticket as an annotation.
+    annotation_links = False
+
+    # When false skips putting issue comments into annotations.
+    annotation_comments = True
+
+    # When false strips newlines from comments in annotations.
+    annotation_newlines = False
+
+    # Set to one of DEBUG, INFO, WARNING, ERROR, CRITICAL, or DISABLED to
+    # control the logging verbosity.
+    log.level = INFO
+
+    # Set to the path at which you would like logging messages written.
+    log.file = <by default messages are written to stderr>
+
+    # Import maximally this number of characters of incoming annotations.
+    annotation_length = 45
+
+    # Use maximally this number of characters in the description.
+    description_length = 35
+
+    # If false, bugwarrior won't bother with adding annotations to your tasks at all.
+    merge_annotations = True
+
+    # If false, bugwarrior won't bother with adding tags to your tasks at all.
+    merge_tags = True
+
+    # If true, bugwarrior will delete all tags prior to fetching new ones,
+    # except those listed in static_tags. Only work if merge_tags is true.
+    replace_tags = False
+
+    # A list of tags that shouldn't be *removed* by bugwarrior. Use for tags
+    # that you want to keep when replace_tags is set to true.
+    static_tags =
+
+    # A list of attributes that shouldn't be *updated* by bugwarrior for any services.
+    # Use for values that you want to tune manually.
+    static_fields = priority
+
+In addition to the ``[general]`` section, sections may be named
+``[flavor.myflavor]`` and may be selected using the ``--flavor`` option to
+``bugwarrior pull``. This section will then be used rather than the
+``[general]`` section.
+
+
+.. _common_configuration_options:
+
+Common Service Configuration Options
+------------------------------------
+
+All services support common configuration options in addition
+to their service-specific features.
+
+.. note::
+    If using INI format, these configuration options must be prefixed with the service name,
+    e.g. ``github.add_tags``, or ``github.default_priority``.
+
+The following options are supported:
+
+* ``only_if_assigned``: If set to a username, only import issues
+  assigned to the specified user.
+* ``also_unassigned``: If set to ``true`` and ``only_if_assigned`` is
+  set, then also create tasks for issues that are not assigned to anybody.
+  Defaults to ``false``.
+* ``default_priority``: Assign this priority ('L', 'M', 'H', or '') to
+  newly-imported issues. Note that priority is static by default, so changes
+  will not be reflected in existing tasks unless it is (at least temporarily)
+  removed from ``static_fields``. Defaults to ``M``.
+* ``add_tags``: A list of tags to add to an issue.  In
+  most cases, plain strings will suffice, but you can also specify
+  templates.  See the section `Field Templates`_ for more information.
+* ``static_fields``: A comma separated list of attributes that shouldn't be
+  *updated* by bugwarrior. Use for values that you want to tune manually.
+
+.. _field_templates:
+
+Field Templates
+---------------
+
+By default, Bugwarrior will import issues with a fairly verbose description
+template looking something like this::
+
+    (BW)Issue#10 - Fix perpetual motion machine .. http://media.giphy.com/media/LldEzRPqyo2Yg/giphy.gif
+
+but depending upon your workflow, the information presented may not be
+useful to you.
+
+To help users build descriptions that suit their needs, all services allow
+one to specify a ``description_template`` configuration option, in
+which one can enter a one-line Jinja template.  The context available includes
+all Taskwarrior fields and all UDAs (see section named 'Provided UDA Fields'
+for each service) defined for the relevant service.
+
+.. note::
+
+   Jinja templates can be very complex.  For more details about
+   Jinja templates, please consult
+   `Jinja's Template Documentation <https://jinja.palletsprojects.com/en/stable/templates/>`_.
+
+For example, to pull-in Github issues assigned to
+`@ralphbean <https://github.com/ralphbean>`_, setting the issue description
+such that it is composed of only the Github issue number and title, you could
+create a service entry like this:
+
+.. config::
+
+    [ralphs_github_account]
+    service = github
+    github.username = ralphbean
+    github.description_template = {{githubnumber}}: {{githubtitle}}
+
+You can also use this tool for altering the generated value of any other
+Taskwarrior record field by using the same kind of template.
+
+Uppercasing the project name for imported issues:
+
+.. config::
+   :fragment: github
+
+   github.project_template = {{project|upper}}
+
+You can also use this feature to override the generated value of any field.
+This example causes imported issues to be assigned to the 'Office' project
+regardless of what project was assigned by the service itself:
+
+.. config::
+   :fragment: github
+
+   github.project_template = Office
+
+.. _Secret Management:
+
+Secret Management
+-----------------
+
+You need not store your secrets in plain text in your configuration file;
+you can enter the following values to control where to gather your secrets
+from:
+
+``password = @oracle:use_keyring``
+  Retrieve a secret from the system keyring.  The ``bugwarrior vault``
+  command line tool can be used to manage your secrets as stored in your
+  keyring (say to reset them or clear them).  Extra dependencies must be
+  installed with `pip install bugwarrior[keyring]` to enable this feature.
+``password = @oracle:ask_password``
+  Ask for a password at runtime.
+``password = @oracle:eval:<command>``
+  Use the output of <command> as the password. For instance, to integrate
+  bugwarrior with the password manager `pass <https://www.passwordstore.org/>`_
+  you can use ``@oracle:eval:pass my/password``.
+
+
+Hooks
+-----
+
+Use hooks to run commands prior to importing from ``bugwarrior pull``.
+``bugwarrior pull`` will run the commands in the order that they are specified
+below.
+
+To use hooks, add a ``[hooks]`` section to your configuration, mapping
+the hook you'd like to use with a list of scripts to execute.
+
+.. config::
+
+      [hooks]
+      pre_import = /home/someuser/backup.sh, /home/someuser/sometask.sh
+
+Hook options:
+
+* ``pre_import``: The pre_import hook is invoked after all issues have been pulled
+  from remote sources, but before they are synced to the TW db. If your
+  pre_import script has a non-zero exit code, the ``bugwarrior pull`` command will
+  exit early.
+
+
+Notifications
+-------------
+
+Add a ``[notifications]`` section to your configuration to receive notifications
+when a bugwarrior pull runs, and when issues are created, updated, or deleted
+by ``bugwarrior pull``
+
+.. config::
+
+      [notifications]
+      notifications = true
+      backend = gobject
+      only_on_new_tasks = true
+
+Backend options:
+
++------------------+------------------+-------------------------+
+| Backend Name     | Operating System | Required Python Modules |
++==================+==================+=========================+
+| ``gobject``      | Linux            | ``gobject``             |
++------------------+------------------+-------------------------+
+| ``applescript``  | MacOS X          |                         |
++------------------+------------------+-------------------------+
