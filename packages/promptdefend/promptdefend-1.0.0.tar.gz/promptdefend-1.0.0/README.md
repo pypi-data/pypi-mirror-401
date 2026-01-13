@@ -1,0 +1,168 @@
+# Prompt Defend Python SDK
+
+[![PyPI version](https://badge.fury.io/py/promptdefend.svg)](https://badge.fury.io/py/promptdefend)
+[![Python Versions](https://img.shields.io/pypi/pyversions/promptdefend.svg)](https://pypi.org/project/promptdefend/)
+
+The official Python SDK for the [Prompt Defend](https://promptdefend.dev) AI Security API. Protect your AI applications with our 16-layer guardrail system.
+
+## Installation
+
+```bash
+pip install promptdefend
+```
+
+## Quick Start
+
+```python
+from promptdefend import PromptDefend
+
+# Initialize the client with your API key
+client = PromptDefend(api_key="your-api-key")
+
+# Scan a prompt for security issues
+result = client.scan("What is the weather today?")
+
+if result.safe:
+    print("✅ Prompt is safe to process")
+else:
+    print(f"⚠️ Warning: {result.reason}")
+```
+
+## Features
+
+- 🛡️ **16-Layer Protection** - Comprehensive guardrail system
+- 🔒 **Prompt Injection Detection** - Block jailbreak and injection attempts
+- ⚡ **Sub-millisecond Latency** - Average response time ~0.7ms
+- 🐍 **Pythonic API** - Clean, intuitive interface
+- 🔧 **Error Handling** - Comprehensive exception classes
+- 📦 **Minimal Dependencies** - Only requires `requests`
+
+## Usage
+
+### Basic Usage
+
+```python
+from promptdefend import PromptDefend
+
+client = PromptDefend(api_key="your-api-key")
+result = client.scan("Hello, how are you?")
+
+print(result.safe)    # True or False
+print(result.reason)  # Explanation string
+print(result.details) # Full detection details
+```
+
+### Using Context Manager
+
+```python
+from promptdefend import PromptDefend
+
+with PromptDefend(api_key="your-api-key") as client:
+    result = client.scan("Tell me a joke")
+    print(result.to_dict())
+```
+
+### Quick Scan Function
+
+For one-off scans without creating a client instance:
+
+```python
+from promptdefend import scan
+
+result = scan(api_key="your-api-key", prompt_text="What is 2+2?")
+print(result.safe)
+```
+
+### Custom Configuration
+
+```python
+from promptdefend import PromptDefend
+
+client = PromptDefend(
+    api_key="your-api-key",
+    base_url="https://api.promptdefend.dev",  # Optional custom endpoint
+    timeout=60  # Custom timeout in seconds
+)
+```
+
+## Error Handling
+
+The SDK provides specific exception classes for different error types:
+
+```python
+from promptdefend import (
+    PromptDefend,
+    PromptDefendError,
+    AuthenticationError,
+    NetworkError,
+    APIError
+)
+
+client = PromptDefend(api_key="your-api-key")
+
+try:
+    result = client.scan("Test prompt")
+except AuthenticationError as e:
+    print(f"Invalid API key: {e}")
+except NetworkError as e:
+    print(f"Network issue: {e}")
+except APIError as e:
+    print(f"API error (status {e.status_code}): {e}")
+except PromptDefendError as e:
+    print(f"General error: {e}")
+```
+
+## Response Object
+
+The `scan()` method returns a `ScanResult` object with the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `safe` | `bool` | Whether the prompt is safe to process |
+| `reason` | `str` | Explanation of the safety assessment |
+| `details` | `dict` | Full detection details from all 16 layers |
+| `fast_path` | `bool` | Whether allowlist short-circuit was used |
+
+### Methods
+
+- `to_dict()` - Convert the result to a dictionary
+
+## API Reference
+
+### PromptDefend Class
+
+#### Constructor
+
+```python
+PromptDefend(
+    api_key: str,                    # Required: Your API key
+    base_url: str = None,            # Optional: Custom API base URL
+    timeout: int = 30                # Optional: Request timeout in seconds
+)
+```
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `scan(prompt_text: str)` | Scan a prompt and return a `ScanResult` |
+| `close()` | Close the HTTP session |
+
+## Requirements
+
+- Python 3.8+
+- `requests` library
+
+## License
+
+This SDK is proprietary software. See [LICENSE](LICENSE) for details.
+
+## Support
+
+- 📚 [Documentation](https://docs.promptdefend.dev)
+- 📧 [Email Support](mailto:support@promptdefend.dev)
+- 🌐 [Website](https://promptdefend.dev)
+
+---
+
+© 2026 Prompt Defend. All Rights Reserved.
