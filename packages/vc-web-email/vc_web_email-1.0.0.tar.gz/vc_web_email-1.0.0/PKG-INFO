@@ -1,0 +1,452 @@
+Metadata-Version: 2.1
+Name: vc-web-email
+Version: 1.0.0
+Summary: A unified email library for VentureCube organization - supports SMTP, Gmail, SendGrid, AWS SES, and Mailgun
+Author-email: VentureCube <support@venturecube.com>
+Maintainer-email: VentureCube <support@venturecube.com>
+Project-URL: Homepage, https://github.com/venturecube/vc-web-email
+Project-URL: Documentation, https://github.com/venturecube/vc-web-email#readme
+Project-URL: Repository, https://github.com/venturecube/vc-web-email.git
+Project-URL: Issues, https://github.com/venturecube/vc-web-email/issues
+Keywords: email,smtp,gmail,sendgrid,aws-ses,mailgun,email-client,venturecube
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Communications :: Email
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Typing :: Typed
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: PyYAML>=6.0
+Provides-Extra: sendgrid
+Requires-Dist: sendgrid>=6.0; extra == "sendgrid"
+Provides-Extra: aws
+Requires-Dist: boto3>=1.26; extra == "aws"
+Provides-Extra: all
+Requires-Dist: sendgrid>=6.0; extra == "all"
+Requires-Dist: boto3>=1.26; extra == "all"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: flake8>=6.0; extra == "dev"
+Requires-Dist: mypy>=1.0; extra == "dev"
+Requires-Dist: isort>=5.12; extra == "dev"
+Requires-Dist: pre-commit>=3.0; extra == "dev"
+Requires-Dist: types-PyYAML>=6.0; extra == "dev"
+Provides-Extra: mailgun
+
+# vc-web-email
+
+A unified email library for VentureCube organization. Send emails through multiple providers with a single, consistent API.
+
+## Features
+
+- **Multiple Providers**: SMTP, Gmail, SendGrid, AWS SES, Mailgun, Outlook
+- **Unified API**: Same interface for all providers
+- **Attachments**: Easy file attachment support
+- **Validation**: Built-in email and message validation
+- **Retry Logic**: Automatic retry with exponential backoff
+- **Config Files**: Load configuration from YAML or JSON
+- **Type Hints**: Full type annotation support
+- **Extensible**: Easy to add custom providers
+
+## Installation
+
+```bash
+# Basic installation
+pip install vc-web-email
+
+# With SendGrid support
+pip install vc-web-email[sendgrid]
+
+# With AWS SES support
+pip install vc-web-email[aws]
+
+# With all providers
+pip install vc-web-email[all]
+
+# Development installation
+pip install vc-web-email[dev]
+```
+
+## Quick Start
+
+### Basic Usage
+
+```python
+from vc_web_email import EmailClient
+
+# Create client with configuration
+client = EmailClient({
+    'provider': 'smtp',
+    'smtp': {
+        'host': 'smtp.example.com',
+        'port': 587,
+        'username': 'your-username',
+        'password': 'your-password',
+    },
+    'default_from': 'sender@example.com'
+})
+
+# Send an email
+response = client.send(
+    to='recipient@example.com',
+    subject='Hello from vc-web-email',
+    text='This is a plain text message.',
+    html='<h1>This is an HTML message.</h1>'
+)
+
+if response.success:
+    print(f"Email sent! Message ID: {response.message_id}")
+else:
+    print(f"Failed to send: {response.error}")
+```
+
+### Load Configuration from File
+
+Create `email-config.yml`:
+
+```yaml
+provider: gmail
+gmail:
+  username: your-email@gmail.com
+  password: your-16-char-app-password
+
+default_from: your-email@gmail.com
+retry_attempts: 3
+timeout: 30
+```
+
+```python
+from vc_web_email import EmailClient
+
+client = EmailClient.from_config('email-config.yml')
+response = client.send(
+    to='recipient@example.com',
+    subject='Hello',
+    text='Hello World!'
+)
+```
+
+### Environment Variables
+
+```python
+from vc_web_email import EmailClient
+
+# Load from environment variables
+client = EmailClient.from_env()
+```
+
+Required environment variables:
+- `VC_EMAIL_PROVIDER`: Provider name (smtp, gmail, sendgrid, aws_ses, mailgun, outlook)
+- `VC_EMAIL_FROM`: Default sender email
+- Provider-specific variables (see documentation)
+
+## Providers
+
+### SMTP
+
+```python
+client = EmailClient({
+    'provider': 'smtp',
+    'smtp': {
+        'host': 'smtp.example.com',
+        'port': 587,
+        'username': 'user@example.com',
+        'password': 'password',
+        'use_tls': True,
+    },
+    'default_from': 'user@example.com'
+})
+```
+
+### Gmail
+
+```python
+client = EmailClient({
+    'provider': 'gmail',
+    'gmail': {
+        'username': 'your-email@gmail.com',
+        'password': 'your-16-char-app-password',  # App Password, not regular password
+    },
+    'default_from': 'your-email@gmail.com'
+})
+```
+
+**Note**: For Gmail, you need to:
+1. Enable 2-Factor Authentication
+2. Generate an App Password at https://myaccount.google.com/apppasswords
+
+### SendGrid
+
+```python
+client = EmailClient({
+    'provider': 'sendgrid',
+    'sendgrid': {
+        'api_key': 'SG.your-api-key',
+    },
+    'default_from': 'sender@example.com'
+})
+```
+
+### AWS SES
+
+```python
+client = EmailClient({
+    'provider': 'aws_ses',
+    'aws_ses': {
+        'region': 'us-east-1',
+        'access_key_id': 'AKIAIOSFODNN7EXAMPLE',
+        'secret_access_key': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    },
+    'default_from': 'sender@example.com'
+})
+```
+
+### Mailgun
+
+```python
+client = EmailClient({
+    'provider': 'mailgun',
+    'mailgun': {
+        'api_key': 'key-xxx',
+        'domain': 'mg.example.com',
+    },
+    'default_from': 'sender@mg.example.com'
+})
+```
+
+### Outlook/Microsoft 365
+
+```python
+client = EmailClient({
+    'provider': 'outlook',
+    'outlook': {
+        'username': 'your-email@outlook.com',
+        'password': 'your-password',
+    },
+    'default_from': 'your-email@outlook.com'
+})
+```
+
+## Advanced Usage
+
+### Attachments
+
+```python
+from vc_web_email import EmailClient, Attachment
+
+client = EmailClient.from_config('config.yml')
+
+# Attach from file path
+response = client.send(
+    to='recipient@example.com',
+    subject='Document attached',
+    text='Please find the document attached.',
+    attachments=['path/to/document.pdf']
+)
+
+# Or use Attachment class
+attachment = Attachment.from_file('path/to/image.png')
+response = client.send(
+    to='recipient@example.com',
+    subject='Image attached',
+    text='See the image.',
+    attachments=[attachment]
+)
+```
+
+### Bulk Sending
+
+```python
+from vc_web_email import EmailClient, EmailMessage
+
+client = EmailClient.from_config('config.yml')
+
+messages = [
+    EmailMessage(to='user1@example.com', subject='Hello User 1', text='Hi!'),
+    EmailMessage(to='user2@example.com', subject='Hello User 2', text='Hi!'),
+    EmailMessage(to='user3@example.com', subject='Hello User 3', text='Hi!'),
+]
+
+response = client.send_bulk(messages)
+
+print(f"Sent: {response.successful}/{response.total}")
+print(f"Success rate: {response.success_rate:.0%}")
+```
+
+### CC and BCC
+
+```python
+response = client.send(
+    to='recipient@example.com',
+    subject='Team Update',
+    text='Here is the update...',
+    cc=['manager@example.com', 'lead@example.com'],
+    bcc='archive@example.com'
+)
+```
+
+### Custom Headers
+
+```python
+response = client.send(
+    to='recipient@example.com',
+    subject='High Priority',
+    text='Urgent message!',
+    headers={
+        'X-Priority': '1',
+        'X-Custom-Header': 'custom-value'
+    }
+)
+```
+
+### Using Context Manager
+
+```python
+with EmailClient.from_config('config.yml') as client:
+    response = client.send(
+        to='recipient@example.com',
+        subject='Test',
+        text='Hello!'
+    )
+```
+
+## API Reference
+
+### EmailClient
+
+```python
+# Initialization
+client = EmailClient(config)
+client = EmailClient.from_config('path/to/config.yml')
+client = EmailClient.from_env()
+
+# Sending
+response = client.send(to, subject, text=None, html=None, ...)
+response = client.send_message(message)
+response = client.send_bulk(messages)
+
+# Utilities
+client.test_connection()  # Returns True if connection works
+client.get_provider_name()  # Returns provider name
+client.close()  # Close connections
+```
+
+### EmailMessage
+
+```python
+from vc_web_email import EmailMessage
+
+message = EmailMessage(
+    to='recipient@example.com',  # or list
+    subject='Subject line',
+    text='Plain text body',
+    html='<p>HTML body</p>',
+    from_email='sender@example.com',
+    cc=['cc@example.com'],
+    bcc=['bcc@example.com'],
+    reply_to='reply@example.com',
+    attachments=[attachment],
+    headers={'X-Custom': 'value'},
+    tags=['newsletter', 'weekly'],
+    metadata={'campaign_id': '123'}
+)
+
+# Add attachment
+message.add_attachment('path/to/file.pdf')
+message.add_attachment(Attachment(...))
+```
+
+### EmailResponse
+
+```python
+response.success  # bool
+response.message_id  # str or None
+response.status  # EmailStatus enum
+response.provider  # str
+response.error  # str or None
+response.timestamp  # datetime
+response.recipients  # list[str]
+response.to_dict()  # dict
+```
+
+### Exceptions
+
+```python
+from vc_web_email.exceptions import (
+    VCEmailError,  # Base exception
+    ConfigurationError,  # Invalid configuration
+    ValidationError,  # Message validation failed
+    ProviderError,  # Provider-specific error
+    ConnectionError,  # Connection failed
+    AuthenticationError,  # Auth failed
+    RateLimitError,  # Rate limit exceeded
+    AttachmentError,  # Attachment issue
+)
+```
+
+## Testing
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Run with coverage
+pytest --cov=vc_web_email --cov-report=html
+
+# Run specific test file
+pytest tests/test_client.py
+
+# Run with verbose output
+pytest -v
+```
+
+## Development
+
+```bash
+# Clone repository
+git clone https://github.com/venturecube/vc-web-email.git
+cd vc-web-email
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+
+# Install in development mode
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+black vc_web_email/
+isort vc_web_email/
+
+# Type checking
+mypy vc_web_email/
+
+# Linting
+flake8 vc_web_email/
+```
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Support
+
+- **Issues**: https://github.com/venturecube/vc-web-email/issues
+- **Email**: support@venturecube.com
