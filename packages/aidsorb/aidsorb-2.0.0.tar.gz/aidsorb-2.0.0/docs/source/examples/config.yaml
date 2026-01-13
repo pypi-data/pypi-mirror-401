@@ -1,0 +1,74 @@
+seed_everything: 1  # Workers are seeded as well
+
+# (Optional) Here you setup the Trainer
+trainer:
+  max_epochs: 2
+  accelerator: 'gpu'
+
+# Here you setup the DataModule (PCDDataModule)
+# For more information 👉 aidsorb.datamodules
+data:
+  # The paths must be relative to where aidsorb-lit is called
+  # Consider using absolute paths
+  path_to_X: 'path/to/pcd_data'
+  path_to_Y: 'path/to/labels.csv'
+  index_col: 'id'
+  labels: ['y1', 'y3']
+  train_transform_x:
+    class_path: torchvision.transforms.v2.Compose
+    init_args:
+      transforms:
+      - class_path: aidsorb.transforms.Center
+      # Data augmentation
+      - class_path: aidsorb.transforms.RandomJitter
+        init_args:
+          std: 0.3
+      - class_path: aidsorb.transforms.RandomRotation
+  eval_transform_x:
+    class_path: aidsorb.transforms.Center
+  train_size: Null  # Use all training data
+  train_batch_size: 2
+  eval_batch_size: 2
+  shuffle: True
+  config_dataloaders:
+    collate_fn:
+      class_path: aidsorb.data.Collator
+      init_args:
+        channels_first: True
+
+# Here you setup the LightningModule (PCDLit)
+# For more information 👉 aidsorb.litmodules
+model:
+  criterion:
+    class_path: torch.nn.MSELoss
+  metric:
+    class_path: torchmetrics.MetricCollection
+    init_args:
+      metrics:
+        r2: {class_path: torchmetrics.R2Score}
+        mae: {class_path: torchmetrics.MeanAbsoluteError}
+  model:
+    # You can also pass a custom architecture
+    class_path: aidsorb.modules.PointNet
+    init_args:
+      head:
+        class_path: aidsorb.modules.PointNetClsHead
+        init_args:
+          n_outputs: 2
+          dropout_rate: 0.1
+
+# (Optional) Here you setup the optimizer
+# If not specified, Adam will be used with default hyperparameters
+optimizer:
+  class_path: torch.optim.SGD
+  init_args:
+    lr: 0.001
+    momentum: 0.0
+
+# (Optional) Here you setup the learning rate scheduler
+# If not specified, no scheduler will be applied
+lr_scheduler:
+  class_path: torch.optim.lr_scheduler.StepLR
+  init_args:
+    step_size: 10
+    gamma: 0.1
