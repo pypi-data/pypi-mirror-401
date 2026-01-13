@@ -1,0 +1,41 @@
+Metadata-Version: 2.4
+Name: image-to-poetry
+Version: 0.0.1
+Summary: A Python package to generate poems from images.
+Project-URL: Homepage, https://github.com/example/image-to-poetry
+Project-URL: Bug Tracker, https://github.com/example/image-to-poetry/issues
+Author-email: Example Author <author@example.com>
+License-File: LICENSE
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.9
+Requires-Dist: google-generativeai
+Requires-Dist: pillow
+Requires-Dist: python-dotenv
+Description-Content-Type: text/markdown
+
+# Image to Poetry
+
+Upload an image and get a rhyming poem about it!
+
+## Prerequisites
+
+You need a Google Gemin API key. Get one from [aistudio.google.com](https://aistudio.google.com/).
+
+Set your API key as an environment variable:
+```bash
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+## Installation
+
+```bash
+pip install image-to-poetry
+```
+
+## Usage
+
+```bash
+image2poetry my_image.jpg
+```
