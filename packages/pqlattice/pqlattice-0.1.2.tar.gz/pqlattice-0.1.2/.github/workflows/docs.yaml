@@ -1,0 +1,48 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "${HOME}/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install docs dependencies with uv
+        run: |
+          uv sync --group docs
+
+      - name: Build MkDocs site
+        run: |
+          uv run mkdocs build --strict
+          uv run mkdocs gh-deploy --force
+
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - id: deployment
+        uses: actions/deploy-pages@v4
