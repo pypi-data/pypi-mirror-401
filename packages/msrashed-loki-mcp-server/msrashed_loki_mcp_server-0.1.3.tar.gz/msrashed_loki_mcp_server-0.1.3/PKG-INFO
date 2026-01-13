@@ -1,0 +1,1231 @@
+Metadata-Version: 2.4
+Name: msrashed-loki-mcp-server
+Version: 0.1.3
+Summary: Read-only Loki MCP server for log querying, searching, and analysis
+Project-URL: Homepage, https://github.com/msalah-eg/loki-mcp-server
+Project-URL: Repository, https://github.com/msalah-eg/loki-mcp-server
+Project-URL: Issues, https://github.com/msalah-eg/loki-mcp-server/issues
+Author-email: Mohamed Salah <mohamed@buyinggroup.com>
+License: MIT
+Keywords: ai,grafana,llm,logging,logs,loki,mcp,model-context-protocol,observability
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Logging
+Requires-Python: >=3.12
+Requires-Dist: click>=8.1.0
+Requires-Dist: fastmcp>=2.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp>=1.24.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: python-dateutil>=2.8.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.24.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: respx>=0.21.0; extra == 'dev'
+Requires-Dist: ruff>=0.8.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Loki MCP Server
+
+A read-only Model Context Protocol (MCP) server for Grafana Loki log aggregation platform. This server enables AI agents like Claude to query, search, and analyze logs from Loki for troubleshooting, incident investigation, and log analysis.
+
+## Features
+
+### Core Capabilities
+- **Log Querying**: Execute LogQL instant and range queries
+- **Label Discovery**: Explore available labels and their values
+- **Series Discovery**: Find log streams matching label selectors
+- **Error Analysis**: Detect error patterns and spike timelines
+- **Incident Investigation**: Get surrounding context, trace logs, correlate events
+- **Multi-Pod Analysis**: Aggregate logs across deployment replicas
+- **Log Volume Metrics**: Analyze traffic patterns and anomalies
+
+### CLI Interface
+- **Full CLI**: Test all MCP tools directly from command line
+- **Command Groups**: Organized commands (query, labels, analyze, status)
+- **Environment Variables**: Configure via env vars or CLI options
+- **Multiple Transports**: stdio, HTTP, SSE, streamable-http
+
+### Safety & Security
+- **Read-only**: All operations are safe and cannot modify Loki
+- **Authentication**: Supports Bearer token and Basic auth
+- **Multi-tenancy**: X-Scope-OrgID header support for multi-tenant Loki
+- **SSL Verification**: Configurable SSL certificate verification
+
+## Installation
+
+### Using pip (from PyPI)
+
+```bash
+pip install msrashed-loki-mcp-server
+```
+
+### Using uvx (Recommended for CLI)
+
+```bash
+# Run directly without installation
+uvx msrashed-loki-mcp-server --help
+
+# Or install globally
+uv tool install msrashed-loki-mcp-server
+```
+
+### From Source
+
+```bash
+git clone https://github.com/msalah-eg/loki-mcp-server.git
+cd loki-mcp-server
+uv sync
+uv run loki-mcp-server --help
+```
+
+## Quick Start
+
+```bash
+# Set Loki URL
+export LOKI_URL="http://localhost:3100"
+
+# Test connection
+loki-mcp-server check
+
+# List available labels
+loki-mcp-server labels list
+
+# Query recent logs
+loki-mcp-server query range '{namespace="production"}' --start now-1h --end now
+
+# Find errors
+loki-mcp-server analyze errors --namespace production
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Required
+export LOKI_URL="https://loki.example.com"
+
+# Optional Authentication
+export LOKI_TOKEN="your_bearer_token"
+# OR
+export LOKI_USERNAME="admin"
+export LOKI_PASSWORD="secret"
+
+# Optional Multi-tenancy
+export LOKI_ORG_ID="tenant1"
+
+# Optional Settings
+export LOKI_TIMEOUT="30"           # Request timeout in seconds
+export LOKI_VERIFY_SSL="true"      # Verify SSL certificates
+```
+
+## CLI Reference
+
+### Main Commands
+
+```
+loki-mcp-server [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  run       Start the MCP server
+  query     Execute LogQL queries
+  labels    Discover labels and series
+  analyze   Error patterns and investigation tools
+  stats     Index statistics
+  status    Check server status
+  check     Verify connection to Loki
+  info      Display MCP tools and CLI mapping
+```
+
+### Global Options
+
+All commands support these connection options:
+
+```
+--url TEXT              Loki server URL [env: LOKI_URL]
+--token TEXT            Bearer token [env: LOKI_TOKEN]
+--username TEXT         Basic auth username [env: LOKI_USERNAME]
+--password TEXT         Basic auth password [env: LOKI_PASSWORD]
+--org-id TEXT           Multi-tenant org ID [env: LOKI_ORG_ID]
+--timeout INTEGER       Request timeout in seconds [default: 30]
+--verify-ssl/--no-verify-ssl  SSL verification [default: verify-ssl]
+```
+
+---
+
+## Command: `run`
+
+Start the MCP server with specified transport.
+
+```bash
+loki-mcp-server run [OPTIONS]
+```
+
+### Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--transport` | stdio | Transport: stdio, http, sse, streamable-http |
+| `--host` | 127.0.0.1 | Host for HTTP/SSE transport |
+| `--port` | 8000 | Port for HTTP/SSE transport |
+
+### Examples
+
+```bash
+# Run with stdio (default for MCP)
+loki-mcp-server run
+
+# Run with HTTP transport on port 8080
+loki-mcp-server run --transport http --port 8080
+
+# Run with custom Loki URL
+loki-mcp-server run --url https://loki.example.com
+
+# Run with authentication
+loki-mcp-server run --url https://loki.example.com --token $LOKI_TOKEN
+
+# Run with multi-tenancy
+loki-mcp-server run --url https://loki.example.com --org-id tenant1
+```
+
+---
+
+## Command Group: `query`
+
+Execute LogQL queries against Loki.
+
+### `query instant`
+
+Execute a LogQL instant query at a single point in time.
+
+```bash
+loki-mcp-server query instant LOGQL [OPTIONS]
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-t, --time` | now | Evaluation timestamp (RFC3339, Unix, or relative) |
+| `-l, --limit` | 100 | Maximum entries to return |
+| `--direction` | backward | Return direction: forward or backward |
+
+**Examples:**
+
+```bash
+# Basic log query
+loki-mcp-server query instant '{namespace="production"}'
+
+# Query with text filter
+loki-mcp-server query instant '{job="api"} |= "error"'
+
+# Query at specific time
+loki-mcp-server query instant '{app="api"}' --time "2024-01-15T10:00:00Z"
+
+# Query with JSON parsing
+loki-mcp-server query instant '{app="api"} | json | level="error"'
+
+# Limit results
+loki-mcp-server query instant '{namespace="prod"}' --limit 50
+```
+
+### `query range`
+
+Execute a LogQL range query over a time period.
+
+```bash
+loki-mcp-server query range LOGQL --start START --end END [OPTIONS]
+```
+
+| Option | Required | Default | Description |
+|--------|----------|---------|-------------|
+| `-s, --start` | Yes | - | Start timestamp |
+| `-e, --end` | Yes | - | End timestamp |
+| `-l, --limit` | No | 1000 | Maximum entries |
+| `--step` | No | - | Resolution for metric queries (e.g., 15s, 1m) |
+| `--direction` | No | backward | Return direction |
+
+**Examples:**
+
+```bash
+# Logs from last hour
+loki-mcp-server query range '{namespace="production"}' \
+    --start now-1h --end now
+
+# Logs with error filter
+loki-mcp-server query range '{job="api"} |= "error"' \
+    --start now-6h --end now --limit 500
+
+# Metric query with step
+loki-mcp-server query range 'rate({namespace="prod"}[5m])' \
+    --start now-24h --end now --step 5m
+
+# Specific time range
+loki-mcp-server query range '{app="api"}' \
+    --start "2024-01-15T09:00:00Z" --end "2024-01-15T10:00:00Z"
+
+# Forward direction (chronological)
+loki-mcp-server query range '{pod="api-123"}' \
+    --start now-1h --end now --direction forward
+```
+
+### `query volume`
+
+Query log volume metrics over time.
+
+```bash
+loki-mcp-server query volume LOGQL --start START --end END [OPTIONS]
+```
+
+| Option | Required | Default | Description |
+|--------|----------|---------|-------------|
+| `-s, --start` | Yes | - | Start timestamp |
+| `-e, --end` | Yes | - | End timestamp |
+| `--step` | No | 5m | Query resolution |
+
+**Examples:**
+
+```bash
+# Volume by app over last 6 hours
+loki-mcp-server query volume '{namespace="production"}' \
+    --start now-6h --end now
+
+# High resolution volume
+loki-mcp-server query volume '{app="api"}' \
+    --start now-1h --end now --step 1m
+
+# Daily volume analysis
+loki-mcp-server query volume '{namespace="prod"}' \
+    --start now-7d --end now --step 1h
+```
+
+---
+
+## Command Group: `labels`
+
+Discover labels, values, and series in Loki.
+
+### `labels list`
+
+List all available label names.
+
+```bash
+loki-mcp-server labels list [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-s, --start` | Start timestamp for filtering |
+| `-e, --end` | End timestamp for filtering |
+
+**Examples:**
+
+```bash
+# List all labels
+loki-mcp-server labels list
+
+# Labels in a time range
+loki-mcp-server labels list --start now-24h --end now
+
+# Labels for specific period
+loki-mcp-server labels list \
+    --start "2024-01-15T00:00:00Z" --end "2024-01-15T23:59:59Z"
+```
+
+### `labels values`
+
+Get all values for a specific label.
+
+```bash
+loki-mcp-server labels values LABEL [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-s, --start` | Start timestamp |
+| `-e, --end` | End timestamp |
+| `-q, --query` | LogQL query to filter results |
+
+**Examples:**
+
+```bash
+# Get all namespaces
+loki-mcp-server labels values namespace
+
+# Get all jobs
+loki-mcp-server labels values job
+
+# Get apps in production namespace
+loki-mcp-server labels values app --query '{namespace="production"}'
+
+# Get pods in last hour
+loki-mcp-server labels values pod --start now-1h --end now
+
+# Get containers for specific app
+loki-mcp-server labels values container --query '{app="api"}'
+```
+
+### `labels series`
+
+Find log series matching label selectors.
+
+```bash
+loki-mcp-server labels series --match SELECTOR [OPTIONS]
+```
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `-m, --match` | Yes | Series selector (can be repeated) |
+| `-s, --start` | No | Start timestamp |
+| `-e, --end` | No | End timestamp |
+
+**Examples:**
+
+```bash
+# Find all series in namespace
+loki-mcp-server labels series --match '{namespace="production"}'
+
+# Find series for multiple jobs
+loki-mcp-server labels series \
+    --match '{job="api"}' \
+    --match '{job="web"}'
+
+# Find series with time filter
+loki-mcp-server labels series \
+    --match '{namespace="prod",app="api"}' \
+    --start now-1h --end now
+
+# Find all HTTP-related series
+loki-mcp-server labels series --match '{job=~".*http.*"}'
+```
+
+---
+
+## Command Group: `analyze`
+
+Error patterns and investigation tools.
+
+### `analyze errors`
+
+Find common error patterns in logs.
+
+```bash
+loki-mcp-server analyze errors [OPTIONS]
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-n, --namespace` | - | Kubernetes namespace filter |
+| `-s, --service` | - | Service/app name filter |
+| `--start` | now-1h | Start timestamp |
+| `--end` | now | End timestamp |
+| `-l, --limit` | 100 | Maximum entries |
+
+**Examples:**
+
+```bash
+# Find errors in production
+loki-mcp-server analyze errors --namespace production
+
+# Find errors for specific service
+loki-mcp-server analyze errors --namespace prod --service api
+
+# Find errors in last 6 hours
+loki-mcp-server analyze errors --namespace prod --start now-6h --end now
+
+# Find errors with higher limit
+loki-mcp-server analyze errors --namespace prod --limit 500
+```
+
+### `analyze error-timeline`
+
+Visualize error rate over time to identify spikes.
+
+```bash
+loki-mcp-server analyze error-timeline [OPTIONS]
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-n, --namespace` | - | Kubernetes namespace filter |
+| `-s, --service` | - | Service/app name filter |
+| `--start` | now-6h | Start timestamp |
+| `--end` | now | End timestamp |
+| `--step` | 1m | Time resolution |
+
+**Examples:**
+
+```bash
+# Error timeline for production
+loki-mcp-server analyze error-timeline --namespace production
+
+# High resolution timeline (30 second intervals)
+loki-mcp-server analyze error-timeline --namespace prod --step 30s
+
+# Last 24 hours with 5 minute resolution
+loki-mcp-server analyze error-timeline \
+    --namespace prod --start now-24h --step 5m
+
+# Timeline for specific service
+loki-mcp-server analyze error-timeline \
+    --namespace prod --service api --step 1m
+```
+
+### `analyze context`
+
+Get logs before and after a specific timestamp.
+
+```bash
+loki-mcp-server analyze context --labels JSON --timestamp TS [OPTIONS]
+```
+
+| Option | Required | Default | Description |
+|--------|----------|---------|-------------|
+| `-l, --labels` | Yes | - | Label selectors as JSON |
+| `-t, --timestamp` | Yes | - | Target timestamp |
+| `--before` | No | 50 | Lines before timestamp |
+| `--after` | No | 50 | Lines after timestamp |
+
+**Examples:**
+
+```bash
+# Get context around an error
+loki-mcp-server analyze context \
+    --labels '{"namespace": "prod", "pod": "api-abc123"}' \
+    --timestamp "2024-01-15T10:30:45.123Z"
+
+# More context (100 lines each direction)
+loki-mcp-server analyze context \
+    --labels '{"namespace": "prod", "pod": "api-abc123", "container": "app"}' \
+    --timestamp "2024-01-15T10:30:45.123Z" \
+    --before 100 --after 100
+
+# Context using Unix nanoseconds timestamp
+loki-mcp-server analyze context \
+    --labels '{"job": "api-server"}' \
+    --timestamp "1705316445123000000"
+```
+
+### `analyze trace`
+
+Find all logs related to a trace ID.
+
+```bash
+loki-mcp-server analyze trace TRACE_ID [OPTIONS]
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--start` | now-1h | Start timestamp |
+| `--end` | now | End timestamp |
+| `-l, --limit` | 1000 | Maximum entries |
+
+**Examples:**
+
+```bash
+# Find logs for a trace
+loki-mcp-server analyze trace abc123def456
+
+# Trace with specific time range
+loki-mcp-server analyze trace abc123def456 \
+    --start "2024-01-15T10:00:00Z" --end "2024-01-15T11:00:00Z"
+
+# Trace with extended time range
+loki-mcp-server analyze trace abc123def456 \
+    --start now-2h --end now --limit 2000
+```
+
+### `analyze pods`
+
+Get logs from pods matching a pattern (all replicas).
+
+```bash
+loki-mcp-server analyze pods POD_PATTERN --namespace NS [OPTIONS]
+```
+
+| Option | Required | Default | Description |
+|--------|----------|---------|-------------|
+| `-n, --namespace` | Yes | - | Kubernetes namespace |
+| `-c, --container` | No | - | Container name filter |
+| `--start` | No | now-1h | Start timestamp |
+| `--end` | No | now | End timestamp |
+| `-l, --limit` | No | 1000 | Maximum entries |
+
+**Examples:**
+
+```bash
+# All API pods
+loki-mcp-server analyze pods "api-.*" --namespace production
+
+# Specific container in pods
+loki-mcp-server analyze pods "web-.*" --namespace prod --container nginx
+
+# All replicas of a deployment
+loki-mcp-server analyze pods "myapp-deployment-.*" --namespace prod
+
+# Pods matching pattern with time filter
+loki-mcp-server analyze pods "worker-.*" \
+    --namespace prod --start now-30m --end now
+
+# High limit for busy pods
+loki-mcp-server analyze pods "api-.*" \
+    --namespace prod --limit 5000
+```
+
+---
+
+## Command Group: `stats`
+
+Index statistics and metrics.
+
+### `stats index`
+
+Get index statistics for a query.
+
+```bash
+loki-mcp-server stats index LOGQL --start START --end END
+```
+
+**Examples:**
+
+```bash
+# Index stats for namespace
+loki-mcp-server stats index '{namespace="production"}' \
+    --start now-24h --end now
+
+# Index stats for specific app
+loki-mcp-server stats index '{app="api"}' \
+    --start now-7d --end now
+```
+
+---
+
+## Command Group: `status`
+
+Check server status.
+
+### `status ready`
+
+Check if Loki is ready to serve queries.
+
+```bash
+loki-mcp-server status ready
+```
+
+**Examples:**
+
+```bash
+# Check readiness
+loki-mcp-server status ready
+
+# Check with custom URL
+loki-mcp-server status ready --url https://loki.example.com
+```
+
+### `status metrics`
+
+Get Loki internal metrics.
+
+```bash
+loki-mcp-server status metrics
+```
+
+---
+
+## Command: `check`
+
+Verify connection to Loki server.
+
+```bash
+loki-mcp-server check [OPTIONS]
+```
+
+**Examples:**
+
+```bash
+# Check default connection
+loki-mcp-server check
+
+# Check specific server
+loki-mcp-server check --url https://loki.example.com
+
+# Check with authentication
+loki-mcp-server check --url https://loki.example.com --token $TOKEN
+```
+
+---
+
+## Command: `info`
+
+Display MCP tools and CLI command mapping.
+
+```bash
+loki-mcp-server info
+```
+
+**Output:**
+
+```
+Loki MCP Server - Tools & CLI Commands
+
+============================================================
+
+Query Tools
+-----------
+  MCP Tool                  CLI Command               Description
+  ------------------------ ------------------------ --------------------
+  query_logs                query instant             Instant LogQL query
+  query_logs_range          query range               Range LogQL query
+  query_log_volume          query volume              Log volume metrics
+
+Label Discovery
+---------------
+  MCP Tool                  CLI Command               Description
+  ------------------------ ------------------------ --------------------
+  list_labels               labels list               List label names
+  get_label_values          labels values             Get label values
+  find_series               labels series             Find log series
+
+...
+```
+
+---
+
+## MCP Tools Reference
+
+### Tool: `query_logs`
+
+Execute LogQL instant query at a specific point in time.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | Yes | - | LogQL query expression |
+| `time` | string | No | now | Evaluation timestamp |
+| `limit` | int | No | 100 | Maximum entries |
+| `direction` | string | No | backward | forward or backward |
+
+**Example:**
+
+```python
+query_logs(
+    query='{namespace="production",app="api"} |= "error" | json',
+    limit=100,
+    time="2024-01-15T10:00:00Z"
+)
+```
+
+### Tool: `query_logs_range`
+
+Execute LogQL query over a time range.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | Yes | - | LogQL query expression |
+| `start` | string | Yes | - | Start timestamp |
+| `end` | string | Yes | - | End timestamp |
+| `limit` | int | No | 1000 | Maximum entries |
+| `direction` | string | No | backward | forward or backward |
+| `step` | string | No | - | Resolution for metric queries |
+
+**Example:**
+
+```python
+query_logs_range(
+    query='{job="api-server"} |= "error"',
+    start="2024-01-15T09:00:00Z",
+    end="2024-01-15T10:00:00Z",
+    limit=1000
+)
+```
+
+### Tool: `query_log_volume`
+
+Query log volume metrics over time.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | Yes | - | Base LogQL selector |
+| `start` | string | Yes | - | Start timestamp |
+| `end` | string | Yes | - | End timestamp |
+| `step` | string | No | 5m | Query resolution |
+| `limit` | int | No | 5000 | Maximum data points |
+
+**Example:**
+
+```python
+query_log_volume(
+    query='{namespace="production"}',
+    start="now-6h",
+    end="now",
+    step="5m"
+)
+```
+
+### Tool: `list_labels`
+
+List all available label names.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `start` | string | No | - | Start timestamp |
+| `end` | string | No | - | End timestamp |
+
+**Example:**
+
+```python
+list_labels(
+    start="2024-01-15T00:00:00Z",
+    end="2024-01-15T23:59:59Z"
+)
+```
+
+### Tool: `get_label_values`
+
+Get all values for a specific label.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `label` | string | Yes | - | Label name (e.g., namespace, job) |
+| `start` | string | No | - | Start timestamp |
+| `end` | string | No | - | End timestamp |
+| `query` | string | No | - | LogQL query to filter |
+
+**Example:**
+
+```python
+get_label_values(
+    label="namespace",
+    query='{job="api"}'
+)
+```
+
+### Tool: `find_series`
+
+Find log series matching label selectors.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `match` | list[string] | Yes | - | List of series selectors |
+| `start` | string | No | - | Start timestamp |
+| `end` | string | No | - | End timestamp |
+
+**Example:**
+
+```python
+find_series(
+    match=['{namespace="production"}', '{job="api"}'],
+    start="2024-01-15T00:00:00Z"
+)
+```
+
+### Tool: `get_index_stats`
+
+Get index statistics for a query.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | Yes | - | LogQL query |
+| `start` | string | Yes | - | Start timestamp |
+| `end` | string | Yes | - | End timestamp |
+
+**Example:**
+
+```python
+get_index_stats(
+    query='{namespace="production"}',
+    start="2024-01-15T00:00:00Z",
+    end="2024-01-15T23:59:59Z"
+)
+```
+
+### Tool: `find_error_patterns`
+
+Find common error patterns in logs.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `namespace` | string | No | - | Kubernetes namespace |
+| `service` | string | No | - | Service/app name |
+| `start` | string | No | now-1h | Start timestamp |
+| `end` | string | No | now | End timestamp |
+| `limit` | int | No | 100 | Maximum entries |
+
+**Example:**
+
+```python
+find_error_patterns(
+    namespace="production",
+    service="api",
+    start="now-1h",
+    end="now",
+    limit=100
+)
+```
+
+### Tool: `get_error_spike_timeline`
+
+Visualize error rate timeline to identify spikes.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `namespace` | string | No | - | Kubernetes namespace |
+| `service` | string | No | - | Service/app name |
+| `start` | string | No | now-6h | Start timestamp |
+| `end` | string | No | now | End timestamp |
+| `step` | string | No | 1m | Time resolution |
+
+**Example:**
+
+```python
+get_error_spike_timeline(
+    namespace="production",
+    service="api",
+    start="now-6h",
+    end="now",
+    step="1m"
+)
+```
+
+### Tool: `get_surrounding_logs`
+
+Get logs before and after a specific timestamp.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `labels` | dict | Yes | - | Label selectors |
+| `timestamp` | string | Yes | - | Target timestamp |
+| `before_lines` | int | No | 50 | Lines before |
+| `after_lines` | int | No | 50 | Lines after |
+
+**Example:**
+
+```python
+get_surrounding_logs(
+    labels={"namespace": "prod", "pod": "api-123"},
+    timestamp="2024-01-15T10:30:45.123Z",
+    before_lines=50,
+    after_lines=50
+)
+```
+
+### Tool: `trace_logs`
+
+Find all logs related to a trace ID.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `trace_id` | string | Yes | - | Trace ID to search |
+| `start` | string | No | now-1h | Start timestamp |
+| `end` | string | No | now | End timestamp |
+| `limit` | int | No | 1000 | Maximum entries |
+
+**Example:**
+
+```python
+trace_logs(
+    trace_id="abc123def456",
+    start="now-1h",
+    end="now"
+)
+```
+
+### Tool: `find_pod_logs`
+
+Retrieve logs from pods matching a pattern.
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `pod_pattern` | string | Yes | - | Pod name regex pattern |
+| `namespace` | string | Yes | - | Kubernetes namespace |
+| `container` | string | No | - | Container name |
+| `start` | string | No | now-1h | Start timestamp |
+| `end` | string | No | now | End timestamp |
+| `limit` | int | No | 1000 | Maximum entries |
+
+**Example:**
+
+```python
+find_pod_logs(
+    pod_pattern="api-.*",
+    namespace="production",
+    container="app",
+    start="now-1h"
+)
+```
+
+### Tool: `check_loki_ready`
+
+Check if Loki is ready to serve queries.
+
+**Parameters:** None
+
+**Example:**
+
+```python
+check_loki_ready()
+```
+
+### Tool: `get_loki_metrics`
+
+Get Loki internal metrics.
+
+**Parameters:** None
+
+**Example:**
+
+```python
+get_loki_metrics()
+```
+
+---
+
+## LogQL Query Syntax
+
+### Basic Stream Selection
+```logql
+{namespace="production", app="api"}
+{job="api-server"}
+{cluster="prod", namespace=~".*-api"}
+```
+
+### Text Filters
+```logql
+{job="api"} |= "error"              # Contains "error"
+{job="api"} != "timeout"            # Does not contain "timeout"
+{job="api"} |~ "error.*database"    # Regex match
+{job="api"} !~ "debug|trace"        # Negative regex
+```
+
+### Parse JSON
+```logql
+{app="api"} | json
+{app="api"} | json | level="error"
+{app="api"} | json | status_code >= 500
+{app="api"} | json | line_format "{{.method}} {{.path}}"
+```
+
+### Parse Logfmt
+```logql
+{job="nginx"} | logfmt
+{job="nginx"} | logfmt | status>=500
+{job="nginx"} | logfmt | duration > 1s
+```
+
+### Metrics Queries
+```logql
+rate({namespace="production"}[5m])
+sum(rate({app="api"}[1m])) by (status_code)
+count_over_time({job="api"}[10m])
+bytes_over_time({app="web"}[1h])
+```
+
+### Pattern Matching
+```logql
+{app="api"} |~ "error.*database"
+{job="nginx"} | regexp "(?P<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)"
+{app="api"} | pattern "<ip> - - [<timestamp>] \"<method> <path>\""
+```
+
+---
+
+## Time Formats
+
+The server supports multiple time formats:
+
+### RFC3339
+```
+2024-01-15T10:00:00Z
+2024-01-15T10:00:00-05:00
+```
+
+### Unix Timestamps
+```
+1705316400              (seconds)
+1705316400000           (milliseconds)
+1705316400000000000     (nanoseconds)
+```
+
+### Relative Times
+```
+now
+now-1h       # 1 hour ago
+now-15m      # 15 minutes ago
+now-6h       # 6 hours ago
+now-1d       # 1 day ago
+now-7d       # 7 days ago
+```
+
+---
+
+## Integration with Claude Code
+
+Add to your Claude Code MCP settings (`~/.claude/mcp_settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "loki": {
+      "command": "loki-mcp-server",
+      "args": ["run"],
+      "env": {
+        "LOKI_URL": "https://loki.example.com",
+        "LOKI_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+Or with uvx:
+
+```json
+{
+  "mcpServers": {
+    "loki": {
+      "command": "uvx",
+      "args": ["msrashed-loki-mcp-server", "run"],
+      "env": {
+        "LOKI_URL": "https://loki.example.com",
+        "LOKI_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+---
+
+## Use Cases
+
+### Troubleshooting Production Issues
+
+```bash
+# 1. Check for errors in production
+loki-mcp-server analyze errors --namespace production
+
+# 2. See error timeline to identify when issues started
+loki-mcp-server analyze error-timeline --namespace production --step 1m
+
+# 3. Query specific time range during incident
+loki-mcp-server query range '{namespace="production"} |= "error"' \
+    --start "2024-01-15T10:25:00Z" --end "2024-01-15T10:35:00Z"
+
+# 4. Get context around specific error
+loki-mcp-server analyze context \
+    --labels '{"namespace": "production", "pod": "api-xyz"}' \
+    --timestamp "2024-01-15T10:30:45Z"
+```
+
+### Trace Correlation
+
+```bash
+# Find all logs for a distributed trace
+loki-mcp-server analyze trace abc123def456 --start now-1h
+
+# Then query specific services in the trace
+loki-mcp-server query range '{namespace="prod"} |= "abc123def456"' \
+    --start now-1h --end now
+```
+
+### Multi-Pod Analysis
+
+```bash
+# Get logs from all replicas of a deployment
+loki-mcp-server analyze pods "api-deployment-.*" --namespace production
+
+# Find which pod has the most errors
+loki-mcp-server query range \
+    'sum(count_over_time({namespace="prod",pod=~"api-.*"} |= "error"[5m])) by (pod)' \
+    --start now-1h --end now --step 1m
+```
+
+### Log Volume Analysis
+
+```bash
+# Check log volume by app
+loki-mcp-server query volume '{namespace="production"}' \
+    --start now-24h --end now --step 15m
+
+# Find apps with most logs
+loki-mcp-server query range \
+    'topk(10, sum(rate({namespace="prod"}[5m])) by (app))' \
+    --start now-1h --end now --step 5m
+```
+
+---
+
+## Troubleshooting
+
+### Connection Issues
+
+```bash
+# Test connectivity
+loki-mcp-server check --url https://loki.example.com
+
+# Check with verbose output
+loki-mcp-server labels list --url https://loki.example.com
+```
+
+### Authentication Errors
+
+```bash
+# Test with token
+loki-mcp-server check --url https://loki.example.com --token $TOKEN
+
+# Test with basic auth
+loki-mcp-server check --url https://loki.example.com \
+    --username admin --password secret
+```
+
+### Query Errors
+
+```bash
+# Validate labels exist
+loki-mcp-server labels list
+
+# Check label values
+loki-mcp-server labels values namespace
+
+# Try simple query first
+loki-mcp-server query range '{}' --start now-5m --end now --limit 5
+```
+
+---
+
+## License
+
+MIT License - See LICENSE file for details
+
+## References
+
+- [Loki HTTP API Documentation](https://grafana.com/docs/loki/latest/reference/loki-http-api/)
+- [LogQL Documentation](https://grafana.com/docs/loki/latest/query/)
+- [FastMCP Documentation](https://gofastmcp.com/)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
