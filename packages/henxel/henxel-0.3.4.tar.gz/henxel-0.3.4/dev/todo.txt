@@ -1,0 +1,1243 @@
+# ^/\|-_+:,.;'"*%?=!@&()[]{}~<>
+###############################
+git config --global user.name
+git config --global user.email
+to set git diff tabsize to 4:
+git config --global core.pager 'less -x1,5'
+
+# diff: show function context
+# in git root:
+echo '*.py diff=python' >> .git/info/attributes
+
+git diff -w == no space diffs
+git diff -b --ignore-blank-lines
+pip install build setuptools
+python -m build -nx
+macos: open filebrowser from terminal to current folder: open .
+############################################################
+##########################################################
+
+
+not doing this:
+a= self.text_widget.config('insertwidth')
+b=self.pad
+
+a/b in 1/3 2/3
+
+a in b/3 2*B/3
+
+
+
+
+no numlock:
+keys like a: 0
+arrows home end pgup down +262144
+shift +1
+control +8
+numlock +4
+Alt +131072
+
+262144 +1 +4 +8
+
+
+
+
+macos printing issue is partly because of using shell installed from brew
+--> don't install from brew
+even when using builtin shell, there was no word wrap for long single lines,
+or for tracabacks from tkinter callbacks
+--> not dumping printer fix, yet
+
+
+
+
+###################
+setting.py
+
+
+defaults = dict()
+
+
+check_for_deleted_old_key():
+	list_of_old_keys = data.keys()
+	
+	for key in list_of_old_keys:
+		try: _ = defaults[key]
+		
+		# old conf-data has extra key --> is not loaded and not saved --> ok
+		except KeyError:
+			print('Old configuration had key(likely old) that is not used', key)
+		
+		
+class Setting
+
+for key in list_of_new_keys:
+	try:
+		Setting.key = data[key]
+	
+	# old conf-data has no new key --> ok
+	except KeyError:
+		print('Old configuration did not have key', key)
+		Setting.key = defaults[key]
+
+###################
+
+
+
+
+Below this: not done:
+###############################################
+
+
+
+
+todo: copy paste
+
+
+--> check_line multiline fix for indent0
+generates indentation errors --> using old way to get scope start ends
+
+
+
+done, this should be user settable bitmap: set_bitmap(bitmap_as_string) ########
+#####################################
+tk.BitmapImage(file=f[, background=b][, foreground=c])
+logo = tk.BitmapImage('logo.xbm', foreground='red'
+
+e.tk.eval('image names')
+
+
+
+create_pic_cmd = '''
+set infopic [image create bitmap -data {
+# define infopic_width 8
+# define infopic_height 21
+static unsigned char infopic_bits[] = {
+0x3c, 0x2a, 0x16, 0x2a, 0x14, 0x00, 0x00, 0x3f, 0x15,
+0x2e, 0x14, 0x2c, 0x14, 0x2c, 0x14, 0x2c, 0x14, 0x2c,
+0xd7, 0xab, 0x55
+}}]
+'''
+
+img_name = e.tk.eval(create_pic_cmd)
+
+btn_git_tcl_name = e.nametowidget(e.btn_git).__str__()
+
+
+cmd2 = '''
+%s config -image %s -text " devel"
+''' % (btn_git_tcl_name, img_name)
+
+e.tk.eval(cmd2)
+
+e.btn_git.config(compound='left')
+e.btn_git.config(bd=0)
+
+width_text = e.menufont.measure('123456')
+width_img = 8
+width_total = width_text + width_img +10
+print(width_total)
+e.btn_git.config(width=width_total)
+
+#####################################
+
+
+
+
+#######
+macos, this could be 3 in future?
+## popup
+self.right_mousebutton_num = 3
+
+if self.os_type == 'mac_os':
+	self.right_mousebutton_num = 2
+	
+also macos, font-scaling in future?
+######
+
+
+setting line wrapping on off?
+
+
+help no can search ##########################
+
+
+searching etc with slow tagging(wait_fors) --> can goto_def and esc too fast
+
+
+check breakpoint usage
+
+
+
+#####
+decoration instead of linenumbers in ln_widget?
+user editable
+	o
+   o
+  o
+ o
+o
+ o
+  o
+   o
+    o
+#####
+
+
+#######################################################
+#######################################################
+save tag-cache for all py files
+chk_sum: len(file), saved in conf
+
+# 800ms  rpi1 no compressing,  yes file writing
+
+
+tcl dictionary crash course
+e.tk.eval('set mydict {}')
+e.tk.eval('dict set mydict mykey "myvalue"')
+e.tk.eval('dict get $mydict mykey')
+
+{
+	{
+	fpath1  {
+			{tag1 {idx1 idx2..} {tag2 {idx1 idx2..}..
+			}
+	}
+	
+	{
+	fpath2  {
+			{tag1 {idx1 idx2..} {tag2 {idx1 idx2..}..
+			}
+	}
+	..
+}
+
+#######################################################
+#######################################################
+
+
+
+
+
+####
+check_line:
+cursor is in multiline string, do that after triple checks
+and par check after them
+then if no check scope and is in multiline: return
+also for comments? use tags instead? like if 'strings' in..
+####
+
+
+
+
+list tree of deflines
+
+
+Control-(Shift)-Home/End no work
+goto/selectto filestart/end 
+
+
+####
+from this: if 'strings' in self.contents.tag_names(pos):
+to this:?
+tags = self.contents.tag_names(pos)
+if 'strings' in tags:
+elif 'comments' in tags:
+(and remove '#' from patts?)
+
+####
+
+
+##########
+needs check
+get_scope_start: on fail return __main__()
+			NOTE: One needs to check that after get_scope_start-call:
+				if scope_path == '__main__()':
+					do not call get_scope_end()
+
+
+fix for multiline strings at __main__:
+check_line:
+if check_scope:
+if __main__ : scope_start/end = get absolutely next deflines up down
+no up --> 1.0 no down --> end
+seems to work
+
+
+Check lines with '@'
+check lint marks
+#############
+
+
+
+
+####
+macos
+clipboard not persist over restart if not paste to console
+###########################################################
+
+
+
+####
+curline needs highligh #################
+when:
+	check_sel, button-1, gotos, tab_open, undo, stop_search
+
+	
+color_choose: enable toggle bold ############
+
+
+red = r'#c01c28'
+self.winfo_rgb(red)
+self.winfo_rgb('deep sky blue')
+####
+
+
+
+tokens
+###########################
+
+Note:
+When adding inside(after first char and before last char) tag-range,
+added letters will get tagged automatically
+and old tags keep their tags.
+
+
+when to check all_cont?
+undo redo paste comment indent tabify_lines
+indent unindent tokens scope?
+
+
+
+
+safe_index = get_safe_index(index)
+elide-safe indexing check:
+	Areas checked:
+		Elide
+
+A always, O almost always
+	dont need safe-index as argument:
+		get_safe_index()
+
+		elide_scope(),		calls:	get_safe_index A
+
+		line_is_defline(),	calls:	None
+		line_is_empty(),	calls:	get_safe_index A
+		idx_linestart(),	calls:	get_safe_index A,	line_is_empty O1, line_is_elided O1
+
+		get_scope_start(),	calls:	get_safe_index A,	line_is_elided O1,
+														line_is_defline O1,
+														idx_linestart O1,
+																			line_is_defline O2,
+																			idx_linestart O2
+
+		get_scope_end(),	calls:	get_safe_index A, line_is_elided A
+
+		move_by_words()
+		select_by_words()
+		goto_linestart()
+		goto_lineend()
+		copy, fallback
+		yank_line()
+		move_many_lines(), select
+
+
+
+
+		not checked:
+			walk_scope
+			select_scope
+			etc
+
+
+		move_by_words seems ok, but elided was not selected
+			--> copy() was not ok:
+			self.contents.selection_get() would not get elided text
+			--> self.contents.get('sel.first', 'sel.last')
+
+			same in yank_line()
+
+
+#######################################################
+# If cursor was at defline lineend, it was moved 1 char left,
+# put it back to lineend
+if self.contents.compare(idx, '!=', ref):
+	#
+	# 	Q: Why not '%s lineend' % idx ?
+	#
+	# 	A:	s = '%s lineend' % idx_scope_start
+	#		self.contents.tag_add('elided', s, e)
+	#
+	# That says, the first index inside elided text is:
+	# 	'lineend' of definition line
+	#
+	# --> if cursor is put there, at 'lineend', it will be elided.
+	# --> in a way it is correct to say that definition line has now no end.
+	#		(the index is there but not visible)
+	#
+	# But lines always have 'display lineend', And putting cursor
+	# there works.
+	#
+	# Q2: Were is cursor exactly if put there?
+	# A2: with some repetition
+	#	s = '%s lineend' % idx_scope_start
+	#	e = idx_scope_end
+	#
+	#	self.contents.tag_add('elided', s, e)
+	#
+	# One has to think what is the first display index after elided
+	# text. That is first index after 'e' and since one knows that
+	# 'idx_scope_end' is 'lineend' of the last line of scope
+	#
+	# --> cursor is there, since text-ranges excludes out ending index if
+	# one remembers right, cursor is exactly at 'idx_scope_end'
+
+	self.contents.mark_set('insert', '%s display lineend' % idx)
+
+	#
+	# Or more general, if elided part would end in the middle of line,
+	# then, current line would be extended with rest of that remaining line.
+	# Then if doing 'display lineend', cursor would just go to end of that line.
+	#
+	##################################################################
+
+
+
+	needs safe-index as argument:
+		line_is_elided(safe_index)
+
+
+
+
+def myfunctionDef() ...
+
+
+chevron
+1fb94
+1fbca
+
+u+2026
+…
+
+u+203a
+›
+
+u+2335
+⌵
+
+
+
+get_scope_end() get_scope_start() get_scope_path()
+################################################################################################
+
+
+update help
+uncomment '##' must be at indent0 or it can not be removed --> help?
+Control-d not Control-c to quit multiline command --> help?
+
+
+handle_normal_entry
+
+
+get(elided) -displaychars
+elided text is getted by default
+structure-viewer with taglinks?
+#####################################################
+replaced less yellow
+
+system_colorname = self.entry.cget('fg')
+colors_as_rgb_tuple = self.winfo_rgb(system_colorname)
+for example, white color would get: (65535, 65535, 65535)
+
+red = r'#c01c28'
+self.winfo_rgb(red)
+self.winfo_rgb('deep sky blue')
+#################################
+
+
+
+
+
+
+
+github:
+fixed tag config -under --> -underline
+tkcon.tcl
+make README etc.
+
+
+
+
+
+
+#######################################
+# Below this, not essential but wanted
+#######################################
+
+automate exit editor, reopen python and editor
+done only for macos
+
+
+#############
+show scope always
+handle_search_entry not done in search_next
+update scope path after:
+	walk_tab etc
+	in fname.py @Class.method()
+
+unbind load() Return?
+focusin focusout show full path?
+#############
+
+
+macos:
+if toggled terminal to fullscreen, after doing one dir(),
+then switch to non fullscreen editor, editor is freezed.
+pressing return in terminal and then switching back to editor
+unfreezes editor.
+If both are fullscreen, there is no freezing.
+This is little similar to win11-behaviour when not using idle-shell
+
+
+
+fdialog.py
+	filter:
+	sorted(pathlib.Path().glob("*AD*"))
+	sorted(pathlib.Path().glob("normal filename"))
+	two entries for setting filter at bottom,
+	one for dirs, one for files: *.* as default
+
+
+when creating for example new function newname(),
+how to ensure newname has not already been reserved?
+
+
+when paste multiline, if cursor is at idx_linestart of non empty line, and copied text
+lastline is indentation only, indentation shape of following lines should be preserved when paste
+
+when paste multiline, then undo that, then paste again same thing, then again undo:
+	there can be something leftovers from paste?
+
+
+check is it necessary to check event.state in select_by_words etc
+
+
+bitmap check ensure width?
+
+
+no state cheks in mac_cmd move_many_lines?
+
+
+goto bookmark show position among all bookmarks etc.
+goto bookmark, show bookmark on top not bottom?
+
+
+cmd-ae linestartend in python shell in macos?
+
+
+animate walk_tab, save etc?
+
+
+save(): escape generate is necessary?
+save is too big
+
+
+todo: tagging system like in youversion
+
+
+type(self).__name__
+
+
+macos:
+ctrl-d --> ctrl-q/cmd-w ?
+
+
+fix macos topbar menus?
+
+
+undo pause, check what is difference when in callback:
+	only one edit_separator
+	two edit_separators
+
+
+
+self.contents.bind( "<<TkWorldChanged>>", self.test_bind)
+	then: self.menufont.configure(underline=1)
+	works on macos
+
+
+search/next also in errors, help####################
+
+
+toggle indent with tabs --> space?
+
+
+bind with eval from dict --> user editable binds
+
+
+tuple after_cancel: (from_who, after_object_id) ?
+
+
+check before copy, paste:
+	is selection from editor?
+	check indentation if not?
+
+
+tab-comp in entry?
+
+
+guides ?
+	on mouseover guideline: show startline of block
+
+
+toggle clipboard (10 newest items) dropdown in git_btn
+	on click put to first?
+
+
+#################
+fix search etc: after giving search word, quickly pressing return and esc
+state is locked to search
+
+
+FIXED with checking if state is waiting in stop_search
+
+check other escapable callbacks?
+#################
+
+
+padx font measure
+cont, ln_wid
+
+padx = self.tab_width // self.ind_depth // 3
+pady = padx
+in init apply conf and update fonts
+
+
+
+##########################################################
+# Not essential End
+##########################################################
+
+##########################################################
+TO NOTES START
+
+
+########################################################################
+Remember that, wait_for()  A: changes state to 'waiting' B: is non-blocking!
+--> be *extra* careful when checking self.state
+	(in code after calls to wait_for )
+				
+Example: in callback1:
+	do_something
+	wait_for(some_time) --> state is now: 'waiting' (until some_time passes)
+	callback2()
+				
+	in callback2:
+		if self.state not in (list of states but not 'waiting'):
+			return 'break'
+				
+	--> FAIL
+########################################################################
+
+
+###################
+filter_keys_out/in(event, keys)
+
+modifier_dict = {
+Mask	Modifier
+0x0001	'Shift'
+0x0002	'CapsLock'
+0x0004	'Control'
+0x0008	'Left-Alt'
+0x0010	'NumLock'
+0x0080	'Right-Alt'
+0x0100	'Button1'
+0x0200	'Button2'
+0x0400	'Button3'
+
+
+in tkinter.Event:
+#####
+if event.state == 0: print('no modifiers')
+
+elif isinstance(event.state, int):
+	state = event.state
+
+	mods = ('Shift', 'Lock', 'Control',
+			'Mod1', 'Mod2', 'Mod3', 'Mod4', 'Mod5',
+			'Button1', 'Button2', 'Button3', 'Button4', 'Button5')
+
+	s = []
+
+	for i, n in enumerate(mods):
+		if state & (1 << i): s.append(n)
+
+
+	if len(s) > 0: print('had modifier')
+	state = state & ~((1<< len(mods)) - 1)
+	#print('state:', state)
+	if state or not s: s.append(hex(state))
+	mods = '|'.join(s)
+	print(mods)
+#######
+###################
+
+
+#########################################################
+wait_for is blocking, BUT in some rare occasions can be non-blocking
+--> see wait_for, see lclick_help as example of that rare occasion
+#########################################################
+
+
+#######
+one time conf:
+when started from terminal with filapaths:
+python -m henxel filepath1 filepath2
+Use one time conf(original conf remains untouched) to enable
+'adhoc behaviour' editor, like normal editor: 
+######
+
+
+################################################
+replace
+new_word capture references need double backslashes
+like \\1 instead of just \1
+
+This is because of not protecting substitution with curlies{}
+
+Reason for not protecting is that if doing that, one
+could indeed use \1 without problem, but, for example
+\n \t etc would not translate to newline tab etc
+################################################
+
+
+#### Really strange bug
+when cursor is on: comment line, that starts from indent0, at index:
+indent0, lineend or lineend -1c
+
+then, walk to next tab, close editor and reopen editor, don't change tab
+
+then, in python console:
+e.tabs[e.tabindex].text_widget.bbox('@0,0') --> normal
+
+#idx_err = (index of closed tab where cursor is on comment line):
+idx_err = e.tabindex-1
+
+e.tabs[idx_err].text_widget.bbox('@0,0') --> None!
+########
+
+
+#######
+printing works also in macos when in mainloop
+#######
+
+
+#######
+e.tk.eval('chan configure stdout')
+'-blocking 1 -buffering line -buffersize 4096 -encoding utf-8 -eofchar {} -translation crlf -mode 9600,n,8,1 -xchar {\x11 \x13}'
+#######
+
+
+#######
+newtab seems to have syntax on by default 
+#######
+
+
+#######
+it seems that when doing long multiline paste,
+after paste, when pasted lines are still selected,
+paste can be adjusted down with return if insert
+is at sel start
+#######
+
+
+####
+self.syntax_can_auto_update is only temporary stopper-flag for self.auto_update_syntax(),
+this flag is used in many places to temporarily stop auto_update_syntax.
+
+syntax_can_auto_update
+auto_update_syntax_stop/continue
+auto_update_syntax
+####
+
+
+####
+A geometry string is a standard way of describing the size and location of a top-level window
+on a desktop. A geometry string has this general form:
+	'wxh±x±y' where:
+	The w and h parts give the window width and height in pixels.
+	They are separated by the character 'x'.
+
+If the next part has the form +x,
+it specifies that the left side of the window should be x pixels from the left side of the desktop.
+If it has the form -x,
+the right side of the window is x pixels from the right side of the desktop.
+
+If the next part has the form +y,
+it specifies that the top of the window should be y pixels below the top of the desktop.
+If it has the form -y,
+the bottom of the window will be y pixels above the bottom edge of the desktop.
+####
+
+
+####
+contents.search searches logical lines, not display lines
+--> no need to check for wrapped lines
+####
+
+
+####
+File "<stdin>", line 12, in <module>
+is last line of launch_test_as_string in build_launch_test()
+This stdin means input file was: '-' see run() for example
+####
+
+
+######
+__new__ is always executed when __init__ would be executed
+######
+
+
+######
+quitme popup
+	needs lambda if doing restart: subprocess.run
+######
+
+
+about indexes
+###
+top = self.getlineno("@0,0")
+bot = self.getlineno("@0,65535")
+if top == bot and text.winfo_height() == 1:
+	# Geometry manager hasn't run yet
+	height = int(text['height'])
+	bot = top + height - 1
+return top, bot
+###
+
+
+#####
+It could be a multiline action, like replace_all
+If trying to undo redo, redo will put cursor to action end,
+undo to action start, if they dont fit in same screen, fail
+
+Undo and indexes:
+1: Redoing an action will put cursor to end of action, that got redoed,
+just like when anything is normally being done
+(example: after inserting letter, cursor is at end of letter)
+
+2: Undoing an action will put cursor to start, where action, that got
+undoed, would have started.
+(example: after undoing insert letter,
+cursor is at start of letter that no longer exist)
+#####		
+
+
+##
+test-launch has own root
+##
+
+
+- test-launch: subprocess in subprocess does work!
+	
+	
+- bookmarks check:
+	view changes, after open tab, restore_bookmarks() is used in:
+		walk_tabs *
+		del_tab *
+		
+		run *
+		show_errors *
+		stop_show_errors *
+		
+		help *
+		stop_help *
+		
+		new_tab *
+		tag_link *
+		loadfile *
+		save *
+		
+
+
+unbind /give info about cmd shift A? man page
+https://intellij-support.jetbrains.com/hc/en-us/articles/360005137400-Cmd-Shift-A-hotkey-opens-Terminal-with-apropos-search-instead-of-the-Find-Action-dialog
+
+1. Open Apple menu | System Settings | Keyboard | Keyboard Shortcuts | Services
+2. Under section: Text
+3. Uncheck Search man Page Index in Terminal (or change the shortcut)
+
+
+######################
+list of tk::mac procs
+https://www.tcl.tk/man/tcl9.0/TkCmd/tk_mac.html
+
+::tk::mac::OpenApplication
+If a proc of this name is defined, this proc fill fire when your application is initially opened. It is the default Apple Event handler for kAEOpenApplication, “oapp”.
+
+::tk::mac::ReopenApplication
+If a proc of this name is defined it is the default Apple Event handler for kAEReopenApplication, “rapp”, the Apple Event sent when your application is opened when it is already running (e.g. by clicking its icon in the Dock). Here is a sample that raises a minimized window when the Dock icon is clicked:
+
+proc ::tk::mac::ReopenApplication {} {
+	if {[wm state .] eq "withdrawn"} {
+		wm state . normal
+	} else {
+		wm deiconify .
+	}
+	raise .
+}
+#######################
+
+
+
+
+Manual selection handling in Text-widget:
+self.contents.mark_names()
+'insert', 'current', 'tk::anchor1'
+self.contents.index('tk::anchor1')
+'38.5'
+self.contents.mark_set('tk::anchor1', '38.6')
+then set SEL_FIRST to same index if selection starts from top
+else: SEL_LAST
+
+
+
+############# About screen dimensions Begin
+
+# This is correct:
+# .winfo_screenheight()
+# .winfo_screenwidth()
+
+# check screen dpi:
+#
+# import tkinter
+# import tkinter.font
+# root = tkinter.Tk()
+# t = tkinter.Text(root)
+# t.pack()
+# f = tkinter.font.Font(t, family='TkDefaulFont', size=12)
+# dpi = f.metrics().get('linespace')*5
+
+############### About screen dimensions End
+
+
+
+####### EVENT STATES #########
+
+win
+plain a	==8
++ ctrl	==12
++ shift	==9
++ both	==13
+
+win10 left
+262144
+win11 left
+262152
+win11 Home/End
+262152
+
+guessing this not tested:
+win10 Home/End
+262144
+
+
+
+linux and macos
+plain a	==0
++ ctrl	==4
++ shift	==1
++ both	==5
+
+
+mac_os extra keys:
+fn Super	bind to key and check state == 64
+Cmd Meta  	bind to key and check state == 8
+Alt			bind to key and check state == 16
+Mod1 == Cmd
+
+# Binding to combinations which has Command-key (apple-key)
+# (or Meta-key as reported by events.py)
+# must use Mod1-Key as modifier name:
+# Mod1-Key-n == Command-Key-n
+
+cmd		-h 	hide
+alt-cmd -h 	hide others
+fn 		-h 	show desktop?
+
+ctrl -up 	toggle show open apps
+ctrl -down hide others temporarily, get them back with ctrl-up
+ctrl -leftright  switch apps?
+
+
+all alt shortcuts makes some special char
+have to bind to symbol name to get alt-shorcuts work in macOS
+self.contents.bind( "<function>", self.mac_cmd_overrides)
+
+
+
+::tk::mac::OnHide
+If defined, this is called when your application receives a kEventAppHidden event, e.g. via the hide menu item in the application or Dock menus.
+
+
+::tk::mac::OnShow
+If defined, this is called when your application receives a kEventAppShown event, e.g. via the show all menu item in the application menu, or by clicking the Dock icon of a hidden application.
+
+
+
+# yet another way to find os_type
+print tcl-array nicely
+e.tk.eval('parray tcl_platform')
+
+print using pattern
+e.tk.eval('parray tcl_platform os')
+
+
+
+
+
+self.bind("<<ThemeChanged>>", self.handle_configure)
+
+# if macos: thread, tkinter.Tk(), button, string
+
+
+system_colorname = self.entry.cget('fg')
+colors_as_rgb_tuple = self.winfo_rgb(system_colorname)
+for example, white color would get: (65535, 65535, 65535)
+
+
+night colors mac_os:
+btn_git
+filedialog
+entry
+made quick fix
+
+
+
+
+
+###################################
+ctrl-r no work in python console
+https://bugs.python.org/issue38995
+
+Most likely what is happening is that the two Python instances you are using are linked to different versions of the external readline library.  From the version information, its clear that you are using the Python 3.8.0 from the python.org macOS installer.  That Python uses the macOS-supplied BSD editline (AKA libedit) for readline functionality.  The Python 3.7.3 you have is not from python.org and based on the prompt it looks like it was linked with a version of GNU readline which probably does bind ^R to the reverse search function by default.  As described in the Python Library Reference page for readline (https://docs.python.org/3/library/readline.html), both GNU readline and BSD editline can be tailored via configuration files; GNU readline uses ~/.inputrc while BSD editline uses ~/.editrc.
+
+On macOS, the available configuration commands for editline are described in the man page for editrc:
+
+man 5 editrc
+
+In particular, you should be able to enable editlines reverse search functionality by adding the following line to ~/.editrc:
+
+bind ^R em-inc-search-prev
+
+where ^R is two characters, not the single character CTRL-R.
+###########################
+
+
+
+
+mac_os:
+When in fullscreen, other toplevels go to their own tab.
+If fullscreen when fontchoose might press wrong close button.
+
+if menufont is 14 buttons are mac buttons
+if bigger they are basic buttons
+
+
+# self.tk.eval('wm attributes .!editor -fullscreen 1')
+
+# get tcl name of widget
+str(e.nametowidget(e.entry))
+e.contents.winfo_name()
+
+label .lbl
+
+e.tk.eval('.!editor.!entry config -bg')
+
+e.tk.eval('proc myproc {args} {puts AAA}')
+e.tk.eval('set myvar A')
+e.tk.eval('trace add variable myvar write myproc')
+
+
+e.tk.eval('proc myproc {args} {puts AAA}')
+e.tk.eval('trace add execution .!editor.!entry enter myproc')
+
+
+e.tk.eval('set myvar B')
+
+
+
+
+
+win11 ctrl-right no work
+e.info_patchlevel()
+_VersionInfoType(major=8, minor=6, micro=12, releaselevel='final', serial=0)
+
+array values:
+e.tk.eval('foreach key [array names ::tcl::WordBreakRE] {puts $::tcl::WordBreakRE($key)}' )
+\s*(\S+)\s*$
+\S\s|\s\S
+\S*\s+\S
+\s*\S+\s
+^.*(\S\s|\s\S)
+
+array keys:
+e.tk.eval('foreach key [array names ::tcl::WordBreakRE] {puts $key}' )
+previous
+after
+next
+end
+before
+
+
+#################
+To fix: replace array ::tcl::WordBreakRE contents with newer version, and
+replace proc tk::TextNextWord with newer version which was looked in Debian 12 below.
+Needs to generate ctrl-leftright before this eval works?:
+
+e.contents.event_generate('<<NextWord>>')
+e.tk.eval('set l3 [list previous {\W*(\w+)\W*$} after {\w\W|\W\w} next {\w*\W+\w} end {\W*\w+\W} before {^.*(\w\W|\W\w)}]; puts $l3 ')
+e.tk.eval('array set ::tcl::WordBreakRE $l3 ')
+e.tk.eval('proc tk::TextNextWord {w start} {TextNextPos $w $start tcl_endOfWord} ')
+
+#################
+
+
+
+# Debian 12, ctrl-right works
+e.info_patchlevel()
+_VersionInfoType(major=8, minor=6, micro=13, releaselevel='final', serial=0)
+
+array values:
+e.tk.eval('foreach index [array names ::tcl::WordBreakRE] {puts $::tcl::WordBreakRE($index)}')
+\W*(\w+)\W*$
+\w\W|\W\w
+\w*\W+\w
+\W*\w+\W
+^.*(\w\W|\W\w)
+
+
+
+# Binding rewrite planning Begin
+
+# print current bindings for a class
+# e.contents.bind_class('Text')
+
+
+# Unbinding default binding of Text-widget:
+# e.contents.unbind_class('Text', '<Button-1>')
+
+# So check what want to bind in self.contents, and unbind them from Text
+# and it should then work: binding straight to self. Also can unbind all other unneeded bindings.
+
+
+# remap keys?
+# unbind always?
+
+# self.is_binded_to_do_nothing = d = dict()
+# d['copy'] = False
+
+# self.is_binded_to_skip_bindlevel = d = dict()
+# d['show next'] = True
+
+# self.is_binded_to_normal = d = dict()
+# d['show next'] = False
+
+
+# self.bind_seqs = d = dict()
+# seq = d['decrease scrollbar width'] = "<Control-minus>"
+# bind_id = self.bind( seq, self.decrease_scrollbar_width)
+
+# self.bind_ids = q = dict()
+# q[seq] = bind_id
+
+
+# when unbinding:
+# seq = d['decrease scrollbar width']
+# id = q[seq]
+# self.contents.unbind(seq, funcid=id)
+# q.pop(seq)
+
+# Binding rewrite planning End
+
+# /dev/idle/colorizer.py
+# import builtins
+# help(builtins)
+
+
+# remove printings before build
+
+
+
+
+# get line from python console:
+# readline.get_line_buffer()
+
+# insert line in console
+#readline.insert_text('dir()')
+
+# display it
+#readline.redisplay()
+
+
+########################## Maybe interesting Begin:
+
+# Handling of states and bindings is hard. One really should read a book about
+# stateful programming or something similar if doing something more serious.
+
+
+# Howto: cancel (not unbind) certain binding for time being:
+
+# def cancelbind(self, event=None):
+#	return 'break'
+
+# self.keyid = self.mywidget.bind( "<Some-Key>", func=self.cancelbind)
+
+
+# Howto: skip bindlevel for certain binding for time being:
+
+# def skip_bindlevel(self, event=None):
+#	return 'continue'
+
+# self.keyid = self.mywidget.bind( "<Some-Key>", func=self.skip_bindlevel)
+
+
+# Howto: lambda to nothing:
+# self.contents.bind( "<Left>", lambda event: ...)
+
+
+# Howto: unbind in tkinter:
+
+# def mycallback1(self, event=None):
+#	print(1, event.keysum, event.num)
+
+# def mycallback2(self, event=None):
+#	print(2, event.keysum, event.num)
+
+# self.anykeyid = self.mywidget1.bind( "<Any-Key>", func=self.mycallback1)
+# self.anybutid = self.mywidget1.bind( "<Any-Button>", func=self.mycallback2)
+
+# self.mywidget1.unbind("<Any-Key>", funcid=self.anykeyid)
+# self.mywidget1.unbind("<Any-Button>", funcid=self.anybutid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

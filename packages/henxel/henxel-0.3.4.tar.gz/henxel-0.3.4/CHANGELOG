@@ -1,0 +1,950 @@
+# Changelog
+* To version: 	0.3.4
+* From version:	0.0.3
+
+
+# 0.3.4
+
+- Added many things, tinted bg-color, keywords are with non-mono font and smaller size and italic,
+  many things.
+
+
+# 0.3.3
+
+More important changes Begin
+
+################################################
+# ungrid Begin
+
+From single tkinter.Text -widget /Editor --> tab.text_widget
+--> like in dev/ungridtest.py
+--> tabs have own widgets
+
+- bindings not triggered when ungridded --> no need to unbind
+
+self.help_tab
+self.error_tab
+
+# ungrid End
+################################################
+
+Elide
+
+Cmd-shift-F
+select cur scope
+
+
+Control-89
+Cmd-89
+	walk_scope() (rising tendency)
+	8 goto next(up) defline
+	9 goto prev(down) defline
+
+
+Control-Shift-()
+Cmd-Shift-()
+	walk_scope() (diving tendency)
+ 	( goto absolutely next(up) defline
+	) goto absolutely prev(down) defline
+###############################################
+
+cmd/Alt-p		save cursor position as bookmark
+cmd/Control-bB	walk bookmarks
+cmd/Alt-g		goto_def, if selection use it
+###############################################
+bookmark Begin
+
+toggle_bookmark cmd/alt-p
+walk_bookmarks cmd/Control-bB
+
+remove_bookmarks(all_tabs=True)	no shortcut, default=all_tabs
+print_bookmarks		no shortcut
+
+bookmark while searching, replacing
+
+have to use real marks because of empty lines
+currently marks persist in conf
+
+bookmark End
+############################################################
+
+while replace: space to exit
+##########
+
+cmd/Alt-g --> goto_def, without selection
+cmd/ctrl-l --> gotoline
+########
+
+long selection: if index not visible,
+show wanted side of selection at first left/right -keypress
+########
+
+search: no strip searchword
+search, show scope in entry when show_next prev
+show_next/prev: entry handling to function
+#########
+
+esc_override(): Enable toggle fullscreen with Esc.
+rename handle_config --> handle_window_resize
+
+esc toggles fullscreen, done with esc_override()
+######################
+
+search, replace:
+search_word:
+	suggest
+	1: selection if short enough, update oldword if found
+	2: old_word
+#####################
+
+search_next now searches with old_word if no selection
+#####################
+
+pressing space when: search_next, search, replace
+--> exit to cursor
+
+also safe esc: if normal and selection --> selection clear
+	for search_next
+##############################
+
+search, replace:
+
+Have to use marks to get overlapping searches work.
+
+Can not replace/replace_all while "-overlap" in search_settings
+
+if -start == 'insert' and search_word == selection_get:
+	start search from sel_start
+	done in do_search()
+
+
+search ACA:
+ACABACABA
+ACA
+
+can search with -overlap, if want to replace, use -regexp:
+boundary == A
+want change contents B:
+B(?=A)
+
+(also matches BBA etc, so must check first with search)
+
+
+search, replace, search_next:
+- Control-np in help, error, normal
+
+reset_search_setting()
+print_search_setting()
+edit_search_setting(search_setting)
+
+
+if selection, use it, else oldword.
+
+
+search_next in help and error works
+###################
+
+tab on line, if at indent0, move line/cursor to same indent than nearest line
+	tab_over_indent
+###################
+
+wordexpand now does expand from single letter at indent0
+	also removed re-import
+	# Get atrributes of 'self' faster. For example, if want: self.attribute1,
+	# one writes any single letter, like 'a' and hits Tab, and gets 'self.'
+	# Then add 'a' --> prevword is now 'self.a'. Now continue Tabbing:
+	# --> self.attribute1 is now likely to appear soon.
+###################
+
+Alt - BackSpace
+Cmd - BackSpace
+del_to_dot()
+delete previous word
+#########################
+
+yank also when help
+yank whole line(even if wrapped)
+search: now can yank without clicking
+yank_line() and bookmark_animate(): not ideal usage of tag 'sel'
+--> use tag 'animate'
+#########################
+
+automate exit editor, check syntax, reopen python and editor
+check syntax of python-files in henxel in quit_me()
+e=henxel.Editor(debug=True)
+	done with: import ast
+#########################
+
+created new placeholder module, importflags, for test-launch
+https://stackoverflow.com/questions/3720740/pass-variable-on-import/39360070#39360070
+-->
+src/importflags
+	__init__.py
+		FLAGS=False
+		
+henxel:
+import importflags
+FLAGS = importflags.FLAGS
+
+cls.flags = FLAGS
+
+if cls.flags:
+	skip some subprocess calls (subprocess in subprocess does work)
+	etc
+
+quit_debug: can quit debug by pressing close button --> no close python console
+	(or by closing python console)
+#######################
+
+only single 's' expands to self. not all single letters
+#######################
+
+when debug, different popup, test, restart
+test: do test-launch in quit_me
+restart: everything in quit_me, and restart
+Close-Button, quit_debug=True does not do test-launch
+
+henxel.stash_pop()
+#######################
+
+undo_override, redo_override
+#######################
+
+ENABLE SUBSTITUTION WITH REGEXP
+
+
+replace/all is now done with "tcl regsub" instead of "tk text replace"
+--> Replacing with regexp, back references etc..
+
+
+###
+Example: If contents of tab is:
+Example: 121 212
+
+Example: 121 212
+
+Example: 121 212
+
+
+And there is "-regexp" in search_setting, And doing replace:
+
+Then if search_word(old_word) would be:
+"(\d+) (\d+)"
+And if substitution(new_word) would be:
+"\2 \1"
+
+Result after replacing would then be:
+Example: 212 121
+
+Example: 212 121
+
+Example: 212 121
+###
+
+###
+Adding space to end of substitution:
+	search_word + () ==empty string, if search_word is "A", then using
+		A()
+	with substitution, if want for example " BB "
+		\0 BB \1
+		
+	where \0 is whole matched string and \1 is the empty string
+	"&" can be used inplace of "\0"
+	
+	--> "A BB "
+
+###
+
+
+Adding to linestart: "^"
+Adding to lineend: "$"
+Concatenate lines: "\n+"
+###
+
+#######################
+
+new state: 'goto_def'
+	in goto_def(), when not already searching
+	
+esc: return to cursor, after goto_def
+double-click: stop to mouse
+goto_def(): content is now disabled like when searching
+	stop_goto_def()
+	self.state = 'goto_def'
+#######################
+
+tab_over_indent(), choose indentation of previous lines or next lines,
+	which is closer to insert
+#######################
+
+deltab not move left index anymore
+#######################
+
+def set_scrollbar_widths(self, width, elementborderwidth)
+	removed incr decr scrollbar width
+	removed binds also
+#######################
+
+More important changes End
+
+
+Less important changes Begin
+
+removed unused move_line and updown_override
+#######################
+macos when trying to open: /home
+
+	PermissionError: [Errno 1] Operation not permitted: '/usr/bin/../../home'
+
+fixed
+###########
+
+check if other than py-files are tabified
+	done they now are not tabified
+	update help?
+###########
+
+fixed capslock macos linux windows
+########
+
+async can be before def
+##########
+
+added get_scope_path
+#############
+
+save() now generates esc in while-loop and returns False if save fails
+save is too big: splitted to save_forced/save
+#########
+
+renamed no_copy_ln --> do_nothing_without_bell
+#########
+
+added state check in save()
+######################
+
+removed tab_override()
+# can_expand_word called before indent and unindent
+
+# Reason is that before commit 5300449a75c4826
+# when completing with Tab word1_word2 at word1:
+# first, pressing Shift down to enter underscore '_'
+# then fast pressing Tab after that.
+
+# Now, Shift might still be pressed down
+# --> get: word1_ and unindent line but no completion
+
+# Want: indent, unindent one line (no selection) only when:
+# cursor_index <= idx_linestart
+
+# Solution
+# Tab-completion also with Shift-Tab,
+# which is intended to help tab-completing with slow/lazy fingers
+#####################
+
+Sticky top right corner, to get some space for console on left
+#####################
+
+cmd-shift-left select indentation same as alt-left
+cmd-shift-left/right, selects from, space only lines also
+#####################
+
+replace with replace(idx1 idx2 new_word)
+now undo works better
+#####################
+
+capslock more visual
+############################
+
+tab completion first suggests from function scope
+############################
+
+strip empty lines, done in tabify()
+############################
+
+idx_linestart() and bookmark_animate()
+were broken due self.contents.bbox('insert') --> None if cursor is offscreen
+	bbox() check done
+	idx_linestart() done
+	bookmark_animate(): done with this check at toggle_bookmark()
+		not self.contents.bbox('insert')
+
+idx_linestart() now returns pos, line_starts_from_curline
+#########################
+
+line_is_defline()
+tab is_pyfile()
+can_do_syntax()
+#########################
+
+searching, if scrolled manually to see next match and then ctrl-n,
+	-->show_next is not ideal
+
+	Control-np removed from NextLine PrevLine virtual events because of this
+	at end of init
+#########################
+
+with io.BytesIO( tmp.encode('utf-8') ) as fo:
+	tokens = tokenize.tokenize( fo.readline )
+-->
+g = iter( tmp.splitlines(keepends=True) )
+tokens = tokenize.generate_tokens( g.__next__ )
+removed import io
+removed do_syntax
+avoid_viewsync_mess --> update_lineinfo
+viewsync --> update_line
+#######################
+
+self.tabs[self.tabindex] --> tab, curtab, newtab, oldtab
+WIP
+#######################
+
+new dev/stash_start folder, basicly garbage
+
+restart_editor.scpt --> back to previous
+restart scripts are now in /src/henxel
+updated MANIFEST.in for that
+#######################
+
+removed requirements.txt because github was confused by it and it was unneeded
+#######################
+
+self.build_launch_test() --> byte-string: launch-test
+
+in quit_me:
+	tmp = self.build_launch_test()
+	d = dict(capture_output=True)
+	p = subprocess.run(['python','-'], input=tmp, **d)
+#######################
+
+pyproject.toml + setup.cfg --> pyproject.toml
+#######################
+
+token_can_update --> line_can_update
+#######################	
+
+save_forced: check alive
+quit_me: check alive
+	if not: fast quit with cleanup()
+#######################
+
+self.cleanup() --> called when quitting etc.
+
+__init__ is now completely in try-block:
+try:
+	all init code
+except Exception as init_err:
+	try: self.cleanup()
+	except Exception as err:
+		# Some object, that cleanup tried to delete,
+		# did not yet had been created.
+		#print(err)
+	raise init_err
+	
+With this setup, no matter how editor was launched, if init fails,
+there will not be any zombie editor window (root) leftovers.
+
+
+when editor launch fails:
+except Exception as init_err:
+if not doing launch_test:
+	give info about recovering: like help(henxel.stash_pop) etc
+	
+
+	
+only debug mode is currently used in testlaunch to speed up testing
+#######################
+
+fonts:
+	from instance attributes --> class attributes like cls.root
+	set in __new__()
+
+they are never deleted
+#######################
+
+give focus to terminal, with activate_terminal, after error in:
+ - syntax
+ - launch-test
+
+if restart fails with error, terminal naturally has focus
+#######################
+
+ensure_idx_visibility: does not set insert-mark anymore
+goto_def: no longer set insert-mark
+#######################
+
+added FreeMono to goodfonts
+#######################
+
+apply_conf no insert contents
+moved to end of init
+
+planning to use magic colors instead in line highlight
+#######################
+
+utilize check_line() as, filtering range for syntax-highlighting,
+which was previously done in update_tokens()
+
+removed self.token_err
+--> tokens of whole content is updated not so often
+
+Less important changes End
+
+
+# 0.3.2
+- Fixed fontchooser, for example the animation should work again
+
+- If uncomment fails, cursor should now keep original position
+
+- 'focus'-tag is now underlined
+
+- Some fixing in comment and uncomment like comment or uncomment curline
+	without selection
+
+- Search again backwards --> ctrl-shift-backspace,
+	still back to previous with arrow left but it has some
+	yet to be fixed issues likely to do something with check_sel
+
+- Ctrl-Tab --> insert Tab
+
+- Removed move _updownleftright() as unused and updated help
+
+- When search, multilines (> 2 lines) are not autofilled as suggested search word
+
+- Fix for: 'SyntaxWarning: invalid escape sequence' for one string in init.
+	due to 'new' string escaping rules in python 3.12
+
+- Caps-Lock state(if on) is now showed in btn_git
+	It needed among other things bind to Motion to work
+
+- There was issue: When search: after giving search word, then quickly pressing return and esc
+	--> state of editor locked to search.
+	This was fixed with checking if state is waiting in stop_search
+	This kind of issues should be also checked on other escapable callbacks
+	in the future.
+		
+- move_by_words and select_by_words now handle line ends better.
+
+- Renamed copying and pasteing functions more clearly
+
+- Copying now checks if user wants to copy a block and tries to keep
+	its shape when doing paste. This is in 'alpha' -condition
+	
+
+# 0.3.1
+- Keywords for syntax highlighting are now from: import keyword.
+
+- 'sel'-tag has now second highest priority only below focus.
+
+- Control-backspace to search again now works again.
+
+- Word-expander works now as Tab-completion, its expands over dot attributes,
+	like: self.at TAB --> self.attrib1, if self.attrib1 is already somewhere in contents.
+	It is quite usable.
+
+- Removed binding ctrl_L-super_L-return to run file in return_override().
+
+- Ctrl-q -> Ctrl-Q for del_tab: prevent closing tab without saving by accident.
+
+- Cmd-ae -> goto_linestart/end, when in macOS, this is quite usable.
+
+- Also in macOS: Cmd-(Shift)-Up/Down -> move/select 10 lines up/down. Also usable.
+	In Linux and Windows this is: Control-(Shift)-Up/Down and bind is to move_many_lines() instead
+	of mac_cmd_overrides(). Not tested in Windows, but hopes are that the states are right.
+
+- In return_override, if line is empty, rstrip to cursor to fix indent sailing if
+	in middle of space.
+
+
+- There were lot of issues with functions like select_by_words(), move_by_words() etc.
+	which changed selection. First fix was like:
+	self.contents.event_generate('<<SelectPrevWord>>')
+	
+	But it was flashy at lineends (because needed to adjust selection later),
+	so ended up using <<PrevWord>> instead with:
+	self.contents.mark_set(self.anchor, idx).
+	
+	It (that is: handling of selection changes) is now done right by setting
+	selection-start-mark or -anchor with:
+	self.contents.mark_set('tk::anchor1', '38.6').
+	
+	The name of anchor changes if editor is launched multiple times in one Python-session,
+	so the current name is retrieved in init but there is still another problem:
+	this anchor does not exist if certain event has not occured before.
+	
+	To get this working, the name of anchor is needed, it is done just before quite
+	similar fix for Windows, and it is ugly.
+
+
+- When doing search and replace one can now copy text and select and adjust selection
+	with many functions like yank line, goto lineend etc.
+	
+	
+- When doing search and replace:
+	space 	--> exit to focus
+	esc 	--> exit to start
+	double-click --> exit to cursor
+	
+- When doing replace: One can continue replacing even if focus is not in contents.
+	Replacement-string can now be changed in the middle of replacing.
+
+- Status-messages of gotoline, search and replace are now in entry. This was done
+	for increase fullscreen usability. Git branch-name remains in btn_git and
+	tab-position remains in title.
+	
+- Editor is now aware if it is in fullscreen-mode. It is not used on anything.
+
+- Editor now handles long strings better in entry, like filenames or searches.
+
+- Small but important change in wait_for() to change state so that certain bindings
+	do not trigger while waiting.
+
+- Added two tkinter-books to dev/books.
+
+- Added screenshots to README, and removed 'more on virtual environments' -section
+	as potentially dangerous.
+
+- Ctrl-q now quits with save when not in macOS, same way than cmd-q does in macOS.
+
+- Updated helpfile
+
+- Updated links to point to Tcl 9.0
+
+
+# 0.3.0
+- Fixed win_install_mkvenv
+- Small fixes
+- Ctrl-ju --> scroll downup without moving cursor, also at the end of the file.
+- Walktabs is again alt-wq if not in macOS.
+
+
+# 0.2.9
+- Added win_install_mkvenv.py to /util which can be run in Windows with
+	py win_install_mkvenv.py
+
+Running it creates:
+	create_scripts.bat
+	launched.bat
+	mkvenv.bat
+	
+in sys.prefix which hopefully is in the PATH.
+
+Then one can do in Windows: mkvenv name_of_env.
+
+That will install possible requirements also.
+And mkvenv creates act.bat to root of venv that will activate venv.
+And mkvenv creates launch_ed.bat to root of venv that will activate venv
+and launch IDLE-shell and launch Henxel-editor if it is installed.
+I no longer recommend installing pyreadline3 because it seems to not work
+properly in Win10. Instead, using IDLE-shell has tab-completion and multiline
+editing etc. Only that one can not change direction of prompt movement after
+command execution. It now moves down and will eventually stay at the
+bottom line. It would be preferable if prompt would move up instead,
+and stay in the first line. One cannot clear screen in Windows so this is quite unfortunate.
+
+- Small looks fixes.
+
+- Alt -leftright now walks tabs in all OS-types. And Alt-wq closes editor
+with save. This was done to increase cross-platform consistency in
+shortcut-keys. It is also more easy to remember, maybe not so ideal though.
+
+- Fixed move_by_words, select_by_words and yank_line for win10.
+
+
+# 0.2.8
+- Moved tcl-script, that fixes ctrl-rightleft behaviour for Windows, to better place.
+So active tab should be safe now also in Windows.
+- Tried 'lsappinfo metainfo' as a way to get terminal app name in macOS but it did not
+work much faster so left as it was before: 'lsappinfo front' to get ASN and then
+'lsappinfo info -only name'. Giving focus back to python terminal-window is not very
+simple task in macOS. Currently tested with Terminal and iTerm2. It works quite ok now.
+- OS-type is now determined as does IDLE-editor, copied it from there:
+
+sys.platform == 'darwin'
+sys.platform[:3] == 'win':
+sys.platform.count('linux'):
+
+This usage of module sys is nice addition, it was used very little before. Also now
+there is no need to blindly try to find macOS terminal.
+- Fix for: search_next would not work if holding ctrl down and repeatedly pressing backspace.
+- Scrollbar is now little thinner if using macOS.
+- Yank_line copies now whole line instead of just visible part of line.
+- Added functions idx_linestart and -end to get effective indexes of the line.
+- Added functions move_by_words and select_by_words which handles ctrl-leftright and
+ctrl-shift-leftright behaviour in Linux and Windows and Alt-leftright and
+Alt-shift-leftright behaviour in macOS. This was done to fix default handling of related
+events near lineends.
+
+
+# 0.2.7
+- One can now yank line with ctrl- or cmd-y.
+- Testing blockcursor -> normal cursor.
+- Made padx and pady depend on font.measure instead of hardcoded values. Currently used only in contents and linenumbers.
+- Clarified bindings after finding out that one can bind to Cmd with Mod1.
+- Fixed goto_linestart -end etc. to make 'select line from' work.
+- Not much else but wanted to release a little more working version.
+
+
+# 0.2.6
+- Added initial support for macOS. Tested to work in macOS 12. Had some major issues with it like
+inability to bind. Also, focus it not restored to Python-console after closing editor, so some
+trickery is made at import stage. You can find this in the beginning of class Editor.
+Coloring with system theme (light/dark) is also difficult and
+may require event-loop, if done with tkinter, or tracing in Tcl and is not yet done.
+- Both command-w and -q closes editor with save. Cmd-left or right walks tabs. Cmd-n opens new tab
+and cmd-return opens filedialog.
+- When have selection in contents or entry, pressing arrow left or right
+moves cursor to other end clearing selection.
+- Ctrl-shift-a or -e does select from line, so does Cmd-shift-left or -right in macOS.
+- Made macOS-helptext.
+- Added copy of NotoMono v. 1.0 to /font for possible use in future.
+- Some improvements in colorchooser.
+- Noticed that macOS seems to have some momemtum in scrolling.
+- Improvements in fontchoose, like made optionmenu choises bigger etc.
+- Removed building part from 'More on virtual environments' -section of Readme.md
+- TkDefaulFont is '.AppleSystemUIFont' in macOS and causes troubles
+because it is not in font-families. We check for error at closing editor
+and when choosing font.
+
+
+# 0.2.5
+- Added small Tcl-script in init to fix ctrl-(shift)-right-left no work in Windows11 with Tcl 8.6.12.
+Changed it to the same as in Tcl 8.6.13 in Debian 12. 8.6.13-version uses word-chars in wordbreak regular
+expressions where 8.6.12 uses space-chars. It explains some of the difference. Space chars RE were greedier
+compared to word-char based ones, and thus they matched more. In normal text editing one would definitely
+want to use space chars RE but this editor is for code editing.
+- Center_view now shifts 1/3 screen height up per event.
+- Because Viewsync-event does not trigger when window size changes, to get linenumbers updated,
+added handle_configure() that is binded to <Configure>-event, which is generetad when window size changes.
+-Being monospaced font does not guarantee same lineheight between lines not containing bold-text
+and lines that do contain bold-text, like keywords. Courier for example is monospaced but does not have
+this kind of constant lineheight. If choosing other than constant lineheight font, linenumbers
+can have little offset. So Consolas is now before Courier in GOODFONTS. Because of this, made changes to
+changefont.py: Added filters for mono- and constant height -fonts, also removed unnecessary options. Also
+added missing call for tracefunc in checkbutton_command. Vertical fonts (those starting with @) are removed
+from the list. Added info about filters.
+
+
+# 0.2.4
+- Canceled move_line binded with arrow left-right as it interfered with search_next.
+- Canceled updown_override which expanded indenation on empty lines as confusing.
+- Fixed editor not getting focus at launch in Windows.
+- Fixed goto-linestart_end to work in error-view.
+- Paste to Python-console works now also in Windows. This is why module threading is now imported and used in copy_windows(). Earlier paste freezed editor so it had to be fixed.
+- Fixed copy-pasteing lines in place to work in windows as intented.
+
+
+# 0.2.3
+- Fix for: Editor not launching in Debian 12.
+- Editor now launches in Windows, but freezes if trying paste to Python-console while editor is open and have to be closed, also move_line is not yet working.
+- Indenting now works in Windows so do all shortcuts except for running file.
+- Fix for:  bell after gotoline, replace, replace_all.
+- Arrow-up and -down now expands indentation on empty line to same as in old line.
+- No more saving TKDEFAULFONT as font-family in get_config.
+
+
+# 0.2.2
+- Much improved colorchooser, settings have now colors and is not compatible with older conf-files.
+	Had to import copy-module for that which is to be removed in the future, when have colors-class.
+- Again many fixes in replace.
+- You can now center view with Ctrl-j.
+- Improved checkpars alot. Curls are also counted.
+- Disabled some default Text-widget-class-bindings like Ctrl-arrow: move 'one paragraph'
+	to somewhere etc.
+
+
+# 0.2.1
+- Fixed multiline parentheses check.
+- Fixed replace, self.replace_overlap_index is still needed.
+	Replaced are now showed until esc, showed also if doing search again.
+	You can now replace by pressing Return only.
+	
+- Ctrl-d in last tab, which has no filepath, clears contents.
+- Ctrl-a is now: goto linestart as is the default. Select all, if needed,
+	can be found from mouse-menu.
+	
+- Removed tabify from mouse-menu as not needed, and binded Control-t to it.
+- Goto linestart now skips indentation.
+- When Un-,Indenting or pasting many lines, first line is shown.
+	Also you can now fix that first line indentation with arrow left and right
+	while indenting many lines.
+	
+- Made waiter-func to add delay while doing things which involve view-changes like
+	unindent many lines or searching.
+	
+- Fix for: view-change to a file with cursor on start of multiline string.
+- Added missing docstring to wordexpand.py
+- Updated help.
+
+
+# 0.2.0
+- It is now possible to close tab without saving it with: ctrl-q
+- Added missing unbind for buttonrelease-1 when replacing.
+- Added initial word-expander from idle/autoexpand.py, renamed it wordexpand.py,
+	binded to Alt-e and updated help-text.
+- Also removed overlap-index stuff from replace and use now 'replaced'-tag instead
+	to mark already replaced areas.
+
+
+# 0.1.9
+- After save (give filename), put focus on text.
+- Pasting to tab with no filename does no longer trigger syntax highlighting.
+- Unindenting single line works now as it should.
+- Updated help-text.
+- Added initial checking for parenthesis mismatch.
+- Fix error raised in v.0.1.8, when walking to newtab.
+- When searching, ensure_visibility shows now 4 next lines instead of just 2.
+- When deleting selection, an extra character before selection was also deleted. This is now fixed.
+
+
+# 0.1.8
+- Fix error-view syntax-highlighting.
+- Fix error when doing ctrl-s if cursor not visible.
+- Colorchooser now shows current color correctly.
+- Updated help-file.
+- Fixes for show_next, ensure_visibility, walk_tabs.
+- Fixes for paste() when dealing with multiline string markers.
+
+
+# 0.1.7
+- Added bunch of files from idlelib to be used as example resource in the future.
+	https://github.com/python/cpython/tree/3.11/Lib/idlelib/
+- Small fixes.
+
+
+# 0.1.6
+- Quick fix for check_indent_depth()
+
+
+# 0.1.5
+- From CHANGELOG.md to CHANGELOG.
+- Add version number to help.
+- Fix syntax-highlight like: calls
+- Small fixes.
+- You can now change indentation depth with: .change_indentation_width()
+- Indentation depth is saved in configuration.
+- Indentation depth is now checked before opening files.
+
+
+# 0.1.4
+- Updating whole-files syntax is now much faster like when walking tabs etc. It is done by calling update_tokens directly, without waiting for sync-event. Sync-event is still used to detect changes and syntax-highlighting is now much ahead last version.
+- Only replace_all leaves tags on now, after searching.
+
+
+# 0.1.3
+- Unified tokenfuncs.
+- Added syntax-option to conf.
+- Tab is syntax-highlighted when it has/gets py-filename.
+- Added shortcut for run-file: Ctrl-Super-Return. Super means search-key.
+- Alt-x toggles syntax.
+- Fixed syntax-highlighting to handle multiline strings etc.
+- Replace all is now much faster and so is show_next and prev.
+- Error-view has also syntax.
+- Because Alt-n after replacing is bad, dont want to open new tab, but also
+want Alt-n-Return, so now: ctrl-n is show_next and ctrl-p show_prev when searching.
+
+
+# 0.1.2
+- Add initial syntax highlight for python-files.
+- Fixed tabify to correctly strip all tabs on disk save.
+- Add tabify region-utility to popup-menu.
+- Search now leaves tags on. Double-Esc clears.
+- It is now possible to go back to last cursor position with arrow left
+when doing seach_next if have gone too far.
+- changefont.py now takes optional tracefunc as kw-argument to perform whatever action is needed
+on font changes.
+- changes on shortcuts:
+- ctrl-p --> alt-f,  ctrl-s --> alt-s,  ctrl-n --> alt-n
+- ctrl-o  insert linebreak
+- ctrl-i  move right
+- ctrl-b  move left
+- ctrl-e  move to line end
+- ctrl-s  move to line end
+- ctrl-k  remove from cursor to lineend
+
+
+# 0.1.1
+- Quick fix for: wrong bind in font_choose
+- And for: __new__ should not alter existing object types
+
+
+# 0.1.0
+- Files can again be opened from entry.
+- Improvements for fdialog.Fdialog like show current directory.
+- File loading is no more blocking but more like fontchoose, using tracevar.
+- If current git-branch is main or master it is shown with red color.
+- No more multiple fontchoose-, colorchoose- or filedialogs or editors.
+- Binding for fontchoose: ctrl-p moved from self to contents reason being
+the same as usual, it has default binding in Text()-widget which moves
+cursor line up. Which is actually pretty good choice, also that ctrl-n for down.
+But I need those and I can scroll.
+- Widgets are now disabled when filedialog is open.
+- changefont.FontChooser no longer initiates its toplevel-window, and font names are taken from font-instances name-attribute rather than using dummy-names.
+- etc. small fixes
+
+
+# 0.0.9
+- Fix for: being able modify contents at the beginning of search.
+- Cursor pos is again set after editor launch
+- Clarified some varnames: like tag 'found' to 'focus'
+- Dumped tkinter.filedialog.FileDialog. Instead use now fdialog.FDialog
+- Tested setting cursor blink off when idle but it added too much overhead, so left as is.
+	(Had to bind to: Button, KeyRelease, FocusIn and it seemed to be too much.)
+
+
+# 0.0.8
+- Reorder grid-related stuff in init to make instantiation of editor feel more instant.
+- You can now toggle linenumbers with Alt-l (as lemon). This adds a new option to conf meaning this version is not compatible with earlier ones.
+- Adjusted colors and borders for filedialog.Filedialog used in load().
+- Made small fix to no_copy_ln(). If encounter problem with copying from editor to shell or console, try
+first to copy something from shell or console to editor and retry. I have not had this issue for some time now.
+- Added inspect-option to popup-menu, and updated help-file for how to use it.
+
+
+# 0.0.7
+- Fix for: goodfonts were left commented and removed badfonts as unused.
+- Removed tkinter.scrolledtext -module as unused.
+- Added info how to inspect objects in help. Was thinking implementing, but I changed my mind.
+- Added a section about venvs for more advanced programmers in README.
+
+
+# 0.0.6
+- Trailing whitespace of non-empty lines is now stripped away in tabify() when saving files to disk.
+- Control-f is now binded to Text-widget instead of Toplevel. Reason is again to avoid default binding.
+	It seems to center to cursor by default.
+- After doing long paste, more lines than in screen, cursor was out of screen. Now view is refreshed after
+	paste.
+- When doing search or replace, clipboard contents is now autofilled to entry in most situations. Yes, I got
+	idea from Gnome editor, which by the way has some issue showing the last lines sometimes, this is bad,
+	I have always showed the lines, keeping them untouched is another story.
+- Finally got rid of module random. Fonts are now initiated with family='TkDefaulFont'.
+- Some renaming etc. in linenumbers.
+- Linenumber update is now handled by built-in event: <<'WidgetViewSync'>>  which is great news:
+	got rid of quite complex self-handled event-loop. It was working alright but this approach is simpler
+	and more responsive. Im keeping copy of version 0.0.5 in dev/oldversions so it can be used as a reference. Install it with pip install oldversion.tar.gz.
+	About event <<'WidgetViewSync'>> :
+	It is generated when doing: insert, delete or screen geometry change. Also on almost all font-changes but
+	not when scrolling, so this is the reason why update_linenums is called also from sbset_override.
+	This really made a difference. It is now child-play to do things like toggle-linenums etc.
+- Started replacing usage of % in strings with f-strings. Now all calls to print() are %-free. Still ~150 replacements left.
+
+
+# 0.0.5
+- Small fix in getLineNumbers()
+- Added borders etc.
+- You can now walk back with: alt-q
+- File open -dialog width is increased
+- Close open dialogs when quitting, tk_chooseColor is problematic though
+	(it might have own temporary root)
+- Dumped 'proxy-undo',  reason being lag-increase, files are in /dev if interested
+- If get motivation to continue with undo, I will go with ungrid, also in /dev
+
+
+# 0.0.4
+- Made decision not to try to do tab-specific undo, for reasons you can read in dev/todo.py
+- Undo should no longer clear contents.
+- Pasting from editor to console works again.
+- Changed title of file selection dialog --> select file
+- Changed title of editor: 3/5 --> 00@00
+- Added dev-dir to repo and some may be useful -files there
+- Updated mkvenv in readme
