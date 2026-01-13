@@ -1,0 +1,149 @@
+# ATLAS — Deterministic Incident Analysis & Response (CLI)
+
+ATLAS is a **pip-installable CLI tool** for **deterministic incident analysis, root cause analysis (RCA), and response workflows**.  
+It ingests real production logs and produces **explainable, auditable outputs** — **without AI / ML**.
+
+**Audience:** SREs, DevOps, Platform engineers  
+**Guarantee:** Same input → same output. No black boxes.
+
+---
+
+## Why ATLAS?
+
+Most incident tools rely on opaque AI or heuristics that cannot be trusted during outages.  
+ATLAS is built for **predictability, explainability, and production realism**.
+
+* 🔒 Zero-AI (no LLMs, no ML, no embeddings)
+* 🧠 Fully deterministic
+* 🧾 Rule-based & explainable
+* 🧪 100% testable core
+* ⚙️ Real CLI workflow (files in → decisions out)
+
+---
+
+## What ATLAS Does
+
+### ATLAS v1 — Incident Analysis
+1. Parses raw logs
+2. Normalizes into a canonical incident schema
+3. Classifies incident type
+4. Infers probable root cause
+5. Suggests remediation actions
+6. Persists incident history (JSONL)
+
+### ATLAS v2 — Priority & Response Engine
+ATLAS v2 converts analyzed incidents into **decisions**.
+
+* Priority scoring (P0–P3)
+* Rule-based decisions (IF–THEN)
+* Workflow execution (step-by-step)
+* State tracking (no infinite loops)
+* Full audit trail
+* Still zero-AI and deterministic
+
+> v1 answers **“What happened?”**  
+> v2 answers **“What should happen next?”**
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart TD
+    A[Log File] --> B[Parsing]
+    B --> C[Normalization]
+    C --> D[Classification]
+    D --> E[RCA]
+    E --> F[Incident Schema]
+    F --> G[Priority Engine]
+    G --> H[Rule Engine]
+    H --> I[Workflow Engine]
+    I --> J[Actions + Audit Trail]
+```
+
+---
+### Install (PyPI)
+
+```bash
+pip install atlas-incident
+```
+Current version: 0.1.2
+
+### Usage
+
+```bash
+python -m atlas <log_file> <service> <environment>
+```
+
+### Example:
+
+```bash
+python -m atlas prod_payments.log payments-api prod
+```
+
+**What happens on run**
+
+1. v1 analyzes logs → Incident
+
+2. v2 assigns priority → runs response workflow
+
+
+### Example Output
+
+```json
+{
+  "service": "payments-api",
+  "environment": "prod",
+  "severity": "LOW",
+  "category": "UNKNOWN",
+  "root_cause": "Unknown root cause",
+  "actions": ["Escalate to on-call engineer"],
+  "confidence": 0.6
+}
+
+```
+
+```makefile
+=== ATLAS v2 RESULT ===
+Priority: P2
+Actions: []
+``` 
+
+**Incident History**
+
+Each run is appended to `incident_history.jsonl.`
+
+- Append-only
+- Audit-friendly
+- Replayable
+
+
+### Testing
+
+```bash
+pytest
+pytest --cov=atlas_v2
+```
+
+- Deterministic tests
+- Edge-case coverage
+- CI-ready
+
+
+
+### Design Principles
+
+- Determinism over intelligence
+- Rules over models
+- Schemas over guesses
+- Clarity over cleverness
+- Production realism over demos
+
+
+---
+
+## License
+
+This project is licensed under the **MIT License**, which permits use, modification, and distribution for both personal and commercial purposes.
+
+ATLAS is provided **“as is”**, without warranty of any kind. It is suitable for learning, internal tooling, and experimental production use where deterministic and explainable behavior is required.
