@@ -1,0 +1,348 @@
+# CheatLab Python Client
+
+Python client library for the CheatLab API - Quick command reference storage and retrieval system.
+
+## Installation
+
+```bash
+pip install cheatlab
+```
+
+## Quick Start
+
+```python
+from cheatlab import Cheat
+
+# Initialize client with your credentials
+cheat = Cheat("your_username", "your_auth_key")
+
+# Create a message
+cheat.post("Hello World", key="greeting")
+
+# Retrieve it
+print(cheat.get("greeting"))  # Output: Hello World
+
+# Delete it
+cheat.delete("greeting")
+```
+
+## Authentication
+
+Get your credentials:
+1. Visit CheatLab dashboard
+2. Find your username and auth_key
+3. Use them to initialize the client
+
+```python
+cheat = Cheat("username", "auth_key")
+
+# Or use custom base URL
+cheat = Cheat("username", "auth_key", base_url="https://your-instance.com")
+```
+
+## Usage Examples
+
+### Retrieving Messages
+
+```python
+# Get latest message
+latest = cheat.get("latest")
+
+# Get by ID
+message = cheat.get(47)
+
+# Get by custom key
+code = cheat.get("mykey")
+
+# Get password-protected message
+secret = cheat.get("mykey", password="secret123")
+
+# Get full details (returns dict)
+details = cheat.get("mykey", details=True)
+print(details['id'])
+print(details['text'])
+print(details['created_at'])
+```
+
+### Creating Messages
+
+```python
+# Simple post
+result = cheat.post("Hello World")
+print(result)  # {'success': True, 'id': 123}
+
+# Post with custom key
+cheat.post("My code snippet", key="snippet1")
+
+# Post with author
+cheat.post("Useful tip", key="tip", who="John")
+
+# Post password-protected content
+cheat.post(
+    "Private data",
+    key="secrets",
+    password="mypass",
+    protect_view=True,      # Require password to view
+    protect_delete=True     # Require password to delete
+)
+
+# Store file contents
+with open("script.py", "r") as f:
+    content = f.read()
+    cheat.post(content, key="backup-script")
+```
+
+### Deleting Messages
+
+```python
+# Delete by ID
+cheat.delete(47)
+
+# Delete latest message
+cheat.delete("latest")
+
+# Delete by key
+cheat.delete("mykey")
+
+# Delete protected message
+cheat.delete("mykey", password="secret123")
+```
+
+### AI Assistant
+
+```python
+# Ask AI a question (requires AI access on your account)
+try:
+    response = cheat.ai("what is recursion?")
+    print(response)
+except Exception as e:
+    print(f"AI error: {e}")
+```
+
+### List Messages
+
+```python
+# Get safe list of all messages (protected content hidden)
+data = cheat.get_uidata()
+print(f"Total messages: {data['count']}")
+
+for msg in data['messages']:
+    text = msg.get('text') or '[protected]'
+    print(f"{msg['id']}: {text}")
+
+# Get all messages (admin only)
+all_data = cheat.get_all("admin_password")
+```
+
+### Health Check
+
+```python
+# Check if API is responding
+status = cheat.ping()
+print(status)  # "pong"
+```
+
+## Exception Handling
+
+The client raises specific exceptions for different error scenarios:
+
+```python
+from cheatlab import Cheat, AuthenticationError, APIError
+
+cheat = Cheat("username", "auth_key")
+
+try:
+    cheat.post("Test message")
+except AuthenticationError as e:
+    print(f"Authentication failed: {e}")
+except APIError as e:
+    print(f"API error: {e}")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
+
+## API Reference
+
+### `Cheat(username, auth_key, base_url="https://cheatlab.onrender.com")`
+
+Initialize the CheatLab client.
+
+**Parameters:**
+- `username` (str): Your CheatLab username
+- `auth_key` (str): Your authentication key
+- `base_url` (str, optional): API base URL
+
+### Methods
+
+#### `get(target, password=None, details=False)`
+
+Retrieve a message.
+
+**Parameters:**
+- `target` (str|int): Message ID, key, or "latest"
+- `password` (str, optional): Password for protected messages
+- `details` (bool, optional): Return full JSON details
+
+**Returns:** str or dict
+
+#### `post(text, key=None, password=None, who=None, protect_view=False, protect_delete=False)`
+
+Create a new message.
+
+**Parameters:**
+- `text` (str): Message content
+- `key` (str, optional): Custom key (must be unique)
+- `password` (str, optional): Protection password
+- `who` (str, optional): Author name
+- `protect_view` (bool, optional): Require password to view
+- `protect_delete` (bool, optional): Require password to delete
+
+**Returns:** dict with `success` and `id`
+
+#### `delete(target, password=None)`
+
+Delete a message.
+
+**Parameters:**
+- `target` (str|int): Message ID, key, or "latest"
+- `password` (str, optional): Password if protected
+
+**Returns:** str ("deleted" on success)
+
+#### `ai(prompt)`
+
+Ask the AI assistant.
+
+**Parameters:**
+- `prompt` (str): Your question
+
+**Returns:** str (AI response)
+
+**Note:** Requires AI access on your account
+
+#### `get_uidata()`
+
+Get safe list of all messages.
+
+**Returns:** dict with `count` and `messages`
+
+#### `get_all(admin_pass)`
+
+Get all messages (admin only).
+
+**Parameters:**
+- `admin_pass` (str): Admin password
+
+**Returns:** dict with `count` and `messages`
+
+#### `ping()`
+
+Health check.
+
+**Returns:** str ("pong")
+
+## Common Use Cases
+
+### Store and Retrieve Code Snippets
+
+```python
+# Store Python function
+code = '''
+def factorial(n):
+    return 1 if n <= 1 else n * factorial(n-1)
+'''
+cheat.post(code, key="factorial-py", who="Dev")
+
+# Retrieve and use it
+snippet = cheat.get("factorial-py")
+exec(snippet)
+print(factorial(5))  # 120
+```
+
+### Quick Notes System
+
+```python
+# Store a quick note
+cheat.post("Remember to review PR #234", key="todo-today")
+
+# Check it later
+todo = cheat.get("todo-today")
+print(todo)
+
+# Delete when done
+cheat.delete("todo-today")
+```
+
+### Secure Credential Storage
+
+```python
+# Store API key securely
+cheat.post(
+    "API_KEY=xyz123abc456",
+    key="production-api-key",
+    password="secure_pass",
+    protect_view=True,
+    protect_delete=True
+)
+
+# Retrieve with password
+credentials = cheat.get("production-api-key", password="secure_pass")
+```
+
+### Backup Important Files
+
+```python
+import os
+
+# Backup a file
+with open("important_config.json", "r") as f:
+    content = f.read()
+    cheat.post(
+        content,
+        key=f"backup-{os.path.basename(f.name)}",
+        who="AutoBackup"
+    )
+
+# Restore later
+restored = cheat.get("backup-important_config.json")
+with open("restored_config.json", "w") as f:
+    f.write(restored)
+```
+
+## Development
+
+### Install for Development
+
+```bash
+git clone https://github.com/yourusername/cheatlab-python.git
+cd cheatlab-python
+pip install -e .
+```
+
+### Run Tests
+
+```bash
+pytest tests/
+```
+
+## Requirements
+
+- Python >= 3.7
+- requests >= 2.25.0
+
+## License
+
+MIT License
+
+## Support
+
+- Documentation: [CheatLab Docs](https://cheatlab.onrender.com)
+- Issues: [GitHub Issues](https://github.com/yourusername/cheatlab-python/issues)
+
+## Changelog
+
+### 1.0.0 (2026-01-11)
+- Initial release
+- Full API support for all endpoints
+- Exception handling
+- Comprehensive documentation
