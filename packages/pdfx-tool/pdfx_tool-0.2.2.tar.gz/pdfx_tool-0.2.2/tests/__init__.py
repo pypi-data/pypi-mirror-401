@@ -1,0 +1,3 @@
+"""
+Tests for pdfx package.
+"""
