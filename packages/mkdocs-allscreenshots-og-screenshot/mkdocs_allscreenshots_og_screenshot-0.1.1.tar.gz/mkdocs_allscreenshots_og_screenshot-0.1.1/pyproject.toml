@@ -1,0 +1,18 @@
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mkdocs-allscreenshots-og-screenshot"
+version = "0.1.1"
+description = "MkDocs plugin for dynamic OpenGraph images via Allscreenshots API"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["mkdocs>=1.0"]
+
+[project.urls]
+Homepage = "https://allscreenshots.com"
+
+[project.entry-points."mkdocs.plugins"]
+allscreenshots-og-screenshot = "allscreenshots_og_screenshot.plugin:AllscreenshotsOgPlugin"
