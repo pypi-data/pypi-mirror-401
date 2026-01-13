@@ -1,0 +1,101 @@
+Metadata-Version: 2.4
+Name: openapi-tools-mcp
+Version: 0.1.0
+Summary: A Model Context Protocol server powered by fastMCP for inspecting local OpenAPI specs.
+Project-URL: Homepage, https://github.com/kardaj/openapi-tools-mcp
+Project-URL: Repository, https://github.com/kardaj/openapi-tools-mcp
+Project-URL: Issues, https://github.com/kardaj/openapi-tools-mcp/issues
+Author: kardaj
+License: MIT License
+        
+        Copyright (c) 2026 kardaj
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: mcp,openapi,specs,tools
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: fastmcp>=0.2.0
+Requires-Dist: openapi-spec-validator>=0.7.1
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: dev
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-black; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: pytest-ruff; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# OpenAPI Tools MCP Server
+
+A [Model Context Protocol](https://spec.modelcontextprotocol.io/) server powered by [fastMCP](https://pypi.org/project/fastmcp/) for inspecting local OpenAPI specs. It exposes tools for listing and retrieving spec details with optional glob/tag filters and `$ref` resolution.
+
+## Add as an MCP server
+
+Add this server to your MCP client configuration (PyPI):
+
+```json
+{
+  "mcpServers": {
+    "openapi-tools": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "openapi-tools-mcp",
+        "openapi-tools-mcp"
+      ]
+    }
+  }
+}
+```
+
+This launches the `openapi-tools-mcp` entrypoint from PyPI via `uvx`.
+
+TOML version (PyPI):
+
+```toml
+[mcp_servers.openapi-tools]
+command = "uvx"
+args = ["--from", "openapi-tools-mcp", "openapi-tools-mcp"]
+```
+
+You can also install directly from GitHub with `uvx`:
+
+```bash
+uvx --from git+ssh://git@github.com/kardaj/openapi-tools-mcp.git openapi-tools-mcp
+```
+
+## Available tools
+
+- `spec_info(spec_path)`: Quickly summarize a spec file (OpenAPI version, title/description, servers). Use this first to confirm you're reading the right spec and its base URLs.
+- `spec_list(section, spec_path, filter_by_glob?, filter_by_tag?)`: Enumerate keys within a spec section (e.g., all paths, schemas, or responses). Use to discover what exists before drilling into details.
+- `spec_get(section, name, spec_path, resolve_refs=True)`: Retrieve a specific item from a section (e.g., one path or schema), with optional `$ref` resolution and source line numbers for precise navigation.
+
+All tools expect a readable OpenAPI YAML/JSON file path on the local filesystem. An example spec lives at `tests/openapi.example.yml`.
+
+## License
+
+MIT
