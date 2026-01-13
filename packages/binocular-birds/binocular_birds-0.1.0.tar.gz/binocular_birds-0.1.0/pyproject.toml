@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "binocular-birds"
+version = "0.1.0"
+authors = [
+  { name="jiujiuche", email="jiujiuche@gmail.com" },
+]
+description = "A bird species classifier"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "torch",
+    "torchvision",
+    "matplotlib",
+    "networkx",
+    "tqdm",
+    "pyyaml",
+    "tensorboard",
+    "huggingface-hub",
+    "Pillow"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/JiuJiuChe/Binocular"
+"Bug Tracker" = "https://github.com/JiuJiuChe/Binocular/issues"
+
+[project.scripts]
+predict_hf = "Binocular.scripts.predict_hf:main"
+
+[tool.setuptools.packages.find]
+include = ["Binocular*"]
