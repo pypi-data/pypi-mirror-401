@@ -1,0 +1,354 @@
+Metadata-Version: 2.4
+Name: mcp-semantic-search
+Version: 0.1.0
+Summary: MCP server for semantic code search
+Project-URL: Homepage, https://github.com/rohithmahesh/mcp-semantic-search
+Project-URL: Repository, https://github.com/rohithmahesh/mcp-semantic-search
+Project-URL: Issues, https://github.com/rohithmahesh/mcp-semantic-search/issues
+Author-email: Rohith Mahesh <rohith@tequerist.com>
+License: MIT
+License-File: LICENSE
+Keywords: code-search,embeddings,mcp,qdrant,semantic-search
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.12
+Requires-Dist: fastmcp>=0.15.0
+Requires-Dist: google-genai>=1.0.0
+Requires-Dist: pathspec>=0.12.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: qdrant-client>=1.12.0
+Requires-Dist: watchdog>=4.0.0
+Description-Content-Type: text/markdown
+
+# MCP Semantic Search
+
+> A Model Context Protocol (MCP) server that indexes codebases using semantic embeddings for natural language search.
+
+[![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+## Features
+
+- **🔍 Semantic Code Search** – Find code using natural language queries instead of exact text matching
+- **⚡ Fast Indexing** – Efficient chunking and batch embedding with background processing
+- **🧠 Smart Chunking** – Language-aware code splitting:
+  - Python: Function/class boundary detection
+  - Others: Line-based with configurable overlap
+- **🌐 Multi-language Support** – Python, JavaScript, TypeScript, JSX, TSX, Markdown, YAML, JSON, HTML, CSS, Bash, SQL, and more
+- **👀 Live Watch** – Automatically re-index on file changes with debouncing
+- **🔄 Incremental Updates** – Reindex only changed files without full rebuild
+- **🗑️ Deletion Handling** – Automatically removes chunks for deleted files
+- **📊 Status Tracking** – Real-time indexing progress and queue monitoring
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.12 or higher
+- [Qdrant](https://qdrant.tech/) vector database (running locally or remotely)
+- Google Gemini API key
+
+### Installation
+
+```bash
+# Using uvx (recommended - no installation needed)
+uvx mcp-semantic-search
+
+# Or install with pip
+pip install mcp-semantic-search
+```
+
+### Configuration
+
+Set environment variables:
+
+```bash
+export GEMINI_API_KEY="your_gemini_api_key"
+export QDRANT_URL="http://localhost:6333"
+```
+
+Optional environment variables:
+
+```bash
+# Embedding model (default: text-embedding-004)
+export GEMINI_EMBEDDING_MODEL="text-embedding-004"
+
+# Chunk configuration (defaults: 50/10/5)
+export CHUNK_MAX_LINES=50        # Max lines per chunk
+export CHUNK_OVERLAP_LINES=10    # Overlap between chunks
+export CHUNK_MIN_LINES=5         # Min lines for valid chunk
+```
+
+Or create a `.env` file:
+
+```bash
+GEMINI_API_KEY=your_gemini_api_key
+QDRANT_URL=http://localhost:6333
+```
+
+### Running Qdrant
+
+```bash
+# Using Docker
+docker run -p 6333:6333 qdrant/qdrant
+
+# Or using docker-compose
+echo '
+services:
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+' | docker-compose -f - up
+```
+
+## Usage with Claude Code
+
+### Method 1: Using MCP Config JSON (Recommended)
+
+Edit your Claude Code MCP configuration file (`~/.claude.json` or `~/.config/claude/config.json`):
+
+```json
+{
+  "mcpServers": {
+    "semantic-search": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-semantic-search"],
+      "env": {
+        "GEMINI_API_KEY": "your_gemini_api_key_here",
+        "QDRANT_URL": "http://localhost:6333"
+      }
+    }
+  }
+}
+```
+
+For a **local installation** (after `pip install mcp-semantic-search`):
+
+```json
+{
+  "mcpServers": {
+    "semantic-search": {
+      "type": "stdio",
+      "command": "mcp-semantic-search",
+      "env": {
+        "GEMINI_API_KEY": "your_gemini_api_key_here",
+        "QDRANT_URL": "http://localhost:6333"
+      }
+    }
+  }
+}
+```
+
+With optional chunk configuration:
+
+```json
+{
+  "mcpServers": {
+    "semantic-search": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-semantic-search"],
+      "env": {
+        "GEMINI_API_KEY": "your_gemini_api_key_here",
+        "QDRANT_URL": "http://localhost:6333",
+        "CHUNK_MAX_LINES": "50",
+        "CHUNK_OVERLAP_LINES": "10",
+        "CHUNK_MIN_LINES": "5"
+      }
+    }
+  }
+}
+```
+
+### Method 2: Using CLI
+
+```bash
+claude mcp add semantic-search \
+  -e GEMINI_API_KEY="$GEMINI_API_KEY" \
+  -e QDRANT_URL="$QDRANT_URL" \
+  -- uvx mcp-semantic-search
+```
+
+### Available Tools
+
+| Tool | Description | Returns |
+|------|-------------|---------|
+| `index_codebase(root_dir, force_reindex, max_files)` | Index the codebase | `{"status": "success", "files_queued": N}` |
+| `search_code(query, limit, score_threshold)` | Semantic search across all files | `{"query": "...", "count": N, "results": [...]}` |
+| `search_file(query, file_path, limit)` | Search within a specific file | `{"query": "...", "file": "...", "results": [...]}` |
+| `get_status()` | Check indexing status | `{"collection": {...}, "queue": {...}}` |
+| `start_live_watch(root_dir, debounce_seconds)` | Start file watching | `{"status": "success", "running": true}` |
+| `stop_live_watch()` | Stop file watching | `{"status": "stopped", "running": false}` |
+| `clear_index()` | Reset the entire index | `{"status": "success", "message": "..."}` |
+
+### Example Workflow
+
+```python
+# Index your codebase (auto-starts on first use)
+index_codebase(root_dir="/path/to/project")
+# Returns: {"status": "success", "files_queued": 1234}
+
+# Search for code using natural language
+search_code("how does authentication work")
+# Returns:
+# {
+#   "query": "...",
+#   "count": 5,
+#   "results": [
+#     {
+#       "file": "src/auth/middleware.py",
+#       "lines": "10-25",
+#       "score": 0.876,
+#       "content": "..."
+#     },
+#     ...
+#   ]
+# }
+
+# Check indexing status
+get_status()
+# Returns:
+# {
+#   "collection": {"total_chunks": 12345, "files_indexed": 1234},
+#   "queue": {"running": true, "queued": 0, "pending": 0}
+# }
+
+# Enable live watching (auto-index on file changes)
+start_live_watch(root_dir="/path/to/project")
+```
+
+## Configuration
+
+### Chunking Configuration
+
+Control how code is split into searchable chunks:
+
+```bash
+# Smaller chunks = more precise results, more storage
+export CHUNK_MAX_LINES=30
+
+# Larger chunks = more context per result
+export CHUNK_MAX_LINES=100
+
+# Adjust overlap for context continuity
+export CHUNK_OVERLAP_LINES=15
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CHUNK_MAX_LINES` | 50 | Maximum lines per chunk |
+| `CHUNK_OVERLAP_LINES` | 10 | Overlap between chunks |
+| `CHUNK_MIN_LINES` | 5 | Minimum lines for valid chunk |
+
+### Search Configuration
+
+```python
+# Adjust search parameters
+search_code(
+    query="your query",
+    limit=20,                 # More results (default: 10)
+    score_threshold=0.3       # Lower threshold = more results (default: 0.5)
+)
+```
+
+## Development
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/mcp-semantic-search.git
+cd mcp-semantic-search
+
+# Install in development mode
+pip install -e .
+```
+
+### Testing
+
+```bash
+# Test with a small subset
+python -c "
+from mcp_semantic_search import GeminiEmbedder, QdrantCodeStore, index_repository
+
+embedder = GeminiEmbedder()
+store = QdrantCodeStore()
+
+# Test with just 5 files
+stats = index_repository(
+    root_dir='.',
+    embedder=embedder,
+    store=store,
+    max_files=5
+)
+print(stats)
+"
+
+# Test semantic search
+python -c "
+from mcp_semantic_search import GeminiEmbedder, QdrantCodeStore
+
+embedder = GeminiEmbedder()
+store = QdrantCodeStore()
+
+query_embedding = embedder.embed_query('authentication')
+results = store.search(query_embedding, limit=5)
+
+for r in results:
+    print(f'{r[\"file_path\"]}:{r[\"start_line\"]} ({r[\"score\"]:.2f})')
+    print(r['content'][:200])
+    print('---')
+"
+```
+
+## Technical Details
+
+- **Embedding Model**: Google `text-embedding-004` (768 dimensions)
+- **Vector Database**: Qdrant with cosine similarity
+- **Chunking Strategy**:
+  - Python: AST-based function/class boundary detection
+  - Others: Line-based with configurable chunk size and overlap
+- **File Watching**: Watchdog with 3-second debouncing
+- **Deduplication**: SHA256 hash-based, unchanged files are skipped
+- **Background Processing**: FIFO queue for incremental reindexing
+
+## Supported Languages
+
+| Extension | Language |
+|-----------|----------|
+| `.py` | Python |
+| `.js` | JavaScript |
+| `.ts` | TypeScript |
+| `.jsx` | JSX |
+| `.tsx` | TSX |
+| `.md` | Markdown |
+| `.yaml`, `.yml` | YAML |
+| `.json` | JSON |
+| `.html` | HTML |
+| `.css` | CSS |
+| `.sh` | Bash |
+| `.sql` | SQL |
+| `.txt` | Text |
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+- [Model Context Protocol](https://modelcontextprotocol.io/) by Anthropic
+- [Qdrant](https://qdrant.tech/) - Vector Database
+- [Google Gemini](https://ai.google.dev/) - Embedding API
+- [fastmcp](https://github.com/jlowin/fastmcp) - MCP framework
