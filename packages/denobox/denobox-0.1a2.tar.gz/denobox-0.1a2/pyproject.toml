@@ -1,0 +1,35 @@
+[project]
+name = "denobox"
+version = "0.1a2"
+description = "Execute JavaScript and WebAssembly in a Deno sandbox from Python"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Simon Willison"}]
+license = "Apache-2.0"
+classifiers = []
+dependencies = [
+    "deno",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+denobox = ["*.js"]
+
+[project.urls]
+Homepage = "https://github.com/simonw/denobox"
+Changelog = "https://github.com/simonw/denobox/releases"
+Issues = "https://github.com/simonw/denobox/issues"
+CI = "https://github.com/simonw/denobox/actions"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
