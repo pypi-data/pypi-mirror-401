@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "erosolar-browser"
+version = "1.0.2"
+description = "Python SDK to automate the EroSolar AI Browser - control a visible browser with AI"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Bo Shang", email = "bo@shang.software"}
+]
+keywords = ["browser", "automation", "ai", "gpt", "selenium", "playwright"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Software Development :: Testing",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.25.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "twine", "build"]
+
+[project.urls]
+Homepage = "https://americaisfinallyback.com"
+Repository = "https://github.com/AmerisFinally/erosolar-browser"
+Documentation = "https://americaisfinallyback.com/downloads"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["erosolar_browser*"]
