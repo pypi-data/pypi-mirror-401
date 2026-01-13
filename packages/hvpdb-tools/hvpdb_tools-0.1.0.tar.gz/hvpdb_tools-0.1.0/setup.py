@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-tools', version='0.1.0', description='Developer Tools & Debugging Plugin for HVPDB', packages=find_packages(), install_requires=['hvpdb'], entry_points={'hvpdb.plugins': ['tools = hvpdb_tools:app']})
