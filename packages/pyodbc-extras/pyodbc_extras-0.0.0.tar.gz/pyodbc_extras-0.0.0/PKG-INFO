@@ -1,0 +1,50 @@
+Metadata-Version: 2.4
+Name: pyodbc-extras
+Version: 0.0.0
+Summary: Extra Methods for Working with ODBC Connections in Python
+Home-page: https://github.com/DanielJDufour/pyodbc-extras
+Download-URL: https://github.com/DanielJDufour/pyodbc-extras/tarball/download
+Author: Daniel J. Dufour
+Author-email: daniel.j.dufour@gmail.com
+Keywords: data,odbc,python,sql
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: summary
+
+# pyodbc-extras
+> Extra Methods for Working with ODBC Connections in Python
+
+## install
+```sh
+pip install pyodbc-extras
+```
+
+## usage
+```python
+from pyodbc import connect
+
+from pyodbc_extras import dump_sql_to_rows, dump_table
+
+cnxn = pyodbc.connect(CONNECTION_STRING)
+cursor = cnxn.cursor()
+
+# dump custom sql
+dump_sql_to_rows(cursor, "SELECT * FROM cars WHERE year < 2015")
+{ "column_names": ["year", "make", "model", ...], "rows": [{"year": 2005, "make": "Audi", "model": "A3"}, ...] }
+
+# same as dump_sql_to_rows(cursor, "SELECT * FROM cars") 
+rows = dump_table(cursor, "cars")
+```
