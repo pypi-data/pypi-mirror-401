@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "speconsense"
+version = "0.7.2"
+description = "High-quality clustering and consensus generation for Oxford Nanopore amplicon reads"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Josh Walker", email = "joshowalker@yahoo.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+keywords = ["bioinformatics", "nanopore", "consensus", "clustering", "amplicon"]
+dependencies = [
+    "edlib>=1.3.9",
+    "numpy>=1.20.0",
+    "biopython>=1.79",
+    "tqdm>=4.62.0",
+    "scipy>=1.7.0",
+    "adjusted-identity>=0.2.4",
+    "pyyaml>=5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/joshuaowalker/speconsense"
+Repository = "https://github.com/joshuaowalker/speconsense"
+Issues = "https://github.com/joshuaowalker/speconsense/issues"
+
+[project.scripts]
+speconsense = "speconsense.cli:main"
+speconsense-summarize = "speconsense.summarize:main"
+speconsense-synth = "speconsense.synth:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["speconsense*"]
+
+[tool.setuptools.package-data]
+"speconsense.profiles" = ["*.yaml"]
