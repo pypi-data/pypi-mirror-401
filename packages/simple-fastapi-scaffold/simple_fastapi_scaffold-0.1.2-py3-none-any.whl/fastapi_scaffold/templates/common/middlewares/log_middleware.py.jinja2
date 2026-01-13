@@ -1,0 +1,33 @@
+"""日志中间件"""
+import time
+from fastapi import Request
+from common.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+async def log_request_middleware(request: Request, call_next):
+    """记录请求日志的中间件"""
+    start_time = time.time()
+
+    # 记录请求信息
+    logger.info(f"Request: {request.method} {request.url.path}")
+
+    response = await call_next(request)
+
+    # 记录响应信息
+    process_time = time.time() - start_time
+    logger.info(
+        f"Response: {request.method} {request.url.path} - "
+        f"Status: {response.status_code} - Time: {process_time:.3f}s"
+    )
+
+    return response
+
+
+# FastAPI 中间件类
+class LoggingMiddleware:
+    """日志中间件"""
+
+    async def __call__(self, request: Request, call_next):
+        return await log_request_middleware(request, call_next)
