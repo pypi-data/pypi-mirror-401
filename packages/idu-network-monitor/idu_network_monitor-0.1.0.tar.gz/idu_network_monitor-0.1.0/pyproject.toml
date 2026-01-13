@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idu-network-monitor"
+version = "0.1.0"
+description = "A network data usage monitor that generates beautiful HTML reports with interactive charts"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [
+    {name = "IDU Development Team", email = "idu@example.com"}
+]
+keywords = [
+    "network",
+    "monitor",
+    "data usage",
+    "bandwidth",
+    "internet",
+    "traffic",
+    "analytics",
+    "report",
+    "visualization"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Networking :: Monitoring",
+    "Topic :: Utilities"
+]
+dependencies = [
+    "psutil>=5.9.0"
+]
+
+[project.optional-dependencies]
+notebook = [
+    "pandas>=1.3.0",
+    "plotly>=5.0.0",
+    "jupyter>=1.0.0"
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0"
+]
+
+[project.scripts]
+idu-report = "idu:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/idu"
+Documentation = "https://github.com/yourusername/idu#readme"
+Repository = "https://github.com/yourusername/idu.git"
+Issues = "https://github.com/yourusername/idu/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+idu = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
