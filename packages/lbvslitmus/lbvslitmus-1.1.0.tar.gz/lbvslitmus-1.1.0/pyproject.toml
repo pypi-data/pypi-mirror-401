@@ -1,0 +1,114 @@
+[project]
+name = "lbvslitmus"
+version = "1.1.0"
+description = "A modern, extendible platform for ligand-based virtual screening benchmarking. Automates data downloading, preprocessing, ML training, evaluation, and statistical analysis. Supports multiple datasets, molecular embeddings (fingerprints and pretrained neural networks), similarity search, and ML classifiers for identifying bioactive compounds."
+authors = [
+    {name = "Kacper Szot", email = "kacperszot1@gmail.com"},
+    {name = "Maciej Nowakowski"},
+    {name = "Kinga Bunkowska"},
+    {name = "Jakub Adamczyk", email = "jadamczy@agh.edu.pl"},
+    {name = "AGH ML & Chemoinformatics Group", email = "jadamczy@agh.edu.pl"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "hf-xet",
+    "huggingface-hub",
+    "joblib>=1.4.2",
+    "numpy>=1.20.0,<3",
+    "pandas<3",
+    "pyarrow",
+    "rdkit<=2024.9.5",
+    "requests>=2.32.3",
+    "scikit-fingerprints>=1.15.0",
+    "scikit-learn>=1.0.0,<2",
+    "scipy>=1.0.0,<2",
+    "tqdm>=4.0.0,<5",
+    "lightgbm>=4,<5",
+    "matplotlib",
+    "seaborn",
+    "pandas-stubs~=2.3.3",
+    "bbt-test>=0.0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "lbvslitmus"
+module-root = ""
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+fix = true
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=lbvslitmus --cov-report=term-missing --cov-report=html --cov-fail-under=70"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["lbvslitmus"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+    "*/dist-packages/*",
+    "*/examples/*",
+    "*/scripts/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "@property",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+precision = 2
+show_missing = true
+skip_covered = false
