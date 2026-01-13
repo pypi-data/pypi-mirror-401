@@ -1,0 +1,342 @@
+Metadata-Version: 2.4
+Name: research-trends-scopus
+Version: 0.2.0
+Summary: A comprehensive tool to retrieve research data from multiple academic databases (Scopus, OpenAlex, Semantic Scholar, CrossRef, PubMed, Google Scholar), analyze trends, and generate interactive dashboards with recommendations
+Author-email: Research Trends Team <research-trends@example.com>
+Maintainer-email: Research Trends Team <research-trends@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/research-trends/research-trends-scopus
+Project-URL: Documentation, https://research-trends-scopus.readthedocs.io
+Project-URL: Repository, https://github.com/research-trends/research-trends-scopus
+Project-URL: Issues, https://github.com/research-trends/research-trends-scopus/issues
+Project-URL: Changelog, https://github.com/research-trends/research-trends-scopus/blob/main/CHANGELOG.md
+Keywords: scopus,openalex,semantic-scholar,crossref,pubmed,google-scholar,research,trends,analysis,dashboard,bibliometrics,scientometrics,academic,publications,citations,multi-source
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.28.0
+Requires-Dist: pandas>=1.5.0
+Requires-Dist: numpy>=1.23.0
+Requires-Dist: plotly>=5.10.0
+Requires-Dist: dash>=2.7.0
+Requires-Dist: dash-bootstrap-components>=1.3.0
+Requires-Dist: scikit-learn>=1.1.0
+Requires-Dist: networkx>=2.8.0
+Requires-Dist: wordcloud>=1.8.0
+Requires-Dist: python-dotenv>=0.21.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: tqdm>=4.64.0
+Requires-Dist: cachetools>=5.2.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.10.0; extra == "dev"
+Requires-Dist: black>=22.0.0; extra == "dev"
+Requires-Dist: isort>=5.10.0; extra == "dev"
+Requires-Dist: flake8>=5.0.0; extra == "dev"
+Requires-Dist: mypy>=0.990; extra == "dev"
+Requires-Dist: pre-commit>=2.20.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=5.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints>=1.19.0; extra == "docs"
+Requires-Dist: myst-parser>=0.18.0; extra == "docs"
+Provides-Extra: notebook
+Requires-Dist: jupyter>=1.0.0; extra == "notebook"
+Requires-Dist: jupyterlab>=3.5.0; extra == "notebook"
+Requires-Dist: ipywidgets>=8.0.0; extra == "notebook"
+Requires-Dist: nbformat>=5.7.0; extra == "notebook"
+Provides-Extra: all
+Requires-Dist: research-trends-scopus[dev,docs,notebook]; extra == "all"
+Dynamic: license-file
+
+# Research Trends Scopus
+
+[![PyPI version](https://badge.fury.io/py/research-trends-scopus.svg)](https://badge.fury.io/py/research-trends-scopus)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation Status](https://readthedocs.org/projects/research-trends-scopus/badge/?version=latest)](https://research-trends-scopus.readthedocs.io/en/latest/?badge=latest)
+
+A comprehensive Python package to retrieve research data from **multiple academic databases**, analyze publication trends, and generate interactive dashboards with actionable recommendations for research exploration.
+
+## 🌐 Supported Data Sources
+
+| Source | API Key | Coverage | Best For |
+|--------|---------|----------|----------|
+| **OpenAlex** | Not required | 250M+ works | General research (recommended) |
+| **Semantic Scholar** | Optional | 200M+ papers | AI/ML research, citations |
+| **CrossRef** | Not required | 150M+ DOIs | Metadata & DOI lookup |
+| **PubMed** | Optional | 36M+ papers | Biomedical/life sciences |
+| **Scopus** | Required | 90M+ records | Comprehensive citation data |
+| **Google Scholar** | N/A (scraper) | Largest | Citation counts |
+
+## 🚀 Features
+
+- **Multi-Source Data Retrieval**: Fetch from OpenAlex, Scopus, Semantic Scholar, CrossRef, PubMed, and Google Scholar
+- **Unified Interface**: Single API to query multiple databases with automatic fallback and deduplication
+- **Trend Analysis**: Analyze publication trends over time, by author, institution, and topic
+- **Network Analysis**: Visualize collaboration networks and citation patterns
+- **Topic Modeling**: Discover emerging research themes using NLP techniques
+- **Interactive Dashboard**: Generate beautiful dashboards using Plotly and Dash
+- **Smart Recommendations**: Get AI-powered suggestions for research areas to explore
+- **Caching**: Built-in caching to minimize API calls and improve performance
+- **Export**: Export data and visualizations in multiple formats
+
+## 📦 Installation
+
+### From PyPI
+
+```bash
+pip install research-trends-scopus
+```
+
+### With optional dependencies
+
+```bash
+# For development
+pip install research-trends-scopus[dev]
+
+# For documentation
+pip install research-trends-scopus[docs]
+
+# For Jupyter notebook support
+pip install research-trends-scopus[notebook]
+
+# Install all optional dependencies
+pip install research-trends-scopus[all]
+```
+
+### From source
+
+```bash
+git clone https://github.com/research-trends/research-trends-scopus.git
+cd research-trends-scopus
+pip install -e ".[all]"
+```
+
+## ⚙️ Configuration
+
+### API Keys (Optional for most sources)
+
+Most data sources work without API keys. Only Scopus requires an API key.
+
+**For Scopus (optional):**
+```bash
+export SCOPUS_API_KEY="your-api-key-here"
+```
+
+**For Semantic Scholar (optional, increases rate limits):**
+```bash
+export S2_API_KEY="your-api-key-here"
+```
+
+**`.env` file:**
+```
+SCOPUS_API_KEY=your-api-key-here
+S2_API_KEY=your-optional-s2-key
+```
+
+## 🎯 Quick Start
+
+### Using OpenAlex (Recommended - No API Key Required)
+
+```python
+from research_trends import OpenAlexClient, TrendAnalyzer, Dashboard
+
+# Initialize the client (no API key needed!)
+client = OpenAlexClient(email="your@email.com")  # email for polite pool
+
+# Search for publications
+results = client.search(
+    query="machine learning healthcare",
+    from_year=2020,
+    max_results=500
+)
+
+# Analyze trends
+analyzer = TrendAnalyzer(results.publications)
+trends = analyzer.analyze()
+
+# Launch interactive dashboard
+dashboard = Dashboard(analyzer)
+dashboard.run(port=8050)
+```
+
+### Multi-Source Search with UnifiedClient
+
+```python
+from research_trends import UnifiedClient, DataSource, TrendAnalyzer
+
+# Initialize unified client
+unified = UnifiedClient()
+
+# Search multiple sources at once
+multi_results = unified.search_multiple(
+    query="deep learning",
+    sources=[DataSource.OPENALEX, DataSource.SEMANTIC_SCHOLAR],
+    max_results=100
+)
+
+# Merge and deduplicate results
+publications = multi_results.merge_deduplicated()
+print(f"Found {len(publications)} unique publications from multiple sources")
+
+# Search with automatic fallback
+results = unified.search_with_fallback(
+    query="quantum computing",
+    sources=[DataSource.SCOPUS, DataSource.OPENALEX, DataSource.CROSSREF],
+    max_results=200
+)
+```
+
+### Individual Clients
+
+```python
+from research_trends import (
+    OpenAlexClient,      # 250M+ works, free
+    SemanticScholarClient,  # 200M+ papers, free
+    CrossRefClient,      # 150M+ DOIs, free
+    PubMedClient,        # 36M+ biomedical, free
+    ScopusClient,        # 90M+ records, requires API key
+    GoogleScholarClient  # Largest, web scraper
+)
+
+# Semantic Scholar (great for AI/ML research)
+s2 = SemanticScholarClient()
+papers = s2.search("transformer architecture", max_results=100)
+
+# CrossRef (great for DOI lookups)
+crossref = CrossRefClient()
+paper = crossref.get_work_by_doi("10.1038/nature12373")
+
+# PubMed (great for biomedical research)
+pubmed = PubMedClient()
+results = pubmed.search("CRISPR gene editing", max_results=50)
+```
+
+### Using Scopus (Requires API Key)
+
+```python
+from research_trends import ScopusClient, TrendAnalyzer, Dashboard
+
+# Initialize the client
+client = ScopusClient()  # Uses SCOPUS_API_KEY from environment
+
+# Search for publications
+publications = client.search(
+    query="machine learning healthcare",
+    start_year=2020,
+    end_year=2025,
+    max_results=1000
+)
+
+# Analyze trends
+analyzer = TrendAnalyzer(publications)
+trends = analyzer.analyze()
+recommendations = analyzer.get_recommendations()
+
+# Launch interactive dashboard
+dashboard = Dashboard(analyzer)
+dashboard.run(port=8050)
+```
+
+### Command Line Interface
+
+```bash
+# Search and analyze
+research-trends search "artificial intelligence" --years 2020-2025 --output results.json
+
+# Generate dashboard
+research-trends dashboard results.json --port 8050
+
+# Get recommendations
+research-trends recommend results.json --top 10
+```
+
+## 📊 Dashboard Features
+
+The interactive dashboard includes:
+
+- **Publication Timeline**: Track publication volume over time
+- **Author Analysis**: Identify top authors and their productivity
+- **Institution Rankings**: Compare research output by institution
+- **Geographic Distribution**: World map of research activity
+- **Keyword Trends**: Track emerging keywords and topics
+- **Citation Analysis**: Analyze citation patterns and impact
+- **Collaboration Network**: Interactive network visualization
+- **Topic Clusters**: Discover research themes and clusters
+
+## 📈 Analysis Capabilities
+
+### Trend Analysis
+- Publication count trends
+- Citation trends
+- Author productivity trends
+- Keyword emergence patterns
+
+### Network Analysis
+- Co-authorship networks
+- Citation networks
+- Institutional collaboration networks
+
+### Topic Modeling
+- Keyword extraction
+- Topic clustering
+- Emerging topic detection
+
+### Recommendations
+- Underexplored research areas
+- Potential collaboration opportunities
+- High-impact journals for publication
+- Trending research directions
+
+## 📚 Documentation
+
+Full documentation is available at [https://research-trends-scopus.readthedocs.io](https://research-trends-scopus.readthedocs.io)
+
+## 🧪 Examples
+
+Check out the [examples](./examples) directory for:
+
+- Jupyter notebooks with step-by-step tutorials
+- Sample analyses for different research domains
+- Dashboard customization examples
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- Code of conduct
+- Development setup
+- Submitting pull requests
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [OpenAlex](https://openalex.org/) - Free, open catalog of scholarly papers
+- [Semantic Scholar](https://www.semanticscholar.org/) - AI-powered research tool
+- [CrossRef](https://www.crossref.org/) - DOI registration agency
+- [PubMed/NCBI](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature database
+- [Elsevier](https://www.elsevier.com/) for the Scopus API
+- The open-source Python community
+
+## 📬 Contact
+
+- Issues: [GitHub Issues](https://github.com/research-trends/research-trends-scopus/issues)
+- Email: research-trends@example.com
