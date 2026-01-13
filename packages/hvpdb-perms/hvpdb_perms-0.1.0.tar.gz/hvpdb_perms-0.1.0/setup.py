@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-perms', version='0.1.0', description='Permission Management Plugin for HVPDB', author='HVPDB Team', packages=find_packages(), install_requires=[], classifiers=['Programming Language :: Python :: 3', 'License :: OSI Approved :: MIT License'], entry_points={'hvpdb.plugins': ['perms = hvpdb_perms:HVPDBPermsPlugin']})
