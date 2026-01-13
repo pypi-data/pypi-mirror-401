@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ceb-pdf-extractor"
+version = "1.0.1"
+authors = [
+    {name = "梁京成", email = "2046175864@qq.com"}
+]
+description = "光大银行PDF对账单提取工具"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.7"
+
+# 简化的分类器（确保有效）
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "PyMuPDF>=1.23.0",
+    "openpyxl>=3.1.0",
+    "camelot-py[base]>=0.11.0",
+    "pdfplumber>=0.10.0",
+    "pandas>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/liangjingcheng/CEBBANK-statement-cleaning"
