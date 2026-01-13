@@ -1,0 +1,70 @@
+[build-system]
+requires = [
+    "setuptools",
+    "scipy",
+    "wheel",
+    "Cython",
+    "pybind11",
+    "numpy<2",
+    
+]
+
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+license-files = []
+
+[project]
+name = "UQPyL"
+version = "2.1.5"
+authors = [
+    {name = "wmtSky", email = "wmtsky@hhu.edu.cn"}
+]
+description = "A python package for parameter uncertainty quantification and optimization"
+readme = "README.md"
+dependencies = [
+  "numpy<2",
+  "scipy",
+  "prettytable",
+  "xarray",
+  # netCDF4 wheels for py38 on Windows can be missing for newer releases,
+  # causing pip to fall back to a source build that requires HDF5 headers.
+  "netcdf4<1.7; python_version<'3.9'",
+  "netcdf4; python_version>='3.9'",
+]
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.pytest.ini_options]
+# Only collect tests from the real test suite.
+# NOTE: `examples/test_*.py` are runnable example scripts (top-level code),
+# and importing them during pytest collection can look like "pytest is stuck".
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+norecursedirs = [
+  "examples",
+  "build",
+  "Result",
+  ".GUI",
+  ".history",
+  ".ipynb_checkpoints",
+  ".pytest_cache",
+]
+addopts = "-ra"
+filterwarnings = [
+  # Massive noisy warning emitted indirectly during MARS training in tests.
+  # It is safe to ignore in test output; fix requires deeper changes in the embedded MARS implementation.
+  "ignore:The truth value of an empty array is ambiguous.*:DeprecationWarning",
+  # Harmless but noisy in some environments.
+  "ignore:The NumPy module was reloaded.*:UserWarning",
+  # Environment-level binary mismatch warning (wheel/conda mix); does not affect unit test logic here.
+  "ignore:numpy\\.ndarray size changed.*:RuntimeWarning",
+]
