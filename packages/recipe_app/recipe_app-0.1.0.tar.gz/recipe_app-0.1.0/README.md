@@ -1,0 +1,43 @@
+# Recipe Manager CLI
+
+A robust command-line application for managing your personal recipe collection. Built with Python and the [Rich library](rich.readthedocs.io), this tool provides a visually appealing interface for searching, editing, and organizing your culinary data.
+
+## Features
+
+*   **List All Recipes:** View your entire collection in a formatted list.
+*   **Detailed View:** Display full recipe details, including ingredients and instructions.
+*   **Smart Search:** Search recipes by name or specific ingredients.
+*   **Management:** Add new recipes, edit existing entries, or archive recipes you no longer use.
+*   **Data Persistence:** Automatically loads and saves your collection to a JSON database.
+
+## Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone github.com
+    cd recipe-manager
+    ```
+
+2.  **Install dependencies:**
+    This project requires the `rich` library for the terminal UI.
+    ```bash
+    uv sync
+    ```
+
+3.  **Setup storage:**
+    Ensure a `recipes.json` file exists in the root directory (or let the `init()` function create it upon first launch).
+
+## Project Structure
+
+*   `main.py`: The entry point and control loop of the application.
+*   `services.py`: Contains business logic for searching, adding, and editing recipes.
+*   `ui.py`: Handles terminal formatting, menus, and data display using Rich.
+*   `storage.py`: Manages JSON serialization and deserialization.
+
+## Usage
+
+Run the application using Python:
+
+```bash
+uv run main.py
+

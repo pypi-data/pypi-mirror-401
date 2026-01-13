@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/recipe_app"]
+
+[project]
+name = "recipe_app"
+version = "0.1.0"
+description = "A recipe management CLI application"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [
+    {name = "Mike Curtin", email = "michaelcurtin31@gmail.com"},
+]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "pydantic>=2.12",
+    "rich>=14.2.0",
+    "typer>=0.21.1",
+]
+
+[project.scripts]
+recipe = "recipe_app.main:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
