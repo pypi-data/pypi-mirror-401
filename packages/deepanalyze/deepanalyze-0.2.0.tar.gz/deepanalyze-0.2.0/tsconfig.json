@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+
+    "moduleResolution": "NodeNext",
+
+    "lib": ["DOM", "DOM.Iterable", "ES2022", "ES2022.Intl"],
+
+    "jsx": "react-jsx",
+
+    /* ===== JupyterLab / React 必须项 ===== */
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    /* ===== Node 18+ typings 兼容 ===== */
+    "types": ["node"],
+
+    /* ===== 实战中必须打开 ===== */
+    "skipLibCheck": true,
+
+    /* ===== 其余安全配置 ===== */
+    "strict": true,
+    "noImplicitAny": false,
+    "forceConsistentCasingInFileNames": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "outDir": "lib"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"]
+}

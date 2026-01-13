@@ -1,0 +1,988 @@
+/*
+    See the JupyterLab Developer Guide for useful CSS Patterns:
+
+    https://jupyterlab.readthedocs.io/en/stable/developer/css.html
+*/
+
+.deepanalyze-chat-panel {
+  /* Modern VS Code / Cursor inspired variables */
+  --deepanalyze-bg: var(--jp-layout-color1);
+  --deepanalyze-bg-secondary: var(--jp-layout-color2);
+  --deepanalyze-border: var(--jp-border-color2);
+  --deepanalyze-text: var(--jp-ui-font-color1);
+  --deepanalyze-text-secondary: var(--jp-ui-font-color2);
+  --deepanalyze-primary: var(--jp-brand-color1);
+  --deepanalyze-primary-hover: var(--jp-brand-color0);
+  --deepanalyze-primary-text: #ffffff;
+  --deepanalyze-radius: 6px;
+  --deepanalyze-input-bg: var(--jp-layout-color0);
+  --deepanalyze-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--deepanalyze-bg);
+  color: var(--deepanalyze-text);
+  font-family: var(--jp-ui-font-family);
+  font-size: var(--jp-ui-font-size1);
+  padding: 0; /* Remove padding to fill the tab */
+}
+
+.deepanalyze-chat-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: none; /* Remove border */
+  border-radius: 0; /* Remove radius */
+  background: var(--deepanalyze-bg);
+  overflow: hidden;
+}
+
+/* Header */
+.deepanalyze-chat-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--deepanalyze-border);
+  background: var(--deepanalyze-bg);
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--deepanalyze-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.deepanalyze-chat-panel-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deepanalyze-chat-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deepanalyze-chat-exit-button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--deepanalyze-text-secondary);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+
+.deepanalyze-chat-exit-button:hover {
+  background: var(--deepanalyze-bg-secondary);
+  color: var(--deepanalyze-text);
+}
+
+/* Messages Area */
+.deepanalyze-chat-messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* More space between messages */
+  background: var(--deepanalyze-bg);
+}
+
+.deepanalyze-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.deepanalyze-chat-message-user {
+  align-items: flex-end;
+}
+
+.deepanalyze-chat-message-assistant,
+.deepanalyze-chat-message-system {
+  align-items: flex-start;
+}
+
+.deepanalyze-chat-bubble {
+  max-width: 90%;
+  padding: 10px 14px;
+  border-radius: var(--deepanalyze-radius);
+  line-height: 1.6;
+  font-size: var(--jp-ui-font-size1);
+  position: relative;
+}
+
+/* User Message Style */
+.deepanalyze-chat-message-user .deepanalyze-chat-bubble {
+  background: var(--deepanalyze-primary);
+  color: var(--deepanalyze-primary-text);
+  border-bottom-right-radius: 2px;
+  box-shadow: var(--deepanalyze-shadow);
+}
+
+/* Assistant Message Style */
+.deepanalyze-chat-message-assistant .deepanalyze-chat-bubble {
+  background: transparent;
+  color: var(--deepanalyze-text);
+  padding: 0; /* Remove padding for assistant to align with code blocks */
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Trace tags (Analyze -> Code -> Understand ...) */
+.deepanalyze-chat-trace {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: var(--deepanalyze-radius);
+  background: var(--deepanalyze-bg-secondary);
+  max-width: 100%;
+}
+
+.deepanalyze-chat-trace-tag {
+  border: 1px solid var(--deepanalyze-border);
+  background: transparent;
+  color: var(--deepanalyze-text);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+.deepanalyze-chat-trace-tag:hover {
+  background: var(--deepanalyze-bg);
+}
+
+.deepanalyze-chat-trace-tag-active {
+  border-color: var(--deepanalyze-primary);
+  background: var(--deepanalyze-primary);
+  color: var(--deepanalyze-primary-text);
+}
+
+.deepanalyze-chat-trace-sep {
+  color: var(--deepanalyze-text-secondary);
+  user-select: none;
+}
+
+/* Working indicator */
+.deepanalyze-chat-message-working .deepanalyze-chat-working-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  color: var(--deepanalyze-text-secondary);
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+
+.deepanalyze-chat-working-details {
+  width: 100%;
+}
+
+.deepanalyze-chat-working-summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.deepanalyze-chat-working-summary::-webkit-details-marker {
+  display: none;
+}
+
+.deepanalyze-chat-working-output {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--deepanalyze-border);
+}
+
+.deepanalyze-chat-working-entry + .deepanalyze-chat-working-entry {
+  margin-top: 12px;
+}
+
+.deepanalyze-chat-message-working .deepanalyze-chat-working-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--deepanalyze-text-secondary);
+  opacity: 0.35;
+  animation: deepanalyze-working-blink 1s ease-in-out infinite;
+}
+
+/* 更高优先级：避免被上面的默认 working dot 样式覆盖 */
+.deepanalyze-chat-message-working.deepanalyze-chat-message-working-done
+  .deepanalyze-chat-working-dot {
+  animation: none;
+  opacity: 1;
+  background: var(--jp-success-color1, #2ea043);
+}
+
+.deepanalyze-chat-message-working.deepanalyze-chat-message-working-done
+  .deepanalyze-chat-working-text {
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-chat-message-working.deepanalyze-chat-message-working-waiting
+  .deepanalyze-chat-working-dot {
+  animation: none;
+  opacity: 1;
+  background: var(--jp-warn-color1, #d29922);
+}
+
+.deepanalyze-chat-message-working.deepanalyze-chat-message-working-waiting
+  .deepanalyze-chat-working-text {
+  color: var(--deepanalyze-text-secondary);
+}
+
+/* scratch.ipynb：右键“使用大模型编辑”底部通知条（停止/接受/回退） */
+.deepanalyze-cell-rewrite-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--jp-layout-color0);
+}
+
+/* 重要：避免 `.deepanalyze-cell-rewrite-bar { display:flex }` 覆盖 HTML `hidden` 的默认样式 */
+.deepanalyze-cell-rewrite-bar[hidden] {
+  display: none !important;
+}
+
+.deepanalyze-cell-rewrite-topbar {
+  margin-top: 4px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--jp-border-color2);
+}
+
+.deepanalyze-cell-rewrite-bottombar {
+  margin-top: 6px;
+  border-top: 1px solid var(--jp-border-color2);
+}
+
+.deepanalyze-cell-rewrite-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+  color: var(--deepanalyze-text-secondary);
+  font-size: var(--jp-ui-font-size1);
+}
+
+.deepanalyze-cell-rewrite-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--jp-border-color2);
+  display: inline-block;
+  opacity: 0.55;
+}
+
+.deepanalyze-cell-rewrite-dot-working {
+  animation: deepanalyze-working-blink 1.2s infinite;
+  opacity: 1;
+}
+
+.deepanalyze-cell-rewrite-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deepanalyze-cell-rewrite-stop,
+.deepanalyze-cell-rewrite-accept,
+.deepanalyze-cell-rewrite-rollback {
+  border: 1px solid var(--jp-border-color2);
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: var(--jp-ui-font-size1);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.deepanalyze-cell-rewrite-stop:hover,
+.deepanalyze-cell-rewrite-accept:hover,
+.deepanalyze-cell-rewrite-rollback:hover {
+  background: var(--jp-layout-color2);
+}
+
+/* 生成结束：接受/回退按钮强调色 */
+.deepanalyze-cell-rewrite-accept {
+  border-color: var(--jp-success-color1, #2ea043);
+  background: color-mix(in srgb, var(--jp-success-color1, #2ea043) 12%, var(--jp-layout-color1));
+  color: var(--jp-ui-font-color1);
+}
+
+.deepanalyze-cell-rewrite-accept:hover {
+  background: color-mix(in srgb, var(--jp-success-color1, #2ea043) 18%, var(--jp-layout-color1));
+}
+
+.deepanalyze-cell-rewrite-rollback {
+  border-color: var(--jp-error-color1, #cf222e);
+  background: color-mix(in srgb, var(--jp-error-color1, #cf222e) 12%, var(--jp-layout-color1));
+  color: var(--jp-ui-font-color1);
+}
+
+.deepanalyze-cell-rewrite-rollback:hover {
+  background: color-mix(in srgb, var(--jp-error-color1, #cf222e) 18%, var(--jp-layout-color1));
+}
+
+@keyframes deepanalyze-working-blink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* System Message Style */
+.deepanalyze-chat-message-system .deepanalyze-chat-bubble {
+  background: var(--jp-layout-color3);
+  border-left: 4px solid var(--jp-error-color1);
+  color: var(--deepanalyze-text);
+  font-size: 0.9em;
+  padding: 8px 12px;
+}
+
+/* Modules (Analyze, Code, etc.) */
+.deepanalyze-chat-module {
+  border: none;
+  background: transparent;
+  margin-top: 8px;
+}
+
+.deepanalyze-chat-module-summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+  background: transparent;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: var(--deepanalyze-text);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--deepanalyze-border);
+}
+
+.deepanalyze-chat-module-summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.8em;
+  transition: transform 0.2s;
+}
+
+.deepanalyze-chat-module[open] .deepanalyze-chat-module-summary::before {
+  transform: rotate(90deg);
+}
+
+.deepanalyze-chat-module[open] .deepanalyze-chat-module-summary {
+  border-bottom-color: var(--deepanalyze-primary);
+}
+
+.deepanalyze-chat-module-content {
+  padding: 8px 0;
+  font-size: 0.95em;
+  background: transparent;
+}
+
+/* 生成过程（下拉栏 A）与块级输出（下拉栏 X） */
+.deepanalyze-chat-stream {
+  margin-top: 3px;
+}
+
+.deepanalyze-chat-stream-root {
+  border: none;
+  background: transparent;
+}
+
+.deepanalyze-chat-stream-root-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 0;
+  font-size: 0.82em;
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-chat-stream-root-summary::-webkit-details-marker {
+  display: none;
+}
+
+.deepanalyze-chat-stream-root-summary::marker {
+  content: '';
+}
+
+.deepanalyze-chat-stream-block {
+  border: none;
+  background: transparent;
+  margin-top: 1px;
+}
+
+.deepanalyze-chat-stream-block-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 0;
+  font-size: 0.82em;
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-chat-stream-block-summary::-webkit-details-marker {
+  display: none;
+}
+
+.deepanalyze-chat-stream-block-summary::marker {
+  content: '';
+}
+
+.deepanalyze-chat-stream-block-content {
+  margin: 1px 0 0 0;
+  padding: 0;
+  font-size: 0.78em;
+  line-height: 1.35;
+}
+
+.deepanalyze-chat-stream-answer-panel {
+  border: none;
+  background: transparent;
+  margin-top: 2px;
+}
+
+.deepanalyze-chat-stream-answer-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 0;
+  font-size: 0.82em;
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-chat-stream-answer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.deepanalyze-chat-stream-answer-summary::marker {
+  content: '';
+}
+
+.deepanalyze-chat-stream-answer-content {
+  margin-top: 2px;
+  font-size: 0.82em;
+  line-height: 1.35;
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-chat-stream-answer-content > :first-child {
+  margin-top: 0;
+}
+
+.deepanalyze-chat-stream-answer-content > :last-child {
+  margin-bottom: 0;
+}
+
+.deepanalyze-chat-stream-inner {
+  margin-top: 1px;
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--deepanalyze-border);
+}
+
+.deepanalyze-chat-stream-block-content-markdown {
+  white-space: normal;
+  word-break: break-word;
+  color: var(--deepanalyze-text-secondary);
+  max-height: 220px;
+  overflow: auto;
+}
+
+.deepanalyze-chat-stream-block-content-markdown > :first-child {
+  margin-top: 0;
+}
+
+.deepanalyze-chat-stream-block-content-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.deepanalyze-chat-stream-block-content-code {
+  padding: 6px 8px;
+  background: var(--deepanalyze-bg-secondary);
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 4px;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 220px;
+}
+
+.deepanalyze-chat-stream-code {
+  display: block;
+  white-space: pre;
+  word-break: normal;
+  font-family: var(--jp-code-font-family);
+  font-size: 0.78em;
+  line-height: 1.35;
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-code-keyword {
+  color: var(--jp-mirror-editor-keyword-color, var(--jp-brand-color1));
+  font-weight: 600;
+}
+
+.deepanalyze-code-string {
+  color: var(--jp-mirror-editor-string-color, #a6d6ff);
+}
+
+.deepanalyze-code-comment {
+  color: var(--jp-mirror-editor-comment-color, var(--deepanalyze-text-secondary));
+  font-style: italic;
+}
+
+.deepanalyze-chat-stream-spinner {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-chat-stream-spinner[hidden] {
+  display: none !important;
+}
+
+.deepanalyze-chat-stream-spinner::before {
+  content: '↻';
+  display: inline-block;
+  animation: deepanalyze-chat-spin 1s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.deepanalyze-chat-stream-caret {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-chat-stream-caret[hidden] {
+  display: none !important;
+}
+
+.deepanalyze-chat-stream-caret::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  transform-origin: 50% 50%;
+}
+
+.deepanalyze-chat-stream-root[open]
+  > .deepanalyze-chat-stream-root-summary
+  .deepanalyze-chat-stream-caret::before {
+  transform: rotate(45deg);
+}
+
+.deepanalyze-chat-stream-block[open]
+  > .deepanalyze-chat-stream-block-summary
+  .deepanalyze-chat-stream-caret::before {
+  transform: rotate(45deg);
+}
+
+.deepanalyze-chat-stream-answer-panel[open]
+  > .deepanalyze-chat-stream-answer-summary
+  .deepanalyze-chat-stream-caret::before {
+  transform: rotate(45deg);
+}
+
+@keyframes deepanalyze-chat-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Input Area */
+.deepanalyze-chat-input-wrapper {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  background: var(--deepanalyze-bg);
+  border-top: 1px solid var(--deepanalyze-border);
+}
+
+.deepanalyze-chat-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: var(--deepanalyze-radius);
+  padding: 8px 10px;
+  background: var(--deepanalyze-input-bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.deepanalyze-chat-composer:focus-within {
+  border-color: var(--deepanalyze-primary);
+  box-shadow: 0 0 0 2px rgba(var(--deepanalyze-primary), 0.2); /* Note: rgba might not work with var, relying on fallback or simple focus */
+}
+
+.deepanalyze-chat-input {
+  width: 100%;
+  resize: none;
+  min-height: 20px;
+  max-height: 120px;
+  border: none;
+  background: transparent;
+  color: var(--deepanalyze-text);
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+.deepanalyze-chat-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.deepanalyze-chat-model-selector {
+  margin-right: auto;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deepanalyze-chat-model-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: var(--deepanalyze-input-bg);
+  color: var(--deepanalyze-text);
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.deepanalyze-chat-model-button:hover {
+  border-color: var(--deepanalyze-primary);
+}
+
+.deepanalyze-chat-lang-select {
+  height: 28px;
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--deepanalyze-input-bg);
+  color: var(--deepanalyze-text);
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.deepanalyze-chat-lang-select:hover {
+  border-color: var(--deepanalyze-primary);
+}
+
+.deepanalyze-chat-model-add-button {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 6px;
+  background: var(--deepanalyze-input-bg);
+  color: var(--deepanalyze-text);
+  cursor: pointer;
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+.deepanalyze-chat-model-add-button:hover {
+  border-color: var(--deepanalyze-primary);
+}
+
+.deepanalyze-chat-model-caret {
+  opacity: 0.8;
+}
+
+.deepanalyze-chat-model-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  min-width: 200px;
+  max-width: 320px;
+  max-height: 240px;
+  overflow: auto;
+  background: var(--deepanalyze-input-bg);
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  padding: 4px;
+  z-index: 9999;
+}
+
+.deepanalyze-chat-model-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.deepanalyze-chat-model-item:hover {
+  background: var(--jp-layout-color2);
+}
+
+.deepanalyze-chat-model-item.is-active {
+  outline: 1px solid var(--deepanalyze-primary);
+}
+
+.deepanalyze-chat-model-item-label {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deepanalyze-chat-model-gear {
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--deepanalyze-text-secondary);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.deepanalyze-chat-model-gear:hover {
+  border-color: var(--deepanalyze-primary);
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-chat-model-item-add {
+  margin-top: 4px;
+  border-top: 1px solid var(--deepanalyze-border);
+  border-radius: 0;
+  padding-top: 10px;
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-chat-model-item-add:hover {
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-chat-model-config-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.deepanalyze-chat-model-config-label {
+  font-size: 0.85em;
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-model-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.deepanalyze-model-dot-ok {
+  background: var(--jp-success-color1, #2ea043);
+}
+
+.deepanalyze-model-dot-bad {
+  background: var(--jp-error-color1, #d1242f);
+}
+
+.deepanalyze-chat-model-key-hint {
+  margin-bottom: 8px;
+  color: var(--deepanalyze-text-secondary);
+}
+
+.deepanalyze-chat-model-key-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--deepanalyze-border);
+  border-radius: 6px;
+  background: var(--deepanalyze-input-bg);
+  color: var(--deepanalyze-text);
+}
+
+.deepanalyze-chat-control-button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-weight: 500;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.deepanalyze-chat-control-button:disabled {
+  background: var(--jp-layout-color3);
+  color: var(--deepanalyze-text-secondary);
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.deepanalyze-chat-continue-button {
+  background: var(--jp-success-color1, #2ea043);
+  color: #ffffff;
+}
+
+.deepanalyze-chat-abort-button {
+  background: var(--jp-error-color1);
+  color: #ffffff;
+}
+
+.deepanalyze-chat-auto-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  color: var(--deepanalyze-text-secondary);
+  user-select: none;
+  font-size: 0.9em;
+}
+
+.deepanalyze-chat-auto-toggle input[type='checkbox'] {
+  transform: translateY(0.5px);
+}
+
+.deepanalyze-chat-send-button {
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  background: var(--deepanalyze-primary);
+  color: var(--deepanalyze-primary-text);
+  font-weight: 500;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.deepanalyze-chat-send-button:hover {
+  opacity: 0.9;
+}
+
+.deepanalyze-chat-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Scrollbar */
+.deepanalyze-chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.deepanalyze-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.deepanalyze-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--jp-layout-color3);
+  border-radius: 4px;
+}
+
+.deepanalyze-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: var(--jp-layout-color4);
+}
+
+.deepanalyze-hidden-tabbar {
+  display: none !important;
+}
+
+.deepanalyze-launcher-icon {
+  background-image: url('./logo.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* Markdown Content Styling */
+.deepanalyze-chat-bubble p {
+  margin-bottom: 0.8em;
+}
+
+.deepanalyze-chat-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.deepanalyze-chat-bubble pre {
+  background: var(--jp-layout-color2);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.deepanalyze-chat-bubble code {
+  font-family: var(--jp-code-font-family);
+  background: rgba(127, 127, 127, 0.15);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.deepanalyze-chat-bubble pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.deepanalyze-chat-bubble a {
+  color: var(--deepanalyze-primary);
+  text-decoration: none;
+}
+
+.deepanalyze-chat-bubble a:hover {
+  text-decoration: underline;
+}
