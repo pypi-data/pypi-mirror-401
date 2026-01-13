@@ -1,0 +1,21 @@
+[project]
+name = "difotrain"
+version = "0.1.0"
+description = "Human to Robot Motion Transfer"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Ashraf Galib Shaik" }]
+requires-python = ">=3.13"
+dependencies = [
+    "mediapipe",
+    "opencv-python",
+    "numpy",
+    "torch",
+]
+
+[project.scripts]
+difotrain = "difotrain.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
