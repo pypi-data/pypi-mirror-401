@@ -1,0 +1,22 @@
+"""
+ResoniteLink.py
+~~~~~~~~~~~~~~~
+
+A python wrapper for the ResoniteLink API.
+Resonite and ResoniteLink are Copyright (c) Yellow Dog Man Studios S.R.O
+
+:copyright: (c) 2026-present JackTheFoxOtter
+:license: MIT, see LICENSE for more details.
+
+"""
+__title__ = "ResoniteLink.py"
+__author__ = "JackTheFoxOtter"
+__license__ = "MIT"
+__copyright__ = "Copyright (c) 2026-present JackTheFoxOtter"
+__version__ = "0.1.0a"
+__path__ = __import__('pkgutil').extend_path(__path__, __name__)
+
+
+from .json import *
+from .models import *
+from .client import *
