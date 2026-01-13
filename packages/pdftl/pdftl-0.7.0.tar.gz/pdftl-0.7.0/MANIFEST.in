@@ -1,0 +1,47 @@
+# --- Core Metadata ---
+include pyproject.toml
+include README.md
+include LICENSE
+include NOTICE.md
+include *.md
+include *.yaml
+
+# --- Package Data ---
+recursive-include src/pdftl *.py
+recursive-include src/pdftl *.pyi
+include src/pdftl/py.typed
+
+# --- Tests & Assets ---
+# useful for downstream packagers like Debian
+recursive-include tests *.py
+recursive-include tests/assets *.pdf *.fdf *.txt
+recursive-include tests *.cnf *.csr *.pem
+
+# --- Documentation ---
+include docs/Makefile
+include docs/README*.md
+include docs/*.py
+
+# --- Tools/Scripts ---
+recursive-include tools *.py
+
+# --- Excludes (Global) ---
+
+# Remove CI/CD configuration and local artifacts
+
+prune .github
+exclude .gitignore
+exclude pytest.log
+
+# Remove Python compilation artifacts
+
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude *.dylib
+
+# Remove OS/Editor junk
+
+global-exclude .DS_Store
+global-exclude .git*
+global-exclude *conflicted*
