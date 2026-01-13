@@ -1,0 +1,291 @@
+Metadata-Version: 2.4
+Name: deepread-contract
+Version: 0.1.0
+Summary: Biblioteca para validação de documentos e contratos brasileiros
+Project-URL: Homepage, https://github.com/BeMonkAI/deepread.contract
+Project-URL: Documentation, https://github.com/BeMonkAI/deepread.contract#readme
+Project-URL: Repository, https://github.com/BeMonkAI/deepread.contract
+Project-URL: Issues, https://github.com/BeMonkAI/deepread.contract/issues
+Author-email: BeMonkAI <contato@bemonk.ai>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: brasil,cnpj,contract,document,pdf,receita-federal,validation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Legal Industry
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Office/Business
+Classifier: Topic :: Text Processing :: General
+Requires-Python: >=3.9
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: requests>=2.25.0
+Provides-Extra: ai
+Requires-Dist: openai>=1.0.0; extra == 'ai'
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# DeepRead Contract 📄
+
+[![PyPI version](https://badge.fury.io/py/deepread-contract.svg)](https://pypi.org/project/deepread-contract/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Biblioteca Python para **validação de documentos e contratos brasileiros**.
+
+Consulta dados de empresas na **Receita Federal** e valida:
+- ✅ CNPJ (situação cadastral)
+- ✅ Razão Social
+- ✅ Endereços
+- ✅ Poder de assinatura (QSA)
+
+## Instalação
+
+```bash
+pip install deepread-contract
+```
+
+## Uso Rápido
+
+### Consultar CNPJ
+
+```python
+from deepread_contract import consultar_cnpj, validar_cnpj
+
+# Validar formato
+if validar_cnpj("33.000.167/0001-01"):
+    # Consultar na Receita Federal
+    dados = consultar_cnpj("33.000.167/0001-01")
+    
+    print(dados["razao_social"])  # PETROLEO BRASILEIRO S A PETROBRAS
+    print(dados["situacao"])       # ATIVA
+    print(dados["socios"])         # Lista de sócios/administradores
+```
+
+### Buscar Empresa por Nome
+
+```python
+from deepread_contract import buscar_cnpj_por_nome
+
+dados = buscar_cnpj_por_nome("Petrobras")
+print(dados["cnpj"])  # 33.000.167/0001-01
+```
+
+### Validar Documento
+
+```python
+from deepread_contract import validar_documento_contrato
+
+texto = """
+CONTRATO DE PRESTAÇÃO DE SERVIÇOS
+CONTRATANTE: Empresa XYZ, inscrita no CNPJ...
+CLÁUSULA PRIMEIRA - OBJETO
+"""
+
+eh_contrato, qtd_keywords, keywords = validar_documento_contrato(texto)
+print(f"É contrato: {eh_contrato}")  # True
+```
+
+### Formatar CNPJ
+
+```python
+from deepread_contract import formatar_cnpj, limpar_cnpj
+
+formatar_cnpj("33000167000101")       # "33.000.167/0001-01"
+limpar_cnpj("33.000.167/0001-01")     # "33000167000101"
+```
+
+## Verificação de Contratos (com DeepRead)
+
+### OpenAI
+
+```python
+from deepread_contract import ContractChecker
+
+checker = ContractChecker(openai_api_key="sk-...")
+resultado = checker.verificar("contrato.pdf")
+
+print(resultado["resultado_final"])  # APROVADO, REPROVADO, PENDENTE
+print(resultado["campos_aprovados"])
+print(resultado["campos_reprovados"])
+```
+
+### Azure OpenAI
+
+```python
+from deepread_contract import ContractChecker
+
+checker = ContractChecker(
+    provider="azure",
+    azure_api_key="sua-chave-azure",
+    azure_endpoint="https://seu-recurso.openai.azure.com",
+    azure_deployment="gpt-4o",
+    azure_api_version="2024-02-15-preview"
+)
+
+resultado = checker.verificar("contrato.pdf")
+```
+
+### Via Variáveis de Ambiente
+
+```bash
+# OpenAI
+export OPENAI_API_KEY=sk-...
+
+# Azure
+export OPENAI_PROVIDER=azure
+export AZURE_API_KEY=sua-chave-azure
+export AZURE_API_ENDPOINT=https://seu-recurso.openai.azure.com
+export AZURE_DEPLOYMENT_NAME=gpt-4o
+export AZURE_API_VERSION=2024-02-15-preview
+```
+
+```python
+# Detecta automaticamente do ambiente
+checker = ContractChecker()
+print(checker.provider)  # "openai" ou "azure"
+```
+
+## Autenticação
+
+### DeepReadAuth
+
+```python
+from deepread_contract import DeepReadAuth
+
+# OpenAI
+auth = DeepReadAuth(openai_api_key="sk-...")
+
+# Azure
+auth = DeepReadAuth(
+    provider="azure",
+    azure_api_key="sua-chave",
+    azure_endpoint="https://seu-recurso.openai.azure.com",
+    azure_deployment="gpt-4o"
+)
+
+# Verificar configuração
+print(auth.provider)        # "openai" ou "azure"
+print(auth.has_api_key)     # True/False
+print(auth.is_deepread_available)  # True/False
+
+# Obter token
+token = auth.get_token()
+```
+
+### AuthenticatedClient
+
+```python
+from deepread_contract import AuthenticatedClient
+
+client = AuthenticatedClient(
+    provider="azure",
+    azure_api_key="...",
+    azure_endpoint="...",
+    azure_deployment="gpt-4o"
+)
+
+if client.is_ready:
+    dr = client.get_deepread_client()
+    resultado = dr.process("documento.pdf")
+```
+
+## CLI
+
+```bash
+# Consultar CNPJ
+deepread-contract cnpj 33.000.167/0001-01
+
+# Buscar por nome
+deepread-contract buscar "Petrobras"
+
+# Verificar contrato
+deepread-contract verificar contrato.pdf
+
+# Saída em JSON
+deepread-contract cnpj 33.000.167/0001-01 --json
+```
+
+## Estrutura de Resposta CNPJ
+
+```python
+{
+    "cnpj": "33.000.167/0001-01",
+    "razao_social": "PETROLEO BRASILEIRO S A PETROBRAS",
+    "nome_fantasia": "PETROBRAS",
+    "situacao": "ATIVA",
+    "data_abertura": "1966-09-28",
+    "natureza_juridica": "Sociedade de Economia Mista",
+    "capital_social": 205431960490.0,
+    "endereco": {
+        "logradouro": "AVENIDA REPUBLICA DO CHILE",
+        "numero": "65",
+        "bairro": "CENTRO",
+        "cidade": "RIO DE JANEIRO",
+        "uf": "RJ",
+        "cep": "20031912"
+    },
+    "socios": [
+        {"nome": "JOAO SILVA", "qualificacao": "Diretor"},
+        ...
+    ]
+}
+```
+
+## Estrutura de Resposta Verificação
+
+```python
+{
+    "resultado_final": "APROVADO",  # APROVADO, REPROVADO, PENDENTE
+    "justificativa": "Todos os campos aprovados",
+    "campos_aprovados": ["CNPJ - Empresa X", "Situação - Empresa X", ...],
+    "campos_reprovados": [],
+    "campos_pendentes": [],
+    "empresas": [...],
+    "assinaturas": [...],
+    "metricas": {
+        "tokens": 5000,
+        "custo_usd": 0.025,
+        "tempo_segundos": 12.5
+    }
+}
+```
+
+## Exemplos
+
+Veja a pasta [`examples/`](examples/) para exemplos completos:
+
+- `exemplo_cnpj.py` - Consulta de CNPJ
+- `exemplo_validacao_documento.py` - Validação de documento
+- `exemplo_verificar_contrato.py` - Verificação completa
+- `exemplo_cli.sh` - Comandos CLI
+
+## Dependências
+
+### Obrigatórias
+- `requests` - Requisições HTTP
+- `pydantic` - Validação de dados
+
+### Opcionais
+- `openai` - Para usar com OpenAI/Azure
+
+## Licença
+
+MIT License - veja [LICENSE](LICENSE) para detalhes.
+
+## Contribuição
+
+Contribuições são bem-vindas! Abra uma issue ou pull request.
+
+---
+
+Desenvolvido por [BeMonkAI](https://github.com/BeMonkAI)
