@@ -1,0 +1,74 @@
+# MercedTodo
+
+A CLI and TUI-based Todo List Manager written in Python.
+
+## Features
+
+- **Categorize Todos**: Organize tasks by custom categories (e.g., Work, Personal).
+- **Rich TUI**: Interactive Terminal User Interface for browsing and editing tasks.
+- **Notes**: Add detailed notes to any task.
+- **Export**: Export tasks and notes to Markdown.
+- **Storage**: SQLite backend for reliable persistence.
+
+## Installation
+
+```bash
+git clone https://github.com/yourusername/mercedtodo.git
+cd mercedtodo
+pip install . -e
+```
+
+## Usage
+
+### Interactive Mode (TUI)
+Run the main command to open the interactive dashboard:
+```bash
+mercedtodo
+```
+
+
+**Keybindings:**
+- `a`: Add a new task (opens editor with Priority/Due Date/Recurrence).
+- `e`: Edit the selected task.
+- `d`: Delete the selected task.
+- `Space`: Toggle completion status.
+- `x`: Export specific (or all) tasks to Markdown.
+- `/`: Search tasks.
+- `q`: Quit.
+
+### CLI Mode
+Export tasks without opening the TUI:
+```bash
+mercedtodo export --output my_tasks.md
+```
+
+Import tasks from JSON or Todo.txt:
+```bash
+mercedtodo import my_old_list.json
+```
+
+Sync tasks (simulate):
+```bash
+mercedtodo sync --target /path/to/backup/folder
+```
+
+## Configuration
+Create `~/.mercedtodo/config.toml` to customize themes:
+```toml
+[theme]
+background = "#1e1e1e"
+primary = "#00ff00"
+```
+
+
+Specify a custom database location:
+```bash
+mercedtodo --path /path/to/my/db.sqlite
+```
+
+## Development
+
+Run tests:
+```bash
+pytest
+```
