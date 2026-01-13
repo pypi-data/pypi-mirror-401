@@ -1,0 +1,479 @@
+"""
+Pipelines tools for GitLab MCP server.
+
+This module provides MCP tools for GitLab CI/CD pipeline and job operations including:
+- Listing pipelines
+- Getting pipeline details
+- Creating, retrying, canceling, and deleting pipelines
+- Listing pipeline jobs
+- Getting job details and logs
+- Retrying, canceling, and playing jobs
+- Downloading job artifacts
+- Listing pipeline variables
+
+All tools are async functions that accept a GitLabClient and return formatted data.
+"""
+
+import asyncio
+from typing import Any
+
+from gitlab_mcp.client.gitlab_client import GitLabClient
+
+
+async def list_pipelines(
+    client: GitLabClient,
+    project_id: str | int,
+    ref: str | None = None,
+    status: str | None = None,
+    page: int = 1,
+    per_page: int = 20,
+) -> dict[str, Any]:
+    """
+    List pipelines for a project.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        ref: Filter by ref (branch/tag name)
+        status: Filter by status (running, pending, success, failed, canceled, skipped)
+        page: Page number for pagination
+        per_page: Results per page (max 100)
+
+    Returns:
+        Dictionary with pipelines list and pagination info
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.list_pipelines(
+        project_id=project_id,
+        ref=ref,
+        status=status,
+        page=page,
+        per_page=per_page,
+    )
+
+    # Extract pipeline list from result dict
+    pipelines = result.get("pipelines", [])
+
+    formatted_pipelines = []
+    for pipeline in pipelines:
+        formatted_pipelines.append(
+            {
+                "id": pipeline["id"],
+                "status": pipeline["status"],
+                "ref": pipeline["ref"],
+                "sha": pipeline["sha"],
+                "web_url": pipeline["web_url"],
+                "created_at": pipeline.get("created_at"),
+                "updated_at": pipeline.get("updated_at"),
+            }
+        )
+
+    return {
+        "pipelines": formatted_pipelines,
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total": len(formatted_pipelines),
+        },
+    }
+
+
+async def get_pipeline(
+    client: GitLabClient,
+    project_id: str | int,
+    pipeline_id: int,
+) -> dict[str, Any]:
+    """
+    Get detailed information about a specific pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        pipeline_id: Pipeline ID
+
+    Returns:
+        Dictionary with pipeline details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    pipeline = client.get_pipeline(project_id=project_id, pipeline_id=pipeline_id)
+
+    return {
+        "id": pipeline["id"],
+        "status": pipeline["status"],
+        "ref": pipeline["ref"],
+        "sha": pipeline["sha"],
+        "web_url": pipeline["web_url"],
+        "created_at": pipeline.get("created_at"),
+        "updated_at": pipeline.get("updated_at"),
+        "started_at": pipeline.get("started_at"),
+        "finished_at": pipeline.get("finished_at"),
+        "duration": pipeline.get("duration"),
+    }
+
+
+async def create_pipeline(
+    client: GitLabClient,
+    project_id: str | int,
+    ref: str,
+    variables: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """
+    Create (trigger) a new pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        ref: Branch or tag name
+        variables: Pipeline variables as key-value pairs (optional)
+
+    Returns:
+        Dictionary with created pipeline details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    pipeline = client.create_pipeline(
+        project_id=project_id,
+        ref=ref,
+        variables=variables,
+    )
+
+    return {
+        "id": pipeline["id"],
+        "status": pipeline["status"],
+        "ref": pipeline["ref"],
+        "sha": pipeline["sha"],
+        "web_url": pipeline["web_url"],
+        "created_at": pipeline.get("created_at"),
+    }
+
+
+async def retry_pipeline(
+    client: GitLabClient,
+    project_id: str | int,
+    pipeline_id: int,
+) -> dict[str, Any]:
+    """
+    Retry a failed pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        pipeline_id: Pipeline ID to retry
+
+    Returns:
+        Dictionary with retried pipeline details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.retry_pipeline(project_id=project_id, pipeline_id=pipeline_id)
+
+    return {
+        "id": result["id"],
+        "status": result["status"],
+        "message": result["message"],
+    }
+
+
+async def cancel_pipeline(
+    client: GitLabClient,
+    project_id: str | int,
+    pipeline_id: int,
+) -> dict[str, Any]:
+    """
+    Cancel a running pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        pipeline_id: Pipeline ID to cancel
+
+    Returns:
+        Dictionary with canceled pipeline details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.cancel_pipeline(project_id=project_id, pipeline_id=pipeline_id)
+
+    return {
+        "id": result["id"],
+        "status": result["status"],
+        "message": result["message"],
+    }
+
+
+async def delete_pipeline(
+    client: GitLabClient,
+    project_id: str | int,
+    pipeline_id: int,
+) -> dict[str, Any]:
+    """
+    Delete a pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        pipeline_id: Pipeline ID to delete
+
+    Returns:
+        Dictionary with deletion confirmation
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.delete_pipeline(project_id=project_id, pipeline_id=pipeline_id)
+
+    return {
+        "pipeline_id": result["pipeline_id"],
+        "message": result["message"],
+    }
+
+
+async def list_pipeline_jobs(
+    client: GitLabClient,
+    project_id: str | int,
+    pipeline_id: int,
+    page: int = 1,
+    per_page: int = 20,
+) -> list[dict[str, Any]]:
+    """
+    List jobs in a pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        pipeline_id: Pipeline ID
+        page: Page number for pagination
+        per_page: Results per page
+
+    Returns:
+        List of job dictionaries with essential fields only
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    jobs = client.list_pipeline_jobs(
+        project_id=project_id,
+        pipeline_id=pipeline_id,
+        page=page,
+        per_page=per_page,
+    )
+
+    # Filter to only essential fields to reduce token usage
+    formatted_jobs = []
+    for job in jobs:
+        formatted_jobs.append(
+            {
+                "id": job["id"],
+                "name": job["name"],
+                "stage": job["stage"],
+                "status": job["status"],
+                "ref": job["ref"],
+                "web_url": job["web_url"],
+                "created_at": job.get("created_at"),
+                "started_at": job.get("started_at"),
+                "finished_at": job.get("finished_at"),
+                "duration": job.get("duration"),
+                "allow_failure": job.get("allow_failure", False),
+                "failure_reason": job.get("failure_reason"),
+            }
+        )
+
+    return formatted_jobs
+
+
+async def get_job(
+    client: GitLabClient,
+    project_id: str | int,
+    job_id: int,
+) -> dict[str, Any]:
+    """
+    Get detailed information about a specific job.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        job_id: Job ID
+
+    Returns:
+        Dictionary with job details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    job = client.get_job(project_id=project_id, job_id=job_id)
+
+    return {
+        "id": job["id"],
+        "name": job["name"],
+        "stage": job["stage"],
+        "status": job["status"],
+        "ref": job["ref"],
+        "web_url": job["web_url"],
+        "created_at": job.get("created_at"),
+        "started_at": job.get("started_at"),
+        "finished_at": job.get("finished_at"),
+        "duration": job.get("duration"),
+        "pipeline": job.get("pipeline", {}),
+    }
+
+
+async def get_job_trace(
+    client: GitLabClient,
+    project_id: str | int,
+    job_id: int,
+    tail_lines: int | None = None,
+) -> dict[str, Any]:
+    """
+    Get execution log (trace) for a job.
+
+    IMPORTANT: Job traces can be very large (10,000+ lines). Use tail_lines to limit output.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        job_id: Job ID
+        tail_lines: Number of lines to return from the end of the log (optional).
+                   Recommended: 500-1000 for error analysis. If not specified,
+                   returns the full log which may exceed token limits for large jobs.
+
+    Returns:
+        Dictionary with job trace/log including:
+        - job_id: The job ID
+        - trace: The log content (last N lines if tail_lines specified)
+        - truncated: Boolean indicating if output was truncated
+        - total_lines: Total number of lines in the full log
+        - returned_lines: Number of lines actually returned
+
+    Example:
+        # Get last 500 lines (recommended for error analysis)
+        trace = await get_job_trace(client, "my-project", 12345, tail_lines=500)
+
+        # Get full log (may be very large)
+        trace = await get_job_trace(client, "my-project", 12345)
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    trace = client.get_job_trace(project_id=project_id, job_id=job_id, tail_lines=tail_lines)
+
+    return {
+        "job_id": trace["job_id"],
+        "trace": trace["trace"],
+        "truncated": trace.get("truncated", False),
+        "total_lines": trace.get("total_lines", 0),
+        "returned_lines": trace.get("returned_lines", 0),
+    }
+
+
+async def retry_job(
+    client: GitLabClient,
+    project_id: str | int,
+    job_id: int,
+) -> dict[str, Any]:
+    """
+    Retry a failed job.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        job_id: Job ID to retry
+
+    Returns:
+        Dictionary with retried job details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.retry_job(project_id=project_id, job_id=job_id)
+
+    return {
+        "job_id": result["job_id"],
+        "status": result["status"],
+        "message": result["message"],
+    }
+
+
+async def cancel_job(
+    client: GitLabClient,
+    project_id: str | int,
+    job_id: int,
+) -> dict[str, Any]:
+    """
+    Cancel a running job.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        job_id: Job ID to cancel
+
+    Returns:
+        Dictionary with canceled job details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.cancel_job(project_id=project_id, job_id=job_id)
+
+    return {
+        "job_id": result["job_id"],
+        "status": result["status"],
+        "message": result["message"],
+    }
+
+
+async def play_job(
+    client: GitLabClient,
+    project_id: str | int,
+    job_id: int,
+) -> dict[str, Any]:
+    """
+    Start a manual job.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        job_id: Job ID to play/start
+
+    Returns:
+        Dictionary with job details
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.play_job(project_id=project_id, job_id=job_id)
+
+    return {
+        "job_id": result["job_id"],
+        "status": result["status"],
+        "message": result["message"],
+    }
+
+
+async def download_job_artifacts(
+    client: GitLabClient,
+    project_id: str | int,
+    job_id: int,
+) -> dict[str, Any]:
+    """
+    Download job artifacts.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        job_id: Job ID
+
+    Returns:
+        Dictionary with artifacts info
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    result = client.download_job_artifacts(project_id=project_id, job_id=job_id)
+
+    size_bytes = int(result["size_bytes"])  # Ensure it's an int for mypy
+    return {
+        "job_id": result["job_id"],
+        "size_bytes": size_bytes,
+        "message": f"Downloaded {size_bytes} bytes of artifacts for job {job_id}",
+    }
+
+
+async def list_pipeline_variables(
+    client: GitLabClient,
+    project_id: str | int,
+    pipeline_id: int,
+) -> list[dict[str, str]]:
+    """
+    List variables for a pipeline.
+
+    Args:
+        client: Authenticated GitLabClient instance
+        project_id: Project ID (int) or path (str)
+        pipeline_id: Pipeline ID
+
+    Returns:
+        List of variable dictionaries
+    """
+    await asyncio.sleep(0)  # Allow event loop to process other tasks
+    return client.list_pipeline_variables(project_id=project_id, pipeline_id=pipeline_id)

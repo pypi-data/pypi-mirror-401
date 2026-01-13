@@ -1,0 +1,481 @@
+Metadata-Version: 2.4
+Name: python-gitlab-mcp
+Version: 1.0.0
+Summary: Production-ready Model Context Protocol server for GitLab - 87 tools, 14 prompts, 13 resources
+Author-email: Wade Woolwine <wade.woolwine@gmail.com>
+Maintainer-email: Wade Woolwine <wade.woolwine@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/wadew/gitlab-mcp
+Project-URL: Documentation, https://github.com/wadew/gitlab-mcp#documentation
+Project-URL: Repository, https://github.com/wadew/gitlab-mcp.git
+Project-URL: Issues, https://github.com/wadew/gitlab-mcp/issues
+Project-URL: Changelog, https://github.com/wadew/gitlab-mcp/blob/main/CHANGELOG.md
+Keywords: gitlab,mcp,model-context-protocol,ai,llm,claude,anthropic,devops,ci-cd,automation,api-client,async,type-safe
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Version Control :: Git
+Classifier: Topic :: System :: Systems Administration
+Classifier: Framework :: AsyncIO
+Classifier: Typing :: Typed
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=1.25.0
+Requires-Dist: python-gitlab>=7.1.0
+Requires-Dist: pydantic>=2.12.5
+Requires-Dist: python-dotenv>=1.2.1
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: starlette>=0.50.0
+Requires-Dist: uvicorn>=0.40.0
+Provides-Extra: dev
+Requires-Dist: pytest>=9.0.2; extra == "dev"
+Requires-Dist: pytest-cov>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=1.3.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.15.1; extra == "dev"
+Requires-Dist: black>=25.12.0; extra == "dev"
+Requires-Dist: ruff>=0.14.10; extra == "dev"
+Requires-Dist: mypy>=1.19.1; extra == "dev"
+Requires-Dist: types-requests; extra == "dev"
+Requires-Dist: pre-commit>=4.0.0; extra == "dev"
+Requires-Dist: build>=1.2.0; extra == "dev"
+Requires-Dist: twine>=6.0.0; extra == "dev"
+Dynamic: license-file
+
+# GitLab MCP Server
+
+A production-ready Model Context Protocol (MCP) server that enables AI assistants like Claude Code to interact seamlessly with self-hosted GitLab instances.
+
+[![PyPI version](https://img.shields.io/pypi/v/python-gitlab-mcp)](https://pypi.org/project/python-gitlab-mcp/)
+[![Tests](https://img.shields.io/badge/tests-1257%20passing-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)]()
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)]()
+[![Type Checked](https://img.shields.io/badge/type%20checked-mypy-blue)]()
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000)]()
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+## Overview
+
+The GitLab MCP Server provides a complete, type-safe interface for AI assistants to interact with GitLab, supporting:
+
+- **Repository Operations**: Search code, browse files, manage branches and commits
+- **Issue Management**: Create, update, close issues, manage labels and comments
+- **Merge Requests**: Complete MR workflows including creation, review, approval, and merging
+- **CI/CD Pipelines**: Monitor pipeline status, trigger jobs, access artifacts and logs
+- **Project Management**: Milestones, labels, project settings
+- **Security & Compliance**: Security scanning results, vulnerability tracking
+- **Advanced Features**: Wikis, snippets, releases, user/group management
+
+Built with **strict Test-Driven Development (TDD)** practices, featuring 1257 tests and 84% code coverage.
+
+**Transport Modes**: stdio (default) and Streamable HTTP for remote clients
+**Slim Mode**: 3 meta-tools for 95% context reduction in LLM conversations
+
+## Features
+
+### Complete Tool Suite (87 Tools + 14 Prompts + 13 Resources)
+
+**Repository Tools (16)**
+- Search repositories, code, and commits
+- Browse files and directory trees
+- Create, update, delete files
+- Manage branches and tags
+- View commit history and diffs
+- Compare branches
+
+**Issue Tools (8)**
+- Create, read, update, close issues
+- Reopen closed issues
+- Add comments and list comments
+- Search and filter issues
+
+**Merge Request Tools (14)**
+- Create and manage merge requests
+- Review code and add comments
+- Approve and merge MRs
+- Manage reviewers and assignees
+- Track MR pipelines and changes
+
+**CI/CD Pipeline Tools (14)**
+- List and monitor pipelines
+- Create, retry, cancel, delete pipelines
+- View job logs and status
+- Download and manage artifacts
+- Retry and cancel jobs
+- Play manual jobs
+
+**Project Management Tools (10)**
+- Create, search, and manage projects
+- View project statistics
+- Manage milestones
+- Handle project members
+
+**Labels, Wikis, Snippets, Releases (19)**
+- Label management (4 tools)
+- Wiki page operations (5 tools)
+- Code snippets (5 tools)
+- Release management (5 tools)
+
+**Users & Groups (6)**
+- User lookup and search
+- Group listing and details
+- Group member management
+
+**Meta Tools (3) - Slim Mode**
+- `discover_tools` - List available tools by category
+- `get_tool_schema` - Get JSON schema for any tool
+- `execute_tool` - Execute any tool dynamically
+
+### 🔒 Security First
+
+- **Personal Access Token (PAT)** authentication
+- **Environment-based** credential management
+- **SSL/TLS verification** with custom certificate support
+- **Secure credential storage** using `.env` files (gitignored)
+- **Token scope validation** and error handling
+
+### 🚀 Performance Optimized
+
+- **Async/await** throughout for non-blocking operations
+- **Efficient pagination** for large datasets
+- **Configurable timeouts** and retry logic
+- **Connection pooling** via httpx
+- **Smart rate limiting** awareness
+
+### Thoroughly Tested
+
+- **1257 tests passing** (100% pass rate)
+- **84% code coverage** (exceeds 80% requirement)
+- **Unit tests** with mocked dependencies
+- **Integration tests** with real GitLab API
+- **E2E tests** validating full MCP protocol
+- **Type-safe** with mypy validation
+
+## Quick Start
+
+### Prerequisites
+
+- **Python 3.10+**
+- **GitLab instance** (self-hosted CE/EE v15.0+ or GitLab.com)
+- **GitLab Personal Access Token** with appropriate scopes
+
+### Installation
+
+```bash
+# Install from PyPI
+pip install python-gitlab-mcp
+
+# Or install from source
+git clone https://github.com/wadew/gitlab-mcp.git
+cd gitlab-mcp
+pip install -e ".[dev]"
+```
+
+### Configuration
+
+#### 1. Create Personal Access Token
+
+Create a GitLab Personal Access Token with these scopes:
+- `api` - Full API access
+- `read_repository` - Read repository content
+- `write_repository` - Write repository content
+
+See [docs/user/installation.md](docs/user/installation.md) for detailed instructions.
+
+#### 2. Configure Environment Variables
+
+Create a `.env` file in your project:
+
+```bash
+# Required
+GITLAB_URL=https://gitlab.example.com
+GITLAB_TOKEN=glpat-xxxxxxxxxxxxxxxxxxxx
+
+# Optional
+GITLAB_DEFAULT_PROJECT=mygroup/myproject
+GITLAB_TIMEOUT=30
+GITLAB_VERIFY_SSL=true
+```
+
+#### 3. Configure Claude Code
+
+Add to your Claude Code MCP settings (`~/.claude/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "gitlab": {
+      "command": "python",
+      "args": ["-m", "gitlab_mcp.server"],
+      "env": {
+        "GITLAB_URL": "https://gitlab.example.com",
+        "GITLAB_TOKEN": "glpat-xxxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+See [docs/user/configuration.md](docs/user/configuration.md) for advanced configuration options.
+
+### Verify Installation
+
+```bash
+# Activate environment (if using venv)
+source .venv/bin/activate
+
+# Test GitLab connection
+python -c "from gitlab_mcp.client import GitLabClient; client = GitLabClient(); print('Connected!')"
+```
+
+## Usage Examples
+
+### Search Code Across Projects
+
+```python
+# Claude Code can now do:
+# "Search for 'authentication' in all repositories"
+
+# This uses the MCP tool:
+search_code(query="authentication", scope="global")
+```
+
+### Create and Manage Issues
+
+```python
+# "Create an issue for the login bug in my-project"
+create_issue(
+    project_id="mygroup/my-project",
+    title="Fix login authentication bug",
+    description="Users cannot log in with SSO",
+    labels=["bug", "security"]
+)
+
+# "Add a comment to issue #42"
+add_issue_comment(
+    project_id="mygroup/my-project",
+    issue_id=42,
+    body="This is related to the auth refactoring in MR !123"
+)
+```
+
+### Manage Merge Requests
+
+```python
+# "Create a merge request from feature-branch to main"
+create_merge_request(
+    project_id="mygroup/my-project",
+    source_branch="feature-branch",
+    target_branch="main",
+    title="Add OAuth2 support",
+    description="Implements OAuth2 authentication flow"
+)
+
+# "Approve merge request !25"
+approve_merge_request(
+    project_id="mygroup/my-project",
+    mr_iid=25
+)
+```
+
+### Monitor CI/CD Pipelines
+
+```python
+# "Show me the latest pipeline status"
+list_pipelines(
+    project_id="mygroup/my-project",
+    limit=1
+)
+
+# "Get logs from the failed job"
+get_job_log(
+    project_id="mygroup/my-project",
+    job_id=12345
+)
+```
+
+See [docs/user/usage_examples.md](docs/user/usage_examples.md) for comprehensive examples.
+
+## Documentation
+
+### User Documentation
+
+- **[Installation Guide](docs/user/installation.md)** - Complete setup instructions
+- **[Configuration Guide](docs/user/configuration.md)** - Configuration options and best practices
+- **[Usage Examples](docs/user/usage_examples.md)** - Real-world usage scenarios
+- **[Troubleshooting](docs/user/troubleshooting.md)** - Common issues and solutions
+
+### API Reference
+
+- **[Tools Reference](docs/api/tools_reference.md)** - Complete tool documentation (67 tools)
+- **[GitLab API Mapping](docs/api/gitlab_api_mapping.md)** - GitLab API endpoint mapping
+
+### Architecture
+
+- **[System Overview](docs/architecture/system_overview.md)** - High-level architecture
+- **[Interfaces](docs/architecture/interfaces.md)** - Interface contracts
+- **[Data Flow](docs/architecture/data_flow.md)** - How data flows through the system
+
+### Development
+
+- **[Development Guide](CLAUDE.md)** - Ground rules and TDD workflow
+- **[Product Requirements](docs/gitlab-mcp-server-prd.md)** - Complete feature specifications
+- **[Session Management](docs/session_management/README.md)** - Development session logs
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone https://github.com/wadew/gitlab-mcp.git
+cd gitlab-mcp
+
+# Install uv (fast Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment
+uv venv
+
+# Activate virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install development dependencies
+uv pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+# Run all tests (unit + e2e)
+pytest tests/unit/ tests/e2e/ -v
+
+# Run with coverage
+pytest tests/unit/ tests/e2e/ --cov=src/gitlab_mcp --cov-report=term-missing
+
+# Run integration tests (requires GitLab instance)
+source .env
+export GITLAB_TEST_PROJECT_ID="mcps/gitlab_mcp"
+pytest tests/integration/ -v -m integration
+
+# Run specific test types
+pytest tests/unit/ -v -m unit
+pytest tests/e2e/ -v -m e2e
+
+# Type checking
+mypy src/gitlab_mcp
+
+# Code formatting
+black src/ tests/
+
+# Linting
+ruff check src/ tests/
+```
+
+### Quality Standards
+
+This project follows **strict TDD practices**:
+
+- ✅ **Tests first**: Write failing tests, then implement
+- ✅ **80%+ coverage**: Minimum code coverage requirement
+- ✅ **100% pass rate**: All tests must pass before commit
+- ✅ **Type safety**: Full mypy compliance
+- ✅ **Code quality**: Black formatting, Ruff linting
+- ✅ **Documentation**: Every function, class, and module
+
+See [CLAUDE.md](CLAUDE.md) for complete development guidelines.
+
+### Project Structure
+
+```
+gitlab_mcp/
+├── src/gitlab_mcp/              # Source code
+│   ├── server.py                # Main MCP server
+│   ├── config/                  # Configuration management
+│   ├── client/                  # GitLab API client wrapper
+│   ├── tools/                   # MCP tool implementations (87 tools)
+│   ├── schemas/                 # Pydantic data models
+│   └── utils/                   # Shared utilities
+├── tests/                       # Test suite (1257 tests)
+│   ├── unit/                    # Unit tests (mocked)
+│   ├── integration/             # Integration tests (real API)
+│   └── e2e/                     # End-to-end MCP tests
+├── docs/                        # Documentation
+│   ├── user/                    # User guides
+│   ├── api/                     # API reference
+│   ├── architecture/            # System design
+│   └── session_management/      # Development logs
+├── CLAUDE.md                    # Development ground rules
+├── next_session_plan.md         # Current development state
+└── pyproject.toml               # Project metadata
+```
+
+## Contributing
+
+We welcome contributions! Before contributing:
+
+1. **Read [CLAUDE.md](CLAUDE.md)** for development ground rules
+2. **Check [next_session_plan.md](next_session_plan.md)** for current work
+3. **Write tests first** (TDD required)
+4. **Ensure 80%+ coverage** and 100% test pass rate
+5. **Update documentation** for user-facing changes
+6. **Follow type hints** and code quality standards
+
+### Commit Message Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+Coverage: X% (±Y%)
+Tests: N passing
+```
+
+**Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`
+
+## Development Phases
+
+- **Phase 1**: Foundation (Server, Config, Client, Auth)
+- **Phase 2**: Repository & Issues Tools
+- **Phase 3**: Merge Requests & Pipelines Tools
+- **Phase 4**: Advanced Features (Security, Wikis, etc.)
+- **Phase 5**: Meta-tools & Streamable HTTP Transport
+- **Phase 6**: Public Release (PyPI + GitHub)
+
+## Roadmap
+
+### v1.1.0 (Next Release)
+- Additional GitLab API coverage
+- Performance optimization for large repositories
+- Enhanced error messages and debugging tools
+- WebSocket transport support
+
+## License
+
+MIT License - See [LICENSE](LICENSE) file for details.
+
+## Support
+
+- **Issues**: https://github.com/wadew/gitlab-mcp/issues
+- **Documentation**: https://github.com/wadew/gitlab-mcp#documentation
+- **MCP Protocol**: https://modelcontextprotocol.io
+
+## Acknowledgments
+
+Built with:
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io) - AI integration protocol
+- [python-gitlab](https://python-gitlab.readthedocs.io) - GitLab API client
+- [Pydantic](https://pydantic.dev) - Data validation
+- [httpx](https://www.python-httpx.org) - Async HTTP client
+
+---
+
+**Built with strict TDD practices. 1257 tests. 84% coverage. Production-ready.**
+
+Made with care for the GitLab and AI communities.
