@@ -1,0 +1,130 @@
+Metadata-Version: 2.4
+Name: traceprintplus
+Version: 0.3
+Description-Content-Type: text/markdown
+Dynamic: description
+Dynamic: description-content-type
+
+
+# TracePrint-plus - Advanced Python Debugging & Logging Utility
+
+TracePrint-plus is a flexible, developer-friendly Python utility that makes debugging and logging smarter. It automatically prints variable names alongside their values, supports custom messages, optional timestamps, and file/line tracking. With configurable color output, separators, and debug toggles, it transforms ordinary print statements into informative, visually distinct logsâ€”perfect for tracing code execution efficiently.
+## Authors
+
+- [@ArkiniDEV](https://github.com/ArkiniDev)
+
+
+## Features
+
+- Automatic Variable Display â€“ Prints variable names with their current values for easier debugging.
+
+- Custom Messages â€“ Add optional debug messages or prefixes to your logs.
+
+- Timestamps â€“ Optionally show the current time for each print statement.
+
+- File & Line Tracking â€“ Display the source file and line number where the print occurred.
+
+- ANSI Color Support â€“ Highlight debug output with standard, bright, or custom colors.
+
+- Global and Per-Print Coloring â€“ Apply colors globally or override per statement.
+
+- Configurable Separators â€“ Customize how multiple variables are joined in output.
+
+- Debug Toggle â€“ Enable or disable debug printing via a single configuration option.
+
+- Smart Start Message â€“ Optionally prepend a message at the first log for clarity.
+
+- Minimal Setup â€“ No complex logging setup just import and use.
+
+
+## Installation
+
+Install traceprint-plus with npm
+
+```bash
+  npm install traceprintplus
+  cd traceprintplus
+```
+
+Install traceprint-plus with pip
+
+```bash
+  pip install traceprintplus
+```
+## Usage/Examples
+
+```python
+import traceprintplus as tp
+
+# Settings that traceprintplus-plus (tp) will follow
+tp.config.update({
+    "DEBUG": True,
+    "COLORSFORDEBUG": True,
+    "SEP": True,
+    "SEPSTYLE": " | ",
+    "MESSAGE": "TRACEPRINT:",
+    "COLOR": "cyan",
+    "TIMESTAMP": True,
+    "FILELINE": True,
+    "FILELINEARGS": (2, 7)
+})
+
+# Demo variables
+x, y, z = 10, 20, 30
+my_list = [1, 2, 3]
+
+# Demo prints
+tp.tprint(x, y, z)
+tp.tprint(my_list, x + y, message="Mixed Demo:")
+tp.config["DEBUG"] = False
+tp.tprint("Debug off â†’ only values")
+
+```
+
+### Expected terminal output
+
+```bash
+[test.py:21] [12:13:47] TRACEPRINT: x = 10  |  y = 20  |  z = 30
+[test.py:22] [12:13:47] Mixed Demo: my_list = [1, 2, 3]  |  x + y = 30
+[test.py:24] [12:13:47] Debug off â†’ only values
+```
+| Color Name      | Sample Text |
+|-----------------|-------------|
+| black           | ![black](https://img.shields.io/badge/black-%23000000?style=flat-square&logoColor=white) |
+| red             | ![red](https://img.shields.io/badge/red-%23FF0000?style=flat-square&logoColor=white) |
+| green           | ![green](https://img.shields.io/badge/green-%2300FF00?style=flat-square&logoColor=white) |
+| yellow          | ![yellow](https://img.shields.io/badge/yellow-%23FFFF00?style=flat-square&logoColor=black) |
+| blue            | ![blue](https://img.shields.io/badge/blue-%230000FF?style=flat-square&logoColor=white) |
+| magenta         | ![magenta](https://img.shields.io/badge/magenta-%23FF00FF?style=flat-square&logoColor=white) |
+| cyan            | ![cyan](https://img.shields.io/badge/cyan-%2300FFFF?style=flat-square&logoColor=black) |
+| white           | ![white](https://img.shields.io/badge/white-%23FFFFFF?style=flat-square&logoColor=black) |
+
+| Bright Colors    | Sample Text |
+|-----------------|-------------|
+| bright_black    | ![bright_black](https://img.shields.io/badge/bright_black-%23555555?style=flat-square&logoColor=white) |
+| bright_red      | ![bright_red](https://img.shields.io/badge/bright_red-%23FF5555?style=flat-square&logoColor=white) |
+| bright_green    | ![bright_green](https://img.shields.io/badge/bright_green-%2355FF55?style=flat-square&logoColor=white) |
+| bright_yellow   | ![bright_yellow](https://img.shields.io/badge/bright_yellow-%23FFFF55?style=flat-square&logoColor=black) |
+| bright_blue     | ![bright_blue](https://img.shields.io/badge/bright_blue-%235555FF?style=flat-square&logoColor=white) |
+| bright_magenta  | ![bright_magenta](https://img.shields.io/badge/bright_magenta-%23FF55FF?style=flat-square&logoColor=white) |
+| bright_cyan     | ![bright_cyan](https://img.shields.io/badge/bright_cyan-%2355FFFF?style=flat-square&logoColor=black) |
+| bright_white    | ![bright_white](https://img.shields.io/badge/bright_white-%23FFFFFF?style=flat-square&logoColor=black) |
+
+| Accent Colors    | Sample Text |
+|-----------------|-------------|
+| orange          | ![orange](https://img.shields.io/badge/orange-%23FF8800?style=flat-square&logoColor=white) |
+| pink            | ![pink](https://img.shields.io/badge/pink-%23FFD5FF?style=flat-square&logoColor=black) |
+| purple          | ![purple](https://img.shields.io/badge/purple-%238D5FFF?style=flat-square&logoColor=white) |
+| light_blue      | ![light_blue](https://img.shields.io/badge/light_blue-%230081FF?style=flat-square&logoColor=white) |
+| teal            | ![teal](https://img.shields.io/badge/teal-%230025FF?style=flat-square&logoColor=white) |
+| lime            | ![lime](https://img.shields.io/badge/lime-%2375FF76?style=flat-square&logoColor=black) |
+| light_gray      | ![light_gray](https://img.shields.io/badge/light_gray-%23FAFAFA?style=flat-square&logoColor=black) |
+| dark_gray       | ![dark_gray](https://img.shields.io/badge/dark_gray-%233B3B3B?style=flat-square&logoColor=white) |
+
+| Reset           | Sample Text |
+|-----------------|-------------|
+| reset           | ![reset](https://img.shields.io/badge/reset-%23FFFFFF?style=flat-square&logoColor=black) |
+
+
+## ðŸš€ About Me
+I'm a Developer who likes making Games in Unity and Programming in Python / C++
