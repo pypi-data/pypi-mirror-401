@@ -1,0 +1,155 @@
+#!/usr/bin/env python
+# coding=utf-8
+import typing
+import time
+import logging
+import json as json_tool
+
+from functools import wraps, partial
+
+
+def requests_logger(
+    func: typing.Optional[typing.Callable] = None,
+    default_ua: str = "",
+    logger_name: str = "pykit_tools.requests",
+    logger_level: int = logging.ERROR,
+) -> typing.Callable:
+    """
+    `装饰器` 应用于对 requests 库的请求进行日志记录.
+
+    扩展 requests 请求函数可传递的参数：
+
+    - log_request: 是否记录请求的参数，默认True
+    - log_response: 是否记录响应内容，默认True，设置为False后可通过参数legal_codes控制记录响应内容
+    - legal_codes: 合法的响应状态码列表/元组，仅当响应状态码不在列表/元组中才记录响应内容，默认None记录所有响应内容
+    - format_resp: 格式化响应内容的函数，用于格式化响应内容，默认None使用response.text
+    - raise_for: 需要抛出的异常类型/异常元组，仅当异常匹配才抛出异常，默认None不抛出异常
+
+    Args:
+        func:
+        default_ua: 默认的 User-Agent
+        logger_name: 日志名称，仅记录异常时使用
+        logger_level: 异常时设置日志的级别
+
+    Returns:
+        function:
+
+    示例：
+    ```python
+    import typing
+    import requests
+    from pykit_tools.decorators.req_utils import requests_logger
+
+    class BaseRequest(object):
+
+        def __init__(self, default_ua: str = "", logger_name: str = "pykit_tools.requests"):
+            self.request = requests_logger(requests.request, default_ua=default_ua, logger_name=logger_name)
+
+        def get(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("GET", url, **kwargs)
+
+        def post(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("POST", url, **kwargs)
+
+        def put(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("PUT", url, **kwargs)
+
+        def delete(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("DELETE", url, **kwargs)
+
+        def patch(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("PATCH", url, **kwargs)
+
+        def head(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("HEAD", url, **kwargs)
+
+        def options(self, url: str, **kwargs: typing.Any) -> requests.Response:
+            return self.request("OPTIONS", url, **kwargs)
+
+    br = BaseRequest()
+    # 控制日志输出内容
+    br.get("https://www.baidu.com", log_request=False, log_response=True)
+    # 控制异常抛出
+    br.get("https://www.baidu.com", raise_for=Exception)
+    ```
+    """
+    if not callable(func):
+        return partial(requests_logger, default_ua=default_ua, logger_name=logger_name, logger_level=logger_level)
+
+    fn = typing.cast(typing.Callable, func)
+    logger = logging.getLogger(logger_name)
+
+    @wraps(fn)
+    def _wrapper(
+        method: str,
+        url: str,
+        log_request: bool = True,
+        log_response: bool = True,
+        legal_codes: typing.Optional[typing.Union[typing.List, typing.Tuple]] = None,
+        format_resp: typing.Optional[typing.Callable] = None,
+        raise_for: typing.Optional[typing.Union[typing.Type, typing.Tuple]] = None,
+        timeout: int = 10,
+        headers: typing.Optional[typing.Dict] = None,
+        **kwargs: typing.Any,
+    ) -> typing.Any:
+
+        if default_ua:
+            # 设置默认的 User-Agent
+            headers = headers or {}
+            _keys = [k.lower() for k in headers.keys()]
+            if "user-agent" not in _keys:
+                headers["User-Agent"] = default_ua
+
+        req_msg = ""
+        if log_request:
+            req_msg = f"timeout={timeout} headers: {headers}"
+            if kwargs.get("params") is not None:
+                req_msg = f"{req_msg}\n\tparams: {kwargs.get('params')}"
+            if kwargs.get("data") is not None:
+                req_msg = f"{req_msg}\n\tdata: {kwargs.get('data')}"
+            if kwargs.get("json") is not None:
+                json_str = json_tool.dumps(kwargs.get("json"), separators=(",", ":"), ensure_ascii=False)
+                req_msg = f"{req_msg}\n\tjson: {json_str}"
+            if kwargs:
+                req_msg = f"{req_msg}\n\tkwargs: {kwargs}"
+
+        response = None
+        err = ""
+        code = 0
+        length = 0
+        resp_msg = ""
+        _start = time.monotonic()
+        try:
+            response = fn(method, url, headers=headers, timeout=timeout, **kwargs)
+            response.encoding = "utf-8"
+            code = response.status_code
+            length = len(response.content)
+            if log_response or (legal_codes and code not in legal_codes):
+                try:
+                    resp_msg = format_resp(response) if callable(format_resp) else response.text
+                except Exception as _e:
+                    resp_msg = f"parse response.text error]: {_e}"
+        except Exception as e:
+            err = str(e)
+            if raise_for and isinstance(e, raise_for):
+                raise
+        finally:
+            # 耗时
+            _end = time.monotonic()
+            cost = (_end - _start) * 1000
+            # 日志内容
+            msg = f"{method.upper()} {url} {code} {length} {cost:.3f} {err or '-'}"
+            if req_msg:
+                msg = f"{msg}\n\trequest: {req_msg}"
+            if resp_msg:
+                msg = f"{msg}\n\tresponse: {resp_msg}"
+
+            if err:
+                logger.log(logger_level, msg, exc_info=True)
+            else:
+                logger.info(msg)
+
+        # 返回结果
+        return response
+
+    return _wrapper
