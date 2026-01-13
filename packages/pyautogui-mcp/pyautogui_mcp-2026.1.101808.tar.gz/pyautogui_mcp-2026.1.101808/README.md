@@ -1,0 +1,112 @@
+<div align="center">
+  <a target="_blank" href="https://github.com/chigwell/pyautogui-mcp">
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=PyAutoGUI-MCP&fontSize=50&fontAlignY=35&animation=fadeIn&fontColor=FFFFFF&descAlignY=55&descAlign=62" alt="Telegram MCP Server" width="100%" />
+  </a>
+</div>
+
+PyAutoGUI-MCP exposes MCP tools dynamically from the [`PyAutoGUI`](https://pypi.org/project/PyAutoGUI/) API.
+It does not manually reimplement or wrap each function: it auto-registers the available API.
+
+## Install with pip
+
+```bash
+pip install pyautogui-mcp
+```
+
+Run the server:
+
+```bash
+pyautogui-mcp --transport stdio
+pyautogui-mcp --transport http --host 127.0.0.1 --port 8000
+```
+
+MCP client config example:
+
+```json
+{
+  "mcpServers": {
+    "pyautogui-mcp": {
+      "command": "pyautogui-mcp",
+      "args": ["--transport", "stdio"]
+    }
+  }
+}
+```
+
+## Run with uv
+
+Dependencies are declared in `pyproject.toml`, so uv can resolve and run directly:
+
+```json
+{
+  "mcpServers": {
+    "pyautogui-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/full/path/to/pyautogui-mcp",
+        "run",
+        "python",
+        "-m",
+        "pyautogui_mcp"
+      ]
+    }
+  }
+}
+```
+
+You can also launch manually:
+
+```bash
+uv run python -m pyautogui_mcp --transport stdio
+uv run python -m pyautogui_mcp --transport http --host 127.0.0.1 --port 8000
+```
+
+## Use in your own project
+
+Import only what you need and run it under your own server lifecycle:
+
+```python
+from pyautogui_mcp import mcp, register_pyautogui_api
+
+register_pyautogui_api(prefix="pyautogui_")
+mcp.run()  # or mcp.run(transport="http", host="127.0.0.1", port=8000)
+```
+
+Other exports:
+
+```python
+from pyautogui_mcp import pyautogui_diagnose, pyautogui_tools
+```
+
+## Desktop control notes
+
+- The server runs actions on the machine where it is launched (current desktop/display).
+- PyAutoGUI requires a real GUI session; headless environments will fail.
+- Safety: moving the mouse to a corner triggers the PyAutoGUI failsafe.
+- Optional pause between actions via `PYAUTOGUI_PAUSE=0.1`.
+
+## Tool examples
+
+Tool names are exposed with the default `pyautogui_` prefix (configurable with `--prefix`).
+
+| Tool | Inputs (common) | Output |
+| --- | --- | --- |
+| `pyautogui_screenshot` | `imageFilename` (optional), `region` (optional `[left, top, width, height]`) | MCP image content (PNG bytes) |
+| `pyautogui_position` | none | cursor coordinates `{ "x": int, "y": int }` |
+| `pyautogui_click` | `x`, `y`, `clicks`, `button`, `interval`, `duration` | `null` (mouse click performed) |
+| `pyautogui_doubleClick` | `x`, `y`, `button`, `interval`, `duration` | `null` (double-click performed) |
+| `pyautogui_rightClick` | `x`, `y`, `interval`, `duration` | `null` (right-click performed) |
+| `pyautogui_moveTo` | `x`, `y`, `duration` | `null` (mouse moved) |
+| `pyautogui_moveRel` | `xOffset`, `yOffset`, `duration` | `null` (mouse moved relative) |
+| `pyautogui_dragTo` | `x`, `y`, `duration`, `button` | `null` (drag performed) |
+| `pyautogui_dragRel` | `xOffset`, `yOffset`, `duration`, `button` | `null` (drag performed) |
+| `pyautogui_write` | `message`, `interval` | `null` (text typed) |
+| `pyautogui_typewrite` | `message`, `interval` | `null` (text typed) |
+| `pyautogui_press` | `keys`, `presses`, `interval` | `null` (key press performed) |
+| `pyautogui_hotkey` | `keys`, `interval` | `null` (hotkey chord performed) |
+| `pyautogui_scroll` | `clicks`, `x`, `y` | `null` (scroll performed) |
+| `pyautogui_tools` | none | tool list `{ note, tools:[{name, description}] }` |
+| `pyautogui_diagnose` | none | `{ python, platform, deps }` diagnostic info |
+
+Use `pyautogui_tools` to list the exact tool set for your environment and PyAutoGUI version.
