@@ -1,0 +1,205 @@
+Metadata-Version: 2.4
+Name: img2tensor
+Version: 0.1.4
+Summary: Unified image to tensor utility with streaming TFRecord support
+Author: Sourabh Yadav
+Project-URL: Homepage, https://github.com/sourabhyadav999/img2tensor
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pillow
+Requires-Dist: pqdm
+Requires-Dist: opencv-python-headless
+Provides-Extra: torch
+Requires-Dist: torch; extra == "torch"
+Requires-Dist: torchvision; extra == "torch"
+Provides-Extra: tf
+Requires-Dist: tensorflow; extra == "tf"
+Provides-Extra: all
+Requires-Dist: torch; extra == "all"
+Requires-Dist: torchvision; extra == "all"
+Requires-Dist: tensorflow; extra == "all"
+Dynamic: license-file
+
+# img2tensor
+
+A unified, high-performance utility to convert images into training-ready tensors for **NumPy**, **PyTorch**, and **TensorFlow**, or stream them directly into **TFRecords**.
+
+`img2tensor` handles the standard deep learning data ingestion "papercuts": BGR/RGB swaps, memory layouts (NHWC vs NCHW), and dtype scaling in a single, lightweight function.
+
+---
+
+
+## ✨ Key Features
+
+* **Multi-Framework Support:** Automatic conversion to `np.ndarray`, `torch.Tensor` (NCHW), or `tf.Tensor`.
+* **Lossless Augmentations:** Geometric transformations (orthogonal rotations and flips) via pure NumPy axis permutations to avoid interpolation drift.
+* **High-Fidelity Resizing:** Support for standard and aspect-ratio-preserving (letterboxed) resizing with synchronized interpolation across PIL and OpenCV backends.
+* **Deterministic Parallelism:** Thread-safe execution with per-image seeding to guarantee reproducible results across runs.
+* **Automatic Memory Management:** Internal RAM monitoring (70% threshold) to auto-calculate batch sizes and prevent OOM (Out-Of-Memory) crashes.
+* **Production Streaming:** Native sharded TFRecord output for massive datasets, enabling parallel I/O during training.
+
+---
+
+
+
+
+## 🚀 Installation
+
+pip install img2tensor
+
+
+---
+
+## 📖 Usage
+
+### 1. Single Image (In-Memory)
+Returns a 3D tensor ($C, H, W$ for PyTorch).
+
+import img2tensor
+
+#### Returns: torch.Tensor of shape (3, 224, 224)
+tensor = img2tensor.get_tensor("cat.jpg", tensor_type="pytorch")
+
+### 2. Batch Loading (In-Memory)
+Returns a 4D tensor ($N, H, W, C$ for NumPy/TF).
+
+#### Returns: np.ndarray of shape (32, 224, 224, 3)
+batch = img2tensor.get_tensor(list_of_paths, n_jobs=8)
+
+### 3. Production Pipeline (TFRecord)
+Writes to disk using a chunked streaming approach to save RAM.
+
+img2tensor.get_tensor(
+    img_paths=large_list_of_paths,
+    output_format="tfrecord",
+    tfrecord_path="dataset.tfrecord",
+    n_jobs=12
+)
+
+
+### 4. High-Fidelity Resizing (Letterboxed)
+Resize images while maintaining the original aspect ratio using high-quality bicubic interpolation.
+
+
+import img2tensor
+
+#### Returns: torch.Tensor of shape (3, 224, 224)
+#### Pads with black (default) to keep the original image proportions
+
+tensor = img2tensor.get_tensor(
+    "input.jpg", 
+    tensor_type="pytorch", 
+    resize=(224, 224),
+    preserve_aspect_ratio=True
+)
+---
+
+
+## 🧠 Resizing and Augmentation Logic
+
+Our `get_tensor` utility implements a **"Quality-First"** approach to data preparation. When features are enabled without specific parameters, the following internal defaults are applied to ensure scientific reproducibility and high signal-to-noise ratios.
+
+### 1. High-Fidelity Resizing
+Resizing often involves interpolation, which can introduce artifacts or blurriness if not managed carefully.
+
+* **Default Interpolation (Bicubic):** If `resize` is provided but `interpolation` is `None`, the system defaults to **Bicubic** interpolation. This method uses a $4 \times 4$ pixel neighborhood for calculation, resulting in sharper edges and better detail preservation than the standard Bilinear method.
+* **Backend Parity:** The function synchronizes interpolation flags across **PIL** and **OpenCV**. This ensures that "Bicubic" resizing yields numerically consistent results regardless of the underlying decoder.
+* **Aspect Ratio Preservation:** When `preserve_aspect_ratio=True` is set, the image is scaled to fit the target dimensions without stretching. Any remaining space is filled using **Letterboxing** with a default `letterbox_color` (black).
+
+
+
+### 2. Lossless Geometric Augmentations
+Standard rotations (e.g., $15^\circ$) require interpolation that "guesses" new pixel values, creating blur. `img2tensor` enforces a **Lossless Philosophy**.
+
+* **D4 Symmetry Group:** When `augmentation=True` is enabled, the utility randomly selects from bit-perfect orthogonal transformations, including $90^\circ, 180^\circ, 270^\circ$ rotations and horizontal/vertical flips.
+* **Pure NumPy Permutations:** These operations are executed using `np.rot90` and `np.flip`. Because these are memory-address rearrangements (swapping axes), they are mathematically lossless—no new pixels are generated and zero information is lost.
+
+
+
+### 3. Internal Safety Defaults
+
+| Parameter | Internal Default | Rationale |
+| :--- | :--- | :--- |
+| **`interpolation`** | `bicubic` | Prioritizes higher image quality for model training over faster, blurrier methods. |
+| **`augmentation_seed`** | `None` | If provided, generates a unique but **deterministic** seed per image path to ensure experiments are 100% reproducible. |
+| **`Memory Threshold`** | `0.7` | Automatically monitors available RAM and caps usage at **70%** to prevent system-wide OOM (Out-of-Memory) crashes. |
+| **Channel Sync** | `RGB` | Automatically replicates 1-channel Grayscale to 3-channels and strips Alpha from RGBA to maintain uniform batch shapes. |
+
+---
+
+
+
+
+## 🛠 API Reference: `get_tensor()`
+
+### Inputs
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `img_paths` | `str \| Path \| list` | **Required** | Single path or list of paths to image files. |
+| `tensor_type` | `str` | `"numpy"` | Target framework: `"numpy"`, `"pytorch"`, or `"tensorflow"`. |
+| `dtype` | `str` | `"float32"` | Target type: `"float32"`, `"float16"`, `"uint8"`. Floats are auto-scaled (1/255). |
+| `image_layer` | `str` | `"PIL"` | Backend decoder: `"PIL"` or `"OpenCV"`. |
+| `n_jobs` | `int` | `4` | Number of threads for parallel processing and decoding. |
+| `output_format` | `str` | `"tensor"` | `"tensor"` (returns object) or `"tfrecord"` (writes to disk). |
+| `tfrecord_path` | `str \| Path` | `None` | Required if `output_format='tfrecord'`. |
+| `num_shards` | `int` | `1` | Number of shards to split TFRecord output into. |
+| `resize` | `tuple` | `None` | `(H, W)` target size. Defaults to **Bicubic** interpolation if set. |
+| `interpolation` | `str` | `None` | `nearest`, `bilinear`, `bicubic`, `area`, or `lanczos` (PIL only). |
+| `preserve_aspect_ratio`| `bool` | `False` | Uses **Letterboxing** (padding) to maintain original aspect ratio. |
+| `augmentation` | `bool` | `None` | Enables **Lossless** geometric augmentations (D4 symmetry group). |
+| `augmentation_angles` | `list` | `[90, 180, 270]` | Specific orthogonal angles to select from when `augmentation=True`. |
+| `augmentation_seed` | `int` | `None` | Seed for deterministic and reproducible augmentation results. |
+
+### Outputs
+
+* **Single Path Input:** Returns a **3D Tensor** ($H, W, C$ for NumPy/TF; $C, H, W$ for PyTorch).
+* **List Input:** Returns a **4D Tensor** ($N, H, W, C$ for NumPy/TF; $N, C, H, W$ for PyTorch).
+* **TFRecord Mode:** Returns a success dictionary containing shard metadata and file counts.
+
+---
+
+## 🧠 Design Philosophy
+
+Our design approach for `img2tensor` is centered on **numerical precision**, **scientific reproducibility**, and **production reliability**. We aim to eliminate the common "silent bugs" that occur during the transition from data loading to model training.
+
+### 1. Framework-Aware Layouts ($NCHW$ vs $NHWC$)
+One of the most frequent errors in Computer Vision pipelines is passing the incorrect channel layout to a model. `img2tensor` automatically detects your `tensor_type` and reorders dimensions accordingly:
+* **PyTorch:** Returns $N \times C \times H \times W$ and ensures memory is `.contiguous()`.
+* **NumPy/TensorFlow:** Returns $N \times H \times W \times C$.
+
+### 2. Lossless vs. Lossy Augmentation
+Standard library rotations often use `rotate()` or `warpAffine()`, which introduce interpolation blur and "black triangle" artifacts at the corners. `img2tensor` enforces a **Lossless Philosophy**:
+* **Memory Permutations:** We use pure NumPy axis permutations (`rot90`, `fliplr`) to perform geometric transformations.
+* **Bit-Perfect Integrity:** Because these operations simply rearrange existing memory addresses, they are mathematically perfect—no new pixel values are "guessed," and the original image signal remains identical.
+
+
+
+### 3. Synchronized High-Fidelity Resizing
+Standard libraries (PIL vs. OpenCV) often have different default behaviors for interpolation. `img2tensor` synchronizes interpolation flags between both backends:
+* **Default Bicubic:** We default to **Bicubic** interpolation over the standard Bilinear to ensure sharper edges and better detail retention for deep learning features.
+* **Letterboxing:** When `preserve_aspect_ratio` is enabled, we use a letterboxing strategy that scales the image to fit the target dimensions without distortion, padding the remaining area with a consistent color.
+
+
+
+### 4. Deterministic Parallelism
+In most libraries, multi-threading can break reproducibility because the order of operations depends on thread scheduling.
+* **Per-Path Seeding:** `img2tensor` pre-calculates an independent seed for every image path *before* starting the thread pool.
+* **Guarantee:** This ensures that a specific `augmentation_seed` will produce the exact same augmented batch regardless of your hardware, the number of workers (`n_jobs`), or the thread execution order.
+
+### 5. Industrial-Grade Memory Safety
+To prevent the "OOM (Out-Of-Memory) Crash" common when processing large datasets, the library utilizes `psutil` to monitor real-time available RAM.
+* **RAM Thresholding:** We cap memory usage at **70%** of available system RAM.
+* **Auto-Chunking:** The utility automatically calculates the memory footprint of your request and chunks the dataset into `safe_batch_size` groups, allowing you to process millions of images on a standard workstation without crashing the kernel.
+
+---
+
+
+## 📄 License
+MIT
