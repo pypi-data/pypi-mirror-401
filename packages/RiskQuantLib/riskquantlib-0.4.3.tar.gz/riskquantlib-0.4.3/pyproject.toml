@@ -1,0 +1,60 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "numpy",
+    "pandas",
+    "QuantLib"
+]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "RiskQuantLib"
+version = "0.4.3"
+description = "RiskQuantLib is a QuantLib derivative to evaluate risk."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Syuya_Murakami", email = "SyuyaMurakami@icloud.com"},
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "QuantLib",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+urls = {"Homepage" = "https://riskquantlib-doc.readthedocs.io/en/latest/index.html", "Bug Tracker" = "https://github.com/SyuyaMurakami/RiskQuantLib"}
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+packages = {find = {where = ["src"]}}
+
+
+[project.scripts]
+newRQL = "RiskQuantLib:newProject"
+saveRQL = "RiskQuantLib:saveModule"
+tplRQL = "RiskQuantLib:unpackModule"
+pkgRQL = "RiskQuantLib:packModule"
+addRQL = "RiskQuantLib:addModule"
+delRQL = "RiskQuantLib:deleteModule"
+clearRQL = "RiskQuantLib:clearAllModule"
+listRQL = "RiskQuantLib:listModule"
+initRQL = "RiskQuantLib:initDefaultModule"
+dftRQL = "RiskQuantLib:setDefaultModule"
+udftRQL = "RiskQuantLib:removeDefaultModule"
+getRQL = "RiskQuantLib:addModuleFromGithub"
+sendRQL = "RiskQuantLib:sendModule"
+recvRQL = "RiskQuantLib:receiveModule"
+bldRQL = "RiskQuantLib:buildProject"
+ubldRQL = "RiskQuantLib:unBuildProject"
+pstRQL = "RiskQuantLib:persistProject"
+autoRQL = "RiskQuantLib:autoBuildProject"
+copyRQL = "RiskQuantLib:copyProject"
