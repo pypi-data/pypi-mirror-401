@@ -1,0 +1,73 @@
+---
+source: src/parse/tests.rs
+expression: "super::parse_string(&input, &dummy_filename.clone())"
+input_file: src/parse/test_inputs/errors.beancount
+---
+{
+  "entries": [
+    {
+      "t": "Open",
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 2,
+      "account": "Assets:Cash",
+      "currencies": [
+        "EUR"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-21",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "<string>",
+        "line": 9
+      },
+      "flag": "*",
+      "payee": null,
+      "narration": "valid syntax",
+      "postings": [
+        {
+          "filename": "<string>",
+          "line": 10,
+          "meta": [],
+          "account": "Income:US:Hooli:Match401k",
+          "flag": null,
+          "units": {
+            "number": "-600.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "filename": "<string>",
+      "line": 1,
+      "message": "Invalid booking method: INVALIDBOOKINGMETHOD",
+      "entry": null
+    },
+    {
+      "filename": "<string>",
+      "line": 4,
+      "message": "Invalid document filename: Filepath is not absolute: 'relative/path'",
+      "entry": null
+    },
+    {
+      "filename": "<string>",
+      "line": 6,
+      "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (ERROR (currency) (currency)))",
+      "entry": null
+    }
+  ],
+  "directives": []
+}
