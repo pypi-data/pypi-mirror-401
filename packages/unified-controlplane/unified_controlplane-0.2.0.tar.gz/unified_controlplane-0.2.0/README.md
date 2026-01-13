@@ -1,0 +1,206 @@
+# Unified
+
+An AI Control Plane for orchestrating models, memory, and evaluation across your projects.
+
+## What is This?
+
+Unified is infrastructure for AI-assisted development. Instead of hardcoding model choices and losing context between sessions, unified provides:
+
+- **Registry** - Catalog of available models, tools, and skills
+- **Router** - Selects the right model based on task type and constraints
+- **Memory** - Persistent storage for decisions, patterns, and project knowledge
+- **Evaluator** - Quality gates that validate AI output against checklists
+- **Audit Log** - Complete record of routing decisions and evaluations
+
+See [docs/concepts.md](docs/concepts.md) for the full mental model.
+
+## Installation
+
+```bash
+pip install unified-controlplane
+```
+
+## Quick Start
+
+### Interactive Mode (Recommended for New Users)
+
+Just run `unified` with no arguments to get a menu-driven interface:
+
+```bash
+unified
+```
+
+```
+========================================
+=== Unified Control Plane ===
+========================================
+
+What would you like to do?
+
+  1. Check status
+  2. Remember something (add to memory)
+  3. Search memory
+  4. Route a task
+  5. List memory entries
+  6. Open web dashboard
+  7. Exit
+
+Enter choice:
+```
+
+### Web Dashboard
+
+For a visual interface, start the web dashboard:
+
+```bash
+unified web
+# Opens http://127.0.0.1:8765
+```
+
+### Command Line
+
+```bash
+# Check system status
+unified status
+
+# Route a task to the appropriate model
+unified route "Generate unit tests for user authentication" --type code
+
+# Add to memory
+unified memory add --type decision --content "Using pytest for testing"
+
+# Search memory
+unified memory search "testing"
+```
+
+## Short Aliases
+
+For power users, shorter aliases are available:
+
+| Alias | Command | Example |
+|-------|---------|---------|
+| `us` | `unified status` | `us` |
+| `ur` | `unified route` | `ur "Build login page"` |
+| `um` | `unified memory` | `um add --type decision --content "..."` |
+| `ui` | `unified interactive` | `ui` |
+| `uw` | `unified web` | `uw --port 9000` |
+
+## CLI Reference
+
+### `unified` (no args) or `unified interactive`
+Interactive menu-driven mode. No command memorization needed.
+
+### `unified status` or `us`
+Display control plane status: registry contents, memory stats, audit log info.
+
+```bash
+unified status [OPTIONS]
+
+Options:
+  --check-health    Verify model availability (may be slow)
+```
+
+### `unified route` or `ur`
+Select the appropriate model for a task.
+
+```bash
+unified route "task description" [OPTIONS]
+
+Options:
+  --type TEXT        Task type: code, review, documentation, research
+  --role TEXT        Role: lead, reviewer, advisor
+  -c, --constraint   Constraints: low-cost, fast, high-accuracy, local-only
+```
+
+### `unified memory` or `um`
+Manage project memory.
+
+```bash
+# Add an entry
+unified memory add --type decision --content "Using pytest"
+
+# List entries
+unified memory list [--type decision]
+
+# Search
+unified memory search "pytest"
+```
+
+### `unified web` or `uw`
+Start the web dashboard.
+
+```bash
+unified web [OPTIONS]
+
+Options:
+  --port INT    Port to run on (default: 8765)
+```
+
+### `unified run`
+Execute the full control plane loop with real model output.
+
+```bash
+unified run "task description" [OPTIONS]
+
+Options:
+  --type TEXT        Task type (default: code)
+  --role TEXT        Role (default: lead)
+  -c, --constraint   Constraints (can specify multiple)
+  --model TEXT       Override model selection
+```
+
+### `unified evaluate`
+Run quality checklists against output.
+
+```bash
+unified evaluate [OPTIONS]
+
+Options:
+  --file PATH        File containing output to evaluate
+  --task-type TEXT   Task type for checklist selection
+  --task-brief TEXT  Brief description for alignment checks
+  -c, --checklist    Specific checklist(s) to run
+```
+
+## Project Configuration
+
+Create `unified.yaml` in your project root to set the project ID:
+
+```yaml
+project_id: "my-project"
+
+routing:
+  default_constraints: []  # Optional: [low-cost] to prefer local models
+```
+
+## Data Storage
+
+Unified stores data in `~/.unified/`:
+
+```
+~/.unified/
+├── config/
+│   └── registry.yaml     # User customization (optional)
+├── memory/
+│   └── <project>/        # Per-project memory storage
+├── audit/
+│   └── audit.jsonl       # Audit log
+└── checklists/           # Custom checklists (optional)
+```
+
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UNIFIED_HOME` | Override home directory (default: ~/.unified) | No |
+| `ANTHROPIC_API_KEY` | API key for Claude models | For Claude adapter |
+| `OLLAMA_HOST` | Ollama endpoint (default: http://localhost:11434) | For Ollama adapter |
+
+## Documentation
+
+- [Conceptual Guide](docs/concepts.md) - Why a control plane? Mental models and workflows
+- [User-Friendly Interfaces](docs/user_friendly_interfaces.md) - Interactive mode, aliases, web dashboard
+
+## License
+
+MIT
