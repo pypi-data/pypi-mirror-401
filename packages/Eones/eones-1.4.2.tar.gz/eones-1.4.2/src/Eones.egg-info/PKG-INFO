@@ -1,0 +1,214 @@
+Metadata-Version: 2.4
+Name: Eones
+Version: 1.4.2
+Summary: Elegant time manipulation and reasoning library
+Author-email: Rodrigo Ezequiel Roldán <roldriel@gmail.com>
+License: # MIT License
+        
+        Copyright (c) 2025 Rodrigo Ezequiel Roldán
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: repository, https://github.com/roldriel/eones
+Project-URL: documentation, https://roldriel.github.io/eones/
+Project-URL: Bug Tracker, https://github.com/roldriel/eones/issues
+Keywords: datetime,time,calendar,library,dates,timezones
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: tzdata
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: myst-parser; extra == "docs"
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: coverage; extra == "test"
+Dynamic: license-file
+
+# Eones
+![Python](https://img.shields.io/badge/Python-3.9+-yellow?style=for-the-badge&logo=python)
+![PyPI](https://img.shields.io/pypi/v/eones?style=for-the-badge)
+![Pylint](https://img.shields.io/badge/pylint-10.00-green?style=for-the-badge)
+![Coverage](https://img.shields.io/badge/Coverage-100%25-red?style=for-the-badge)
+![Build](https://img.shields.io/badge/Build-manual-green?style=for-the-badge)
+![Tox](https://img.shields.io/badge/Tested%20tox-yellowgreen?style=for-the-badge)
+
+---
+
+> Compatible with Python 3.9+ · No external dependencies · Portable and lightweight
+
+---
+
+## ✨ What is Eones?
+
+Eones is a minimalist, dependency-free library for expressive, clear, and powerful date/time manipulation. Inspired by natural language semantics, it allows you to manipulate, compare, and transform dates as if they were living entities.
+
+> *"That is not dead which can eternal lie, and with strange aeons even death may die."*  
+> — *Abdul Alhazred*, Necronomicon
+
+### Philosophy
+
+> **Eones is not a datetime replacement. It's a temporal reasoning layer.**
+
+Eones exists to fill the gap between Python's low-level `datetime` and the need for semantic, calendar-aware date manipulation:
+
+- Using **only the standard library** (Python 3.9+)
+- Providing a **semantically rich and consistent API**
+- Supporting modern timezone-aware design with `zoneinfo`
+- Maintaining **modular and composable** architecture through clear separation of responsibilities (`Date`, `Delta`, `Range`)
+
+**Eones is for:**
+- Developers who want to reason about time semantically, not just manipulate timestamps
+- Teams that want **zero external dependencies** for maximum portability
+- Projects where **timezones, truncation, deltas and ranges** are central domain logic
+
+---
+
+## 📦 Installation
+
+```bash
+pip install "eones"
+```
+
+> If you're working with timezones on Windows or containers:  
+> ⚠️ Also install `tzdata`:
+> ```bash
+> pip install tzdata
+> ```
+
+---
+
+## 🧪 Basic Example
+
+```python
+from eones import Eones
+
+e = Eones("2025-06-15")
+
+print(e.add(months=1, days=3))                       # → Eones(date=2025-07-18T00:00:00+00:00, tz='UTC')
+print(e.format("%Y-%m-%d"))                          # → 2025-07-18
+print(e.diff_for_humans("2025-06-10"))               # → in 1 month
+print(e.diff_for_humans("2025-06-20", locale="es"))  # → en 4 semanas
+```
+
+---
+
+## 🔍 Key Features
+
+- ✅ **Zero external dependencies**: Pure Python (Python 3.9+)
+- ✅ **Intuitive interface**: Simple, semantically rich and easy-to-use API
+- ✅ **Modern timezone support**: Robust handling with `zoneinfo` (not `pytz`)
+- ✅ **Flexible parsing**: Accepts multiple date formats automatically, including ISO 8601 with timezone offsets
+- ✅ **Advanced temporal operations**: Deltas, ranges and semantic comparisons
+- ✅ **Modular architecture**: Clear separation between `Date`, `Delta`, `Range` and utilities
+- ✅ **Localization**: Support for multiple languages
+- ✅ **Humanization**: Converts time differences to readable text
+- ✅ **Complete type hinting**: Fully typed following PEP 561
+- ✅ **Interoperability**: Compatible with Python's standard `datetime`
+
+### Localization & Error Handling
+
+You can add more languages by creating a new file in `eones/locales/` with the
+translations for your locale. For example, `fr.py` for French.
+
+Eones surfaces clear exceptions derived from `EonesError`. Invalid timezones
+raise `InvalidTimezoneError`, while unparsable strings raise
+`InvalidFormatError`.
+
+---
+
+## 🧾 Comparison with other libraries
+
+### Why not Pendulum or Arrow?
+
+| Feature                                 | Eones | Pendulum | Arrow | Delorean | dateutil | pytz |
+|-----------------------------------------|:-----:|:--------:|:-----:|:--------:|:--------:|:----:|
+| Modern timezone support                | ✅ (`zoneinfo`) | ❌ (`pytz`) | ❌ (`pytz`) | ✅ | ⚠️ | ✅ |
+| External dependencies                   | ✅ None | ❌ Yes | ❌ Yes | ❌ Yes | ❌ Yes | ❌ Yes |
+| Semantically rich API                   | ✅ Rich | ✅ Medium | ✅ Medium | ⚠️ | ❌ | ❌ |
+| Modular/facade architecture             | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
+| Complete type hinting & PEP 561         | ✅ Yes | ❌ Limited | ❌ Limited | ❌ No | ❌ No | ❌ No |
+| **High Performance (~1M ops/sec)**      | **✅ Yes** | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Memory Optimized (`__slots__`)**      | **✅ Yes** | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
+| Zero-dep Localization (No Babel)        | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
+| Dedicated Range/Period API              | ✅ Yes | ✅ Yes | ⚠️ Basic | ⚠️ Basic | ❌ No | ❌ No |
+| Date arithmetic (add/subtract)          | ✅    | ✅        | ✅    | ✅        | ❌        | ❌   |
+| Flexible parsing (string, dict, dt)     | ✅    | ✅        | ✅    | ⚠️        | ✅        | ❌   |
+| Coverage tested ≥ 97%                   | ✅    | ❓        | ❓    | ❌        | ❌        | ❌   |
+| Can replace native `datetime` directly  | ✅    | ✅        | ✅    | ❌        | ❌        | ❌   |
+| Permissive license (MIT / BSD)          | ✅    | ✅        | ✅    | ✅        | ✅        | ✅   |
+| Actively maintained                     | ✅    | ✅        | ✅    | ❌        | ✅        | ⚠️   |
+
+> **See the numbers yourself:** For detailed performance metrics (Speed, Memory, Profiling), check out our **[Benchmark Suite](https://github.com/roldriel/eones/blob/master/benchmarks/README.md)**.
+
+---
+
+## 📚 Documentation & Examples
+
+Comprehensive examples and documentation are available:
+
+### 📖 Core Examples
+- **[Quick Start](https://github.com/roldriel/eones/blob/master/docs/source/examples/quick_start.md)** - Library import, date creation, formatting, basic operations
+- **[Advanced Patterns](https://github.com/roldriel/eones/blob/master/docs/source/examples/advanced_patterns.md)** - Truncation, rounding, period ranges, comparisons
+- **[Time Deltas](https://github.com/roldriel/eones/blob/master/docs/source/examples/time_deltas.md)** - Dual delta architecture, calendar vs duration intervals
+- **[Real World Scenarios](https://github.com/roldriel/eones/blob/master/docs/source/examples/real_world_scenarios.md)** - Real-world examples: age calculation, billing cycles, reports
+- **[Error Handling](https://github.com/roldriel/eones/blob/master/docs/source/examples/error_handling.md)** - Exception hierarchy, safe date creation, validation
+- **[Formatting & Serialization](https://github.com/roldriel/eones/blob/master/docs/source/examples/formatting_serialization.md)** - ISO 8601, JSON export/import, API integration
+- **[Regional Configuration](https://github.com/roldriel/eones/blob/master/docs/source/examples/regional_configuration.md)** - First day of week configuration, ISO vs US standards, weekend detection
+
+### 🔗 Integration Examples
+- **Django**: Custom model fields
+- **SQLAlchemy**: Specialized column types  
+- **REST APIs**: Serialization utilities
+
+---
+
+## 🔧 Tests & Coverage
+
+```bash
+tox
+```
+
+```bash
+coverage html && open htmlcov/index.html
+```
+
+---
+
+## 📖 Requirements
+
+- Python 3.9 or higher
+- (Optional) `tzdata` if using timezones in systems without a local zoneinfo database
+
+---
+
+## 📝 License
+
+MIT © 2025 — Rodrigo Ezequiel Roldán  
+[View full license](https://github.com/roldriel/eones/blob/master/LICENSE.md)
