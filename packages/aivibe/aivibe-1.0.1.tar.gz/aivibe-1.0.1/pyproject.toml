@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aivibe"
+version = "1.0.1"
+description = "AI Vibe - Complete AI Agent Training Package for VibeKaro.ai Platform with Flutter, Dart, Kotlin, Python, AWS expertise"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "AICippy Technologies", email = "dev@vibekaro.ai"}
+]
+maintainers = [
+    {name = "VibeKaro AI Team", email = "support@vibekaro.ai"}
+]
+keywords = [
+    "ai", "agent", "training", "flutter", "dart", "kotlin", "python",
+    "aws", "gcloud", "firebase", "sdlc", "coding-standards", "vibekaro"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Framework :: AWS CDK",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.34.0",
+    "google-generativeai>=0.3.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+    "schedule>=1.2.0",
+    "pydantic>=2.5.0",
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://vibekaro.ai"
+Documentation = "https://docs.vibekaro.ai"
+Repository = "https://github.com/aicippy/aivibe"
+Issues = "https://github.com/aicippy/aivibe/issues"
+
+[project.scripts]
+aivibe-train = "aivibe.cli:train_agent"
+aivibe-evaluate = "aivibe.cli:evaluate_agent"
+aivibe-schedule = "aivibe.cli:schedule_training"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aivibe*"]
+
+[tool.setuptools.package-data]
+aivibe = ["*.md", "*.yaml", "*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ['py311', 'py312']
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+ignore = ["E501"]
