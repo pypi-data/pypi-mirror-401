@@ -1,0 +1,107 @@
+[project]
+name = "gi-loadouts"
+version = "0.1.13"
+description = "Loadouts for Genshin Impact"
+authors = [
+    {name = "Akashdeep Dhar", email = "akashdeep.dhar@gmail.com"},
+    {name = "Avadhoot Dhere", email = "avadhootd99@gmail.com"},
+    {name = "Dhruv Bhirud", email = "bhiruddhruv@gmail.com"},
+    {name = "Prithviraj Chavan", email = "prithvichavan56110@gmail.com"},
+    {name = "Shounak Dey", email = "shounakdey@ymail.com"}
+]
+maintainers = [
+    {name = "Akashdeep Dhar", email = "akashdeep.dhar@gmail.com"}
+]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+keywords = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: Qt",
+    "Framework :: Pydantic :: 2",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Database :: Front-Ends",
+    "Topic :: Games/Entertainment",
+    "Topic :: Utilities",
+    "Typing :: Typed"
+]
+dependencies = [
+    "pillow>=10.4.0,<13.0.0",
+    "pydantic>=2.8.2,<3.0.0",
+    "pyside6-essentials>=6.10.0,<7.0.0",
+    "pytesseract>=0.3.13,<1.0.0",
+    "pyyaml>=6.0.2,<7.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyinstaller>=6.0.0,<7.0.0",
+    "pytest>=8.3.3,<10.0.0",
+    "pytest-cov>=4.1.0,<8.0.0",
+    "pytest-mock>=3.14.0,<4.0.0",
+    "pytest-qt>=4.4.0,<5.0.0",
+    "pytest-xdist>=3.6.1,<4.0.0",
+    "pytest-xvfb>=3.0.0,<4.0.0",
+    "ruff>=0.2.0,<1.0.0",
+    "tox>=4.0.0,<5.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/gridhead/gi-loadouts"
+Repository = "https://github.com/gridhead/gi-loadouts"
+Documentation = "https://github.com/gridhead/gi-loadouts/blob/main/README.md"
+
+[project.scripts]
+gi-loadouts = "gi_loadouts.main:main"
+
+[tool.ruff]
+line-length = 100
+fix = true
+extend-exclude = [
+    "gi_loadouts/face/rsrc/arti/*.py",
+    "gi_loadouts/face/rsrc/char/*.py",
+    "gi_loadouts/face/rsrc/data/*.py",
+    "gi_loadouts/face/rsrc/font/*.py",
+    "gi_loadouts/face/rsrc/pmon/*.py",
+    "gi_loadouts/face/rsrc/rare/*.py",
+    "gi_loadouts/face/rsrc/vson/*.py",
+    "gi_loadouts/face/rsrc/weap/*.py"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "S", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"gi_loadouts/*" = ["E501"]
+"test/*" = ["S101", "E501", "S311"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["gi_loadouts*"]
+
+[tool.coverage]
+report = { show_missing = true }
+
+[tool.coverage.run]
+omit = [
+    "gi_loadouts/face/rsrc/arti/*.py",
+    "gi_loadouts/face/rsrc/char/*.py",
+    "gi_loadouts/face/rsrc/data/*.py",
+    "gi_loadouts/face/rsrc/font/*.py",
+    "gi_loadouts/face/rsrc/pmon/*.py",
+    "gi_loadouts/face/rsrc/rare/*.py",
+    "gi_loadouts/face/rsrc/vson/*.py",
+    "gi_loadouts/face/rsrc/weap/*.py"
+]
