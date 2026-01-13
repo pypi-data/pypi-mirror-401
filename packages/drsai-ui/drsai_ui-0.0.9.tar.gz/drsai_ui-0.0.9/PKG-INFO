@@ -1,0 +1,47 @@
+Metadata-Version: 2.4
+Name: drsai_ui
+Version: 0.0.9
+Summary: This is the UI backend for the dr.sai project.
+Project-URL: Homepage, https://github.com/hepaihub/drsai
+Author: hepai
+License-Expression: MIT
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.11
+Requires-Dist: aioconsole
+Requires-Dist: aiofiles
+Requires-Dist: alembic
+Requires-Dist: authlib
+Requires-Dist: autogen-ext[docker,file-surfer,magentic-one,task-centric-memory,web-surfer]==0.5.7
+Requires-Dist: damei
+Requires-Dist: docker
+Requires-Dist: dotmap
+Requires-Dist: drsai>=1.0.5
+Requires-Dist: hepai>=1.3.3
+Requires-Dist: html2text
+Requires-Dist: itsdangerous
+Requires-Dist: nest-asyncio
+Requires-Dist: playwright==1.51
+Requires-Dist: psutil
+Requires-Dist: psycopg
+Requires-Dist: pycryptodome
+Requires-Dist: python-jose
+Requires-Dist: pyyaml
+Requires-Dist: sqlmodel
+Requires-Dist: tldextract
+Requires-Dist: typer
+Requires-Dist: websockets
+Provides-Extra: azure
+Requires-Dist: autogen-ext[azure]==0.5.7; extra == 'azure'
+Provides-Extra: eval
+Requires-Dist: huggingface-hub; extra == 'eval'
+Requires-Dist: pandas; extra == 'eval'
+Requires-Dist: scipy; extra == 'eval'
+Provides-Extra: ollama
+Requires-Dist: autogen-ext[ollama]==0.5.7; extra == 'ollama'
+Description-Content-Type: text/markdown
+
+# drsai_ui package 
+
+A web application backend package for the drsai Agent and multi-agent system.
