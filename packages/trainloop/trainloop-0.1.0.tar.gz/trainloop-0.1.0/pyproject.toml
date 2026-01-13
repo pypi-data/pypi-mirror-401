@@ -1,0 +1,26 @@
+[project]
+name = "trainloop"
+version = "0.1.0"
+description = "Minimal PyTorch training loop with hooks and checkpointing."
+readme = "README.md"
+authors = [
+    { name = "Karim Abou Zeid", email = "contact@ka.codes" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "pillow>=11.3.0",
+    "torch>=2.0.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.0,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "wandb>=0.20.1",
+    "pytest>=8.4.0",
+    "ruff>=0.11.13",
+    "zensical>=0.0.10",
+    "mkdocstrings-python>=2.0.1",
+]
