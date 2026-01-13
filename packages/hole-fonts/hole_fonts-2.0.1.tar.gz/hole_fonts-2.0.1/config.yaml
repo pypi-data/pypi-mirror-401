@@ -1,0 +1,57 @@
+# HOLE Fonts Configuration
+
+library:
+  # Main font library location
+  path: '/Volumes/80F9F6D9-7BEF-4B9D-BE79-A7E2F900F1ED/Library/Daemon Containers/85C492CA-B246-4619-9E1D-E222C06C5FC9/Data/Library/Mobile Documents/com~apple~CloudDocs/HOLE-Foundation-Stuff/Brand/Fonts/HOLE-Font-Library/HOLE-Font-Library(Fonttools)'
+
+  # Fallback to local if external drive is unavailable
+  fallback_path: 'Library'
+
+input:
+  # Source fonts directory
+  path: 'Input'
+
+output:
+  # Temporary conversion output
+  path: 'Output'
+
+# Font formats to generate
+formats:
+  - ttf
+  - otf
+  - woff2
+
+# Adobe Typekit API (v0.2)
+typekit:
+  api_key: 'beea03b82c5b7f168058ef9d33815eb8b15abf4b'
+  base_url: 'https://typekit.com/api/v1/json'
+  enabled: false  # Enable in v0.2
+
+# Processing options
+processing:
+  # Number of fonts to process in parallel
+  parallel_workers: 4
+
+  # Skip fonts that already exist in library
+  skip_existing: true
+
+  # Create backup before overwriting
+  backup_on_overwrite: true
+
+# Logging
+logging:
+  level: 'INFO'  # DEBUG, INFO, WARNING, ERROR
+  file: 'hole-fonts.log'
+
+# Export settings (for FontBase integration)
+export:
+  # Default export directory (add this to FontBase as watched folder)
+  default_path: 'Export'
+
+  # Export structure
+  # Options: flat-by-family, format-separated, single-flat
+  structure: 'flat-by-family'
+
+  # Metadata export
+  export_metadata: true
+  metadata_format: 'json'
