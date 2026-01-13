@@ -1,0 +1,375 @@
+Metadata-Version: 2.4
+Name: firevm
+Version: 0.2.0
+Summary: Official Python SDK for FireVM - MicroVM Management Platform
+Home-page: https://github.com/firevm/firevm-python
+Author: FireVM Team
+Author-email: FireVM Team <support@firevm.dev>
+License: MIT
+Project-URL: Homepage, https://firevm.dev
+Project-URL: Documentation, https://docs.firevm.dev
+Project-URL: Repository, https://github.com/firevm/firevm-python
+Project-URL: Issues, https://github.com/firevm/firevm-python/issues
+Keywords: firevm,microvm,firecracker,vm,cloud,infrastructure
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.31.0
+Requires-Dist: pydantic>=2.0.0
+Provides-Extra: async
+Requires-Dist: aiohttp>=3.9.0; extra == "async"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# FireVM Python SDK
+
+Official Python client library for [FireVM](https://firevm.dev) - A microVM management platform built on AWS Firecracker.
+
+## Features
+
+- **Simple & Pythonic API**: Easy-to-use interface for managing microVMs
+- **Type-Safe**: Full type hints and Pydantic models
+- **Async Support**: Built-in async/await support with `aiohttp`
+- **Automatic Retries**: Configurable retry logic for network errors
+- **Well-Documented**: Comprehensive documentation and examples
+
+## Installation
+
+```bash
+# Basic installation
+pip install firevm
+
+# With async support
+pip install firevm[async]
+
+# Development installation
+pip install firevm[dev]
+```
+
+## Quick Start
+
+### Authentication
+
+```python
+from firevm import FireVM
+
+# Using API key
+client = FireVM(api_key="fvm_live_your_api_key_here")
+
+# Using JWT token (from OAuth)
+client = FireVM(token="your_jwt_token_here")
+```
+
+### Managing VMs
+
+```python
+# Create a new VM
+vm = client.vms.create(
+    name="my-app-vm",
+    tier="small",  # small, medium, or large
+    image="ubuntu-22.04"
+)
+print(f"Created VM: {vm.id}")
+
+# List all VMs
+vms = client.vms.list()
+for vm in vms:
+    print(f"{vm.name}: {vm.state}")
+
+# Get VM details
+vm = client.vms.get("vm_abc123")
+print(f"VM {vm.name} is {vm.state}")
+
+# Start/Stop/Restart a VM
+client.vms.start(vm.id)
+client.vms.stop(vm.id)
+client.vms.restart(vm.id)
+
+# Pause and resume
+client.vms.pause(vm.id)
+client.vms.resume(vm.id)
+
+# Get VM logs
+logs = client.vms.logs(vm.id, lines=100)
+print(logs)
+
+# Terminate a VM
+client.vms.kill(vm.id)
+```
+
+### API Key Management
+
+```python
+# Create a new API key
+key = client.api_keys.create(
+    name="production-key",
+    scopes=["vms:read", "vms:write"]
+)
+print(f"API Key: {key.key}")  # Save this securely!
+
+# List API keys
+keys = client.api_keys.list()
+for key in keys:
+    print(f"{key.name}: {key.scopes}")
+
+# Revoke an API key
+client.api_keys.revoke(key.id)
+```
+
+### Async Usage
+
+```python
+import asyncio
+from firevm import AsyncFireVM
+
+async def main():
+    async with AsyncFireVM(api_key="fvm_live_...") as client:
+        # Create VM
+        vm = await client.vms.create(
+            name="async-vm",
+            tier="small",
+            image="ubuntu-22.04"
+        )
+        
+        # Start it
+        await client.vms.start(vm.id)
+        
+        # Get status
+        status = await client.vms.get(vm.id)
+        print(f"VM state: {status.state}")
+
+asyncio.run(main())
+```
+
+## Advanced Usage
+
+### Error Handling
+
+```python
+from firevm import FireVM, FireVMError, VMNotFoundError, QuotaExceededError
+
+client = FireVM(api_key="fvm_live_...")
+
+try:
+    vm = client.vms.create(name="test", tier="small", image="ubuntu-22.04")
+except QuotaExceededError as e:
+    print(f"Quota exceeded: {e.message}")
+except FireVMError as e:
+    print(f"API error: {e.status_code} - {e.message}")
+```
+
+### Pagination
+
+```python
+# Get all VMs with pagination
+all_vms = []
+page = 1
+while True:
+    response = client.vms.list(page=page, limit=50)
+    all_vms.extend(response.data)
+    if page >= response.total_pages:
+        break
+    page += 1
+```
+
+### Filtering VMs
+
+```python
+# Filter by state
+running_vms = client.vms.list(state="running")
+
+# Filter by tier
+small_vms = client.vms.list(tier="small")
+```
+
+### Custom Configuration
+
+```python
+from firevm import FireVM
+
+client = FireVM(
+    api_key="fvm_live_...",
+    base_url="https://api.firevm.dev",  # Custom API endpoint
+    timeout=30,  # Request timeout in seconds
+    max_retries=3,  # Max retry attempts
+    retry_delay=1.0,  # Delay between retries (seconds)
+)
+```
+
+## API Reference
+
+### Client
+
+#### `FireVM(api_key=None, token=None, base_url=None, timeout=30, max_retries=3)`
+
+Main client for interacting with FireVM API.
+
+**Parameters:**
+- `api_key` (str, optional): Your FireVM API key (starts with `fvm_live_`)
+- `token` (str, optional): JWT token from OAuth authentication
+- `base_url` (str, optional): Custom API base URL (defaults to production)
+- `timeout` (int, optional): Request timeout in seconds
+- `max_retries` (int, optional): Number of retry attempts for failed requests
+
+### VM Operations
+
+#### `client.vms.create(name, tier, image, **kwargs)`
+
+Create a new microVM.
+
+**Parameters:**
+- `name` (str): VM name (3-50 chars, alphanumeric + hyphens)
+- `tier` (str): VM size tier (`small`, `medium`, `large`)
+- `image` (str): OS image name (e.g., `ubuntu-22.04`)
+
+**Returns:** `VM` object
+
+#### `client.vms.list(state=None, tier=None, page=1, limit=20)`
+
+List all VMs for the authenticated user.
+
+**Returns:** `PaginatedResponse[VM]`
+
+#### `client.vms.get(vm_id)`
+
+Get details of a specific VM.
+
+**Returns:** `VM` object
+
+#### `client.vms.start(vm_id)` / `stop(vm_id)` / `restart(vm_id)`
+
+Control VM lifecycle.
+
+**Returns:** `VM` object with updated state
+
+#### `client.vms.pause(vm_id)` / `resume(vm_id)`
+
+Pause and resume a running VM.
+
+#### `client.vms.kill(vm_id)`
+
+Forcefully terminate a VM.
+
+#### `client.vms.logs(vm_id, lines=100)`
+
+Get VM console logs.
+
+**Returns:** `str` (log content)
+
+### API Key Operations
+
+#### `client.api_keys.create(name, scopes=None)`
+
+Create a new API key.
+
+**Parameters:**
+- `name` (str): Key name for identification
+- `scopes` (list[str], optional): Permission scopes
+
+**Returns:** `APIKey` object (includes plaintext key - save it!)
+
+#### `client.api_keys.list()`
+
+List all API keys (without plaintext values).
+
+#### `client.api_keys.revoke(key_id)`
+
+Revoke an API key.
+
+## Models
+
+### VM
+
+```python
+class VM:
+    id: str
+    name: str
+    user_id: str
+    tier: str  # "small" | "medium" | "large"
+    image: str
+    state: str  # "creating" | "running" | "stopped" | "paused" | "terminated"
+    worker_id: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    metadata: dict
+```
+
+### APIKey
+
+```python
+class APIKey:
+    id: str
+    user_id: str
+    name: str
+    key_hash: str
+    key: Optional[str]  # Only present when creating
+    scopes: list[str]
+    last_used_at: Optional[datetime]
+    created_at: datetime
+    revoked: bool
+```
+
+## Error Handling
+
+All errors inherit from `FireVMError`:
+
+- `AuthenticationError`: Invalid API key or token
+- `PermissionDeniedError`: Insufficient permissions
+- `VMNotFoundError`: VM does not exist
+- `QuotaExceededError`: VM quota limit reached
+- `RateLimitError`: Too many requests
+- `ValidationError`: Invalid request parameters
+- `ServerError`: Internal server error
+
+## Development
+
+```bash
+# Clone the repository
+git clone https://github.com/firevm/firevm-python
+cd firevm-python
+
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+black firevm tests
+
+# Type checking
+mypy firevm
+
+# Lint
+ruff check firevm
+```
+
+## Requirements
+
+- Python 3.8+
+- `requests` >= 2.31.0
+- `pydantic` >= 2.0.0
+- `aiohttp` >= 3.9.0 (for async support)
+
+## Support
+
+- **Documentation**: https://docs.firevm.dev
+- **Issues**: https://github.com/firevm/firevm-python/issues
+- **Email**: support@firevm.dev
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
