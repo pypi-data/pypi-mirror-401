@@ -1,0 +1,224 @@
+import asyncio
+from datetime import UTC, datetime
+import logging
+from typing import TYPE_CHECKING, cast
+import uuid
+
+from asynctasq.config import Config
+from asynctasq.drivers import DriverType
+from asynctasq.drivers.base_driver import BaseDriver
+from asynctasq.monitoring import EventRegistry, EventType, TaskEvent
+from asynctasq.serializers import BaseSerializer
+from asynctasq.serializers.msgspec_serializer import MsgspecSerializer
+from asynctasq.tasks.services.serializer import TaskSerializer
+
+from .driver_factory import DriverFactory
+
+if TYPE_CHECKING:
+    from asynctasq.tasks import BaseTask
+
+logger = logging.getLogger(__name__)
+
+
+class Dispatcher:
+    """Dispatches tasks to queues using queue drivers.
+
+    The Dispatcher manages task serialization and enqueueing across different
+    queue drivers (Redis, SQS, Postgres, MySQL). It supports per-task driver overrides.
+
+    Attributes:
+        driver: Default queue driver for tasks without driver override
+        serializer: Task serializer (default: config-based, msgspec by default)
+        event_emitter: Optional event emitter for monitoring integration
+    """
+
+    def __init__(
+        self,
+        driver: BaseDriver,
+        serializer: BaseSerializer | None = None,
+        event_emitter: None = None,
+    ) -> None:
+        self.driver = driver
+        self.serializer = serializer or MsgspecSerializer()
+        # Dispatcher no longer stores an emitter instance; global emitters are used
+        self.event_emitter = None
+        self._driver_cache: dict[str, BaseDriver] = {}  # Cache for driver overrides
+        self._task_serializer = TaskSerializer(self.serializer)
+
+    def _get_driver(self, task: "BaseTask") -> BaseDriver:
+        """Get the appropriate driver for this task.
+
+        Resolution order:
+        1. Task's config["driver"] (BaseDriver instance or string)
+        2. Global default driver
+        """
+        driver = task.config.get("driver")
+
+        if driver is None:
+            return self.driver
+
+        # If driver is already a BaseDriver instance
+        if isinstance(driver, BaseDriver):
+            logger.debug(f"Using task-specific driver instance for {task.__class__.__name__}")
+            return driver
+
+        # If driver is a string, create driver from config
+        if isinstance(driver, str):
+            cache_key = driver
+            if cache_key not in self._driver_cache:
+                logger.debug(f"Creating driver override '{driver}' for {task.__class__.__name__}")
+                config = Config.get()
+                config.driver = cast(DriverType, driver)
+                self._driver_cache[cache_key] = DriverFactory.create(driver, config)
+            return self._driver_cache[cache_key]
+
+        return self.driver
+
+    async def dispatch(
+        self,
+        task: "BaseTask",
+        queue: str | None = None,
+        delay: int | None = None,
+    ) -> str:
+        """Dispatch a task to the queue.
+
+        Args:
+            task: BaseTask instance to dispatch
+            queue: Queue name (overrides task.config.get("queue") if set)
+            delay: Delay in seconds (overrides task._delay_seconds if set)
+
+        Returns:
+            Task ID (UUID string)
+        """
+        # Ensure cleanup hooks are registered for the current event loop
+        # This handles the case where asynctasq.init() was called before the loop started
+        from asynctasq import ensure_cleanup_registered
+
+        await ensure_cleanup_registered()
+
+        # Generate task ID
+        task_id = str(uuid.uuid4())
+        task._task_id = task_id
+        task._dispatched_at = datetime.now(UTC)
+
+        # Determine queue and delay
+        target_queue = queue or task.config.get("queue") or "default"
+        if delay is not None:
+            delay_seconds = delay
+        else:
+            delay_seconds = getattr(task, "_delay_seconds", None) or 0
+
+        # Get driver and serialize task
+        driver = self._get_driver(task)
+        driver_type = driver.__class__.__name__
+        serialized_task = self._task_serializer.serialize(task)
+
+        # Get visibility_timeout and max_attempts from task config or use defaults
+        config = Config.get()
+        visibility_timeout = task.config.get("visibility_timeout", 3600)
+        max_attempts = task.config.get("max_attempts", config.task_defaults.max_attempts)
+
+        # Enqueue with current attempt number, visibility timeout, and max_attempts
+        await driver.enqueue(
+            target_queue,
+            serialized_task,
+            delay_seconds,
+            task._current_attempt,
+            visibility_timeout,
+            max_attempts,
+        )
+
+        # Emit task_enqueued event via global emitters
+        await EventRegistry.emit(
+            TaskEvent(
+                event_type=EventType.TASK_ENQUEUED,
+                task_id=task_id,
+                task_name=task.__class__.__name__,
+                queue=target_queue,
+                worker_id="dispatcher",
+            )
+        )
+
+        logger.info(
+            f"Dispatching task {task_id}: {task.__class__.__name__} "
+            f"to queue '{target_queue}' using {driver_type}"
+            + (f" with {delay_seconds}s delay" if delay_seconds > 0 else "")
+        )
+
+        return task_id
+
+
+# Global dispatcher management
+_dispatchers: dict[str, tuple[Dispatcher, BaseDriver]] = {}
+
+
+def get_dispatcher(driver: str | BaseDriver | None = None) -> Dispatcher:
+    """Get dispatcher singleton for the specified driver.
+
+    Lazy initialization: creates dispatcher on first access.
+
+    Args:
+        driver: Optional driver specification (None = use default from config)
+
+    Returns:
+        Dispatcher instance
+    """
+    global _dispatchers
+
+    # Determine cache key
+    if driver is None:
+        driver_key = "default"
+    elif isinstance(driver, str):
+        driver_key = driver
+    else:
+        driver_key = f"instance_{id(driver)}"
+
+    # Return cached if exists
+    if driver_key in _dispatchers:
+        return _dispatchers[driver_key][0]
+
+    config = Config.get()
+
+    # Create driver
+    if isinstance(driver, str):
+        config.driver = cast(DriverType, driver)
+        driver_instance = DriverFactory.create(driver, config)
+    elif driver is None:
+        driver_instance = DriverFactory.create(config.driver, config)
+    else:
+        driver_instance = driver
+
+    # Ensure global event emitters are configured
+    EventRegistry.init()
+
+    # Create dispatcher (uses global emission)
+    dispatcher = Dispatcher(driver_instance)
+    _dispatchers[driver_key] = (dispatcher, driver_instance)
+
+    logger.debug(f"Created dispatcher for driver: {driver_key}")
+
+    return dispatcher
+
+
+async def cleanup():
+    """Cleanup all dispatchers and drivers."""
+    global _dispatchers
+
+    if not _dispatchers:
+        logger.debug("No dispatchers to cleanup")
+        return
+
+    logger.info(f"Cleaning up {len(_dispatchers)} dispatcher(s)")
+
+    for driver_key, (_dispatcher, driver) in _dispatchers.items():
+        try:
+            # Close global event emitters
+            await asyncio.wait_for(EventRegistry.close_all(), timeout=5.0)
+            # Disconnect driver
+            await asyncio.wait_for(driver.disconnect(), timeout=5.0)
+            logger.debug(f"Successfully cleaned up dispatcher: {driver_key}")
+        except Exception as e:
+            logger.exception(f"Error disconnecting driver {driver_key}: {e}")
+
+    _dispatchers.clear()
+    logger.info("Dispatcher cleanup complete")
