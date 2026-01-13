@@ -1,0 +1,86 @@
+[project]
+name = "sbcourse"
+version = "0.1.2"
+description = "Steel Bank Course - A comprehensive toolkit for managing Jupyter notebook-based courses with interactive widgets, leaderboards, and gamification"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    { name = "John Kitchin", email = "jkitchin@andrew.cmu.edu" }
+]
+keywords = ["jupyter", "education", "course", "widgets", "quiz", "flashcards", "leaderboard"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Jupyter",
+    "Topic :: Education",
+]
+requires-python = ">=3.10"
+dependencies = [
+    # Core Jupyter/IPython
+    "nbformat",
+    "nbconvert",
+    "ipykernel",
+    "jupyter-server",
+    "IPython",
+    # Interactive widgets
+    "ipywidgets>=8.0.0",
+    # PDF export
+    "playwright",
+    "pypdf>=4.0.0",
+    # Search
+    "chromadb",
+    # CLI and utilities
+    "click",
+    "requests",
+    "tqdm",
+    "pyyaml>=6.0",
+    # Config
+    "tomli>=2.0.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+# Discord bot dependencies
+bot = [
+    "discord.py>=2.3.0",
+    "flask>=3.0.0",
+    "python-dotenv>=1.0.0",
+]
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jkitchin/sbcourse"
+Documentation = "https://github.com/jkitchin/sbcourse#readme"
+Repository = "https://github.com/jkitchin/sbcourse"
+Issues = "https://github.com/jkitchin/sbcourse/issues"
+
+[project.scripts]
+sbc = "sbc.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/README.md",
+    "/LICENSE",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sbc"]
+
+[tool.ruff]
+line-length = 100
