@@ -1,0 +1,63 @@
+from contextlib import asynccontextmanager
+from typing import Optional
+
+import uvicorn
+import uvloop
+from common.entity.base_response import BaseResponse
+from common.logger import get_logger, init_logging
+from common.middlewares.log_middleware import LoggingMiddleware
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from router import *
+
+# 初始化日志系统
+init_logging()
+logger = get_logger(__name__)
+
+# 使用 uvloop 作为事件循环
+uvloop.install()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    yield
+
+
+app = FastAPI(
+    title="{{ project_name }}",
+    description="{{ description }}",
+    version="0.1.2",
+    lifespan=lifespan
+)
+
+# 添加 CORS 中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 添加日志中间件
+app.add_middleware(LoggingMiddleware)
+
+# Health 接口
+@app.get("/health", response_model=BaseResponse[Optional[str]], tags=["health"])
+async def health_check():
+    """健康检查接口"""
+    return BaseResponse(code=0, message="success", data="ok")
+
+# 注册路由
+app.include_router(user_router)
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        loop="uvloop",
+        reload=True
+    )

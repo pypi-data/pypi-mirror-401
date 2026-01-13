@@ -1,0 +1,60 @@
+# {{ project_name }}
+
+FastAPI 后端项目
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+uv sync
+```
+
+### 初始化数据库
+
+```bash
+uv run python init_db.py
+```
+
+### 启动开发服务器
+
+```bash
+uv run uvicorn main:app --reload
+```
+
+访问 http://localhost:8000/docs 查看 API 文档
+
+## 测试账号
+
+- 用户名: `admin`
+- 密码: `admin123`
+
+## 项目结构
+
+```
+backend/
+├── common/           # 公共模块
+│   ├── entity/      # 实体和响应模型
+│   ├── middlewares/ # 中间件
+│   └── orm/         # 数据库 ORM
+├── models/          # 数据模型
+├── router/          # 路由
+├── logs/            # 日志目录
+└── main.py          # 应用入口
+```
+
+## 开发
+
+### 添加新模块
+
+使用 simple-fastapi-scaffold 工具：
+
+```bash
+simple-fastapi-scaffold add article
+```
+
+或者手动创建：
+1. 在 `models/` 中创建模型
+2. 在 `common/entity/schemas/` 中创建 Schema
+3. 在 `router/` 中创建路由
+4. 在 `main.py` 中注册路由

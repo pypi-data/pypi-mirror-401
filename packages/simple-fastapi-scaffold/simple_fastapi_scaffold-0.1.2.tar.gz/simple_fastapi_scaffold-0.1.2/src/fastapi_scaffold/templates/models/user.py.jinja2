@@ -1,0 +1,17 @@
+"""用户模型"""
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String
+
+from common.orm import Base, TimestampMixin, BaseModelMixin
+
+
+class User(Base, TimestampMixin, BaseModelMixin):
+    """用户模型"""
+    __tablename__ = "users"
+
+    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, comment="用户名")
+    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, comment="邮箱")
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False, comment="密码哈希")
+
+    def __repr__(self):
+        return f"<User(id={self.id}, username={self.username}, email={self.email})>"

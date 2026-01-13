@@ -1,0 +1,64 @@
+[project]
+name = "simple_fastapi_scaffold"
+version = "0.1.2"
+description = "FastAPI 后端项目脚手架 - 一键生成完整的企业级后端架构"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.9"
+authors = [
+    { name = "xinmos", email = "xiongxinqi@outlook.com" }
+]
+license = { text = "MIT" }
+keywords = ["fastapi", "scaffold", "template", "boilerplate", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Topic :: Software Development :: Code Generators",
+]
+
+dependencies = [
+    "click>=8.1.0",
+    "jinja2>=3.1.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "toml>=0.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+simple-fastapi-scaffold = "fastapi_scaffold.cli:main"
+fasc = "fastapi_scaffold.cli:main"
+simple-fastapi-scaffold-setup = "fastapi_scaffold.setup_env:main"
+
+[project.urls]
+Homepage = "https://github.com/xinmos"
+Documentation = "https://github.com/xinmos/simple-fastapi-scaffold/blob/master/README.md"
+Repository = "https://github.com/xinmos/simple-fastapi-scaffold.git"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"fastapi_scaffold" = ["templates/**/*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
