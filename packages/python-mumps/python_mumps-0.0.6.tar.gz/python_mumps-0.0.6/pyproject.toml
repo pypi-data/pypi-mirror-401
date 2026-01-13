@@ -1,0 +1,153 @@
+[build-system]
+requires = [
+    "cython >= 3.1.1",
+    "meson >= 1.8.0",
+    "meson-python >= 0.18.0",
+    "numpy >= 2.0",
+    "setuptools_scm",
+]
+build-backend = "mesonpy"
+
+[project]
+name = "python-mumps"
+description = "Bindings and Python interface for the MUMPS sparse solver"
+readme = "README.md"
+authors = [
+    {name = "Python-MUMPS authors", email = "authors@kwant-project.org"}
+]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows"
+]
+requires-python = ">= 3.12"
+dependencies = [ "numpy>=2.0", "scipy>=1.13.0"]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://gitlab.kwant-project.org/kwant/python-mumps"
+repository = "https://gitlab.kwant-project.org/kwant/python-mumps"
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.black]
+line-length = 88
+
+[tool.codespell]
+skip = ["*.lock"]
+ignore-words-list = "groth,coo"
+
+[tool.pixi.workspace]
+channels = ["https://prefix.dev/pixi-build-backends", "conda-forge"]
+platforms = ["linux-64"]
+preview = ["pixi-build"]
+
+[tool.pixi.pypi-dependencies]
+python-mumps = { path = ".", editable = true }
+
+[tool.pixi.activation.env]
+# Turn off threading to avoid slowdowns
+OPENBLAS_NUM_THREADS = "1"
+OMP_NUM_THREADS = "1"
+MKL_DYNAMIC = "FALSE"
+MKL_NUM_THREADS = "1"
+
+[tool.pixi.dependencies]
+python = ">=3.12"
+scipy = ">=1.13"
+numpy = ">=2.0"
+setuptools_scm = ">=8.3.1,<9"
+meson-python = ">=0.18.0,<0.19"
+compilers = ">=1.9.0,<2"
+ninja = ">=1.12.1,<2"
+cython = ">=3.1.1,<4"
+pytest = ">=8.3.5,<9"
+pytest-mpi = ">=0.6,<0.7"
+git = ">=2.49.0,<3"
+pkgconfig = ">=1.5.5,<2"
+
+[tool.pixi.package]
+name = "python-mumps"
+version = "0.0.4" # TODO: Replace once pixi-build supports dynamic versions.
+readme = "README.md"
+authors = ["Python-MUMPS authors <authors@kwant-project.org>"]
+license = "BSD-2-Clause"
+
+[tool.pixi.package.build]
+backend = { name = "pixi-build-python", version = "==0.4.0" }
+
+[tool.pixi.package.host-dependencies]
+python = ">=3.12"
+cython = ">=3.1.1"
+meson = ">=1.8.0"
+meson-python = ">=0.18.0"
+numpy = ">=2.0"
+mumps-seq = ">=5.8.1,<6"
+setuptools-scm = ">=8"
+pip = "*"
+python-build = "*"
+compilers = ">=1.9.0,<2"
+ninja = ">=1.12.1,<2"
+pkg-config = "*"
+
+[tool.pixi.package.run-dependencies]
+python = ">=3.12"
+numpy = ">=2.0"
+scipy = ">=1.13"
+mumps-seq = ">=5.8.1,<6"
+
+[tool.pixi.feature.publish.dependencies]
+uv = ">=0.4.5"
+twine = ">=5.1.1"
+
+[tool.pixi.feature.precommit.dependencies]
+pre-commit = "*"
+git = "*"
+
+[tool.pixi.feature.develop.dependencies]
+ipykernel = ">=6.29.0"
+
+[tool.pixi.feature.minimal]
+solve-strategy = "lowest-direct"
+
+[tool.pixi.feature.seq.dependencies]
+mumps-seq = ">=5.8.1,<6"
+
+[tool.pixi.feature.seq.tasks]
+test = { cmd = "python -P -m pytest -v --import-mode=importlib --pyargs mumps", clean-env = true }
+
+[tool.pixi.feature.mpi.dependencies]
+# meson-python keys build directories by python version. To ensure that the builds
+# for sequential and MPI-enabled MUMPS do not conflict, we fix the python version here.
+python = "3.13.*"
+mumps-mpi = ">=5.8.1,<6"
+mpi4py = ">=4.1.0,<5"
+
+[tool.pixi.feature.mpi.tasks]
+test-mpi = { cmd = "mpirun -n 2 python -P -m pytest -v -rs --import-mode=importlib --pyargs mumps -m mpi --with-mpi", clean-env = true }
+
+[tool.pixi.pypi-options]
+no-build-isolation = ["python-mumps"]
+
+[tool.pixi.environments]
+default = { features = ["seq", "develop", "publish", "precommit"], solve-group = "default" }
+parallel = { features = ["mpi", "develop", "publish", "precommit"], solve-group = "parallel" }
+minimal = { features = ["minimal", "seq"], solve-group = "minimal" }
+precommit = { features = ["precommit"], no-default-feature = true }
+publish = { features = ["publish", "seq"] }
+
+
+[tool.pixi.feature.precommit.tasks]
+check = "pre-commit run --all-files"
+pre-commit = "pre-commit"
