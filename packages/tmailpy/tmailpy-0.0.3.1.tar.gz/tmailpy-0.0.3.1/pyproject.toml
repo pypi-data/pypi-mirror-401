@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tmailpy"
+version = "0.0.3.1"
+description = "Python wrapper for TMail Instances"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.28",
+]
+authors = [ { name = "nxyyhaha" } ]
+license = { file = "LICENSE" }
+
+[project.scripts]
+tmailpy = "tmailpy.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/nxyyhaha/tmail-wrapper"
+issues = "https://github.com/nxyyhaha/tmail-wrapper/issues"
+contribute = "https://github.com/nxyyhaha/tmail-wrapper/pulls"
