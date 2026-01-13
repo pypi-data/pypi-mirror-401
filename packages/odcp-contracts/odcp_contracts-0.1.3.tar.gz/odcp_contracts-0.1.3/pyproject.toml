@@ -1,0 +1,39 @@
+[project]
+name = "odcp-contracts"
+version = "0.1.3"
+description = "Contracts for Owndivision Control Plane ↔ Data Plane"
+readme = "CP_README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic[email]>=2.7,<3.0",
+    "pyjwt>=2.10.1,<3.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["odcp_contracts"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.2,<9.0"
+pytest-xdist = ">=3.6,<4.0"
+pytest-timeout = ">=2.3,<3.0"
+httpx = ">=0.27,<0.29"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+markers = [
+    "contracts: contract stability tests for odcp_contracts",
+    "unit: fast unit tests that do not need external services",
+    "integration: integration tests that hit a running CP + DB",
+    "e2e: end-to-end API tests that require a running CP instance",
+]
+# Configure pytest to be the default test runner
+addopts = "-v --tb=short"
