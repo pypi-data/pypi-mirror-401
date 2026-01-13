@@ -1,0 +1,42 @@
+[project]
+name = "ftai"
+version = "1.0.0"
+description = "FTAI CLI tool for linting, formatting, and converting .ftai files."
+authors = [
+    { name = "Michael Folk", email = "michael.folk@folktechai.com" }
+]
+requires-python = ">=3.8"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+keywords = ["ftai", "ai", "linter", "format", "human-ai", "agent"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
+]
+
+[project.urls]
+Homepage = "https://github.com/FolkTechAI/ftai-spec"
+Repository = "https://github.com/FolkTechAI/ftai-spec"
+Documentation = "https://github.com/FolkTechAI/ftai-spec#readme"
+
+[project.scripts]
+ftai = "ftai_linter.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ftai_linter = ["py.typed"]
