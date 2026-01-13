@@ -1,0 +1,143 @@
+collections:
+  dreambank:
+    title: "DreamBank"
+    brief_description: "..."
+    long_description: "..."
+    url: "https://dreambank.net"
+    corpora:
+      - hurovitz1999
+      - hvdc
+      - urbina1975
+  sddb:
+    title: "Sleep and Dream Database"
+    brief_description: "..."
+    long_description: "..."
+    url: "https://sleepanddreamdatabase.org"
+    corpora:
+      - hvdc
+
+corpora:
+  hurovitz1999:
+    title: "Hurovitz et al., 1999"
+    brief_description: "Dreams from blind individuals, sourced from DreamBank"
+    long_description: "This corpus contains dreams from the DreamBank collection. The two datasets Blind dreamers (F) and Blind dreamers (M) were merged and author data extracted from additional metadata available in DreamBank. The dataset was analyzed and published in Hurovitz et al. (1999)."
+    citations:
+      - "Domhoff, G. W., & Schneider, A. (2008). Studying dream content using the archive and search engine on DreamBank.net. Consciousness and Cognition, 17(4), 1238-1247. https://doi.org/10.1016/j.concog.2008.06.010"
+      - "Hurovitz, C. S., Dunn, S., Domhoff, G. W., & Fiss, H. (1999). The dreams of blind men and women: A replication and extension of previous findings. Dreaming, 9(2), 183-193. https://doi.org/10.1023/A:1021397817164"
+    environment: "unknown"
+    probe: "unknown"
+    includes_norecall: false
+    column_map:
+      report: "report"
+      author: "author"
+    author_columns:
+      - "sex"
+      - "age"
+      - "years_education"
+      - "occupation"
+      - "retired"
+      - "years_blind"
+      - "nature_blindness"
+      - "degree_blindness"
+    latest: "1"
+    versions:
+      "1":
+        download_url: "https://zenodo.org/records/18191334/files/hurovitz1999.csv?download=1"
+        hash: "md5:2af24d8982609d34c62fb5c7eda32f8a"
+        doi: "10.5281/zenodo.18191334"
+  hvdc:
+    title: "Hall & Van de Castle Norms"
+    brief_description: "Historically significant collection of dream reports"
+    long_description: "This corpus contains dream reports collected by Calvin S. Hall and Robert L. Van de Castle in the 1960s to establish normative data for their dream content analysis system. They were used to establish normative data for the Hall and Van de Castle coding system. The dreams have been widely used in dream research for comparative studies."
+    citations:
+      - "Domhoff, G. W., & Schneider, A. (2008). Studying dream content using the archive and search engine on DreamBank.net. Consciousness and Cognition, 17(4), 1238-1247. https://doi.org/10.1016/j.concog.2008.06.010"
+      - "Hall, C. S., & Van de Castle, R. L. (1966). The content analysis of dreams. Appleton-Century-Crofts."
+    environment: "unknown"
+    probe: "unknown"
+    includes_norecall: false
+    column_map:
+      report: "report"
+      author: "author_id"
+    author_columns:
+      - "sex"
+    latest: "1"
+    versions:
+      "1":
+        download_url: "https://zenodo.org/records/18089278/files/hvdc.csv?download=1"
+        hash: "md5:bd376d9dcc77f5369e7f4a058a1ba166"
+        doi: "10.5281/zenodo.18089278"
+  ucsc1996:
+    title: "UCSC, 1996"
+    brief_description: "Women ages 18-24 at the University of California Santa Cruz in 1996"
+    long_description: "This corpus contains dream reports collected from women ages 18-24 at the University of California Santa Cruz in 1996. It is part of the DreamBank collection and has been used in various dream research studies."
+    citations:
+      - "Domhoff, G. W., & Schneider, A. (2008). Studying dream content using the archive and search engine on DreamBank.net. Consciousness and Cognition, 17(4), 1238-1247. https://doi.org/10.1016/j.concog.2008.06.010"
+    environment: "unknown"
+    probe: "most recent dream"
+    includes_norecall: false
+    column_map:
+      report: "report"
+      author: "author_id"
+    author_columns:
+      - "age"
+      - "sex"
+    latest: "1"
+    versions:
+      "1":
+        download_url: "https://zenodo.org/records/18099365/files/ucsc1996.csv?download=1"
+        hash: "md5:caf94dc6bac916330caeb200e60c5671"
+        doi: "10.5281/zenodo.18099365"
+  urbina1975:
+    title: "Urbina & Grey, 1975"
+    brief_description: "Dreams from college students collected in Lima, Peru in 1970 and translated into English"
+    long_description: "This corpus contains dream reports collected from college students in Lima, Peru in 1970 by Urbina and Grey. The dreams were originally recorded in Spanish and later translated into English."
+    citations:
+      - "Domhoff, G. W., & Schneider, A. (2008). Studying dream content using the archive and search engine on DreamBank.net. Consciousness and Cognition, 17(4), 1238-1247. https://doi.org/10.1016/j.concog.2008.06.010"
+      - "Urbina, S. P., & Grey, A. (1975). Cultural and Sex Differences in the Sex Distribution of Dream Characters. Journal of Cross-Cultural Psychology, 6, 358-364. https://doi.org/10.1177/002202217563008"
+    environment: "unknown"
+    probe: "unknown"
+    includes_norecall: false
+    column_map:
+      report: "report"
+      author: "author"
+    author_columns:
+      - "sex"
+    latest: "1"
+    versions:
+      "1":
+        download_url: "https://zenodo.org/records/18091505/files/urbina1975.csv?download=1"
+        hash: "md5:05197362b787f8bef2e7c11fb9b81bf1"
+        doi: "10.5281/zenodo.18091505"
+  zhang2019:
+    title: "Zhang & Wamsley, 2019"
+    brief_description: "Dream reports collected from a laboratory polysomnography study"
+    long_description: "This corpus contains dream reports collected from participants in a laboratory polysomnography study conducted by Zhang and Wamsley and published in 2019. The dreams were collected using the serial awakening method, where participants were awakened during different sleep stages to report their dreams. The dataset includes various metadata about the participants and the sleep conditions."
+    citations:
+      - "Zhang, J., & Wamsley, E. J. (2019). EEG predictors of dreaming outside of REM sleep. Psychophysiology, 56(7), e13368. https://doi.org/10.1111/psyp.13368"
+      - "Wong, W., Herzog, R., Andrade, K. C., Andrillon, T., De Araujo, D. B., Arnulf, I., ... & Tsuchiya, N. (2025). A dream EEG and mentation database. Nature Communications, 16(1), 7495. https://doi.org/10.1038/s41467-025-61945-1"
+    environment: "lab"
+    probe: "serial awakening"
+    includes_norecall: true
+    column_map:
+      report: "Text of Report"
+      author: "Subject ID"
+      age: "Subject age"
+      sex: "Subject sex"
+      time: "Time of awakening"
+      stage_intended: "Intended last sleep stage"
+      stage_actual: "Actual last sleep stage"
+      experience: "Experience"
+    column_descriptions:
+      time: "Time of awakening for dream report"
+      stage_intended: "Sleep stage the experimenter intended to awaken the participant from"
+      stage_actual: "Sleep stage the participant was actually in when awakened"
+      experience: "True if the report contains any conscious experience, otherwise False"
+    author_columns:
+      - "age"
+      - "sex"
+    latest: "1"
+    versions:
+      "1":
+        download_url: "https://zenodo.org/records/18050635/files/zhang2019.csv?download=1"
+        hash: "md5:a61a3c56f4ee8c14e4a6466044df88f8"
+        doi: "10.5281/zenodo.18050635"
