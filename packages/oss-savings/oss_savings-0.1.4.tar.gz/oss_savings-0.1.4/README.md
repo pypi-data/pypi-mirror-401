@@ -1,0 +1,216 @@
+# OSS Savings Calculator
+
+**How much money did open source save you?**
+
+A command-line tool that estimates the development cost you avoided by using an open-source library instead of building it yourself.
+
+```bash
+$ oss-savings pytorch/pytorch
+
+  Build savings:            71,189 hrs     $12.46M
+  Maintenance savings:     124,581 hrs     $21.80M   (over 7 years)
+  ─────────────────────────────────────────────────
+  TOTAL:                   195,770 hrs     $34.26M
+```
+
+The total represents what it would cost to build from scratch plus maintain for the usage period (default: min of repo age or 7 years).
+
+## Why?
+
+Every time you type `pip install` or `npm install`, you're importing decades of collective engineering effort. But how much effort, exactly?
+
+This tool turns that vague intuition into concrete numbers—useful for:
+
+- **Justifying OSS contributions** to your manager ("We use $50M of free software, maybe we should give back?")
+- **Appreciating maintainers** ("Your library saved our company $2M")
+- **Understanding technical debt** ("We depend on a $500K library maintained by one person")
+- **Due diligence** ("How much would it cost to replace this dependency?")
+
+## Installation
+
+```bash
+pip install oss-savings
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/skyfallsin/oss-savings
+cd oss-savings
+pip install -e .
+```
+
+No external dependencies. Just Python 3.10+.
+
+## Usage
+
+### Analyze a single repository
+
+```bash
+oss-savings facebook/react
+oss-savings https://github.com/rails/rails
+
+# Include dependency analysis
+oss-savings expressjs/express --deps
+
+# Use industry-standard COCOMO model (higher estimates)
+oss-savings pytorch/pytorch --model cocomo
+
+# Customize assumptions
+oss-savings django/django --hourly-rate 150 --years-of-use 5
+```
+
+### Analyze your entire dependency file
+
+```bash
+# Analyze all your dependencies at once
+oss-analyze package.json
+oss-analyze requirements.txt
+oss-analyze Gemfile
+oss-analyze Cargo.toml
+oss-analyze go.mod
+
+# Limit to first N deps (useful for testing / rate limits)
+oss-analyze package.json --limit 20
+```
+
+This gives you:
+- **Total savings** across all dependencies
+- **Top dependencies by value** 
+- **Funding recommendations** (high value + high risk = fund this!)
+- **Risk warnings** for dependencies with bus factor or staleness issues
+
+## Sample Results
+
+| Repository | Category | Build | Maintenance | Total |
+|------------|----------|-------|-------------|-------|
+| pytorch/pytorch | AI/ML | $12.5M | $21.8M | **$34.3M** |
+| rails/rails | Framework | $4.2M | $18.6M | **$22.8M** |
+| pallets/flask | Framework | $2.1M | $651K | **$2.75M** |
+| sindresorhus/is | Utility | $73K | $97K | **$170K** |
+
+## How It Works
+
+The calculator fetches repository stats from GitHub and applies a multi-factor model:
+
+### 1. Lines of Code Estimation
+- Per-language bytes-to-LOC conversion (C averages 25 bytes/line, Python 34, etc.)
+- Filters out docs, config, and stylesheets
+- Estimates test/example code ratio from topics and description
+- Applies diminishing returns for mega-repos (you don't use all of Linux)
+
+### 2. Complexity Multipliers
+
+| Factor | Range | Based On |
+|--------|-------|----------|
+| Domain | 1.0-1.1x | AI/ML, crypto, compilers vs utilities |
+| Performance | 1.0-1.2x | C/C++/Rust/Go/CUDA ratio |
+| Safety-critical | 1.0-1.4x | Security, crypto, database, infra keywords |
+| Contributor overhead | 1.0-1.5x | Coordination cost saved (log scale) |
+
+### 3. Build vs Maintenance
+
+- **Build**: LOC ÷ productivity × complexity × hourly rate
+- **Maintenance**: 15-25% of build effort per year, scaled by commit activity
+- **COCOMO mode**: Uses `effort = a × KLOC^b` for superlinear scaling
+
+### 4. Risk Assessment
+
+Every dependency is a liability. The tool scores risk (0-100) based on:
+- Staleness (last commit)
+- Bus factor (contribution concentration)
+- Issue backlog
+- Archived/disabled status
+- Popularity (low stars = low visibility)
+
+## The Math
+
+**Linear model** (default):
+```
+build_hours = (effective_loc / loc_per_hour) × complexity
+maintenance_hours = build_hours × 0.15-0.25 × years × activity_factor
+total_cost = (build_hours + maintenance_hours) × $175/hr
+```
+
+**COCOMO model** (`--model cocomo`):
+```
+person_months = a × (KLOC ^ b) × complexity
+build_hours = person_months × 152
+```
+
+Where `a` and `b` vary by domain (2.4-3.0 and 1.03-1.10 respectively).
+
+### What is COCOMO?
+
+[COCOMO](https://en.wikipedia.org/wiki/COCOMO) (Constructive Cost Model) is an algorithmic software cost estimation model developed by Barry Boehm in 1981. It's one of the most well-known and studied models in software engineering economics.
+
+The key insight is that effort scales **superlinearly** with code size—a 100K LOC project takes more than 10x the effort of a 10K LOC project due to increased complexity, communication overhead, and integration challenges.
+
+COCOMO II (1995) refined the model with modern software practices. Our "COCOMO-lite" implementation uses the basic formula with domain-specific parameters, providing more realistic estimates for large codebases than simple LOC/hour calculations.
+
+## Limitations
+
+This is a **rough estimate**, not an audit. The methodology is opinionated—there are many valid ways to calculate software costs, and reasonable people disagree on the right approach. If you have a better model, [send a PR](https://github.com/skyfallsin/oss-savings/pulls)!
+
+The tool:
+
+- Can't know how much of a library you actually use
+- Uses heuristics for test/doc ratio, not actual file analysis
+- Doesn't account for your team's specific productivity
+- Ignores integration/learning costs (you still pay those)
+- GitHub API has rate limits (see below for authentication)
+
+The goal is order-of-magnitude accuracy. If it says $10M, the true value is probably $3M-$30M, not $100K or $100M.
+
+## Philosophy
+
+Open source is infrastructure. Like roads and bridges, we use it without thinking about what it cost to build. Unlike roads, there's no tax funding it—just mass unpaid labor.
+
+Consider [sponsoring a maintainer](https://github.com/sponsors) whose work you depend on.
+
+## GitHub Rate Limits
+
+Without authentication, GitHub limits you to 60 API requests/hour. With a token, you get 5,000/hour.
+
+To authenticate using the [GitHub CLI](https://cli.github.com/):
+
+```bash
+gh auth login
+export GITHUB_TOKEN=$(gh auth token)
+```
+
+Add the export to `~/.zshrc` or `~/.bashrc` for persistence.
+
+The tool automatically uses `GITHUB_TOKEN` or `GH_TOKEN` environment variables if set.
+
+## CLI Options
+
+```
+positional arguments:
+  repo                  GitHub repo (owner/repo or full URL)
+
+options:
+  --deps                Analyze dependencies (npm, pypi, rubygems, crates)
+  --years-of-use N      Years you'll rely on this library (default: min(repo age, 7))
+  --hourly-rate N       Loaded hourly rate in USD (default: 175)
+  --model {linear,cocomo}
+                        Estimation model (default: linear)
+```
+
+## Contributing
+
+PRs welcome. Ideas for improvement:
+
+- [x] GitHub token support for higher rate limits
+- [ ] `--deep-loc` mode that analyzes the file tree
+- [ ] Usage coverage estimation from import analysis
+- [ ] Integration cost modeling
+- [ ] Export to JSON/CSV
+- [ ] Web interface
+
+## License
+
+MIT
+
+## AI use
+Yes, this project was coded in an afternoon with LLM assistance.
