@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: epicsdev_simulated
+Version: 0.1.0
+Summary: EPICS PVAccess server for Tektronix MSO oscilloscopes
+Project-URL: Homepage, https://github.com/ASukhanov/epicsdev_simulated
+Project-URL: Bug Tracker, https://github.com/ASukhanov/epicsdev_simulated
+Author-email: Andrey Sukhanov <sukhanov@bnl.gov>
+License-File: LICENSE
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
+Requires-Dist: p4p
+Description-Content-Type: text/markdown
+
+# epicsdev_simulated
+EPICS PVAccess servers for simulated devices
+
+Start: ```python -m epicsdev_simulated.simscope -l```<br.
+Access:<br>
+```
+python -m p4p.client.cli get simScope1:cycle
+python -m p4p.client.cli monitor simScope1:WaveForm_RBV
+```
+Plot: ```python -m pvplot -a'V:simScope1:' WaveForm_RBV```
