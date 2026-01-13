@@ -1,0 +1,1 @@
+# AnimationifyV2\nCLI based 2D cartoon animation engine (experimental)
