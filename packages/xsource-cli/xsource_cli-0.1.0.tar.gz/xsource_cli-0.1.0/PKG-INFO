@@ -1,0 +1,70 @@
+Metadata-Version: 2.4
+Name: xsource-cli
+Version: 0.1.0
+Summary: XSource Security CLI - AI Agent Security Scanner & Benchmark Tool
+Project-URL: Homepage, https://xsourcesec.com
+Project-URL: Documentation, https://docs.xsourcesec.com
+Project-URL: Repository, https://github.com/XSource-Sec/xsource-cli
+Project-URL: Issues, https://github.com/XSource-Sec/xsource-cli/issues
+Author-email: XSource Security <support@xsourcesec.com>
+License-Expression: MIT
+Keywords: ai,benchmark,cli,llm,scanning,security
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Security
+Classifier: Topic :: Software Development :: Testing
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: keyring>=24.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: typer[all]>=0.9.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# XSource Security CLI
+
+MCP & AI Agent Security Scanner
+
+## Installation
+
+```bash
+# Recommended (works on Kali, Ubuntu, etc.)
+pipx install git+https://github.com/XSource-Sec/xsource-cli.git
+
+# Or with venv
+python3 -m venv venv && source venv/bin/activate
+pip install git+https://github.com/XSource-Sec/xsource-cli.git
+```
+
+## Quick Start
+
+```bash
+xsource scan --demo https://vulnerable-mcp-demo.fly.dev/mcp
+# → 26 vulnerabilities (12 CRITICAL, 5 HIGH, 7 MEDIUM, 2 LOW)
+```
+
+## Full Usage (requires account)
+
+```bash
+xsource login
+xsource scan https://your-mcp-server.com/mcp
+xsource report export 123 --format pdf
+```
+
+## License
+
+MIT
