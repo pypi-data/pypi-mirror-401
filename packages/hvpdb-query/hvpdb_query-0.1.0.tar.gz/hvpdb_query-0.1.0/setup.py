@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-query', version='0.1.0', description='Polyglot Query Plugin for HVPDB (SQL, Mongo, Redis)', author='HVPDB Team', packages=find_packages(), install_requires=[], classifiers=['Programming Language :: Python :: 3', 'License :: OSI Approved :: MIT License', 'Operating System :: OS Independent'], python_requires='>=3.6', entry_points={'hvpdb.plugins': ['query = hvpdb_query:app']})
