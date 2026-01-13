@@ -1,0 +1,53 @@
+name: Publish
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    name: release
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Create Release Branch
+        run: |
+          git checkout -b release/$GITHUB_REF_NAME
+          git push origin release/$GITHUB_REF_NAME
+
+      - name: Install dependencies
+        run: |
+          uv sync --extra dev
+
+      - name: Run tests
+        run: |
+          uv run pytest tests/ -v
+
+      - name: Build package
+        run: |
+          uv build
+
+      - name: Publish to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.MYRE }}
+        run: |
+          uv publish --username __token__ --password $PYPI_TOKEN
