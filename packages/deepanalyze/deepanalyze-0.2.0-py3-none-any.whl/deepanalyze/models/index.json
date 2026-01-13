@@ -1,0 +1,31 @@
+{
+  "default_model_id": "deepanalyze_8b",
+  "models": [
+    {
+      "id": "deepanalyze_8b",
+      "label": "DeepAnalyze 8B",
+      "backend": "vllm",
+      "prompt_name": "deepanalyze_8b",
+      "requires_api_key": false
+    },
+    {
+      "id": "deepseek",
+      "label": "DeepSeek",
+      "backend": "openai_compat",
+      "base_url": "https://api.deepseek.com/v1",
+      "model": "deepseek-chat",
+      "prompt_name": "universal_llm",
+      "requires_api_key": true
+    },
+    {
+      "id": "openai",
+      "label": "OpenAI",
+      "backend": "openai_compat",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-4o-mini",
+      "prompt_name": "universal_llm",
+      "requires_api_key": true
+    }
+  ]
+}
+
