@@ -1,0 +1,29 @@
+[project]
+name = "kuuk"
+version = "0.1.1"
+authors=[{name="pablo-desperados"}]
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "starlette>=0.50.0",
+    "uvicorn>=0.38.0",
+    "sqlalchemy>=2.0.0",
+    "pydantic>=2.12.5",
+]
+license = "Apache-2.0"
+license-files = ["LICENSE*"]
+
+[project.urls]
+Homepage = "https://github.com/pablo-desperados/kuuk"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+kuuk = "cli.main:main"
