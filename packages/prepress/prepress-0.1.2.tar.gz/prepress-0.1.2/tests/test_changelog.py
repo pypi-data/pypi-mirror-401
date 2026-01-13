@@ -1,0 +1,89 @@
+import pytest
+from pathlib import Path
+from prepress.core.drivers.changelog import ChangelogDriver
+
+def test_changelog_exists(tmp_path):
+    path = tmp_path / "CHANGELOG.md"
+    driver = ChangelogDriver(path)
+    assert not driver.exists()
+    path.write_text("# Changelog")
+    assert driver.exists()
+
+def test_get_latest_version(tmp_path):
+    path = tmp_path / "CHANGELOG.md"
+    path.write_text("""# Changelog
+## [1.2.3] - 2023-01-01
+### Added
+- Feature A
+""")
+    driver = ChangelogDriver(path)
+    assert driver.get_latest_version() == "1.2.3"
+
+def test_get_unreleased_notes(tmp_path):
+    path = tmp_path / "CHANGELOG.md"
+    path.write_text("""# Changelog
+## [Unreleased]
+### Added
+- New feature
+- Another one
+
+## [1.2.3] - 2023-01-01
+""")
+    driver = ChangelogDriver(path)
+    notes = driver.get_unreleased_notes()
+    assert "### Added" in notes
+    assert "- New feature" in notes
+    assert "## [1.2.3]" not in notes
+
+def test_add_note(tmp_path):
+    path = tmp_path / "CHANGELOG.md"
+    path.write_text("# Changelog\n\n## [Unreleased]\n")
+    driver = ChangelogDriver(path)
+    driver.add_note("Test note", "Fixed")
+    
+    content = path.read_text()
+    assert "### Fixed" in content
+    assert "- Test note" in content
+
+def test_bump(tmp_path):
+    path = tmp_path / "CHANGELOG.md"
+    path.write_text("""# Changelog
+## [Unreleased]
+### Added
+- Feature X
+
+## [1.0.0] - 2023-01-01
+""")
+    driver = ChangelogDriver(path)
+    driver.bump("1.1.0")
+    
+    content = path.read_text()
+    assert "## [Unreleased]" in content
+    assert "## [1.1.0] -" in content
+    assert "### Added" in content
+    assert "- Feature X" in content
+    # Check order: Unreleased should be at top
+    assert content.find("## [Unreleased]") < content.find("## [1.1.0]")
+
+def test_add_note_anchoring_above_version(tmp_path):
+    path = tmp_path / "CHANGELOG.md"
+    content = """# Changelog
+
+Intro text.
+
+## [1.0.0] - 2023-01-01
+"""
+    path.write_text(content)
+    driver = ChangelogDriver(path)
+    driver.add_note("New note", "Added")
+    
+    new_content = path.read_text()
+    assert "## [Unreleased]" in new_content
+    intro_pos = new_content.find("Intro text.")
+    unreleased_pos = new_content.find("## [Unreleased]")
+    v100_pos = new_content.find("## [1.0.0]")
+    
+    assert intro_pos < unreleased_pos
+    assert unreleased_pos < v100_pos
+    assert "### Added" in new_content
+    assert "- New note" in new_content
