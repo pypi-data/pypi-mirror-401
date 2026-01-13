@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
+
+[project]
+name = "ZenAuth-server"
+dynamic = ["version"]
+description = "A user authentication and management library."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Yusuke KITAGAWA", email = "tonosama_kaeru@icloud.com" }]
+dependencies = [
+    "ZenAuth",
+    "zenhtml",
+    "pyyaml",
+    "passlib[bcrypt]",
+    "sqlalchemy",
+    "typing-extensions",
+    "fastapi",
+    "pydantic",
+    "pydantic-settings",
+    "requests",
+    "python-jose",
+    "python-dotenv",
+    "bcrypt<4.0.0",
+    "uvicorn",
+    "python-multipart",
+]
+
+[tool.setuptools]
+include-package-data = true
+packages = { find = { where = ["src"], namespaces = true } }
+
+[tool.setuptools.package-data]
+"zen_auth.server" = ["api/**/*.css", "api/**/*.js"]
+
+[tool.setuptools_scm]
+# Version is derived from git tags.
+# Monorepo: allow discovering .git from a subdirectory checkout.
+search_parent_directories = true
+write_to = "src/zen_auth/server/_version.py"
+tag_regex = "^v(?P<version>\\d+(?:\\.\\d+)*(?:a\\d+|b\\d+|rc\\d+)?(?:\\.post\\d+)?(?:\\.dev\\d+)?)$"
+# Bump to the next patch version when building on commits after the latest tag.
+# Example: v0.1.0 + 1 commit => 0.1.1.dev1
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+write_to_template = "__version__ = '{version}'\n"
+
+[project.urls]
+Homepage = "https://github.com/MeiRakuPapa/ZenAuth"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "httpx"
+]
+
+dev = [
+    "autopep8",
+    "black",
+    "debugpy",
+    "flake8",
+    "mypy",
+    "mypy-extensions",
+    "ipython",
+    "build",
+    "twine",
+    "isort",
+    "pre-commit",
+    "faker",
+    "aiosqlite",
+]
+
+[tool.black]
+line-length = 110
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+# plugins = ["pydantic.mypy"]
+strict = true
+ignore_missing_imports = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+exclude = ["build/.*", "dist/.*", ".*.pyi", ".venv/.*"]
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report=xml"
