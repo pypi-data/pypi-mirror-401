@@ -1,0 +1,27 @@
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "B",    # flake8-bugbear
+    "D",    # pydocstyle
+    "N",    # pep8-naming
+    "I",    # isort (sorts imports)
+    "W",    # pycodestyle warnings
+    "RUF",  # Ruff specific 
+]
+
+# Violations to ignore
+ignore = [
+    "E501",     # Maximum line-length exceede 
+    "B905",     # `zip()` without an explicit `strict` parameter
+    "D401",     # First line of docstring should be in imperative mood
+]
+
+# Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+
+# Ignore `E402` (import violations) in all `__init__.py` files.
+[per-file-ignores]
+"__init__.py" = ["F401"]
+
+[pydocstyle]
+convention = "numpy"
