@@ -1,0 +1,16 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include requirements.txt
+recursive-include claudefucker *.py
+recursive-include examples *.py
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .env
+global-exclude uploads
+global-exclude dist
+global-exclude *.egg-info
+global-exclude build
+prune claudefucker/__pycache__
+prune .pytest_cache

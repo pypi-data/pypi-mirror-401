@@ -1,0 +1,270 @@
+Metadata-Version: 2.4
+Name: claudefucker
+Version: 3.1.1
+Summary: Anthropic格式AI代理服务器 - 将Claude Code请求转换为各厂商格式
+Author-email: python学霸 <contact@example.com>
+Maintainer-email: python学霸 <contact@example.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/yourusername/claudefucker
+Project-URL: Documentation, https://github.com/yourusername/claudefucker#readme
+Project-URL: Repository, https://github.com/yourusername/claudefucker
+Project-URL: Issues, https://github.com/yourusername/claudefucker/issues
+Keywords: anthropic,claude,ai,llm,openai,api,proxy,server,flask,chatbot
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Internet :: WWW/HTTP :: HTTP Servers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: flask>=3.0.0
+Requires-Dist: flask-cors>=4.0.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic>=0.7.0
+Requires-Dist: zhipuai>=2.0.0
+Requires-Dist: dashscope>=1.14.0
+Requires-Dist: google-generativeai>=0.3.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: build; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Dynamic: license-file
+
+# claudefucker
+
+<div align="center">
+
+**统一多模型AI代理服务器**
+
+将Claude Code的Anthropic格式请求转换为各厂商API格式，支持14个主流AI厂商，共106个模型
+
+[![PyPI version](https://badge.fury.io/py/claudefucker.svg)](https://badge.fury.io/py/claudefucker)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Downloads](https://img.shields.io/pypi/dm/claudefucker)](https://pypistats.org/packages/claudefucker)
+
+</div>
+
+## 📖 简介
+
+`claudefucker` 是一个轻量级的AI代理服务器，提供统一的OpenAI兼容接口，让你可以在Claude Code中使用各大厂商的AI模型。
+
+### ✨ 核心特性
+
+- 🌍 **多厂商支持** - 集成14个主流AI厂商，共支持106个模型
+- 🔄 **格式转换** - 自动将Anthropic格式转换为各厂商API格式
+- 🚀 **流式输出** - 完美支持流式和非流式输出
+- 📤 **文件上传** - 支持图像、文档等多文件上传（最大16MB）
+- 🎯 **模型灵活** - 支持手动输入任意模型名称
+- 🛠️ **一键启动** - 简单命令即可启动服务
+- 📦 **自动安装依赖** - 首次运行自动检测并安装缺失的依赖包
+- 🔧 **零依赖配置** - 开箱即用，无需复杂配置
+
+## 🚀 快速开始
+
+### 安装
+
+```bash
+pip install claudefucker
+```
+
+### 启动服务
+
+```bash
+claudefuck
+```
+
+**首次运行**时，程序会自动检测并安装所有必需的依赖包，无需手动操作！
+
+启动后会看到交互式菜单：
+
+```
+╔════════════════════════════════════════════════════════════╗
+║          Welcome to ClaudeFucker - AI Proxy Server         ║
+╚════════════════════════════════════════════════════════════╝
+
+请选择AI厂商:
+  1. OpenAI (GPT系列)
+  2. 豆包（火山引擎）
+  3. 智谱AI（GLM系列）
+  4. 通义千问（阿里云）
+  5. Gemini（Google）
+  6. 文心一言（百度）
+  7. 讯飞星火
+  8. Kimi（月之暗面）
+  9. Claude（Anthropic）
+  10. NVIDIA NIM
+  11. Ollama（本地）
+  12. MiniMax
+  13. 零一万物（Yi）
+  14. DeepSeek
+  0. 手动输入模型名称
+
+请输入选项 [1-14]: _
+```
+
+### 配置Claude Code
+
+服务启动成功后（默认端口5000），在Claude Code中配置环境变量：
+
+```bash
+export ANTHROPIC_BASE_URL=http://localhost:5000
+export ANTHROPIC_API_KEY=<你的API Key>
+```
+
+或者在 `.zshrc` 或 `.bashrc` 中永久配置：
+
+```bash
+echo 'export ANTHROPIC_BASE_URL=http://localhost:5000' >> ~/.zshrc
+echo 'export ANTHROPIC_API_KEY=<你的API Key>' >> ~/.zshrc
+source ~/.zshrc
+```
+
+## 📋 支持的厂商和模型
+
+| 厂商 | 模型数量 | 主要模型 |
+|------|---------|---------|
+| OpenAI | 15 | GPT-4, GPT-4o, GPT-3.5 |
+| 豆包 | 8 | Doubao-Pro, Doubao-Lite |
+| 智谱AI | 9 | GLM-4, GLM-3-Turbo |
+| 通义千问 | 8 | Qwen-Turbo, Qwen-Plus |
+| Gemini | 6 | Gemini-Pro, Gemini-Ultra |
+| 文心一言 | 6 | ERNIE-4.0, ERNIE-3.5 |
+| 讯飞星火 | 5 | Spark-4.0, Spark-3.5 |
+| Kimi | 7 | Moonshot-v1-8k, Moonshot-v1-32k |
+| Claude | 5 | Claude-3.5-Sonnet, Claude-3-Opus |
+| NVIDIA NIM | 9 | meta/llama-3.1-405b |
+| Ollama | 10 | 本地所有模型 |
+| MiniMax | 6 | MiniMax-M2.1 |
+| 零一万物 | 6 | Yi-1.5-34B |
+| DeepSeek | 6 | DeepSeek-V3 |
+
+**总计：106个模型**
+
+## 💡 高级用法
+
+### 手动输入模型名称
+
+选择 `0. 手动输入模型名称`，可以直接使用自定义模型：
+
+```bash
+# 格式：custom:模型名称
+# 或 manual:模型名称
+claudefuck
+# 选择 0
+# 输入: custom:openai/gpt-4-turbo-preview
+```
+
+### 指定端口
+
+编辑 `~/.claudefucker/config.yaml` 或通过环境变量：
+
+```bash
+export CLAUDEFUCKER_PORT=8000
+claudefuck
+```
+
+### 使用Docker
+
+```dockerfile
+FROM python:3.11-slim
+RUN pip install claudefucker
+CMD ["claudefuck"]
+```
+
+## 🔧 API接口
+
+服务提供了OpenAI兼容的API接口：
+
+### 创建聊天完成
+
+```bash
+curl -X POST http://localhost:5000/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your-api-key" \
+  -d '{
+    "model": "claude-3-5-sonnet-20241022",
+    "max_tokens": 1024,
+    "messages": [
+      {"role": "user", "content": "Hello!"}
+    ]
+  }'
+```
+
+### 文件上传
+
+```bash
+curl -X POST http://localhost:5000/v1/messages \
+  -H "Authorization: Bearer your-api-key" \
+  -F "file=@image.jpg" \
+  -F 'data={"model":"claude-3-5-sonnet-20241022","max_tokens":1024,"messages":[{"role":"user","content":[{"type":"image","source":{"type":"base64","media_type":"image/jpeg","data":"$(base64 -w 0 image.jpg)"}}]}]}'
+```
+
+## ❓ 常见问题
+
+### 1. 服务启动失败
+
+检查端口5000是否被占用：
+
+```bash
+lsof -i :5000
+```
+
+### 2. API Key无效
+
+确保：
+- API Key格式正确
+- 账户有足够额度
+- 已在对应平台开通权限
+
+### 3. 模型列表为空
+
+检查网络连接，确保可以访问对应的API端点。
+
+### 4. 中文显示乱码
+
+已内置UTF-8支持，如仍有问题请检查终端编码设置：
+
+```bash
+export LANG=zh_CN.UTF-8
+export LC_ALL=zh_CN.UTF-8
+```
+
+## 📄 开源协议
+
+本项目采用 [MIT License](LICENSE) 开源协议。
+
+## 🙏 致谢
+
+感谢所有贡献者，以及以下优秀的开源项目：
+
+- [OpenAI](https://openai.com/)
+- [Anthropic](https://www.anthropic.com/)
+- 各大AI厂商提供的API服务
+
+## 📮 联系方式
+
+- 作者：python学霸
+- 问题反馈：[GitHub Issues](https://github.com/yourusername/claudefucker/issues)
+
+---
+
+<div align="center">
+
+**如果觉得这个项目对你有帮助，请给个⭐️ Star支持一下！**
+
+Made with ❤️ by python学霸
+
+</div>
