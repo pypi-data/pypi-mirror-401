@@ -1,0 +1,41 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        # Use the same mypy invocation as the Makefile so pre-commit runs
+        # mypy through the project's uv-managed environment.
+        entry: uv run mypy src
+        language: system
+        pass_filenames: false
+      - id: pytest-check
+        name: pytest-check
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+
+      - id: nextflow-lint
+        name: nextflow-lint
+        entry: bash -c 'if command -v nextflow >/dev/null 2>&1; then find src/sirnaforge/pipeline/nextflow/workflows -name "*.nf" -exec nextflow lint {} \; 2>/dev/null || true; else echo "⚠️  Nextflow not found, skipping lint"; fi'
+        language: system
+        files: \.nf$
+        pass_filenames: false

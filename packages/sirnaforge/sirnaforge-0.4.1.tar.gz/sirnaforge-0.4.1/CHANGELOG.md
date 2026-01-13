@@ -1,0 +1,401 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.4.0] - 2025-1-5
+
+### Breaking
+
+- Drop support for Python 3.9; minimum supported Python is now 3.10. This
+  enables PEP 604 union syntax (e.g. `list[str] | None`) and other modern
+  typing features. Update developer environments, CI, and pre-commit hooks to
+  use Python 3.10 or later.
+
+
+### New Features
+- **Variant Targeting Implementation**: Complete Phase 1-5 implementation for targeting specific genetic variants
+  - Core variant models and resolver infrastructure with Parquet-based caching
+  - Population-specific AF filtering for geographic variant targeting
+  - Phase 5 workflow integration with CLI flags for variant_mode parameter
+  - Comprehensive variant feature implementation summary and documentation
+- **Enhanced CLI and Workflow Integration**:
+  - Off-target-only entry point for pre-designed siRNA candidates
+  - Support for any sequence length in thermodynamic calculations
+  - Improved CLI enum integration for variant_mode parameter
+- **Docker and Container Improvements**:
+  - Python 3.12 upgrade with optimized Dockerfile targeting
+  - Login shell PATH preservation with `/etc/profile.d/conda-path.sh`
+  - Enhanced container testing with dedicated test categories
+  - Improved Docker entrypoint and health checks
+
+### Improvements
+- **Performance Optimizations**:
+  - Parquet-based variant cache for improved performance
+  - Cache-first index reuse with complete validation
+  - Transcriptome filtering and major refactoring for simplicity
+  - Unified cache management with Pythonic interface
+- **CI/CD Pipeline Enhancements**:
+  - Python 3.12 requirement across all workflows
+  - Aligned pre-commit mypy with uv package manager
+  - Enhanced release workflow with comprehensive testing
+  - Improved Docker build and test categorization
+- **Code Quality and Maintenance**:
+  - Python 3.10+ syntax modernization throughout codebase
+  - Comprehensive typing improvements and linting fixes
+  - Enhanced error handling and validation middleware
+  - Improved documentation with live CLI output examples
+
+### Dependencies
+- **Python 3.12 Support**: Full upgrade to Python 3.12 with modern syntax
+- **Enhanced Dependencies**: Added `pyarrow>=18.0.0` for Parquet support
+- **Updated Packages**: Modernized dependency versions with improved compatibility
+- **uv Package Manager**: Full alignment with uv for faster dependency resolution
+
+### Performance
+- **Variant Caching**: Parquet-based storage for improved variant data performance
+- **Memory Optimization**: Reduced memory requirements for Docker-constrained environments
+- **Parallel Processing**: Enhanced concurrent execution for variant analysis
+- **Index Reuse**: Cache-first approach for transcriptome indices
+
+
+## [0.3.4] - 2025-12-31
+
+### Added
+- **Transcript Annotation Provider Layer**: New data provider interface for fetching genomic transcript annotations
+  - Added `AbstractTranscriptAnnotationClient` interface in `src/sirnaforge/data/base.py`
+  - Implemented `EnsemblTranscriptModelClient` using Ensembl REST API (lookup/id and overlap/region endpoints)
+  - Added `VepConsequenceClient` stub for optional VEP enrichment (behind config flag, placeholder implementation)
+  - New Pydantic models: `Interval`, `TranscriptAnnotation`, and `TranscriptAnnotationBundle` in `src/sirnaforge/models/transcript_annotation.py`
+  - In-memory LRU cache with TTL for transcript annotations
+  - Support for fetching by stable IDs or genomic regions
+  - Comprehensive unit tests with mocked REST responses
+  - Integration tests for real Ensembl REST API (gated by `@pytest.mark.requires_network`)
+
+### Improvements
+- **Extensible Architecture**: Transcript annotation provider follows the same layered pattern as existing data providers (gene search, ORF analysis, transcriptome management)
+- **Reference Tracking**: Annotations include provenance metadata (provider, endpoint, reference choice) for reproducibility
+- **Error Handling**: Robust handling of unresolved IDs and network errors with fallback to unresolved list
+
+### Documentation
+- Added comprehensive docstrings for all new classes and methods
+- Unit and integration tests serve as usage examples
+
+
+## [0.3.3] - 2025-12-15
+
+### Bug Fixes
+- **Docker Login Shell PATH**: Fixed issue #37 where login shells (`/bin/bash -lc`) would reset PATH and drop `/opt/conda/bin`, making `sirnaforge` and `nextflow` unavailable
+  - Added `/etc/profile.d/conda-path.sh` to preserve conda toolchain paths in login shells
+  - Non-login shells continue to work as before
+  - Added regression test `test_docker_login_shell_path()` to container test suite
+  - Added standalone test script `scripts/test-docker-login-shell.sh` for manual verification
+- **Nextflow Off-target Aggregation**: Fixed a Groovy/DSL2 runtime crash during final aggregation (`No signature of method ... call(LinkedList)`) by correcting channel collection/defaulting semantics in the embedded workflow
+  - Replaced invalid `ifEmpty([])`/`ifEmpty('')` usage with `ifEmpty { [] }`/`ifEmpty { '' }`
+  - Switched from `collect()` to `toList()` for explicit channel materialization before combining genome + miRNA result lists
+
+
+## [0.3.1] - 2025-12-04
+
+### Added
+- **Dirty Control Injection**: `workflow.py` now carries the worst rejected guides forward as "dirty control" candidates (see `sirnaforge/utils/control_candidates.py`) so every Nextflow/off-target run includes known-failing sentinels for health checks.
+
+### Improvements
+- **Resilient Aggregation & Reporting**: Nextflow modules (`modules/local/aggregate_results.nf`, `mirna_offtarget_analysis.nf`, `split_candidates.nf`, etc.) plus `pipeline/nextflow_cli.py` were refactored to emit consolidated TSV/JSON artefacts even when some analyses are skipped, ensuring miRNA/genome summaries always arrive in `workflow_output/`.
+- **Deterministic Caching**: New cache utilities expose `SIRNAFORGE_CACHE_DIR`/XDG-aware paths and tag Nextflow workdirs with metadata, dramatically reducing repeated downloads and making cleanup predictable.
+- **Workflow Parameter Safety**: CLI defaults now enforce valid GC range/length boundaries and automatically fall back to the bundled Ensembl transcriptome set (`ensembl_human_cdna`, `ensembl_mouse_cdna`, `ensembl_rat_cdna`, `ensembl_macaque_cdna`) when no input is provided, preventing empty design runs.
+
+### Bug Fixes
+- **Pipeline Robustness**: Aggregation handles missing combined TSVs, gracefully copies per-species miRNA batches, and logs explicit workdir pointers so failed runs can be recovered without manual spelunking.
+- **Nextflow Reliability**: All embedded DSL2 modules gained scoped retries, consistent BWA-MEM2 index prep, and container profile detection, eliminating the intermittent crashes seen in long off-target analyses.
+
+### Documentation
+- **Docs v2 Stack**: Added a parallel `docs_v2/` tree with autogenerated CLI/API references, live `sirnaforge` command output, and refreshed installation guides focused on Docker + Nextflow workflows.
+- **Workflow & Tutorial Refresh**: `docs/getting_started.md`, `docs/usage_examples.md`, and the new Nextflow tutorial now describe dirty controls, cache locations, and off-target artefacts so users can reproduce the updated pipeline end-to-end.
+
+## [0.3.0] - 2025-11-21
+
+### Improvements
+- **Documentation Standardization**: Unified tab-based execution examples across all documentation
+  - Added sphinx-design tab-sets for uv/Docker execution in all usage examples
+  - Standardized command patterns in `usage_examples.md`, `gene_search.md`, `getting_started.md`
+  - Simplified usage examples from redundant variations to minimal/comprehensive pattern
+  - Improved user experience with consistent execution context switching
+- **GC Content Default Update**: Increased default `--gc-max` from 52% to 60%
+  - Updated across CLI, documentation, and tutorials
+  - Better alignment with siRNA design best practices
+  - Maintains conservative gc-min default of 35%
+- **CI/CD Pipeline Enhancements**:
+  - Fixed release.yml to use correct make targets (`docker-test`, `test-dev`)
+  - Added comprehensive `test-release` job with full coverage reporting
+  - Improved test tier structure: `test-dev` (unit), `test-ci` (smoke), `test-release` (comprehensive)
+  - Coverage artifacts now uploaded with 30-day retention
+  - Added coverage summary to GitHub Actions workflow UI
+
+### Bug Fixes
+- **Off Target and miRNA seed match search now works!**
+- **Docker Test Environment**: Fixed environment conflicts in `make docker-test`
+  - Removed uv sync from Docker container execution (conflicts with conda)
+  - Explicit pytest installation and conda path execution
+  - Resolved parallel execution issues with pytest-xdist
+- **Missing Dependencies**: Added `psutil>=6.0.0` to production dependencies
+  - Required by workflow.py but was previously undeclared
+  - Ensures consistent environment across installations
+- **Nextflow Integration Tests**: Fixed two previously skipped tests
+  - Corrected Nextflow version flag: `--version` → `-version`
+  - Fixed workflow access to use NextflowRunner API instead of module import
+  - All 20 container tests now passing (was 18 passed, 2 skipped)
+
+### Testing
+- **Comprehensive Test Coverage**: Enhanced `make test-release` to run all test tiers
+  - Now runs 179 tests (dev + ci + release markers) with 55% coverage
+  - Generates XML, HTML, and terminal coverage reports
+  - Full JUnit XML for CI/CD integration
+  - Execution time: ~22 seconds for complete validation
+- **Test Organization**: All tests properly tagged with tier markers
+  - 9 expected skips (requires Docker/Nextflow/BWA-MEM2 tools)
+  - Consistent marker structure across test suite
+  - Better CI/CD integration with proper test selection
+
+### Build & Infrastructure
+- **Makefile Improvements**: Enhanced test targets with better coverage support
+  - `test-release` now comprehensive (dev + ci + release tests)
+  - All test targets include appropriate coverage/junit reporting
+  - Clear documentation of tier structure in help text
+- **GitHub Actions**: Aligned workflows with current Makefile structure
+  - CI workflow: lint → security → test-ci → build
+  - Release workflow: validate → ci → test-release → build artifacts → docker
+  - Proper dependency chains ensure quality gates
+
+## [0.2.2] - 2025-10-26
+
+### New Features
+- **miRNA Design Mode**: New `--design-mode mirna` option for microRNA-specific siRNA design
+  - Specialized `MiRNADesigner` subclass with miRNA-biogenesis-aware scoring
+  - Enhanced CSV schema with miRNA-specific columns (strand_role, biogenesis_score)
+  - CLI support via `--design-mode` flag with automatic parameter adjustment
+- **miRNA Seed Match Analysis**: Integrated miRNA off-target screening in Nextflow pipeline
+  - Lightweight seed region matching (positions 2-8) against miRNA databases
+  - Automatic miRNA database download and caching from MirGeneDB
+  - Per-candidate and aggregated miRNA hit reports in TSV/JSON formats
+  - Configurable via `--mirna-db` and `--mirna-species` flags
+- **Species Registry System**: Canonical species name mapping and normalization
+  - Unified species identifiers across genome and miRNA databases
+  - Automatic species alias resolution (e.g., "human" → "Homo sapiens" → mirgenedb slug)
+  - Support for multi-species analysis with consistent naming
+
+### Improvements
+- **Nextflow Pipeline Enhancements**:
+  - Reduced memory requirements for Docker-constrained environments (2GB → 1GB for most processes)
+  - Added miRNA seed analysis module with BWA-based matching
+  - Improved error handling and progress reporting
+  - Better resource allocation with memory/CPU buffers
+- **Data Validation**: Extended Pandera schemas for miRNA-specific columns
+- **CSV Output**: New columns `transcript_hit_count` and `transcript_hit_fraction` track guide specificity
+- **miRNA Database Manager**: Enhanced with species normalization and canonical name mapping
+
+### Bug Fixes
+- Fixed Nextflow Docker configuration for resource-constrained CI environments
+- Resolved schema validation errors for miRNA columns in mixed-mode workflows
+- Fixed typing issues in pipeline CLI functions
+
+### Documentation
+- **Major Documentation Consolidation**: Reorganized structure for improved user experience
+  - Simplified navigation from 4 to 3 main sections (Getting Started, User Guide, Reference, Developer)
+  - Consolidated `getting_started.md` and `quick_reference.md` into comprehensive guide
+  - Streamlined tutorials to 2 focused guides (pipeline integration, custom scoring)
+  - Created dedicated developer section for advanced documentation
+- **Complete API Reference**: Added 18 previously missing modules
+  - Comprehensive coverage of all 27 sirnaforge modules
+  - Auto-generated Sphinx documentation with proper cross-references
+- **Quality Improvements**: Configured ruff D rules for docstring validation
+  - Fixed 116 docstring formatting issues automatically
+  - Clean Sphinx builds with no warnings
+- **Usage Examples**: Added miRNA seed analysis workflow documentation
+
+### Testing
+- **New Test Coverage**: 232 new tests for miRNA design mode
+  - Comprehensive unit tests for MiRNADesigner scoring
+  - Schema validation tests for miRNA-specific columns
+  - Integration tests for miRNA database functionality
+- **Test Organization**: Normalized test markers for consistent CI/CD workflows
+- **Documentation Tests**: Verified all doc builds and cross-references work correctly
+
+### Dependencies
+- No new runtime dependencies (leverages existing httpx, pydantic, pandera)
+- Enhanced development dependencies for documentation generation
+
+---
+
+## [0.2.1] - 2025-10-24
+
+```markdown
+## [X.Y.Z] - YYYY-MM-DD
+
+### New Features
+- Brief description of new features
+
+### Improvements
+- Improvements to existing functionality
+- Performance enhancements
+
+### Bug Fixes
+- Fixed specific issues
+- Resolved edge cases
+
+### 📊 Performance
+- Performance improvements with metrics if available
+
+### Testing
+- New tests added
+- Test coverage improvements
+```
+
+---
+
+## [0.2.1] - 2025-10-24
+
+### New Features
+- **Chemical Modification System**: Comprehensive infrastructure for siRNA chemical modifications
+  - Default modification patterns automatically applied to designed siRNAs (standard_2ome, minimal_terminal, maximal_stability)
+  - New `--modifications` and `--overhang` CLI flags for workflow and design commands
+  - FDA-approved Patisiran (Onpattro) pattern included in example library
+- **Modification Metadata Models**: Pydantic models for StrandMetadata, ChemicalModification, Provenance tracking
+- **FASTA Annotation System**: Merge modification metadata into FASTA headers with full roundtrip support
+- **Remote FASTA Inputs**: Workflow supports `--input-fasta` with automatic HTTP download and caching
+- **Enhanced Pandera Schemas**: Runtime DataFrame validation with @pa.check_types decorators, automatic addition of modification columns
+
+### Improvements
+- Modification columns (guide/passenger overhangs and modifications) now included in CSV outputs
+- CLI `sequences show` command with JSON/FASTA/table output formats
+- CLI `sequences annotate` command for merging metadata into FASTA files
+- Standardized `+` separators in modification headers (backward compatible with `|`)
+- Resource resolver for flexible input handling (local files, HTTP URLs)
+- Improved type safety with Pandera schema validation on DesignResult.save_csv() and _generate_orf_report()
+
+### Bug Fixes
+- Fixed JSON metadata loading regression with StrandMetadata subscripting
+- Resolved mypy typing issues for optional FASTA descriptions
+- Fixed CLI output handling for modification metadata
+
+### Documentation
+- **Chemical Modification Review** (551 lines): Comprehensive analysis and integration guide
+- **Modification Integration Guide** (543 lines): Developer documentation with code examples
+- **Modification Annotation Spec** (381 lines): Complete FASTA header specification
+- **Example Patterns Library**: 4 production-ready modification patterns with usage guide
+- Updated README with chemical modifications feature documentation
+- Remote FASTA usage documented in CLI and gene search guides
+
+### Testing
+- **18 new tests** for chemical modifications (100% passing):
+  - 11 integration tests for workflow roundtrip validation
+  - 7 tests validating example pattern files
+- Added resource resolver unit tests (local paths, HTTP downloads, schemes)
+- Extended modification metadata tests for delimiter compatibility
+- All 164 tests passing with enhanced Pandera validation
+
+### Dependencies
+- No new runtime dependencies added (uses existing Pydantic, Pandera, httpx)
+
+### Performance
+- Removed Bowtie indexing (standardized on BWA-MEM2)
+- Streamlined off-target analysis pipeline configuration
+
+---
+
+## [0.2.0] - 2025-09-27
+
+### New Features
+- **miRNA Database Cache System** (`sirnaforge cache`) - Local caching and management of miRNA databases from multiple sources with automatic updates
+- **Comprehensive Data Validation** - Pandera DataFrameSchemas for type-safe output validation ensuring consistent CSV/TSV report formatting
+- **Enhanced Thermodynamic Scoring** - Modified composite score to heavily favor (90%) duplex binding energy for improved siRNA selection accuracy
+- **Workflow Input Flexibility** - Added FASTA file input support for custom transcript analysis workflows
+- **Embedded Nextflow Pipeline** - Integrated Nextflow execution directly within Python API for scalable processing
+
+### Improvements
+- **Performance Optimization** - Parallelized off-target analysis and improved memory efficiency for large transcript sets
+- **CLI Enhancement** - Better Unicode support, cleaner help text, and improved error reporting
+- **Data Schema Validation** - Robust output validation with detailed error messages using modern Pandera 0.26.1 patterns
+- **Documentation Overhaul** - Comprehensive testing guide, thermodynamic documentation, and improved API references
+- **Development Workflow** - Enhanced Makefile with Docker testing categories, release validation, and conda environment support
+
+### � Bug Fixes
+- **Security Improvements** - Resolved security linting issues and improved dependency management
+- **Off-target Analysis** - Fixed alignment indexing and improved multi-species database handling
+- **CI/CD Pipeline** - Resolved build failures, improved test categorization, and enhanced release automation
+- **Unicode Handling** - Fixed CLI display issues in various terminal environments
+
+### 📊 Performance
+- **10-100x Faster Dependencies** - Full migration to uv package manager for ultra-fast installs and environment management
+- **Optimized Algorithms** - Improved thermodynamic calculation efficiency with better filtering strategies
+- **Parallel Processing** - Enhanced concurrent execution for off-target analysis across multiple genomes
+
+### Testing & Infrastructure
+- **Enhanced Test Categories** - Smoke tests (256MB), integration tests (2GB), and full CI validation
+- **Docker Improvements** - Multi-stage builds, intelligent entrypoint, and resource-aware testing
+- **Release Automation** - Comprehensive GitHub Actions workflow with quality gates and artifact management
+
+### Documentation
+- **Testing Guide** - Comprehensive documentation for all test categories and Docker workflows
+- **Thermodynamic Guide** - Detailed explanation of scoring algorithms and parameter optimization
+- **CLI Reference** - Auto-generated command documentation with examples
+- **Development Setup** - Streamlined onboarding with conda environment and uv integration
+
+### Dependencies & Architecture
+- **Modern Python Support** - Maintained compatibility across Python 3.9-3.12 with improved type safety
+- **Pydantic Integration** - Enhanced data models with validation middleware and error handling
+- **Containerization** - Production-ready Docker images with conda bioinformatics stack
+- **Package Management** - Full uv adoption for dependency resolution and virtual environment management
+
+## [0.1.0] - 2025-09-06
+
+### Added
+- Initial release of siRNAforge toolkit
+- Core siRNA design algorithms with thermodynamic scoring
+- Multi-database gene search (Ensembl, RefSeq, GENCODE)
+- Rich command-line interface with Typer and Rich
+- Comprehensive siRNA candidate scoring system
+- Off-target prediction framework
+- Nextflow pipeline integration for scalable analysis
+- Docker containerization for reproducible environments
+- Python API with Pydantic data models
+- Comprehensive test suite with unit and integration tests
+- Modern development tooling with uv, black, ruff, mypy
+
+### Core Features
+- **Gene Search**: Multi-database transcript retrieval
+- **siRNA Design**: Algorithm-driven candidate generation
+- **Quality Control**: GC content, structure, and specificity filters
+- **Scoring System**: Composite scoring with multiple components
+- **Workflow Orchestration**: End-to-end gene-to-siRNA pipeline
+- **CLI Interface**: Rich, user-friendly command-line tools
+- **Python API**: Programmatic access for automation
+
+### Supported Operations
+- `sirnaforge workflow`: Complete gene-to-siRNA analysis
+- `sirnaforge search`: Gene and transcript search
+- `sirnaforge design`: siRNA candidate generation
+- `sirnaforge validate`: Input file validation
+- `sirnaforge config`: Configuration display
+- `sirnaforge version`: Version information
+
+### Technical Stack
+- **Language**: Python 3.9-3.12
+- **Package Management**: uv for fast dependency resolution
+- **Data Models**: Pydantic for type-safe data handling
+- **CLI Framework**: Typer with Rich for beautiful output
+- **Testing**: pytest with comprehensive coverage
+- **Code Quality**: black, ruff, mypy for consistency
+- **Containerization**: Multi-stage Docker builds
+- **Pipeline**: Nextflow integration for scalability
+- **Documentation**: Sphinx with MyST parser, Read the Docs theme
+
+[Unreleased]: https://github.com/austin-s-h/sirnaforge/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/austin-s-h/sirnaforge/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/austin-s-h/sirnaforge/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/austin-s-h/sirnaforge/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/austin-s-h/sirnaforge/releases/tag/v0.1.0
