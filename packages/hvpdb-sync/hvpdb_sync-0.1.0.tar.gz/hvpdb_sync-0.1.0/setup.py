@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-sync', version='0.1.0', description='Data Import/Export Connectors for HVPDB', packages=find_packages(), install_requires=['hvpdb'], entry_points={'hvpdb.plugins': ['sync = hvpdb_sync:app']})
