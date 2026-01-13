@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]  # ✅ 正确：只放构建工具
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "musi-piacode"          # 名字要唯一，建议加后缀
+version = "0.1.0"
+authors = [
+  { name = "piacode", email = "liangzanqun@163.com" }
+]
+description = "A music package based on the twelve-tone equal temperament"
+readme = "README.md"  # 建议添加
+requires-python = ">=3.7"
+
+# ⚠️ 包依赖放在这里，不是放在 build-system 里！
+dependencies = [
+    "numpy==1.26.4",
+    "pydub==0.25.1",
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
