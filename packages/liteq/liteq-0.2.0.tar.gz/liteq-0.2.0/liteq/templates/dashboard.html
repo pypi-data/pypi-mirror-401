@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiteQ | Modern Task Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05070a;
+            --surface: #0f121a;
+            --surface-lighter: #161b26;
+            --border: #222938;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+        
+        header {
+            padding: 1.5rem 2rem;
+            background: rgba(15, 18, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo { display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; }
+        .logo span { color: var(--primary); }
+
+        main { padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card h3 { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .stat-card .value { font-family: 'JetBrains Mono', monospace; font-size: 2.5rem; font-weight: 700; }
+        .stat-card .icon { position: absolute; right: -10px; bottom: -10px; opacity: 0.05; transform: rotate(-15deg); }
+
+        /* Charts Section */
+        .charts-row {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .chart-container { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; height: 300px; }
+
+        /* Navigation */
+        .nav-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1px; }
+        .tab {
+            padding: 0.75rem 1.5rem; cursor: pointer; color: var(--text-muted); font-weight: 600;
+            border-bottom: 2px solid transparent; transition: 0.2s;
+        }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* Workers & Queues */
+        .grid-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem; }
+        .worker-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .worker-header { display: flex; justify-content: space-between; align-items: center; }
+        .status-pill { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 20px; }
+        .status-pill.online { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        /* Tables */
+        .table-container { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 1rem; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+        /* Status Badges */
+        .badge { padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .badge.pending { background: #3b82f6; color: white; }
+        .badge.running { background: var(--success); color: white; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        .badge.failed { background: var(--error); color: white; }
+        .badge.done { background: #475569; color: white; }
+
+        /* Buttons */
+        .btn {
+            background: var(--surface-lighter); border: 1px solid var(--border); color: var(--text-main);
+            padding: 0.5rem 0.8rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.75rem;
+            display: inline-flex; align-items: center; gap: 0.4rem; transition: 0.2s;
+        }
+        .btn:hover { border-color: var(--primary); background: var(--primary); }
+        .btn-danger:hover { background: var(--error); border-color: var(--error); }
+
+        .hidden { display: none; }
+
+        /* Spinner */
+        .loader { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo"><i data-lucide="zap"></i> LITE<span>Q</span></div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="sync-status" class="status-pill online"><div class="loader" id="main-loader" style="display:none"></div> LIVE</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted)" id="last-update">Syncing...</div>
+            </div>
+        </header>
+
+        <main>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Pending</h3>
+                    <div class="value" id="stat-pending">0</div>
+                    <i data-lucide="clock" class="icon" size="64"></i>
+                </div>
+                <div class="stat-card" style="border-color: var(--success)">
+                    <h3>Running</h3>
+                    <div class="value" id="stat-running" style="color: var(--success)">0</div>
+                    <i data-lucide="play" class="icon" size="64"></i>
+                </div>
+                <div class="stat-card">
+                    <h3>Failed</h3>
+                    <div class="value" id="stat-failed" style="color: var(--error)">0</div>
+                    <i data-lucide="alert-circle" class="icon" size="64"></i>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Workers</h3>
+                    <div class="value" id="stat-workers" style="color: var(--primary)">0</div>
+                    <i data-lucide="cpu" class="icon" size="64"></i>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="queueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="nav-tabs">
+                <div class="tab active" data-tab="tasks">Tasks History</div>
+                <div class="tab" data-tab="workers">Workers Info</div>
+                <div class="tab" data-tab="queues">Queues</div>
+            </div>
+
+            <div id="content-tasks" class="tab-pane">
+                <div class="table-container">
+                    <table id="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Task Name</th>
+                                <th>Status</th>
+                                <th>Runtime info</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="content-workers" class="tab-pane hidden">
+                <div class="grid-list" id="workers-grid"></div>
+            </div>
+
+            <div id="content-queues" class="tab-pane hidden">
+                <div class="grid-list" id="queues-grid"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let mainChart, queueChart;
+        const state = { activeTab: 'tasks' };
+
+        // Tab management
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+                tab.classList.add('active');
+                state.activeTab = tab.dataset.tab;
+                document.getElementById(`content-${state.activeTab}`).classList.remove('hidden');
+            });
+        });
+
+        function initCharts() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{ label: 'Tasks Done', borderColor: '#6366f1', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#222938' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+
+            const qCtx = document.getElementById('queueChart').getContext('2d');
+            queueChart = new Chart(qCtx, {
+                type: 'doughnut',
+                data: { labels: ['Done', 'Pending', 'Failed'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#3b82f6', '#ef4444'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12 } } } }
+            });
+        }
+
+        async function api(path, method = 'GET') {
+            document.getElementById('main-loader').style.display = 'block';
+            try {
+                const r = await fetch(path, { method });
+                return await r.json();
+            } finally {
+                document.getElementById('main-loader').style.display = 'none';
+            }
+        }
+
+        async function refresh() {
+            const [overview, tasks, workers, queues] = await Promise.all([
+                api('/api/overview'),
+                api('/api/tasks'),
+                api('/api/workers'),
+                api('/api/queues')
+            ]);
+
+            // Stats
+            document.getElementById('stat-pending').textContent = overview.total_pending;
+            document.getElementById('stat-running').textContent = overview.total_running;
+            document.getElementById('stat-failed').textContent = overview.total_failed;
+            document.getElementById('stat-workers').textContent = workers.length;
+
+            // Charts
+            queueChart.data.datasets[0].data = [overview.total_done, overview.total_pending, overview.total_failed];
+            queueChart.update();
+
+            // Tables
+            if (state.activeTab === 'tasks') renderTasks(tasks);
+            if (state.activeTab === 'workers') renderWorkers(workers);
+            if (state.activeTab === 'queues') renderQueues(queues);
+
+            document.getElementById('last-update').textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
+        }
+
+        function renderTasks(tasks) {
+            const tbody = document.querySelector('#tasks-table tbody');
+            tbody.innerHTML = tasks.map(t => `
+                <tr>
+                    <td class="mono">#${t.id}</td>
+                    <td style="font-weight: 600">${t.name}</td>
+                    <td><span class="badge ${t.status}">${t.status}</span></td>
+                    <td>
+                        <div style="font-size: 0.75rem; color: var(--text-muted)">
+                            Worker: ${t.worker_id || '---'}<br>
+                            Queue: ${t.queue}
+                        </div>
+                    </td>
+                    <td class="mono">${new Date(t.created_at).toLocaleTimeString()}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem">
+                            ${t.status === 'failed' ? `<button class="btn" onclick="retryTask(${t.id})"><i data-lucide="refresh-cw" size="14"></i></button>` : ''}
+                            ${['pending', 'running'].includes(t.status) ? `<button class="btn btn-danger" onclick="cancelTask(${t.id})"><i data-lucide="trash-2" size="14"></i></button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderWorkers(workers) {
+            const grid = document.getElementById('workers-grid');
+            if (!workers.length) { grid.innerHTML = '<div style="color: var(--text-muted)">No workers found</div>'; return; }
+            grid.innerHTML = workers.map(w => `
+                <div class="worker-card">
+                    <div class="worker-header">
+                        <div style="font-weight: 800; font-size: 1rem">@${w.worker_id}</div>
+                        <div class="status-pill online"><div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%"></div> Active</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem">
+                        <div><span style="color: var(--text-muted)">Host:</span> ${w.hostname}</div>
+                        <div><span style="color: var(--text-muted)">Tasks:</span> ${w.active_tasks} / ${w.concurrency}</div>
+                        <div style="grid-column: span 2"><span style="color: var(--text-muted)">Queues:</span> ${w.queues.join(', ')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderQueues(queues) {
+            const grid = document.getElementById('queues-grid');
+            grid.innerHTML = queues.map(q => `
+                <div class="worker-card">
+                    <div style="font-weight: 800; font-size: 1.1rem; color: var(--primary)">${q.queue || 'default'}</div>
+                    <div style="font-size: 2rem; font-weight: 700">${q.count} <span style="font-size: 0.9rem; color: var(--text-muted)">tasks</span></div>
+                    <div class="status-pill" style="background: rgba(99, 102, 241, 0.1); color: var(--primary)">${q.status}</div>
+                </div>
+            `).join('');
+        }
+
+        async function retryTask(id) { await api(`/api/tasks/${id}/retry`, 'POST'); refresh(); }
+        async function cancelTask(id) { if(confirm('Cancel this task?')) { await api(`/api/tasks/${id}/cancel`, 'POST'); refresh(); } }
+
+        initCharts();
+        refresh();
+        setInterval(refresh, 3000);
+    </script>
+</body>
+</html>
