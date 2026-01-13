@@ -1,0 +1,85 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  size-label:
+    name: Label PR Size
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Size label
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: "size/xs"
+          xs_max_size: 10
+          s_label: "size/s"
+          s_max_size: 100
+          m_label: "size/m"
+          m_max_size: 500
+          l_label: "size/l"
+          l_max_size: 1000
+          xl_label: "size/xl"
+          fail_if_xl: false
+
+  validate-files:
+    name: Validate Changed Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+
+      - name: Check for sensitive files
+        run: |
+          SENSITIVE_PATTERNS=(
+            "*.key"
+            "*.pem"
+            "*.p12"
+            ".env"
+            "credentials.json"
+            "secrets.yml"
+          )
+
+          for pattern in "${SENSITIVE_PATTERNS[@]}"; do
+            if echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -q "$pattern"; then
+              echo "❌ Sensitive file pattern detected: $pattern"
+              exit 1
+            fi
+          done
+          echo "✅ No sensitive files detected"
+
+      - name: Check Python syntax
+        if: steps.changed-files.outputs.any_modified == 'true'
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ $file == *.py ]]; then
+              python -m py_compile "$file" || exit 1
+            fi
+          done
+          echo "✅ All Python files have valid syntax"
+
+  spell-check:
+    name: Spell Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check spelling
+        uses: crate-ci/typos@master
+        with:
+          files: "*.md docs/*.md synteles_platform_mcp/**/*.py"
