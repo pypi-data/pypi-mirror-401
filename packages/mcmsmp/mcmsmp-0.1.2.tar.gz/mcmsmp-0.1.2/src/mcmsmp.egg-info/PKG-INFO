@@ -1,0 +1,77 @@
+Metadata-Version: 2.4
+Name: mcmsmp
+Version: 0.1.2
+Summary: Python client for Minecraft Management Server Protocol
+Author-email: dngynq <dngynq@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/DngYnQ/mcmsmp
+Project-URL: Repository, https://github.com/DngYnQ/mcmsmp
+Project-URL: Documentation, https://github.com/DngYnQ/mcmsmp#readme
+Project-URL: Changelog, https://github.com/DngYnQ/mcmsmp/releases
+Project-URL: Issues, https://github.com/DngYnQ/mcmsmp/issues
+Keywords: minecraft,rpc,websocket,server-management,game-server
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Games/Entertainment
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: websockets>=15.0.1
+Requires-Dist: jsonrpcclient>=4.0.3
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=7.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "docs"
+Dynamic: license-file
+
+# mcmsmp - Minecraft Management Server Protocol Client
+
+Python client for Minecraft Management Server Protocol (MCMSP).
+
+## Installation
+
+```pip install mcmsmp```
+
+## Quick Start
+
+
+```bash
+import asyncio
+from mcmsmp import MinecraftManagementClient
+
+async def main():
+    client = MinecraftManagementClient(
+        uri="ws://localhost:8080",
+        secret="your_secret_key"
+    )
+    
+    await client.connect()
+    
+    # Get online players
+    players = await client.rpc("minecraft:players")
+    print(f"Online players: {players}")
+    
+    await client.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+## Documentation
+See [examples](https://github.com/DngYnQ/mcmsmp/tree/master/examples) for more usage examples.
+
