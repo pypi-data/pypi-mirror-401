@@ -1,0 +1,72 @@
+Metadata-Version: 2.4
+Name: noodler-sdk
+Version: 0.1.0
+Summary: Python library for the Noodler API
+Author: Noodler
+License: MIT
+License-File: LICENSE
+Keywords: noodler,observability,openai,opentelemetry,tracing
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: openai>=2.14.0
+Requires-Dist: opentelemetry-api>=1.39.1
+Requires-Dist: opentelemetry-exporter-otlp-proto-http>=1.39.1
+Requires-Dist: opentelemetry-sdk>=1.39.1
+Description-Content-Type: text/markdown
+
+# Noodler Python SDK
+
+## Example
+
+```python
+from noodler import setup, instrument_openai
+from openai import OpenAI
+
+# Configure OpenTelemetry tracing
+setup(
+    base_url="http://localhost:8000",
+    api_key="noodler-api-key",
+)
+
+# Create and instrument OpenAI client
+client = OpenAI()
+wrapped_client = instrument_openai(client)
+
+# Use the instrumented client - all API calls will be automatically traced
+# Non-streaming
+response = wrapped_client.chat.completions.create(
+    model="gpt-4.1",
+    messages=[
+        {"role": "user", "content": "hi there!"}
+    ],
+)
+
+# Streaming (also supported)
+stream = wrapped_client.chat.completions.create(
+    model="gpt-4.1",
+    messages=[
+        {"role": "user", "content": "hi there!"}
+    ],
+    stream=True,
+)
+for chunk in stream:
+    print(chunk.choices[0].delta.content, end="")
+```
+
+## Features
+
+- ✅ Automatic tracing of `chat.completions.create()` calls
+- ✅ Support for both streaming and non-streaming responses
+- ✅ Full OpenTelemetry GenAI semantic convention compliance
+- ✅ Token usage tracking
+- ✅ Error tracking and span status reporting
+
+## Limitations
+
+Currently, only the `chat.completions.create()` endpoint is instrumented. Other OpenAI endpoints (embeddings, audio, fine-tuning, etc.) are not automatically traced. Calls to these endpoints will work normally but will not generate traces.
