@@ -1,0 +1,110 @@
+name: Release to PyPI and GitHub
+
+on:
+  workflow_run:
+    workflows: ["CI - Code Quality & Testing"]
+    types:
+      - completed
+    branches: [main]
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: PROD  # Use production environment for security
+    
+    steps:
+    - name: Check if CI succeeded
+      id: check-ci
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+          if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+            echo "❌ CI workflow did not succeed. Skipping release."
+            exit 0
+          fi
+        fi
+        echo "✅ Proceeding with release"
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache-dependency-path: 'uv.lock'
+
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras --dev
+
+    - name: Set VERSION from project
+      id: get-version
+      run: |
+        VERSION=$(uv version --short)
+        
+        if [[ -z "$VERSION" ]]; then
+          echo "❌ Failed to read version from uv"
+          exit 1
+        fi
+        
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "📦 Release version: $VERSION"
+
+    - name: Build package
+      run: |
+        echo "🏗️ Building package..."
+        rm -rf dist/ build/ *.egg-info/
+        uv build
+        echo "✅ Package built successfully"
+
+    - name: Publish to PyPI
+      env:
+        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        echo "🚀 Publishing to PyPI..."
+        echo "Package files in dist/:"
+        ls -la dist/
+        uv publish --token "$UV_PUBLISH_TOKEN" dist/http_client_benchmarker-${{ env.VERSION }}.tar.gz dist/http_client_benchmarker-${{ env.VERSION }}.whl
+        echo "✅ Published to PyPI successfully"
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+      with:
+        tag_name: v${{ env.VERSION }}
+        name: Release v${{ env.VERSION }}
+        body: |
+          ## 🚀 HTTP Client Benchmarker v${{ env.VERSION }}
+          
+          **⚡ Performance benchmarking for your HTTP stack**
+          
+          ### 📦 Installation
+          ```bash
+          # Using pip
+          pip install http-client-benchmarker==${{ env.VERSION }}
+          
+          # Using uv (recommended)
+          uv add http-client-benchmarker==${{ env.VERSION }}
+          ```
+          
+          ### 🔧 Package Details
+          - **Package**: http-client-benchmarker
+          - **Version**: v${{ env.VERSION }}
+          - **Python**: 3.12+
+          - **Package Manager**: uv
+          
+          ### 🐛 Bug Reports
+          Please report issues at: https://github.com/${{ github.repository }}/issues
+          
+          ### ⭐ Support
+          If you find this useful, please give us a ⭐ on GitHub!
+        draft: false
+        prerelease: false
+        files: |
+          dist/*
