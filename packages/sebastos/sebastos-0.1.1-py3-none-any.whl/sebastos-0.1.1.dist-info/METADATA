@@ -1,0 +1,40 @@
+Metadata-Version: 2.4
+Name: sebastos
+Version: 0.1.1
+Summary: local query&sync of standardebooks
+Requires-Python: >=3.12
+Requires-Dist: requests>=2.32.5
+Requires-Dist: tqdm>=4.67.1
+Description-Content-Type: text/markdown
+
+# sebastos: a sync client for Standard Ebooks
+
+The folks over at [Standard Ebooks](https://standardebooks.org/) provide a fabulous collection of public domain books,
+beautifully produced.
+
+I recently purchased a Kobo e-reader, and want to load it with some of those ebooks, getting updates as new books become available, and without having to download and copy a bunch of files. This client makes that easy.
+
+## Getting started
+
+Make a directory for `sebastos` to run from. If you have your ereader plugged in and mounted, this can be on the device itself.
+
+For example, on my Mac with my Kobo plugged in and mounted:
+
+```bash
+cd /Volumes/KOBOeReader
+mkdir sebastos
+cd sebastos
+uvx sebastos init
+```
+
+The `init` subcommand will scan the standardebooks github organisation for ebooks, and download their metadata. This process
+will take a few minutes to complete. At any later time, you can use the `update` subcommand to redo this scan. This will only download metadata for new ebooks, so it will be substantially quicker than the initial scan.
+
+Edit the `.sebastos/config.toml` file and set up as many `[[query]]` blocks as you like, to download by author, subject, title, and so on.
+Then run `uvx sebastos sync` and matching books will be downloaded. If you've pared back your queries, books may be deleted, although the tool will ask you to confirm before it does so.
+
+If you'd like to see the metadata that queries run against, just run `uvx sebastos list`
+
+## Donations
+
+I'm conscious that Standard Ebooks rely upon donations to operate. You can [donate here](https://standardebooks.org/donate) - please do so if you find some value in this tool.
