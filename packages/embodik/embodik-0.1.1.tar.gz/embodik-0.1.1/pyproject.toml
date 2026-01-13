@@ -1,0 +1,104 @@
+[build-system]
+# Build isolation only installs build-system requirements. We include `pin` here so that
+# source builds (sdists) can still locate Pinocchio's CMake package config via the PyPI wheel.
+requires = ["scikit-build-core", "nanobind", "numpy>=1.26.0", "pin>=3.8.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "embodik"
+version = "0.1.1"
+description = "High-performance inverse kinematics solver optimized for cross-embodiment VLA/AI applications"
+authors = [{ name = "Andy Park", email = "andypark.purdue@gmail.com" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26.0", "pin>=3.8.0"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["robotics", "inverse-kinematics", "optimization", "motion-planning"]
+
+[project.scripts]
+embodik-sanitize-env = "embodik.cli:sanitize_env"
+embodik-examples = "embodik.cli:examples_cmd"
+
+[project.optional-dependencies]
+visualization = [
+    "viser>=0.1.0",   # Required by Pinocchio's ViserVisualizer
+    "trimesh>=3.0.0", # Required by Pinocchio's ViserVisualizer for mesh loading
+]
+visualization-legacy = [
+    "viser>=0.1.0",
+    "yourdfpy>=0.0.52", # Only needed for legacy custom visualization
+    # Note: spatialmath-python removed - now using Pinocchio's native transforms
+]
+# Example scripts copied via `embodik-examples` import these directly.
+examples = [
+    "pyyaml>=6.0",
+    "robot_descriptions>=1.0.0",
+    "viser>=0.1.0",
+    "yourdfpy>=0.0.52",
+]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "black>=24.0", "isort>=5.13.0"]
+
+[project.urls]
+Homepage = "https://github.com/embodik/embodik"
+Repository = "https://github.com/embodik/embodik"
+Documentation = "https://embodik.readthedocs.io"
+"Bug Reports" = "https://github.com/embodik/embodik/issues"
+
+[tool.scikit-build]
+# Specify the CMake source directory
+build-dir = "build"
+
+[tool.scikit-build.cmake]
+source-dir = "."
+
+[tool.scikit-build.wheel]
+# Install the Python package - CMake installs go here
+install-dir = "embodik"
+# Include Python packages from source
+packages = ["python/embodik"]
+
+[tool.scikit-build.ninja]
+# Explicitly use Ninja generator (required when ninja is available)
+make-fallback = false
+
+[tool.scikit-build.editable]
+# Use inplace mode for editable installs (builds extension in source directory)
+mode = "inplace"
+
+[tool.scikit-build.cmake.define]
+CMAKE_BUILD_TYPE = "Release"
+BUILD_EXAMPLES = "OFF"       # Examples are Python scripts, not C++ builds
+BUILD_TESTS = "OFF"          # Tests should be built separately, not during pip install
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --tb=short"
+markers = [
+    "benchmark: marks tests as benchmarks (deselect with '-m \"not benchmark\"')",
+]
+filterwarnings = ["ignore::DeprecationWarning:hppfcl"]

@@ -1,0 +1,89 @@
+[project]
+name = "embodik"
+version = "0.1.1"
+description = "High-performance inverse kinematics solver optimized for cross-embodiment VLA/AI applications"
+authors = ["Andy Park <andypark.purdue@gmail.com>"]
+channels = ["conda-forge"]
+platforms = ["linux-64", "linux-aarch64"]
+
+[activation.env]
+CMAKE_PREFIX_PATH = "$CONDA_PREFIX"
+LD_LIBRARY_PATH = "$CONDA_PREFIX/lib"
+PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig"
+
+[dependencies]
+# Build tools (explicitly listed for faster builds, though scikit-build-core can auto-detect)
+cmake = ">=3.16,<4"
+ninja = ">=1.12,<2"
+# C++ dependencies
+eigen = ">=3.4.0,<4"
+pinocchio = ">=3.8.0,<4" # Required for built-in ViserVisualizer
+# Python build dependencies
+python = ">=3.10,<3.13"
+nanobind = ">=2.8.0,<3"
+scikit-build-core = ">=0.11.5,<0.12"
+pip = ">=25.1,<26"
+qhull = ">=2020.2,<2021"
+qhull-static = ">=2020.2,<2021"
+
+[pypi-dependencies]
+numpy = ">=1.26.0"
+# Visualization dependencies (needed for examples)
+viser = ">=0.1.0"
+trimesh = ">=3.0.0"
+robot_descriptions = ">=1.0.0"
+scipy = ">=1.11.0"
+# YAML parsing for robot presets
+pyyaml = ">=6.0"
+# Publishing tools
+build = ">=1.0.0"
+twine = ">=5.0.0"
+# Testing and development tools (available in default environment)
+pytest = ">=7.0"
+pytest-benchmark = ">=4.0"
+black = ">=24.0"
+isort = ">=5.13.0"
+mkdocs-material = "*"
+mkdocstrings = { extras = ["python"], version = "*" }
+
+[tasks]
+# Patch Qhull CMake config before building (workaround for conda-forge qhull package)
+patch-qhull = "python scripts/patch_qhull_cmake.py"
+# Development install with automatic rebuild on import (2025 best practice)
+install = { cmd = "pip install -e . --no-build-isolation", depends-on = [
+    "patch-qhull",
+] }
+install-rebuild = { cmd = "pip install -C editable.rebuild=true -e . --no-build-isolation", depends-on = [
+    "patch-qhull",
+] }
+build = { cmd = "pip install --no-build-isolation .", depends-on = [
+    "patch-qhull",
+] }
+test = "pytest test/"
+test-verbose = "pytest test/ -v"
+lint = "black --check python/ test/ && isort --check python/ test/"
+format = "black python/ test/ && isort python/ test/"
+docs-build = "python -W ignore::DeprecationWarning:hppfcl -m mkdocs build"
+docs-serve = "mkdocs serve"
+# Build distributions
+build-wheel = { cmd = "python -m build --wheel", depends-on = ["patch-qhull"] }
+build-sdist = { cmd = "python -m build --sdist", depends-on = ["patch-qhull"] }
+build-dist = { cmd = "python -m build", depends-on = ["patch-qhull"] }
+# Setup PyPI credentials (run once to create ~/.pypirc)
+setup-pypirc = "bash scripts/setup_pypirc.sh"
+# Upload to PyPI (requires credentials configured in ~/.pypirc)
+upload-testpypi = "bash scripts/upload_testpypi.sh"
+upload-pypi = "bash scripts/upload_pypi.sh"
+# Version management
+version = "python scripts/version.py"
+
+[feature.dev.dependencies]
+# Additional dev-only dependencies
+pytest-cov = ">=2.0"
+
+[feature.dev.tasks]
+test-cov = "pytest test/ --cov=embodik --cov-report=term-missing"
+
+[environments]
+# Default environment includes dev features for development
+default = { features = ["dev"] }
