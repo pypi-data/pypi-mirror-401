@@ -1,0 +1,406 @@
+{# Toast/Notification Container - placeholder for real-time event notifications #}
+<div id="toast-container" class="toast-container"></div>
+
+<style>
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 300px;
+    max-width: 500px;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--error);
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    pointer-events: auto;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast.toast-success {
+    border-left-color: #10b981;
+}
+
+.toast.toast-error {
+    border-left-color: var(--red-500);
+}
+
+.toast.toast-warning {
+    border-left-color: var(--yellow-500);
+}
+
+.toast.toast-blocked {
+    border-left-color: var(--red-500);
+}
+
+.toast.toast-budget-exceeded {
+    border-left-color: var(--red-500);
+}
+
+.toast.toast-burn-rate-exceeded {
+    border-left-color: var(--yellow-500);
+}
+
+.toast.toast-token-limit-exceeded {
+    border-left-color: var(--yellow-500);
+}
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.toast-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: var(--text-primary);
+}
+
+.toast-message {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.toast-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.toast-error-code {
+    font-family: monospace;
+    color: var(--error);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.toast.closing {
+    animation: slideOut 0.3s ease-out;
+}
+
+.toast-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.toast-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--blue-500);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.15s;
+}
+
+.toast-link:hover {
+    background: var(--blue-600);
+}
+
+/* Confirmation Modal */
+.confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    animation: slideInUp 0.3s ease-out;
+}
+
+.confirm-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.confirm-modal-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.confirm-modal-body {
+    padding: 1.5rem;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.confirm-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.confirm-btn {
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.confirm-btn-cancel {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.confirm-btn-cancel:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.confirm-btn-primary {
+    background: var(--blue-500);
+    color: white;
+    border-color: var(--blue-500);
+}
+
+.confirm-btn-primary:hover {
+    background: var(--blue-600);
+    border-color: var(--blue-600);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+</style>
+
+<script>
+// Toast notification system (placeholder for real-time events)
+(function() {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    /**
+     * Show a toast notification
+     * @param {Object} event - Event object
+     *   Format 1 (legacy): { type, seq, ts, reason, error_code, run_id }
+     *   Format 2 (new): { type, title, message, action: {label, url} }
+     * @param {number} duration - Auto-hide duration in ms (0 = never auto-hide)
+     */
+    window.showToast = function(event, duration = 5000) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${event.type}`;
+        
+        // Determine title (new format or legacy)
+        let title = event.title || 
+                   (event.type === 'success' ? 'SUCCESS' :
+                    event.type === 'error' ? 'ERROR' :
+                    event.type === 'warning' ? 'WARNING' :
+                    event.type === 'blocked' ? 'BLOCKED' :
+                    event.type === 'budget_exceeded' ? 'BUDGET EXCEEDED' :
+                    event.type === 'burn_rate_exceeded' ? 'BURN RATE EXCEEDED' :
+                    event.type === 'token_limit_exceeded' ? 'TOKEN LIMIT EXCEEDED' :
+                    'NOTIFICATION');
+        
+        // Determine message (new format or legacy)
+        const message = event.message || event.reason || 'No details available';
+        
+        // Build action link (new format or legacy)
+        let actionHtml = '';
+        if (event.action) {
+            actionHtml = `<div class="toast-actions">
+                <a href="${event.action.url}" class="toast-link">${escapeHtml(event.action.label)}</a>
+            </div>`;
+        } else if (event.run_id) {
+            actionHtml = `<div class="toast-actions">
+                <a href="/runs/${encodeURIComponent(event.run_id)}/replay" class="toast-link">View Replay</a>
+            </div>`;
+        }
+        
+        // Build meta info (for legacy events)
+        let metaHtml = '';
+        if (event.seq || event.ts || event.error_code) {
+            metaHtml = `<div class="toast-meta">
+                ${event.seq ? `<span>Step ${event.seq}</span>` : ''}
+                ${event.ts ? `<span>${new Date(event.ts).toLocaleTimeString()}</span>` : ''}
+                ${event.error_code ? `<span class="toast-error-code">${escapeHtml(event.error_code)}</span>` : ''}
+            </div>`;
+        }
+        
+        toast.innerHTML = `
+            <div class="toast-header">
+                <span class="toast-title">${escapeHtml(title)}</span>
+                <button class="toast-close" onclick="this.closest('.toast').remove()">×</button>
+            </div>
+            <div class="toast-message">${escapeHtml(message)}</div>
+            ${metaHtml}
+            ${actionHtml}
+        `;
+        
+        container.appendChild(toast);
+        
+        // Auto-hide after duration
+        if (duration > 0) {
+            setTimeout(() => {
+                toast.classList.add('closing');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        return toast;
+    };
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    /**
+     * Show a confirmation dialog
+     * @param {string} message - Confirmation message
+     * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
+     */
+    window.showConfirm = function(message) {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal';
+            modal.innerHTML = `
+                <div class="confirm-modal-overlay"></div>
+                <div class="confirm-modal-content">
+                    <div class="confirm-modal-header">
+                        <span class="confirm-modal-title">CONFIRM ACTION</span>
+                    </div>
+                    <div class="confirm-modal-body">${escapeHtml(message)}</div>
+                    <div class="confirm-modal-footer">
+                        <button class="confirm-btn confirm-btn-cancel">Cancel</button>
+                        <button class="confirm-btn confirm-btn-primary">Confirm</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle confirm
+            modal.querySelector('.confirm-btn-primary').onclick = () => {
+                modal.remove();
+                resolve(true);
+            };
+            
+            // Handle cancel
+            const cancel = () => {
+                modal.remove();
+                resolve(false);
+            };
+            modal.querySelector('.confirm-btn-cancel').onclick = cancel;
+            modal.querySelector('.confirm-modal-overlay').onclick = cancel;
+            
+            // Focus primary button
+            setTimeout(() => modal.querySelector('.confirm-btn-primary').focus(), 100);
+        });
+    };
+    
+    /**
+     * Connect to SSE event stream (placeholder)
+     * TODO: Replace with actual SSE implementation
+     */
+    window.connectEventStream = function(runId) {
+        // Placeholder: no-op
+        // Real implementation would:
+        // 1. Create EventSource('/api/runs/' + runId + '/events')
+        // 2. Listen for 'message' events
+        // 3. Parse event data and call showToast()
+        console.log('Event stream connection placeholder for run:', runId);
+    };
+})();
+</script>
