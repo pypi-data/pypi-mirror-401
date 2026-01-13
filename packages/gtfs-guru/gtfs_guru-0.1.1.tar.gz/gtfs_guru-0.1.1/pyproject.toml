@@ -1,0 +1,35 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "gtfs-guru"
+version = "0.1.1"
+description = "Fast GTFS validator written in Rust"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+keywords = ["gtfs", "transit", "validator", "public-transit"]
+
+[project.urls]
+Homepage = "https://github.com/abasis-ltd/gtfs.guru"
+Repository = "https://github.com/abasis-ltd/gtfs.guru"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "python"
+module-name = "gtfs_guru"
+manifest-path = "crates/gtfs_validator_python/Cargo.toml"
