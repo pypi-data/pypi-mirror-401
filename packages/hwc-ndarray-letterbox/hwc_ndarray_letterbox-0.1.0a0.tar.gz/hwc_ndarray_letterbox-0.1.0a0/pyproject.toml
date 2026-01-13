@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hwc-ndarray-letterbox"
+version = "0.1.0a0"
+description = "Letterbox an HWC ndarray image to fit the target width and height while updating the homogeneous transformation matrix."
+readme = "README.md"
+requires-python = ">=2"
+license = "MIT"
+authors = [
+  { name="Jifeng Wu", email="jifengwu2k@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "opencv-python-headless",
+    "typing; python_version < '3.5'"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jifengwu2k/hwc-ndarray-letterbox"
+"Bug Tracker" = "https://github.com/jifengwu2k/hwc-ndarray-letterbox/issues"

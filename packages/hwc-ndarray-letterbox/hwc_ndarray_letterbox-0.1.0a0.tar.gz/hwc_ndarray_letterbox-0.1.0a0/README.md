@@ -1,0 +1,47 @@
+# `hwc-ndarray-letterbox`
+
+Letterbox an HWC ndarray image to fit the target width and height while updating the homogeneous transformation matrix.
+
+Commonly used in computer vision pipelines (e.g., YOLO object detection), where you need to reverse-map coordinates such
+as bounding boxes from the preprocessed image back to the original image space.
+
+## Usage
+
+```python
+import cv2
+import numpy as np
+from hwc_ndarray_letterbox import hwc_ndarray_letterbox
+
+# Load an image (HWC ndarray)
+image = cv2.imread('input.jpg')
+current_homogeneous_transformation_matrix = np.eye(3)
+
+# Desired output size
+target_width = 640
+target_height = 640
+
+# Perform letterbox resize with matrix tracking
+(
+    letterboxed_image,
+    homogeneous_transformation_matrix,
+) = hwc_ndarray_letterbox(
+    image,
+    current_homogeneous_transformation_matrix,
+    target_width,
+    target_height,
+)
+
+print('Homogeneous transformation matrix:', homogeneous_transformation_matrix)
+
+# To map points from letterboxed image back to original:
+# inverse_homogeneous_transformation_matrix = np.linalg.inv(homogeneous_transformation_matrix)
+# original_point = inverse_homogeneous_transformation_matrix @ np.ndarray([x, y, 1])
+```
+
+## Contributing
+
+Contributions are welcome! Please submit pull requests or open issues on the GitHub repository.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
