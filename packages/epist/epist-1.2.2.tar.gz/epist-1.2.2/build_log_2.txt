@@ -1,0 +1,519 @@
+lint	UNKNOWN STEP	﻿2025-12-24T00:05:19.4718003Z Current runner version: '2.330.0'
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4742223Z ##[group]Runner Image Provisioner
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4743194Z Hosted Compute Agent
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4743688Z Version: 20251211.462
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4744382Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4745031Z Build Date: 2025-12-11T16:28:49Z
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4745654Z Worker ID: {8225c7f7-809e-4d67-85b8-3813f21c3dd4}
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4746419Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4746908Z ##[group]Operating System
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4747457Z Ubuntu
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4747956Z 24.04.3
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4748403Z LTS
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4748817Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4749393Z ##[group]Runner Image
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4749892Z Image: ubuntu-24.04
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4750390Z Version: 20251215.174.1
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4751438Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4753350Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4754414Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4755448Z ##[group]GITHUB_TOKEN Permissions
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4757665Z Contents: read
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4758223Z Metadata: read
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4758689Z Packages: read
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4759222Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4761256Z Secret source: Actions
+lint	UNKNOWN STEP	2025-12-24T00:05:19.4762102Z Prepare workflow directory
+lint	UNKNOWN STEP	2025-12-24T00:05:19.5432142Z Prepare all required actions
+lint	UNKNOWN STEP	2025-12-24T00:05:19.5487987Z Getting action download info
+lint	UNKNOWN STEP	2025-12-24T00:05:20.0746907Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+lint	UNKNOWN STEP	2025-12-24T00:05:20.1914906Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+lint	UNKNOWN STEP	2025-12-24T00:05:20.3883301Z Complete job name: lint
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4607115Z ##[group]Run actions/checkout@v4
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4607934Z with:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4608325Z   repository: Seifollahi/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4609011Z   token: ***
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4609384Z   ssh-strict: true
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4609766Z   ssh-user: git
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4610160Z   persist-credentials: true
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4610589Z   clean: true
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4610988Z   sparse-checkout-cone-mode: true
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4611453Z   fetch-depth: 1
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4612101Z   fetch-tags: false
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4612503Z   show-progress: true
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4612894Z   lfs: false
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4613260Z   submodules: false
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4613649Z   set-safe-directory: true
+lint	UNKNOWN STEP	2025-12-24T00:05:20.4614360Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6546199Z Syncing repository: Seifollahi/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6548826Z ##[group]Getting Git version info
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6549483Z Working directory is '/home/runner/work/epist/epist'
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6550423Z [command]/usr/bin/git version
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6550874Z git version 2.52.0
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6552696Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6557373Z Temporarily overriding HOME='/home/runner/work/_temp/98a6c759-7226-4008-b517-088f2f55e60f' before making global git config changes
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6558631Z Adding repository directory to the temporary git global config as a safe directory
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6559615Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6561505Z Deleting the contents of '/home/runner/work/epist/epist'
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6562756Z ##[group]Initializing the repository
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6563370Z [command]/usr/bin/git init /home/runner/work/epist/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6564131Z hint: Using 'master' as the name for the initial branch. This default branch name
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6564993Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6565834Z hint: to use in all of your new repositories, which will suppress this warning,
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6566483Z hint: call:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6566833Z hint:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6567744Z hint: 	git config --global init.defaultBranch <name>
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6568306Z hint:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6568834Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6570196Z hint: 'development'. The just-created branch can be renamed via this command:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6570873Z hint:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6571236Z hint: 	git branch -m <name>
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6571872Z hint:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6572482Z hint: Disable this message with "git config set advice.defaultBranchName false"
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6573351Z Initialized empty Git repository in /home/runner/work/epist/epist/.git/
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6574722Z [command]/usr/bin/git remote add origin https://github.com/Seifollahi/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6576065Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6576713Z ##[group]Disabling automatic garbage collection
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6577304Z [command]/usr/bin/git config --local gc.auto 0
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6578486Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6579083Z ##[group]Setting up auth
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6579716Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6582229Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6914605Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint	UNKNOWN STEP	2025-12-24T00:05:20.6933025Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint	UNKNOWN STEP	2025-12-24T00:05:20.7176982Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint	UNKNOWN STEP	2025-12-24T00:05:20.7228869Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint	UNKNOWN STEP	2025-12-24T00:05:20.7468377Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+lint	UNKNOWN STEP	2025-12-24T00:05:20.7505132Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:20.7507428Z ##[group]Fetching the repository
+lint	UNKNOWN STEP	2025-12-24T00:05:20.7515622Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c114ee2ca6498192e6f7a4c82161a93fbec0bec9:refs/remotes/origin/develop
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6809279Z From https://github.com/Seifollahi/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6812563Z  * [new ref]         c114ee2ca6498192e6f7a4c82161a93fbec0bec9 -> origin/develop
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6859251Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6861128Z ##[group]Determining the checkout info
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6863456Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6867066Z [command]/usr/bin/git sparse-checkout disable
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6914582Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6944121Z ##[group]Checking out the ref
+lint	UNKNOWN STEP	2025-12-24T00:05:21.6947923Z [command]/usr/bin/git checkout --progress --force -B develop refs/remotes/origin/develop
+lint	UNKNOWN STEP	2025-12-24T00:05:21.8608551Z Switched to a new branch 'develop'
+lint	UNKNOWN STEP	2025-12-24T00:05:21.8613017Z branch 'develop' set up to track 'origin/develop'.
+lint	UNKNOWN STEP	2025-12-24T00:05:21.8626782Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:21.8666986Z [command]/usr/bin/git log -1 --format=%H
+lint	UNKNOWN STEP	2025-12-24T00:05:21.8692438Z c114ee2ca6498192e6f7a4c82161a93fbec0bec9
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9011545Z ##[group]Run actions/setup-node@v4
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9012885Z with:
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9013693Z   node-version: 20
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9014581Z   cache: npm
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9015597Z   cache-dependency-path: apps/web/package-lock.json
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9016953Z   always-auth: false
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9017869Z   check-latest: false
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9019080Z   token: ***
+lint	UNKNOWN STEP	2025-12-24T00:05:21.9019906Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:22.0864150Z Found in cache @ /opt/hostedtoolcache/node/20.19.6/x64
+lint	UNKNOWN STEP	2025-12-24T00:05:22.0870857Z ##[group]Environment details
+lint	UNKNOWN STEP	2025-12-24T00:05:22.6174923Z node: v20.19.6
+lint	UNKNOWN STEP	2025-12-24T00:05:22.6182783Z npm: 10.8.2
+lint	UNKNOWN STEP	2025-12-24T00:05:22.6183203Z yarn: 1.22.22
+lint	UNKNOWN STEP	2025-12-24T00:05:22.6184400Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:22.6203412Z [command]/opt/hostedtoolcache/node/20.19.6/x64/bin/npm config get cache
+lint	UNKNOWN STEP	2025-12-24T00:05:22.7547856Z /home/runner/.npm
+lint	UNKNOWN STEP	2025-12-24T00:05:23.2243620Z Cache hit for: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+lint	UNKNOWN STEP	2025-12-24T00:05:24.5200435Z Received 0 of 211728947 (0.0%), 0.0 MBs/sec
+lint	UNKNOWN STEP	2025-12-24T00:05:25.5205456Z Received 117440512 of 211728947 (55.5%), 56.0 MBs/sec
+lint	UNKNOWN STEP	2025-12-24T00:05:26.5213654Z Received 207534643 of 211728947 (98.0%), 66.0 MBs/sec
+lint	UNKNOWN STEP	2025-12-24T00:05:26.5815780Z Received 211728947 of 211728947 (100.0%), 65.9 MBs/sec
+lint	UNKNOWN STEP	2025-12-24T00:05:26.5820791Z Cache Size: ~202 MB (211728947 B)
+lint	UNKNOWN STEP	2025-12-24T00:05:26.5859032Z [command]/usr/bin/tar -xf /home/runner/work/_temp/250ade35-a55a-4c4f-8740-0695b8f02709/cache.tzst -P -C /home/runner/work/epist/epist --use-compress-program unzstd
+lint	UNKNOWN STEP	2025-12-24T00:05:27.0748013Z Cache restored successfully
+lint	UNKNOWN STEP	2025-12-24T00:05:27.1158559Z Cache restored from key: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+lint	UNKNOWN STEP	2025-12-24T00:05:27.1337531Z ##[group]Run npm ci --legacy-peer-deps
+lint	UNKNOWN STEP	2025-12-24T00:05:27.1337918Z [36;1mnpm ci --legacy-peer-deps[0m
+lint	UNKNOWN STEP	2025-12-24T00:05:27.1384256Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2025-12-24T00:05:27.1384529Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7773928Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7783727Z added 849 packages, and audited 850 packages in 19s
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7784233Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7784532Z 290 packages are looking for funding
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7785024Z   run `npm fund` for details
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7799517Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7800175Z 1 moderate severity vulnerability
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7801494Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7801957Z To address all issues, run:
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7802435Z   npm audit fix
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7802669Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:45.7802888Z Run `npm audit` for details.
+lint	UNKNOWN STEP	2025-12-24T00:05:45.8779475Z ##[group]Run npm run lint
+lint	UNKNOWN STEP	2025-12-24T00:05:45.8779766Z [36;1mnpm run lint[0m
+lint	UNKNOWN STEP	2025-12-24T00:05:45.8813883Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2025-12-24T00:05:45.8814126Z ##[endgroup]
+lint	UNKNOWN STEP	2025-12-24T00:05:45.9982826Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:45.9984530Z > web@0.1.0 lint
+lint	UNKNOWN STEP	2025-12-24T00:05:45.9985014Z > eslint .
+lint	UNKNOWN STEP	2025-12-24T00:05:45.9985224Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5342394Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5347446Z /home/runner/work/epist/epist/apps/web/src/app/admin/organizations/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5402676Z ##[warning]  9:5  warning  'MoreVertical' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5410756Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5411299Z /home/runner/work/epist/epist/apps/web/src/app/admin/users/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5499932Z ##[warning]  7:5  warning  'Shield' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5501291Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5502078Z /home/runner/work/epist/epist/apps/web/src/app/blog/[slug]/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5506361Z ##[warning]  120:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5508782Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5509314Z /home/runner/work/epist/epist/apps/web/src/app/dashboard-old/layout.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5513580Z ##[warning]  140:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5515977Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5516549Z /home/runner/work/epist/epist/apps/web/src/app/dashboard-old/profile/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5520589Z ##[warning]   34:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5524992Z ##[warning]   96:18  warning  'e' is defined but never used                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5527781Z ##[warning]  157:18  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5529127Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5529651Z /home/runner/work/epist/epist/apps/web/src/app/dashboard/api-keys/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5531276Z ##[warning]  24:5   warning  'AlertDialogCancel' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5533698Z ##[warning]  35:10  warning  'cn' is defined but never used                 @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5534905Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5535401Z /home/runner/work/epist/epist/apps/web/src/app/dashboard/logs/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5537257Z ##[warning]   55:25  warning  'setAutoRefresh' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5540206Z ##[warning]  104:8   warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5543882Z ##[warning]  119:8   warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5545600Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5546144Z /home/runner/work/epist/epist/apps/web/src/app/dashboard/profile/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5547556Z ##[warning]  62:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5549544Z ##[warning]  72:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5563263Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5563736Z /home/runner/work/epist/epist/apps/web/src/app/login/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5565159Z ##[warning]  5:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5566430Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5566898Z /home/runner/work/epist/epist/apps/web/src/app/pricing/page.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5568289Z ##[warning]  5:33  warning  'Headphones' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5569586Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5570140Z /home/runner/work/epist/epist/apps/web/src/components/landing/PainPoints.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5576581Z ##[warning]  4:10  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5577973Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5578645Z /home/runner/work/epist/epist/apps/web/src/components/legal/CookieConsent.tsx
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5580141Z ##[warning]  5:10  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5581352Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5582298Z ✖ 18 problems (0 errors, 18 warnings)
+lint	UNKNOWN STEP	2025-12-24T00:05:55.5582611Z 
+lint	UNKNOWN STEP	2025-12-24T00:05:55.6010319Z Post job cleanup.
+lint	UNKNOWN STEP	2025-12-24T00:05:55.7670431Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280, not saving cache.
+lint	UNKNOWN STEP	2025-12-24T00:05:55.7830539Z Post job cleanup.
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8782701Z [command]/usr/bin/git version
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8822975Z git version 2.52.0
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8868152Z Temporarily overriding HOME='/home/runner/work/_temp/ff3bca68-dc02-4729-9dd9-37e3f6eccc93' before making global git config changes
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8870199Z Adding repository directory to the temporary git global config as a safe directory
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8874836Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8919886Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint	UNKNOWN STEP	2025-12-24T00:05:55.8956338Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9197443Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9220973Z http.https://github.com/.extraheader
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9235330Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9273896Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9504905Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9539035Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint	UNKNOWN STEP	2025-12-24T00:05:55.9898316Z Cleaning up orphan processes
+build_and_deploy	UNKNOWN STEP	﻿2025-12-24T00:06:02.0496648Z Current runner version: '2.330.0'
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0562164Z ##[group]Runner Image Provisioner
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0563369Z Hosted Compute Agent
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0564428Z Version: 20251211.462
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0565420Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0566543Z Build Date: 2025-12-11T16:28:49Z
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0567584Z Worker ID: {8f322d3b-9362-4532-8377-c094a70a3af5}
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0568899Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0569828Z ##[group]Operating System
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0570687Z Ubuntu
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0571415Z 24.04.3
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0572197Z LTS
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0572945Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0573710Z ##[group]Runner Image
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0574625Z Image: ubuntu-24.04
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0575491Z Version: 20251215.174.1
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0577173Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0620245Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0622068Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0623675Z ##[group]GITHUB_TOKEN Permissions
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0626645Z Contents: read
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0627460Z Metadata: read
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0628581Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0631593Z Secret source: Actions
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.0633134Z Prepare workflow directory
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.1602385Z Prepare all required actions
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.1713123Z Getting action download info
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.4211749Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.5356220Z Download action repository 'google-github-actions/auth@v2' (SHA:c200f3691d83b41bf9bbd8638997a462592937ed)
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:02.8442911Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.0649872Z Complete job name: build_and_deploy
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1664707Z ##[group]Run actions/checkout@v4
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1665651Z with:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1666096Z   repository: Seifollahi/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1666850Z   token: ***
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1667255Z   ssh-strict: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1667671Z   ssh-user: git
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1668104Z   persist-credentials: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1668905Z   clean: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1669339Z   sparse-checkout-cone-mode: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1669840Z   fetch-depth: 1
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1670245Z   fetch-tags: false
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1670661Z   show-progress: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1671090Z   lfs: false
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1671499Z   submodules: false
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1671914Z   set-safe-directory: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.1672806Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.2865464Z Syncing repository: Seifollahi/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.2868158Z ##[group]Getting Git version info
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.2869153Z Working directory is '/home/runner/work/epist/epist'
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:03.2870214Z [command]/usr/bin/git version
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0170383Z git version 2.52.0
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0393033Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0432081Z Temporarily overriding HOME='/home/runner/work/_temp/cc2ab9cf-d62b-4369-be52-75505bbb0c5e' before making global git config changes
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0439630Z Adding repository directory to the temporary git global config as a safe directory
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0630770Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0635665Z Deleting the contents of '/home/runner/work/epist/epist'
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0638896Z ##[group]Initializing the repository
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.0660942Z [command]/usr/bin/git init /home/runner/work/epist/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4316446Z hint: Using 'master' as the name for the initial branch. This default branch name
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4320762Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4323871Z hint: to use in all of your new repositories, which will suppress this warning,
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4326691Z hint: call:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4327977Z hint:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4329905Z hint: 	git config --global init.defaultBranch <name>
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4331794Z hint:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4333648Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4336790Z hint: 'development'. The just-created branch can be renamed via this command:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4340054Z hint:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4341421Z hint: 	git branch -m <name>
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4342967Z hint:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4345034Z hint: Disable this message with "git config set advice.defaultBranchName false"
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4348679Z Initialized empty Git repository in /home/runner/work/epist/epist/.git/
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4355610Z [command]/usr/bin/git remote add origin https://github.com/Seifollahi/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4632604Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4636923Z ##[group]Disabling automatic garbage collection
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4647160Z [command]/usr/bin/git config --local gc.auto 0
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4692984Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4697616Z ##[group]Setting up auth
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4700310Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.4737200Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.6078211Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.6137812Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.6415327Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.6492587Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.6925197Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.7103815Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.7112847Z ##[group]Fetching the repository
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:04.7136967Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c114ee2ca6498192e6f7a4c82161a93fbec0bec9:refs/remotes/origin/develop
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7308480Z From https://github.com/Seifollahi/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7309928Z  * [new ref]         c114ee2ca6498192e6f7a4c82161a93fbec0bec9 -> origin/develop
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7341879Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7346993Z ##[group]Determining the checkout info
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7348151Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7353341Z [command]/usr/bin/git sparse-checkout disable
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7402237Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7433314Z ##[group]Checking out the ref
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.7437689Z [command]/usr/bin/git checkout --progress --force -B develop refs/remotes/origin/develop
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9105519Z Switched to a new branch 'develop'
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9110177Z branch 'develop' set up to track 'origin/develop'.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9122692Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9167401Z [command]/usr/bin/git log -1 --format=%H
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9193682Z c114ee2ca6498192e6f7a4c82161a93fbec0bec9
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9444875Z ##[group]Run google-github-actions/auth@v2
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9445198Z with:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9445703Z   workload_identity_provider: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9446416Z   service_account: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9446813Z   create_credentials_file: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9447261Z   export_environment_variables: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9447785Z   universe: googleapis.com
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9448004Z   cleanup_credentials: true
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9448227Z   access_token_lifetime: 3600s
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9448863Z   access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9449212Z   id_token_include_email: false
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:05.9449520Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.1267406Z Created credentials file at "/home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json"
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2180654Z ##[group]Run actions/setup-node@v4
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2181086Z with:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2181397Z   node-version: 20
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2181741Z   cache: npm
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2182107Z   cache-dependency-path: apps/web/package-lock.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2182575Z   always-auth: false
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2182883Z   check-latest: false
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2183519Z   token: ***
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2183819Z env:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2184455Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2185581Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2186590Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2187333Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2187857Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2188719Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2189202Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2189679Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.2190137Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.4065424Z Found in cache @ /opt/hostedtoolcache/node/20.19.6/x64
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:06.4074794Z ##[group]Environment details
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.2235491Z node: v20.19.6
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.2236422Z npm: 10.8.2
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.2236833Z yarn: 1.22.22
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.2237643Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.2264991Z [command]/opt/hostedtoolcache/node/20.19.6/x64/bin/npm config get cache
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.4617547Z /home/runner/.npm
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:08.6052987Z Cache hit for: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:09.6693506Z Received 171966464 of 211728947 (81.2%), 162.9 MBs/sec
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:09.8459421Z Received 211728947 of 211728947 (100.0%), 170.7 MBs/sec
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:09.8464348Z Cache Size: ~202 MB (211728947 B)
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:09.8503827Z [command]/usr/bin/tar -xf /home/runner/work/_temp/4627e832-2123-4731-a77d-ba9f29f01da3/cache.tzst -P -C /home/runner/work/epist/epist --use-compress-program unzstd
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.3388469Z Cache restored successfully
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.3798182Z Cache restored from key: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.3998678Z ##[group]Run npm ci --legacy-peer-deps
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.3999085Z [36;1mnpm ci --legacy-peer-deps[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4043293Z shell: /usr/bin/bash -e {0}
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4043543Z env:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4043938Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4044588Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4045143Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4045559Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4045853Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4046127Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4046397Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4046671Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:10.4046923Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6037280Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6054200Z added 849 packages, and audited 850 packages in 20s
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6056564Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6059271Z 290 packages are looking for funding
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6061562Z   run `npm fund` for details
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6069269Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6071410Z 1 moderate severity vulnerability
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6072612Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6074472Z To address all issues, run:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6076145Z   npm audit fix
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6076391Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.6076614Z Run `npm audit` for details.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7039622Z ##[group]Run if [[ "refs/heads/develop" == "refs/heads/main" ]]; then
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7040551Z [36;1mif [[ "refs/heads/develop" == "refs/heads/main" ]]; then[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7041244Z [36;1m  echo "Setting up PRODUCTION environment"[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7041746Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDjPRc4hG5fgxiK1hmZh1ZiVEWJiSUhHGI" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7042632Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=audiointelligence-3cb34.firebaseapp.com" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7043402Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=audiointelligence-3cb34" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7044420Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=audiointelligence-3cb34.firebasestorage.app" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7045352Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=920152096400" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7046378Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:920152096400:web:51703a4ff4d3d334d96215" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7047337Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-5K89BRNB9L" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7048606Z [36;1m  echo "NEXT_PUBLIC_API_URL=https://epist-api-prod-920152096400.us-central1.run.app/api/v1" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7049223Z [36;1m  echo "FIREBASE_PROJECT=audiointelligence-3cb34" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7049668Z [36;1melif [[ "refs/heads/develop" == "refs/heads/develop" ]]; then[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7050039Z [36;1m  echo "Setting up STAGING environment"[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7050520Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAnET-zbBVg04rrb3vvkQAeCNrHxcz1P8Y" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7051108Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=epist-staging.firebaseapp.com" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7051604Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7052131Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=epist-staging.firebasestorage.app" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7052674Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=831401877324" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7053182Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:831401877324:web:474a0a64c75c47d7c879e9" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7053687Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-M9EWLY5FGN" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7054280Z [36;1m  echo "NEXT_PUBLIC_API_URL=https://epist-api-staging-920152096400.us-central1.run.app/api/v1" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7054827Z [36;1m  echo "FIREBASE_PROJECT=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7055119Z [36;1melse[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7055422Z [36;1m  echo "Unknown branch, defaulting to STAGING"[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7055967Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAnET-zbBVg04rrb3vvkQAeCNrHxcz1P8Y" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7056541Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=epist-staging.firebaseapp.com" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7057035Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7057551Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=epist-staging.firebasestorage.app" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7058086Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=831401877324" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7059320Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:831401877324:web:474a0a64c75c47d7c879e9" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7059831Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-M9EWLY5FGN" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7060641Z [36;1m  echo "NEXT_PUBLIC_API_URL=https://epist-api-staging-920152096400.us-central1.run.app/api/v1" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7061185Z [36;1m  echo "FIREBASE_PROJECT=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7061604Z [36;1m  echo "STRIPE_PRICE_ID_PRO=price_1SdmnX3GSBwsq2SjKXLMiwDL" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7062282Z [36;1m  echo "STRIPE_SECRET_KEY_SECRET=epist-stripe-secret-key-staging:latest" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7062893Z [36;1m  echo "STRIPE_WEBHOOK_SECRET_SECRET=epist-stripe-webhook-secret-staging:latest" >> $GITHUB_ENV[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7063327Z [36;1mfi[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7095929Z shell: /usr/bin/bash -e {0}
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7096198Z env:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7096602Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7097252Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7097835Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7098252Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7098677Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7098950Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7099220Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7099497Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7099758Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7155139Z Setting up STAGING environment
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7180528Z ##[group]Run npm run build:static
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7180819Z [36;1mnpm run build:static[0m
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7209617Z shell: /usr/bin/bash -e {0}
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7209867Z env:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7210261Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7210923Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7211500Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7211930Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7212233Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7212516Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7212788Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7213066Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7213473Z   NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyAnET-zbBVg04rrb3vvkQAeCNrHxcz1P8Y
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7213907Z   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: epist-staging.firebaseapp.com
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7214262Z   NEXT_PUBLIC_FIREBASE_PROJECT_ID: epist-staging
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7214633Z   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: epist-staging.firebasestorage.app
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7215027Z   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: 831401877324
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7215393Z   NEXT_PUBLIC_FIREBASE_APP_ID: 1:831401877324:web:474a0a64c75c47d7c879e9
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7215751Z   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: G-M9EWLY5FGN
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7216182Z   NEXT_PUBLIC_API_URL: https://epist-api-staging-920152096400.us-central1.run.app/api/v1
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7216595Z   FIREBASE_PROJECT: epist-staging
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.7216817Z ##[endgroup]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.8420268Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.8421865Z > web@0.1.0 build:static
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.8423679Z > next build
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:30.8423886Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.7267112Z ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8086491Z Attention: Next.js now collects completely anonymous telemetry regarding usage.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8091957Z This information is used to shape Next.js' roadmap and prioritize features.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8095735Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8097076Z https://nextjs.org/telemetry
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8097354Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8765067Z    ▲ Next.js 16.0.10 (Turbopack)
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.8769462Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:31.9233566Z  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:32.1919697Z    Creating an optimized production build ...
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:32.2764004Z [MDX] generated files in 14.075323000000026ms
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7077113Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7086642Z > Build error occurred
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7120333Z Error: Turbopack build failed with 1 errors:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7123934Z ./node_modules/fumadocs-ui/dist/style.css
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7124455Z Error evaluating Node.js code
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7127248Z CssSyntaxError: /home/runner/work/epist/epist/apps/web/node_modules/fumadocs-ui/dist/style.css:87:1: `@layer base` is used but no matching `@tailwind base` directive is present.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7129614Z     at Input.error (node_modules/postcss/lib/input.js:135:16) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:4651:22]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7131425Z     at AtRule.error (node_modules/postcss/lib/node.js:146:32) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:928:38]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7133463Z     [at normalizeTailwindDirectives (/home/runner/work/epist/epist/apps/web/node_modules/tailwindcss/lib/lib/normalizeTailwindDirectives.js:72:32)]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7135383Z     [at /home/runner/work/epist/epist/apps/web/node_modules/tailwindcss/lib/processTailwindFeatures.js:29:98]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7136594Z     [at plugins (/home/runner/work/epist/epist/apps/web/node_modules/tailwindcss/lib/plugin.js:38:69)]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7138127Z     at LazyResult.runOnRoot (node_modules/postcss/lib/lazy-result.js:361:16) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6264:24]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7140171Z     at LazyResult.runAsync (node_modules/postcss/lib/lazy-result.js:290:26) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6203:32]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7141966Z     at LazyResult.async (node_modules/postcss/lib/lazy-result.js:192:30) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6135:36]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7143732Z     at LazyResult.then (node_modules/postcss/lib/lazy-result.js:436:17) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6321:21]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7144999Z     [at process.processTicksAndRejections (node:internal/process/task_queues:95:5)]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7145487Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7145622Z Import trace:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7145933Z   Client Component Browser:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7146565Z     ./node_modules/fumadocs-ui/dist/style.css [Client Component Browser]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7147236Z     ./src/app/globals.css [Client Component Browser]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7147788Z     ./src/app/layout.tsx [Server Component]
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7148088Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7148097Z 
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.7148524Z     at ignore-listed frames
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.8146718Z ##[error]Process completed with exit code 1.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.8242214Z Post job cleanup.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.9116587Z Removed exported credentials at "/home/runner/work/epist/epist/gha-creds-aaed22dc132a6b7e.json".
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:06:59.9233236Z Post job cleanup.
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.0323276Z [command]/usr/bin/git version
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.0364717Z git version 2.52.0
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.0413213Z Temporarily overriding HOME='/home/runner/work/_temp/ca130cca-3138-4b93-afcb-540124554e51' before making global git config changes
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.0415056Z Adding repository directory to the temporary git global config as a safe directory
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.0420861Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.1052394Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.1100998Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.1613622Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.1695341Z http.https://github.com/.extraheader
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.1715712Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.2088078Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.2465576Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.2534767Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build_and_deploy	UNKNOWN STEP	2025-12-24T00:07:00.3480258Z Cleaning up orphan processes

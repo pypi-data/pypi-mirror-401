@@ -1,0 +1,226 @@
+name: Backend Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'migrations/**'
+      - 'tests/**'
+      - 'infra/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/backend-deploy.yml'
+
+env:
+  PROJECT_ID: audiointelligence-3cb34
+  REGION: us-central1
+  REPO_NAME: epist-repo
+  SERVICE_NAME_PROD: epist-api-prod
+  SERVICE_NAME_STAGING: epist-api-staging
+  WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+  SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: epist
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+
+
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run tests
+        env:
+          SECRET_KEY: "test_secret_key"
+          API_KEY: "test_api_key"
+          DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/epist"
+          STRIPE_PRICE_ID_PRO: "price_test_pro"
+          STRIPE_PRICE_ID_STARTER: "price_test_starter"
+        run: uv run python -m pytest
+
+      - name: Run linter
+        run: uv run ruff check .
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/api:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Set Image URI
+        run: echo "IMAGE_URI=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/api:${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Get DB Password
+        id: db_secrets
+        uses: google-github-actions/get-secretmanager-secrets@v2
+        with:
+          secrets: |-
+            DB_PASSWORD:projects/${{ env.PROJECT_ID }}/secrets/${{ github.ref == 'refs/heads/main' && 'epist-db-password-prod' || 'epist-db-password-staging' }}/versions/latest
+
+      - name: Run Database Migrations
+        env:
+          DB_PASSWORD: ${{ steps.db_secrets.outputs.DB_PASSWORD }}
+          SECRET_KEY: "migration-placeholder"
+          API_KEY: "migration-placeholder"
+          INSTANCE_CONNECTION_NAME: ${{ github.ref == 'refs/heads/main' && 'audiointelligence-3cb34:us-central1:epist-db-prod' || 'audiointelligence-3cb34:us-central1:epist-db-staging' }}
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy $INSTANCE_CONNECTION_NAME --port 5432 &
+          PROXY_PID=$!
+          
+          # Wait for proxy
+          sleep 10
+          
+          # Run migrations
+          DATABASE_URL=postgresql+asyncpg://epist_user:$DB_PASSWORD@127.0.0.1:5432/epist uv run alembic upgrade head
+          
+          kill $PROXY_PID
+
+      - name: Deploy to Cloud Run (Production)
+        if: github.ref == 'refs/heads/main'
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME_PROD }}
+          image: ${{ env.IMAGE_URI }}
+          region: ${{ env.REGION }}
+          flags: '--memory 2Gi --timeout 300 --service-account=920152096400-compute@developer.gserviceaccount.com --add-cloudsql-instances=audiointelligence-3cb34:us-central1:epist-db-prod'
+          env_vars: |
+            API_BASE_URL=https://epist-api-prod-920152096400.us-central1.run.app
+            CLOUD_TASKS_QUEUE_PATH=projects/audiointelligence-3cb34/locations/us-central1/queues/transcription-queue-v3
+            FIREBASE_PROJECT_ID=audiointelligence-3cb34
+            DB_HOST=/cloudsql/audiointelligence-3cb34:us-central1:epist-db-prod
+            DB_NAME=epist
+            DB_USER=epist_user
+            MASTER_API_KEY=yaSwFNMVCrYup1m65XZvAJd5vgEqD0yl
+            ENVIRONMENT=prod
+            STRIPE_PRICE_ID_STARTER=price_1SkAau3yCRFf2ZvZUKCoBNk3
+            STRIPE_PRICE_ID_PRO=price_1SkAav3yCRFf2ZvZhicGygjC
+          secrets: |
+            DB_PASSWORD=epist-db-password-prod:latest
+            API_KEY=epist-api-key-prod:latest
+            SECRET_KEY=epist-secret-key-prod:latest
+            FIREWORKS_API_KEY=epist-fireworks-key:latest
+            OPENAI_API_KEY=epist-openai-key:latest
+            STRIPE_SECRET_KEY=epist-stripe-secret-key-prod:latest
+            STRIPE_WEBHOOK_SECRET=epist-stripe-webhook-secret-prod:latest
+            SENTRY_DSN=epist-sentry-dsn:latest
+            FIREWORKS_PROXY_URL=FIREWORKS_PROXY_URL:latest
+
+      - name: Deploy to Cloud Run (Staging)
+        if: github.ref == 'refs/heads/develop'
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME_STAGING }}
+          image: ${{ env.IMAGE_URI }}
+          region: ${{ env.REGION }}
+          flags: '--clear-vpc-connector --allow-unauthenticated --memory 2Gi --timeout 300 --service-account=920152096400-compute@developer.gserviceaccount.com --add-cloudsql-instances=audiointelligence-3cb34:us-central1:epist-db-staging'
+          env_vars: |
+            FIREBASE_PROJECT_ID=epist-staging
+            API_BASE_URL=https://epist-api-staging-920152096400.us-central1.run.app
+            CLOUD_TASKS_QUEUE_PATH=projects/audiointelligence-3cb34/locations/us-central1/queues/transcription-queue-v3
+            DB_HOST=/cloudsql/audiointelligence-3cb34:us-central1:epist-db-staging
+            DB_NAME=epist
+            DB_USER=epist_user
+            STRIPE_PRICE_ID_PRO=price_1SdmnX3GSBwsq2SjKXLMiwDL
+            ENVIRONMENT=staging
+            FRONTEND_URL=https://epist-staging.web.app
+          secrets: |
+            DB_PASSWORD=epist-db-password-staging:latest
+            API_KEY=epist-api-key-staging:latest
+            SECRET_KEY=epist-secret-key-staging:latest
+            FIREWORKS_API_KEY=epist-fireworks-key:latest
+            OPENAI_API_KEY=epist-openai-key:latest
+            STRIPE_SECRET_KEY=epist-stripe-secret-key-staging:latest
+            STRIPE_WEBHOOK_SECRET=epist-stripe-webhook-secret-staging:latest
+            SENTRY_DSN=epist-sentry-dsn:latest

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epist Widget Test</title>
+    <!-- Tailwind for basic styling of the container -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto space-y-8">
+        <h1 class="text-3xl font-bold text-gray-900">Epist Widget Test</h1>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4">Search Widget</h2>
+            <!-- Widget Container -->
+            <div id="epist-widget" 
+                 data-api-key="test-key"
+                 data-base-url="https://api.epist.ai/v1" 
+                 data-placeholder="Search knowledge base..."
+                 data-limit="3">
+            </div>
+        </div>
+
+        <div class="space-y-2 text-sm text-gray-500">
+            <p><strong>Config:</strong></p>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>API Key: <code>test-key</code></li>
+                <li>Base URL: <code>https://api.epist.ai/v1</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load the polished widget bundle -->
+    <script src="./dist/embed/epist-widget.js"></script>
+</body>
+</html>

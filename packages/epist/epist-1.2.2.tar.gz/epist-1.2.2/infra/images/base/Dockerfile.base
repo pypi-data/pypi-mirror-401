@@ -1,0 +1,48 @@
+# Base Image for Audio RAG Platform with heavy ML dependencies pre-installed
+# (Triggering rebuild for path context fix)
+FROM python:3.11-slim-bookworm
+
+# Install uv provided by Astral
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+# Configure uv
+ENV UV_COMPILE_BYTECODE=1 
+ENV UV_LINK_MODE=copy
+ENV PYTHONUNBUFFERED=1
+
+# Reduce concurrency to avoid OOM in small CI runners
+ENV UV_CONCURRENT_DOWNLOADS=1
+ENV UV_CONCURRENT_BUILDS=1
+
+# Install system dependencies if any (e.g. for audio/video processing)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libsndfile1 \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Heavy ML Dependencies into a virtual environment
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Create the virtual environment
+RUN uv venv /app/.venv
+
+# Install dependencies into the venv
+# Split install to avoid memory/timeout issues in CI
+RUN uv pip install \
+    "torch>=2.2.0" \
+    "torchaudio>=2.2.0" \
+    "torchvision>=0.17.0" \
+    --index-url https://download.pytorch.org/whl/cpu
+
+RUN uv pip install "transformers>=4.30.0"
+
+# sentence-transformers and others will be installed in the app build
+# to keep the base build stable and low-memory.
+# RUN uv pip install "sentence-transformers>=2.2.2"
+#
+# RUN uv pip install \
+#     "chromadb>=0.4.0" \
+#     "laion-clap>=0.0.16" \
+#     "librosa>=0.10.1" \
+#     "numpy>=1.26.0"

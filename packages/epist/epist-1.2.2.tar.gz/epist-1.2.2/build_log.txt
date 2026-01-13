@@ -1,0 +1,516 @@
+lint	Set up job	﻿2025-12-23T23:58:10.1829853Z Current runner version: '2.330.0'
+lint	Set up job	2025-12-23T23:58:10.1924750Z ##[group]Runner Image Provisioner
+lint	Set up job	2025-12-23T23:58:10.1926080Z Hosted Compute Agent
+lint	Set up job	2025-12-23T23:58:10.1927075Z Version: 20251211.462
+lint	Set up job	2025-12-23T23:58:10.1928058Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+lint	Set up job	2025-12-23T23:58:10.1929171Z Build Date: 2025-12-11T16:28:49Z
+lint	Set up job	2025-12-23T23:58:10.1930114Z Worker ID: {6b9596f1-5e81-4ab7-ab49-bc90c5220f26}
+lint	Set up job	2025-12-23T23:58:10.1931475Z ##[endgroup]
+lint	Set up job	2025-12-23T23:58:10.1932262Z ##[group]Operating System
+lint	Set up job	2025-12-23T23:58:10.1933242Z Ubuntu
+lint	Set up job	2025-12-23T23:58:10.1934017Z 24.04.3
+lint	Set up job	2025-12-23T23:58:10.1934976Z LTS
+lint	Set up job	2025-12-23T23:58:10.1935876Z ##[endgroup]
+lint	Set up job	2025-12-23T23:58:10.1936673Z ##[group]Runner Image
+lint	Set up job	2025-12-23T23:58:10.1937573Z Image: ubuntu-24.04
+lint	Set up job	2025-12-23T23:58:10.1938368Z Version: 20251215.174.1
+lint	Set up job	2025-12-23T23:58:10.1940223Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+lint	Set up job	2025-12-23T23:58:10.1942556Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+lint	Set up job	2025-12-23T23:58:10.1944818Z ##[endgroup]
+lint	Set up job	2025-12-23T23:58:10.1946541Z ##[group]GITHUB_TOKEN Permissions
+lint	Set up job	2025-12-23T23:58:10.1949206Z Contents: read
+lint	Set up job	2025-12-23T23:58:10.1950057Z Metadata: read
+lint	Set up job	2025-12-23T23:58:10.1950817Z Packages: read
+lint	Set up job	2025-12-23T23:58:10.1972413Z ##[endgroup]
+lint	Set up job	2025-12-23T23:58:10.1976400Z Secret source: Actions
+lint	Set up job	2025-12-23T23:58:10.1977991Z Prepare workflow directory
+lint	Set up job	2025-12-23T23:58:10.3096194Z Prepare all required actions
+lint	Set up job	2025-12-23T23:58:10.3151074Z Getting action download info
+lint	Set up job	2025-12-23T23:58:10.5374945Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+lint	Set up job	2025-12-23T23:58:10.6970776Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+lint	Set up job	2025-12-23T23:58:10.9299797Z Complete job name: lint
+lint	Run actions/checkout@v4	﻿2025-12-23T23:58:10.9969184Z ##[group]Run actions/checkout@v4
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9970045Z with:
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9970448Z   repository: Seifollahi/epist
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9971144Z   token: ***
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9971531Z   ssh-strict: true
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9971913Z   ssh-user: git
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9972363Z   persist-credentials: true
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9972798Z   clean: true
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9973204Z   sparse-checkout-cone-mode: true
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9973668Z   fetch-depth: 1
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9974054Z   fetch-tags: false
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9974450Z   show-progress: true
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9975157Z   lfs: false
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9975991Z   submodules: false
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9976417Z   set-safe-directory: true
+lint	Run actions/checkout@v4	2025-12-23T23:58:10.9977216Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.1290617Z Syncing repository: Seifollahi/epist
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.1294859Z ##[group]Getting Git version info
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.1297154Z Working directory is '/home/runner/work/epist/epist'
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.1298658Z [command]/usr/bin/git version
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.1996395Z git version 2.52.0
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2010544Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2017241Z Temporarily overriding HOME='/home/runner/work/_temp/119f621c-9821-4e89-8cac-e6d1ad0507ea' before making global git config changes
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2019552Z Adding repository directory to the temporary git global config as a safe directory
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2021616Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2024023Z Deleting the contents of '/home/runner/work/epist/epist'
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2026050Z ##[group]Initializing the repository
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2027171Z [command]/usr/bin/git init /home/runner/work/epist/epist
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2028623Z hint: Using 'master' as the name for the initial branch. This default branch name
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2030253Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2031793Z hint: to use in all of your new repositories, which will suppress this warning,
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2033050Z hint: call:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2033663Z hint:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2035036Z hint: 	git config --global init.defaultBranch <name>
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2035981Z hint:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2036896Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2038475Z hint: 'development'. The just-created branch can be renamed via this command:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2039754Z hint:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2040414Z hint: 	git branch -m <name>
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2041176Z hint:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2042126Z hint: Disable this message with "git config set advice.defaultBranchName false"
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2043626Z Initialized empty Git repository in /home/runner/work/epist/epist/.git/
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2046310Z [command]/usr/bin/git remote add origin https://github.com/Seifollahi/epist
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2066081Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2067331Z ##[group]Disabling automatic garbage collection
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2068402Z [command]/usr/bin/git config --local gc.auto 0
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2084492Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2085925Z ##[group]Setting up auth
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2092366Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2213532Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2590034Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2625040Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2873284Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.2909437Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.3160539Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.3200283Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.3202156Z ##[group]Fetching the repository
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.3210862Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d4a6aea8105f7ec7676602efd8ca5cfad90abf64:refs/remotes/origin/develop
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9549477Z From https://github.com/Seifollahi/epist
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9571485Z  * [new ref]         d4a6aea8105f7ec7676602efd8ca5cfad90abf64 -> origin/develop
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9599867Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9601553Z ##[group]Determining the checkout info
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9603556Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9610442Z [command]/usr/bin/git sparse-checkout disable
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9675339Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9722621Z ##[group]Checking out the ref
+lint	Run actions/checkout@v4	2025-12-23T23:58:11.9733285Z [command]/usr/bin/git checkout --progress --force -B develop refs/remotes/origin/develop
+lint	Run actions/checkout@v4	2025-12-23T23:58:12.1572954Z Switched to a new branch 'develop'
+lint	Run actions/checkout@v4	2025-12-23T23:58:12.1578243Z branch 'develop' set up to track 'origin/develop'.
+lint	Run actions/checkout@v4	2025-12-23T23:58:12.1593001Z ##[endgroup]
+lint	Run actions/checkout@v4	2025-12-23T23:58:12.1635463Z [command]/usr/bin/git log -1 --format=%H
+lint	Run actions/checkout@v4	2025-12-23T23:58:12.1660730Z d4a6aea8105f7ec7676602efd8ca5cfad90abf64
+lint	Setup Node.js	﻿2025-12-23T23:58:12.1960311Z ##[group]Run actions/setup-node@v4
+lint	Setup Node.js	2025-12-23T23:58:12.1961436Z with:
+lint	Setup Node.js	2025-12-23T23:58:12.1962220Z   node-version: 20
+lint	Setup Node.js	2025-12-23T23:58:12.1963055Z   cache: npm
+lint	Setup Node.js	2025-12-23T23:58:12.1964017Z   cache-dependency-path: apps/web/package-lock.json
+lint	Setup Node.js	2025-12-23T23:58:12.1965378Z   always-auth: false
+lint	Setup Node.js	2025-12-23T23:58:12.1966262Z   check-latest: false
+lint	Setup Node.js	2025-12-23T23:58:12.1967405Z   token: ***
+lint	Setup Node.js	2025-12-23T23:58:12.1968205Z ##[endgroup]
+lint	Setup Node.js	2025-12-23T23:58:12.3988546Z Found in cache @ /opt/hostedtoolcache/node/20.19.6/x64
+lint	Setup Node.js	2025-12-23T23:58:12.3994433Z ##[group]Environment details
+lint	Setup Node.js	2025-12-23T23:58:12.8840797Z node: v20.19.6
+lint	Setup Node.js	2025-12-23T23:58:12.8844140Z npm: 10.8.2
+lint	Setup Node.js	2025-12-23T23:58:12.8846158Z yarn: 1.22.22
+lint	Setup Node.js	2025-12-23T23:58:12.8849178Z ##[endgroup]
+lint	Setup Node.js	2025-12-23T23:58:12.8873293Z [command]/opt/hostedtoolcache/node/20.19.6/x64/bin/npm config get cache
+lint	Setup Node.js	2025-12-23T23:58:13.0214234Z /home/runner/.npm
+lint	Setup Node.js	2025-12-23T23:58:13.1520039Z Cache hit for: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+lint	Setup Node.js	2025-12-23T23:58:14.2346426Z Received 188743680 of 211728947 (89.1%), 178.4 MBs/sec
+lint	Setup Node.js	2025-12-23T23:58:14.3218368Z Received 211728947 of 211728947 (100.0%), 184.4 MBs/sec
+lint	Setup Node.js	2025-12-23T23:58:14.3222247Z Cache Size: ~202 MB (211728947 B)
+lint	Setup Node.js	2025-12-23T23:58:14.3266498Z [command]/usr/bin/tar -xf /home/runner/work/_temp/d736be18-2535-4980-b42d-8f2a8318dc65/cache.tzst -P -C /home/runner/work/epist/epist --use-compress-program unzstd
+lint	Setup Node.js	2025-12-23T23:58:15.0386917Z Cache restored successfully
+lint	Setup Node.js	2025-12-23T23:58:15.0785580Z Cache restored from key: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+lint	Install dependencies	﻿2025-12-23T23:58:15.0990348Z ##[group]Run npm ci --legacy-peer-deps
+lint	Install dependencies	2025-12-23T23:58:15.0990779Z [36;1mnpm ci --legacy-peer-deps[0m
+lint	Install dependencies	2025-12-23T23:58:15.1038190Z shell: /usr/bin/bash -e {0}
+lint	Install dependencies	2025-12-23T23:58:15.1038472Z ##[endgroup]
+lint	Install dependencies	2025-12-23T23:58:34.0064850Z 
+lint	Install dependencies	2025-12-23T23:58:34.0079527Z added 849 packages, and audited 850 packages in 19s
+lint	Install dependencies	2025-12-23T23:58:34.0081655Z 
+lint	Install dependencies	2025-12-23T23:58:34.0082025Z 290 packages are looking for funding
+lint	Install dependencies	2025-12-23T23:58:34.0082564Z   run `npm fund` for details
+lint	Install dependencies	2025-12-23T23:58:34.0097062Z 
+lint	Install dependencies	2025-12-23T23:58:34.0099106Z 1 moderate severity vulnerability
+lint	Install dependencies	2025-12-23T23:58:34.0100474Z 
+lint	Install dependencies	2025-12-23T23:58:34.0105775Z To address all issues, run:
+lint	Install dependencies	2025-12-23T23:58:34.0107073Z   npm audit fix
+lint	Install dependencies	2025-12-23T23:58:34.0109451Z 
+lint	Install dependencies	2025-12-23T23:58:34.0111568Z Run `npm audit` for details.
+lint	Run Lint	﻿2025-12-23T23:58:34.1087209Z ##[group]Run npm run lint
+lint	Run Lint	2025-12-23T23:58:34.1087505Z [36;1mnpm run lint[0m
+lint	Run Lint	2025-12-23T23:58:34.1125200Z shell: /usr/bin/bash -e {0}
+lint	Run Lint	2025-12-23T23:58:34.1125468Z ##[endgroup]
+lint	Run Lint	2025-12-23T23:58:34.2291102Z 
+lint	Run Lint	2025-12-23T23:58:34.2292135Z > web@0.1.0 lint
+lint	Run Lint	2025-12-23T23:58:34.2293457Z > eslint .
+lint	Run Lint	2025-12-23T23:58:34.2294826Z 
+lint	Run Lint	2025-12-23T23:58:44.2959193Z 
+lint	Run Lint	2025-12-23T23:58:44.2973953Z /home/runner/work/epist/epist/apps/web/src/app/admin/organizations/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3014086Z ##[warning]  9:5  warning  'MoreVertical' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3023691Z 
+lint	Run Lint	2025-12-23T23:58:44.3024275Z /home/runner/work/epist/epist/apps/web/src/app/admin/users/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3026182Z ##[warning]  7:5  warning  'Shield' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3027414Z 
+lint	Run Lint	2025-12-23T23:58:44.3027922Z /home/runner/work/epist/epist/apps/web/src/app/blog/[slug]/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3127227Z ##[warning]  120:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+lint	Run Lint	2025-12-23T23:58:44.3129937Z 
+lint	Run Lint	2025-12-23T23:58:44.3130485Z /home/runner/work/epist/epist/apps/web/src/app/dashboard-old/layout.tsx
+lint	Run Lint	2025-12-23T23:58:44.3134478Z ##[warning]  140:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+lint	Run Lint	2025-12-23T23:58:44.3137104Z 
+lint	Run Lint	2025-12-23T23:58:44.3137671Z /home/runner/work/epist/epist/apps/web/src/app/dashboard-old/profile/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3141640Z ##[warning]   34:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+lint	Run Lint	2025-12-23T23:58:44.3145976Z ##[warning]   96:18  warning  'e' is defined but never used                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3148771Z ##[warning]  157:18  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3150117Z 
+lint	Run Lint	2025-12-23T23:58:44.3150640Z /home/runner/work/epist/epist/apps/web/src/app/dashboard/api-keys/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3152299Z ##[warning]  24:5   warning  'AlertDialogCancel' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3154422Z ##[warning]  35:10  warning  'cn' is defined but never used                 @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3155929Z 
+lint	Run Lint	2025-12-23T23:58:44.3156435Z /home/runner/work/epist/epist/apps/web/src/app/dashboard/logs/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3158312Z ##[warning]   55:25  warning  'setAutoRefresh' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3161225Z ##[warning]  104:8   warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+lint	Run Lint	2025-12-23T23:58:44.3164215Z ##[warning]  119:8   warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+lint	Run Lint	2025-12-23T23:58:44.3166468Z 
+lint	Run Lint	2025-12-23T23:58:44.3167012Z /home/runner/work/epist/epist/apps/web/src/app/dashboard/profile/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3168428Z ##[warning]  62:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3170416Z ##[warning]  72:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3171598Z 
+lint	Run Lint	2025-12-23T23:58:44.3172003Z /home/runner/work/epist/epist/apps/web/src/app/login/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3192031Z ##[warning]  5:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3193403Z 
+lint	Run Lint	2025-12-23T23:58:44.3193876Z /home/runner/work/epist/epist/apps/web/src/app/pricing/page.tsx
+lint	Run Lint	2025-12-23T23:58:44.3195599Z ##[warning]  5:33  warning  'Headphones' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3196889Z 
+lint	Run Lint	2025-12-23T23:58:44.3197449Z /home/runner/work/epist/epist/apps/web/src/components/landing/PainPoints.tsx
+lint	Run Lint	2025-12-23T23:58:44.3198963Z ##[warning]  4:10  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3200195Z 
+lint	Run Lint	2025-12-23T23:58:44.3200750Z /home/runner/work/epist/epist/apps/web/src/components/legal/CookieConsent.tsx
+lint	Run Lint	2025-12-23T23:58:44.3202113Z ##[warning]  5:10  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+lint	Run Lint	2025-12-23T23:58:44.3203279Z 
+lint	Run Lint	2025-12-23T23:58:44.3203816Z ✖ 18 problems (0 errors, 18 warnings)
+lint	Run Lint	2025-12-23T23:58:44.3204122Z 
+lint	Post Setup Node.js	﻿2025-12-23T23:58:44.3672596Z Post job cleanup.
+lint	Post Setup Node.js	2025-12-23T23:58:44.5408481Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280, not saving cache.
+lint	Post Run actions/checkout@v4	﻿2025-12-23T23:58:44.5560490Z Post job cleanup.
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6530847Z [command]/usr/bin/git version
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6583482Z git version 2.52.0
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6633143Z Temporarily overriding HOME='/home/runner/work/_temp/bebb672f-fbdb-47e1-8235-e648fbdaf9b7' before making global git config changes
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6637012Z Adding repository directory to the temporary git global config as a safe directory
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6641579Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6687414Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6723261Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.6989392Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.7013847Z http.https://github.com/.extraheader
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.7028982Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.7063259Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.7299394Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint	Post Run actions/checkout@v4	2025-12-23T23:58:44.7335066Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint	Complete job	﻿2025-12-23T23:58:44.7676937Z Cleaning up orphan processes
+build_and_deploy	Set up job	﻿2025-12-23T23:58:49.8190863Z Current runner version: '2.330.0'
+build_and_deploy	Set up job	2025-12-23T23:58:49.8224727Z ##[group]Runner Image Provisioner
+build_and_deploy	Set up job	2025-12-23T23:58:49.8225910Z Hosted Compute Agent
+build_and_deploy	Set up job	2025-12-23T23:58:49.8226793Z Version: 20251211.462
+build_and_deploy	Set up job	2025-12-23T23:58:49.8227790Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+build_and_deploy	Set up job	2025-12-23T23:58:49.8229437Z Build Date: 2025-12-11T16:28:49Z
+build_and_deploy	Set up job	2025-12-23T23:58:49.8230524Z Worker ID: {d759192e-fdcc-4d59-8e47-99eea00df2ad}
+build_and_deploy	Set up job	2025-12-23T23:58:49.8231729Z ##[endgroup]
+build_and_deploy	Set up job	2025-12-23T23:58:49.8232547Z ##[group]Operating System
+build_and_deploy	Set up job	2025-12-23T23:58:49.8233446Z Ubuntu
+build_and_deploy	Set up job	2025-12-23T23:58:49.8234256Z 24.04.3
+build_and_deploy	Set up job	2025-12-23T23:58:49.8235011Z LTS
+build_and_deploy	Set up job	2025-12-23T23:58:49.8235805Z ##[endgroup]
+build_and_deploy	Set up job	2025-12-23T23:58:49.8236627Z ##[group]Runner Image
+build_and_deploy	Set up job	2025-12-23T23:58:49.8237733Z Image: ubuntu-24.04
+build_and_deploy	Set up job	2025-12-23T23:58:49.8238772Z Version: 20251215.174.1
+build_and_deploy	Set up job	2025-12-23T23:58:49.8240497Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+build_and_deploy	Set up job	2025-12-23T23:58:49.8243308Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+build_and_deploy	Set up job	2025-12-23T23:58:49.8245292Z ##[endgroup]
+build_and_deploy	Set up job	2025-12-23T23:58:49.8246858Z ##[group]GITHUB_TOKEN Permissions
+build_and_deploy	Set up job	2025-12-23T23:58:49.8249494Z Contents: read
+build_and_deploy	Set up job	2025-12-23T23:58:49.8250562Z Metadata: read
+build_and_deploy	Set up job	2025-12-23T23:58:49.8251353Z ##[endgroup]
+build_and_deploy	Set up job	2025-12-23T23:58:49.8254372Z Secret source: Actions
+build_and_deploy	Set up job	2025-12-23T23:58:49.8255570Z Prepare workflow directory
+build_and_deploy	Set up job	2025-12-23T23:58:49.9195542Z Prepare all required actions
+build_and_deploy	Set up job	2025-12-23T23:58:49.9292529Z Getting action download info
+build_and_deploy	Set up job	2025-12-23T23:58:50.3105863Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+build_and_deploy	Set up job	2025-12-23T23:58:50.4350900Z Download action repository 'google-github-actions/auth@v2' (SHA:c200f3691d83b41bf9bbd8638997a462592937ed)
+build_and_deploy	Set up job	2025-12-23T23:58:50.9022227Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+build_and_deploy	Set up job	2025-12-23T23:58:51.1264826Z Complete job name: build_and_deploy
+build_and_deploy	Run actions/checkout@v4	﻿2025-12-23T23:58:51.2033947Z ##[group]Run actions/checkout@v4
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2035069Z with:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2035623Z   repository: Seifollahi/epist
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2036617Z   token: ***
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2037132Z   ssh-strict: true
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2037667Z   ssh-user: git
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2038544Z   persist-credentials: true
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2039190Z   clean: true
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2039731Z   sparse-checkout-cone-mode: true
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2040435Z   fetch-depth: 1
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2040952Z   fetch-tags: false
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2041497Z   show-progress: true
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2042054Z   lfs: false
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2042571Z   submodules: false
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2043129Z   set-safe-directory: true
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.2044059Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3240806Z Syncing repository: Seifollahi/epist
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3246017Z ##[group]Getting Git version info
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3247556Z Working directory is '/home/runner/work/epist/epist'
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3250059Z [command]/usr/bin/git version
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3334658Z git version 2.52.0
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3366922Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3386342Z Temporarily overriding HOME='/home/runner/work/_temp/1f150b11-7b92-4633-bcdf-073e3af4c70b' before making global git config changes
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3390872Z Adding repository directory to the temporary git global config as a safe directory
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3406301Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3452645Z Deleting the contents of '/home/runner/work/epist/epist'
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3458392Z ##[group]Initializing the repository
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3464729Z [command]/usr/bin/git init /home/runner/work/epist/epist
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3579819Z hint: Using 'master' as the name for the initial branch. This default branch name
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3582613Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3586884Z hint: to use in all of your new repositories, which will suppress this warning,
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3590943Z hint: call:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3593473Z hint:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3594518Z hint: 	git config --global init.defaultBranch <name>
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3595885Z hint:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3597095Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3599817Z hint: 'development'. The just-created branch can be renamed via this command:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3601923Z hint:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3602730Z hint: 	git branch -m <name>
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3603687Z hint:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3605071Z hint: Disable this message with "git config set advice.defaultBranchName false"
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3607565Z Initialized empty Git repository in /home/runner/work/epist/epist/.git/
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3611884Z [command]/usr/bin/git remote add origin https://github.com/Seifollahi/epist
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3646872Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3649709Z ##[group]Disabling automatic garbage collection
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3651620Z [command]/usr/bin/git config --local gc.auto 0
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3686380Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3687825Z ##[group]Setting up auth
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3693789Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.3730383Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4168199Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4175586Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4415640Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4460117Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4711466Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4749556Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4753032Z ##[group]Fetching the repository
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:51.4761850Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d4a6aea8105f7ec7676602efd8ca5cfad90abf64:refs/remotes/origin/develop
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4160892Z From https://github.com/Seifollahi/epist
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4166443Z  * [new ref]         d4a6aea8105f7ec7676602efd8ca5cfad90abf64 -> origin/develop
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4198368Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4199875Z ##[group]Determining the checkout info
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4203704Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4210103Z [command]/usr/bin/git sparse-checkout disable
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4260999Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4290542Z ##[group]Checking out the ref
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.4299435Z [command]/usr/bin/git checkout --progress --force -B develop refs/remotes/origin/develop
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.6106416Z Switched to a new branch 'develop'
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.6111378Z branch 'develop' set up to track 'origin/develop'.
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.6123353Z ##[endgroup]
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.6169244Z [command]/usr/bin/git log -1 --format=%H
+build_and_deploy	Run actions/checkout@v4	2025-12-23T23:58:52.6195279Z d4a6aea8105f7ec7676602efd8ca5cfad90abf64
+build_and_deploy	Authenticate to Google Cloud	﻿2025-12-23T23:58:52.6501844Z ##[group]Run google-github-actions/auth@v2
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6502780Z with:
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6503927Z   workload_identity_provider: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6505328Z   service_account: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6506308Z   create_credentials_file: true
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6507089Z   export_environment_variables: true
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6508230Z   universe: googleapis.com
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6508980Z   cleanup_credentials: true
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6509739Z   access_token_lifetime: 3600s
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6510647Z   access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6511572Z   id_token_include_email: false
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.6512300Z ##[endgroup]
+build_and_deploy	Authenticate to Google Cloud	2025-12-23T23:58:52.9162307Z Created credentials file at "/home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json"
+build_and_deploy	Setup Node.js	﻿2025-12-23T23:58:53.0932801Z ##[group]Run actions/setup-node@v4
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0933248Z with:
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0933548Z   node-version: 20
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0933962Z   cache: npm
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0934323Z   cache-dependency-path: apps/web/package-lock.json
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0934793Z   always-auth: false
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0935136Z   check-latest: false
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0935675Z   token: ***
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0936029Z env:
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0936661Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0937751Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0938933Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0939663Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0940171Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0940661Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0941178Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0941654Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.0942108Z ##[endgroup]
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.3257170Z Found in cache @ /opt/hostedtoolcache/node/20.19.6/x64
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.3282194Z ##[group]Environment details
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.8264924Z node: v20.19.6
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.8266483Z npm: 10.8.2
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.8266827Z yarn: 1.22.22
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.8267769Z ##[endgroup]
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.8291283Z [command]/opt/hostedtoolcache/node/20.19.6/x64/bin/npm config get cache
+build_and_deploy	Setup Node.js	2025-12-23T23:58:53.9664313Z /home/runner/.npm
+build_and_deploy	Setup Node.js	2025-12-23T23:58:54.1623641Z Cache hit for: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+build_and_deploy	Setup Node.js	2025-12-23T23:58:55.3037118Z Received 109051904 of 211728947 (51.5%), 104.0 MBs/sec
+build_and_deploy	Setup Node.js	2025-12-23T23:58:56.0505408Z Received 211728947 of 211728947 (100.0%), 115.6 MBs/sec
+build_and_deploy	Setup Node.js	2025-12-23T23:58:56.0506576Z Cache Size: ~202 MB (211728947 B)
+build_and_deploy	Setup Node.js	2025-12-23T23:58:56.0537683Z [command]/usr/bin/tar -xf /home/runner/work/_temp/0643eafd-25f1-42cf-96a7-78ca8da11049/cache.tzst -P -C /home/runner/work/epist/epist --use-compress-program unzstd
+build_and_deploy	Setup Node.js	2025-12-23T23:58:56.6022090Z Cache restored successfully
+build_and_deploy	Setup Node.js	2025-12-23T23:58:56.6418992Z Cache restored from key: node-cache-Linux-x64-npm-9eb2e2ded1a289fce1e5e5513b80dda8ceeaabd8038ed2ec63f341199ee53280
+build_and_deploy	Install Dependencies	﻿2025-12-23T23:58:56.6597894Z ##[group]Run npm ci --legacy-peer-deps
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6598675Z [36;1mnpm ci --legacy-peer-deps[0m
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6644380Z shell: /usr/bin/bash -e {0}
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6644640Z env:
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6645038Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6645665Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6646218Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6646637Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6646928Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6647206Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6647477Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6647752Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Install Dependencies	2025-12-23T23:58:56.6648326Z ##[endgroup]
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2574320Z 
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2599102Z added 849 packages, and audited 850 packages in 19s
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2599741Z 
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2600482Z 290 packages are looking for funding
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2601034Z   run `npm fund` for details
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2607874Z 
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2610303Z 1 moderate severity vulnerability
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2620407Z 
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2620709Z To address all issues, run:
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2621197Z   npm audit fix
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2627911Z 
+build_and_deploy	Install Dependencies	2025-12-23T23:59:15.2628437Z Run `npm audit` for details.
+build_and_deploy	Set Environment Variables	﻿2025-12-23T23:59:15.3609416Z ##[group]Run if [[ "refs/heads/develop" == "refs/heads/main" ]]; then
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3609950Z [36;1mif [[ "refs/heads/develop" == "refs/heads/main" ]]; then[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3610308Z [36;1m  echo "Setting up PRODUCTION environment"[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3610768Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDjPRc4hG5fgxiK1hmZh1ZiVEWJiSUhHGI" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3611385Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=audiointelligence-3cb34.firebaseapp.com" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3611956Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=audiointelligence-3cb34" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3612581Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=audiointelligence-3cb34.firebasestorage.app" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3613154Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=920152096400" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3613656Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:920152096400:web:51703a4ff4d3d334d96215" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3614181Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-5K89BRNB9L" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3614747Z [36;1m  echo "NEXT_PUBLIC_API_URL=https://epist-api-prod-920152096400.us-central1.run.app/api/v1" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3615296Z [36;1m  echo "FIREBASE_PROJECT=audiointelligence-3cb34" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3615706Z [36;1melif [[ "refs/heads/develop" == "refs/heads/develop" ]]; then[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3616056Z [36;1m  echo "Setting up STAGING environment"[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3616503Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAnET-zbBVg04rrb3vvkQAeCNrHxcz1P8Y" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3617075Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=epist-staging.firebaseapp.com" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3617560Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3618308Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=epist-staging.firebasestorage.app" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3618858Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=831401877324" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3619380Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:831401877324:web:474a0a64c75c47d7c879e9" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3619864Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-M9EWLY5FGN" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3620438Z [36;1m  echo "NEXT_PUBLIC_API_URL=https://epist-api-staging-920152096400.us-central1.run.app/api/v1" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3620979Z [36;1m  echo "FIREBASE_PROJECT=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3621285Z [36;1melse[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3621514Z [36;1m  echo "Unknown branch, defaulting to STAGING"[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3621970Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAnET-zbBVg04rrb3vvkQAeCNrHxcz1P8Y" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3622538Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=epist-staging.firebaseapp.com" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3623032Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3623540Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=epist-staging.firebasestorage.app" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3624070Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=831401877324" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3624573Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:831401877324:web:474a0a64c75c47d7c879e9" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3625060Z [36;1m  echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-M9EWLY5FGN" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3625829Z [36;1m  echo "NEXT_PUBLIC_API_URL=https://epist-api-staging-920152096400.us-central1.run.app/api/v1" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3626354Z [36;1m  echo "FIREBASE_PROJECT=epist-staging" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3626756Z [36;1m  echo "STRIPE_PRICE_ID_PRO=price_1SdmnX3GSBwsq2SjKXLMiwDL" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3627256Z [36;1m  echo "STRIPE_SECRET_KEY_SECRET=epist-stripe-secret-key-staging:latest" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3628211Z [36;1m  echo "STRIPE_WEBHOOK_SECRET_SECRET=epist-stripe-webhook-secret-staging:latest" >> $GITHUB_ENV[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3628643Z [36;1mfi[0m
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3661506Z shell: /usr/bin/bash -e {0}
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3661748Z env:
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3662142Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3662784Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3663350Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3663772Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3664064Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3664339Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3664607Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3664884Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3665140Z ##[endgroup]
+build_and_deploy	Set Environment Variables	2025-12-23T23:59:15.3723212Z Setting up STAGING environment
+build_and_deploy	Build	﻿2025-12-23T23:59:15.3751439Z ##[group]Run npm run build:static
+build_and_deploy	Build	2025-12-23T23:59:15.3751733Z [36;1mnpm run build:static[0m
+build_and_deploy	Build	2025-12-23T23:59:15.3782303Z shell: /usr/bin/bash -e {0}
+build_and_deploy	Build	2025-12-23T23:59:15.3782545Z env:
+build_and_deploy	Build	2025-12-23T23:59:15.3782939Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Build	2025-12-23T23:59:15.3783584Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Build	2025-12-23T23:59:15.3784142Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json
+build_and_deploy	Build	2025-12-23T23:59:15.3784558Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+build_and_deploy	Build	2025-12-23T23:59:15.3784854Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+build_and_deploy	Build	2025-12-23T23:59:15.3785135Z   GCLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Build	2025-12-23T23:59:15.3785403Z   GCP_PROJECT: audiointelligence-3cb34
+build_and_deploy	Build	2025-12-23T23:59:15.3785677Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+build_and_deploy	Build	2025-12-23T23:59:15.3786040Z   NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyAnET-zbBVg04rrb3vvkQAeCNrHxcz1P8Y
+build_and_deploy	Build	2025-12-23T23:59:15.3786506Z   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: epist-staging.firebaseapp.com
+build_and_deploy	Build	2025-12-23T23:59:15.3786853Z   NEXT_PUBLIC_FIREBASE_PROJECT_ID: epist-staging
+build_and_deploy	Build	2025-12-23T23:59:15.3787294Z   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: epist-staging.firebasestorage.app
+build_and_deploy	Build	2025-12-23T23:59:15.3787699Z   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: 831401877324
+build_and_deploy	Build	2025-12-23T23:59:15.3788341Z   NEXT_PUBLIC_FIREBASE_APP_ID: 1:831401877324:web:474a0a64c75c47d7c879e9
+build_and_deploy	Build	2025-12-23T23:59:15.3788720Z   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: G-M9EWLY5FGN
+build_and_deploy	Build	2025-12-23T23:59:15.3789154Z   NEXT_PUBLIC_API_URL: https://epist-api-staging-920152096400.us-central1.run.app/api/v1
+build_and_deploy	Build	2025-12-23T23:59:15.3789558Z   FIREBASE_PROJECT: epist-staging
+build_and_deploy	Build	2025-12-23T23:59:15.3789789Z ##[endgroup]
+build_and_deploy	Build	2025-12-23T23:59:15.4947106Z 
+build_and_deploy	Build	2025-12-23T23:59:15.4947769Z > web@0.1.0 build:static
+build_and_deploy	Build	2025-12-23T23:59:15.4948469Z > next build
+build_and_deploy	Build	2025-12-23T23:59:15.4948683Z 
+build_and_deploy	Build	2025-12-23T23:59:16.3901516Z ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+build_and_deploy	Build	2025-12-23T23:59:16.5746688Z Attention: Next.js now collects completely anonymous telemetry regarding usage.
+build_and_deploy	Build	2025-12-23T23:59:16.5752073Z This information is used to shape Next.js' roadmap and prioritize features.
+build_and_deploy	Build	2025-12-23T23:59:16.5754546Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+build_and_deploy	Build	2025-12-23T23:59:16.5756237Z https://nextjs.org/telemetry
+build_and_deploy	Build	2025-12-23T23:59:16.5756697Z 
+build_and_deploy	Build	2025-12-23T23:59:16.6242184Z    ▲ Next.js 16.0.10 (Turbopack)
+build_and_deploy	Build	2025-12-23T23:59:16.6243041Z 
+build_and_deploy	Build	2025-12-23T23:59:16.6723092Z  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+build_and_deploy	Build	2025-12-23T23:59:16.8656613Z    Creating an optimized production build ...
+build_and_deploy	Build	2025-12-23T23:59:17.0399507Z [MDX] generated files in 39.30559900000003ms
+build_and_deploy	Build	2025-12-23T23:59:43.8406677Z 
+build_and_deploy	Build	2025-12-23T23:59:43.8411971Z > Build error occurred
+build_and_deploy	Build	2025-12-23T23:59:43.8450031Z Error: Turbopack build failed with 1 errors:
+build_and_deploy	Build	2025-12-23T23:59:43.8451322Z ./node_modules/fumadocs-ui/dist/style.css
+build_and_deploy	Build	2025-12-23T23:59:43.8458939Z Error evaluating Node.js code
+build_and_deploy	Build	2025-12-23T23:59:43.8460489Z CssSyntaxError: /home/runner/work/epist/epist/apps/web/node_modules/fumadocs-ui/dist/style.css:87:1: `@layer base` is used but no matching `@tailwind base` directive is present.
+build_and_deploy	Build	2025-12-23T23:59:43.8467638Z     at Input.error (node_modules/postcss/lib/input.js:135:16) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:4651:22]
+build_and_deploy	Build	2025-12-23T23:59:43.8470110Z     at AtRule.error (node_modules/postcss/lib/node.js:146:32) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:928:38]
+build_and_deploy	Build	2025-12-23T23:59:43.8473673Z     [at normalizeTailwindDirectives (/home/runner/work/epist/epist/apps/web/node_modules/tailwindcss/lib/lib/normalizeTailwindDirectives.js:72:32)]
+build_and_deploy	Build	2025-12-23T23:59:43.8475230Z     [at /home/runner/work/epist/epist/apps/web/node_modules/tailwindcss/lib/processTailwindFeatures.js:29:98]
+build_and_deploy	Build	2025-12-23T23:59:43.8476786Z     [at plugins (/home/runner/work/epist/epist/apps/web/node_modules/tailwindcss/lib/plugin.js:38:69)]
+build_and_deploy	Build	2025-12-23T23:59:43.8478581Z     at LazyResult.runOnRoot (node_modules/postcss/lib/lazy-result.js:361:16) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6264:24]
+build_and_deploy	Build	2025-12-23T23:59:43.8480589Z     at LazyResult.runAsync (node_modules/postcss/lib/lazy-result.js:290:26) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6203:32]
+build_and_deploy	Build	2025-12-23T23:59:43.8482630Z     at LazyResult.async (node_modules/postcss/lib/lazy-result.js:192:30) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6135:36]
+build_and_deploy	Build	2025-12-23T23:59:43.8484647Z     at LazyResult.then (node_modules/postcss/lib/lazy-result.js:436:17) [/home/runner/work/epist/epist/apps/web/.next/build/chunks/node_modules_fe693df6._.js:6321:21]
+build_and_deploy	Build	2025-12-23T23:59:43.8486177Z     [at process.processTicksAndRejections (node:internal/process/task_queues:95:5)]
+build_and_deploy	Build	2025-12-23T23:59:43.8486772Z 
+build_and_deploy	Build	2025-12-23T23:59:43.8486927Z Import trace:
+build_and_deploy	Build	2025-12-23T23:59:43.8487288Z   Client Component Browser:
+build_and_deploy	Build	2025-12-23T23:59:43.8488166Z     ./node_modules/fumadocs-ui/dist/style.css [Client Component Browser]
+build_and_deploy	Build	2025-12-23T23:59:43.8488985Z     ./src/app/dashboard/docs/layout.tsx [Server Component]
+build_and_deploy	Build	2025-12-23T23:59:43.8489384Z 
+build_and_deploy	Build	2025-12-23T23:59:43.8489397Z 
+build_and_deploy	Build	2025-12-23T23:59:43.8489565Z     at ignore-listed frames
+build_and_deploy	Build	2025-12-23T23:59:43.9404861Z ##[error]Process completed with exit code 1.
+build_and_deploy	Post Authenticate to Google Cloud	﻿2025-12-23T23:59:43.9525835Z Post job cleanup.
+build_and_deploy	Post Authenticate to Google Cloud	2025-12-23T23:59:44.0355235Z Removed exported credentials at "/home/runner/work/epist/epist/gha-creds-512fbbb2c3c2ff74.json".
+build_and_deploy	Post Run actions/checkout@v4	﻿2025-12-23T23:59:44.0492170Z Post job cleanup.
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1444545Z [command]/usr/bin/git version
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1485352Z git version 2.52.0
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1532469Z Temporarily overriding HOME='/home/runner/work/_temp/5a0f1d15-1163-44b0-ada3-75b486ef427d' before making global git config changes
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1535829Z Adding repository directory to the temporary git global config as a safe directory
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1540152Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1585881Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1622118Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1867318Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1891813Z http.https://github.com/.extraheader
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1906602Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.1942223Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.2180730Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build_and_deploy	Post Run actions/checkout@v4	2025-12-23T23:59:44.2216208Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build_and_deploy	Complete job	﻿2025-12-23T23:59:44.2570701Z Cleaning up orphan processes

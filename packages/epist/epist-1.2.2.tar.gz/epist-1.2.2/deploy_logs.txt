@@ -1,0 +1,1348 @@
+deploy	Set up job	﻿2026-01-05T05:36:32.3230324Z Current runner version: '2.330.0'
+deploy	Set up job	2026-01-05T05:36:32.3267737Z ##[group]Runner Image Provisioner
+deploy	Set up job	2026-01-05T05:36:32.3269027Z Hosted Compute Agent
+deploy	Set up job	2026-01-05T05:36:32.3269910Z Version: 20251211.462
+deploy	Set up job	2026-01-05T05:36:32.3270842Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+deploy	Set up job	2026-01-05T05:36:32.3272071Z Build Date: 2025-12-11T16:28:49Z
+deploy	Set up job	2026-01-05T05:36:32.3273124Z Worker ID: {b4415319-6442-40e7-a82f-23027b4b3a1c}
+deploy	Set up job	2026-01-05T05:36:32.3274312Z ##[endgroup]
+deploy	Set up job	2026-01-05T05:36:32.3275376Z ##[group]Operating System
+deploy	Set up job	2026-01-05T05:36:32.3276572Z Ubuntu
+deploy	Set up job	2026-01-05T05:36:32.3277347Z 24.04.3
+deploy	Set up job	2026-01-05T05:36:32.3278011Z LTS
+deploy	Set up job	2026-01-05T05:36:32.3278963Z ##[endgroup]
+deploy	Set up job	2026-01-05T05:36:32.3279775Z ##[group]Runner Image
+deploy	Set up job	2026-01-05T05:36:32.3280723Z Image: ubuntu-24.04
+deploy	Set up job	2026-01-05T05:36:32.3281668Z Version: 20251215.174.1
+deploy	Set up job	2026-01-05T05:36:32.3283423Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+deploy	Set up job	2026-01-05T05:36:32.3286122Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+deploy	Set up job	2026-01-05T05:36:32.3288158Z ##[endgroup]
+deploy	Set up job	2026-01-05T05:36:32.3290075Z ##[group]GITHUB_TOKEN Permissions
+deploy	Set up job	2026-01-05T05:36:32.3292760Z Contents: read
+deploy	Set up job	2026-01-05T05:36:32.3293633Z Metadata: read
+deploy	Set up job	2026-01-05T05:36:32.3294573Z ##[endgroup]
+deploy	Set up job	2026-01-05T05:36:32.3297758Z Secret source: Actions
+deploy	Set up job	2026-01-05T05:36:32.3299029Z Prepare workflow directory
+deploy	Set up job	2026-01-05T05:36:32.4044728Z Prepare all required actions
+deploy	Set up job	2026-01-05T05:36:32.4102473Z Getting action download info
+deploy	Set up job	2026-01-05T05:36:33.0576217Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+deploy	Set up job	2026-01-05T05:36:33.1744330Z Download action repository 'google-github-actions/auth@v2' (SHA:c200f3691d83b41bf9bbd8638997a462592937ed)
+deploy	Set up job	2026-01-05T05:36:33.6744292Z Download action repository 'google-github-actions/setup-gcloud@v2' (SHA:e427ad8a34f8676edf47cf7d7925499adf3eb74f)
+deploy	Set up job	2026-01-05T05:36:34.1513978Z Download action repository 'docker/setup-buildx-action@v3' (SHA:8d2750c68a42422c14e847fe6c8ac0403b4cbd6f)
+deploy	Set up job	2026-01-05T05:36:34.7857691Z Download action repository 'docker/build-push-action@v5' (SHA:ca052bb54ab0790a636c9b5f226502c73d547a25)
+deploy	Set up job	2026-01-05T05:36:35.4784709Z Download action repository 'google-github-actions/deploy-cloudrun@v2' (SHA:251330ba9a8a34bfbc1622895f42e1d53fd14522)
+deploy	Set up job	2026-01-05T05:36:36.1093287Z Complete job name: deploy
+deploy	Checkout code	﻿2026-01-05T05:36:36.1774949Z ##[group]Run actions/checkout@v4
+deploy	Checkout code	2026-01-05T05:36:36.1775971Z with:
+deploy	Checkout code	2026-01-05T05:36:36.1776248Z   repository: Seifollahi/epist
+deploy	Checkout code	2026-01-05T05:36:36.1776834Z   token: ***
+deploy	Checkout code	2026-01-05T05:36:36.1777064Z   ssh-strict: true
+deploy	Checkout code	2026-01-05T05:36:36.1777302Z   ssh-user: git
+deploy	Checkout code	2026-01-05T05:36:36.1777540Z   persist-credentials: true
+deploy	Checkout code	2026-01-05T05:36:36.1777803Z   clean: true
+deploy	Checkout code	2026-01-05T05:36:36.1778046Z   sparse-checkout-cone-mode: true
+deploy	Checkout code	2026-01-05T05:36:36.1778350Z   fetch-depth: 1
+deploy	Checkout code	2026-01-05T05:36:36.1778577Z   fetch-tags: false
+deploy	Checkout code	2026-01-05T05:36:36.1778834Z   show-progress: true
+deploy	Checkout code	2026-01-05T05:36:36.1779072Z   lfs: false
+deploy	Checkout code	2026-01-05T05:36:36.1779326Z   submodules: false
+deploy	Checkout code	2026-01-05T05:36:36.1779561Z   set-safe-directory: true
+deploy	Checkout code	2026-01-05T05:36:36.1780056Z env:
+deploy	Checkout code	2026-01-05T05:36:36.1849614Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Checkout code	2026-01-05T05:36:36.1850395Z   REGION: us-central1
+deploy	Checkout code	2026-01-05T05:36:36.1850823Z   REPO_NAME: epist-repo
+deploy	Checkout code	2026-01-05T05:36:36.1851318Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Checkout code	2026-01-05T05:36:36.1851881Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Checkout code	2026-01-05T05:36:36.1853219Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Checkout code	2026-01-05T05:36:36.1854394Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Checkout code	2026-01-05T05:36:36.1855045Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:36.3155840Z Syncing repository: Seifollahi/epist
+deploy	Checkout code	2026-01-05T05:36:36.3157538Z ##[group]Getting Git version info
+deploy	Checkout code	2026-01-05T05:36:36.3158024Z Working directory is '/home/runner/work/epist/epist'
+deploy	Checkout code	2026-01-05T05:36:36.3158592Z [command]/usr/bin/git version
+deploy	Checkout code	2026-01-05T05:36:36.3264673Z git version 2.52.0
+deploy	Checkout code	2026-01-05T05:36:36.3298840Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:36.3318513Z Temporarily overriding HOME='/home/runner/work/_temp/6fadd4b6-8e3c-4963-8021-f4d92b5edfae' before making global git config changes
+deploy	Checkout code	2026-01-05T05:36:36.3321109Z Adding repository directory to the temporary git global config as a safe directory
+deploy	Checkout code	2026-01-05T05:36:36.3337491Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+deploy	Checkout code	2026-01-05T05:36:36.3389745Z Deleting the contents of '/home/runner/work/epist/epist'
+deploy	Checkout code	2026-01-05T05:36:36.3393008Z ##[group]Initializing the repository
+deploy	Checkout code	2026-01-05T05:36:36.3400281Z [command]/usr/bin/git init /home/runner/work/epist/epist
+deploy	Checkout code	2026-01-05T05:36:36.3533178Z hint: Using 'master' as the name for the initial branch. This default branch name
+deploy	Checkout code	2026-01-05T05:36:36.3534406Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+deploy	Checkout code	2026-01-05T05:36:36.3535428Z hint: to use in all of your new repositories, which will suppress this warning,
+deploy	Checkout code	2026-01-05T05:36:36.3536607Z hint: call:
+deploy	Checkout code	2026-01-05T05:36:36.3537036Z hint:
+deploy	Checkout code	2026-01-05T05:36:36.3537636Z hint: 	git config --global init.defaultBranch <name>
+deploy	Checkout code	2026-01-05T05:36:36.3538232Z hint:
+deploy	Checkout code	2026-01-05T05:36:36.3538876Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+deploy	Checkout code	2026-01-05T05:36:36.3539864Z hint: 'development'. The just-created branch can be renamed via this command:
+deploy	Checkout code	2026-01-05T05:36:36.3540633Z hint:
+deploy	Checkout code	2026-01-05T05:36:36.3541075Z hint: 	git branch -m <name>
+deploy	Checkout code	2026-01-05T05:36:36.3541534Z hint:
+deploy	Checkout code	2026-01-05T05:36:36.3542168Z hint: Disable this message with "git config set advice.defaultBranchName false"
+deploy	Checkout code	2026-01-05T05:36:36.3543221Z Initialized empty Git repository in /home/runner/work/epist/epist/.git/
+deploy	Checkout code	2026-01-05T05:36:36.3554587Z [command]/usr/bin/git remote add origin https://github.com/Seifollahi/epist
+deploy	Checkout code	2026-01-05T05:36:36.3598379Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:36.3599127Z ##[group]Disabling automatic garbage collection
+deploy	Checkout code	2026-01-05T05:36:36.3607387Z [command]/usr/bin/git config --local gc.auto 0
+deploy	Checkout code	2026-01-05T05:36:36.3651546Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:36.3652251Z ##[group]Setting up auth
+deploy	Checkout code	2026-01-05T05:36:36.3652951Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+deploy	Checkout code	2026-01-05T05:36:36.3684097Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+deploy	Checkout code	2026-01-05T05:36:36.4246959Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+deploy	Checkout code	2026-01-05T05:36:36.4311567Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+deploy	Checkout code	2026-01-05T05:36:36.4654079Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+deploy	Checkout code	2026-01-05T05:36:36.4703829Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+deploy	Checkout code	2026-01-05T05:36:36.4958391Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+deploy	Checkout code	2026-01-05T05:36:36.4996988Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:36.4999758Z ##[group]Fetching the repository
+deploy	Checkout code	2026-01-05T05:36:36.5007865Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d84de2059bd5e5643ddf9062bd064b526e0170ae:refs/remotes/origin/develop
+deploy	Checkout code	2026-01-05T05:36:37.5066287Z From https://github.com/Seifollahi/epist
+deploy	Checkout code	2026-01-05T05:36:37.5070639Z  * [new ref]         d84de2059bd5e5643ddf9062bd064b526e0170ae -> origin/develop
+deploy	Checkout code	2026-01-05T05:36:37.5107349Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:37.5108336Z ##[group]Determining the checkout info
+deploy	Checkout code	2026-01-05T05:36:37.5109303Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:37.5114928Z [command]/usr/bin/git sparse-checkout disable
+deploy	Checkout code	2026-01-05T05:36:37.5164442Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+deploy	Checkout code	2026-01-05T05:36:37.5197934Z ##[group]Checking out the ref
+deploy	Checkout code	2026-01-05T05:36:37.5202061Z [command]/usr/bin/git checkout --progress --force -B develop refs/remotes/origin/develop
+deploy	Checkout code	2026-01-05T05:36:37.7177203Z Switched to a new branch 'develop'
+deploy	Checkout code	2026-01-05T05:36:37.7177880Z branch 'develop' set up to track 'origin/develop'.
+deploy	Checkout code	2026-01-05T05:36:37.7190160Z ##[endgroup]
+deploy	Checkout code	2026-01-05T05:36:37.7262553Z [command]/usr/bin/git log -1 --format=%H
+deploy	Checkout code	2026-01-05T05:36:37.7304079Z d84de2059bd5e5643ddf9062bd064b526e0170ae
+deploy	Authenticate to Google Cloud	﻿2026-01-05T05:36:37.7592537Z ##[group]Run google-github-actions/auth@v2
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7592896Z with:
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7593417Z   workload_identity_provider: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7594140Z   service_account: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7594556Z   create_credentials_file: true
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7594811Z   export_environment_variables: true
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7595091Z   universe: googleapis.com
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7595332Z   cleanup_credentials: true
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7595733Z   access_token_lifetime: 3600s
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7596081Z   access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7596474Z   id_token_include_email: false
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7596687Z env:
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7596873Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7597119Z   REGION: us-central1
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7597311Z   REPO_NAME: epist-repo
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7597589Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7597854Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7598429Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7599133Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:37.7599513Z ##[endgroup]
+deploy	Authenticate to Google Cloud	2026-01-05T05:36:38.1547162Z Created credentials file at "/home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json"
+deploy	Set up Cloud SDK	﻿2026-01-05T05:36:38.2998899Z ##[group]Run google-github-actions/setup-gcloud@v2
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.2999259Z with:
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.2999444Z   version: latest
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.2999654Z   skip_install: false
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.2999897Z   skip_tool_cache: false
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3000102Z env:
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3000289Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3000545Z   REGION: us-central1
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3000747Z   REPO_NAME: epist-repo
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3000961Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3001225Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3001816Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3002528Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3003122Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3003771Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3004367Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3004793Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3005096Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3005380Z   GCLOUD_PROJECT: audiointelligence-3cb34
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3005802Z   GCP_PROJECT: audiointelligence-3cb34
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3006091Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+deploy	Set up Cloud SDK	2026-01-05T05:36:38.3006363Z ##[endgroup]
+deploy	Set up Cloud SDK	2026-01-05T05:36:40.2888402Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/13a7f891-eed1-4565-b9a9-0db3cc169dc8 -f /home/runner/work/_temp/8e40afc2-2c7f-4aac-a64d-3b2fdef9bbd6
+deploy	Set up Cloud SDK	2026-01-05T05:37:03.2454542Z Successfully authenticated
+deploy	Configure Docker	﻿2026-01-05T05:37:03.2650243Z ##[group]Run gcloud auth configure-docker us-central1-docker.pkg.dev
+deploy	Configure Docker	2026-01-05T05:37:03.2650986Z [36;1mgcloud auth configure-docker us-central1-docker.pkg.dev[0m
+deploy	Configure Docker	2026-01-05T05:37:03.2689511Z shell: /usr/bin/bash -e {0}
+deploy	Configure Docker	2026-01-05T05:37:03.2689786Z env:
+deploy	Configure Docker	2026-01-05T05:37:03.2689991Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Configure Docker	2026-01-05T05:37:03.2690250Z   REGION: us-central1
+deploy	Configure Docker	2026-01-05T05:37:03.2690455Z   REPO_NAME: epist-repo
+deploy	Configure Docker	2026-01-05T05:37:03.2690668Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Configure Docker	2026-01-05T05:37:03.2690934Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Configure Docker	2026-01-05T05:37:03.2691519Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Configure Docker	2026-01-05T05:37:03.2692224Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Configure Docker	2026-01-05T05:37:03.2692810Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Configure Docker	2026-01-05T05:37:03.2693450Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Configure Docker	2026-01-05T05:37:03.2694079Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Configure Docker	2026-01-05T05:37:03.2694498Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+deploy	Configure Docker	2026-01-05T05:37:03.2694794Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+deploy	Configure Docker	2026-01-05T05:37:03.2695073Z   GCLOUD_PROJECT: audiointelligence-3cb34
+deploy	Configure Docker	2026-01-05T05:37:03.2695334Z   GCP_PROJECT: audiointelligence-3cb34
+deploy	Configure Docker	2026-01-05T05:37:03.2695774Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+deploy	Configure Docker	2026-01-05T05:37:03.2696113Z   CLOUDSDK_METRICS_ENVIRONMENT: github-actions-setup-gcloud
+deploy	Configure Docker	2026-01-05T05:37:03.2696440Z   CLOUDSDK_METRICS_ENVIRONMENT_VERSION: 2.2.1
+deploy	Configure Docker	2026-01-05T05:37:03.2696694Z ##[endgroup]
+deploy	Configure Docker	2026-01-05T05:37:03.8393513Z Adding credentials for: us-central1-docker.pkg.dev
+deploy	Configure Docker	2026-01-05T05:37:03.8396179Z After update, the following will be written to your Docker config file located 
+deploy	Configure Docker	2026-01-05T05:37:03.8416271Z at [/home/runner/.docker/config.json]:
+deploy	Configure Docker	2026-01-05T05:37:03.8416829Z  {
+deploy	Configure Docker	2026-01-05T05:37:03.8417127Z   "credHelpers": {
+deploy	Configure Docker	2026-01-05T05:37:03.8417531Z     "us-central1-docker.pkg.dev": "gcloud"
+deploy	Configure Docker	2026-01-05T05:37:03.8418022Z   }
+deploy	Configure Docker	2026-01-05T05:37:03.8418292Z }
+deploy	Configure Docker	2026-01-05T05:37:03.8418459Z 
+deploy	Configure Docker	2026-01-05T05:37:03.8418609Z Do you want to continue (Y/n)?  
+deploy	Configure Docker	2026-01-05T05:37:03.8599812Z Docker configuration file updated.
+deploy	Set up Docker Buildx	﻿2026-01-05T05:37:03.9914360Z ##[group]Run docker/setup-buildx-action@v3
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9914668Z with:
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9914852Z   driver: docker-container
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9915068Z   use: true
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9915241Z   keep-state: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9915424Z   cache-binary: true
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9916244Z   cleanup: true
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9916433Z   install: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9916602Z env:
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9916789Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9917040Z   REGION: us-central1
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9917236Z   REPO_NAME: epist-repo
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9917449Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9917723Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9918292Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9918997Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9919590Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9920248Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9920800Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9921209Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9921498Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9921771Z   GCLOUD_PROJECT: audiointelligence-3cb34
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9922037Z   GCP_PROJECT: audiointelligence-3cb34
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9922316Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9922830Z   CLOUDSDK_METRICS_ENVIRONMENT: github-actions-setup-gcloud
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9923190Z   CLOUDSDK_METRICS_ENVIRONMENT_VERSION: 2.2.1
+deploy	Set up Docker Buildx	2026-01-05T05:37:03.9923443Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2669266Z ##[group]Docker info
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2701706Z [command]/usr/bin/docker version
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2957453Z Client: Docker Engine - Community
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2957991Z  Version:           28.0.4
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2958413Z  API version:       1.48
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2958781Z  Go version:        go1.23.7
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2959156Z  Git commit:        b8034c0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2959903Z  Built:             Tue Mar 25 15:07:16 2025
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2960328Z  OS/Arch:           linux/amd64
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2960695Z  Context:           default
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2960918Z 
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2961070Z Server: Docker Engine - Community
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2961445Z  Engine:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2961738Z   Version:          28.0.4
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2962156Z   API version:      1.48 (minimum version 1.24)
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2963270Z   Go version:       go1.23.7
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2963628Z   Git commit:       6430e49
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2963983Z   Built:            Tue Mar 25 15:07:16 2025
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2964665Z   OS/Arch:          linux/amd64
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2965040Z   Experimental:     false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2965390Z  containerd:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2965879Z   Version:          v2.2.0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2966320Z   GitCommit:        1c4457e00facac03ce1d75f7b6777a7a851e5c41
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2966810Z  runc:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2967681Z   Version:          1.3.4
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2968041Z   GitCommit:        v1.3.4-0-gd6d73eb8
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2968441Z  docker-init:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2968743Z   Version:          0.19.0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.2969094Z   GitCommit:        de40ad0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.3046341Z [command]/usr/bin/docker info
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6534008Z Client: Docker Engine - Community
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6534679Z  Version:    28.0.4
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6535032Z  Context:    default
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6535392Z  Debug Mode: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6546382Z  Plugins:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6546735Z   buildx: Docker Buildx (Docker Inc.)
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6547179Z     Version:  v0.30.1
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6547638Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6548715Z   compose: Docker Compose (Docker Inc.)
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6549179Z     Version:  v2.38.2
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6549642Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6550043Z 
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6550160Z Server:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6550451Z  Containers: 0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6550777Z   Running: 0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6551082Z   Paused: 0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6551370Z   Stopped: 0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6551652Z  Images: 0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6551978Z  Server Version: 28.0.4
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6552360Z  Storage Driver: overlay2
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6552738Z   Backing Filesystem: extfs
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6553123Z   Supports d_type: true
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6553486Z   Using metacopy: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6553853Z   Native Overlay Diff: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6554210Z   userxattr: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6554541Z  Logging Driver: json-file
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6554911Z  Cgroup Driver: systemd
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6555256Z  Cgroup Version: 2
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6566607Z  Plugins:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6566964Z   Volume: local
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6567376Z   Network: bridge host ipvlan macvlan null overlay
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6568103Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6568751Z  Swarm: inactive
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6569107Z  Runtimes: io.containerd.runc.v2 runc
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6569576Z  Default Runtime: runc
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6569958Z  Init Binary: docker-init
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6570484Z  containerd version: 1c4457e00facac03ce1d75f7b6777a7a851e5c41
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6571083Z  runc version: v1.3.4-0-gd6d73eb8
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6571825Z  init version: de40ad0
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6572179Z  Security Options:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6572495Z   apparmor
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6572789Z   seccomp
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6573073Z    Profile: builtin
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6573374Z   cgroupns
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6573699Z  Kernel Version: 6.11.0-1018-azure
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6574137Z  Operating System: Ubuntu 24.04.3 LTS
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6574578Z  OSType: linux
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6574898Z  Architecture: x86_64
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6575234Z  CPUs: 2
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6586133Z  Total Memory: 7.758GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6586557Z  Name: runnervmh13bl
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6586922Z  ID: 0a695d56-123a-42a8-a772-617b83954cb8
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6587391Z  Docker Root Dir: /var/lib/docker
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6587806Z  Debug Mode: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6588145Z  Username: githubactions
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6588529Z  Experimental: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6588884Z  Insecure Registries:
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6593031Z   ::1/128
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6593354Z   127.0.0.0/8
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6593682Z  Live Restore Enabled: false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6593938Z 
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.6608249Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.7308889Z ##[group]Buildx version
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.7340464Z [command]/usr/bin/docker buildx version
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8119485Z github.com/docker/buildx v0.30.1 9e66234aa13328a5e75b75aa5574e1ca6d6d9c01
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8156186Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8330383Z ##[group]Inspecting default docker context
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8497852Z [
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8499266Z   {
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8499598Z     "Name": "default",
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8499981Z     "Metadata": {},
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8500299Z     "Endpoints": {
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8500602Z       "docker": {
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8500969Z         "Host": "unix:///var/run/docker.sock",
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8501488Z         "SkipTLSVerify": false
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8502534Z       }
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8502820Z     },
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8503143Z     "TLSMaterial": {},
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8503542Z     "Storage": {
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8503901Z       "MetadataPath": "<IN MEMORY>",
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8504357Z       "TLSPath": "<IN MEMORY>"
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8504760Z     }
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8505036Z   }
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8505317Z ]
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8506404Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.8507032Z ##[group]Creating a new builder instance
+deploy	Set up Docker Buildx	2026-01-05T05:37:04.9924184Z [command]/usr/bin/docker buildx create --name builder-2369a13c-d479-4e2c-97e4-9880134d7d05 --driver docker-container --buildkitd-flags --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host --use
+deploy	Set up Docker Buildx	2026-01-05T05:37:05.0646793Z builder-2369a13c-d479-4e2c-97e4-9880134d7d05
+deploy	Set up Docker Buildx	2026-01-05T05:37:05.0687959Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:05.0689559Z ##[group]Booting builder
+deploy	Set up Docker Buildx	2026-01-05T05:37:05.0734942Z [command]/usr/bin/docker buildx inspect --bootstrap --builder builder-2369a13c-d479-4e2c-97e4-9880134d7d05
+deploy	Set up Docker Buildx	2026-01-05T05:37:05.1294631Z #1 [internal] booting buildkit
+deploy	Set up Docker Buildx	2026-01-05T05:37:05.2799355Z #1 pulling image moby/buildkit:buildx-stable-1
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.0391443Z #1 pulling image moby/buildkit:buildx-stable-1 6.9s done
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.1900420Z #1 creating container buildx_buildkit_builder-2369a13c-d479-4e2c-97e4-9880134d7d050
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5022583Z #1 creating container buildx_buildkit_builder-2369a13c-d479-4e2c-97e4-9880134d7d050 0.5s done
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5063222Z #1 DONE 7.4s
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5514989Z Name:          builder-2369a13c-d479-4e2c-97e4-9880134d7d05
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5517813Z Driver:        docker-container
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5518497Z Last Activity: 2026-01-05 05:37:05 +0000 UTC
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5519082Z 
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5519431Z Nodes:
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5520047Z Name:                  builder-2369a13c-d479-4e2c-97e4-9880134d7d050
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5521755Z Endpoint:              unix:///var/run/docker.sock
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5522438Z Status:                running
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5523495Z BuildKit daemon flags: --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5525112Z BuildKit version:      v0.26.2
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5526133Z Platforms:             linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/386
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5526798Z Labels:
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5527319Z  org.mobyproject.buildkit.worker.executor:         oci
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5528185Z  org.mobyproject.buildkit.worker.hostname:         1529d4d5cf1a
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5528981Z  org.mobyproject.buildkit.worker.network:          host
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5530999Z  org.mobyproject.buildkit.worker.oci.process-mode: sandbox
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5534392Z  org.mobyproject.buildkit.worker.selinux.enabled:  false
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5535285Z  org.mobyproject.buildkit.worker.snapshotter:      overlayfs
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5536202Z GC Policy rule#0:
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5537053Z  All:            false
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5537693Z  Filters:        type==source.local,type==exec.cachemount,type==source.git.checkout
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5538469Z  Keep Duration:  48h0m0s
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5538916Z  Max Used Space: 488.3MiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5539519Z GC Policy rule#1:
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5540164Z  All:            false
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5540778Z  Keep Duration:  1440h0m0s
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5541393Z  Reserved Space: 7.451GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5545384Z  Max Used Space: 54.02GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5549648Z  Min Free Space: 13.97GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5556152Z GC Policy rule#2:
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5556523Z  All:            false
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5559774Z  Reserved Space: 7.451GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5560494Z  Max Used Space: 54.02GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5560910Z  Min Free Space: 13.97GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5561557Z GC Policy rule#3:
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5561877Z  All:            true
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5562323Z  Reserved Space: 7.451GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5562678Z  Max Used Space: 54.02GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5563025Z  Min Free Space: 13.97GiB
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.5648989Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6772232Z ##[group]Inspect builder
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6772791Z {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6773083Z   "nodes": [
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6773401Z     {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6773834Z       "name": "builder-2369a13c-d479-4e2c-97e4-9880134d7d050",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6778702Z       "endpoint": "unix:///var/run/docker.sock",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6779230Z       "status": "running",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6780088Z       "buildkitd-flags": "--allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6781232Z       "buildkit": "v0.26.2",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6781715Z       "platforms": "linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/386",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6782282Z       "features": {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6782736Z         "Automatically load images to the Docker Engine image store": true,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6783308Z         "Cache export": true,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6783664Z         "Direct push": true,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6784001Z         "Docker exporter": true,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6784367Z         "Multi-platform build": true,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6784761Z         "OCI exporter": true
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6785076Z       },
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6785318Z       "labels": {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6785974Z         "org.mobyproject.buildkit.worker.executor": "oci",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6786560Z         "org.mobyproject.buildkit.worker.hostname": "1529d4d5cf1a",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6787146Z         "org.mobyproject.buildkit.worker.network": "host",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6787753Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6788410Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6789030Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6789523Z       },
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6789782Z       "gcPolicy": [
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6790047Z         {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6790302Z           "all": false,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6790596Z           "filter": [
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6790889Z             "type==source.local",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6791479Z             "type==exec.cachemount",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6791864Z             "type==source.git.checkout"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6792221Z           ],
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6792523Z           "keepDuration": "48h0m0s",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6792920Z           "maxUsedSpace": "488.3MiB"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6793279Z         },
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6793549Z         {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6793818Z           "all": false,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6794149Z           "keepDuration": "1440h0m0s",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6794559Z           "reservedSpace": "7.451GiB",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6794963Z           "maxUsedSpace": "54.02GiB",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6795355Z           "minFreeSpace": "13.97GiB"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6797000Z         },
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6797270Z         {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6797534Z           "all": false,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6797877Z           "reservedSpace": "7.451GiB",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6798285Z           "maxUsedSpace": "54.02GiB",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6798677Z           "minFreeSpace": "13.97GiB"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6799057Z         },
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6799317Z         {
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6799579Z           "all": true,
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6799913Z           "reservedSpace": "7.451GiB",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6800315Z           "maxUsedSpace": "54.02GiB",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6800684Z           "minFreeSpace": "13.97GiB"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6801055Z         }
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6801308Z       ]
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6801537Z     }
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6801762Z   ],
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6802085Z   "name": "builder-2369a13c-d479-4e2c-97e4-9880134d7d05",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6802512Z   "driver": "docker-container",
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6802883Z   "lastActivity": "2026-01-05T05:37:05.000Z"
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6803272Z }
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6803778Z ##[endgroup]
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6804429Z ##[group]BuildKit version
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6804903Z builder-2369a13c-d479-4e2c-97e4-9880134d7d050: v0.26.2
+deploy	Set up Docker Buildx	2026-01-05T05:37:12.6805785Z ##[endgroup]
+deploy	Build and Push Docker Image	﻿2026-01-05T05:37:12.6952181Z ##[group]Run docker/build-push-action@v5
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6952490Z with:
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6952665Z   context: .
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6952834Z   push: true
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6953547Z   tags: us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae
+deploy	Build and Push Docker Image	us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:latest
+deploy	Build and Push Docker Image	
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6954316Z   cache-from: type=gha
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6954527Z   cache-to: type=gha,mode=max
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6954748Z   load: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6954923Z   no-cache: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6955099Z   pull: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6955398Z   github-token: ***
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6955880Z env:
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6956089Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6956338Z   REGION: us-central1
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6956539Z   REPO_NAME: epist-repo
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6956785Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6957045Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6957662Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6958370Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6958959Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6959574Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6960115Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6960528Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6960828Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6961100Z   GCLOUD_PROJECT: audiointelligence-3cb34
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6961361Z   GCP_PROJECT: audiointelligence-3cb34
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6961640Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6961978Z   CLOUDSDK_METRICS_ENVIRONMENT: github-actions-setup-gcloud
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6962500Z   CLOUDSDK_METRICS_ENVIRONMENT_VERSION: 2.2.1
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.6962759Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9639460Z ##[group]GitHub Actions runtime token ACs
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9665104Z refs/heads/develop: read/write
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9667018Z refs/heads/main: read
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9668917Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9670770Z ##[group]Docker info
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9708058Z [command]/usr/bin/docker version
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9929112Z Client: Docker Engine - Community
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9931012Z  Version:           28.0.4
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9931915Z  API version:       1.48
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9932932Z  Go version:        go1.23.7
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9933296Z  Git commit:        b8034c0
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9933659Z  Built:             Tue Mar 25 15:07:16 2025
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9934051Z  OS/Arch:           linux/amd64
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9934398Z  Context:           default
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9934644Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9934825Z Server: Docker Engine - Community
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9935183Z  Engine:
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9936117Z   Version:          28.0.4
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9936529Z   API version:      1.48 (minimum version 1.24)
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9936978Z   Go version:       go1.23.7
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9937343Z   Git commit:       6430e49
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9937717Z   Built:            Tue Mar 25 15:07:16 2025
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9938128Z   OS/Arch:          linux/amd64
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9938499Z   Experimental:     false
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9938843Z  containerd:
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9939130Z   Version:          v2.2.0
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9939549Z   GitCommit:        1c4457e00facac03ce1d75f7b6777a7a851e5c41
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9940010Z  runc:
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9940285Z   Version:          1.3.4
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9940633Z   GitCommit:        v1.3.4-0-gd6d73eb8
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9941057Z  docker-init:
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9941378Z   Version:          0.19.0
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9941767Z   GitCommit:        de40ad0
+deploy	Build and Push Docker Image	2026-01-05T05:37:12.9985433Z [command]/usr/bin/docker info
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0557497Z Client: Docker Engine - Community
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0558457Z  Version:    28.0.4
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0559640Z  Context:    default
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0561109Z  Debug Mode: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0561535Z  Plugins:
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0562296Z   buildx: Docker Buildx (Docker Inc.)
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0563563Z     Version:  v0.30.1
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0564001Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0564519Z   compose: Docker Compose (Docker Inc.)
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0564929Z     Version:  v2.38.2
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0565330Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0565986Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0566100Z Server:
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0566368Z  Containers: 1
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0566650Z   Running: 1
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0566935Z   Paused: 0
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0567212Z   Stopped: 0
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0567479Z  Images: 1
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0567813Z  Server Version: 28.0.4
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0568160Z  Storage Driver: overlay2
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0568515Z   Backing Filesystem: extfs
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0568871Z   Supports d_type: true
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0569182Z   Using metacopy: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0569488Z   Native Overlay Diff: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0569835Z   userxattr: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0570148Z  Logging Driver: json-file
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0570477Z  Cgroup Driver: systemd
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0570797Z  Cgroup Version: 2
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0571097Z  Plugins:
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0571367Z   Volume: local
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0571733Z   Network: bridge host ipvlan macvlan null overlay
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0572345Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0572898Z  Swarm: inactive
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0573230Z  Runtimes: io.containerd.runc.v2 runc
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0573644Z  Default Runtime: runc
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0573968Z  Init Binary: docker-init
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0574837Z  containerd version: 1c4457e00facac03ce1d75f7b6777a7a851e5c41
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0575412Z  runc version: v1.3.4-0-gd6d73eb8
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0576027Z  init version: de40ad0
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0576354Z  Security Options:
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0576665Z   apparmor
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0576939Z   seccomp
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0577210Z    Profile: builtin
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0577512Z   cgroupns
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0577805Z  Kernel Version: 6.11.0-1018-azure
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0578192Z  Operating System: Ubuntu 24.04.3 LTS
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0578575Z  OSType: linux
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0578878Z  Architecture: x86_64
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0579193Z  CPUs: 2
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0579485Z  Total Memory: 7.758GiB
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0579847Z  Name: runnervmh13bl
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0580211Z  ID: 0a695d56-123a-42a8-a772-617b83954cb8
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0580659Z  Docker Root Dir: /var/lib/docker
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0581059Z  Debug Mode: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0581398Z  Username: githubactions
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0581816Z  Experimental: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0582181Z  Insecure Registries:
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0582546Z   ::1/128
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0582830Z   127.0.0.0/8
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0583139Z  Live Restore Enabled: false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0583380Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0584894Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0586932Z ##[group]Proxy configuration
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0590765Z No proxy configuration found
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.0592599Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.1271380Z ##[group]Buildx version
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.1306391Z [command]/usr/bin/docker buildx version
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.1845083Z github.com/docker/buildx v0.30.1 9e66234aa13328a5e75b75aa5574e1ca6d6d9c01
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.1883754Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.1885210Z ##[group]Builder info
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2892077Z {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2900546Z   "nodes": [
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2900898Z     {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2901348Z       "name": "builder-2369a13c-d479-4e2c-97e4-9880134d7d050",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2901983Z       "endpoint": "unix:///var/run/docker.sock",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2903035Z       "status": "running",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2903874Z       "buildkitd-flags": "--allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2904765Z       "buildkit": "v0.26.2",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2905307Z       "platforms": "linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/386",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2910854Z       "features": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2911416Z         "Automatically load images to the Docker Engine image store": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2912069Z         "Cache export": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2912464Z         "Direct push": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2912857Z         "Docker exporter": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2913297Z         "Multi-platform build": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2913751Z         "OCI exporter": true
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2914130Z       },
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2914417Z       "labels": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2914822Z         "org.mobyproject.buildkit.worker.executor": "oci",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2915749Z         "org.mobyproject.buildkit.worker.hostname": "1529d4d5cf1a",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2916437Z         "org.mobyproject.buildkit.worker.network": "host",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2917147Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2917938Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2918690Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2919263Z       },
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2919567Z       "gcPolicy": [
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2919898Z         {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2920190Z           "all": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2920549Z           "filter": [
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2920900Z             "type==source.local",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2921322Z             "type==exec.cachemount",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2921780Z             "type==source.git.checkout"
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2922207Z           ],
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2922541Z           "keepDuration": "48h0m0s"
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2923412Z         },
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2923695Z         {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2923979Z           "all": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2924359Z           "keepDuration": "1440h0m0s"
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2924769Z         },
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2925048Z         {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2925334Z           "all": false
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2925974Z         },
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2926265Z         {
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2926555Z           "all": true
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2926883Z         }
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2927153Z       ]
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2927418Z     }
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2927698Z   ],
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2928073Z   "name": "builder-2369a13c-d479-4e2c-97e4-9880134d7d05",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2928611Z   "driver": "docker-container",
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2929057Z   "lastActivity": "2026-01-05T05:37:05.000Z"
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2929493Z }
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.2930133Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.4652493Z [command]/usr/bin/docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --iidfile /home/runner/work/_temp/docker-actions-toolkit-uEdf4J/build-iidfile-9f4f10dd40.txt --attest type=provenance,mode=min,inline-only=true,builder-id=https://github.com/Seifollahi/epist/actions/runs/20706156881 --tag us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae --tag us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:latest --metadata-file /home/runner/work/_temp/docker-actions-toolkit-uEdf4J/build-metadata-9029f74b51.json --push .
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7544491Z #0 building with "builder-2369a13c-d479-4e2c-97e4-9880134d7d05" instance using docker-container driver
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7545702Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7546036Z #1 [internal] load build definition from Dockerfile
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7546724Z #1 transferring dockerfile: 2.54kB done
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7547512Z #1 WARN: FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 2)
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7548201Z #1 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7548400Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:13.7549600Z #2 [internal] load metadata for us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api-base:latest
+deploy	Build and Push Docker Image	2026-01-05T05:37:14.9505017Z #2 ...
+deploy	Build and Push Docker Image	2026-01-05T05:37:14.9505700Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:14.9506312Z #3 [auth] audiointelligence-3cb34/epist-repo/api-base:pull token for us-central1-docker.pkg.dev
+deploy	Build and Push Docker Image	2026-01-05T05:37:14.9507109Z #3 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:15.1000548Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:15.1001932Z #2 [internal] load metadata for us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api-base:latest
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.0056931Z #2 DONE 2.4s
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1828596Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1829816Z #4 [internal] load .dockerignore
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1831760Z #4 transferring context: 261B done
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1832194Z #4 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1832317Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1832410Z #5 [internal] load build context
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1832641Z #5 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1832750Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1833306Z #6 [builder 1/4] FROM us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api-base:latest@sha256:9f2ff63aee4838961325584921eaef5945ed8d63af19ea5567a14b6af9ef90c8
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1834468Z #6 resolve us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api-base:latest@sha256:9f2ff63aee4838961325584921eaef5945ed8d63af19ea5567a14b6af9ef90c8 done
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1835117Z #6 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1835218Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.1835349Z #7 importing cache manifest from gha:737242616464078941
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.5966903Z #7 DONE 0.6s
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8042089Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8042848Z #5 [internal] load build context
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8043243Z #5 transferring context: 278.23kB 0.0s done
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8043570Z #5 DONE 0.1s
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8043698Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8044257Z #8 [stage-1  9/10] RUN python -c 'from sentence_transformers import CrossEncoder; CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2-v2")'
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8044959Z #8 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8045085Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8045219Z #9 [stage-1  8/10] RUN chmod +x ./scripts/start.sh
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8046303Z #9 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8046423Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8051262Z #10 [builder 4/4] RUN --mount=type=cache,target=/root/.cache/uv     uv pip install     "torch>=2.2.0"     "torchaudio>=2.2.0"     "torchvision>=0.17.0"     --index-url https://download.pytorch.org/whl/cpu &&     uv pip install -e ".[audio-rag]" --no-deps &&     uv pip install     langchain langchain-core langchain-community langchain-openai langchain-experimental langchain-text-splitters     langgraph langgraph-checkpoint langsmith     chromadb pgvector sentence-transformers     fastapi uvicorn httpx pydantic pydantic-settings python-multipart     sqlalchemy sqlmodel asyncpg alembic greenlet tenacity     librosa audioread soundfile soxr numpy scipy pandas moviepy pydub     transformers datasets huggingface-hub tiktoken openai fireworks-ai rank-bm25     firebase-admin authlib python-jose pyjwt cryptography     stripe sentry-sdk prometheus-client slowapi     google-cloud-storage google-cloud-tasks     mcp feedparser apscheduler     ragas arize-phoenix opentelemetry-api opentelemetry-sdk     python-dotenv pyyaml aiohttp httptools uvloop     --extra-index-url https://pypi.org/simple
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8057426Z #10 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8057641Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8057802Z #11 [stage-1  5/10] COPY alembic.ini .
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8058376Z #11 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8058552Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8059830Z #12 [stage-1  3/10] COPY --from=builder /app/.venv /app/.venv
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8061211Z #12 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8061405Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8061545Z #13 [stage-1  4/10] COPY src/ ./src/
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8061925Z #13 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8062084Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8062262Z #14 [stage-1  6/10] COPY migrations/ ./migrations/
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8062702Z #14 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8062871Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8063019Z #15 [builder 2/4] WORKDIR /app
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8063362Z #15 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8063526Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8063714Z #16 [builder 3/4] COPY pyproject.toml README.md ./
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8064475Z #16 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8064632Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8064794Z #17 [stage-1  7/10] COPY scripts/ ./scripts/
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8065206Z #17 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8065364Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.8065871Z #18 [stage-1 10/10] RUN useradd -m appuser && chown -R appuser:appuser /app
+deploy	Build and Push Docker Image	2026-01-05T05:37:16.9967554Z #18 CACHED
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1776224Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1776994Z #19 exporting to image
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1777341Z #19 exporting layers done
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1777900Z #19 exporting manifest sha256:1da0ec334c611d099b9d97c59b21ab1f62091952243bdab5b536d46f837e0757 done
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1778734Z #19 exporting config sha256:2a6b666786c5f54ede8d10ed517853e14ba6304f7accc634d13ebf71a422a8fe done
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1779628Z #19 exporting attestation manifest sha256:a8c77442b605c5b9765f8d135c8f12ece1103de7cfe06e402e7521f82375b173 done
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1780542Z #19 exporting manifest list sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62 done
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.1781176Z #19 pushing layers
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.4798831Z #19 ...
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.4799342Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.4799928Z #20 [auth] audiointelligence-3cb34/epist-repo/api:pull,push token for us-central1-docker.pkg.dev
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.4800507Z #20 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.6294943Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:17.6295950Z #19 exporting to image
+deploy	Build and Push Docker Image	2026-01-05T05:37:18.5515207Z #19 pushing layers 1.5s done
+deploy	Build and Push Docker Image	2026-01-05T05:37:18.5517285Z #19 pushing manifest for us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae@sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62
+deploy	Build and Push Docker Image	2026-01-05T05:37:19.4047228Z #19 pushing manifest for us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae@sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62 0.9s done
+deploy	Build and Push Docker Image	2026-01-05T05:37:19.9901129Z #19 pushing layers 0.6s done
+deploy	Build and Push Docker Image	2026-01-05T05:37:19.9902752Z #19 pushing manifest for us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:latest@sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62
+deploy	Build and Push Docker Image	2026-01-05T05:37:20.4336943Z #19 pushing manifest for us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:latest@sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62 0.4s done
+deploy	Build and Push Docker Image	2026-01-05T05:37:20.4338624Z #19 DONE 3.4s
+deploy	Build and Push Docker Image	2026-01-05T05:37:20.5832940Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:20.5833575Z #21 exporting to GitHub Actions Cache
+deploy	Build and Push Docker Image	2026-01-05T05:37:20.5834288Z #21 preparing build cache for export
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4447736Z #21 preparing build cache for export 3.0s done
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4452580Z #21 DONE 3.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4763170Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4765698Z #22 resolving provenance for metadata file
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4766866Z #22 DONE 0.0s
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4770052Z 
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4770844Z  [33m1 warning found (use docker --debug to expand):
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4771758Z [0m - FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 2)
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4876968Z ##[group]ImageID
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4877604Z sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4882587Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4885315Z ##[group]Digest
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4886821Z sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4887675Z ##[endgroup]
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4888186Z ##[group]Metadata
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4888480Z {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4888775Z   "buildx.build.provenance": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4889147Z     "builder": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4889613Z       "id": "https://github.com/Seifollahi/epist/actions/runs/20706156881"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4890158Z     },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4890507Z     "buildType": "https://mobyproject.org/buildkit@v1",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4890963Z     "materials": [
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4891251Z       {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4891934Z         "uri": "pkg:docker/us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api-base@latest?platform=linux%2Famd64",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4893154Z         "digest": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4893663Z           "sha256": "9f2ff63aee4838961325584921eaef5945ed8d63af19ea5567a14b6af9ef90c8"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4894220Z         }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4894458Z       }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4894699Z     ],
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4895096Z     "invocation": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4895385Z       "configSource": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4895881Z         "entryPoint": "Dockerfile"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4896244Z       },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4896525Z       "parameters": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4896871Z         "frontend": "dockerfile.v0",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4897247Z         "locals": [
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4897530Z           {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4897810Z             "name": "context"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4898143Z           },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4898403Z           {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4898690Z             "name": "dockerfile"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4899026Z           }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4899288Z         ]
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4899575Z       },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4899837Z       "environment": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4900174Z         "github_actor": "Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4900577Z         "github_actor_id": "13357246",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4900990Z         "github_event_name": "push",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4901384Z         "github_event_payload": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4901840Z           "after": "d84de2059bd5e5643ddf9062bd064b526e0170ae",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4902312Z           "base_ref": "refs/heads/main",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4902786Z           "before": "82a80c69d2f039ac5d01ef87102069b91348bfee",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4903237Z           "commits": [
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4903530Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4903805Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4904165Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4904571Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4904909Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4905202Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4905765Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4906424Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4906763Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4907055Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4907465Z               "id": "d0a3293e88be07e9a3fad9dbf57a625059e19c9d",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4908082Z               "message": "feat: implement 3-tier pricing strategy and usage enforcement",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4908684Z               "timestamp": "2025-12-30T12:32:18-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4909152Z               "tree_id": "93baabd3591491e43b3761990cd17ff643e84e9d",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4909914Z               "url": "https://github.com/Seifollahi/epist/commit/d0a3293e88be07e9a3fad9dbf57a625059e19c9d"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4910599Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4910868Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4911135Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4911492Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4911899Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4912264Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4912549Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4912909Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4913328Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4913673Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4913957Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4914368Z               "id": "40229bfb02a2ce83402ac68de35b0d67ad4e6fbb",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4914907Z               "message": "fix: lint errors and usage limit definitions",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4915408Z               "timestamp": "2025-12-30T12:40:48-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4916451Z               "tree_id": "c43491a0a28e54af9bead55b9a9d43b9151a82f7",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4917250Z               "url": "https://github.com/Seifollahi/epist/commit/40229bfb02a2ce83402ac68de35b0d67ad4e6fbb"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4917985Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4918264Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4918564Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4919144Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4919564Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4919893Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4920160Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4920539Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4921059Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4921394Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4921689Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4922093Z               "id": "94f32e5086b21ee24230b8a93e0c6d65f7f831dc",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4922686Z               "message": "fix: remove unused ClassVar import in usage_service.py",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4923216Z               "timestamp": "2025-12-30T12:49:38-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4923667Z               "tree_id": "700174e90cb43c7459e47fc196afd30e4dbf1d89",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4924377Z               "url": "https://github.com/Seifollahi/epist/commit/94f32e5086b21ee24230b8a93e0c6d65f7f831dc"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4925015Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4925274Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4925690Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4926038Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4926433Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4926758Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4927032Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4927399Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4927804Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4928134Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4928413Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4928819Z               "id": "911df051d3cea55cc913e1ede6b8089ed89fa842",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4929369Z               "message": "style(ui): improve profile page billing actions",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4929907Z               "timestamp": "2025-12-30T12:50:17-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4930389Z               "tree_id": "3c8fa2ac46671deb7073040de72b7ae4041345bb",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4931311Z               "url": "https://github.com/Seifollahi/epist/commit/911df051d3cea55cc913e1ede6b8089ed89fa842"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4932014Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4932289Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4932569Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4932912Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4933301Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4933624Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4933884Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4934246Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4934666Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4935005Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4935308Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4935932Z               "id": "634c3bd03ed64ec3c3167aee58207bd156d50f0c",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4936516Z               "message": "fix(lint): remove unused imports in entitlements.py",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4937068Z               "timestamp": "2025-12-30T12:52:28-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4937538Z               "tree_id": "918fbf25bd2c7c933005936864a193538f3c5b9a",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4938299Z               "url": "https://github.com/Seifollahi/epist/commit/634c3bd03ed64ec3c3167aee58207bd156d50f0c"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4938985Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4939254Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4939534Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4939899Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4940310Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4940650Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4940946Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4941316Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4941729Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4942061Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4942349Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4942752Z               "id": "cd68ba419be71681272a7618d74d9cd4f2d4985c",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4943542Z               "message": "fix(test): clean db before tests to ensure fresh schema",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4944101Z               "timestamp": "2025-12-30T13:03:39-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4944593Z               "tree_id": "ba606ae3eb67736df5dc54e286dfaa64059e1232",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4945355Z               "url": "https://github.com/Seifollahi/epist/commit/cd68ba419be71681272a7618d74d9cd4f2d4985c"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4946179Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4946446Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4946726Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4947081Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4947496Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4947831Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4948115Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4948484Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4948898Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4949234Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4949529Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4949947Z               "id": "51e23682c6681bf5137df8a1815722cdfe636578",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4950470Z               "message": "ci: include tests in backend ci trigger paths",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4950998Z               "timestamp": "2025-12-30T13:04:34-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4951488Z               "tree_id": "51d756a1d8d5adc339c5f4a6d8d7d12f29afb55d",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4952245Z               "url": "https://github.com/Seifollahi/epist/commit/51e23682c6681bf5137df8a1815722cdfe636578"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4952902Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4953166Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4953437Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4953782Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4954192Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4954538Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4954820Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4955188Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4955811Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4956340Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4956649Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4957068Z               "id": "7570d81c81024bf79744ee1a9b45725dfd8e04e4",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4957706Z               "message": "fix(backend): use robust getattr for usage tracking to satisfy tests",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4958324Z               "timestamp": "2025-12-30T13:10:08-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4958811Z               "tree_id": "17cc4e89f076135f789d524bad42ee10048093a5",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4959549Z               "url": "https://github.com/Seifollahi/epist/commit/7570d81c81024bf79744ee1a9b45725dfd8e04e4"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4960203Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4960481Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4960751Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4961115Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4961540Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4961886Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4962191Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4962588Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4963004Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4963328Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4963605Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4963983Z               "id": "c2c8d5b8aa48a9a8d597d94069c224014bd97e3e",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4964516Z               "message": "style(ui): clarify usage stats with remaining allowance",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4965083Z               "timestamp": "2025-12-30T13:11:01-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4965739Z               "tree_id": "838849e6e428db00e9d7caf2a25bd79dc6cb6baa",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4966476Z               "url": "https://github.com/Seifollahi/epist/commit/c2c8d5b8aa48a9a8d597d94069c224014bd97e3e"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4967157Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4967387Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4967621Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4967968Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4968613Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4968932Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4969200Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4969538Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4969909Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4970218Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4970496Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4970914Z               "id": "7e261b9cd727a81ae70d9e4b199d6d0fa7c2568a",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4971448Z               "message": "style: apply ruff formatting to fix CI",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4971964Z               "timestamp": "2025-12-30T13:13:45-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4972406Z               "tree_id": "9277c9b58e087cdbf9ae382460e8500bc5276cb8",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4973177Z               "url": "https://github.com/Seifollahi/epist/commit/7e261b9cd727a81ae70d9e4b199d6d0fa7c2568a"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4973877Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4974159Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4974440Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4974810Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4975233Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4975811Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4976112Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4976491Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4976905Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4977252Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4977549Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4977948Z               "id": "f938a57b2af8498b7006058822f5c5717918c7cb",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4978566Z               "message": "feat(stripe): implement multi-tier logic and seeding script",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4979173Z               "timestamp": "2025-12-30T13:27:26-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4979658Z               "tree_id": "93094d87abd341b29a87fd2ba509b7deced80858",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4980427Z               "url": "https://github.com/Seifollahi/epist/commit/f938a57b2af8498b7006058822f5c5717918c7cb"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4981296Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4981562Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4981843Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4982204Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4982617Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4982966Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4983267Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4983636Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4984056Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4984401Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4984689Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4985094Z               "id": "3b3532395f65f6f54a6fc981a5e04517e9ce9f65",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4985903Z               "message": "chore(deploy): inject production Stripe secrets and legacy price IDs",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4986561Z               "timestamp": "2025-12-30T13:39:03-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4987060Z               "tree_id": "d4fa52679acd633f147a143f8481c2b2eea6b76c",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4987824Z               "url": "https://github.com/Seifollahi/epist/commit/3b3532395f65f6f54a6fc981a5e04517e9ce9f65"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4988507Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4988772Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4989049Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4989405Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4989822Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4990174Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4990467Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4990834Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4991245Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4991579Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4991862Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4992247Z               "id": "531d7488e0bd9608de1566825103403b6be58588",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4992744Z               "message": "style: fix imports in seed_stripe.py",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4993373Z               "timestamp": "2025-12-30T13:41:12-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4993826Z               "tree_id": "012d9738d9602dccec40c8506df4d62acf855d32",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4994551Z               "url": "https://github.com/Seifollahi/epist/commit/531d7488e0bd9608de1566825103403b6be58588"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4995199Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4995665Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4995952Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4996308Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4996735Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4997052Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4997344Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4997715Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4998122Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4998443Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4998732Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4999133Z               "id": "1745693de2539cea1f2b6c2e5d4705bf909b10ce",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.4999751Z               "message": "fix(tests): align stripe tests with new logic and inject env vars",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5000372Z               "timestamp": "2025-12-30T13:45:11-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5000838Z               "tree_id": "6f21af41ef206e3297ee52aa746e47456ab8a5cf",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5001602Z               "url": "https://github.com/Seifollahi/epist/commit/1745693de2539cea1f2b6c2e5d4705bf909b10ce"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5002257Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5002521Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5002803Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5003158Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5003547Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5003895Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5004185Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5004562Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5004980Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5005769Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5006074Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5006497Z               "id": "ad25d9e65ef632e6ae750775e4bf5781aa82c268",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5007050Z               "message": "chore: align ci env vars and fix formatting",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5007576Z               "timestamp": "2025-12-30T13:49:28-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5008057Z               "tree_id": "197bc9a7983b422a74f48a3a792c0fbf35aecacb",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5008867Z               "url": "https://github.com/Seifollahi/epist/commit/ad25d9e65ef632e6ae750775e4bf5781aa82c268"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5009596Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5009888Z             {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5010196Z               "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5010590Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5011038Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5011414Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5011732Z               "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5012164Z                 "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5012617Z                 "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5012987Z               },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5013300Z               "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5013750Z               "id": "d84de2059bd5e5643ddf9062bd064b526e0170ae",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5014480Z               "message": "fix(usage): fix AttributeError in increment_usage by using scalar result",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5015185Z               "timestamp": "2026-01-04T21:23:13-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5016028Z               "tree_id": "04ce8d16441b00bb227116b78dd13b6802259c6b",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5016862Z               "url": "https://github.com/Seifollahi/epist/commit/d84de2059bd5e5643ddf9062bd064b526e0170ae"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5017589Z             }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5017935Z           ],
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5018518Z           "compare": "https://github.com/Seifollahi/epist/compare/82a80c69d2f0...d84de2059bd5",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5019516Z           "created": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5019900Z           "deleted": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5020262Z           "forced": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5020618Z           "head_commit": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5020964Z             "author": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5021336Z               "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5021789Z               "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5022144Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5022502Z             "committer": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5022907Z               "email": "mrseifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5023354Z               "name": "Mo Seif"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5023731Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5024046Z             "distinct": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5024482Z             "id": "d84de2059bd5e5643ddf9062bd064b526e0170ae",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5025217Z             "message": "fix(usage): fix AttributeError in increment_usage by using scalar result",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5026068Z             "timestamp": "2026-01-04T21:23:13-08:00",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5026570Z             "tree_id": "04ce8d16441b00bb227116b78dd13b6802259c6b",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5027386Z             "url": "https://github.com/Seifollahi/epist/commit/d84de2059bd5e5643ddf9062bd064b526e0170ae"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5028120Z           },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5028422Z           "pusher": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5028810Z             "email": "mr.seifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5029277Z             "name": "Seifollahi"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5029643Z           },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5029969Z           "ref": "refs/heads/develop",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5030393Z           "repository": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5030755Z             "allow_forking": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5031438Z             "archive_url": "https://api.github.com/repos/Seifollahi/epist/{archive_format}{/ref}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5032142Z             "archived": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5032761Z             "assignees_url": "https://api.github.com/repos/Seifollahi/epist/assignees{/user}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5033942Z             "blobs_url": "https://api.github.com/repos/Seifollahi/epist/git/blobs{/sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5034831Z             "branches_url": "https://api.github.com/repos/Seifollahi/epist/branches{/branch}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5035873Z             "clone_url": "https://github.com/Seifollahi/epist.git",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5036795Z             "collaborators_url": "https://api.github.com/repos/Seifollahi/epist/collaborators{/collaborator}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5037841Z             "comments_url": "https://api.github.com/repos/Seifollahi/epist/comments{/number}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5038733Z             "commits_url": "https://api.github.com/repos/Seifollahi/epist/commits{/sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5039638Z             "compare_url": "https://api.github.com/repos/Seifollahi/epist/compare/{base}...{head}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5040576Z             "contents_url": "https://api.github.com/repos/Seifollahi/epist/contents/{+path}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5041502Z             "contributors_url": "https://api.github.com/repos/Seifollahi/epist/contributors",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5042230Z             "created_at": 1763758793,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5042656Z             "default_branch": "main",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5043315Z             "deployments_url": "https://api.github.com/repos/Seifollahi/epist/deployments",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5043999Z             "description": null,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5044395Z             "disabled": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5044999Z             "downloads_url": "https://api.github.com/repos/Seifollahi/epist/downloads",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5046047Z             "events_url": "https://api.github.com/repos/Seifollahi/epist/events",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5046665Z             "fork": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5047033Z             "forks": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5047379Z             "forks_count": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5047917Z             "forks_url": "https://api.github.com/repos/Seifollahi/epist/forks",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5048555Z             "full_name": "Seifollahi/epist",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5049549Z             "git_commits_url": "https://api.github.com/repos/Seifollahi/epist/git/commits{/sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5050489Z             "git_refs_url": "https://api.github.com/repos/Seifollahi/epist/git/refs{/sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5051372Z             "git_tags_url": "https://api.github.com/repos/Seifollahi/epist/git/tags{/sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5052121Z             "git_url": "git://github.com/Seifollahi/epist.git",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5052567Z             "has_discussions": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5052818Z             "has_downloads": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5053062Z             "has_issues": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5053291Z             "has_pages": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5053502Z             "has_projects": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5053724Z             "has_wiki": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5053936Z             "homepage": null,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5054238Z             "hooks_url": "https://api.github.com/repos/Seifollahi/epist/hooks",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5054627Z             "html_url": "https://github.com/Seifollahi/epist",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5054908Z             "id": 1101552933,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5055112Z             "is_template": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5055754Z             "issue_comment_url": "https://api.github.com/repos/Seifollahi/epist/issues/comments{/number}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5056365Z             "issue_events_url": "https://api.github.com/repos/Seifollahi/epist/issues/events{/number}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5056883Z             "issues_url": "https://api.github.com/repos/Seifollahi/epist/issues{/number}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5057330Z             "keys_url": "https://api.github.com/repos/Seifollahi/epist/keys{/key_id}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5057774Z             "labels_url": "https://api.github.com/repos/Seifollahi/epist/labels{/name}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5058132Z             "language": "TypeScript",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5058476Z             "languages_url": "https://api.github.com/repos/Seifollahi/epist/languages",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5058841Z             "license": null,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5059238Z             "master_branch": "main",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5059551Z             "merges_url": "https://api.github.com/repos/Seifollahi/epist/merges",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5060024Z             "milestones_url": "https://api.github.com/repos/Seifollahi/epist/milestones{/number}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5060452Z             "mirror_url": null,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5060668Z             "name": "epist",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5060876Z             "node_id": "R_kgDOQahdJQ",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5061350Z             "notifications_url": "https://api.github.com/repos/Seifollahi/epist/notifications{?since,all,participating}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5061823Z             "open_issues": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5062032Z             "open_issues_count": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5062256Z             "owner": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5062551Z               "avatar_url": "https://avatars.githubusercontent.com/u/13357246?v=4",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5062903Z               "email": "mr.seifollahi@gmail.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5063266Z               "events_url": "https://api.github.com/users/Seifollahi/events{/privacy}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5063695Z               "followers_url": "https://api.github.com/users/Seifollahi/followers",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5064144Z               "following_url": "https://api.github.com/users/Seifollahi/following{/other_user}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5064598Z               "gists_url": "https://api.github.com/users/Seifollahi/gists{/gist_id}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5064940Z               "gravatar_id": "",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5065197Z               "html_url": "https://github.com/Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5065617Z               "id": 13357246,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5065860Z               "login": "Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5066097Z               "name": "Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5066334Z               "node_id": "MDQ6VXNlcjEzMzU3MjQ2",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5066685Z               "organizations_url": "https://api.github.com/users/Seifollahi/orgs",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5067294Z               "received_events_url": "https://api.github.com/users/Seifollahi/received_events",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5067723Z               "repos_url": "https://api.github.com/users/Seifollahi/repos",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5068032Z               "site_admin": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5068373Z               "starred_url": "https://api.github.com/users/Seifollahi/starred{/owner}{/repo}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5068842Z               "subscriptions_url": "https://api.github.com/users/Seifollahi/subscriptions",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5069202Z               "type": "User",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5069454Z               "url": "https://api.github.com/users/Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5069739Z               "user_view_type": "public"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5069959Z             },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5070138Z             "private": true,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5070458Z             "pulls_url": "https://api.github.com/repos/Seifollahi/epist/pulls{/number}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5070801Z             "pushed_at": 1767591260,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5071150Z             "releases_url": "https://api.github.com/repos/Seifollahi/epist/releases{/id}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5071497Z             "size": 21439,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5071726Z             "ssh_url": "git@github.com:Seifollahi/epist.git",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5071997Z             "stargazers": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5072207Z             "stargazers_count": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5072540Z             "stargazers_url": "https://api.github.com/repos/Seifollahi/epist/stargazers",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5073003Z             "statuses_url": "https://api.github.com/repos/Seifollahi/epist/statuses/{sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5073472Z             "subscribers_url": "https://api.github.com/repos/Seifollahi/epist/subscribers",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5073960Z             "subscription_url": "https://api.github.com/repos/Seifollahi/epist/subscription",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5074361Z             "svn_url": "https://github.com/Seifollahi/epist",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5074717Z             "tags_url": "https://api.github.com/repos/Seifollahi/epist/tags",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5075271Z             "teams_url": "https://api.github.com/repos/Seifollahi/epist/teams",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5075850Z             "topics": [],
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5076182Z             "trees_url": "https://api.github.com/repos/Seifollahi/epist/git/trees{/sha}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5076548Z             "updated_at": "2026-01-05T05:23:18Z",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5076839Z             "url": "https://api.github.com/repos/Seifollahi/epist",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5077132Z             "visibility": "private",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5077358Z             "watchers": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5077553Z             "watchers_count": 0,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5077784Z             "web_commit_signoff_required": false
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5078025Z           },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5078187Z           "sender": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5078479Z             "avatar_url": "https://avatars.githubusercontent.com/u/13357246?v=4",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5078926Z             "events_url": "https://api.github.com/users/Seifollahi/events{/privacy}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5079357Z             "followers_url": "https://api.github.com/users/Seifollahi/followers",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5079801Z             "following_url": "https://api.github.com/users/Seifollahi/following{/other_user}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5080261Z             "gists_url": "https://api.github.com/users/Seifollahi/gists{/gist_id}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5080592Z             "gravatar_id": "",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5080832Z             "html_url": "https://github.com/Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5081096Z             "id": 13357246,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5081306Z             "login": "Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5081540Z             "node_id": "MDQ6VXNlcjEzMzU3MjQ2",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5081881Z             "organizations_url": "https://api.github.com/users/Seifollahi/orgs",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5082333Z             "received_events_url": "https://api.github.com/users/Seifollahi/received_events",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5082933Z             "repos_url": "https://api.github.com/users/Seifollahi/repos",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5083239Z             "site_admin": false,
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5083577Z             "starred_url": "https://api.github.com/users/Seifollahi/starred{/owner}{/repo}",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5084048Z             "subscriptions_url": "https://api.github.com/users/Seifollahi/subscriptions",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5084394Z             "type": "User",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5084639Z             "url": "https://api.github.com/users/Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5084919Z             "user_view_type": "public"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5085135Z           }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5085296Z         },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5085616Z         "github_job": "deploy",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5085898Z         "github_ref": "refs/heads/develop",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5086154Z         "github_ref_name": "develop",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5086395Z         "github_ref_protected": "false",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5086630Z         "github_ref_type": "branch",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5086890Z         "github_repository": "Seifollahi/epist",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5087173Z         "github_repository_id": "1101552933",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5087431Z         "github_repository_owner": "Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5087702Z         "github_repository_owner_id": "13357246",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5087963Z         "github_run_attempt": "1",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5088188Z         "github_run_id": "20706156881",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5088425Z         "github_run_number": "356",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5088658Z         "github_runner_arch": "X64",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5088916Z         "github_runner_environment": "github-hosted",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5089201Z         "github_runner_image_os": "ubuntu24",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5089478Z         "github_runner_image_version": "20251215.174.1",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5089770Z         "github_runner_name": "GitHub Actions 1000004565",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5090042Z         "github_runner_os": "Linux",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5090375Z         "github_runner_tracking_id": "github_9d31df33-1429-472d-bafd-eba9b1652393",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5090884Z         "github_server_url": "https://github.com",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5091155Z         "github_triggering_actor": "Seifollahi",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5091426Z         "github_workflow": "Backend Deploy",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5091862Z         "github_workflow_ref": "Seifollahi/epist/.github/workflows/backend-deploy.yml@refs/heads/develop",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5092360Z         "github_workflow_sha": "d84de2059bd5e5643ddf9062bd064b526e0170ae",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5092691Z         "platform": "linux/amd64"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5092913Z       }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5093064Z     }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5093220Z   },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5093715Z   "buildx.build.ref": "builder-2369a13c-d479-4e2c-97e4-9880134d7d05/builder-2369a13c-d479-4e2c-97e4-9880134d7d050/toekgnkf17clubfrbbqylrp6s",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5094298Z   "containerimage.descriptor": {
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5094594Z     "mediaType": "application/vnd.oci.image.index.v1+json",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5095039Z     "digest": "sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5095403Z     "size": 856
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5095774Z   },
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5096131Z   "containerimage.digest": "sha256:63bc67e36dc54e41bd5bf1683d464b4b36309794ffe526b1a563080ae3825a62",
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5097102Z   "image.name": "us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae,us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:latest"
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5097863Z }
+deploy	Build and Push Docker Image	2026-01-05T05:37:23.5098228Z ##[endgroup]
+deploy	Set Image URI	﻿2026-01-05T05:37:23.5140023Z ##[group]Run echo "IMAGE_URI=us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae" >> $GITHUB_ENV
+deploy	Set Image URI	2026-01-05T05:37:23.5141893Z [36;1mecho "IMAGE_URI=us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae" >> $GITHUB_ENV[0m
+deploy	Set Image URI	2026-01-05T05:37:23.5187741Z shell: /usr/bin/bash -e {0}
+deploy	Set Image URI	2026-01-05T05:37:23.5187985Z env:
+deploy	Set Image URI	2026-01-05T05:37:23.5188188Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Set Image URI	2026-01-05T05:37:23.5188448Z   REGION: us-central1
+deploy	Set Image URI	2026-01-05T05:37:23.5188653Z   REPO_NAME: epist-repo
+deploy	Set Image URI	2026-01-05T05:37:23.5188871Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Set Image URI	2026-01-05T05:37:23.5189131Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Set Image URI	2026-01-05T05:37:23.5189699Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Set Image URI	2026-01-05T05:37:23.5190403Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Set Image URI	2026-01-05T05:37:23.5191020Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set Image URI	2026-01-05T05:37:23.5191644Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set Image URI	2026-01-05T05:37:23.5192188Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Set Image URI	2026-01-05T05:37:23.5192598Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+deploy	Set Image URI	2026-01-05T05:37:23.5192883Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+deploy	Set Image URI	2026-01-05T05:37:23.5193155Z   GCLOUD_PROJECT: audiointelligence-3cb34
+deploy	Set Image URI	2026-01-05T05:37:23.5193421Z   GCP_PROJECT: audiointelligence-3cb34
+deploy	Set Image URI	2026-01-05T05:37:23.5193689Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+deploy	Set Image URI	2026-01-05T05:37:23.5194017Z   CLOUDSDK_METRICS_ENVIRONMENT: github-actions-setup-gcloud
+deploy	Set Image URI	2026-01-05T05:37:23.5194344Z   CLOUDSDK_METRICS_ENVIRONMENT_VERSION: 2.2.1
+deploy	Set Image URI	2026-01-05T05:37:23.5194584Z ##[endgroup]
+deploy	Deploy to Cloud Run (Staging)	﻿2026-01-05T05:37:23.5341245Z ##[group]Run google-github-actions/deploy-cloudrun@v2
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5341576Z with:
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5341764Z   service: epist-api-staging
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5342278Z   image: us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5342771Z   region: us-central1
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5343645Z   flags: --allow-unauthenticated --memory 2Gi --timeout 300 --service-account=920152096400-compute@developer.gserviceaccount.com --add-cloudsql-instances=audiointelligence-3cb34:us-central1:epist-db-staging
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5346445Z   env_vars: FIREBASE_PROJECT_ID=epist-staging
+deploy	Deploy to Cloud Run (Staging)	API_BASE_URL=https://epist-api-staging-920152096400.us-central1.run.app
+deploy	Deploy to Cloud Run (Staging)	CLOUD_TASKS_QUEUE_PATH=projects/audiointelligence-3cb34/locations/us-central1/queues/transcription-queue
+deploy	Deploy to Cloud Run (Staging)	DB_HOST=/cloudsql/audiointelligence-3cb34:us-central1:epist-db-staging
+deploy	Deploy to Cloud Run (Staging)	DB_NAME=epist
+deploy	Deploy to Cloud Run (Staging)	DB_USER=epist_user
+deploy	Deploy to Cloud Run (Staging)	STRIPE_PRICE_ID_PRO=price_1SdmnX3GSBwsq2SjKXLMiwDL
+deploy	Deploy to Cloud Run (Staging)	ENVIRONMENT=staging
+deploy	Deploy to Cloud Run (Staging)	FRONTEND_URL=https://epist-staging.web.app
+deploy	Deploy to Cloud Run (Staging)	
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5349272Z   secrets: DB_PASSWORD=epist-db-password-staging:latest
+deploy	Deploy to Cloud Run (Staging)	API_KEY=epist-api-key-staging:latest
+deploy	Deploy to Cloud Run (Staging)	SECRET_KEY=epist-secret-key-staging:latest
+deploy	Deploy to Cloud Run (Staging)	FIREWORKS_API_KEY=epist-fireworks-key:latest
+deploy	Deploy to Cloud Run (Staging)	OPENAI_API_KEY=epist-openai-key:latest
+deploy	Deploy to Cloud Run (Staging)	STRIPE_SECRET_KEY=epist-stripe-secret-key-staging:latest
+deploy	Deploy to Cloud Run (Staging)	STRIPE_WEBHOOK_SECRET=epist-stripe-webhook-secret-staging:latest
+deploy	Deploy to Cloud Run (Staging)	SENTRY_DSN=epist-sentry-dsn:latest
+deploy	Deploy to Cloud Run (Staging)	
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5350806Z   env_vars_update_strategy: merge
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5351143Z   secrets_update_strategy: merge
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5351450Z   skip_default_labels: false
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5351789Z   no_traffic: false
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5352065Z   wait: false
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5352343Z env:
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5369485Z   PROJECT_ID: audiointelligence-3cb34
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5369945Z   REGION: us-central1
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5370372Z   REPO_NAME: epist-repo
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5370859Z   SERVICE_NAME_PROD: epist-api-prod
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5371284Z   SERVICE_NAME_STAGING: epist-api-staging
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5372232Z   WORKLOAD_IDENTITY_PROVIDER: projects/920152096400/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5373379Z   SERVICE_ACCOUNT: github-actions@audiointelligence-3cb34.iam.gserviceaccount.com
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5374360Z   CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5375406Z   GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5376547Z   GOOGLE_GHA_CREDS_PATH: /home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5377275Z   CLOUDSDK_CORE_PROJECT: audiointelligence-3cb34
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5377747Z   CLOUDSDK_PROJECT: audiointelligence-3cb34
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5378179Z   GCLOUD_PROJECT: audiointelligence-3cb34
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5378601Z   GCP_PROJECT: audiointelligence-3cb34
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5379045Z   GOOGLE_CLOUD_PROJECT: audiointelligence-3cb34
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5379595Z   CLOUDSDK_METRICS_ENVIRONMENT: github-actions-setup-gcloud
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5380135Z   CLOUDSDK_METRICS_ENVIRONMENT_VERSION: 2.2.1
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5380982Z   IMAGE_URI: us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:23.5381797Z ##[endgroup]
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:24.4113303Z Successfully authenticated
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:24.4195316Z Running: gcloud run deploy epist-api-staging --image us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae --update-env-vars ^,^FIREBASE_PROJECT_ID=epist-staging,API_BASE_URL=https://epist-api-staging-920152096400.us-central1.run.app,CLOUD_TASKS_QUEUE_PATH=projects/audiointelligence-3cb34/locations/us-central1/queues/transcription-queue,DB_HOST=/cloudsql/audiointelligence-3cb34:us-central1:epist-db-staging,DB_NAME=epist,DB_USER=epist_user,STRIPE_PRICE_ID_PRO=price_1SdmnX3GSBwsq2SjKXLMiwDL,ENVIRONMENT=staging,FRONTEND_URL=https://epist-staging.web.app --update-secrets ^,^DB_PASSWORD=epist-db-password-staging:latest,API_KEY=epist-api-key-staging:latest,SECRET_KEY=epist-secret-key-staging:latest,FIREWORKS_API_KEY=epist-fireworks-key:latest,OPENAI_API_KEY=epist-openai-key:latest,STRIPE_SECRET_KEY=epist-stripe-secret-key-staging:latest,STRIPE_WEBHOOK_SECRET=epist-stripe-webhook-secret-staging:latest,SENTRY_DSN=epist-sentry-dsn:latest --update-labels ^,^managed-by=github-actions,commit-sha=d84de2059bd5e5643ddf9062bd064b526e0170ae --format json --region us-central1 --allow-unauthenticated --memory 2Gi --timeout 300 --service-account 920152096400-compute@developer.gserviceaccount.com --add-cloudsql-instances audiointelligence-3cb34:us-central1:epist-db-staging
+deploy	Deploy to Cloud Run (Staging)	2026-01-05T05:37:29.8819873Z ##[error]google-github-actions/deploy-cloudrun failed with: failed to deploy: Deploying container to Cloud Run service [epist-api-staging] in project [audiointelligence-3cb34] region [us-central1]
+deploy	Deploy to Cloud Run (Staging)	Deploying...
+deploy	Deploy to Cloud Run (Staging)	Setting IAM Policy..............done
+deploy	Deploy to Cloud Run (Staging)	Creating Revision..........failed
+deploy	Deploy to Cloud Run (Staging)	Deployment failed
+deploy	Deploy to Cloud Run (Staging)	ERROR: (gcloud.run.deploy) VPC connector projects/audiointelligence-3cb34/locations/us-central1/connectors/epist-conn-staging does not exist, or Cloud Run does not have permission to use it.
+deploy	Deploy to Cloud Run (Staging)	, full command:
+deploy	Deploy to Cloud Run (Staging)		gcloud run deploy epist-api-staging --image us-central1-docker.pkg.dev/audiointelligence-3cb34/epist-repo/api:d84de2059bd5e5643ddf9062bd064b526e0170ae --update-env-vars ^,^FIREBASE_PROJECT_ID=epist-staging,API_BASE_URL=https://epist-api-staging-920152096400.us-central1.run.app,CLOUD_TASKS_QUEUE_PATH=projects/audiointelligence-3cb34/locations/us-central1/queues/transcription-queue,DB_HOST=/cloudsql/audiointelligence-3cb34:us-central1:epist-db-staging,DB_NAME=epist,DB_USER=epist_user,STRIPE_PRICE_ID_PRO=price_1SdmnX3GSBwsq2SjKXLMiwDL,ENVIRONMENT=staging,FRONTEND_URL=https://epist-staging.web.app --update-secrets ^,^DB_PASSWORD=epist-db-password-staging:latest,API_KEY=epist-api-key-staging:latest,SECRET_KEY=epist-secret-key-staging:latest,FIREWORKS_API_KEY=epist-fireworks-key:latest,OPENAI_API_KEY=epist-openai-key:latest,STRIPE_SECRET_KEY=epist-stripe-secret-key-staging:latest,STRIPE_WEBHOOK_SECRET=epist-stripe-webhook-secret-staging:latest,SENTRY_DSN=epist-sentry-dsn:latest --update-labels ^,^managed-by=github-actions,commit-sha=d84de2059bd5e5643ddf9062bd064b526e0170ae --format json --region us-central1 --allow-unauthenticated --memory 2Gi --timeout 300 --service-account 920152096400-compute@developer.gserviceaccount.com --add-cloudsql-instances audiointelligence-3cb34:us-central1:epist-db-staging
+deploy	Post Build and Push Docker Image	﻿2026-01-05T05:37:29.8914991Z Post job cleanup.
+deploy	Post Build and Push Docker Image	2026-01-05T05:37:30.1269270Z ##[group]Removing temp folder /home/runner/work/_temp/docker-actions-toolkit-uEdf4J
+deploy	Post Build and Push Docker Image	2026-01-05T05:37:30.1283878Z ##[endgroup]
+deploy	Post Build and Push Docker Image	2026-01-05T05:37:30.1287057Z ##[group]Post cache
+deploy	Post Build and Push Docker Image	2026-01-05T05:37:30.1287401Z State not set
+deploy	Post Build and Push Docker Image	2026-01-05T05:37:30.1290794Z ##[endgroup]
+deploy	Post Set up Docker Buildx	﻿2026-01-05T05:37:30.1419952Z Post job cleanup.
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.4086483Z ##[group]Removing builder
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.5166993Z [command]/usr/bin/docker buildx rm builder-2369a13c-d479-4e2c-97e4-9880134d7d05
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.6997003Z builder-2369a13c-d479-4e2c-97e4-9880134d7d05 removed
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.7046035Z ##[endgroup]
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.7052824Z ##[group]Cleaning up certificates
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.7070020Z ##[endgroup]
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.7074667Z ##[group]Post cache
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.7080355Z State not set
+deploy	Post Set up Docker Buildx	2026-01-05T05:37:30.7084128Z ##[endgroup]
+deploy	Post Authenticate to Google Cloud	﻿2026-01-05T05:37:30.7258575Z Post job cleanup.
+deploy	Post Authenticate to Google Cloud	2026-01-05T05:37:30.8306505Z Removed exported credentials at "/home/runner/work/epist/epist/gha-creds-2a0138624abfc95d.json".
+deploy	Post Checkout code	﻿2026-01-05T05:37:30.8444769Z Post job cleanup.
+deploy	Post Checkout code	2026-01-05T05:37:30.9497636Z [command]/usr/bin/git version
+deploy	Post Checkout code	2026-01-05T05:37:30.9542110Z git version 2.52.0
+deploy	Post Checkout code	2026-01-05T05:37:30.9601888Z Temporarily overriding HOME='/home/runner/work/_temp/f540ca05-89d6-4523-a94b-681e9e53e83b' before making global git config changes
+deploy	Post Checkout code	2026-01-05T05:37:30.9607439Z Adding repository directory to the temporary git global config as a safe directory
+deploy	Post Checkout code	2026-01-05T05:37:30.9616779Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/epist/epist
+deploy	Post Checkout code	2026-01-05T05:37:30.9684788Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+deploy	Post Checkout code	2026-01-05T05:37:30.9723544Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+deploy	Post Checkout code	2026-01-05T05:37:30.9979201Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+deploy	Post Checkout code	2026-01-05T05:37:31.0006286Z http.https://github.com/.extraheader
+deploy	Post Checkout code	2026-01-05T05:37:31.0023392Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+deploy	Post Checkout code	2026-01-05T05:37:31.0059895Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+deploy	Post Checkout code	2026-01-05T05:37:31.0320444Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+deploy	Post Checkout code	2026-01-05T05:37:31.0358360Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+deploy	Complete job	﻿2026-01-05T05:37:31.0729048Z Cleaning up orphan processes

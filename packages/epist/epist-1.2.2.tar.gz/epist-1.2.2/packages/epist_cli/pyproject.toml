@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "epist-cli"
+version = "0.1.0"
+description = "Command Line Interface for Epist.ai"
+readme = "README.md"
+authors = [
+    { name = "Epist Team", email = "admin@epist.ai" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "httpx",
+    "python-dotenv"
+]
+
+[project.scripts]
+epist = "epist_cli.main:app"
+
+[project.urls]
+Homepage = "https://epist.ai"
+Repository = "https://github.com/epist-ai/epist-cli"
