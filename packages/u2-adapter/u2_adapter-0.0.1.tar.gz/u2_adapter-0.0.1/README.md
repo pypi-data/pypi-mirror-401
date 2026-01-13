@@ -1,0 +1,51 @@
+# u2-adapter
+
+A Python library designed to provide a **unified, uiautomator2-compatible interface** for various automation drivers.
+
+Currently supports:
+- **iOS**: Via `facebook-wda`.
+
+Planned support:
+- **PC (Windows)**: Via `WinAppDriver` or similar.
+- **PC (Mac)**: Via native accessibility APIs.
+
+## Installation
+
+```bash
+pip install u2-adapter
+```
+
+## Usage (iOS Example)
+
+This adapter wraps a `facebook-wda` driver instance, allowing you to use `uiautomator2` syntax.
+
+```python
+import wda
+from u2_adapter import WdaAdapter
+
+# Connect to your iOS device using facebook-wda
+c = wda.Client('http://localhost:8100')
+wda_driver = c.session()
+
+# Wrap it with the adapter
+d = WdaAdapter(wda_driver)
+
+# Now you can use uiautomator2-like syntax
+d(text="Settings").click()
+d(text="General").wait(timeout=3)
+
+# Existence check
+if d(text="Bluetooth").exists:
+    print("Bluetooth is visible")
+```
+
+## Features
+
+- **Unified Syntax**: Write once, think in `uiautomator2`, run on supported platforms.
+- **Selector Mapping**: Maps `text`, `resourceId`, etc., to platform-specific queries (e.g., Predicates for iOS).
+- **Element Operations**: `.click()`, `.wait()`, `.get_text()`, `.set_text()`.
+- **XPath Support**: Automatic attribute translation (e.g., `@text` -> `@label` for iOS).
+
+## License
+
+MIT

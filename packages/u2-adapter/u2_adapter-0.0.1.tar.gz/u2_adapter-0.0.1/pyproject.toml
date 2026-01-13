@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "u2-adapter"
+version = "0.0.1"
+description = "A universal automation adapter providing a uiautomator2-compatible interface for iOS (WDA) and potentially PC platforms."
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [
+  {name = "hexin", email = "hexinpy@gmail.com"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "facebook-wda",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/bodphi/u2_adapter"
+"Bug Tracker" = "https://github.com/bodphi/u2_adapter/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
