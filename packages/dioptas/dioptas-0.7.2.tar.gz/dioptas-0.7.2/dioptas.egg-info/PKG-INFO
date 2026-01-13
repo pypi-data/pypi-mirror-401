@@ -1,0 +1,141 @@
+Metadata-Version: 2.4
+Name: dioptas
+Version: 0.7.2
+Summary: GUI program for reduction and exploration of 2D X-ray diffraction data
+Author-email: Clemens Prescher <clemens.prescher@gmail.com>
+License: GPL-3.0
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Requires-Python: <3.14,>=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: EXtra-data<2.0,>=1.13.0; sys_platform == "linux"
+Requires-Dist: h5py<4.0,>=3.13.0
+Requires-Dist: hdf5plugin<6.0,>=5.0.0
+Requires-Dist: lmfit<2.0,>=1.3.3
+Requires-Dist: pandas<3.0,>=2.1.1
+Requires-Dist: psutil<6.0,>=5.9.5
+Requires-Dist: PyCifRW<6.0,>=5.0.0
+Requires-Dist: PyQt6<7.0,>=6.8
+Requires-Dist: pyfai==2025.3.0
+Requires-Dist: pyqtgraph<0.14,>=0.13.7
+Requires-Dist: pyshortcuts<2.0,>=1.8.1
+Requires-Dist: QtPy<3.0,>=2.4.3
+Requires-Dist: scikit-image<0.23,>=0.22.0; python_version == "3.10"
+Requires-Dist: scikit-image<0.27,>=0.26.0; python_version >= "3.11"
+Requires-Dist: sharedmem<0.4,>=0.3.8
+Requires-Dist: watchdog<7.0,>=6.0.0
+Requires-Dist: pyopengl<4.0,>=3.1.7
+Requires-Dist: pyopengl-accelerate<4.0,>=3.1.7
+Requires-Dist: xypattern<2.0,>=1.2.2
+Requires-Dist: numpy<2.0,>=1.26.0; python_version == "3.10"
+Requires-Dist: numpy<3.0,>=2.0; python_version >= "3.11"
+Requires-Dist: scipy<2.0,>=1.11.3; python_version == "3.10"
+Requires-Dist: scipy<2.0,>=1.16.3; python_version >= "3.11"
+Requires-Dist: numexpr<3.0,>=2.10.2
+Requires-Dist: qt-material<3.0,>=2.14
+Provides-Extra: test
+Requires-Dist: pytest<9.0,>=7.4.0; extra == "test"
+Requires-Dist: pytest-qt<5.0,>=4.4.0; extra == "test"
+Requires-Dist: mock<6.0,>=5.1.0; extra == "test"
+Requires-Dist: pytest-xdist>=3.8.0; extra == "test"
+Dynamic: license-file
+
+# Dioptas
+
+A GUI program for fast analysis of powder X-ray diffraction Images. It provides the capability of calibrating,
+creating masks, having pattern overlays and showing phase lines.
+
+## Maintainer
+
+Clemens Prescher (clemens.prescher@gmail.com)
+
+## Requirements
+
+    * python 3.9+
+
+It is known to run on Windows, Mac and Linux. For optimal usage on a Windows machine it should be run with 64 bit
+python.
+
+## Installation
+
+### Executables
+
+Executable versions for Windows, Mac OsX and Linux (all 64bit) can be downloaded from:
+
+https://github.com/Dioptas/Dioptas/releases
+
+The executable versions are self-contained folders, which do not need any python installation.
+Under Windows and Linux the program can be started by running the executable (e.g. Dioptas.exe or Dioptas).
+Under MacOS X the folder will contain an app folder which needs to be right-clicked and selected "Open" to start the program.
+Accepting the security prompts is required.
+
+### Python Package
+
+The easiest way to install the dioptas python package is using pip.
+
+```bash
+pip install dioptas
+```
+
+and then run Dioptas by typing:
+
+```bash
+dioptas
+```
+
+in the commandline.
+
+We also maintain a conda-forge version of dioptas.
+You can add the conda-forge channel to your conda distribution and then install dioptas via conda should be working correctly.
+
+```bash
+conda config --add channels conda-forge
+conda install dioptas
+```
+
+## Running the Program from source
+
+In order to run the program from source, the easiest way is to use the uv package manager.
+Clone the repository from github and navigate to the repository:
+
+```bash
+git clone https://github.com/Dioptas/Dioptas.git
+cd Dioptas
+```
+
+Note: This will clone the `develop` branch by default, which contains the latest development version.
+If you want to use the latest stable release instead, switch to the `main` branch after cloning:
+
+```bash
+git checkout main
+```
+
+Install uv and the dependencies by running:
+
+```bash
+python -m pip install uv
+uv sync
+```
+
+This will create a new environment with all the required python packages in `.venv`.
+
+Afterward the program can be started by running:
+
+```bash
+uv run dioptas
+```
+
+In order to run the program without uv, you need to install the required packages yourself.
+The packages are listed in the file `pyproject.toml`. The program can then be started by running:
+
+```bash
+python run.py
+```
