@@ -1,0 +1,242 @@
+# Configure version.cc from skeleton
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/version.cc.skeleton"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    @ONLY
+)
+
+# Define version variables for the skeleton
+set(GIT_IS_DIRTY "${MUGRID_GIT_DIRTY}")
+set(GIT_COMMIT_DESCRIBE "${MUGRID_VERSION_STRING}")
+set(GIT_HEAD_SHA1 "${MUGRID_GIT_HASH}")
+
+# Re-configure with proper variable substitution
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/version.cc.skeleton"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    @ONLY
+)
+
+# Source files for libmuGrid
+set(MUGRID_SOURCES
+    # core/
+    core/exception.cc
+    core/enums.cc
+    core/units.cc
+    core/type_descriptor.cc
+    # grid/
+    grid/index_ops.cc
+    grid/pixels.cc
+    grid/strides.cc
+    # field/
+    field/field.cc
+    field/field_typed.cc
+    field/field_map.cc
+    field/state_field.cc
+    field/state_field_map.cc
+    # collection/
+    collection/field_collection.cc
+    collection/field_collection_global.cc
+    collection/field_collection_local.cc
+    # mpi/
+    mpi/communicator.cc
+    mpi/cartesian_communicator.cc
+    mpi/cartesian_decomposition.cc
+    # operators/
+        operators/generic.cc
+        operators/laplace_2d.cc
+        operators/laplace_3d.cc
+        operators/fem_gradient_2d.cc
+        operators/fem_gradient_3d.cc
+        operators/solids/isotropic_stiffness_2d.cc
+        operators/solids/isotropic_stiffness_3d.cc
+    # io/
+    io/file_io_base.cc
+    # memory/
+    memory/device.cc
+    # util/
+    # linalg/
+    linalg/linalg_host.cc
+    # fft/
+    fft/fft_backend_factory.cc
+    fft/pocketfft_backend.cc
+    fft/transpose.cc
+    fft/fft_utils.cc
+    fft/fft_engine_base.cc
+    fft/fft_engine.cc
+    "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+)
+
+# Add NetCDF source if available
+if(MUGRID_ENABLE_NETCDF)
+    list(APPEND MUGRID_SOURCES io/file_io_netcdf.cc)
+    list(APPEND MUGRID_SOURCES io/type_descriptor_netcdf.cc)
+endif()
+
+# Add MPI-specific sources
+if(MUGRID_ENABLE_MPI)
+    list(APPEND MUGRID_SOURCES mpi/type_descriptor_mpi.cc)
+endif()
+
+# Add GPU backend sources if CUDA or HIP is available
+if(MUGRID_ENABLE_CUDA)
+    list(APPEND MUGRID_SOURCES fft/cufft_backend.cc)
+    list(APPEND MUGRID_SOURCES operators/generic_gpu.cc)
+    list(APPEND MUGRID_SOURCES operators/laplace_gpu.cc)
+    list(APPEND MUGRID_SOURCES operators/fem_gradient_gpu.cc)
+    list(APPEND MUGRID_SOURCES operators/solids/isotropic_stiffness_gpu.cc)
+    list(APPEND MUGRID_SOURCES linalg/linalg_gpu.cc)
+    # Mark .cc files to be compiled as CUDA
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/fft/cufft_backend.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/generic_gpu.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/laplace_gpu.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/fem_gradient_gpu.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/solids/isotropic_stiffness_gpu.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/linalg/linalg_gpu.cc
+        PROPERTIES LANGUAGE CUDA
+    )
+elseif(MUGRID_ENABLE_HIP)
+    list(APPEND MUGRID_SOURCES fft/rocfft_backend.cc)
+    list(APPEND MUGRID_SOURCES operators/generic_gpu.cc)
+    list(APPEND MUGRID_SOURCES operators/laplace_gpu.cc)
+    list(APPEND MUGRID_SOURCES operators/fem_gradient_gpu.cc)
+    list(APPEND MUGRID_SOURCES operators/solids/isotropic_stiffness_gpu.cc)
+    list(APPEND MUGRID_SOURCES linalg/linalg_gpu.cc)
+    # Mark .cc files to be compiled as HIP
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/fft/rocfft_backend.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/generic_gpu.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/laplace_gpu.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/fem_gradient_gpu.cc
+            ${CMAKE_CURRENT_SOURCE_DIR}/operators/solids/isotropic_stiffness_gpu.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/linalg/linalg_gpu.cc
+        PROPERTIES LANGUAGE HIP
+    )
+endif()
+
+# Create shared library
+add_library(muGrid STATIC ${MUGRID_SOURCES})
+
+# Set library properties
+set_target_properties(muGrid PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    POSITION_INDEPENDENT_CODE ON
+)
+
+# Include directories
+target_include_directories(muGrid
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/core>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/grid>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/field>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/collection>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/mpi>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/operators>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/operators/solids>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/io>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/util>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/memory>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/fft>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/linalg>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/benchmark>
+        $<INSTALL_INTERFACE:include>
+)
+
+# Link Eigen3
+target_link_libraries(muGrid PUBLIC Eigen3::Eigen)
+
+# Compile definitions
+if(MUGRID_ENABLE_MPI)
+    target_compile_definitions(muGrid PUBLIC WITH_MPI)
+    target_link_libraries(muGrid PUBLIC MPI::MPI_CXX)
+endif()
+
+if(MUGRID_ENABLE_NETCDF)
+    target_compile_definitions(muGrid PUBLIC WITH_NETCDF_IO)
+    target_include_directories(muGrid PRIVATE ${MUGRID_NETCDF_INCLUDE_DIRS})
+    target_link_libraries(muGrid PRIVATE ${MUGRID_NETCDF_LIBRARIES})
+endif()
+
+# CUDA support
+if(MUGRID_ENABLE_CUDA)
+    find_package(CUDAToolkit REQUIRED)
+    target_compile_definitions(muGrid PUBLIC MUGRID_ENABLE_CUDA)
+    # Link CUDA libraries privately (only needed at link time)
+    target_link_libraries(muGrid PRIVATE CUDA::cudart CUDA::cufft)
+    # But expose CUDA include directories publicly since headers like array.hh
+    # include cuda_runtime.h when MUGRID_ENABLE_CUDA is defined
+    target_include_directories(muGrid PUBLIC ${CUDAToolkit_INCLUDE_DIRS})
+    target_compile_options(muGrid PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>
+        $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr>
+    )
+endif()
+
+# HIP/ROCm support
+if(MUGRID_ENABLE_HIP)
+    find_package(hip REQUIRED)
+    find_package(rocfft REQUIRED)
+    target_compile_definitions(muGrid PUBLIC MUGRID_ENABLE_HIP)
+    # HIP headers require the platform to be defined when not using hipcc
+    target_compile_definitions(muGrid PUBLIC __HIP_PLATFORM_AMD__)
+    # Link native rocFFT (not hipFFT) for better stride support in 3D MPI FFTs
+    target_link_libraries(muGrid PRIVATE hip::host roc::rocfft)
+    # Some ROCm installations don't properly set include dirs on the hip::host target
+    # Derive ROCm root from hip_DIR and add include path explicitly
+    get_filename_component(ROCM_PATH "${hip_DIR}/../../.." ABSOLUTE)
+    target_include_directories(muGrid PUBLIC ${ROCM_PATH}/include)
+endif()
+
+# Optional libraries for some systems
+find_library(DL_LIBRARY dl)
+if(DL_LIBRARY)
+    target_link_libraries(muGrid PRIVATE ${DL_LIBRARY})
+endif()
+
+find_library(EXECINFO_LIBRARY execinfo)
+if(EXECINFO_LIBRARY)
+    target_link_libraries(muGrid PRIVATE ${EXECINFO_LIBRARY})
+endif()
+
+# Windows-specific libraries for stack trace support
+if(WIN32)
+    target_link_libraries(muGrid PRIVATE dbghelp)
+endif()
+
+# Installation
+# Build list of targets to export (muGrid + any FetchContent dependencies)
+set(_MUGRID_INSTALL_TARGETS muGrid)
+if(MUGRID_EIGEN_FROM_FETCHCONTENT)
+    list(APPEND _MUGRID_INSTALL_TARGETS eigen)
+endif()
+
+install(TARGETS ${_MUGRID_INSTALL_TARGETS}
+    EXPORT muGridTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
+# Install header files for each subdirectory
+foreach(subdir core grid field collection mpi operators io util memory fft linalg benchmark)
+    file(GLOB MUGRID_${subdir}_HEADERS "${subdir}/*.hh")
+    install(FILES ${MUGRID_${subdir}_HEADERS}
+        DESTINATION include/libmugrid/${subdir}
+    )
+endforeach()
+
+# Install pocketfft header
+install(FILES fft/pocketfft/pocketfft_hdronly.h
+    DESTINATION include/libmugrid/fft/pocketfft
+)
+
+# Install operators/solids headers
+file(GLOB MUGRID_SOLIDS_HEADERS "operators/solids/*.hh")
+install(FILES ${MUGRID_SOLIDS_HEADERS}
+    DESTINATION include/libmugrid/operators/solids
+)
