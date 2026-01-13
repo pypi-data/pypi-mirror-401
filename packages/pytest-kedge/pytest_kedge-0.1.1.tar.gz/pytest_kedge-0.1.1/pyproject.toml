@@ -1,0 +1,32 @@
+[project]
+name = "pytest-kedge"
+version = "0.1.1"
+description = "Agent-friendly structured test data collector for pytest"
+authors = [{ name = "Pete Bowman" }]
+dependencies = ["pytest>=7.0.0"]
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.entry-points.pytest11]
+kedge = "pytest_kedge"
+
+[dependency-groups]
+dev = ["ruff", "ty", "debugpy", "pytest", "pyright", "docformatter"]
+test = ["pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.sdist]
+include = ["/pytest_kedge.py", "/pytest_kedge.pyi", "/py.typed"]
+
+[tool.hatch.build.targets.wheel]
+include = ["/pytest_kedge.py", "/pytest_kedge.pyi", "/py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-p pytester"
+testpaths = ["tests"]

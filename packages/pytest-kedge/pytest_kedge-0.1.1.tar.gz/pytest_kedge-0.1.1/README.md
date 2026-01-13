@@ -1,0 +1,59 @@
+# pytest-kedge ⚓
+
+ I built this as a way to abstract tests for agentic workflows, currently it just creates basic `x -> f(x) -should be-> y` or `x -> f(x) -should be-> Exception` but its great to stop claude from mucking about
+
+## Installation
+
+Using [uv](https://docs.astral.sh/uv/)  (recommended):
+
+```bash 
+uv add pytest-kedge
+```
+
+## Usage
+
+Define your component or function, then create a TestSuite. 
+pytest will find it and run it automatically.
+
+```python 
+from pytest_kedge import TestSuite, TestCase from my_app import add_numbers
+
+math_tests = TestSuite(
+    target=add_numbers,
+    scenarios=[
+        TestCase(
+            name="happy_path",
+            input={"a": 1, "b": 2},
+            expected=3,
+            test_failure_message="Basic addition failed",
+        ),
+        TestCase(
+            name="type_error",
+            input={"a": "1", "b": 2},
+            expected=TypeError,
+            test_failure_message="Did not catch string input",
+        ),
+    ],
+)
+```
+
+### Agent-Friendly Reporting
+
+- Run pytest with the kedge flag to get a concise summary:
+
+```bash 
+uv run pytest --kedge-summary
+```
+
+Output: 
+
+```text 
+Kedge Agentic Summary FAILURES DETECTED:
+
+❌ renders_correctly Reason: Kedge Scenario Failed: Footer mismatch SUCCESSES:
+
+✅ smoke_test 
+```
+
+Development & Testing
+Clone the repo.
