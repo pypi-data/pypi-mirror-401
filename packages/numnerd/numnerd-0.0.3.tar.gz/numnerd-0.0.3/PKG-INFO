@@ -1,0 +1,108 @@
+Metadata-Version: 2.4
+Name: numnerd
+Version: 0.0.3
+Summary: A Python library for nerdy mathematical functions and number theory.
+Author-email: Max <mail@maxduckwitz.de>
+Project-URL: Homepage, https://github.com/mduckwitz/numnerd
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# numnerd 🤓
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+
+**numnerd** is a Python library dedicated to the pursuit of numerical excellence and the exploration of integer properties. The library currently features exactly **73** specialized functions, providing a comprehensive toolkit for the modern number theorist.
+
+Whether you are seeking the next Mersenne prime, navigating the recursive paths of the Collatz conjecture, or calculating $\pi$ to a precision that would make a circle blush, `numnerd` provides the necessary tools.
+
+---
+
+## 🛠 Installation
+
+You can install `numnerd` via pip:
+
+```bash
+pip install numnerd
+```
+
+*Note: For those with a collaboration distance of zero to the source, cloning the repository is also an option.*
+
+---
+
+## 🚀 Quick Start
+
+Integration is straightforward. No complex axioms required.
+
+```python
+from numnerd import is_prime, fibonacci, calculate_pi, is_happy_number
+
+# Primality check
+is_prime(17) # True
+
+# The 10th term of the Fibonacci sequence
+fibonacci(10) # 55
+
+# Detecting "Happy" integers
+is_happy_number(19) # True
+
+# High-precision constants
+calculate_pi(50)
+```
+
+---
+
+## 📚 The Collection
+
+Organized into four fundamental modules, the library provides a comprehensive toolkit for mathematical discovery.
+
+### 🔢 Building Blocks (`primes`)
+Tools for the analysis of primality and divisibility.
+*   **Classification**: `is_prime`, `is_perfect_number`, `is_sophie_germain_prime`, `is_twin_prime`, `is_mersenne_prime`, `is_chen_prime`, `is_fermat_prime`.
+*   **Arithmetic Functions**: `prime_factorization`, `euler_totient` ($\phi$), `mobius_function` ($\mu$), `prime_pi` ($\pi(n)$).
+*   **Search & Selection**: `sieve_of_eratosthenes`, `lcm`, `next_prime`, `prev_prime`.
+*   **Conjectures**: `goldbach_partition`.
+
+### 🌀 Recursive Logic (`sequences`)
+Exotic and classical integer sequences.
+*   **Foundations**: `fibonacci`, `lucas_number`, `catalan_number`, `triangular_number`, `pell_number`, `collatz_path`.
+*   **Growth & Patterns**: `look_and_say`, `lazy_caterer`, `thue_morse_iteration`, `recaman_sequence`, `padovan_sequence`, `sylvester_sequence`.
+*   **Combinatorial**: `bell_number`, `motzkin_number`, `juggler_sequence`, `golomb_sequence`, `perrin_number`, `narayana_cows`.
+*   **Chaotic Systems**: `hofstadter_q`, `van_eck_sequence`, `wythoff_sequences`.
+
+### 🃏 Numerical Oddities (`recreational`)
+Properties that emerge from the digits themselves.
+*   **Self-Referential**: `is_armstrong_number`, `is_munchausen_number`, `is_disarium_number`, `is_neon_number`, `is_kaprekar_number`, `is_automorphic_number`.
+*   **Digit Dynamics**: `kaprekar_routine` (6174), `digital_root`, `is_spy_number`, `is_keith_number`, `is_vampire_number`, `is_polydivisible_number`.
+*   **Divisor Relations**: `is_abundant_number`, `is_deficient_number`, `is_smith_number`, `is_pronic_number`, `is_happy_number`.
+
+### ♾️ Fundamental Constants (`constants`)
+Arbitrary-precision calculation of the universe's most important ratios.
+*   **Universal Ratios**: `calculate_pi`, `calculate_e`, `calculate_golden_ratio`, `calculate_silver_ratio`.
+*   **Roots & Logarithms**: `calculate_sqrt2`, `calculate_ln2`, `calculate_gauss_constant`.
+*   **Physical & Mathematical Limits**: `calculate_catalan_constant`, `calculate_universal_parabolic_constant`, `calculate_aperys_constant`, `calculate_gelfond_constant`, `calculate_omega_constant`, `calculate_levy_constant`.
+
+---
+
+## 🧪 Verification
+
+We value rigor. The library maintains a 1:1 ratio of functions to tests.
+
+```bash
+python run_tests.py
+```
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**. As Paul Erdős would say, "A mathematician is a device for turning coffee into theorems"—this library is simply the byproduct of that process.
+
+---
+
+*"Mathematics, rightly viewed, possesses not only truth, but supreme beauty."* – Bertrand Russell
