@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+VENV=.venv
+CLEAN=false
+
+for arg in "$@"; do
+  [[ "$arg" == "--clean" ]] && CLEAN=true && break
+done
+
+if [[ "$CLEAN" == true && -d "$VENV" ]]; then
+  echo "Cleaning existing virtual environment..."
+  rm -rf "$VENV"
+fi
+
+if [[ ! -d "$VENV" ]]; then
+  echo "Creating new virtual environment..."
+  uv venv --python 3.11 "$VENV"
+  source "$VENV/bin/activate"
+  uv pip install -e ".[all]"
+else
+  echo "Using existing virtual environment..."
+  source "$VENV/bin/activate"
+fi
+
+# pre-commit install
