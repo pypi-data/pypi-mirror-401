@@ -1,0 +1,2 @@
+from setuptools import setup, find_packages
+setup(name='hvpdb-admin', version='0.1.0', description='Admin & Audit Tools for HVPDB', packages=find_packages(), install_requires=['hvpdb'], entry_points={'hvpdb.plugins': ['admin = hvpdb_admin:app']})
