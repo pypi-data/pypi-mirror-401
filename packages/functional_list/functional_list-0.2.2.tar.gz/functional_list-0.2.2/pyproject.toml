@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=80.9.0", "wheel>=0.45.1", "Cython>=3.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "functional_list"
+dynamic = ["version"]
+description = "package for map a list"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Andrianarivo Tantelitiana RAKOTOARIJAONA", email = "tantelitiana22@gmail.com" },
+]
+keywords = ["functional", "list", "map", "reduce"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.optional-dependencies]
+# Optional backends and IO extras.
+# Note: these libraries have their own Python support windows.
+ray = [
+  "ray>=2.53.0; python_version >= '3.10'",
+]
+dask = [
+  "dask>=2025.12.0; python_version >= '3.10'",
+]
+io = [
+  "pyarrow>=22.0.0; python_version >= '3.10'",
+]
+all = [
+  "functional_list[ray,dask,io]",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/Tantelitiana22/list-function-python-project"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests", "tests.*"]
+
+# Optional Cython extension for LocalBackend helpers.
+[[tool.setuptools.ext-modules]]
+name = "functional_list.accelerators._local_accel"
+sources = ["src/functional_list/accelerators/_local_accel.pyx"]
+optional = true
+
+# Optional Cython extension for numeric reductions.
+[[tool.setuptools.ext-modules]]
+name = "functional_list.accelerators._reduce_accel"
+sources = ["src/functional_list/accelerators/_reduce_accel.pyx"]
+optional = true
+
+[dependency-groups]
+dev = [
+  "flake8==7.3.0",
+  "mypy==1.19.1",
+  "pre-commit>=4.5.1",
+  "pylint==4.0.4",
+  "pytest>=9.0.2",
+  "pytest-cov>=6.0.0",
+  "pytest-timeout>=2.3.1",
+  "cibuildwheel>=2.23.0",
+  "twine>=6.2.0",
+  "wheel>=0.45.1",
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.0",
+  "mkdocs-jupyter>=0.25.0",
+  "nbformat>=5.10.4",
+  "setuptools>=80.9.0",
+]
+
+[tool.cibuildwheel]
+# Project supports Python >=3.10
+build = "cp310-* cp311-* cp312-*"
+# Keep wheel builds fast and predictable in CI.
+skip = "pp* *musllinux*"
