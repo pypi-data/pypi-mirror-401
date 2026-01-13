@@ -1,0 +1,23 @@
+# Pre-commit hooks for typo-shield
+# See https://pre-commit.com for more information
+
+- id: typo-shield
+  name: typo-shield security check
+  description: Scan for typosquatting in Python dependencies
+  entry: typo-shield scan --staged --fail-on fail
+  language: python
+  types: [python, text]
+  pass_filenames: false
+  stages: [commit]
+  require_serial: true
+
+- id: typo-shield-strict
+  name: typo-shield security check (strict)
+  description: Scan for typosquatting with strict import checking
+  entry: typo-shield scan --staged --fail-on warn --strict-imports
+  language: python
+  types: [python, text]
+  pass_filenames: false
+  stages: [commit]
+  require_serial: true
+

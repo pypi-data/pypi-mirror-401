@@ -1,0 +1,154 @@
+# pyproject.toml - typo-shield
+# Security guard against typosquatting in Python dependencies
+
+# ============================================================================
+# Build System (PEP 517) - WYMAGANE
+# ============================================================================
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ============================================================================
+# Project Metadata (PEP 621)
+# ============================================================================
+[project]
+name = "typo-shield"
+version = "0.1.1"
+description = "Security guard against typosquatting in Python dependencies"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Kacper", email = "kacper@example.com"},
+]
+keywords = [
+    "security",
+    "typosquatting",
+    "supply-chain",
+    "dependencies",
+    "pre-commit",
+    "python",
+    "pip",
+    "pypi",
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "typer>=0.9.0",
+    "rapidfuzz>=3.0.0",
+    "packaging>=23.0",
+    "tomli>=2.0.0; python_version < '3.11'",
+]
+
+[project.urls]
+Homepage = "https://github.com/kszmigiel/typo-shield"
+Repository = "https://github.com/kszmigiel/typo-shield"
+Issues = "https://github.com/kszmigiel/typo-shield/issues"
+
+# ============================================================================
+# Optional Dependencies - Development
+# ============================================================================
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pre-commit>=3.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+]
+
+# ============================================================================
+# Entry Points - CLI Commands
+# ============================================================================
+[project.scripts]
+typo-shield = "typo_shield.cli:app"
+
+# ============================================================================
+# Hatchling Configuration
+# ============================================================================
+[tool.hatch.build.targets.wheel]
+packages = ["typo_shield"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "typo_shield/**/*.py",
+    "typo_shield/data/*.txt",
+    "typo_shield/data/*.json",
+    "tests/**/*.py",
+    "tests/fixtures/**",
+    "README.md",
+    "LICENSE",
+    ".pre-commit-hooks.yaml",
+    "MANIFEST.in",
+]
+
+# ============================================================================
+# Tool Configuration
+# ============================================================================
+
+# Pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "--verbose",
+    "--strict-markers",
+    "--cov=typo_shield",
+    "--cov-report=term-missing",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+# Coverage
+[tool.coverage.run]
+source = ["typo_shield"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+# Ruff
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP"]
+ignore = ["E501"]  # Line too long
+
+# MyPy
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
