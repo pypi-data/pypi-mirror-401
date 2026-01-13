@@ -1,0 +1,56 @@
+Metadata-Version: 2.4
+Name: pyautogui-mcp
+Version: 2026.1.101321
+Summary: Expose PyAutoGUI through MCP.
+Author-email: Eugene Evstafev <hi@eugene.plus>
+License: BSD-3-Clause license
+Project-URL: Repository, https://github.com/chigwell/pyautogui-mcp
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: anyio==4.12.0
+Requires-Dist: fastmcp==2.14.2
+Requires-Dist: pyautogui==0.9.54
+Requires-Dist: pyscreeze==1.0.1
+Requires-Dist: pillow>=10
+Dynamic: license-file
+
+<div align="center">
+  <a target="_blank" href="https://github.com/chigwell/pyautogui-mcp">
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=PyAutoGUI-MCP&fontSize=50&fontAlignY=35&animation=fadeIn&fontColor=FFFFFF&descAlignY=55&descAlign=62" alt="Telegram MCP Server" width="100%" />
+  </a>
+</div>
+
+## Run with uv
+
+Dependencies are declared in `pyproject.toml`, so uv can resolve and run directly:
+
+```json
+{
+  "mcpServers": {
+    "pyautogui-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/full/path/to/pyautogui-mcp",
+        "run",
+        "python",
+        "-m",
+        "pyautogui_mcp"
+      ]
+    }
+  }
+}
+```
+
+You can also launch manually:
+
+```bash
+uv run python -m pyautogui_mcp --transport stdio
+uv run python -m pyautogui_mcp --transport http --host 127.0.0.1 --port 8000
+```
