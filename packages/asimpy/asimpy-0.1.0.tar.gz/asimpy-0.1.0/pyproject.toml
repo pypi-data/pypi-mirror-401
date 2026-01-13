@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/asimpy"]
+
+[project]
+name = "asimpy"
+version = "0.1.0"
+requires-python = ">=3.13"
+authors = [
+    {name = "Greg Wilson", email = "gvwilson@third-bit.com"},
+]
+maintainers = [
+    {name = "Greg Wilson", email = "gvwilson@third-bit.com"},
+]
+description = "A simple discrete event simulator using async/await"
+keywords = ["open source", "discrete event simulation"]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.4.0",
+    "markdown-include>=0.8.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.1",
+    "mkdocstrings[python]>=1.0.0",
+    "ruff>=0.14.10",
+    "taskipy>=1.14.1",
+    "twine>=6.2.0",
+    "ty>=0.0.11"
+]
+
+[tool.taskipy.tasks]
+build = {cmd = "python -m build", help = "build package"}
+check = {cmd = "ruff check .", help = "Check code issues"}
+docs = {cmd = "mkdocs build", help = "Build documentation"}
+fix = {cmd = "ruff check --fix .", help = "Fix code issues"}
+format = {cmd = "ruff format .", help = "Format code"}
+serve = {cmd = "python -m http.server -d docs", help = "Serve documentation"}
+types = {cmd = "ty check .", help = "Check types"}
