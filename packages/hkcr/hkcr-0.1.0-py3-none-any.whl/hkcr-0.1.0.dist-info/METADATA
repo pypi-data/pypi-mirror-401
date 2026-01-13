@@ -1,0 +1,60 @@
+Metadata-Version: 2.4
+Name: hkcr
+Version: 0.1.0
+Summary: Hong Kong Companies Registry Search SDK
+Project-URL: Homepage, https://github.com/rocky/hkcompsearch
+License-Expression: MIT
+Keywords: api,companies,hong kong,registry,search
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
+# hkcr
+
+Hong Kong Companies Registry Search SDK
+
+## Installation
+
+```bash
+pip install hkcr
+```
+
+## CLI Usage
+
+```bash
+# Search local companies by name
+hkcr "China"
+
+# Search foreign companies
+hkcr -f "HSBC"
+
+# Search by BRN
+hkcr -b C1572528
+
+# JSON output
+hkcr "China" -j
+```
+
+## Python Usage
+
+```python
+from hkcr import search_local, search_foreign, SearchOptions
+
+# Search local companies
+companies = search_local("China")
+for co in companies:
+    print(f"{co.brn}: {co.english_name}")
+
+# Search by BRN
+results = search_local("C1572528", SearchOptions(by_brn=True))
+
+# Search foreign companies
+foreign = search_foreign("HSBC")
+```
