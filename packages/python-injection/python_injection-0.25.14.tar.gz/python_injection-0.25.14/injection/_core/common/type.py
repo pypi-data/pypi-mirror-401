@@ -1,0 +1,69 @@
+from collections.abc import (
+    AsyncGenerator,
+    AsyncIterable,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Collection,
+    Generator,
+    Iterable,
+    Iterator,
+)
+from inspect import isclass, isfunction
+from types import GenericAlias, UnionType
+from typing import (
+    Any,
+    TypeAliasType,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
+
+type InputType[T] = type[T] | TypeAliasType | GenericAlias | UnionType
+type TypeInfo[T] = (
+    InputType[T]
+    | Callable[..., T]
+    | Callable[..., Awaitable[T]]
+    | Collection[TypeInfo[T]]
+)
+
+
+def get_return_type[T](function: Callable[..., T]) -> Any | None:
+    return get_type_hints(function).get("return")
+
+
+def get_yield_types[T](
+    function: Callable[..., Iterator[T]] | Callable[..., AsyncIterator[T]],
+) -> tuple[Any] | tuple[()]:
+    return_type = get_return_type(function)
+
+    if get_origin(return_type) in (
+        AsyncGenerator,
+        AsyncIterable,
+        AsyncIterator,
+        Generator,
+        Iterable,
+        Iterator,
+    ):
+        for arg in get_args(return_type):
+            return (arg,)
+
+    return ()
+
+
+def iter_flat_types(*args: Any) -> Iterator[Any]:
+    for arg in args:
+        if isinstance(arg, Collection) and not isclass(arg):
+            yield from iter_flat_types(*arg)
+
+        else:
+            yield arg
+
+
+def iter_return_types(*args: Any) -> Iterator[Any]:
+    for arg in args:
+        if isfunction(arg) and (return_type := get_return_type(arg)):
+            yield return_type
+
+        else:
+            yield arg
