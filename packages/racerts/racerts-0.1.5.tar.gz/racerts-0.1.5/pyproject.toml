@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "racerts"
+version = "0.1.5"
+authors = [
+    { name = "Stefan P. Schmid", email = "stefan.schmid@chem.ethz.ch" },
+    { name = "Henrik Seng" ,email = "heseng@ethz.ch" },
+    { name = "Thibault Kläy", email = "thibault.klay@epfl.ch" },
+    { name = "Kjell Jorner", email = "kjell.jorner@chem.ethz.ch" },
+]
+description = "Rapid Conformer Ensemble with RDKit for Transition States"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "rdkit>=2023.9.6",
+    "numpy>=1.26.4",
+    "ipython>=7.34.0",
+    "py3Dmol>=2.0.0",
+]
+license = "MIT"
+license-files = ["LICENSE*"]
+
+[project.urls]
+Homepage = "https://github.com/digital-chemistry-laboratory/racerts/"
+Documentation = "https://digital-chemistry-laboratory.github.io/racerts/"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["racerts*"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=21.12b0",
+    "flake8>=6.1.0",
+    "isort>=5.12.0",
+]
+[project.scripts]
+racerts = "racerts.cli:main"
