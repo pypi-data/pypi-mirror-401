@@ -1,0 +1,196 @@
+# **AuraData — Automated Data Quality Auditing Engine**
+**Author:** Abdul Mofique Siddiqui  
+**License:** MIT  
+
+**Install via pip:**
+```bash
+pip install auradata
+```
+
+Import it in your Python code:
+```python
+from auradata import Dataset
+```
+
+---
+
+## Overview
+AuraData is a data-centric auditing and diagnostics engine for machine learning datasets.
+
+It automatically inspects datasets to detect:
+* Duplicate samples
+* Noisy or anomalous records
+* Potentially mislabeled samples
+* Subgroup performance disparities (bias risks)
+
+AuraData is designed to be **transparent, conservative, and human-in-the-loop** — it flags risks and provides diagnostics instead of blindly modifying data.
+
+---
+
+## Installation
+Install the package via pip:
+```bash
+pip install auradata
+```
+
+---
+
+## How It Works
+* **Duplicate Detection** Identifies exact row duplicates.
+* **Noise Detection** Uses Isolation Forest on numeric features to flag outliers.
+* **Label Issue Detection** Flags samples where the model strongly disagrees with provided labels.
+* **Bias Audit** Evaluates subgroup performance disparities across sensitive attributes.
+* **State Tracking** Tracks cleaning and fixing actions safely and reversibly.
+* **HTML Reporting** Produces structured, readable audit reports.
+
+---
+
+## Getting Started
+
+### 1. Import the package
+```python
+from auradata import Dataset
+```
+
+### 2. Initialize the dataset
+```python
+ds = Dataset(X, y)
+```
+
+### 3. Run an initial audit
+```python
+ds.audit(check_labels=False, check_bias=False)
+```
+
+### 4. Clean obvious issues
+```python
+ds.clean(remove_duplicates=True, remove_noise=True)
+```
+
+### 5. Train your model
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression(max_iter=1000)
+model.fit(ds.X.select_dtypes(include=["number"]), ds.y)
+```
+
+### 6. Run a full audit
+```python
+ds.audit(model=model, sensitive_feature="gender", check_duplicates=False, check_noise=False)
+```
+
+### 7. Fix label issues (optional)
+```python
+ds.fix_labels(model)
+```
+
+### 8. Generate a report
+```python
+ds.report("auradata_report.html")
+```
+
+---
+
+## API Reference
+
+### Dataset(X, y=None, feature_names=None)
+Initializes the dataset.
+
+**Parameters:**
+* `X`: Feature matrix (array-like or DataFrame)
+* `y`: Labels (optional)
+* `feature_names`: Optional column names
+
+---
+
+### `.audit(...)`
+Audits the dataset for quality issues.
+
+---
+
+### `.clean(...)`
+Removes duplicate and/or noisy samples.
+
+---
+
+### `.fix_labels(model)`
+Replaces mislabeled values with model predictions.
+
+---
+
+### `.report(path)`
+Generates an HTML report summarizing all detected issues.
+
+---
+
+### `.restore_original()`
+Restores the dataset to its original unmodified state.
+
+---
+
+### `.summary()`
+Prints a quick console summary of the dataset state.
+
+---
+
+## Example Usage
+
+### Example 1: Basic Audit
+```python
+from auradata import Dataset
+import pandas as pd
+
+X = pd.read_csv("data.csv")
+ds = Dataset(X)
+ds.audit()
+ds.summary()
+```
+
+---
+
+### Example 2: Audit + Clean + Fix Labels
+```python
+from auradata import Dataset
+from sklearn.linear_model import LogisticRegression
+
+X = pd.read_csv("data.csv")
+y = pd.read_csv("labels.csv").squeeze()
+
+ds = Dataset(X, y)
+ds.audit(check_labels=False, check_bias=False)
+ds.clean()
+
+model = LogisticRegression(max_iter=1000).fit(ds.X.select_dtypes(include=["number"]), ds.y)
+ds.audit(model=model, sensitive_feature="gender", check_duplicates=False, check_noise=False)
+ds.fix_labels(model)
+ds.report("auradata_report.html")
+```
+
+---
+
+## Internals
+* Isolation Forest for outlier detection
+* Confidence-based disagreement for label validation
+* Group-wise evaluation for bias detection
+* State-aware cleaning with reversible actions
+* Transparent reporting for auditability
+
+---
+
+## Notes
+* Works with numeric and mixed datasets
+* Conservative by default (no blind destructive actions)
+* Designed for ML practitioners and researchers
+* Suitable for responsible and regulated workflows
+
+---
+
+## Author
+Abdul Mofique Siddiqui
+
+---
+
+## License
+This project is licensed under the MIT License.
+
