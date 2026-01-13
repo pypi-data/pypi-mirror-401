@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vnewsapi"
+version = "0.1.0"
+description = "A Python library for crawling Vietnamese financial news from major news websites"
+readme = "README.md"
+authors = [
+    { name = "vnewsapi contributors", email = "support@vnewsapi.com" },
+]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+keywords = ["vietnam", "news", "crawler", "finance", "rss", "sitemap", "scraping"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Natural Language :: Vietnamese",
+    "Natural Language :: English",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+    "feedparser>=6.0.0",
+    "html2text>=2020.1.16",
+    "pandas>=2.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-timeout>=2.1.0",
+]
+dev = [
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Hoanganhvu123/vnewsapi"
+Documentation = "https://github.com/Hoanganhvu123/vnewsapi#readme"
+Repository = "https://github.com/Hoanganhvu123/vnewsapi"
+Issues = "https://github.com/Hoanganhvu123/vnewsapi/issues"
+
+[tool.setuptools]
+include-package-data = true
+packages = { find = { exclude = ["tests*", "venv*", "*.egg-info*", "build*", "dist*"] } }
+
+[tool.setuptools.package-data]
+vnewsapi = ["*.txt", "*.md"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow tests",
+]
+

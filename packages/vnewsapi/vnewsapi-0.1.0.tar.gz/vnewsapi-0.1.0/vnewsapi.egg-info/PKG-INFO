@@ -1,0 +1,430 @@
+Metadata-Version: 2.4
+Name: vnewsapi
+Version: 0.1.0
+Summary: A Python library for crawling Vietnamese financial news from major news websites
+Home-page: https://github.com/Hoanganhvu123/vnewsapi
+Author: vnewsapi contributors
+Author-email: vnewsapi contributors <support@vnewsapi.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/Hoanganhvu123/vnewsapi
+Project-URL: Documentation, https://github.com/Hoanganhvu123/vnewsapi#readme
+Project-URL: Repository, https://github.com/Hoanganhvu123/vnewsapi
+Project-URL: Issues, https://github.com/Hoanganhvu123/vnewsapi/issues
+Keywords: vietnam,news,crawler,finance,rss,sitemap,scraping
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Internet :: WWW/HTTP :: Indexing/Search
+Classifier: Topic :: Text Processing :: Markup :: HTML
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Classifier: Natural Language :: Vietnamese
+Classifier: Natural Language :: English
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.31.0
+Requires-Dist: beautifulsoup4>=4.12.0
+Requires-Dist: lxml>=4.9.0
+Requires-Dist: feedparser>=6.0.0
+Requires-Dist: html2text>=2020.1.16
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: python-dateutil>=2.8.0
+Provides-Extra: test
+Requires-Dist: pytest>=7.0.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0.0; extra == "test"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "test"
+Requires-Dist: pytest-timeout>=2.1.0; extra == "test"
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: build>=0.10.0; extra == "dev"
+Requires-Dist: twine>=4.0.0; extra == "dev"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# vnewsapi
+
+[![Python Version](https://img.shields.io/pypi/pyversions/vnewsapi)](https://pypi.org/project/vnewsapi/)
+[![License](https://img.shields.io/pypi/l/vnewsapi)](https://github.com/Hoanganhvu123/vnewsapi/blob/main/LICENSE)
+[![PyPI Version](https://img.shields.io/pypi/v/vnewsapi)](https://pypi.org/project/vnewsapi/)
+
+A Python library for crawling Vietnamese financial news from major news websites. Provides RSS feed parsing, sitemap parsing, content extraction, and batch processing capabilities.
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Supported News Sources](#supported-news-sources)
+- [API Reference](#api-reference)
+- [Examples](#examples)
+- [Configuration](#configuration)
+- [Requirements](#requirements)
+- [Contributing](#contributing)
+- [License](#license)
+- [Links](#links)
+
+## Features
+
+- RSS Feed Parsing: Fetch and parse RSS feeds from news websites
+- Sitemap Parsing: Extract article URLs from XML sitemaps
+- Content Extraction: Extract article content using CSS selectors
+- Batch Processing: Fetch multiple articles with rate limiting
+- Multiple Sources: Support for 10+ Vietnamese news websites
+- Easy to Use: Simple, intuitive API
+- Error Handling: Comprehensive error handling and logging
+- Rate Limiting: Built-in request delay management
+
+## Installation
+
+Install from PyPI:
+
+```bash
+pip install vnewsapi
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/Hoanganhvu123/vnewsapi.git
+cd vnewsapi
+pip install -e .
+```
+
+## Quick Start
+
+### Basic Usage
+
+```python
+from vnewsapi import Crawler
+
+# Initialize crawler for a news site
+crawler = Crawler('cafef')
+
+# Get latest articles
+articles = crawler.get_articles(limit=10)
+print(articles)
+
+# Get article details
+details = crawler.get_article_details('https://cafef.vn/article-url')
+print(details['title'])
+print(details['content'])
+```
+
+### Batch Crawling
+
+```python
+from vnewsapi import BatchCrawler
+
+# Initialize batch crawler
+batch = BatchCrawler('cafef', request_delay=0.5)
+
+# Get article list
+crawler = Crawler('cafef')
+articles = crawler.get_articles(limit=20)
+
+# Fetch details for all articles
+details_df = batch.fetch_details_from_dataframe(articles, url_column='link')
+print(details_df)
+```
+
+### RSS and Sitemap Parsing
+
+```python
+from vnewsapi import RSS, Sitemap
+
+# Parse RSS feed
+rss = RSS()
+articles = rss.fetch('https://cafef.vn/rss/tin-moi-nhat.rss')
+print(articles)
+
+# Parse sitemap
+sitemap = Sitemap()
+urls_df = sitemap.run('https://cafef.vn/sitemap.xml', limit=100)
+print(urls_df)
+```
+
+## Supported News Sources
+
+The library supports the following Vietnamese news websites:
+
+- CafeF (cafef) - Financial news
+- CafeBiz (cafebiz) - Business news
+- VietStock (vietstock) - Stock market news
+- VnExpress (vnexpress) - General news
+- Bao Dau Tu (baodautu) - Investment news
+- Tuoi Tre (tuoitre) - General news
+- Thanh Nien (thanhnien) - General news
+- Dan Tri (dantri) - General news
+- Vietnam Economy (vneconomy) - Economic news
+- VietnamNet (vietnamnet) - General news
+
+## API Reference
+
+### Crawler
+
+Main class for fetching news articles.
+
+```python
+crawler = Crawler(site_name, custom_config=None, timeout=30)
+```
+
+**Parameters:**
+- `site_name` (str): Name of the news site (e.g., 'cafef', 'vietstock')
+- `custom_config` (dict, optional): Custom configuration override
+- `timeout` (int): Request timeout in seconds (default: 30)
+
+**Methods:**
+
+- `get_articles(limit=None, sitemap_url=None, rss_url=None, prefer_rss=True)`: Get list of articles
+  - Returns: pandas DataFrame with columns: title, link, pubDate, description
+- `get_article_details(url)`: Get detailed content of a single article
+  - Returns: dict with keys: title, content, content_html, short_desc, publish_time, author, url
+
+### BatchCrawler
+
+Batch processing for multiple articles.
+
+```python
+batch = BatchCrawler(site_name, request_delay=0.5, timeout=30)
+```
+
+**Parameters:**
+- `site_name` (str): Name of the news site
+- `request_delay` (float): Delay between requests in seconds (default: 0.5)
+- `timeout` (int): Request timeout in seconds (default: 30)
+
+**Methods:**
+
+- `fetch_details_for_urls(urls, show_progress=True)`: Fetch details for multiple URLs
+  - Returns: pandas DataFrame with article details
+- `fetch_details_from_dataframe(df, url_column='link')`: Fetch details from DataFrame
+  - Returns: pandas DataFrame merged with article details
+
+### RSS
+
+RSS feed parser.
+
+```python
+rss = RSS(timeout=30, data_source='CAFEF')
+articles = rss.fetch(rss_url)
+```
+
+**Parameters:**
+- `timeout` (int): Request timeout in seconds (default: 30)
+- `data_source` (str): Data source name for headers (default: 'CAFEF')
+
+**Methods:**
+
+- `fetch(rss_url)`: Fetch and parse RSS feed
+  - Returns: List of dicts with keys: title, link, pubDate, description
+
+### Sitemap
+
+Sitemap parser.
+
+```python
+sitemap = Sitemap(timeout=30, data_source='CAFEF')
+urls_df = sitemap.run(sitemap_url, limit=None)
+```
+
+**Parameters:**
+- `timeout` (int): Request timeout in seconds (default: 30)
+- `data_source` (str): Data source name for headers (default: 'CAFEF')
+
+**Methods:**
+
+- `run(sitemap_url, limit=None)`: Fetch and parse sitemap
+  - Returns: pandas DataFrame with columns: loc, lastmod
+
+## Examples
+
+### Example 1: Get Latest Articles
+
+```python
+from vnewsapi import Crawler
+
+crawler = Crawler('cafef')
+articles = crawler.get_articles(limit=10)
+
+for idx, row in articles.iterrows():
+    print(f"{idx+1}. {row['title']}")
+    print(f"   URL: {row['link']}")
+    print(f"   Date: {row.get('pubDate', 'N/A')}")
+    print()
+```
+
+### Example 2: Extract Article Content
+
+```python
+from vnewsapi import Crawler
+
+crawler = Crawler('vietstock')
+articles = crawler.get_articles(limit=1)
+
+if not articles.empty:
+    article_url = articles.iloc[0]['link']
+    details = crawler.get_article_details(article_url)
+    
+    print(f"Title: {details['title']}")
+    print(f"Author: {details.get('author', 'N/A')}")
+    print(f"Publish Time: {details.get('publish_time', 'N/A')}")
+    print(f"\nContent:\n{details['content'][:500]}...")
+```
+
+### Example 3: Batch Processing
+
+```python
+from vnewsapi import Crawler, BatchCrawler
+
+# Get article list
+crawler = Crawler('cafef')
+articles = crawler.get_articles(limit=5)
+
+# Fetch details in batch
+batch = BatchCrawler('cafef', request_delay=0.5)
+details_df = batch.fetch_details_from_dataframe(articles, url_column='link')
+
+# Filter successful fetches
+successful = details_df[details_df['error'].isna()]
+print(f"Successfully fetched {len(successful)} articles")
+```
+
+### Example 4: Custom Configuration
+
+```python
+from vnewsapi import Crawler
+
+custom_config = {
+    'name': 'Custom News Site',
+    'base_url': 'https://example.com',
+    'rss': {
+        'urls': ['https://example.com/rss']
+    },
+    'sitemap': {
+        'url': 'https://example.com/sitemap.xml',
+        'pattern_type': 'static'
+    },
+    'selectors': {
+        'title': {'tag': 'h1', 'class': 'article-title'},
+        'content': {'tag': 'div', 'class': 'article-content'},
+        'short_desc': {'tag': 'div', 'class': 'article-summary'},
+        'publish_time': {'tag': 'time', 'class': 'publish-date'},
+        'author': {'tag': 'span', 'class': 'author-name'}
+    }
+}
+
+crawler = Crawler('cafef', custom_config=custom_config)
+articles = crawler.get_articles(limit=10)
+```
+
+## Configuration
+
+### Site Configuration Structure
+
+Each news site requires a configuration dictionary with the following structure:
+
+```python
+{
+    'name': 'Site Name',
+    'base_url': 'https://example.com',
+    'rss': {
+        'urls': ['https://example.com/rss/feed1.rss']
+    },
+    'sitemap': {
+        'url': 'https://example.com/sitemap.xml',
+        'pattern_type': 'static'  # or 'dynamic'
+    },
+    'selectors': {
+        'title': {'tag': 'h1', 'class': 'title'},
+        'content': {'tag': 'div', 'class': 'content'},
+        'short_desc': {'tag': 'div', 'class': 'summary'},
+        'publish_time': {'tag': 'span', 'class': 'time'},
+        'author': {'tag': 'span', 'class': 'author'}
+    }
+}
+```
+
+### Selector Configuration
+
+Selectors can be specified in two ways:
+
+1. Using tag and class:
+```python
+{'tag': 'h1', 'class': 'title'}
+```
+
+2. Using CSS selector directly:
+```python
+{'selector': 'h1.article-title'}
+```
+
+## Requirements
+
+- Python >= 3.10
+- requests >= 2.31.0
+- beautifulsoup4 >= 4.12.0
+- lxml >= 4.9.0
+- feedparser >= 6.0.0
+- html2text >= 2020.1.16
+- pandas >= 2.0.0
+- python-dateutil >= 2.8.0
+
+## Contributing
+
+Contributions are welcome. Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Development Setup
+
+```bash
+git clone https://github.com/Hoanganhvu123/vnewsapi.git
+cd vnewsapi
+python -m venv venv
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+pip install -e .
+```
+
+### Running Tests
+
+```bash
+pytest tests/unit/ -v
+pytest tests/integration/ -v -m integration
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Disclaimer
+
+This library is for educational and research purposes only. Please respect the terms of service of the news websites you are crawling. Always use appropriate rate limiting and be respectful of server resources. The authors are not responsible for any misuse of this library.
+
+## Links
+
+- GitHub Repository: https://github.com/Hoanganhvu123/vnewsapi
+- PyPI Package: https://pypi.org/project/vnewsapi/
+- Issues: https://github.com/Hoanganhvu123/vnewsapi/issues
+- Documentation: https://github.com/Hoanganhvu123/vnewsapi#readme
+
+## Acknowledgments
+
+- Inspired by [vnstock](https://github.com/thinh-vu/vnstock)
+- Uses [feedparser](https://github.com/kurtmckee/feedparser) for RSS parsing
+- Uses [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) for HTML parsing
