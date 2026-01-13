@@ -1,0 +1,44 @@
+Metadata-Version: 2.4
+Name: pyautogui-mcp
+Version: 2026.1.101310
+Summary: Expose PyAutoGUI through MCP.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: anyio==4.12.0
+Requires-Dist: fastmcp==2.14.2
+Requires-Dist: pyautogui==0.9.54
+Requires-Dist: pyscreeze==1.0.1
+Requires-Dist: pillow>=10
+Dynamic: license-file
+
+# pyautogui-mcp
+
+## Run with uv
+
+Dependencies are declared in `pyproject.toml`, so uv can resolve and run directly:
+
+```json
+{
+  "mcpServers": {
+    "pyautogui-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/full/path/to/pyautogui-mcp",
+        "run",
+        "python",
+        "-m",
+        "pyautogui_mcp"
+      ]
+    }
+  }
+}
+```
+
+You can also launch manually:
+
+```bash
+uv run python -m pyautogui_mcp --transport stdio
+uv run python -m pyautogui_mcp --transport http --host 127.0.0.1 --port 8000
+```
