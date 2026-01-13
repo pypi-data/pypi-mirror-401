@@ -1,0 +1,64 @@
+Getting bugwarrior
+==================
+
+Requirements
+------------
+
+To use bugwarrior, you need python 3 and taskwarrior. Upon installation, the
+setup script will automatically download and install missing python
+dependencies.
+
+Note that some of those dependencies have a C extension module (e.g. the
+``cryptography`` package).  If those packages are not yet present on your
+system, the setup script will try to build them locally, for which you will
+need a C compiler (e.g. ``gcc``) and the necessary header files (python and,
+for the cryptography package, openssl).
+A convenient way to install those is to use your usual package manager
+(``dnf``, ``yum``, ``apt``, etc).
+Header files are installed from development packages (e.g.  ``python-devel``
+and ``openssl-devel`` on Fedora or ``python-dev`` ``libssl-dev`` on Debian).
+
+Installing from the Python Package Index
+----------------------------------------
+
+.. highlight:: console
+
+Installing from https://pypi.python.org/pypi/bugwarrior is easy with
+:command:`pip`::
+
+    $ pip install bugwarrior
+
+Many services are supported by default, but others require extra dependencies that
+are installed by specifying ``bugwarrior[<extra>]`` in the commands above. For
+example, if you want to use bugwarrior with Jira::
+
+    $ pip install "bugwarrior[jira]"
+
+The following extra dependency sets are available:
+
+.. extras::
+
+.. note::
+
+    For keyring, see also `linux installation instructions <https://github.com/jaraco/keyring#linux>`_.
+
+Installing from Distribution Packages
+-------------------------------------
+
+bugwarrior has been packaged for various operating system distributions. You can install it your distributions package
+manager
+
+- Fedora
+
+bugwarrior has been packaged for Fedora.  You can install it with the standard
+:command:`dnf` (:command:`yum`) package management tools as follows::
+
+    $ sudo dnf install bugwarrior
+    
+    
+- Debian and its Derivatives like Ubuntu
+
+bugwarrior has been packaged for Debian and Debian Derivatives like Ubuntu.  You can install it with the standard
+:command:`apt` package management tools as follows::
+
+    $ sudo apt install bugwarrior

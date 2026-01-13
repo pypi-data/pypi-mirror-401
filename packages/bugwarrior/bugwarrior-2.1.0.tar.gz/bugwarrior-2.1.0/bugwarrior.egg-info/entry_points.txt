@@ -1,0 +1,35 @@
+[bugwarrior.service]
+azuredevops = bugwarrior.services.azuredevops:AzureDevopsService
+bitbucket = bugwarrior.services.bitbucket:BitbucketService
+bts = bugwarrior.services.bts:BTSService
+bugzilla = bugwarrior.services.bz:BugzillaService
+clickup = bugwarrior.services.clickup:ClickupService
+deck = bugwarrior.services.deck:NextcloudDeckService
+gerrit = bugwarrior.services.gerrit:GerritService
+gitbug = bugwarrior.services.gitbug:GitBugService
+github = bugwarrior.services.github:GithubService
+gitlab = bugwarrior.services.gitlab:GitlabService
+gmail = bugwarrior.services.gmail:GmailService
+jira = bugwarrior.services.jira:JiraService
+kanboard = bugwarrior.services.kanboard:KanboardService
+linear = bugwarrior.services.linear:LinearService
+logseq = bugwarrior.services.logseq:LogseqService
+pagure = bugwarrior.services.pagure:PagureService
+phabricator = bugwarrior.services.phab:PhabricatorService
+pivotaltracker = bugwarrior.services.pivotaltracker:PivotalTrackerService
+redmine = bugwarrior.services.redmine:RedMineService
+taiga = bugwarrior.services.taiga:TaigaService
+teamwork_projects = bugwarrior.services.teamwork_projects:TeamworkService
+todoist = bugwarrior.services.todoist:TodoistService
+trac = bugwarrior.services.trac:TracService
+trello = bugwarrior.services.trello:TrelloService
+youtrack = bugwarrior.services.youtrack:YoutrackService
+
+[console_scripts]
+bugwarrior = bugwarrior:cli
+bugwarrior-pull = bugwarrior:pull
+bugwarrior-uda = bugwarrior:uda
+bugwarrior-vault = bugwarrior:vault
+
+[ini2toml.processing]
+bugwarrior = bugwarrior.config.ini2toml_plugin:activate

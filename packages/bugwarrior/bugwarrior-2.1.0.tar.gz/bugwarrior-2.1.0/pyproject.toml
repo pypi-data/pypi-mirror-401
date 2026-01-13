@@ -1,0 +1,117 @@
+[project]
+name = "bugwarrior"
+version = "2.1.0"
+description = "a command line utility for updating your local taskwarrior database from your forge issue trackers"
+readme = "bugwarrior/README.rst"
+requires-python = ">=3.10"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE.txt"]
+keywords=["task", "taskwarrior", "todo", "github"]
+classifiers=[
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Bug Tracking",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "click",
+  "dogpile.cache>=0.5.3",
+  "jinja2>=2.7.2",
+  "lockfile>=0.9.1",
+  "pydantic[email]>=2",
+  "python-dateutil",
+  "requests",
+  "taskw>=0.8",
+  "tomli ; python_version <= '3.10'",
+]
+
+[project.optional-dependencies]
+bts = ["python-debianbts>=4.1.1"]
+bugzilla = ["python-bugzilla>=2.0.0"]
+gmail = ["google-api-python-client", "google-auth-oauthlib"]
+ini2toml = ["ini2toml[full]"]
+jira = ["jira>=3.10.0"]
+kanboard = ["kanboard"]
+keyring = ["keyring"]
+phabricator = ["phabricator"]
+test = [
+   # sphinx-inline-tabs is incompatible with docutils-0.22 https://github.com/pradyunsg/sphinx-inline-tabs/pull/51
+   "docutils<0.22",
+   "pytest",
+   "pytest-subtests",
+   "responses",
+   "ruff",
+   "sphinx>=1.0,<9.0 ; python_version <= '3.10'",
+   "sphinx>=9.0.3 ; python_version >= '3.11'",
+   "sphinx-click",
+   "sphinx-inline-tabs",
+   # To make this installable with uvx/pipx and no additional options needed.
+   "setuptools",
+]
+todoist = ["todoist_api_python>=3.0.0"]
+trac = ["offtrac"]
+
+all = ["bugwarrior[bts,bugzilla,gmail,ini2toml,jira,kanboard,keyring,phabricator,test,todoist,trac]"]
+
+[project.urls]
+documentation = "https://bugwarrior.readthedocs.io/en/stable/"
+repository = "https://github.com/GothenburgBitFactory/bugwarrior"
+
+[project.scripts]
+bugwarrior = "bugwarrior:cli"
+bugwarrior-pull = "bugwarrior:pull"
+bugwarrior-vault = "bugwarrior:vault"
+bugwarrior-uda = "bugwarrior:uda"
+
+[project.entry-points."bugwarrior.service"]
+azuredevops = "bugwarrior.services.azuredevops:AzureDevopsService"
+deck = "bugwarrior.services.deck:NextcloudDeckService"
+gitbug = "bugwarrior.services.gitbug:GitBugService"
+github = "bugwarrior.services.github:GithubService"
+gitlab = "bugwarrior.services.gitlab:GitlabService"
+bitbucket = "bugwarrior.services.bitbucket:BitbucketService"
+trac = "bugwarrior.services.trac:TracService"
+bts = "bugwarrior.services.bts:BTSService"
+bugzilla = "bugwarrior.services.bz:BugzillaService"
+kanboard = "bugwarrior.services.kanboard:KanboardService"
+redmine = "bugwarrior.services.redmine:RedMineService"
+jira = "bugwarrior.services.jira:JiraService"
+phabricator = "bugwarrior.services.phab:PhabricatorService"
+pagure = "bugwarrior.services.pagure:PagureService"
+taiga = "bugwarrior.services.taiga:TaigaService"
+gerrit = "bugwarrior.services.gerrit:GerritService"
+trello = "bugwarrior.services.trello:TrelloService"
+youtrack = "bugwarrior.services.youtrack:YoutrackService"
+gmail = "bugwarrior.services.gmail:GmailService"
+teamwork_projects = "bugwarrior.services.teamwork_projects:TeamworkService"
+pivotaltracker = "bugwarrior.services.pivotaltracker:PivotalTrackerService"
+linear = "bugwarrior.services.linear:LinearService"
+logseq = "bugwarrior.services.logseq:LogseqService"
+todoist = "bugwarrior.services.todoist:TodoistService"
+clickup = "bugwarrior.services.clickup:ClickupService"
+
+[project.entry-points."ini2toml.processing"]
+bugwarrior = "bugwarrior.config.ini2toml_plugin:activate"
+
+[tool.ruff.format]
+quote-style = "preserve"
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "W", "I", "E501"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 100
+
+[tool.setuptools.packages.find]
+include = ["bugwarrior*"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
