@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "musi"
+version = "0.2.0"
+authors = [{name = "piacode"}]
+description = "A music library based on the equal temperament"
+requires-python = ">=3.7"
+
+# 依赖包：每个包单独一行！
+dependencies = [
+    "numpy==1.26.4",
+    "pydub==0.25.1",
+    # 或者指定范围
+    # "numpy>=1.20.0",
+    # "pydub>=0.25.0",
+]
+
+# 可选分类器
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+
