@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FetchYT - YouTube Playlist Downloader</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎵 FetchYT</h1>
+        <p class="subtitle">Download MP3s from YouTube Playlists</p>
+      </header>
+
+      <main>
+        <div class="card">
+          <form id="downloadForm">
+            <div class="form-group">
+              <label for="url">YouTube URL (Video or Playlist)</label>
+              <input
+                type="text"
+                id="url"
+                name="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="format">Format</label>
+                <select id="format" name="format">
+                  <option value="mp3" selected>MP3</option>
+                  <option value="m4a">M4A</option>
+                  <option value="wav">WAV</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="quality">Quality (kbps)</label>
+                <select id="quality" name="quality">
+                  <option value="128">128</option>
+                  <option value="192" selected>192</option>
+                  <option value="256">256</option>
+                  <option value="320">320</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="button" id="extractBtn" class="btn btn-secondary">
+                📋 Extract Info
+              </button>
+              <button type="submit" id="downloadBtn" class="btn btn-primary">
+                ⬇️ Download
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div id="infoSection" class="card hidden">
+          <h2>Video Information</h2>
+          <div id="videoInfo"></div>
+        </div>
+
+        <div id="progressSection" class="card hidden">
+          <h2>Download Progress</h2>
+          <div id="progressInfo"></div>
+          <div class="progress-bar">
+            <div id="progressBar" class="progress-fill"></div>
+          </div>
+          <p id="progressText">Preparing download...</p>
+        </div>
+
+        <div id="errorSection" class="card error hidden">
+          <h2>❌ Error</h2>
+          <p id="errorMessage"></p>
+        </div>
+
+        <div id="successSection" class="card success hidden">
+          <h2>✅ Success</h2>
+          <p id="successMessage"></p>
+        </div>
+      </main>
+
+      <footer>
+        <p>FetchYT • © 2026 Krishnakanth Allika</p>
+      </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
