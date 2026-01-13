@@ -1,0 +1,429 @@
+Metadata-Version: 2.4
+Name: django-ultracache
+Version: 2.3
+Summary: Cache views, template fragments and arbitrary Python code. Monitor Django object changes to perform automatic fine-grained cache invalidation from Django level, through proxies, to the browser. Make Django really fast.
+Home-page: http://github.com/hedleyroos/django-ultracache
+Author: Hedley Roos
+Author-email: hedleyroos@gmail.com
+License: BSD
+Classifier: Programming Language :: Python
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: AUTHORS.rst
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: summary
+
+# Django Ultracache
+
+**Cache views, template fragments, and arbitrary Python code with automatic, fine-grained invalidation.**
+
+`django-ultracache` solves the hardest problem in caching: **invalidation**.
+
+Standard Django caching requires you to manually manage cache keys or set short timeouts. Ultracache is different. It automatically tracks every database object accessed during the rendering of a cached block. When those objects are modified or deleted, the relevant cache entries are immediately and automatically invalidated.
+
+Crucially, it also handles the "new object" problem: if a list of objects is cached, and a *new* object is created that should appear in that list, Ultracache knows to invalidate the list.
+
+## Features
+
+*   **Zero-Config Invalidation**: No manual `cache.delete()`. It just works.
+*   **Granular Updates**: Change one comment, and only the fragments displaying that comment are purged. The rest of the page stays cached.
+*   **Long-Term Caching**: Set timeouts to days or weeks. Content updates instantly when data changes.
+*   **Full Stack Integration**: Can issue PURGE requests to Varnish, Nginx, or via RabbitMQ to clear downstream caches.
+*   **Nested Caching**: Fully supports nested `{% ultracache %}` tags.
+
+## Installation
+
+1.  **Install the package:**
+
+    ```bash
+    pip install django-ultracache
+    ```
+
+2.  **Add to `INSTALLED_APPS`:**
+
+    ```python
+    INSTALLED_APPS = [
+        ...,
+        "ultracache",
+    ]
+    ```
+
+3.  **Add Middleware:**
+    Add `UltraCacheMiddleware` to `MIDDLEWARE`. It should be placed near the top, receiving requests early and sending responses late.
+
+    ```python
+    MIDDLEWARE = [
+        "ultracache.middleware.UltraCacheMiddleware",
+        ...,
+        "django.middleware.common.CommonMiddleware",
+        ...,
+    ]
+    ```
+
+4.  **Check Context Processors:**
+    Ensure `django.template.context_processors.request` is enabled (it usually is by default).
+
+    ```python
+    TEMPLATES = [{
+        "OPTIONS": {
+            "context_processors": [
+                ...,
+                "django.template.context_processors.request",
+            ],
+        },
+    }]
+    ```
+
+## Usage
+
+### 1. Template Fragments
+
+Use the `{% ultracache %}` tag like Django's standard `{% cache %}`.
+
+```html
+{% load ultracache_tags %}
+
+{# Cache this sidebar for 24 hours #}
+{% ultracache 86400 "sidebar_widget" %}
+    
+    {# If any object in 'promotions' is modified/deleted -> Invalidate #}
+    {# If a new Promotion is created -> Invalidate (tracks ContentType) #}
+    {% for promo in promotions %}
+        <div class="promo">
+             {{ promo.title }}
+        </div>
+    {% endfor %}
+
+    {# If this specific user object changes -> Invalidate #}
+    <div>Welcome, {{ request.user.first_name }}</div>
+
+{% endultracache %}
+```
+
+### 2. View Caching
+
+You can cache entire views. Ultracache will execute the view code, render the template, and track all database accesses during the process.
+
+**Class-Based Views:**
+
+Use the `@ultracache` decorator on the class.
+
+```python
+from ultracache.decorators import ultracache
+from django.views.generic import TemplateView
+
+# Cache for 1 hour. Invalidation happens if any referenced data changes.
+@ultracache(3600)
+class PostListView(TemplateView):
+    template_name = "posts.html"
+
+    def get_context_data(self, **kwargs):
+        return {"posts": Post.objects.all()}
+```
+
+**URL Patterns:**
+
+If you are reusing views or cannot modify the view code, apply caching in `urls.py` using `cached_get`.
+
+```python
+from django.urls import path
+from ultracache.decorators import cached_get
+from myapp.views import MyView
+
+urlpatterns = [
+    path("my-view/", cached_get(3600)(MyView.as_view()), name="my-view"),
+]
+```
+
+*Note: `request.get_full_path()` is automatically added to the cache key, so query parameters are handled correctly.*
+
+### 3. Arbitrary Python Code
+
+You can manually cache complex calculations.
+
+```python
+from ultracache.utils import Ultracache
+
+# Define a cache key and timeout
+def get_user_metrics(user):
+    # 'request' is optional but recommended if in a view context
+    uc = Ultracache(300, "user-metrics", user.id)
+    
+    if uc:
+        return uc.cached
+    
+    # --- Start Calculation ---
+    # Ultracache records object access here
+    
+    score = calculate_complex_score(user)
+    stats = user.statistics_set.all()
+    
+    result = {"score": score, "stats": list(stats)}
+    
+    # --- End Calculation ---
+    
+    uc.cache(result)
+    return result
+```
+
+## How It Works
+
+Ultracache monkey-patches `django.db.models.Model.__getattribute__` to detect when any attribute of a model instance is accessed.
+
+1.  **Recording**: When you enter a `{% ultracache %}` block or a decorated view, a "recorder" is started in thread-local storage.
+2.  **Tracking**: As you iterate over querysets or access model attributes (e.g., `{{ product.price }}`), Ultracache notes the object's `ContentType` and `primary key`.
+3.  **Registry**: When the block finishes rendering, Ultracache saves the content to the cache *and* writes a "registry" entry linking those objects to this specific cache key.
+4.  **Invalidation**: When an object is saved or deleted, a `post_save` or `post_delete` signal triggers. Ultracache checks the registry for any cache keys dependent on that object and deletes them.
+
+## Advanced Configuration
+
+### Reverse Proxy Purging (Varnish, Nginx)
+
+Ultracache can issue HTTP PURGE requests to downstream caches when data changes. Configure this in your `settings.py`:
+
+```python
+ULTRACACHE = {
+    "purge": {
+        "method": "ultracache.purgers.varnish",  # or ultracache.purgers.nginx
+        "url": "http://127.0.0.1:80/",
+    }
+}
+```
+
+The `url` should point to your caching proxy. Ultracache will append the resource path to this URL when issuing a purge.
+
+### Broadcast Purging (Celery)
+
+For multi-server setups, you can use RabbitMQ/Celery to broadcast purge instructions to all workers.
+
+```python
+ULTRACACHE = {
+    "purge": {
+        "method": "ultracache.purgers.broadcast",
+    }
+}
+```
+
+*Requires `celery` and `kombu` to be installed and configured.*
+
+### Custom Cache Backend
+
+Ultracache uses the `default` cache alias by default. To use a different backend:
+
+```python
+ULTRACACHE = {
+    "cache_alias": "secondary",
+}
+```
+
+## Best Practices
+
+1.  **Cache Keys**: Keep them simple. You don't need to include `updated_at` timestamps in your keys—Ultracache handles staleness for you. Use keys to differentiate *context* (e.g., `user.id` for private content, `language_code` for translations).
+2.  **Order of Operations**: Place `{% ultracache %}` as high as possible in your template DOM tree to maximize performance, but be mindful of parts that *must* remain dynamic (like CSRF tokens).
+3.  **Context Processors**: If your context processors access the database (e.g., loading a site menu), that access is also recorded. This means global site changes can invalidate page caches, which is usually desired behavior.
+
+## Running Tests
+
+```bash
+pip install -r requirements.txt
+tox
+```
+Authors
+=======
+
+* Hedley Roos
+
+Changelog
+=========
+
+2.3
+---
+
+#. Django 4.2, 5.0, and 6.0 compatibility.
+#. Remove tests for versions older than Django 4.1.
+#. Remove support for Django Rest Framework caching.
+
+2.2
+---
+#. Django 4.0 compatibility.
+
+2.1.1
+-----
+#. Ensure cache coherency should a purger fail.
+
+2.1.0
+-----
+#. Django 3 compatibility.
+#. Fix potential thread local residual data issue.
+
+2.0.0
+-----
+#. Remove dependency on the sites framework everywhere. The sites framework is still automatically
+   considered if an installed app.
+#. Do not store metadata in the request anymore but in a list on thread locals.
+#. Introduce class utils.Ultracache to subject arbitrary pieces of Python code to caching.
+#. Drop Django 1 support.
+
+1.11.12
+-------
+#. Simpler class based decorator.
+#. Add Django 2.1 and Python 3.6 tests.
+
+1.11.11
+-------
+#. Add a test for tasks.
+
+1.11.10
+-------
+#. Ensure a working error message if pika is not found.
+#. `cached_get` now considers any object accessed in get_context_data and not just objects accessed in the view template.
+#. The original request headers are now sent to the purgers along with the path. This enables fine-grained proxy invalidation.
+#. Django 2.0 and Python 3 compatibility. Django 1.9 support has been dropped.
+
+1.11.9
+------
+#. Simplify the DRF caching implementation. It also now considers objects touched by sub-serializers.
+
+1.11.8
+------
+#. The DRF settings now accept dotted names.
+#. The DRF setting now accepts a callable whose result forms part of the cache key.
+
+1.11.7
+------
+#. Use pickle to cache DRF data because DRF uses a Decimal type that isn't recognized by Python's json library.
+
+1.11.6
+------
+#. Adjust the DRF decorator so it can be used in more places.
+
+1.11.5
+------
+#. Django Rest Framework caching does not cache the entire response anymore, only the data and headers.
+
+1.11.4
+------
+#. Move the twisted work to `django-ultracache-twisted`.
+#. Clearly raise exception if libraries are not found.
+
+1.11.3
+------
+#. Move the twisted directory one lower.
+
+1.11.2
+------
+#. Package the product properly so all directories are included.
+
+1.11.1
+------
+#. More defensive code to ensure we don't interfere during migrations in a test run.
+
+1.11.0
+------
+#. Introduce `rabbitmq-url` setting for use by `broadcast_purge` task.
+#. Django 1.11 support.
+#. Deprecate Django 1.6 support.
+
+1.10.2
+------
+#. Remove logic that depends on SITE_ID so site can also be inferred from the request.
+
+1.10.1
+------
+#. Add caching for Django Rest Framework viewsets.
+#. Django 1.10 compatibility.
+
+1.9.1
+-----
+#. Add missing import only surfacing in certain code paths.
+#. `Invalidate` setting was not being loaded properly. Fixed.
+#. Handle content types RuntimeError when content types have not been migrated yet.
+
+1.9.0
+-----
+#. Move to tox for tests.
+#. Django 1.9 compatibility.
+
+0.3.8
+-----
+#. Honor the `raw` parameter send along by loaddata. It prevents redundant post_save handling.
+
+0.3.7
+-----
+#. Revert the adding of the template name. It introduces a performance penalty in a WSGI environment.
+#. Further reduce the number of writes to the cache.
+
+0.3.6
+-----
+#. Add template name (if possible) to the caching key.
+#. Reduce number of calls to set_many.
+
+0.3.5
+-----
+#. Keep the metadata cache size in check to prevent possibly infinite growth.
+
+0.3.4
+-----
+#. Prevent redundant sets.
+#. Work around an apparent Python bug related to `di[k].append(v)` vs `di[k] = di[k] + [v]`. The latter is safe.
+
+0.3.3
+-----
+#. Handle case where one cached view renders another cached view inside it, thus potentially sharing the same cache key.
+
+0.3.2
+-----
+#. The `ultracache` template tag now only caches HEAD and GET requests.
+
+0.3.1
+-----
+#. Trivial release to work around Pypi errors of the day.
+
+0.3
+---
+#. Replace `cache.get` in for loop with `cache.get_many`.
+
+0.2
+---
+#. Do not automatically add `request.get_full_path()` if any of `request.get_full_path()`, `request.path` or `request.path_info` is an argument for `cached_get`.
+
+0.1.6
+-----
+#. Also cache response headers.
+
+0.1.5
+-----
+#. Explicitly check for GET and HEAD request method and cache only those requests.
+
+0.1.4
+-----
+#. Rewrite decorator to be function based instead of class based so it is easier to use in urls.py.
+
+0.1.3
+-----
+#. `cached_get` decorator now does not cache if request contains messages.
+
+0.1.2
+-----
+#. Fix HTTPResponse caching bug.
+
+0.1.1
+-----
+#. Handle case where a view returns an HTTPResponse object.
+
+0.1
+---
+#. Initial release.
+
