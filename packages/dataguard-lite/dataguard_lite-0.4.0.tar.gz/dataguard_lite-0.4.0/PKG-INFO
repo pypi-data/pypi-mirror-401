@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: dataguard-lite
+Version: 0.4.0
+Summary: Lightweight dataset quality checks for CSV files
+Author: Aditya Kinikar
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas
+Dynamic: license-file
+
+# DataGuard
+
+DataGuard is a lightweight Python package for basic dataset quality validation with both API and CLI support.
+
+## Features
+
+- Missing value detection
+- Duplicate row detection
+- Optional target column analysis
+- JSON report export
+- Command line interface
+
+## Installation
+
+From TestPyPI:
+
+```bash
+pip install -i https://test.pypi.org/simple/ dataguard-lite
+```
+
+Local development:
+```
+pip install -e .
+```
+
+Usage (Python API)
+
+```
+from dataguard import validate_csv
+
+report = validate_csv("data.csv", target="label")
+report.summary()
+report.to_json("report.json")
+```
+Usage (CLI)
+```
+dataguard data.csv
+dataguard data.csv --target label
+dataguard data.csv --json report.json
+```
