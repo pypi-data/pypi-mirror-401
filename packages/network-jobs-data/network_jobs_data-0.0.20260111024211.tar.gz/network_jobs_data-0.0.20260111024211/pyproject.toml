@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "network-jobs-data"
+version = "0.0.20260111024211"
+description = "Job listings from advisor networks for potential intro opportunities"
+license = {text = "MIT"}
+authors = [{name = "hirefrank"}]
+
+[tool.setuptools.packages.find]
+include = ["network_jobs_data*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json"]
