@@ -1,0 +1,13 @@
+prefix=/var/folders/03/bcr7nd0x5lz0x5lkgq6vrh5w0000gn/T/tmpv9v1c3at/wheel/platlib
+exec_prefix=/var/folders/03/bcr7nd0x5lz0x5lkgq6vrh5w0000gn/T/tmpv9v1c3at/wheel/platlib
+libdir=${exec_prefix}/lib
+sharedlibdir=${exec_prefix}/lib
+includedir=${exec_prefix}/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.4.1.1
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}
