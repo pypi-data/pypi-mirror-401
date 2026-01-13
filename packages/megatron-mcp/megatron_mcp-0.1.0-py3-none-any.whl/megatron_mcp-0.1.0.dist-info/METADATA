@@ -1,0 +1,97 @@
+Metadata-Version: 2.4
+Name: megatron-mcp
+Version: 0.1.0
+Summary: Semantic memory for Claude Code sessions
+Author: astrosteveo
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/astrosteveo/megatron
+Project-URL: Repository, https://github.com/astrosteveo/megatron
+Keywords: claude,claude-code,mcp,memory,semantic-search
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: chromadb>=0.4.0
+Requires-Dist: sentence-transformers>=2.2.0
+Requires-Dist: click>=8.0.0
+Dynamic: license-file
+
+# Megatron
+
+Semantic memory system for Claude Code. Indexes conversation transcripts into project-local vector databases for context persistence across sessions.
+
+## Installation
+
+```bash
+claude mcp add megatron-mcp uvx megatron-mcp
+```
+
+That's it. Restart Claude Code and the memory tools are available.
+
+### Alternative: Manual Setup
+
+If you prefer manual configuration, add to your `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "megatron-mcp": {
+      "command": "uvx",
+      "args": ["megatron-mcp"]
+    }
+  }
+}
+```
+
+### Available Tools
+
+Once configured, Claude Code gains these MCP tools:
+
+| Tool | Description |
+|------|-------------|
+| `memory_search` | Search past conversations semantically |
+| `memory_resume` | Get context to continue previous work |
+| `memory_remember` | Save important decisions/context |
+| `memory_sync` | Index the current session |
+| `memory_stats` | View memory index statistics |
+
+### Skills (Slash Commands)
+
+If you copied the skills, these commands become available:
+
+- `/recall <topic>` - Search memory for past context
+- `/remember` - Save something to memory
+- `/resume` - Continue where you left off
+- `/stats` - Show memory statistics
+- `/sync` - Sync current session to memory
+
+### CLI Commands
+
+```bash
+uv run megatron init                    # Initialize project memory
+uv run megatron sync                    # Sync from latest transcript
+uv run megatron project-search "query"  # Search project memory
+uv run megatron resume                  # Get resume context
+uv run megatron project-stats           # Show memory stats
+```
+
+## Project Structure
+
+When used, each project gets a `.megatron/` directory containing:
+- `index/` - ChromaDB vector database
+- `state.json` - Session state snapshots
+- `queue/` - Pending sync items
+
+## How It Works
+
+1. Parses Claude Code JSONL transcripts from `~/.claude/projects/`
+2. Groups messages into user-assistant exchanges
+3. Indexes chunks into ChromaDB with semantic embeddings
+4. Exposes search/remember/sync tools via MCP protocol
+
+See [CLAUDE.md](./CLAUDE.md) for detailed architecture.
