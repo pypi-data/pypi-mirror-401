@@ -1,0 +1,94 @@
+Metadata-Version: 2.4
+Name: notebooklm-cli
+Version: 0.1.0
+Summary: Command-line interface for Google NotebookLM
+Project-URL: Homepage, https://github.com/jacob-bd/notebooklm-cli
+Project-URL: Repository, https://github.com/jacob-bd/notebooklm-cli
+Project-URL: Issues, https://github.com/jacob-bd/notebooklm-cli/issues
+Author-email: Jacob <jacob@example.com>
+License: MIT
+License-File: LICENSE
+Keywords: ai,cli,google,notebook,notebooklm
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Utilities
+Requires-Python: >=3.10
+Requires-Dist: browser-cookie3>=0.19.0
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: platformdirs>=4.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: typer>=0.9.0
+Requires-Dist: websocket-client>=1.6.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# NLM - NotebookLM CLI
+
+A powerful command-line interface for Google NotebookLM.
+
+## Installation
+
+```bash
+pip install nlm
+# or
+pipx install nlm
+# or
+uv tool install nlm
+```
+
+## Quick Start
+
+```bash
+# Authenticate
+nlm login
+
+# List notebooks
+nlm notebook list
+
+# Create a notebook and add sources
+nlm notebook create "My Research"
+nlm source add <notebook-id> --url "https://example.com"
+
+# Use Aliases for easier management
+nlm alias set my-nb <notebook-id>
+nlm source list my-nb
+
+# Sync Drive sources
+nlm source stale my-nb
+nlm source sync my-nb
+
+# Generate a podcast
+nlm audio create <notebook-id>
+
+# Get AI-friendly documentation
+nlm --ai
+```
+
+## Features
+
+- **Full NotebookLM API coverage** - notebooks, sources, audio, reports, quizzes, and more
+- **Cross-browser authentication** - Chrome, Firefox, Safari, Edge, Brave
+- **Multiple output formats** - tables, JSON, compact
+- **AI-teachable** - `nlm --ai` outputs documentation for AI assistants
+- **Profile support** - manage multiple accounts
+
+## Documentation
+
+See the [full documentation](https://github.com/jacob-bd/notebooklm-cli) for complete usage guide.
+
+## License
+
+MIT
