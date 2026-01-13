@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "time-server-mcp"
+version = "0.1.1"
+authors = [
+  { name = "PCccc", email = "2670891864@qq.com" }
+]
+description = "A time server implementation using MCP (Model Context Protocol)"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "pytz",
+  "mcp"
+]
+
+[project.scripts]
+time-server-mcp = "time_server_mcp.timeserver2:main"
