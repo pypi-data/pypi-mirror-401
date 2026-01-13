@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "loadmemory"
+version = "0.2.0"
+description = "Utilities for loadmemory"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "zhouwe1", email = "zhouwei@live.it" }
+]
+dependencies = []
+
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.0"]
+db = ["tinydb>=4.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests", "helper"]
