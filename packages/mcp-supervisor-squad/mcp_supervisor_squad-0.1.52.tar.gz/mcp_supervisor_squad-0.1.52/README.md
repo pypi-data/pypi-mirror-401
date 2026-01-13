@@ -1,0 +1,72 @@
+# mcp-supervisor-squad
+
+Python MCP 服务器，提供最小化的 “contract-first + coder” 工作流，**仅支持 stdio 传输**，默认日志级别 ERROR 以保证 stdout 只输出 MCP JSON。
+
+当前版本的核心思路：
+- 主会话生成并覆盖写 `/.codex/contract.json`（必须存在且无未解决的 `questions`，否则拒绝执行）。
+- `squad_start` 在仓库内直接写代码（无 patch 文件、无 dual 模式、无 KB），但强制读取 contract 约束 scope/denylist/验收/预算。
+- 返回值永远只有 1–3 行 digest（goal 复述 + 变更概览 + artifact 路径），避免上下文堆叠。
+- 默认启用 lease + watchdog：若客户端停止轮询且 lease 到期（默认 120s），会自动终止 codex 子进程并标记 canceled。
+
+## 工具
+
+- `squad_start(cwd, query, options?)`  
+  - 必填 `cwd`（目标仓库内的绝对路径）。  
+  - 读取 `/.codex/contract.json`；缺失或无效/存在 `questions` 时直接报错并拒绝执行。  
+  - 创建 run，记录元数据，异步启动 coder 子任务（模型/沙箱/审批策略由 `options` 提供，默认为 `workspace-write` + `never`）。  
+  - 默认 `lease_ttl_s=120`，客户端需按 `forced_wait_s` 轮询以续租，否则将自动取消。  
+  - 返回简短状态：`run_id`、`forced_wait_s`、`event_lines`（≤3 行 digest）。  
+
+- `squad_status(run_id, options?)`  
+  - 必填 `options.cwd`（目标仓库内绝对路径）。  
+  - 可选 `cancel`/`cancel_reason` 取消运行。  
+  - 非终态调用会自动续租（重置 lease 过期时间）；断开轮询超过 `lease_ttl_s` 后，watchdog 会终止 codex。  
+  - 返回简短状态：`run_id`、`forced_wait_s`、`event_lines`（终态附带 `next_step=stop polling; print event_lines once`）。缺少或找不到 run 时返回可操作错误提示（≤3 行）。  
+
+> 无 `squad_apply`：coder 直接写入仓库，当前不生成 patch。
+
+## 调用流程（director）
+
+1) 调用 `squad_start(cwd, query, options)`，记下 `run_id`。  
+2) 按返回的 `forced_wait_s` 轮询 `squad_status(run_id, options={"cwd":"<仓库内绝对路径>"})`。非终态不要提早轮询。  
+3) 如需中止，调用 `squad_status(..., options={"cwd":"<仓库内绝对路径>", "cancel":true, "cancel_reason":"..."})`。  
+
+## 返回字段
+
+所有响应都会包含：
+
+```json
+{
+  "run_id": "ss-...",
+  "forced_wait_s": 8.0,
+  "event_lines": ["...<=3 lines..."],   // 终态附加 next_step（含 digest 与 artifact 路径）
+  "next_step": "stop polling; print event_lines once" // 仅终态
+}
+```
+
+终态（done/error/canceled）时 `forced_wait_s=0`，非终态需按推荐等待后再 poll。
+
+## 存储布局（仓库本地）
+
+`<repo_root>/.codex/supervisor-squad/`：
+- `runs/<run_id>/state.json`：运行状态  
+- `runs/<run_id>/artifacts/report.md`：简要执行报告（含 digest 与 diffstat 路径）  
+- `runs/<run_id>/artifacts/diffstat.txt`：`git diff --stat` 摘要  
+- `runs/<run_id>/jobs/<job_id>/*`：coder 子任务日志与元数据  
+- `worktrees/<run_id>/`：预留工作树目录（当前未使用）  
+- `prune_meta.json`：清理元信息  
+
+保留策略：启动时按 `retention_days`（默认 10 天）和最近 20 个 run 做清理。
+
+## 运行
+
+```bash
+poetry install
+poetry run mcp-supervisor-squad --transport stdio   # stdout 仅 JSON，日志输出到 stderr（级别 ERROR）
+```
+
+## 测试
+
+```bash
+python -m compileall src/mcp_supervisor_squad
+```
