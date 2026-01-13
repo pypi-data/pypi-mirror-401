@@ -1,0 +1,2 @@
+import rand_using_virt_lcg as LCG
+import xor_shift
