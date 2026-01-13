@@ -1,0 +1,66 @@
+Metadata-Version: 2.4
+Name: Aumiao
+Version: 2.5.0
+Summary: 赋能编程猫社区脚本开发 - https://aumiao.aurzex.top
+Project-URL: Homepage, https://aumiao.aurzex.top
+Project-URL: Documentation, https://docs.aumiao.aurzex.top
+Project-URL: Repository, https://github.com/aurzex/aumiao
+Project-URL: Issues, https://github.com/aurzex/aumiao/issues
+Project-URL: Changelog, https://github.com/aurzex/aumiao/releases
+Project-URL: Bug Tracker, https://github.com/aurzex/aumiao/issues
+Author: Aurzex, MiTao, MoonLeaaaf, Nomen
+Author-email: Aumiao Team <aumiao@aurzex.top>, DontLoveBy <laya200900@outlook.com>
+Maintainer-email: Aumiao Team <aumiao@aurzex.top>
+License: GNU General Public License v3.0 or later
+Keywords: aumiao,automation,bcm,codemao,development,script
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
+Requires-Python: <3.15,>=3.12
+Requires-Dist: cryptography>=46.0.3
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: websocket-client>=1.9.0
+Provides-Extra: dev
+Requires-Dist: black>=24.0.0; extra == 'dev'
+Requires-Dist: mypy>=1.8.0; extra == 'dev'
+Requires-Dist: nuitka>=2.0.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.4.0; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: mkdocs-material>=9.5.0; extra == 'docs'
+Requires-Dist: mkdocs>=1.5.0; extra == 'docs'
+Description-Content-Type: text/markdown
+
+近日,我们痛心地发现,编程猫社区内出现了大量由自动化脚本发布的评论。这些行为不仅严重干扰了普通用户的正常交流,更在社区中滋生了对自动化工具的普遍反感与抵触情绪,这与我们创造工具的初衷完全相悖。
+
+2022 年,社区成员“伴雪纷飞”在论坛分享了一套用于自动点赞、评论的 Python 代码。我们(Aumiao 团队)当时出于技术探索精神,对其功能进行了优化与增补,初衷是希望为开发者提供一个研究学习与便捷测试的工具。
+
+然而,事与愿违。我们看到这段代码及其衍生程序在各大论坛、博客被肆意传播,甚至被用于恶意刷取互动数据。此刻,我们内心五味杂陈。技术的传播一旦失控,其带来的负面影响远超我们的想象。
+
+我们的郑重呼吁
+在此,我们向整个开发者社区及所有用户发出郑重呼吁:
+
+致开发者: 请勿随意传播或出售您手中的相关源码与程序。我们应当成为社区环境的守护者,而非破坏者。技术的价值在于造福,而非滥用。
+
+致使用者: 请立即停止对自动化工具的滥用行为。编程猫社区是一个供广大创作者学习、交流与成长的平台,任何破坏社区氛围的行为都是对他人劳动成果的不尊重。
+
+我们坚信,技术的使用必须是有益且负责任的。既然我们共同选择在这个社区扎根,就有责任携手保护并促进我们所珍视的这片学习交流空间的和谐与发展。
+让我们回归技术的本心,用代码创造美好,而非困扰。
+
+---
+
+Aumiao Team
+MAOYU
+2024 年 8 月 7 日
+
+附:技术使用说明(优化版)
+为方便开发者进行合规的技术研究,现将部分 API 使用规范说明如下:
+API 版本说明: 编程猫 API 中的 v2 等字样代表接口版本号。通常,高版本接口兼容低版本功能,但建议优先使用指定版本。
+分页请求说明: 若函数使用 fetch_all_data 方法,则该方法的 limit 参数主要用于控制请求速度(值越大,请求速度通常越快,建议取值范围为 [5, 100]),而 offset 与 page 参数则用于设定数据请求的起始位置(默认从 0 开始)。
