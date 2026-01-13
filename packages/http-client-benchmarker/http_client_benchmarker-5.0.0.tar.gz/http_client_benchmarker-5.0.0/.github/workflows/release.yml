@@ -1,0 +1,116 @@
+name: Release to PyPI and GitHub
+
+on:
+  workflow_run:
+    workflows: ["CI - Code Quality & Testing"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:  # Allow manual triggering
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.2.3)'
+        required: true
+        type: string
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production  # Use production environment for security
+    
+    steps:
+    - name: Check if CI succeeded
+      id: check-ci
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+          if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+            echo "❌ CI workflow did not succeed. Skipping release."
+            exit 0
+          fi
+        fi
+        echo "✅ Proceeding with release"
+        echo "run_release=true" >> $GITHUB_OUTPUT
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache-dependency-path: 'uv.lock'
+
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras --dev
+
+    - name: Get version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          # Extract version from pyproject.toml for workflow_run events
+          VERSION=$(uv run python -c "import toml; print(toml.load('pyproject.toml')['project']['version'])" 2>/dev/null || echo "0.1.0")
+        fi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "📦 Release version: $VERSION"
+
+    - name: Build package
+      run: |
+        echo "🏗️ Building package..."
+        rm -rf dist/ build/ *.egg-info/
+        uv build
+        echo "✅ Package built successfully"
+
+    - name: Publish to PyPI
+      env:
+        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        echo "🚀 Publishing to PyPI..."
+        echo "Package files in dist/:"
+        ls -la dist/
+        uv publish --token "$UV_PUBLISH_TOKEN" dist/http_client_benchmarker-*.tar.gz dist/http_client_benchmarker-*.whl
+        echo "✅ Published to PyPI successfully"
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+      with:
+        tag_name: v${{ steps.version.outputs.version }}
+        name: Release v${{ steps.version.outputs.version }}
+        body: |
+          ## 🚀 HTTP Client Benchmarker v${{ steps.version.outputs.version }}
+          
+          **⚡ Performance benchmarking for your HTTP stack**
+          
+          ### 📦 Installation
+          ```bash
+          # Using pip
+          pip install http-client-benchmarker==${{ steps.version.outputs.version }}
+          
+          # Using uv (recommended)
+          uv add http-client-benchmarker==${{ steps.version.outputs.version }}
+          ```
+          
+          ### 🔧 Package Details
+          - **Package**: http-client-benchmarker
+          - **Version**: v${{ steps.version.outputs.version }}
+          - **Python**: 3.12+
+          - **Package Manager**: uv
+          
+          ### 🐛 Bug Reports
+          Please report issues at: https://github.com/${{ github.repository }}/issues
+          
+          ### ⭐ Support
+          If you find this useful, please give us a ⭐ on GitHub!
+        draft: false
+        prerelease: false
+        files: |
+          dist/*
