@@ -1,0 +1,78 @@
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import (
+    QMessageBox,
+    QDockWidget,
+    QApplication,
+    QMainWindow,
+)
+
+
+def create_or_toggle_dock(
+    instance, dock_attr_name, dialog_widget, dock_area=Qt.RightDockWidgetArea
+):
+    """
+    Helper method to create or toggle a docked dialog.
+
+    Parameters
+    ----------
+    dock_attr_name : str
+        The attribute name to store the dock widget (e.g., 'histogram_dock')
+    dialog_widget : QWidget
+        The dialog widget to display in the dock
+    dock_area : Qt.DockWidgetArea, optional
+        Where to dock the widget, default is RightDockWidgetArea
+    """
+
+    def _exit():
+        dock = getattr(instance, dock_attr_name, None)
+        if dock:
+            if widget := dock.widget():
+                widget.close()
+            dock.close()
+            dock.deleteLater()
+        setattr(instance, dock_attr_name, None)
+        try:
+            dialog_widget.close()
+        except Exception:
+            pass
+
+    if getattr(instance, dock_attr_name, None) is not None:
+        return _exit()
+
+    if dialog_widget is None:
+        return None
+
+    class ClosableDockWidget(QDockWidget):
+        def closeEvent(self, event):
+            _exit()
+            super().closeEvent(event)
+
+    dock = ClosableDockWidget()
+    dock.setFeatures(
+        QDockWidget.DockWidgetClosable
+        | QDockWidget.DockWidgetFloatable
+        | QDockWidget.DockWidgetMovable
+    )
+    dock.setWidget(dialog_widget)
+
+    if hasattr(dialog_widget, "accepted"):
+        dialog_widget.accepted.connect(_exit)
+    if hasattr(dialog_widget, "rejected"):
+        dialog_widget.rejected.connect(_exit)
+
+    main_window = None
+    for widget in QApplication.instance().topLevelWidgets():
+        if isinstance(widget, QMainWindow):
+            main_window = widget
+            break
+
+    if main_window is None:
+        QMessageBox.warning(
+            instance, "Warning", "Could not determine application main window."
+        )
+        return dialog_widget.show()
+
+    main_window.addDockWidget(dock_area, dock)
+    setattr(instance, dock_attr_name, dock)
+    dock.show()
+    dock.raise_()
