@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdfx-tool"
+version = "0.2.1"
+description = "A local CLI tool for PDF and image manipulation - merge PDFs, split by page/range, convert images to PDF with enhancement"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Manoj Adhikari", email = "adhikarim@etsu.edu"}
+]
+maintainers = [
+    {name = "Manoj Adhikari", email = "adhikarim@etsu.edu"}
+]
+keywords = ["pdf", "cli", "merge", "split", "filter", "ocr", "convert"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+    "Topic :: Office/Business",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pypdf>=3.0.0",
+    "cryptography>=41.0.0",
+]
+
+[project.optional-dependencies]
+full = [
+    "pymupdf>=1.22.0",
+    "Pillow>=10.0.0",
+    "pytesseract>=0.3.10",
+    "pdf2image>=1.16.3",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/pdfx"
+Documentation = "https://github.com/yourusername/pdfx#readme"
+Repository = "https://github.com/yourusername/pdfx"
+Issues = "https://github.com/yourusername/pdfx/issues"
+
+[project.scripts]
+pdfx = "pdfx.cli:main"
+
+[tool.setuptools]
+packages = ["pdfx"]
+
+[tool.setuptools.package-data]
+pdfx = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+addopts = "-v --cov=pdfx --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
