@@ -1,0 +1,17 @@
+[project]
+name = "AnXinxin-mcp-data-analzyer"
+version = "0.1.1"
+description = "a mcp-data-analzyer mcp server"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "mcp[cli]>=1.25.0",
+    "pandas>=2.3.3",
+    "twine>=6.2.0",
+]
+[project.scripts]
+mcp-data-server = "mcp_data_analyzer.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mcp_data_analyzer"]
