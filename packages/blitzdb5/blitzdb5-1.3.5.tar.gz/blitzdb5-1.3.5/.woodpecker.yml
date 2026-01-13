@@ -1,0 +1,32 @@
+labels:
+  platform: linux/amd64
+
+steps:
+  # -----------------
+  # 1. BUILD STAGE
+  # -----------------
+  build:
+    image: python:3.12
+    commands:
+      - pip install --upgrade pip
+      - pip install build
+      - python -m build
+      - ls -l dist/
+    when:
+      event: [push, tag, pull_request]
+
+  # -----------------
+  # 2. PUBLISH STAGE
+  # -----------------
+  # This runs only when you push a git tag (e.g., v1.0.0)
+  publish:
+    image: python:3.12
+    environment:
+      TWINE_USERNAME: __token__
+      TWINE_PASSWORD:
+        from_secret: PYPI_TOKEN
+    commands:
+      - pip install twine
+      - twine upload --non-interactive dist/*
+    when:
+      event: tag
