@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "volikos"
+version = "0.2.0"
+description = "A tiny, intro-friendly LLVM language."
+authors = [{name = "Your Name", email = "you@example.com"}]
+dependencies = [
+    "llvmlite",
+    "rply",
+    "click"
+]
+requires-python = ">=3.8"
+
+[project.scripts]
+volikos = "volikos.cli:cli"
+
+[tool.setuptools]
+packages = ["volikos"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.11",
+    "ty>=0.0.11",
+]
