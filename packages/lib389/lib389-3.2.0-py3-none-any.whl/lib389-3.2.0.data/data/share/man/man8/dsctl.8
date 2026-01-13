@@ -1,0 +1,892 @@
+.TH DSCTL "8" "2026\-01\-09" "lib389 3.2.0" "Generated Python Manual"
+.SH NAME
+dsctl
+.SH SYNOPSIS
+.B dsctl
+[-h] [-v] [-j] [-l] [instance] {restart,start,stop,status,remove,db2index,db2bak,db2ldif,dbverify,bak2db,ldif2db,backups,ldifs,tls,healthcheck,get-nsstate,ldifgen,dsrc,cockpit,dblib} ...
+
+.SH
+POSITIONAL ARGUMENTS
+.TP
+\fBdsctl\fR \fI\,restart\/\fR
+Restart an instance of Directory Server, if it is running: else start it.
+.TP
+\fBdsctl\fR \fI\,start\/\fR
+Start an instance of Directory Server, if it is not currently running
+.TP
+\fBdsctl\fR \fI\,stop\/\fR
+Stop an instance of Directory Server, if it is currently running
+.TP
+\fBdsctl\fR \fI\,status\/\fR
+Check running status of an instance of Directory Server
+.TP
+\fBdsctl\fR \fI\,remove\/\fR
+Destroy an instance of Directory Server, and remove all data.
+.TP
+\fBdsctl\fR \fI\,db2index\/\fR
+Initialise a reindex of the server database. The server must be stopped for this to proceed.
+.TP
+\fBdsctl\fR \fI\,db2bak\/\fR
+Initialise a BDB backup of the database. The server must be stopped for this to proceed.
+.TP
+\fBdsctl\fR \fI\,db2ldif\/\fR
+Initialise an LDIF dump of the database. The server must be stopped for this to proceed.
+.TP
+\fBdsctl\fR \fI\,dbverify\/\fR
+Perform a db verification. You should only do this at direction of support
+.TP
+\fBdsctl\fR \fI\,bak2db\/\fR
+Restore a BDB backup of the database. The server must be stopped for this to proceed.
+.TP
+\fBdsctl\fR \fI\,ldif2db\/\fR
+Restore an LDIF dump of the database. The server must be stopped for this to proceed.
+.TP
+\fBdsctl\fR \fI\,backups\/\fR
+List backup's found in the server's default backup directory
+.TP
+\fBdsctl\fR \fI\,ldifs\/\fR
+List all the LDIF files located in the server's LDIF directory
+.TP
+\fBdsctl\fR \fI\,tls\/\fR
+Manage TLS certificates
+.TP
+\fBdsctl\fR \fI\,healthcheck\/\fR
+Run a healthcheck report on a local Directory Server instance. This is a safe and read\-only operation.  Do not attempt to run this on a remote Directory Server as this tool needs access to local resources, otherwise the report may be inaccurate.
+.TP
+\fBdsctl\fR \fI\,get\-nsstate\/\fR
+Get the replication nsState in a human readable format
+
+Replica DN:           The DN of the replication configuration entry
+Replica Suffix:       The replicated suffix
+Replica ID:           The Replica identifier
+Gen Time              The time the CSN generator was created
+Gen Time String:      The time string of generator
+Gen as CSN:           The generation CSN
+Local Offset:         The offset due to the local clock being set back
+Local Offset String:  The offset in a nice human format
+Remote Offset:        The offset due to clock difference with remote systems
+Remote Offset String: The offset in a nice human format
+Time Skew:            The time skew between this server and its replicas
+Time Skew String:     The time skew in a nice human format
+Seq Num:              The number of multiple csns within a second
+System Time:          The local system time
+Diff in Seconds:      The time difference in seconds from the CSN generator creation to now
+Diff in days/secs:    The time difference broken up into days and seconds
+Endian:               Little/Big Endian
+.TP
+\fBdsctl\fR \fI\,ldifgen\/\fR
+LDIF generator to make sample LDIF files for testing
+.TP
+\fBdsctl\fR \fI\,dsrc\/\fR
+Manage the .dsrc file
+.TP
+\fBdsctl\fR \fI\,cockpit\/\fR
+Enable the Cockpit interface/UI
+.TP
+\fBdsctl\fR \fI\,dblib\/\fR
+database library (i.e bdb/lmdb) migration
+
+.SH COMMAND \fI\,'dsctl restart'\/\fR
+usage: dsctl [\-v] [\-j] [instance] restart [\-h]
+
+.SH COMMAND \fI\,'dsctl start'\/\fR
+usage: dsctl [\-v] [\-j] [instance] start [\-h]
+
+.SH COMMAND \fI\,'dsctl stop'\/\fR
+usage: dsctl [\-v] [\-j] [instance] stop [\-h]
+
+.SH COMMAND \fI\,'dsctl status'\/\fR
+usage: dsctl [\-v] [\-j] [instance] status [\-h]
+
+.SH COMMAND \fI\,'dsctl remove'\/\fR
+usage: dsctl [\-v] [\-j] [instance] remove [\-h] [\-\-do\-it]
+
+.SH OPTIONS \fI\,'dsctl remove'\/\fR
+.TP
+\fB\-\-do\-it\fR
+By default we do a dry run. This actually initiates the removal of the instance.
+
+.SH COMMAND \fI\,'dsctl db2index'\/\fR
+usage: dsctl [\-v] [\-j] [instance] db2index [\-h] [\-\-attr [ATTR ...]] [backend]
+
+.TP
+\fBbackend\fR
+The backend to reindex. IE userRoot
+
+.SH OPTIONS \fI\,'dsctl db2index'\/\fR
+.TP
+\fB\-\-attr\fR \fI\,[ATTR ...]\/\fR
+The attribute's to reindex. IE \-\-attr aci cn givenname
+
+.SH COMMAND \fI\,'dsctl db2bak'\/\fR
+usage: dsctl [\-v] [\-j] [instance] db2bak [\-h] [archive]
+
+.TP
+\fBarchive\fR
+The destination for the archive. This will be created during the db2bak process.
+
+.SH COMMAND \fI\,'dsctl db2ldif'\/\fR
+usage: dsctl [\-v] [\-j] [instance] db2ldif [\-h] [\-\-replication] [\-\-encrypted] backend [ldif]
+
+.TP
+\fBbackend\fR
+The backend to output as an LDIF. IE userRoot
+
+.TP
+\fBldif\fR
+The path to the ldif output location.
+
+.SH OPTIONS \fI\,'dsctl db2ldif'\/\fR
+.TP
+\fB\-\-replication\fR
+Export replication information, suitable for importing on a new consumer or backups.
+
+.TP
+\fB\-\-encrypted\fR
+Export encrypted attributes
+
+.SH COMMAND \fI\,'dsctl dbverify'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dbverify [\-h] backend
+
+.TP
+\fBbackend\fR
+The backend to verify. IE userRoot
+
+.SH COMMAND \fI\,'dsctl bak2db'\/\fR
+usage: dsctl [\-v] [\-j] [instance] bak2db [\-h] archive
+
+.TP
+\fBarchive\fR
+The archive to restore. This will erase all current server databases.
+
+.SH COMMAND \fI\,'dsctl ldif2db'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldif2db [\-h] [\-\-encrypted] backend ldif
+
+.TP
+\fBbackend\fR
+The backend to restore from an LDIF. IE userRoot
+
+.TP
+\fBldif\fR
+The path to the ldif to import
+
+.SH OPTIONS \fI\,'dsctl ldif2db'\/\fR
+.TP
+\fB\-\-encrypted\fR
+Import encrypted attributes
+
+.SH COMMAND \fI\,'dsctl backups'\/\fR
+usage: dsctl [\-v] [\-j] [instance] backups [\-h] [\-\-delete DELETE]
+
+.SH OPTIONS \fI\,'dsctl backups'\/\fR
+.TP
+\fB\-\-delete\fR \fI\,DELETE\/\fR
+Delete backup directory
+
+.SH COMMAND \fI\,'dsctl ldifs'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifs [\-h] [\-\-delete DELETE]
+
+.SH OPTIONS \fI\,'dsctl ldifs'\/\fR
+.TP
+\fB\-\-delete\fR \fI\,DELETE\/\fR
+Delete LDIF file
+
+.SH COMMAND \fI\,'dsctl tls'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls [\-h] {list\-ca,list\-client\-ca,show\-server\-cert,show\-cert,generate\-server\-cert\-csr,import\-client\-ca,import\-ca,import\-server\-cert,import\-server\-key\-cert,remove\-cert,export\-cert} ...
+
+.SH
+POSITIONAL ARGUMENTS \fI\,'dsctl tls'\/\fR
+.TP
+\fBdsctl tls\fR \fI\,list\-ca\/\fR
+list server certificate authorities including intermediates
+.TP
+\fBdsctl tls\fR \fI\,list\-client\-ca\/\fR
+list client certificate authorities including intermediates
+.TP
+\fBdsctl tls\fR \fI\,show\-server\-cert\/\fR
+Show the active server certificate that clients will see and verify
+.TP
+\fBdsctl tls\fR \fI\,show\-cert\/\fR
+Show a certificate's details referenced by it's nickname. This is analogous to certutil \-L \-d <path> \-n <nickname>
+.TP
+\fBdsctl tls\fR \fI\,generate\-server\-cert\-csr\/\fR
+Generate a Server\-Cert certificate signing request \- the csr is then submitted to a CA for verification, and when signed you import with import\-ca and import\-server\-cert
+.TP
+\fBdsctl tls\fR \fI\,import\-client\-ca\/\fR
+Import a CA trusted to issue user (client) certificates. This is part of how client certificate authentication functions.
+.TP
+\fBdsctl tls\fR \fI\,import\-ca\/\fR
+Import a CA or intermediate CA for signing this servers certificates (aka Server\-Cert). You should import all the CA's in the chain as required.  PEM bundles are accepted
+.TP
+\fBdsctl tls\fR \fI\,import\-server\-cert\/\fR
+Import a new Server\-Cert after the csr has been signed from a CA.
+.TP
+\fBdsctl tls\fR \fI\,import\-server\-key\-cert\/\fR
+Import a new key and Server\-Cert after having been signed from a CA. This is used if you have an external csr tool or a service like lets encrypt that generates PEM keys externally.
+.TP
+\fBdsctl tls\fR \fI\,remove\-cert\/\fR
+Delete a certificate from this database. This will remove it from acting as a CA, a client CA or the Server\-Cert role.
+.TP
+\fBdsctl tls\fR \fI\,export\-cert\/\fR
+Export a certificate to PEM or DER/Binary format.  PEM format is the default
+
+.SH COMMAND \fI\,'dsctl tls list\-ca'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls list\-ca [\-h]
+
+.SH COMMAND \fI\,'dsctl tls list\-client\-ca'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls list\-client\-ca [\-h]
+
+.SH COMMAND \fI\,'dsctl tls show\-server\-cert'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls show\-server\-cert [\-h]
+
+.SH COMMAND \fI\,'dsctl tls show\-cert'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls show\-cert [\-h] nickname
+
+.TP
+\fBnickname\fR
+The nickname (friendly name) of the certificate to display
+
+.SH COMMAND \fI\,'dsctl tls generate\-server\-cert\-csr'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls generate\-server\-cert\-csr [\-h] [\-\-subject SUBJECT] [alt_names ...]
+
+.TP
+\fBalt_names\fR
+Certificate requests subject alternative names. These are auto\-detected if not provided
+
+.SH OPTIONS \fI\,'dsctl tls generate\-server\-cert\-csr'\/\fR
+.TP
+\fB\-\-subject\fR \fI\,SUBJECT\/\fR, \fB\-s\fR \fI\,SUBJECT\/\fR
+Certificate Subject field to use
+
+.SH COMMAND \fI\,'dsctl tls import\-client\-ca'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls import\-client\-ca [\-h] cert_path nickname
+
+.TP
+\fBcert_path\fR
+The path to the x509 cert to import as a client trust root
+
+.TP
+\fBnickname\fR
+The name of the certificate once imported
+
+.SH COMMAND \fI\,'dsctl tls import\-ca'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls import\-ca [\-h] cert_path nickname [nickname ...]
+
+.TP
+\fBcert_path\fR
+The path to the x509 cert to import as a server CA
+
+.TP
+\fBnickname\fR
+The name of the certificate once imported
+
+.SH COMMAND \fI\,'dsctl tls import\-server\-cert'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls import\-server\-cert [\-h] cert_path
+
+.TP
+\fBcert_path\fR
+The path to the x509 cert to import as Server\-Cert
+
+.SH COMMAND \fI\,'dsctl tls import\-server\-key\-cert'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls import\-server\-key\-cert [\-h] cert_path key_path
+
+.TP
+\fBcert_path\fR
+The path to the x509 cert to import as Server\-Cert
+
+.TP
+\fBkey_path\fR
+The path to the x509 key to import associated to Server\-Cert
+
+.SH COMMAND \fI\,'dsctl tls remove\-cert'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls remove\-cert [\-h] nickname
+
+.TP
+\fBnickname\fR
+The name of the certificate to delete
+
+.SH COMMAND \fI\,'dsctl tls export\-cert'\/\fR
+usage: dsctl [\-v] [\-j] [instance] tls export\-cert [\-h] [\-\-binary\-format] [\-\-output\-file OUTPUT_FILE] nickname
+
+.TP
+\fBnickname\fR
+The name of the certificate to export
+
+.SH OPTIONS \fI\,'dsctl tls export\-cert'\/\fR
+.TP
+\fB\-\-binary\-format\fR
+Export certificate in DER/binary format
+
+.TP
+\fB\-\-output\-file\fR \fI\,OUTPUT_FILE\/\fR
+The name for the exported certificate. Default name is the certificate nickname with an extension of ".pem" or ".crt"
+
+.SH COMMAND \fI\,'dsctl healthcheck'\/\fR
+usage: dsctl [instance] healthcheck [\-h] [\-\-list\-checks] [\-\-list\-errors] [\-\-dry\-run] [\-\-check CHECK [CHECK ...]] [\-\-exclude\-check EXCLUDE_CHECK [EXCLUDE_CHECK ...]]
+
+.SH OPTIONS \fI\,'dsctl healthcheck'\/\fR
+.TP
+\fB\-\-list\-checks\fR
+List of known checks
+
+.TP
+\fB\-\-list\-errors\fR
+List of known error codes
+
+.TP
+\fB\-\-dry\-run\fR
+Do not execute the actual check, only list what would be done
+
+.TP
+\fB\-\-check\fR \fI\,CHECK [CHECK ...]\/\fR
+Areas to check. These can be obtained by \-\-list\-checks. Every element on the left of the colon (:) may be replaced by an asterisk if multiple options on the right are available.
+
+.TP
+\fB\-\-exclude\-check\fR \fI\,EXCLUDE_CHECK [EXCLUDE_CHECK ...]\/\fR
+Areas to skip. These can be obtained by \-\-list\-checks. Every element on the left of the colon (:) may be replaced by an asterisk if multiple options on the right are available.
+
+.SH COMMAND \fI\,'dsctl get\-nsstate'\/\fR
+usage: dsctl [instance] get\-nsstate [\-h] [\-\-suffix SUFFIX] [\-\-flip FLIP]
+
+.SH OPTIONS \fI\,'dsctl get\-nsstate'\/\fR
+.TP
+\fB\-\-suffix\fR \fI\,SUFFIX\/\fR
+The DN of the replication suffix to read the state from
+
+.TP
+\fB\-\-flip\fR \fI\,FLIP\/\fR
+Flip between Little/Big Endian, this might be required for certain architectures
+
+.SH COMMAND \fI\,'dsctl ldifgen'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen [\-h] {users,groups,cos\-def,cos\-template,roles,mod\-load,nested} ...
+
+.SH
+POSITIONAL ARGUMENTS \fI\,'dsctl ldifgen'\/\fR
+.TP
+\fBdsctl ldifgen\fR \fI\,users\/\fR
+Generate a LDIF containing user entries
+.TP
+\fBdsctl ldifgen\fR \fI\,groups\/\fR
+Generate a LDIF containing groups and members
+.TP
+\fBdsctl ldifgen\fR \fI\,cos\-def\/\fR
+Generate a LDIF containing a COS definition (classic, pointer, or indirect)
+.TP
+\fBdsctl ldifgen\fR \fI\,cos\-template\/\fR
+Generate a LDIF containing a COS template
+.TP
+\fBdsctl ldifgen\fR \fI\,roles\/\fR
+Generate a LDIF containing a role entry (managed, filtered, or indirect)
+.TP
+\fBdsctl ldifgen\fR \fI\,mod\-load\/\fR
+Generate a LDIF containing modify operations.  This is intended to be consumed by ldapmodify.
+.TP
+\fBdsctl ldifgen\fR \fI\,nested\/\fR
+Generate a heavily nested database LDIF in a cascading/fractal tree design
+
+.SH COMMAND \fI\,'dsctl ldifgen users'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen users [\-h] [\-\-number NUMBER] [\-\-suffix SUFFIX] [\-\-parent PARENT] [\-\-generic] [\-\-start\-idx START_IDX] [\-\-rdn\-cn] [\-\-localize] [\-\-ldif\-file LDIF_FILE]
+
+.SH OPTIONS \fI\,'dsctl ldifgen users'\/\fR
+.TP
+\fB\-\-number\fR \fI\,NUMBER\/\fR
+The number of users to create.
+
+.TP
+\fB\-\-suffix\fR \fI\,SUFFIX\/\fR
+The database suffix where the entries will be created.
+
+.TP
+\fB\-\-parent\fR \fI\,PARENT\/\fR
+The parent entry that the user entries should be created under. If not specified, the entries are stored under random Organizational Units.
+
+.TP
+\fB\-\-generic\fR
+Create generic entries in the format of "uid=user####". These entries are also compatible with ldclt.
+
+.TP
+\fB\-\-start\-idx\fR \fI\,START_IDX\/\fR
+For generic LDIF's you can choose the starting index for the user entries. The default is "0".
+
+.TP
+\fB\-\-rdn\-cn\fR
+Use the attribute "cn" as the RDN attribute in the DN instead of "uid"
+
+.TP
+\fB\-\-localize\fR
+Localize the LDIF data
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl ldifgen groups'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen groups [\-h] [\-\-number NUMBER] [\-\-suffix SUFFIX] [\-\-parent PARENT] [\-\-num\-members NUM_MEMBERS] [\-\-create\-members] [\-\-member\-parent MEMBER_PARENT]
+                                                 [\-\-member\-attr MEMBER_ATTR] [\-\-ldif\-file LDIF_FILE]
+                                                 NAME
+
+.TP
+\fBNAME\fR
+The group name.
+
+.SH OPTIONS \fI\,'dsctl ldifgen groups'\/\fR
+.TP
+\fB\-\-number\fR \fI\,NUMBER\/\fR
+The number of groups to create.
+
+.TP
+\fB\-\-suffix\fR \fI\,SUFFIX\/\fR
+The database suffix where the groups will be created.
+
+.TP
+\fB\-\-parent\fR \fI\,PARENT\/\fR
+The parent entry that the group entries should be created under. If not specified the groups are stored under the suffix.
+
+.TP
+\fB\-\-num\-members\fR \fI\,NUM_MEMBERS\/\fR
+The number of members in the group. Default is 10000
+
+.TP
+\fB\-\-create\-members\fR
+Create the member user entries.
+
+.TP
+\fB\-\-member\-parent\fR \fI\,MEMBER_PARENT\/\fR
+The entry DN that the members should be created under. The default is the suffix entry.
+
+.TP
+\fB\-\-member\-attr\fR \fI\,MEMBER_ATTR\/\fR
+The membership attribute to use in the group. Default is "uniquemember".
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl ldifgen cos\-def'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen cos\-def [\-h] [\-\-type TYPE] [\-\-parent PARENT] [\-\-create\-parent] [\-\-cos\-specifier COS_SPECIFIER] [\-\-cos\-template COS_TEMPLATE] [\-\-cos\-attr [COS_ATTR ...]]
+                                                  [\-\-ldif\-file LDIF_FILE]
+                                                  NAME
+
+.TP
+\fBNAME\fR
+The COS definition name.
+
+.SH OPTIONS \fI\,'dsctl ldifgen cos\-def'\/\fR
+.TP
+\fB\-\-type\fR \fI\,TYPE\/\fR
+The COS definition type: "classic", "pointer", or "indirect".
+
+.TP
+\fB\-\-parent\fR \fI\,PARENT\/\fR
+The parent entry that the COS definition should be created under.
+
+.TP
+\fB\-\-create\-parent\fR
+Create the parent entry
+
+.TP
+\fB\-\-cos\-specifier\fR \fI\,COS_SPECIFIER\/\fR
+Used in a classic COS definition, this attribute located in the user entry is used to select which COS template to use.
+
+.TP
+\fB\-\-cos\-template\fR \fI\,COS_TEMPLATE\/\fR
+The DN of the COS template entry, only used for "classic" and "pointer" COS definitions.
+
+.TP
+\fB\-\-cos\-attr\fR \fI\,[COS_ATTR ...]\/\fR
+A list of attributes which defines which attribute the COS generates values for.
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl ldifgen cos\-template'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen cos\-template [\-h] [\-\-parent PARENT] [\-\-create\-parent] [\-\-cos\-priority COS_PRIORITY] [\-\-cos\-attr\-val COS_ATTR_VAL] [\-\-ldif\-file LDIF_FILE] NAME
+
+.TP
+\fBNAME\fR
+The COS template name.
+
+.SH OPTIONS \fI\,'dsctl ldifgen cos\-template'\/\fR
+.TP
+\fB\-\-parent\fR \fI\,PARENT\/\fR
+The DN of the entry to store the COS template entry under.
+
+.TP
+\fB\-\-create\-parent\fR
+Create the parent entry
+
+.TP
+\fB\-\-cos\-priority\fR \fI\,COS_PRIORITY\/\fR
+Sets the priority of this conflicting/competing COS templates.
+
+.TP
+\fB\-\-cos\-attr\-val\fR \fI\,COS_ATTR_VAL\/\fR
+defines the attribute and value that the template provides.
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl ldifgen roles'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen roles [\-h] [\-\-type TYPE] [\-\-parent PARENT] [\-\-create\-parent] [\-\-filter FILTER] [\-\-role\-dn [ROLE_DN ...]] [\-\-ldif\-file LDIF_FILE] NAME
+
+.TP
+\fBNAME\fR
+The Role name.
+
+.SH OPTIONS \fI\,'dsctl ldifgen roles'\/\fR
+.TP
+\fB\-\-type\fR \fI\,TYPE\/\fR
+The Role type: "managed", "filtered", or "nested".
+
+.TP
+\fB\-\-parent\fR \fI\,PARENT\/\fR
+The DN of the entry to store the Role entry under
+
+.TP
+\fB\-\-create\-parent\fR
+Create the parent entry
+
+.TP
+\fB\-\-filter\fR \fI\,FILTER\/\fR
+A search filter for gathering Role members. Required for a "filtered" role.
+
+.TP
+\fB\-\-role\-dn\fR \fI\,[ROLE_DN ...]\/\fR
+A DN of a role entry that should be included in this role. Used for "nested" roles only.
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl ldifgen mod\-load'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen mod\-load [\-h] [\-\-create\-users] [\-\-delete\-users] [\-\-num\-users NUM_USERS] [\-\-parent PARENT] [\-\-create\-parent] [\-\-add\-users ADD_USERS] [\-\-del\-users DEL_USERS]
+                                                   [\-\-modrdn\-users MODRDN_USERS] [\-\-mod\-users MOD_USERS] [\-\-mod\-attrs [MOD_ATTRS ...]] [\-\-randomize] [\-\-ldif\-file LDIF_FILE]
+
+.SH OPTIONS \fI\,'dsctl ldifgen mod\-load'\/\fR
+.TP
+\fB\-\-create\-users\fR
+Create the entries that will be modified or deleted. By default the script assumes the user entries already exist.
+
+.TP
+\fB\-\-delete\-users\fR
+Delete all the user entries at the end of the LDIF.
+
+.TP
+\fB\-\-num\-users\fR \fI\,NUM_USERS\/\fR
+The number of user entries that will be modified or deleted
+
+.TP
+\fB\-\-parent\fR \fI\,PARENT\/\fR
+The DN of the parent entry where the user entries are located.
+
+.TP
+\fB\-\-create\-parent\fR
+Create the parent entry
+
+.TP
+\fB\-\-add\-users\fR \fI\,ADD_USERS\/\fR
+The number of additional entries to add during the load.
+
+.TP
+\fB\-\-del\-users\fR \fI\,DEL_USERS\/\fR
+The number of entries to delete during the load.
+
+.TP
+\fB\-\-modrdn\-users\fR \fI\,MODRDN_USERS\/\fR
+The number of entries to perform a modrdn operation on.
+
+.TP
+\fB\-\-mod\-users\fR \fI\,MOD_USERS\/\fR
+The number of entries to modify.
+
+.TP
+\fB\-\-mod\-attrs\fR \fI\,[MOD_ATTRS ...]\/\fR
+List of attributes the script will randomly choose from when modifying an entry. The default is "description".
+
+.TP
+\fB\-\-randomize\fR
+Randomly perform the specified add, mod, delete, and modrdn operations
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl ldifgen nested'\/\fR
+usage: dsctl [\-v] [\-j] [instance] ldifgen nested [\-h] [\-\-num\-users NUM_USERS] [\-\-node\-limit NODE_LIMIT] [\-\-suffix SUFFIX] [\-\-ldif\-file LDIF_FILE]
+
+.SH OPTIONS \fI\,'dsctl ldifgen nested'\/\fR
+.TP
+\fB\-\-num\-users\fR \fI\,NUM_USERS\/\fR
+The total number of user entries to create in the entire LDIF (does not include the container entries).
+
+.TP
+\fB\-\-node\-limit\fR \fI\,NODE_LIMIT\/\fR
+The total number of user entries to create under each node/subtree
+
+.TP
+\fB\-\-suffix\fR \fI\,SUFFIX\/\fR
+The suffix DN for the LDIF
+
+.TP
+\fB\-\-ldif\-file\fR \fI\,LDIF_FILE\/\fR
+The LDIF file name. Default location is the server's LDIF directory using the name 'ldifgen.ldif'
+
+.SH COMMAND \fI\,'dsctl dsrc'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dsrc [\-h] {create,modify,delete,display,repl\-mon} ...
+
+.SH
+POSITIONAL ARGUMENTS \fI\,'dsctl dsrc'\/\fR
+.TP
+\fBdsctl dsrc\fR \fI\,create\/\fR
+Generate the .dsrc file
+.TP
+\fBdsctl dsrc\fR \fI\,modify\/\fR
+Modify the .dsrc file
+.TP
+\fBdsctl dsrc\fR \fI\,delete\/\fR
+Delete instance configuration from the .dsrc file.
+.TP
+\fBdsctl dsrc\fR \fI\,display\/\fR
+Display the contents of the .dsrc file.
+.TP
+\fBdsctl dsrc\fR \fI\,repl\-mon\/\fR
+Display the contents of the .dsrc file.
+
+.SH COMMAND \fI\,'dsctl dsrc create'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dsrc create [\-h] [\-\-uri URI] [\-\-basedn BASEDN] [\-\-people\-rdn PEOPLE_RDN] [\-\-groups\-rdn GROUPS_RDN] [\-\-binddn BINDDN] [\-\-saslmech SASLMECH] [\-\-tls\-cacertdir TLS_CACERTDIR]
+                                              [\-\-tls\-cert TLS_CERT] [\-\-tls\-key TLS_KEY] [\-\-tls\-reqcert TLS_REQCERT] [\-\-starttls] [\-\-pwdfile PWDFILE] [\-\-do\-it]
+
+.SH OPTIONS \fI\,'dsctl dsrc create'\/\fR
+.TP
+\fB\-\-uri\fR \fI\,URI\/\fR
+The URI (LDAP URL) for the Directory Server instance.
+
+.TP
+\fB\-\-basedn\fR \fI\,BASEDN\/\fR
+The default database suffix.
+
+.TP
+\fB\-\-people\-rdn\fR \fI\,PEOPLE_RDN\/\fR
+Set the RDN for the 'people' subtree. Default is "ou=people"
+
+.TP
+\fB\-\-groups\-rdn\fR \fI\,GROUPS_RDN\/\fR
+Set the RDN for the 'groups' subtree. Default is "ou=groups"
+
+.TP
+\fB\-\-binddn\fR \fI\,BINDDN\/\fR
+The default Bind DN used or authentication.
+
+.TP
+\fB\-\-saslmech\fR \fI\,SASLMECH\/\fR
+The SASL mechanism to use: PLAIN or EXTERNAL.
+
+.TP
+\fB\-\-tls\-cacertdir\fR \fI\,TLS_CACERTDIR\/\fR
+The directory containing the Trusted Certificate Authority certificate.
+
+.TP
+\fB\-\-tls\-cert\fR \fI\,TLS_CERT\/\fR
+The absolute file name to the server certificate.
+
+.TP
+\fB\-\-tls\-key\fR \fI\,TLS_KEY\/\fR
+The absolute file name to the server certificate key.
+
+.TP
+\fB\-\-tls\-reqcert\fR \fI\,TLS_REQCERT\/\fR
+Request certificate strength: 'never', 'allow', 'hard'
+
+.TP
+\fB\-\-starttls\fR
+Use startTLS for connection to the server.
+
+.TP
+\fB\-\-pwdfile\fR \fI\,PWDFILE\/\fR
+The absolute path to a file containing the Bind DN's password.
+
+.TP
+\fB\-\-do\-it\fR
+Create the file without any confirmation.
+
+.SH COMMAND \fI\,'dsctl dsrc modify'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dsrc modify [\-h] [\-\-uri [URI]] [\-\-basedn [BASEDN]] [\-\-people\-rdn [PEOPLE_RDN]] [\-\-groups\-rdn [GROUPS_RDN]] [\-\-binddn [BINDDN]] [\-\-saslmech [SASLMECH]]
+                                              [\-\-tls\-cacertdir [TLS_CACERTDIR]] [\-\-tls\-cert [TLS_CERT]] [\-\-tls\-key [TLS_KEY]] [\-\-tls\-reqcert [TLS_REQCERT]] [\-\-starttls] [\-\-cancel\-starttls] [\-\-pwdfile [PWDFILE]]
+                                              [\-\-do\-it]
+
+.SH OPTIONS \fI\,'dsctl dsrc modify'\/\fR
+.TP
+\fB\-\-uri\fR \fI\,[URI]\/\fR
+The URI (LDAP URL) for the Directory Server instance.
+
+.TP
+\fB\-\-basedn\fR \fI\,[BASEDN]\/\fR
+The default database suffix.
+
+.TP
+\fB\-\-people\-rdn\fR \fI\,[PEOPLE_RDN]\/\fR
+Sets the RDN used for the 'people' container
+
+.TP
+\fB\-\-groups\-rdn\fR \fI\,[GROUPS_RDN]\/\fR
+Sets the RDN used for the 'groups' container
+
+.TP
+\fB\-\-binddn\fR \fI\,[BINDDN]\/\fR
+The default Bind DN used or authentication.
+
+.TP
+\fB\-\-saslmech\fR \fI\,[SASLMECH]\/\fR
+The SASL mechanism to use: PLAIN or EXTERNAL.
+
+.TP
+\fB\-\-tls\-cacertdir\fR \fI\,[TLS_CACERTDIR]\/\fR
+The directory containing the Trusted Certificate Authority certificate.
+
+.TP
+\fB\-\-tls\-cert\fR \fI\,[TLS_CERT]\/\fR
+The absolute file name to the server certificate.
+
+.TP
+\fB\-\-tls\-key\fR \fI\,[TLS_KEY]\/\fR
+The absolute file name to the server certificate key.
+
+.TP
+\fB\-\-tls\-reqcert\fR \fI\,[TLS_REQCERT]\/\fR
+Request certificate strength: 'never', 'allow', 'hard'
+
+.TP
+\fB\-\-starttls\fR
+Use startTLS for connection to the server.
+
+.TP
+\fB\-\-cancel\-starttls\fR
+Do not use startTLS for connection to the server.
+
+.TP
+\fB\-\-pwdfile\fR \fI\,[PWDFILE]\/\fR
+The absolute path to a file containing the Bind DN's password.
+
+.TP
+\fB\-\-do\-it\fR
+Update the file without any confirmation.
+
+.SH COMMAND \fI\,'dsctl dsrc delete'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dsrc delete [\-h] [\-\-do\-it]
+
+.SH OPTIONS \fI\,'dsctl dsrc delete'\/\fR
+.TP
+\fB\-\-do\-it\fR
+Delete this instance's configuration from the .dsrc file.
+
+.SH COMMAND \fI\,'dsctl dsrc display'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dsrc display [\-h]
+
+.SH COMMAND \fI\,'dsctl dsrc repl\-mon'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dsrc repl\-mon [\-h] [\-\-add\-conn ADD_CONN [ADD_CONN ...]] [\-\-del\-conn DEL_CONN [DEL_CONN ...]] [\-\-add\-alias ADD_ALIAS [ADD_ALIAS ...]] [\-\-del\-alias DEL_ALIAS [DEL_ALIAS ...]]
+
+.SH OPTIONS \fI\,'dsctl dsrc repl\-mon'\/\fR
+.TP
+\fB\-\-add\-conn\fR \fI\,ADD_CONN [ADD_CONN ...]\/\fR
+Add a replica connection: 'NAME:HOST:PORT:BINDDN:CREDENTIAL'
+
+.TP
+\fB\-\-del\-conn\fR \fI\,DEL_CONN [DEL_CONN ...]\/\fR
+delete a replica connection by its NAME
+
+.TP
+\fB\-\-add\-alias\fR \fI\,ADD_ALIAS [ADD_ALIAS ...]\/\fR
+Add a host/port alias: 'ALIAS_NAME:HOST:PORT'
+
+.TP
+\fB\-\-del\-alias\fR \fI\,DEL_ALIAS [DEL_ALIAS ...]\/\fR
+delete a host/port alias by its ALIAS_NAME
+
+.SH COMMAND \fI\,'dsctl cockpit'\/\fR
+usage: dsctl [\-v] [\-j] [instance] cockpit [\-h] {enable,open\-firewall,disable,close\-firewall} ...
+
+.SH
+POSITIONAL ARGUMENTS \fI\,'dsctl cockpit'\/\fR
+.TP
+\fBdsctl cockpit\fR \fI\,enable\/\fR
+Enable the Cockpit socket
+.TP
+\fBdsctl cockpit\fR \fI\,open\-firewall\/\fR
+Open the firewall for the "cockpit" service
+.TP
+\fBdsctl cockpit\fR \fI\,disable\/\fR
+Disable the Cockpit socket
+.TP
+\fBdsctl cockpit\fR \fI\,close\-firewall\/\fR
+Remove the "cockpit" service from the firewall settings
+
+.SH COMMAND \fI\,'dsctl cockpit enable'\/\fR
+usage: dsctl [\-v] [\-j] [instance] cockpit enable [\-h]
+
+.SH COMMAND \fI\,'dsctl cockpit open\-firewall'\/\fR
+usage: dsctl [\-v] [\-j] [instance] cockpit open\-firewall [\-h] [\-\-zone ZONE]
+
+.SH OPTIONS \fI\,'dsctl cockpit open\-firewall'\/\fR
+.TP
+\fB\-\-zone\fR \fI\,ZONE\/\fR
+The firewall zone
+
+.SH COMMAND \fI\,'dsctl cockpit disable'\/\fR
+usage: dsctl [\-v] [\-j] [instance] cockpit disable [\-h]
+
+.SH COMMAND \fI\,'dsctl cockpit close\-firewall'\/\fR
+usage: dsctl [\-v] [\-j] [instance] cockpit close\-firewall [\-h]
+
+.SH COMMAND \fI\,'dsctl dblib'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dblib [\-h] {bdb2mdb,mdb2bdb,cleanup} ...
+
+.SH
+POSITIONAL ARGUMENTS \fI\,'dsctl dblib'\/\fR
+.TP
+\fBdsctl dblib\fR \fI\,bdb2mdb\/\fR
+Migrate bdb databases to lmdb
+.TP
+\fBdsctl dblib\fR \fI\,mdb2bdb\/\fR
+Migrate lmdb databases to bdb
+.TP
+\fBdsctl dblib\fR \fI\,cleanup\/\fR
+Remove migration ldif file and old database
+
+.SH COMMAND \fI\,'dsctl dblib bdb2mdb'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dblib bdb2mdb [\-h] [\-\-tmpdir TMPDIR]
+
+.SH OPTIONS \fI\,'dsctl dblib bdb2mdb'\/\fR
+.TP
+\fB\-\-tmpdir\fR \fI\,TMPDIR\/\fR
+ldif migration files directory path.
+
+.SH COMMAND \fI\,'dsctl dblib mdb2bdb'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dblib mdb2bdb [\-h] [\-\-tmpdir TMPDIR]
+
+.SH OPTIONS \fI\,'dsctl dblib mdb2bdb'\/\fR
+.TP
+\fB\-\-tmpdir\fR \fI\,TMPDIR\/\fR
+ldif migration files directory path.
+
+.SH COMMAND \fI\,'dsctl dblib cleanup'\/\fR
+usage: dsctl [\-v] [\-j] [instance] dblib cleanup [\-h]
+
+.SH OPTIONS
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Display verbose operation tracing during command execution
+
+.TP
+\fB\-j\fR, \fB\-\-json\fR
+Return result in JSON object
+
+.TP
+\fB\-l\fR, \fB\-\-list\fR
+List available Directory Server instances
+
+.SH AUTHOR
+.nf
+"Red Hat, Inc., and William Brown" <389-devel@lists.fedoraproject.org>
+.fi
