@@ -1,0 +1,294 @@
+# paxx
+
+Python Async API - a domain-oriented web framework scaffolding tool built on top of FastAPI.
+
+paxx generates plain, readable code using well-known libraries (FastAPI, SQLAlchemy, Pydantic, Alembic) directly - no wrapper abstractions, just a solid starting point for domain-driven FastAPI applications.
+
+## Installation
+
+```bash
+pip install paxx
+# or with uv
+uv add paxx
+```
+
+## Quick Start
+
+```bash
+# Create a new project
+paxx bootstrap myproject
+
+# Enter the project directory
+cd myproject
+
+# Install dependencies
+uv sync --all-extras
+
+# Start the development server
+uv run paxx start
+```
+
+Visit http://127.0.0.1:8000/docs to see your API documentation.
+
+## CLI Reference
+
+### `paxx bootstrap`
+
+Create a new paxx project with the standard structure.
+
+```bash
+paxx bootstrap <name> [OPTIONS]
+```
+
+**Arguments:**
+- `name` - Name of the new project
+
+**Options:**
+- `-o, --output-dir PATH` - Directory to create the project in (default: current directory)
+- `-d, --description TEXT` - Project description
+- `-a, --author TEXT` - Author name (default: "Author")
+
+**Examples:**
+```bash
+paxx bootstrap myproject
+paxx bootstrap my-api --description "My awesome API"
+paxx bootstrap myproject -o /path/to/projects
+```
+
+---
+
+### `paxx start`
+
+Start the development server (uvicorn wrapper).
+
+```bash
+paxx start [OPTIONS]
+```
+
+**Options:**
+- `-h, --host TEXT` - Host to bind to (default: 127.0.0.1)
+- `-p, --port INTEGER` - Port to bind to (default: 8000)
+- `-r, --reload / -R, --no-reload` - Enable auto-reload (default: enabled)
+- `-w, --workers INTEGER` - Number of workers, only without reload (default: 1)
+
+**Examples:**
+```bash
+paxx start                         # Start on localhost:8000 with reload
+paxx start --port 3000             # Start on port 3000
+paxx start --host 0.0.0.0          # Bind to all interfaces
+paxx start --no-reload --workers 4 # Production-like mode
+```
+
+---
+
+### `paxx feature create`
+
+Create a new domain feature from scratch.
+
+```bash
+paxx feature create <name> [OPTIONS]
+```
+
+**Arguments:**
+- `name` - Name of the new feature
+
+**Options:**
+- `-d, --description TEXT` - Feature description
+
+**Examples:**
+```bash
+paxx feature create users
+paxx feature create blog_posts
+paxx feature create orders --description "Order management"
+```
+
+This creates a feature with the standard structure:
+```
+features/<name>/
+├── __init__.py
+├── config.py      # Feature configuration
+├── models.py      # SQLAlchemy models
+├── schemas.py     # Pydantic schemas
+├── services.py    # Business logic
+└── routes.py      # API endpoints
+```
+
+---
+
+### `paxx feature add`
+
+Add a bundled feature to your project.
+
+```bash
+paxx feature add <feature> [OPTIONS]
+paxx feature add --list
+```
+
+**Arguments:**
+- `feature` - Name of the bundled feature to add
+
+**Options:**
+- `-l, --list` - List all available features
+- `-f, --force` - Overwrite existing feature if it exists
+
+**Examples:**
+```bash
+paxx feature add --list            # List available features
+paxx feature add example_products  # Add the example CRUD feature
+paxx feature add auth --force      # Overwrite existing auth feature
+```
+
+---
+
+### `paxx db migrate`
+
+Create a new database migration.
+
+```bash
+paxx db migrate <message> [OPTIONS]
+```
+
+**Arguments:**
+- `message` - Migration message describing the changes
+
+**Options:**
+- `-a, --autogenerate / -A, --no-autogenerate` - Auto-detect model changes (default: enabled)
+
+**Examples:**
+```bash
+paxx db migrate "add users table"
+paxx db migrate "add email index" --no-autogenerate
+```
+
+---
+
+### `paxx db upgrade`
+
+Apply migrations to the database.
+
+```bash
+paxx db upgrade [REVISION]
+```
+
+**Arguments:**
+- `revision` - Target revision (default: head = latest)
+
+**Examples:**
+```bash
+paxx db upgrade          # Apply all pending migrations
+paxx db upgrade head     # Same as above
+paxx db upgrade +1       # Apply next migration only
+paxx db upgrade abc123   # Migrate to specific revision
+```
+
+---
+
+### `paxx db downgrade`
+
+Revert migrations.
+
+```bash
+paxx db downgrade [REVISION]
+```
+
+**Arguments:**
+- `revision` - Target revision (default: -1 = previous)
+
+**Examples:**
+```bash
+paxx db downgrade        # Revert last migration
+paxx db downgrade -1     # Same as above
+paxx db downgrade -2     # Revert last 2 migrations
+paxx db downgrade base   # Revert all migrations
+paxx db downgrade abc123 # Downgrade to specific revision
+```
+
+---
+
+### `paxx db status`
+
+Show current migration status.
+
+```bash
+paxx db status
+```
+
+---
+
+### `paxx db history`
+
+Show migration history.
+
+```bash
+paxx db history [OPTIONS]
+```
+
+**Options:**
+- `-v, --verbose` - Show detailed history
+
+---
+
+### `paxx db heads`
+
+Show current available heads (useful for migration branches).
+
+```bash
+paxx db heads
+```
+
+---
+
+### `paxx --version`
+
+Show the paxx version.
+
+```bash
+paxx --version
+paxx -v
+```
+
+## Project Structure
+
+A paxx project follows this structure:
+
+```
+myproject/
+├── main.py              # Application entry point & factory
+├── settings.py          # Configuration (pydantic-settings)
+├── conftest.py          # Pytest fixtures
+├── alembic.ini          # Alembic configuration
+├── .env                 # Environment variables
+├── core/                # Core utilities
+│   ├── exceptions.py    # Custom exceptions
+│   ├── middleware.py    # Custom middleware
+│   ├── dependencies.py  # FastAPI dependencies
+│   └── schemas.py       # Shared Pydantic schemas
+├── db/                  # Database
+│   ├── database.py      # Database setup & session
+│   └── migrations/      # Alembic migrations
+│       └── versions/    # Migration files
+└── features/            # Domain features
+    └── <feature_name>/
+        ├── config.py    # Feature config (prefix, tags)
+        ├── models.py    # SQLAlchemy models
+        ├── schemas.py   # Pydantic schemas
+        ├── services.py  # Business logic
+        └── routes.py    # API endpoints
+```
+
+## Philosophy
+
+paxx is **not** a framework wrapper. It's a scaffolding tool that generates plain code you own and control:
+
+- **No magic** - Generated code uses FastAPI, SQLAlchemy, and Pydantic directly
+- **No lock-in** - After bootstrapping, your project has no dependency on paxx
+- **Domain-driven** - Features organized by business capability, not technical layer
+- **Convention over configuration** - Sensible defaults, but everything is customizable
+
+## Documentation
+
+Full documentation: https://your-docs-url.com (coming soon)
+
+## License
+
+MIT
