@@ -1,0 +1,117 @@
+Metadata-Version: 2.4
+Name: promptdefend-mcp
+Version: 1.0.0
+Summary: Prompt Defend MCP Server - 16-Layer Guardrails for AI Agents
+Project-URL: Homepage, https://promptdefend.dev
+Project-URL: Documentation, https://docs.promptdefend.dev
+Author-email: Prompt Defend <support@promptdefend.dev>
+License: Proprietary
+Keywords: ai,guardrails,llm,mcp,promptdefend,security
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: Other/Proprietary License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Security
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: mcp>=1.0.0
+Description-Content-Type: text/markdown
+
+# Prompt Defend MCP Server (Python)
+
+A Model Context Protocol (MCP) server that exposes Prompt Defend's 16-layer guardrail system as tools for AI agents.
+
+## Installation
+
+```bash
+pip install promptdefend-mcp
+```
+
+Or install from source:
+
+```bash
+cd framework/promptdefend-mcp/python
+pip install -e .
+```
+
+## Quick Start
+
+### As a Standalone Server
+
+```bash
+promptdefend-mcp --api-key your-api-key
+```
+
+### With Claude Desktop
+
+Add to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "promptdefend": {
+      "command": "promptdefend-mcp",
+      "args": ["--api-key", "your-api-key"]
+    }
+  }
+}
+```
+
+## Available Tools
+
+### `scan_prompt`
+Scan a prompt for security threats using 16-layer guardrails.
+
+**Input:**
+```json
+{
+  "prompt": "string - The prompt to scan"
+}
+```
+
+**Output:**
+```json
+{
+  "safe": true,
+  "reason": "No threats detected",
+  "details": {...}
+}
+```
+
+### `check_blocklist`
+Check if a prompt contains known attack keywords.
+
+**Input:**
+```json
+{
+  "prompt": "string - The prompt to check"
+}
+```
+
+### `check_allowlist`
+Check if a prompt matches safe/educational phrases.
+
+**Input:**
+```json
+{
+  "prompt": "string - The prompt to check"
+}
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PROMPTDEFEND_API_KEY` | Your Prompt Defend API key |
+| `PROMPTDEFEND_BASE_URL` | Custom API endpoint (optional) |
+
+## License
+
+Proprietary - See LICENSE for details.
+
+---
+
+© 2026 Prompt Defend. All Rights Reserved.
