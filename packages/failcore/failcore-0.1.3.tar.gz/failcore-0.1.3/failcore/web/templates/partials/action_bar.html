@@ -1,0 +1,82 @@
+{# Action Bar - renders registered actions dynamically #}
+<div class="action-bar">
+    {% if actions %}
+        {% for action in actions %}
+        <button 
+            class="action-btn {% if action.danger %}action-danger{% endif %}"
+            data-action-id="{{ action.id }}"
+            data-endpoint="{{ action.endpoint }}"
+            data-method="{{ action.method }}"
+            data-result="{{ action.result }}"
+            {% if not action.capability or action.capability %}{% else %}disabled{% endif %}
+            onclick="executeAction(this)"
+            title="{{ action.description or action.label }}"
+        >
+            {% if action.icon %}{{ action.icon }} {% endif %}{{ action.label }}
+        </button>
+        {% endfor %}
+    {% else %}
+        <span class="no-actions">No actions available</span>
+    {% endif %}
+</div>
+
+<script>
+async function executeAction(btn) {
+    const actionId = btn.dataset.actionId;
+    const isDanger = btn.classList.contains('action-danger');
+    
+    // Confirm dangerous actions
+    if (isDanger && !await showConfirm(`Are you sure you want to execute: ${btn.textContent.trim()}?`)) {
+        return;
+    }
+    
+    // Disable button
+    const originalLabel = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Processing...';
+    
+    try {
+        // Get run info from page
+        const runId = document.querySelector('[data-run-id]')?.dataset.runId;
+        
+        // Unified job creation endpoint
+        const response = await fetch('/api/jobs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action_id: actionId,
+                run_id: runId,
+                params: {},
+            }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.detail || 'Action failed');
+        }
+        
+        // Show success toast
+        showToast({
+            type: 'success',
+            title: 'JOB CREATED',
+            message: `Job ${data.job_id} has been queued successfully.`,
+            action: {
+                label: 'View Jobs',
+                url: '/jobs'
+            }
+        }, 6000);
+        
+    } catch (error) {
+        showToast({
+            type: 'error',
+            title: 'ACTION FAILED',
+            message: error.message,
+        }, 8000);
+    } finally {
+        // Re-enable button
+        btn.disabled = false;
+        btn.innerHTML = originalLabel;
+    }
+}
+</script>
