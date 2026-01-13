@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "az-secure-env"
+version = "1.0.1"
+description = "A simple CLI tool to secure Azure App Services and Function Apps by managing environment variables safely with Azure Key Vault"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Aakash Shah", email = "aakash.shah@simformsolutions.com"}
+]
+keywords = ["azure", "keyvault", "security", "app-service", "function-app", "environment-variables", "secrets"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Topic :: System :: Systems Administration",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "typer",
+    "azure-identity",
+    "azure-mgmt-web",
+    "azure-keyvault-secrets",
+    "azure-mgmt-authorization",
+    "azure-mgmt-keyvault",
+    "azure-mgmt-resource",
+    "rich",
+]
+
+[project.scripts]
+az-secure-env = "az_secure_env.cli:app"
