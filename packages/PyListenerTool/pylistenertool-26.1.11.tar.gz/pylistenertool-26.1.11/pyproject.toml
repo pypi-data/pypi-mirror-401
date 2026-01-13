@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "PyListenerTool"
+version = "26.01.11"
+description = "A lightweight event listener system for Python classes that auto-generates documentation."
+authors = ["qiufeng <appleidqiufeng@outlook.com>"]
+readme = "README.md"
+license = "MIT"
+keywords = [
+    "event-driven",
+    "listener",
+    "observer-pattern",
+    "pub-sub",
+    "event-management",
+    "event-documentation"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+packages = [
+    { include = "PyListenerTool" }
+]
+
+[tool.poetry.urls]
+"Homepage" = "https://github.com/qiufengcute/PyListenerTool"
+"Repository" = "https://github.com/qiufengcute/PyListenerTool"
+"Changelog" = "https://github.com/qiufengcute/PyListenerTool/blob/main/CHANGELOG.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
