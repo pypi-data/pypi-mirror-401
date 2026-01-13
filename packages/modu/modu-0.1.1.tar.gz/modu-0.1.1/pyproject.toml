@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "modu"
+version = "0.1.1"
+authors = [
+    { name="Pierre Denis", email="pie.denis@skynet.be" },
+]
+description = "Modular arithmetic in Python"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Mathematics"
+]
+
+[project.urls]
+Homepage = "https://github.com/piedenis/Modu"
+"Bug Tracker" = "https://github.com/piedenis/Modu/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = ["modu"]
