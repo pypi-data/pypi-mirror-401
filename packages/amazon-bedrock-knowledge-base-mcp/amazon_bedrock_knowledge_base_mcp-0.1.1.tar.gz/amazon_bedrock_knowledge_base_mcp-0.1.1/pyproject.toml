@@ -1,0 +1,130 @@
+[project]
+name = "amazon-bedrock-knowledge-base-mcp"
+version = "0.1.1"
+description = "Standalone Model Context Protocol (MCP) server for Amazon Bedrock Knowledge Base Retrieval"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "boto3>=1.37.24",
+    "loguru>=0.7.3",
+    "mcp[cli]>=1.23.0",
+    "pydantic>=2.11.1",
+    "PyJWT[crypto]>=2.10.1",
+]
+license = {text = "Apache-2.0"}
+license-files = ["LICENSE", "NOTICE" ]
+
+authors = [
+    {name = "Zlash65"},
+]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.scripts]
+"amazon-bedrock-knowledge-base-mcp" = "amazon_bedrock_knowledge_base_mcp.server:main"
+
+[dependency-groups]
+dev = [
+    "boto3-stubs[bedrock-agent,bedrock-agent-runtime]>=1.37.24",
+    "pre-commit>=4.2.0",
+    "pyright>=1.1.398",
+    "python-semantic-release>=10.2.0",
+    "ruff>=0.11.2",
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.ruff]
+line-length = 99
+extend-include = ["*.ipynb"]
+exclude = [
+    ".venv",
+    "**/__pycache__",
+    "**/node_modules",
+    "**/dist",
+    "**/build",
+    "**/env",
+    "**/.ruff_cache",
+    "**/.venv",
+    "**/.ipynb_checkpoints"
+]
+force-exclude = true
+
+[tool.ruff.lint]
+exclude = ["__init__.py"]
+select = ["C", "D", "E", "F", "I", "W"]
+ignore = ["C901", "E501", "E741", "F402", "F823", "D100", "D106"]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+known-first-party = ["amazon_bedrock_knowledge_base_mcp"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*.ipynb" = ["F704"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/amazon_bedrock_knowledge_base_mcp"]
+
+[tool.bandit]
+exclude_dirs = ["venv","tests"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["amazon_bedrock_knowledge_base_mcp"]
+
+[tool.semantic_release]
+commit_parser = "conventional"
+version_toml = ["pyproject.toml:project.version"]
+version_variables = ["src/amazon_bedrock_knowledge_base_mcp/__init__.py:__version__"]
+tag_format = "v{version}"
+build_command = "uv build"
+allow_zero_version = true
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "refactor", "docs"]
+parse_squash_commits = true
+ignore_merge_commits = true
+
+[tool.semantic_release.changelog]
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+output_format = "md"
