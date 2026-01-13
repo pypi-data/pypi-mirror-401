@@ -1,0 +1,107 @@
+Metadata-Version: 2.4
+Name: bdt-short-rate
+Version: 1.0.0
+Summary: Black-Derman-Toy binomial short-rate model for interest rate derivatives
+Author-email: Quant Finance Team <quant@example.com>
+Maintainer-email: Quant Finance Team <quant@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/quantfinance/bdt-short-rate
+Project-URL: Documentation, https://bdt-short-rate.readthedocs.io
+Project-URL: Repository, https://github.com/quantfinance/bdt-short-rate.git
+Project-URL: Issues, https://github.com/quantfinance/bdt-short-rate/issues
+Project-URL: Changelog, https://github.com/quantfinance/bdt-short-rate/blob/main/CHANGELOG.md
+Keywords: finance,quantitative-finance,interest-rate,short-rate-model,bdt,black-derman-toy,derivatives,swaption,calibration,binomial-tree
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Office/Business :: Financial
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: pandas>=1.3.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=6.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.2.0; extra == "docs"
+Dynamic: license-file
+
+# BDT Short Rate Model
+
+A professional Python implementation of the Black-Derman-Toy (BDT) binomial short-rate model for interest rate derivatives pricing and calibration.
+
+## Installation
+
+```bash
+pip install bdt-short-rate
+```
+
+## Quick Start
+
+```python
+import numpy as np
+from bdt import BDTModel, BDTCalibrator, SwaptionPricer
+
+# Market spot rates (annualized)
+spot_rates = np.array([0.03, 0.031, 0.032, 0.033, 0.034,
+                       0.035, 0.0355, 0.036, 0.0365, 0.037])
+
+# Create and calibrate the model
+model = BDTModel(n_periods=10, b=0.05, dt=1.0)
+calibrator = BDTCalibrator(model, spot_rates)
+calibrator.calibrate()
+
+# Price a swaption
+pricer = SwaptionPricer(model)
+price = pricer.price_payer_swaption(
+    expiry=5,
+    tenor=4,
+    strike=0.05,
+    notional=1_000_000
+)
+print(f"Swaption price: ${price:,.2f}")
+```
+
+## Features
+
+- **Calibration**: Fit model to market zero-coupon bond prices using scipy.optimize
+- **Pricing**: Value swaptions, defaultable bonds, and other interest rate derivatives
+- **Lattice Visualization**: Display the short-rate binomial tree
+- **CLI Interface**: Command-line tools for production use
+
+## CLI Usage
+
+```bash
+# Calibrate model to market data
+bdt calibrate --data market_rates.csv --volatility 0.05 --output calibrated.json
+
+# Price a swaption
+bdt price-swaption --model calibrated.json --expiry 5 --tenor 4 --strike 0.05
+
+# Show the rate lattice
+bdt show-lattice --model calibrated.json
+```
+
+## Documentation
+
+See the [full documentation](https://bdt-short-rate.readthedocs.io) for detailed API reference and examples.
+
+## License
+
+MIT License
