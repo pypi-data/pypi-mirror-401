@@ -1,0 +1,19 @@
+include LICENSE
+include README.md
+include requirements.txt
+include pyproject.toml
+include .env.example
+include AUTHORS.md
+include CHANGELOG.md
+include CITATION.cff
+include CONTRIBUTING.md
+include DEPLOYMENT_GUIDE.md
+
+recursive-include Core_Package *.py
+recursive-include Web_Interfaces *.html *.py
+recursive-include CLI_Tools *.py
+
+exclude *.pyc
+exclude __pycache__
+exclude .git
+exclude .env
