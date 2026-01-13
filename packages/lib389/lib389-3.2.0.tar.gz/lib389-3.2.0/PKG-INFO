@@ -1,0 +1,128 @@
+Metadata-Version: 2.4
+Name: lib389
+Version: 3.2.0
+Summary: A library for accessing, testing, and configuring the 389 Directory Server
+Author-email: "Red Hat, Inc., and William Brown" <389-devel@lists.fedoraproject.org>
+License: GPL-3.0-or-later
+Project-URL: Homepage, https://www.port389.org/docs/389ds/FAQ/upstream-test-framework.html
+Project-URL: Documentation, https://www.port389.org/docs/389ds/documentation.html
+Project-URL: Repository, https://github.com/389ds/389-ds-base
+Project-URL: Issues, https://github.com/389ds/389-ds-base/issues
+Keywords: 389,directory,server,test,configure
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: System :: Systems Administration :: Authentication/Directory :: LDAP
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pyasn1
+Requires-Dist: pyasn1-modules
+Requires-Dist: python-dateutil
+Requires-Dist: argcomplete
+Requires-Dist: python-ldap
+Requires-Dist: distro
+Requires-Dist: cryptography
+Requires-Dist: psutil
+Dynamic: license-file
+
+# lib389
+
+`lib389` is a Python library that provides a convenient way to interact with and manage a 389 Directory Server instance. It simplifies common LDAP operations and offers an object-oriented interface for various directory server components.
+
+## Installation
+
+To install `lib389` along with the main 389 Directory Server do:
+
+```bash
+pip3 install lib389==3.1.2
+```
+
+**Important Note:** When you install `lib389`, ensure that its version matches the version of the 389 Directory Server you plan to connect to. Mismatched versions can lead to unexpected behavior or errors.
+
+## Sample Connection Code
+
+Here's an example of how to connect to a 389 Directory Server instance using `lib389`, with configuration from environment variables:
+
+```python
+from lib389 import DirSrv
+from lib389.idm.user import UserAccounts
+
+
+def get_ldap_config():
+    """Get LDAP configuration from environment variables."""
+    return {
+        'ldap_url': 'ldap://localhost:389',
+        'base_dn': 'dc=example,dc=com',
+        'bind_dn': 'cn=Directory Manager',
+        'bind_password': 'Password123'
+    }
+
+
+def get_ldap_connection():
+    """Create and return a connection to the LDAP server."""
+
+    config = get_ldap_config()
+    ds = DirSrv(verbose=True)
+    try:
+        ds.remote_simple_allocate(
+            config['ldap_url'],
+            config['bind_dn'],
+            config['bind_password']
+        )
+
+        ds.open()
+        print(f"Successfully connected to {config['ldap_url']} as {config['bind_dn']}")
+        return ds
+
+    except Exception as e:
+        print(f"Failed to connect to LDAP server: {e}")
+        raise
+
+
+def search_users_example(basedn=None):
+    """Example function to search for users and return their details as JSON."""
+
+    config = get_ldap_config()
+    search_basedn = basedn or config['base_dn']
+
+    connection = get_ldap_connection()
+    if not connection:
+        print("Could not establish LDAP connection.")
+        return []
+
+    users = UserAccounts(connection, search_basedn)
+    for user in users.list():
+        print(user.display())
+
+    print("Closing LDAP connection in search_users_example.")
+    connection.unbind_s()
+
+
+if __name__ == '__main__':
+    search_users_example()
+```
+
+For more detailed examples on managing users, groups, services, and other directory features, please refer to the documentation within the `src/lib389/doc/source/` directory, such as `user.rst`, `group.rst`, etc.
+
+## Contributing
+
+Please see our [contributing guide](https://www.port389.org/docs/389ds/contributing.html).
+
+## License
+
+The 389 Directory Server is subject to the terms detailed in the
+license agreement file called LICENSE in the main project directory.
+
+
+
