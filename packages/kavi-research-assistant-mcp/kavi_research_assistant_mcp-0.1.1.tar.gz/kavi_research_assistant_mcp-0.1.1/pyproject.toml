@@ -1,0 +1,55 @@
+[project]
+name = "kavi-research-assistant-mcp"
+version = "0.1.1"
+description = "A Model Context Protocol server for research assistance with ChromaDB vector storage by kavi.ai"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Laxmi Kant Tiwari", email = "info@kgptalkie.com" }
+]
+keywords = ["mcp", "research", "chromadb", "vector-database", "ai", "langchain", "kavi.ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "chromadb>=1.1.0",
+    "fastapi>=0.116.1",
+    "fastmcp>=2.12.3",
+    "langchain>=0.3.27",
+    "langchain-chroma>=0.2.6",
+    "langchain-community>=0.3.29",
+    "langchain-mcp-adapters>=0.1.9",
+    "langchain-ollama>=0.3.8",
+    "langchain-openai>=0.3.33",
+    "langgraph>=0.6.7",
+    "matplotlib>=3.10.6",
+    "mcp-use[search]>=1.3.10",
+    "mcp[cli]>=1.14.0",
+    "numpy>=2.3.3",
+    "openai>=1.108.1",
+    "pandas>=2.3.2",
+    "pypdf2>=3.0.1",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.5",
+    "scipy>=1.16.2"
+]
+
+[project.urls]
+Homepage = "https://github.com/machhakiran/kavi-research-assistant-mcp"
+Repository = "https://github.com/machhakiran/kavi-research-assistant-mcp"
+Issues = "https://github.com/machhakiran/kavi-research-assistant-mcp"
+
+[project.scripts]
+kavi-research-assistant-mcp = "kavi_research_assistant_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kavi_research_assistant_mcp"]
