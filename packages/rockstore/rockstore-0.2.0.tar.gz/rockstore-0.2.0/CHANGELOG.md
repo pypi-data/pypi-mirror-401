@@ -1,0 +1,47 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.2] - 2024-01-XX
+
+### Added
+- `get_range()` method for efficient range queries with pagination support
+- `iterate_range()` generator for memory-efficient streaming of key-value pairs
+- Support for start_key, end_key, and limit parameters in range operations
+- Comprehensive pagination examples for large databases (10M+ records)
+- Enhanced documentation with practical examples for batch processing
+
+### Enhanced
+- Updated API documentation with range query methods
+- Added tests for pagination scenarios and edge cases
+
+## [0.1.1] - 2024-01-XX
+
+### Removed
+- **BREAKING**: Removed string convenience methods (`put_string`, `get_string`, `delete_string`)
+- API now focuses solely on binary operations for better performance and simplicity
+
+### Changed
+- Updated documentation to show manual string encoding/decoding examples
+- Simplified API surface to core binary operations only
+
+## [0.1.0] - 2024-01-XX
+
+### Added
+- Initial release of RockStore
+- Basic RocksDB operations: put, get, delete
+- String convenience methods: put_string, get_string, delete_string
+- Context manager support with open_database
+- Read-only mode support
+- Configurable compression types (snappy, lz4, zstd, etc.)
+- Customizable write buffer size and max open files
+- Per-operation sync and fill_cache options
+- Cross-platform support (macOS, Linux, Windows)
+- Comprehensive test suite
+
+### Notes
+- Package renamed from "pyrocks" to "rockstore" due to PyPI name availability
+- Main class renamed from "PyRocks" to "RockStore" for consistency 
