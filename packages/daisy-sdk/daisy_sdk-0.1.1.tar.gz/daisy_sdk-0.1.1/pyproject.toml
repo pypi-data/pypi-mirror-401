@@ -1,0 +1,32 @@
+[project]
+name = "daisy-sdk"
+version = "0.1.1"
+description = "Daisy SDK CLI for auth and image fetch"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Daisy" }]
+keywords = ["daisy", "cli", "sdk"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+  "requests>=2.32,<3.0",
+  "tomli-w>=1.0,<2.0",
+  "typer>=0.12,<1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[project.scripts]
+daisy = "daisy_sdk.cli:app"
+
+[tool.uv]
+package = true
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
