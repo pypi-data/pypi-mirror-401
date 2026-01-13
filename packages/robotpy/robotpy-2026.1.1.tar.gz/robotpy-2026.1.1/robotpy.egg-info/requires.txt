@@ -1,0 +1,75 @@
+robotpy-wpiutil==2026.1.1
+robotpy-wpinet==2026.1.1
+robotpy-wpimath==2026.1.1
+pyntcore==2026.1.1
+robotpy-hal==2026.1.1
+wpilib==2026.1.1
+robotpy-wpilib-utilities<2027.0.0,>=2026.0.1
+robotpy-cli<2027.0.0,>=2026.0.1
+
+[:platform_machine != "roborio"]
+robotpy-halsim-gui==2026.1.1
+
+[:platform_machine != "roborio" and platform_machine != "armv7l"]
+robotpy-installer<2027.0.0,>=2026.0.1
+pyfrc<2027.0.0,>=2026.0.1
+
+[all]
+robotpy-wpiutil==2026.1.1
+robotpy-wpinet==2026.1.1
+robotpy-wpimath==2026.1.1
+pyntcore==2026.1.1
+robotpy-hal==2026.1.1
+wpilib==2026.1.1
+robotpy-wpilib-utilities<2027.0.0,>=2026.0.1
+robotpy-cli<2027.0.0,>=2026.0.1
+robotpy-apriltag==2026.1.1
+robotpy-commands-v2==2026.1.1
+robotpy-cscore==2026.1.1
+
+[all:platform_machine != "roborio"]
+robotpy-halsim-gui==2026.1.1
+robotpy-romi==2026.1.1
+robotpy-halsim-ds-socket==2026.1.1
+robotpy-halsim-ws==2026.1.1
+robotpy-xrp==2026.1.1
+
+[all:platform_machine != "roborio" and platform_machine != "armv7l"]
+robotpy-installer<2027.0.0,>=2026.0.1
+pyfrc<2027.0.0,>=2026.0.1
+
+[all:platform_machine == "roborio"]
+numpy==2.3.5.*
+robotpy-opencv
+
+[apriltag]
+robotpy-apriltag==2026.1.1
+
+[apriltag:platform_machine == "roborio"]
+numpy==2.3.5.*
+
+[commands2]
+robotpy-commands-v2==2026.1.1
+
+[cscore]
+robotpy-cscore==2026.1.1
+
+[cscore:platform_machine == "roborio"]
+numpy==2.3.5.*
+robotpy-opencv
+
+[romi]
+
+[romi:platform_machine != "roborio"]
+robotpy-romi==2026.1.1
+
+[sim]
+
+[sim:platform_machine != "roborio"]
+robotpy-halsim-ds-socket==2026.1.1
+robotpy-halsim-ws==2026.1.1
+
+[xrp]
+
+[xrp:platform_machine != "roborio"]
+robotpy-xrp==2026.1.1
