@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rutube-studio-client"
+version = "0.1.0"
+description = "Async wrapper for Rutube Studio API"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "httpx",
+    "pydantic",
+    "yt-dlp"
+]
+
+# ВОТ ЭТА ЧАСТЬ САМАЯ ВАЖНАЯ:
+[tool.hatch.build.targets.wheel]
+packages = ["rutube_studio_client"]
