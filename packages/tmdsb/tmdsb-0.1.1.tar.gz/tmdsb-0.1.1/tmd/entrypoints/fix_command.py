@@ -1,0 +1,185 @@
+from pprint import pformat
+import os
+import sys
+from difflib import SequenceMatcher
+from .. import logs, types, const
+from ..conf import settings
+from ..corrector import get_corrected_commands
+from ..exceptions import EmptyCommand
+from ..ui import select_command
+from ..utils import get_alias, get_all_executables
+
+
+def _get_raw_command(known_args):
+    if known_args.force_command:
+        return [known_args.force_command]
+    elif known_args.command:
+        return known_args.command
+    elif os.environ.get('TMD_HISTORY'):
+        # 如果通过别名调用，使用环境变量中的历史
+        history = os.environ['TMD_HISTORY'].split('\n')[::-1]
+        alias = get_alias()
+        executables = get_all_executables()
+        for command in history:
+            diff = SequenceMatcher(a=alias, b=command).ratio()
+            if diff < const.DIFF_WITH_ALIAS or command in executables:
+                return [command]
+    else:
+        # 不使用别名：获取最近几条命令，找到第一条非 tmd 的命令
+        import subprocess
+        
+        # 已知的 tmd 命令列表（需要排除）
+        known_commands = ['tmd']
+        # 系统命令列表（需要排除）
+        system_commands = ['bash', 'sh', 'history', 'fc', 'echo', 'source', 'export', 'cd', 'pwd', 'ls', 'cat', 'grep']
+        
+        # 方法1: 优先使用 fc -ln 从当前 shell 会话获取历史（包含最新命令）
+        # 注意：fc 在子进程中可能无法获取当前 shell 的历史，所以需要从历史文件读取
+        # 但先尝试 fc，因为它可能在某些情况下能工作
+        try:
+            result = subprocess.run(
+                ['bash', '-c', 'fc -ln -20'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                timeout=1
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                lines = result.stdout.strip().split('\n')
+                # 从后往前查找，找到第一条非 tmd 和非系统命令
+                for cmd in reversed(lines):
+                    cmd = cmd.strip()
+                    if cmd:
+                        cmd_parts = cmd.split()
+                        if cmd_parts and cmd_parts[0] not in known_commands:
+                            if cmd_parts[0] not in system_commands:
+                                # 调试：记录找到的命令
+                                from .. import logs
+                                logs.debug(f'通过 fc 找到命令: {cmd}')
+                                return [cmd]
+        except Exception as e:
+            from .. import logs
+            logs.debug(f'无法使用 fc 命令读取历史: {e}')
+        
+        # 方法2: 读取历史文件，优先查找包含 "apt" 等关键词的命令（更可能是用户刚输入的错误命令）
+        try:
+            histfile = os.environ.get('HISTFILE', os.path.expanduser('~/.bash_history'))
+            if os.path.exists(histfile):
+                with open(histfile, 'r', encoding='utf-8', errors='ignore') as f:
+                    lines = f.readlines()
+                    # 从后往前查找最后50条，增加范围以提高成功率
+                    # 优先返回包含常见命令关键词的命令（如 apt, pip, git 等）
+                    priority_keywords = ['apt', 'pip', 'git', 'sudo', 'docker', 'npm', 'yarn']
+                    
+                    # 第一遍：查找包含优先级关键词的命令
+                    for line in reversed(lines[-50:]):
+                        cmd = line.strip()
+                        if cmd:
+                            cmd_parts = cmd.split()
+                            if cmd_parts and cmd_parts[0] not in known_commands:
+                                if cmd_parts[0] not in system_commands:
+                                    # 如果命令包含优先级关键词，优先返回
+                                    if any(keyword in cmd for keyword in priority_keywords):
+                                        from .. import logs
+                                        logs.debug(f'通过历史文件找到命令（优先级）: {cmd}')
+                                        return [cmd]
+                    
+                    # 第二遍：如果没有找到优先级命令，返回任何非 tmd 和非系统命令
+                    for line in reversed(lines[-50:]):
+                        cmd = line.strip()
+                        if cmd:
+                            cmd_parts = cmd.split()
+                            if cmd_parts and cmd_parts[0] not in known_commands:
+                                if cmd_parts[0] not in system_commands:
+                                    from .. import logs
+                                    logs.debug(f'通过历史文件找到命令: {cmd}')
+                                    return [cmd]
+        except Exception as e:
+            from .. import logs
+            logs.debug(f'无法读取历史文件: {e}')
+        except Exception as e:
+            from .. import logs
+            logs.debug(f'无法读取历史文件: {e}')
+        
+        # 方法2: 使用 fc -ln -10 获取最近10条命令（bash 内置命令）
+        try:
+            result = subprocess.run(
+                ['bash', '-c', 'fc -ln -10'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                timeout=1
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                lines = result.stdout.strip().split('\n')
+                # 从后往前查找，找到第一条非 tmd 的命令
+                for cmd in reversed(lines):
+                    cmd = cmd.strip()
+                    if cmd:
+                        cmd_parts = cmd.split()
+                        if cmd_parts and cmd_parts[0] not in known_commands:
+                            return [cmd]
+        except Exception as e:
+            from .. import logs
+            logs.debug(f'无法使用 fc 命令读取历史: {e}')
+        
+        # 方法3: 如果 fc 失败，尝试使用 history | tail -10
+        try:
+            result = subprocess.run(
+                ['bash', '-c', 'history | tail -10'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                timeout=1
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                lines = result.stdout.strip().split('\n')
+                # 从后往前查找，找到第一条非 tmd 的命令
+                for line in reversed(lines):
+                    line = line.strip()
+                    if line:
+                        # history 输出格式通常是: "  123  command"
+                        # 需要提取命令部分（去掉行号）
+                        parts = line.split(None, 1)  # 按空格分割，最多分割一次
+                        if len(parts) > 1:
+                            cmd = parts[1].strip()  # 取第二部分（命令）
+                        else:
+                            cmd = line.strip()
+                        
+                        # 检查是否是 tmd 命令
+                        if cmd:
+                            cmd_parts = cmd.split()
+                            if cmd_parts and cmd_parts[0] not in known_commands:
+                                return [cmd]
+        except Exception as e:
+            from .. import logs
+            logs.debug(f'无法使用 history 命令读取历史: {e}')
+    return []
+
+
+def fix_command(known_args):
+    """Fixes previous command. Used when `tmd` called without arguments."""
+    settings.init(known_args)
+    with logs.debug_time('Total'):
+        logs.debug(u'Run with settings: {}'.format(pformat(settings)))
+        raw_command = _get_raw_command(known_args)
+        
+        # 调试：显示读取到的命令
+        if raw_command:
+            logs.debug(u'读取到的命令: {}'.format(raw_command))
+        else:
+            logs.debug(u'未读取到命令')
+
+        try:
+            command = types.Command.from_raw_script(raw_command)
+        except EmptyCommand:
+            logs.debug('Empty command, nothing to do')
+            return
+
+        corrected_commands = get_corrected_commands(command)
+        selected_command = select_command(corrected_commands)
+
+        if selected_command:
+            selected_command.run(command)
+        else:
+            sys.exit(1)
