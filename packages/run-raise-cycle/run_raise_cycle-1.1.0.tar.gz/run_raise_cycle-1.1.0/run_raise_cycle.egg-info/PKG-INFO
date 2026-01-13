@@ -1,0 +1,64 @@
+Metadata-Version: 2.4
+Name: run-raise-cycle
+Version: 1.1.0
+Summary: Run, raise, or cycle through application windows
+Author-email: "@readwithai" <talwrii@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/run-raise-cycle
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Environment :: X11 Applications
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# Run (or) raise (or) cycle
+Try to raise a window for a program. If none exist create one, if one is already focused and there is another cycle to the next one.
+
+Only suports X11, XWayland may work.
+
+This contains AI generated code.
+
+## Motivation
+There are many run-or-raise script which will select a window if it is open or open the application. This is useful because you need only one shortcut to interact with an application, you don't need a separate commadn to open the program. Having a shortcut to switch to a specific application can be learned once and reused regardless of context.
+
+However, sometimes you have multiple window for the same program. This tool deals with this situation by also cycling through windows.
+
+
+## Installation
+You can install run-raise-cycle with pipx with 
+
+```
+pipx install run-raise-cycle
+```
+
+
+## Caveaats
+We only support X11 because there appears to be no consistent way of getting window identities in wayland compositors. Wayland only supports a subset of X11's functionality
+
+
+## Usage
+Obtain the window class:
+
+```
+xprop WM_CLASS
+```
+
+Then run
+
+```
+run-raise-cycle "CLASS" -- start-program
+```
+
+You may wish to create a shortcut in your window manager to do this. This is how you can [do this from the command-line in KDE](https://readwithai.substack.com/p/creating-kde-keyboard-shortcuts-from).
+
+## Alternaives and prior work
+Your desktop may allow you to raise and cycle windows through it's GUI taskbar may implement this functoinality. KDE has this feature but seems to require you to click on an icon to switch. `wmctrl` and `xdotoo` can raise windwos.
+
+There are many implementations of the run-or-raise tool.
+
+If you using X11 then you may be able to set the class of a window when you spawn it with `--class` and then have a distinct binding for each instance of an application window.
+
+

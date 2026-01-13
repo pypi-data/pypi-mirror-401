@@ -1,0 +1,27 @@
+[build-system]
+requires = [ "setuptools>=61.0",]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "run-raise-cycle"
+version = "1.1.0"
+description = "Run, raise, or cycle through application windows"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [ "Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Operating System :: POSIX :: Linux", "Environment :: X11 Applications",]
+[[project.authors]]
+name = "@readwithai"
+email = "talwrii@gmail.com"
+
+[project.license]
+text = "MIT"
+
+[project.scripts]
+run-raise-cycle = "run_raise_cycle.main:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/run-raise-cycle"
+
+[tool.setuptools.packages.find]
+where = [ ".",]
+include = [ "run_raise_cycle*",]
