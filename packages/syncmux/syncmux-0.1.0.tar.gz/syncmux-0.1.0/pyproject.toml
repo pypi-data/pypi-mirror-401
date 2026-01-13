@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "syncmux"
+dynamic = ["version"]
+description = "Fast file synchronization for remote development over SSH"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [{name = "Shantanu Banerjee", email = "shantanu@banerg.net"}]
+keywords = ["ssh", "sync", "development", "remote", "rsync"]
+dependencies = ["watchdog>=3.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/bradley101/syncmux"
+Repository = "https://github.com/bradley101/syncmux"
+
+[project.scripts]
+syncmux = "syncmux.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "syncmux.version.__version__"}
