@@ -1,0 +1,29 @@
+[project]
+name = "itar"
+version = "0.4.2"
+description = "tar file index for constant-time member access"
+readme = "README.md"
+authors = [
+    { name = "Karim Abou Zeid", email = "contact@ka.codes" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "msgpack>=1.1.1",
+    "tqdm>=4.67.1",
+    "humanize>=4.12.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0",
+    "ruff>=0.11.13",
+    "zensical>=0.0.10",
+    "mkdocstrings-python>=2.0.1",
+]
+
+[project.scripts]
+itar = "itar.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.0,<0.10.0"]
+build-backend = "uv_build"
