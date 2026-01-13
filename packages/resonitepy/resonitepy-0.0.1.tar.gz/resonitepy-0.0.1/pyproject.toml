@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "resonitepy"
+version = "0.0.1"
+description = "Unofficial Resonite API python library."
+authors = ["brodokk <brodokk@brodokk.space>"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/brodokk/resonitepy"
+repository = "https://github.com/brodokk/resonitepy"
+include = [
+    "LICENSE",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+python-dateutil = "^2.8.2"
+requests = "^2.28.1"
+dacite = "^1.6.0"
+
+[tool.poetry.dev-dependencies]
+pdoc3 = "^0.10.0"
+pytest = "^8.3.5"
+pytest-mock = "^3.14.0"
+pytest-cov = "^2.12.1"
+
+[tool.poetry.scripts]
+test = "run_tests:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
