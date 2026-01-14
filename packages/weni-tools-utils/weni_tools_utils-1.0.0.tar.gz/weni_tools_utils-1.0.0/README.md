@@ -1,0 +1,371 @@
+# Weni Tools Utils
+
+Biblioteca compartilhada de utilitários e ferramentas para agentes de IA na plataforma Weni.
+
+## 🎯 Problema que Resolve
+
+Antes desta biblioteca, cada cliente tinha uma cópia completa do código do agente, resultando em:
+- ❌ Código duplicado (70%+ idêntico entre clientes)
+- ❌ Bug fix = N deploys manuais
+- ❌ Manutenção exponencial
+- ❌ Difícil onboarding de novos clientes
+
+## ✅ Solução
+
+Uma biblioteca centralizada com sistema de plugins:
+- ✅ Core compartilhado (busca, simulação, estoque)
+- ✅ Plugins opcionais (regionalização, atacado, carousel)
+- ✅ Bug fix = 1 deploy, todos atualizados
+- ✅ Novo cliente = importar e configurar plugins
+
+## 📦 Instalação
+
+```bash
+pip install weni-tools-utils
+```
+
+Ou adicione ao `requirements.txt`:
+```
+weni-tools-utils>=1.0.0
+```
+
+## 🚀 Uso Básico
+
+```python
+from weni_vtex import ProductConcierge
+
+concierge = ProductConcierge(
+    base_url="https://loja.vtexcommercestable.com.br",
+    store_url="https://loja.com.br"
+)
+
+result = concierge.search(product_name="furadeira")
+```
+
+## 🔌 Plugins Disponíveis
+
+### Regionalization
+Para clientes com regionalização por CEP.
+
+```python
+from weni_vtex import ProductConcierge
+from weni_vtex.plugins import Regionalization
+
+concierge = ProductConcierge(
+    base_url="...",
+    store_url="...",
+    plugins=[
+        Regionalization(
+            seller_rules={
+                "mooca_sellers": ["loja1000", "loja1003"],
+                "retirada_sellers": ["loja1000"],
+                "entrega_sellers": ["loja1003"],
+            }
+        )
+    ]
+)
+
+result = concierge.search(
+    product_name="cimento",
+    postal_code="01310-100"
+)
+```
+
+### Wholesale
+Para clientes com preços de atacado.
+
+```python
+from weni_vtex.plugins import Wholesale
+
+concierge = ProductConcierge(
+    plugins=[
+        Wholesale(fixed_price_url="https://loja.com.br/fixedprices")
+    ]
+)
+```
+
+### Carousel
+Para enviar produtos via WhatsApp carousel.
+
+```python
+from weni_vtex.plugins import Carousel
+
+concierge = ProductConcierge(
+    plugins=[
+        Carousel(
+            weni_token="seu-token",
+            max_items=10,
+            auto_send=True
+        )
+    ]
+)
+
+result = concierge.search(
+    product_name="camiseta",
+    contact_info={"urn": "whatsapp:5511999999999"}
+)
+```
+
+### CAPI (Meta Conversions API)
+Para enviar eventos de conversão para Meta.
+
+```python
+from weni_vtex.plugins import CAPI
+
+concierge = ProductConcierge(
+    plugins=[
+        CAPI(event_type="lead", auto_send=True)
+    ]
+)
+```
+
+### WeniFlowTrigger
+Para disparar fluxos Weni.
+
+```python
+from weni_vtex.plugins import WeniFlowTrigger
+
+concierge = ProductConcierge(
+    plugins=[
+        WeniFlowTrigger(
+            flow_uuid="uuid-do-fluxo",
+            trigger_once=True
+        )
+    ]
+)
+```
+
+## 📋 Exemplo Completo: Obramax
+
+```python
+from weni import Tool
+from weni.context import Context
+from weni.responses import TextResponse
+from weni_vtex import ProductConcierge
+from weni_vtex.plugins import Regionalization, Wholesale, WeniFlowTrigger
+
+
+class SearchProduct(Tool):
+    def execute(self, context: Context) -> TextResponse:
+        concierge = ProductConcierge(
+            base_url=context.credentials.get("BASE_URL"),
+            store_url=context.credentials.get("STORE_URL"),
+            plugins=[
+                Regionalization(
+                    seller_rules={
+                        "mooca_sellers": ["lojaobramax1000", "lojaobramax1003", "lojaobramax1500"],
+                        "retirada_sellers": ["lojaobramax1000", "lojaobramax1003"],
+                        "entrega_sellers": ["lojaobramax1000", "lojaobramax1500"],
+                    },
+                    priority_categories=[
+                        "/Pisos e Revestimentos/Pisos Cerâmicos/",
+                        "/Pisos e Revestimentos/Porcelanatos/",
+                    ]
+                ),
+                Wholesale(fixed_price_url="https://www.obramax.com.br/fixedprices"),
+                WeniFlowTrigger(trigger_once=True),
+            ]
+        )
+        
+        result = concierge.search(
+            product_name=context.parameters.get("product_name"),
+            postal_code=context.parameters.get("postal_code"),
+            quantity=int(context.parameters.get("quantity", 1)),
+            credentials={
+                "API_TOKEN_WENI": context.credentials.get("API_TOKEN_WENI"),
+                "EVENT_ID_CONCIERGE": context.credentials.get("EVENT_ID_CONCIERGE"),
+            },
+            contact_info={"urn": context.contact.get("urn")}
+        )
+        
+        return TextResponse(data=result)
+```
+
+## 🏗️ Arquitetura
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        ProductConcierge                              │
+│                     (Orquestra todo o fluxo)                         │
+└─────────────────────────────────────────────────────────────────────┘
+                                 │
+            ┌────────────────────┼────────────────────┐
+            │                    │                    │
+            ▼                    ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│   VTEXClient    │  │  StockManager   │  │    Plugins      │
+│                 │  │                 │  │                 │
+│ • search()      │  │ • check()       │  │ • before_search │
+│ • simulate()    │  │ • filter()      │  │ • after_search  │
+│ • get_region()  │  │ • limit_size()  │  │ • enrich()      │
+└─────────────────┘  └─────────────────┘  └─────────────────┘
+```
+
+## 🔄 Fluxo de Execução
+
+1. **before_search** - Plugins modificam contexto (ex: obtém region_id)
+2. **intelligent_search** - Busca produtos na VTEX
+3. **after_search** - Plugins filtram/modificam produtos
+4. **check_availability** - Verifica estoque
+5. **after_stock_check** - Plugins enriquecem (ex: preços atacado)
+6. **filter_products** - Filtra apenas produtos com estoque
+7. **enrich_products** - Plugins adicionam dados extras
+8. **finalize_result** - Plugins fazem ações finais (ex: enviar eventos)
+
+## 🧪 Desenvolvimento
+
+```bash
+# Clone o repositório
+git clone https://github.com/weni-ai/tools-utils.git
+cd tools-utils
+
+# Crie um ambiente virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou: venv\Scripts\activate  # Windows
+
+# Instale dependências de desenvolvimento
+pip install -e ".[dev]"
+
+# Execute testes
+pytest
+
+# Formate código
+black src/
+isort src/
+
+# Verifique tipos
+mypy src/
+```
+
+## 📦 Publicando no PyPI
+
+### Primeira vez (configuração)
+
+1. Crie uma conta em [pypi.org](https://pypi.org/account/register/)
+2. Gere um token de API em [Account Settings > API tokens](https://pypi.org/manage/account/token/)
+3. Configure o token localmente:
+
+```bash
+# Crie o arquivo de configuração
+cat > ~/.pypirc << EOF
+[pypi]
+username = __token__
+password = pypi-YOUR-TOKEN-HERE
+EOF
+
+chmod 600 ~/.pypirc
+```
+
+### Publicando uma nova versão
+
+```bash
+# 1. Atualize a versão no pyproject.toml
+# version = "1.0.1"
+
+# 2. Atualize o CHANGELOG.md
+
+# 3. Instale ferramentas de build
+pip install build twine
+
+# 4. Limpe builds anteriores
+rm -rf dist/ build/ *.egg-info
+
+# 5. Construa o pacote
+python -m build
+
+# 6. Verifique o pacote (opcional mas recomendado)
+twine check dist/*
+
+# 7. Publique no PyPI (produção)
+twine upload dist/*
+
+# OU publique no TestPyPI primeiro (para testar)
+twine upload --repository testpypi dist/*
+```
+
+### Testando a instalação
+
+```bash
+# Do PyPI
+pip install weni-tools-utils
+
+# Do TestPyPI
+pip install --index-url https://test.pypi.org/simple/ weni-tools-utils
+```
+
+### CI/CD com GitHub Actions
+
+Crie `.github/workflows/publish.yml`:
+
+```yaml
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      
+      - name: Build package
+        run: python -m build
+      
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*
+```
+
+## 📊 Comparação: Antes vs Depois
+
+| Métrica | Antes | Depois |
+|---------|-------|--------|
+| Linhas de código (Obramax) | 938 | ~50 |
+| Linhas de código (Reserva) | 770 | ~130 |
+| Arquivos duplicados | 2+ | 0 |
+| Deploy para bug fix | N clientes | 1 (lib) |
+| Tempo onboarding novo cliente | Horas | Minutos |
+
+## 🤝 Criando um Novo Plugin
+
+```python
+from weni_vtex.plugins import PluginBase
+
+class MeuPlugin(PluginBase):
+    name = "meu_plugin"
+    
+    def before_search(self, context, client):
+        # Modifica contexto antes da busca
+        return context
+    
+    def after_search(self, products, context, client):
+        # Modifica produtos após busca
+        return products
+    
+    def after_stock_check(self, products_with_stock, context, client):
+        # Enriquece produtos após verificação de estoque
+        return products_with_stock
+    
+    def finalize_result(self, result, context):
+        # Última modificação antes de retornar
+        return result
+```
+
+## 📝 Licença
+
+MIT License - Weni AI
