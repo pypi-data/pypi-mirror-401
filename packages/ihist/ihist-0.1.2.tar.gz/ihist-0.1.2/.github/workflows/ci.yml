@@ -1,0 +1,285 @@
+# This file is part of ihist
+# Copyright 2025 Board of Regents of the University of Wisconsin System
+# SPDX-License-Identifier: MIT
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: pre-commit/action@v3.0.1
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            compiler: Clang
+            cxx: clang++
+            opts: -Db_sanitize=address,undefined -Db_lundef=false
+          - runner: ubuntu-24.04
+            compiler: GCC
+            cxx: g++-14
+          - runner: windows-2025
+            compiler: Clang
+            cxx: clang-cl
+            opts: -Db_sanitize=address,undefined
+          - runner: windows-2025
+            compiler: MSVC
+            cxx: cl
+          - runner: macos-15
+            compiler: Clang
+            cxx: clang++
+            opts: -Db_sanitize=address,undefined -Db_lundef=false
+          - runner: macos-15-intel
+            compiler: Clang
+            cxx: clang++
+    name: cpp-test-${{ matrix.runner }}-${{ matrix.compiler }}
+    runs-on: ${{ matrix.runner }}
+    env:
+      CXX: ${{ matrix.cxx }}
+      MACOSX_DEPLOYMENT_TARGET: 12.0
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+      - name: Install tools
+        run: uv tool install rust-just
+      - name: Install dependencies - macOS
+        if: startsWith(matrix.runner, 'macos-')
+        run: brew install tbb
+      - name: Install OpenCV - macOS (not Intel)
+        # This is very slow on macos-15-intel so skip there.
+        if: matrix.runner == 'macos-15'
+        run: brew install opencv
+      - name: Install dependencies - Ubuntu
+        if: startsWith(matrix.runner, 'ubuntu-')
+        run: |
+          sudo apt-get update
+          sudo apt-get install libtbb-dev libopencv-dev
+      - name: Install GCC-14 - Ubuntu
+        if: startsWith(matrix.runner, 'ubuntu-') && matrix.compiler == 'GCC'
+        run: |
+           sudo apt-get install g++-14
+      - name: Install dependencies (Windows)
+        if: startsWith(matrix.runner, 'windows-')
+        uses: MinoruSekine/setup-scoop@v4.0.2
+        with:
+          apps: pkg-config opencv
+      - name: Build and test
+        shell: bash
+        run: |
+          just configure release ${{ matrix.opts }}
+          just build  # Make sure benchmarks build, too
+          just test
+
+  test-no-tbb:
+    name: cpp-test-no-tbb-ubuntu
+    runs-on: ubuntu-24.04
+    env:
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+      - name: Build and test without TBB
+        run: |
+          uvx meson setup builddir -Dtbb=disabled
+          uvx meson compile -C builddir
+          uvx meson test -C builddir
+
+  wheels:
+    name: wheels-${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            name: ubuntu-24.04
+          - os: windows-2025
+            name: windows-2025
+          - os: macos-15
+            arch: arm64
+            deployment_target: "11.0"
+            name: macos-15-arm64
+          - os: macos-15
+            arch: x86_64
+            deployment_target: "10.15"
+            name: macos-15-x86_64
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install pkg-config (Windows)
+        if: startsWith(matrix.os, 'windows-')
+        uses: MinoruSekine/setup-scoop@v4.0.2
+        with:
+          apps: pkg-config
+      - uses: pypa/cibuildwheel@v3.3.0
+        env:
+          CIBW_ENVIRONMENT_LINUX: >-
+            TBB_PREFIX=/tmp/tbb
+            PKG_CONFIG_PATH=/tmp/tbb/lib/pkgconfig
+          CIBW_ENVIRONMENT_MACOS: >-
+            MACOSX_DEPLOYMENT_TARGET=${{ matrix.deployment_target }}
+            PKG_CONFIG=/opt/homebrew/bin/pkg-config
+            TBB_PREFIX=/tmp/tbb
+            PKG_CONFIG_PATH=/tmp/tbb/lib/pkgconfig
+          CIBW_ENVIRONMENT_WINDOWS: >-
+            CXX=clang-cl
+            TBB_PREFIX="$RUNNER_TEMP/tbb"
+            PKG_CONFIG_PATH="$RUNNER_TEMP/tbb/lib/pkgconfig"
+          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
+          CIBW_TEST_SKIP: "*-macosx_x86_64"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: wheels-${{ matrix.name }}
+          path: wheelhouse/*.whl
+
+  publish-wheels:
+    needs: [lint, test, test-no-tbb, wheels]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # PyPI trusted publishing
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+      - run: uv build --sdist -C setup-args=-Dtbb=disabled
+      - uses: actions/upload-artifact@v6
+        with:
+          name: python-sdist
+          path: dist/ihist-*.tar.gz
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+      - run: ls dist
+      - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  jni-jars:
+    name: jars-${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            name: ubuntu-24.04
+            cxx: clang++
+          - os: windows-2025
+            name: windows-2025
+            cxx: clang-cl
+          - os: macos-15
+            name: macos-15-arm64
+            arch_flags: -arch arm64
+            deployment_target: "11.0"
+            cxx: clang++
+          - os: macos-15
+            name: macos-15-x86_64
+            arch_flags: -arch x86_64
+            meson_cross_args: --cross-file=scripts/meson-cross-macos-x86_64.txt
+            jdk_arch: x86_64
+            deployment_target: "10.15"
+    env:
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.deployment_target }}
+      ARCHFLAGS: ${{ matrix.arch_flags }}
+      IHIST_MESON_CROSS_ARGS: ${{ matrix.meson_cross_args }}
+      CJDK_ARCH: ${{ matrix.jdk_arch }}
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+      - name: Install bash (macOS)
+        # macOS runners have Apple's ancient Bash by default
+        if: startsWith(matrix.os, 'macos-')
+        run: |
+          brew install bash
+      - name: Install pkg-config (Windows)
+        if: startsWith(matrix.os, 'windows-')
+        uses: MinoruSekine/setup-scoop@v4.0.2
+        with:
+          apps: pkg-config
+      - name: Install tools
+        run: uv tool install rust-just
+      - name: Build and test
+        shell: bash
+        run: just java-test
+      - uses: actions/upload-artifact@v6
+        with:
+          name: jni-jars-${{ matrix.name }}
+          path: java/target/ihist-*-natives-*.jar
+
+  publish-jars:
+    needs: [lint, test, test-no-tbb, jni-jars]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+      - name: Install tools
+        run: uv tool install rust-just
+      - run: just java-package-no-jni
+      - uses: actions/upload-artifact@v6
+        with:
+          name: java-jars
+          path: java/target/ihist-*.jar
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: jni-jars-*
+          merge-multiple: true
+          path: jnijars
+      - id: check-jars
+        run: |
+          just java-stage jnijars
+          tree java/target/staging-deploy
+          ./scripts/check_jars.sh java/target/staging-deploy
+          echo "version=$(just java-version)" >> $GITHUB_OUTPUT
+      - name: Deploy to Maven Central
+        uses: jreleaser/release-action@v2
+        timeout-minutes: 15
+        with:
+          arguments: deploy ${{ !startsWith(github.ref, 'refs/tags/v') && '--dry-run' || '' }}
+          working-directory: java
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ steps.check-jars.outputs.version }}
+          JRELEASER_GITHUB_TOKEN: unused
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.MAVENCENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.MAVENCENTRAL_TOKEN }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.MAVEN_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.MAVEN_GPG_SECRET_KEY }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      - run: cat java/out/jreleaser/output.properties
+
+  create-release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [publish-wheels, publish-jars]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
