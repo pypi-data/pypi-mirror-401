@@ -1,0 +1,14 @@
+import os
+
+DEFAULT_MODEL = os.getenv("PP_DEFAULT_MODEL") or "gpt-4o-mini"
+DEFAULT_TEMPERATURE = os.getenv("PP_DEFAULT_TEMPERATURE") or 1.0
+DEFAULT_TOP_P = os.getenv("PP_DEFAULT_TOP_P") or 1.0
+DEFAULT_FREQUENCY_PENALTY = os.getenv("PP_DEFAULT_FREQUENCY_PENALTY") or 0.0
+DEFAULT_PRESENCE_PENALTY = os.getenv("PP_DEFAULT_PRESENCE_PENALTY") or 0.0
+MAX_RETRIES = os.getenv("PP_MAX_RETRIES") or 3
+
+# Minimum token budget for extended thinking/reasoning features
+# Used by providers that support reasoning (e.g., Bedrock with Claude)
+MIN_THINKING_BUDGET_TOKENS = 1024
+
+GENERATE_STRUCTURED_OUTPUT_PROMPT = "YOUR RESPONSE HAS TO INCLUDE A VALID JSON OBJECT THAT IMPLEMENTS THIS JSON SCHEMA: "
