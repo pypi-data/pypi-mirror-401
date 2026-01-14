@@ -1,0 +1,230 @@
+[project]
+name = "satvu"
+version = "0.3.0.20260113.1752"
+description = "SatVu API SDK"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+keywords = [ "satellite", "imagery", "thermal", "remote-sensing", "earth-observation", "stac", "geospatial", "api-client", "sdk",]
+classifiers = [ "Development Status :: 4 - Beta", "License :: OSI Approved :: MIT License", "Intended Audience :: Developers", "Intended Audience :: Science/Research", "Topic :: Scientific/Engineering :: GIS", "Topic :: Scientific/Engineering :: Image Processing", "Topic :: Software Development :: Libraries :: Python Modules", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Programming Language :: Python :: 3 :: Only", "Typing :: Typed", "Operating System :: OS Independent", "Framework :: Pydantic :: 2",]
+dependencies = [ "pydantic>=2.11.7",]
+[[project.authors]]
+name = "Christian Wygoda"
+email = "christian.wygoda@satellitevu.com"
+
+[[project.authors]]
+name = "James Harrison"
+email = "james.harrison@satellitevu.com"
+
+[[project.authors]]
+name = "Zhelini Raveendran"
+email = "zhelini.raveendran@satellitevu.com"
+
+[build-system]
+requires = [ "hatchling", "openapi-python-client>=0.27.0", "httpx>=0.28.1", "attr>=0.3.2",]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [ "attr>=0.3.2", "fawltydeps>=0.20.0", "freezegun>=1.5.5", "httpx>=0.28.1", "hypothesis>=6.148.2", "hypothesis-jsonschema>=0.23.1", "mdformat>=1.0.0", "mdformat-gfm>=1.0.0", "mdformat-ruff>=0.1.3", "openapi-python-client>=0.27.0", "pook>=2.1.0", "pyright>=1.1.407", "pytest>=8.3.4", "pytest-cov>=7.0.0", "pytest-xdist>=3.8.0", "requests>=2.32.0", "ruff>=0.14.3", "urllib3>=2.0.0",]
+
+[project.urls]
+Homepage = "https://www.satellitevu.com/"
+Documentation = "https://github.com/SatelliteVu/satvu-api-sdk#readme"
+Repository = "https://github.com/SatelliteVu/satvu-api-sdk"
+Issues = "https://github.com/SatelliteVu/satvu-api-sdk/issues"
+Changelog = "https://github.com/SatelliteVu/satvu-api-sdk/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+standard = [ "appdirs>=1.4.4",]
+http-urllib3 = [ "urllib3>=2.0.0",]
+http-requests = [ "requests>=2.32.0",]
+http-httpx = [ "httpx>=0.28.1",]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.pyright]
+exclude = [ ".dagger/", ".venv/", "**/__pycache__/", "**/node_modules/", "src/builder/patches.py",]
+pythonVersion = "3.10"
+reportMissingImports = true
+reportMissingTypeStubs = false
+typeCheckingMode = "basic"
+venv = ".venv"
+venvPath = "."
+
+[tool.fawltydeps]
+code = [ "src/",]
+ignore_unused = [ "fawltydeps", "hypothesis-jsonschema", "mdformat", "mdformat-gfm", "mdformat-ruff", "pyright", "pytest-cov", "pytest-xdist", "ruff",]
+ignore_undeclared = [ "builder", "hatchling", "jinja2", "satvu",]
+
+[tool.commitizen]
+name = "cz_customize"
+
+[tool.ruff.lint]
+select = [ "B", "E", "F", "FURB", "I", "SIM", "UP",]
+ignore = [ "E501", "UP007",]
+
+[tool.commitizen.customize]
+message_template = "{{change_type}}({{scope}}): {{subject}}{% if body %}\n\n{{body}}{% endif %}{% if breaking %}\n\nBREAKING CHANGE: {{breaking}}{% endif %}"
+example = "feat(catalog): add thermal_anomaly collection support"
+schema = "<type>(<scope>): <subject>"
+schema_pattern = "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\\((core|auth|http|catalog|cos|id|otm|policy|reseller|wallet|builder|deps|docs|test|misc)\\): .{1,50}$"
+commit_parser = "^(?P<change_type>feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\\((?P<scope>core|auth|http|catalog|cos|id|otm|policy|reseller|wallet|builder|deps|docs|test|misc)\\): (?P<message>.*)$"
+bump_pattern = "^(feat|fix|refactor|perf)"
+info = "Commits must follow: <type>(<scope>): <subject>"
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+message = "Select the type of change:"
+[[tool.commitizen.customize.questions.choices]]
+value = "feat"
+name = "feat:     A new feature"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "fix"
+name = "fix:      A bug fix"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "docs"
+name = "docs:     Documentation only"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "style"
+name = "style:    Code style (formatting, etc)"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "refactor"
+name = "refactor: Code change that neither fixes a bug nor adds a feature"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "perf"
+name = "perf:     Performance improvement"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "test"
+name = "test:     Adding or updating tests"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "build"
+name = "build:    Build system or dependencies"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "ci"
+name = "ci:       CI/CD configuration"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "chore"
+name = "chore:    Other changes (maintenance, tooling)"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "revert"
+name = "revert:   Revert a previous commit"
+
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "scope"
+message = "Select the scope of this change:"
+[[tool.commitizen.customize.questions.choices]]
+value = "core"
+name = "core:     SDK core (SDKClient, base functionality)"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "auth"
+name = "auth:     Authentication (AuthService, tokens)"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "http"
+name = "http:     HTTP adapters (httpx, requests, urllib3, stdlib)"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "catalog"
+name = "catalog:  Catalog API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "cos"
+name = "cos:      COS API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "id"
+name = "id:       ID API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "otm"
+name = "otm:      OTM API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "policy"
+name = "policy:   Policy API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "reseller"
+name = "reseller: Reseller API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "wallet"
+name = "wallet:   Wallet API service"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "builder"
+name = "builder:  SDK code generator"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "deps"
+name = "deps:     Dependencies"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "docs"
+name = "docs:     Documentation"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "test"
+name = "test:     Test infrastructure"
+
+[[tool.commitizen.customize.questions.choices]]
+value = "misc"
+name = "misc:     Miscellaneous changes"
+
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "Write a short description (max 50 chars):"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Longer description (optional, press enter to skip):"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "breaking"
+message = "Breaking change description (optional, press enter to skip):"
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+sort = "Cover"
+omit = [ "**/*_test.py", "**/conftest.py", "src/builder/**",]
+
+[tool.commitizen.customize.bump_map]
+feat = "MINOR"
+fix = "PATCH"
+refactor = "PATCH"
+perf = "PATCH"
+
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "src/satvu",]
+
+[tool.hatch.build.targets.sdist]
+include = [ "/src",]
+
+[tool.hatch.envs.default.scripts]
+build-sdk = "uv run python -m builder all"
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/builder" = "builder"
