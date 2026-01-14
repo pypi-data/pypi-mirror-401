@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Queue - Factumerit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status.info {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .queue-list {
+            margin: 20px 0;
+        }
+
+        .queue-item {
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            background: #fafafa;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
+        .queue-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .queue-item-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .queue-item-meta {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .queue-item-details {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .queue-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .queue-item.done {
+            opacity: 0.6;
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+
+        .queue-item.cancelled {
+            opacity: 0.6;
+            background: #ffebee;
+            border-color: #c62828;
+            text-decoration: line-through;
+        }
+
+        .queue-item.processing {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin-right: 6px;
+            vertical-align: middle;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #4caf50;
+        }
+
+        .btn-success:hover {
+            background: #43a047;
+        }
+
+        .btn-danger {
+            background: #e53935;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+        }
+
+        .btn-secondary {
+            background: #9e9e9e;
+        }
+
+        .btn-secondary:hover {
+            background: #757575;
+        }
+
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="pageTitle">Project Queue</h1>
+        <p id="subtitle" class="subtitle">Review and approve queued projects</p>
+
+        <div id="status" class="status loading">
+            <span class="spinner"></span>
+            <span id="statusText">Loading...</span>
+        </div>
+
+        <div id="queueList" class="queue-list hidden"></div>
+
+        <div id="actionsBar" class="actions-bar hidden">
+            <button id="approveAllBtn" class="btn btn-success" onclick="approveAll()">Approve All</button>
+            <button id="cancelAllBtn" class="btn btn-danger" onclick="cancelAll()">Cancel All</button>
+            <button id="closeBtn" class="btn btn-secondary" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const VIKUNJA_URL = 'https://vikunja.factumerit.app';
+        const MCP_URL = 'https://mcp.factumerit.app';
+
+        let token = null;
+        let queueData = [];
+
+        function setStatus(message, type = 'loading') {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${type}`;
+            if (type === 'loading') {
+                statusEl.innerHTML = `<span class="spinner"></span><span>${message}</span>`;
+            } else {
+                statusEl.textContent = message;
+            }
+        }
+
+        function getVikunjaToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+
+        async function fetchQueue() {
+            const resp = await fetch(`${MCP_URL}/project-queue`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!resp.ok) throw new Error(`Failed to fetch queue: ${resp.status}`);
+            return await resp.json();
+        }
+
+        async function createProject(spec) {
+            const resp = await fetch(`${VIKUNJA_URL}/api/v1/projects`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: spec.title,
+                    description: spec.description || '',
+                    hex_color: spec.hex_color || '',
+                    parent_project_id: spec.parent_project_id || 0
+                })
+            });
+            if (!resp.ok) throw new Error(`Failed to create project: ${resp.status}`);
+            return await resp.json();
+        }
+
+        async function shareWithBot(projectId, botUsername) {
+            try {
+                await fetch(`${VIKUNJA_URL}/api/v1/projects/${projectId}/users`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: botUsername, right: 2 })
+                });
+            } catch (e) {
+                console.warn(`Failed to share with bot: ${e}`);
+            }
+        }
+
+        async function markComplete(queueId) {
+            await fetch(`${MCP_URL}/project-queue/${queueId}/complete`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        }
+
+        async function cancelEntry(queueId) {
+            const resp = await fetch(`${MCP_URL}/project-queue/${queueId}/cancel`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            return resp.ok;
+        }
+
+        function getEntryTitle(entry) {
+            if (entry.projects && entry.projects.length > 0) {
+                return entry.projects.map(p => p.title).join(', ');
+            }
+            return entry.title || 'Untitled';
+        }
+
+        function getEntryColor(entry) {
+            if (entry.projects && entry.projects.length > 0) {
+                return entry.projects[0].hex_color;
+            }
+            return entry.hex_color;
+        }
+
+        function getEntryDescription(entry) {
+            if (entry.projects && entry.projects.length > 0) {
+                const count = entry.projects.length;
+                return `${count} project${count > 1 ? 's' : ''} to create`;
+            }
+            return entry.description || '';
+        }
+
+        function renderQueueList(entries) {
+            const listEl = document.getElementById('queueList');
+            listEl.innerHTML = '';
+
+            if (entries.length === 0) {
+                setStatus('No pending projects in queue', 'info');
+                document.getElementById('closeBtn').classList.remove('hidden');
+                document.getElementById('actionsBar').classList.remove('hidden');
+                document.getElementById('approveAllBtn').classList.add('hidden');
+                document.getElementById('cancelAllBtn').classList.add('hidden');
+                return;
+            }
+
+            for (const entry of entries) {
+                const color = getEntryColor(entry);
+                const colorSwatch = color ? `<span class="color-swatch" style="background: ${color}"></span>` : '';
+
+                const itemHtml = `
+                    <div class="queue-item" id="item-${entry.id}">
+                        <div class="queue-item-header">
+                            <div class="queue-item-title">${colorSwatch}${getEntryTitle(entry)}</div>
+                            <div class="queue-item-meta">ID: ${entry.id}</div>
+                        </div>
+                        <div class="queue-item-details">${getEntryDescription(entry)}</div>
+                        <div class="queue-item-actions">
+                            <button class="btn btn-success" onclick="approveItem(${entry.id})">Approve</button>
+                            <button class="btn btn-danger" onclick="cancelItem(${entry.id})">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                listEl.innerHTML += itemHtml;
+            }
+
+            listEl.classList.remove('hidden');
+            document.getElementById('actionsBar').classList.remove('hidden');
+            setStatus(`${entries.length} project${entries.length > 1 ? 's' : ''} pending approval`, 'info');
+        }
+
+        async function processEntry(entry) {
+            const itemEl = document.getElementById(`item-${entry.id}`);
+            if (itemEl) itemEl.classList.add('processing');
+
+            try {
+                if (entry.projects) {
+                    // Batch mode
+                    const idMap = new Map();
+                    for (const spec of entry.projects) {
+                        let parentId = spec.parent_project_id || 0;
+                        if (parentId < 0 && idMap.has(parentId)) {
+                            parentId = idMap.get(parentId);
+                        } else if (parentId < 0) {
+                            parentId = 0;
+                        }
+
+                        const project = await createProject({ ...spec, parent_project_id: parentId });
+                        if (spec.temp_id) idMap.set(spec.temp_id, project.id);
+                        if (entry.bot_username) await shareWithBot(project.id, entry.bot_username);
+                    }
+                } else {
+                    // Single mode
+                    const project = await createProject(entry);
+                    if (entry.bot_username) await shareWithBot(project.id, entry.bot_username);
+                }
+
+                await markComplete(entry.id);
+
+                if (itemEl) {
+                    itemEl.classList.remove('processing');
+                    itemEl.classList.add('done');
+                    itemEl.querySelector('.queue-item-actions').innerHTML = '<span style="color: #4caf50">Created</span>';
+                }
+                return true;
+            } catch (error) {
+                console.error(`Failed to process entry ${entry.id}:`, error);
+                if (itemEl) {
+                    itemEl.classList.remove('processing');
+                    itemEl.querySelector('.queue-item-actions').innerHTML = `<span style="color: #c62828">Error: ${error.message}</span>`;
+                }
+                return false;
+            }
+        }
+
+        async function approveItem(queueId) {
+            const entry = queueData.find(e => e.id === queueId);
+            if (!entry) return;
+
+            setStatus(`Creating project...`, 'loading');
+            const success = await processEntry(entry);
+
+            if (success) {
+                setStatus('Project created successfully!', 'success');
+                // Remove from local data
+                queueData = queueData.filter(e => e.id !== queueId);
+                if (queueData.length === 0) {
+                    document.getElementById('approveAllBtn').classList.add('hidden');
+                    document.getElementById('cancelAllBtn').classList.add('hidden');
+                }
+            }
+        }
+
+        async function cancelItem(queueId) {
+            setStatus('Cancelling...', 'loading');
+            const success = await cancelEntry(queueId);
+
+            const itemEl = document.getElementById(`item-${queueId}`);
+            if (success && itemEl) {
+                itemEl.classList.add('cancelled');
+                itemEl.querySelector('.queue-item-actions').innerHTML = '<span style="color: #c62828">Cancelled</span>';
+                queueData = queueData.filter(e => e.id !== queueId);
+                setStatus('Request cancelled', 'info');
+
+                if (queueData.length === 0) {
+                    document.getElementById('approveAllBtn').classList.add('hidden');
+                    document.getElementById('cancelAllBtn').classList.add('hidden');
+                }
+            } else {
+                setStatus('Failed to cancel', 'error');
+            }
+        }
+
+        async function approveAll() {
+            setStatus('Creating all projects...', 'loading');
+            let successCount = 0;
+
+            for (const entry of [...queueData]) {
+                const success = await processEntry(entry);
+                if (success) successCount++;
+            }
+
+            setStatus(`Created ${successCount} project(s)`, 'success');
+            queueData = [];
+            document.getElementById('approveAllBtn').classList.add('hidden');
+            document.getElementById('cancelAllBtn').classList.add('hidden');
+        }
+
+        async function cancelAll() {
+            if (!confirm('Cancel all pending projects?')) return;
+
+            setStatus('Cancelling all...', 'loading');
+
+            for (const entry of [...queueData]) {
+                await cancelEntry(entry.id);
+                const itemEl = document.getElementById(`item-${entry.id}`);
+                if (itemEl) {
+                    itemEl.classList.add('cancelled');
+                    itemEl.querySelector('.queue-item-actions').innerHTML = '<span style="color: #c62828">Cancelled</span>';
+                }
+            }
+
+            queueData = [];
+            setStatus('All requests cancelled', 'info');
+            document.getElementById('approveAllBtn').classList.add('hidden');
+            document.getElementById('cancelAllBtn').classList.add('hidden');
+        }
+
+        async function main() {
+            // Get token
+            token = getVikunjaToken();
+            if (!token) {
+                setStatus('Please log into Vikunja first', 'error');
+                setTimeout(() => { window.location.href = VIKUNJA_URL; }, 2000);
+                return;
+            }
+
+            // Check URL params
+            const params = new URLSearchParams(window.location.search);
+            const singleId = params.get('id');
+            const cancelId = params.get('cancel');
+            const processAll = params.get('all') === 'true';
+
+            try {
+                // Handle cancel request (no need to fetch queue first)
+                if (cancelId) {
+                    document.getElementById('pageTitle').textContent = 'Cancel Request';
+                    document.getElementById('subtitle').textContent = 'Cancelling queued project...';
+
+                    setStatus('Cancelling...', 'loading');
+                    const success = await cancelEntry(parseInt(cancelId));
+
+                    if (success) {
+                        setStatus('Request cancelled successfully', 'success');
+                    } else {
+                        setStatus('Could not cancel (already processed or not found)', 'error');
+                    }
+
+                    document.getElementById('closeBtn').classList.remove('hidden');
+                    document.getElementById('actionsBar').classList.remove('hidden');
+                    document.getElementById('approveAllBtn').classList.add('hidden');
+                    document.getElementById('cancelAllBtn').classList.add('hidden');
+                    return;
+                }
+
+                setStatus('Loading queue...', 'loading');
+                queueData = await fetchQueue();
+
+                if (singleId) {
+                    // Single item mode: process immediately
+                    const entry = queueData.find(e => e.id === parseInt(singleId));
+                    if (!entry) {
+                        setStatus('Queue item not found or already processed', 'error');
+                        document.getElementById('closeBtn').classList.remove('hidden');
+                        document.getElementById('actionsBar').classList.remove('hidden');
+                        return;
+                    }
+
+                    document.getElementById('pageTitle').textContent = 'Create Project';
+                    document.getElementById('subtitle').textContent = `Creating: ${getEntryTitle(entry)}`;
+
+                    setStatus('Creating project...', 'loading');
+                    const success = await processEntry(entry);
+
+                    if (success) {
+                        setStatus('Project created successfully!', 'success');
+                    } else {
+                        setStatus('Failed to create project', 'error');
+                    }
+
+                    document.getElementById('closeBtn').classList.remove('hidden');
+                    document.getElementById('actionsBar').classList.remove('hidden');
+                    document.getElementById('approveAllBtn').classList.add('hidden');
+                    document.getElementById('cancelAllBtn').classList.add('hidden');
+
+                } else if (processAll) {
+                    // Process all mode
+                    document.getElementById('pageTitle').textContent = 'Creating All Projects';
+                    await approveAll();
+                    document.getElementById('closeBtn').classList.remove('hidden');
+                    document.getElementById('actionsBar').classList.remove('hidden');
+
+                } else {
+                    // List mode: show all pending items
+                    renderQueueList(queueData);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                setStatus(`Error: ${error.message}`, 'error');
+                document.getElementById('closeBtn').classList.remove('hidden');
+                document.getElementById('actionsBar').classList.remove('hidden');
+            }
+        }
+
+        main();
+    </script>
+</body>
+</html>

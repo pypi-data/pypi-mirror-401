@@ -1,0 +1,108 @@
+# =============================================================================
+# RENDER SERVICE: vikunja-slack-bot
+# =============================================================================
+# This is the AI task assistant bot that connects to:
+# - Slack workspaces (via Slack Events API)
+# - Matrix homeserver (via matrix-nio client)
+# - MCP clients (via SSE transport)
+#
+# NOT to be confused with:
+# - factumerit-matrix: The Matrix homeserver itself (Synapse + MAS)
+# - factumerit-zitadel: The identity provider
+# - vikunja: The task management app (separate deployment)
+#
+# Dashboard: https://dashboard.render.com/web/srv-d50p4ns9c44c738capjg
+# =============================================================================
+
+services:
+  - type: web
+    name: vikunja-slack-bot
+    runtime: python
+    plan: starter  # $9/mo
+    buildCommand: pip install --no-cache-dir .
+    startCommand: vikunja-mcp --transport sse --port $PORT --smart-tasks
+    envVars:
+      # ----- SLACK BOT -----
+      # Get from: https://api.slack.com/apps → Your App → OAuth & Permissions
+      - key: SLACK_BOT_TOKEN
+        sync: false  # xoxb-xxx
+      - key: SLACK_SIGNING_SECRET
+        sync: false  # From Basic Information page
+
+      # ----- CLAUDE API -----
+      # Get from: https://console.anthropic.com/settings/keys
+      - key: ANTHROPIC_API_KEY
+        sync: false  # sk-ant-xxx
+
+      # ----- VIKUNJA -----
+      # The task management backend this bot connects to
+      - key: VIKUNJA_URL
+        sync: false  # REQUIRED: https://vikunja.factumerit.app
+      - key: VIKUNJA_MCP_CONFIG_DIR
+        value: /data/config  # Persistent storage for user configs
+      - key: VIKUNJA_BOT_TOKEN
+        sync: false  # API token for @eis bot user (smart tasks polling)
+
+      # ----- WAITING LIST -----
+      # For pre-launch waiting list feature
+      - key: WAITING_LIST_PROJECT_ID
+        sync: false  # Vikunja project ID for waiting list
+      - key: WAITING_LIST_VIKUNJA_TOKEN
+        sync: false  # Token with access to waiting list project
+
+      # ----- MATRIX BOT -----
+      # Bot account credentials on the Matrix homeserver
+      # The bot connects AS A CLIENT to factumerit-matrix
+      - key: MATRIX_HOMESERVER
+        sync: false  # https://matrix.factumerit.app
+      - key: MATRIX_USER
+        sync: false  # @eis:matrix.factumerit.app
+      - key: MATRIX_PASSWORD
+        sync: false  # Bot account password
+      - key: MATRIX_ACCESS_TOKEN
+        sync: false  # Optional: Pre-authenticated token (skip login)
+      - key: MATRIX_DEVICE_ID
+        value: vikunja_bot_render  # Session identifier
+      - key: MATRIX_WELCOME_ROOM_ID
+        sync: false  # Room ID for welcome messages
+      - key: MATRIX_CRYPTO_STORE_PATH
+        value: /data/crypto_store  # E2EE crypto keys (persistent disk)
+
+      # ----- ADMIN CONFIGURATION -----
+      # Comma-separated list of admin user IDs (granted owner role on startup)
+      # Supports any format: Slack (U0AJNT3KP), Vikunja (vikunja:ivan), Matrix (@user:server)
+      - key: ADMIN_USER_IDS
+        sync: false  # e.g., U0AJNT3KP,vikunja:ivan,@admin:matrix.factumerit.app
+
+      # ----- TOKEN BROKER (solutions-kik7) -----
+      # Secure token storage in PostgreSQL with encryption
+      - key: DATABASE_URL
+        sync: false  # Internal Render PostgreSQL URL
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false  # 32-byte Fernet key, base64 encoded
+
+      # ----- DEBUGGING -----
+      # Enable debug logging for troubleshooting
+      - key: VIKUNJA_DEBUG
+        value: "1"  # Set to "1" to enable debug logging
+      - key: LOG_LEVEL
+        value: DEBUG  # DEBUG, INFO, WARNING, ERROR
+
+    disk:
+      name: slack-bot-data
+      mountPath: /data
+      sizeGB: 1
+    healthCheckPath: /health
+
+# =============================================================================
+# DEPLOYMENT CHECKLIST
+# =============================================================================
+# 1. Set env vars in Render dashboard for vikunja-slack-bot service
+# 2. Create bot account on Matrix homeserver:
+#    - Via MAS admin panel, OR
+#    - Via register-user.py script with REGISTRATION_SECRET
+# 3. Deploy and check /health endpoint
+# 4. Test: DM @eis on Matrix, should get welcome message
+#
+# Cost: $9/mo (Starter) + $2.50/mo (1GB disk) = $11.50/mo
+# =============================================================================

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database (shared by Vikunja and MCP server)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: vikunja
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: vikunja
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vikunja"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Vikunja task management
+  vikunja:
+    image: vikunja/vikunja:0.24.6
+    environment:
+      VIKUNJA_DATABASE_TYPE: postgres
+      VIKUNJA_DATABASE_HOST: postgres
+      VIKUNJA_DATABASE_USER: vikunja
+      VIKUNJA_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      VIKUNJA_DATABASE_DATABASE: vikunja
+      VIKUNJA_SERVICE_PUBLICURL: http://localhost:3456
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: "true"
+      VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: "false"
+      VIKUNJA_MAILER_ENABLED: "false"
+      VIKUNJA_RATELIMIT_ENABLED: "false"  # Disable rate limiting for testing
+    ports:
+      - "3456:3456"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - vikunja_files:/app/vikunja/files
+
+  # MCP server (your backend)
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      DATABASE_URL: postgresql://vikunja:${POSTGRES_PASSWORD:-changeme}@postgres:5432/vikunja
+      VIKUNJA_URL: http://vikunja:3456
+      VIKUNJA_ADMIN_TOKEN: ${VIKUNJA_ADMIN_TOKEN:-dev-admin-token}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY:-fake-key}  # Optional for local dev
+      RESEND_WEBHOOK_SECRET: ${RESEND_WEBHOOK_SECRET:-}  # For inbound email (fa-4mda.1)
+      # Add other env vars as needed
+    ports:
+      - "8000:8000"  # MCP server HTTP
+    depends_on:
+      - postgres
+      - vikunja
+    volumes:
+      - ./src:/app/src  # Hot reload source code
+    command: uvicorn vikunja_mcp.server:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  vikunja_files:
+

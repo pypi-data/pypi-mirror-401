@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect to Vikunja</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 400px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { font-size: 24px; margin: 0 0 8px; }
+    .subtitle { color: #666; margin-bottom: 24px; }
+    .status {
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .status.pending { background: #fff3cd; color: #856404; }
+    .status.success { background: #d4edda; color: #155724; }
+    .status.error { background: #f8d7da; color: #721c24; }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .manual {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #eee;
+      font-size: 13px;
+      color: #666;
+    }
+    .manual a { color: #1a73e8; }
+    button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    button:hover { background: #1557b0; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Connect to Vikunja</h1>
+    <p class="subtitle">Link your account to the Slack bot</p>
+
+    <div id="status" class="status pending">
+      <span class="spinner"></span>
+      Checking login status...
+    </div>
+
+    <button id="action-btn" style="display:none" onclick="openLogin()">
+      Sign in with Slack
+    </button>
+
+    <div class="manual" id="manual" style="display:none">
+      <p>Popup blocked? <a href="#" onclick="openLogin(); return false;">Click here</a> to open login.</p>
+      <p>Or use <code>/connect</code> in Slack with your API token.</p>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION - Edit for different apps
+    // ============================================================
+    const CONFIG = {
+      // App name (for display)
+      appName: 'Vikunja',
+
+      // API endpoints (relative to origin)
+      api: {
+        base: '/api/v1',
+        user: '/user',           // GET - returns user info if authenticated
+        routes: '/routes',       // GET - returns available permissions
+        tokens: '/tokens'        // PUT - creates API token
+      },
+
+      // Authentication
+      auth: {
+        storageKey: 'token',           // localStorage key for JWT
+        oidcPath: '/auth/openid/slack', // Path to initiate OIDC
+        headerName: 'Authorization',    // Header name for auth
+        headerPrefix: 'Bearer '         // Prefix for token in header
+      },
+
+      // Token creation
+      token: {
+        titlePrefix: 'slack-bot-',     // Prefix for created tokens
+        expiryDays: 365,               // Token validity
+        allPermissions: true           // Request all permissions
+      },
+
+      // Bot callback
+      callback: {
+        url: 'https://vikunja-slack-bot.onrender.com/vikunja-callback',
+        stateParam: 'state',
+        tokenParam: 'token',
+        emailParam: 'email'
+      },
+
+      // Polling
+      poll: {
+        intervalMs: 1500,
+        timeoutMs: 300000  // 5 minutes
+      }
+    };
+    // ============================================================
+
+    const statusEl = document.getElementById('status');
+    const actionBtn = document.getElementById('action-btn');
+    const manualEl = document.getElementById('manual');
+
+    // Get state from URL
+    const params = new URLSearchParams(location.search);
+    const state = params.get('state');
+
+    if (!state) {
+      showError('Missing state parameter. Please start from Slack.');
+    }
+
+    // Status display helpers
+    function showStatus(msg, type = 'pending') {
+      const spinner = type === 'pending' ? '<span class="spinner"></span>' : '';
+      statusEl.innerHTML = spinner + msg;
+      statusEl.className = 'status ' + type;
+    }
+
+    function showError(msg) {
+      showStatus(msg, 'error');
+      manualEl.style.display = 'block';
+    }
+
+    function showSuccess(msg) {
+      showStatus(msg, 'success');
+    }
+
+    // API helpers
+    function getAuthHeader(token) {
+      return { [CONFIG.auth.headerName]: CONFIG.auth.headerPrefix + token };
+    }
+
+    async function apiCall(endpoint, options = {}) {
+      const jwt = localStorage.getItem(CONFIG.auth.storageKey);
+      const headers = { ...options.headers };
+      if (jwt) Object.assign(headers, getAuthHeader(jwt));
+      if (options.body) headers['Content-Type'] = 'application/json';
+
+      const resp = await fetch(CONFIG.api.base + endpoint, {
+        ...options,
+        headers
+      });
+
+      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+      return resp.json();
+    }
+
+    // Check if user is logged in
+    async function checkAuth() {
+      const jwt = localStorage.getItem(CONFIG.auth.storageKey);
+      if (!jwt) return null;
+
+      try {
+        return await apiCall(CONFIG.api.user);
+      } catch (e) {
+        // JWT expired or invalid
+        localStorage.removeItem(CONFIG.auth.storageKey);
+        return null;
+      }
+    }
+
+    // Create API token
+    async function createToken(user) {
+      // Get available routes/permissions
+      const routes = await apiCall(CONFIG.api.routes);
+
+      // Build permissions (all permissions)
+      const permissions = {};
+      if (CONFIG.token.allPermissions) {
+        for (const [group, groupRoutes] of Object.entries(routes)) {
+          permissions[group] = Object.keys(groupRoutes);
+        }
+      }
+
+      // Create token
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + CONFIG.token.expiryDays);
+
+      const tokenData = await apiCall(CONFIG.api.tokens, {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: CONFIG.token.titlePrefix + state.slice(0, 8),
+          expires_at: expiryDate.toISOString(),
+          permissions
+        })
+      });
+
+      return tokenData.token;
+    }
+
+    // Redirect to bot callback
+    function redirectToCallback(token, email) {
+      const url = new URL(CONFIG.callback.url);
+      url.searchParams.set(CONFIG.callback.stateParam, state);
+      url.searchParams.set(CONFIG.callback.tokenParam, token);
+      if (email) url.searchParams.set(CONFIG.callback.emailParam, email);
+      location.href = url.toString();
+    }
+
+    // Open login popup
+    let popup = null;
+    let pollInterval = null;
+
+    function openLogin() {
+      showStatus('Opening login window...');
+
+      popup = window.open(
+        CONFIG.auth.oidcPath,
+        'auth-popup',
+        'width=500,height=650,menubar=no,toolbar=no'
+      );
+
+      if (!popup || popup.closed) {
+        showError('Popup was blocked. Please allow popups for this site.');
+        return;
+      }
+
+      // Start polling for auth completion
+      const startTime = Date.now();
+      pollInterval = setInterval(async () => {
+        // Check timeout
+        if (Date.now() - startTime > CONFIG.poll.timeoutMs) {
+          clearInterval(pollInterval);
+          showError('Login timed out. Please try again.');
+          return;
+        }
+
+        // Check if popup closed without completing
+        if (popup.closed) {
+          const user = await checkAuth();
+          if (!user) {
+            clearInterval(pollInterval);
+            showStatus('Login cancelled. Click below to try again.', 'error');
+            actionBtn.style.display = 'block';
+            actionBtn.textContent = 'Try Again';
+            return;
+          }
+        }
+
+        // Check for JWT
+        const user = await checkAuth();
+        if (user) {
+          clearInterval(pollInterval);
+          if (popup && !popup.closed) popup.close();
+          await completeConnection(user);
+        }
+      }, CONFIG.poll.intervalMs);
+
+      showStatus('Waiting for login...');
+      manualEl.style.display = 'block';
+    }
+
+    // Complete the connection
+    async function completeConnection(user) {
+      try {
+        showStatus('Creating API token...');
+        const token = await createToken(user);
+
+        showSuccess('Connected! Redirecting...');
+        setTimeout(() => redirectToCallback(token, user.email), 500);
+      } catch (e) {
+        console.error('Connection failed:', e);
+        showError('Failed to create token. ' + e.message);
+      }
+    }
+
+    // Main flow
+    async function main() {
+      if (!state) return;
+
+      // SECURITY FIX (solutions-56u9): Clear any existing session before OAuth flow.
+      // This prevents token creation under the wrong user account when someone else
+      // is already logged into Vikunja in the same browser.
+      localStorage.removeItem(CONFIG.auth.storageKey);
+
+      const user = await checkAuth();
+
+      if (user) {
+        // Already logged in - complete immediately
+        showStatus('Already logged in as ' + user.username);
+        await completeConnection(user);
+      } else {
+        // Need to log in
+        showStatus('Not logged in');
+        actionBtn.style.display = 'block';
+
+        // Auto-open popup (may be blocked)
+        openLogin();
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>

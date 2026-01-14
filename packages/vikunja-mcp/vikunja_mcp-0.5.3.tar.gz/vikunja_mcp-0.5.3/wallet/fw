@@ -1,0 +1,26 @@
+#!/bin/bash
+# Factumerit Wallet - Registration token management
+# Wrapper for scripts/manage_tokens.py
+
+set -e
+
+BACKEND_DIR="$HOME/factumerit/backend"
+ENV_FILE="$BACKEND_DIR/.env"
+
+# Source DATABASE_URL from .env if it exists
+if [ -f "$ENV_FILE" ]; then
+    source "$ENV_FILE"
+fi
+
+# Check DATABASE_URL is set
+if [ -z "$DATABASE_URL" ]; then
+    echo "Error: DATABASE_URL not set"
+    echo ""
+    echo "Either:"
+    echo "  1. Create $ENV_FILE with: export DATABASE_URL='postgresql://...'"
+    echo "  2. Or set DATABASE_URL in your environment"
+    exit 1
+fi
+
+cd "$BACKEND_DIR"
+exec uv run python scripts/manage_tokens.py "$@"
