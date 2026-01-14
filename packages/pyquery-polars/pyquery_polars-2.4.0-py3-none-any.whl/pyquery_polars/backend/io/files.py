@@ -1,0 +1,681 @@
+import re
+import os
+import glob
+import requests
+import shutil
+import uuid
+import polars as pl
+import connectorx as cx
+import chardet
+import fastexcel
+import tempfile
+import time
+import copy
+from itertools import islice
+from openpyxl import load_workbook
+from typing import List, Literal, Optional, Any, Dict, cast, Iterator, Union
+import fnmatch
+
+from ...core.io_params import FileFilter, FilterType
+
+STAGING_DIR_NAME = "pyquery_staging"
+
+
+def get_staging_dir() -> str:
+    """Get or create the centralized staging directory."""
+    temp_dir = tempfile.gettempdir()
+    staging_path = os.path.join(temp_dir, STAGING_DIR_NAME)
+    os.makedirs(staging_path, exist_ok=True)
+    return staging_path
+
+
+def cleanup_staging_files(max_age_hours: int = 24):
+    """Clean up old files from the staging directory."""
+    try:
+        staging_dir = get_staging_dir()
+        now = time.time()
+        cutoff = now - (max_age_hours * 3600)
+
+        if os.path.exists(staging_dir):
+            for filename in os.listdir(staging_dir):
+                file_path = os.path.join(staging_dir, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        if os.path.getmtime(file_path) < cutoff:
+                            os.remove(file_path)
+                            # print(f"Cleaned up stale staging file: {filename}") # Reduce noise
+                except Exception as e:
+                    pass
+    except Exception as e:
+        pass
+
+
+def resolve_file_paths(base_path: str, filters: Optional[List[FileFilter]] = None, limit: Optional[int] = None) -> List[str]:
+    """
+    Resolve a base path and optional filters into a list of file paths.
+
+    Uses a streaming approach to efficiently handle large directories.
+    Optimizes simple filters into glob patterns where possible (Partial Globbing).
+    Falls back to Python-side filtering for complex requirements.
+
+    Args:
+        base_path: Target path (file, directory, or glob pattern).
+        filters: Optional list of filters to apply.
+        limit: Optional maximum number of files to return (for previews).
+    """
+    if not base_path:
+        return []
+
+    # Scenario 1: No Filters
+    # If a specific path or valid glob is provided without extra filters,
+    # we return it directly to let the optimized Polars reader handle scanning.
+    if not filters:
+        if os.path.isfile(base_path):
+            return [base_path]
+        if "*" in base_path:
+            # standard behavior for 'resolve' implies returning the list.
+            if limit:
+                return list(islice(glob.iglob(base_path, recursive="**" in base_path), limit))
+            return glob.glob(base_path, recursive="**" in base_path)
+
+        if os.path.isdir(base_path):
+            # Return directory as-is for Polars to scan/hive-partition auto-detect
+            return [base_path]
+
+        return []
+
+    # Scenario 2: Filters Present
+    # We must scan and filter files manually (or partially optimized).
+
+    # Attempt to narrow the search space using the most restrictive filter (Partial Globbing)
+    optimized_glob = _optimize_filters_to_glob(base_path, filters)
+
+    candidates_iter: Iterator[str]
+
+    if optimized_glob:
+        # Use the optimized glob as the primary candidate source
+        candidates_iter = glob.iglob(
+            optimized_glob, recursive="**" in optimized_glob)
+    else:
+        # Fallback: Determine candidate source based on base_path type
+        if "*" in base_path:
+            candidates_iter = glob.iglob(
+                base_path, recursive="**" in base_path)
+        elif os.path.isdir(base_path):
+            # Generator for recursive directory scan
+            candidates_iter = _recursive_dir_walker(base_path)
+        elif os.path.isfile(base_path):
+            candidates_iter = iter([base_path])
+        else:
+            return []
+
+    # Apply remaining filters in a streaming fashion
+    return _apply_param_filters(candidates_iter, filters, limit)
+
+
+def _recursive_dir_walker(path: str) -> Iterator[str]:
+    """Yields all file paths recursively from a directory."""
+    for dp, dn, filenames in os.walk(path):
+        for f in filenames:
+            yield os.path.join(dp, f)
+
+
+def _optimize_filters_to_glob(base_path: str, filters: List[FileFilter]) -> Optional[str]:
+    """
+    Selects the best available filter to create a narrowing glob pattern.
+    Priority: EXACT > GLOB > CONTAINS (filename target only).
+    """
+    # Globbing is only applicable if we are starting from a directory
+    if not os.path.isdir(base_path):
+        return None
+
+    # Priority 1: Exact Filename Match
+    for f in filters:
+        if f.target == "filename" and f.type == FilterType.EXACT:
+            return os.path.join(base_path, f.value)
+
+    # Priority 2: User-provided Glob
+    for f in filters:
+        if f.target == "filename" and f.type == FilterType.GLOB:
+            return os.path.join(base_path, f.value)
+
+    # Priority 3: Contains (Substring)
+    for f in filters:
+        if f.target == "filename" and f.type == FilterType.CONTAINS:
+            return os.path.join(base_path, "**", f"*{f.value}*")
+
+    return None
+
+
+def _check_filter_match(path: str, f: FileFilter) -> bool:
+    """Evaluates if a file path satisfies a single filter."""
+    val = f.value
+
+    # Resolve target
+    if f.target == "path":
+        check_val = path
+    else:
+        check_val = os.path.basename(path)
+
+    # Standardize case for case-insensitive comparisons
+    # EXACT is the only strictly case-sensitive mode
+    check_lower = check_val.lower()
+    val_lower = val.lower()
+
+    if f.type == FilterType.EXACT:
+        return val == check_val
+
+    if f.type == FilterType.IS_NOT:
+        return val != check_val
+
+    if f.type == FilterType.CONTAINS:
+        return val_lower in check_lower
+
+    if f.type == FilterType.NOT_CONTAINS:
+        return val_lower not in check_lower
+
+    if f.type == FilterType.GLOB:
+        return fnmatch.fnmatch(check_lower, val_lower)
+
+    if f.type == FilterType.REGEX:
+        try:
+            return bool(re.search(val, check_val, re.IGNORECASE))
+        except re.error:
+            return False
+
+    return False
+
+
+def _apply_param_filters(files: Iterator[str], filters: List[FileFilter], limit: Optional[int] = None) -> List[str]:
+    """
+    Consumes the file iterator, applies filters, and returns a list up to the limit.
+    """
+    kept = []
+
+    for path in files:
+        # Check limit before processing
+        if limit is not None and len(kept) >= limit:
+            break
+
+        # Verify all filters match
+        if all(_check_filter_match(path, f) for f in filters):
+            kept.append(path)
+
+    return kept
+
+
+def get_files_from_path(path_str: str) -> List[str]:
+    # Backward compatibility wrapper
+    return resolve_file_paths(path_str)
+
+
+def get_excel_sheet_names(file_path: str) -> List[str]:
+    """
+    Efficiently retrieve sheet names from an Excel file using fastexcel.
+    Fallback to 'Sheet1' if any error occurs.
+    Handles globs and directories by inspecting the first matching file.
+    """
+    try:
+        # Resolve path (handle globs, dirs)
+        files = get_files_from_path(file_path)
+        if not files:
+            return ["Sheet1"]
+
+        target_file = files[0]
+
+        ext = os.path.splitext(target_file)[1].lower()
+        if ext not in [".xlsx", ".xls", ".xlsm"]:
+            return ["Sheet1"]
+
+        try:
+            excel = fastexcel.read_excel(target_file)
+            return excel.sheet_names
+        except Exception:
+            # Fallback
+            try:
+                wb = load_workbook(
+                    target_file, read_only=True, keep_links=False)
+                return wb.sheetnames
+            except:
+                return ["Sheet1"]
+    except Exception as e:
+        return ["Sheet1"]
+
+
+def clean_header_name(col: str) -> str:
+    """Normalize column name by replacing whitespace with single spaces and stripping."""
+    return " ".join(col.strip().split())
+
+
+def detect_encoding(file_path: str, n_bytes: int = 10_000) -> str:
+    """
+    Detect the encoding of a file using chardet with confidence gating.
+    Defaults to 'utf-8' if detection fails or confidence is low.
+    """
+    try:
+        with open(file_path, 'rb') as f:
+            rawdata = f.read(n_bytes)
+        result = chardet.detect(rawdata)
+        encoding = result['encoding']
+        confidence = result['confidence']
+
+        if not encoding or (confidence and confidence < 0.6):
+            return 'utf-8'
+
+        # Common fix: 'ascii' -> 'utf-8'
+        if encoding.lower() == 'ascii':
+            return 'utf-8'
+
+        return encoding
+    except (ImportError, Exception):
+        # Fallback to UTF-8
+        return 'utf-8'
+
+
+def batch_detect_encodings(files: List[str]) -> Dict[str, str]:
+    """
+    Detect encodings for a list of files.
+    Returns a dictionary mapping file path to detected encoding.
+    Only returns entries where encoding is NOT utf8 (or ascii).
+    """
+    results = {}
+    for f in files:
+        # Skip if not a text file (simplified check)
+        ext = os.path.splitext(f)[1].lower()
+        if ext not in [".csv", ".txt", ".json", ".ndjson"]:
+            continue
+
+        enc = detect_encoding(f)
+        # Normalize: ascii is compatible with utf8
+        if enc.lower() not in ['utf8', 'utf-8', 'ascii']:
+            results[f] = enc
+    return results
+
+
+def convert_file_to_utf8(file_path: str, source_encoding: str) -> str:
+    """
+    Convert a file from source_encoding to UTF-8 using streaming processing.
+    Writes the converted file to the staging directory in chunks to minimize RAM usage.
+    Returns the path to the new UTF-8 file.
+    """
+    try:
+        staging_dir = get_staging_dir()
+        filename = os.path.basename(file_path)
+        # Append identifier to avoid collisions
+        new_filename = f"utf8_{uuid.uuid4().hex[:6]}_{filename}"
+        new_path = os.path.join(staging_dir, new_filename)
+
+        # Stream Read/Write (Block size 1MB)
+        # Using text mode ensures correct character handling across block boundaries
+        chunk_size = 1024 * 1024
+
+        with open(file_path, 'r', encoding=source_encoding, errors='replace') as source_f:
+            with open(new_path, 'w', encoding='utf-8') as target_f:
+                while True:
+                    chunk = source_f.read(chunk_size)
+                    if not chunk:
+                        break
+                    # Clean Null Bytes if any (common in some raw dumps)
+                    if "\x00" in chunk:
+                        chunk = chunk.replace("\x00", "")
+                    target_f.write(chunk)
+
+        return new_path
+    except Exception as e:
+        print(f"Failed to convert {file_path}: {e}")
+        raise e
+
+
+def load_lazy_frame(files: List[str], sheet_name: Union[str, List[str]] = "Sheet1", process_individual: bool = False, include_source_info: bool = False, clean_headers: bool = False) -> Optional[tuple]:
+    """
+    Load files into LazyFrame(s).
+
+    Returns:
+        Tuple of (Union[LazyFrame, List[LazyFrame]], metadata_dict) or None
+    """
+    if not files:
+        return None
+
+    # Determine file format
+    exts = {os.path.splitext(f)[1].lower() for f in files}
+    ext = list(exts)[0] if len(exts) == 1 else ".mixed"
+
+    # OPTIMIZATION: Try Bulk Scan for homogeneous files
+    # Only if NOT processing individual, NOT including source info, AND NOT cleaning headers
+    if len(exts) == 1 and not process_individual and not include_source_info and not clean_headers:
+        try:
+            if ext == ".csv":
+                # Strict UTF-8: We assume files are UTF-8 validated by the frontend/pre-check.
+                # If they are not, this will likely fail, which satisfies the "reject" requirement.
+                lf = pl.scan_csv(files, infer_schema_length=0, encoding="utf8")
+                metadata = {
+                    "input_type": "folder" if len(files) > 1 else "file",
+                    "input_format": ext,
+                    "file_list": files,
+                    "file_count": len(files)
+                }
+                return lf, metadata
+            elif ext == ".parquet":
+                lf = pl.scan_parquet(files)
+                metadata = {
+                    "input_type": "folder" if len(files) > 1 else "file",
+                    "input_format": ext,
+                    "file_list": files,
+                    "file_count": len(files)
+                }
+                return lf, metadata
+            elif ext in [".arrow", ".ipc", ".feather"]:
+                lf = pl.scan_ipc(files)
+                metadata = {
+                    "input_type": "folder" if len(files) > 1 else "file",
+                    "input_format": ext,
+                    "file_list": files,
+                    "file_count": len(files)
+                }
+                return lf, metadata
+            elif ext == ".json":
+                lf = pl.scan_ndjson(files, infer_schema_length=0)
+                metadata = {
+                    "input_type": "folder" if len(files) > 1 else "file",
+                    "input_format": ext,
+                    "file_list": files,
+                    "file_count": len(files)
+                }
+                return lf, metadata
+        except Exception as e:
+            print(f"Bulk scan error, falling back to iterative: {e}")
+
+    # Fallback: Iterative
+    lfs = []
+    for f in files:
+        file_ext = os.path.splitext(f)[1].lower()
+        try:
+            current_lf = None
+            if file_ext == ".csv":
+                # Strict UTF-8
+                current_lf = pl.scan_csv(
+                    f, infer_schema_length=0, encoding="utf8")
+            elif file_ext == ".parquet":
+                current_lf = pl.scan_parquet(f)
+            elif file_ext in [".arrow", ".ipc", ".feather"]:
+                current_lf = pl.scan_ipc(f)
+            elif file_ext in [".xlsx", ".xls"]:
+                # Dump to Parquet
+                try:
+                    staging_dir = get_staging_dir()
+                    target_sheets = []
+                    if isinstance(sheet_name, list):
+                        target_sheets = sheet_name
+                    elif sheet_name == "__ALL_SHEETS__":
+                        target_sheets = get_excel_sheet_names(f)
+                    else:
+                        target_sheets = [sheet_name]
+
+                    for s_name in target_sheets:
+                        try:
+                            # Note: read_excel is eager. We can rename cols here easily if needed.
+                            df = pl.read_excel(
+                                f, sheet_name=s_name, infer_schema_length=0)
+
+                            # Clean Headers Immediate for Excel
+                            if clean_headers:
+                                new_cols = {c: clean_header_name(
+                                    c) for c in df.columns}
+                                df = df.rename(new_cols)
+
+                            stage_filename = f"{os.path.splitext(os.path.basename(f))[0]}_{s_name}_{uuid.uuid4().hex[:8]}.parquet"
+                            stage_path = os.path.join(
+                                staging_dir, stage_filename)
+                            df.write_parquet(stage_path)
+                            del df
+
+                            current_lf = pl.scan_parquet(stage_path)
+
+                            # Header cleaning already done for Excel above
+
+                            # Source Info
+                            if include_source_info:
+                                abs_path = os.path.abspath(f)
+                                name = os.path.basename(f)
+                                ext_val = os.path.splitext(f)[1]
+                                display_name = f"{name} [{s_name}]"
+
+                                current_lf = current_lf.with_columns([
+                                    pl.lit(abs_path).alias(
+                                        "__pyquery_source_path__"),
+                                    pl.lit(display_name).alias(
+                                        "__pyquery_source_name__"),
+                                    pl.lit(ext_val).alias(
+                                        "__pyquery_source_ext__")
+                                ])
+
+                            lfs.append(current_lf)
+                        except Exception as inner_ex:
+                            print(
+                                f"Failed to load sheet {s_name} from {f}: {inner_ex}")
+
+                    current_lf = None  # Handled via loop append
+
+                except Exception as ex:
+                    print(f"Excel Load Error {f}: {ex}")
+
+            elif file_ext == ".json":
+                current_lf = pl.scan_ndjson(f, infer_schema_length=0)
+
+            # --- POST-SCAN PROCESSING (Common) ---
+            if current_lf is not None:
+                # 1. Clean Headers (Lazy Rename)
+                if clean_headers and file_ext != ".xlsx" and file_ext != ".xls":
+                    # We need the schema to rename. collect_schema() is fast.
+                    try:
+                        base_cols = current_lf.collect_schema().names()
+                        rename_map = {c: clean_header_name(
+                            c) for c in base_cols}
+                        current_lf = current_lf.rename(rename_map)
+                    except Exception as e:
+                        print(f"Header cleaning failed for {f}: {e}")
+
+                # 2. Source Info
+                if include_source_info:
+                    abs_path = os.path.abspath(f)
+                    name = os.path.basename(f)
+                    ext_val = os.path.splitext(f)[1]
+
+                    current_lf = current_lf.with_columns([
+                        pl.lit(abs_path).alias("__pyquery_source_path__"),
+                        pl.lit(name).alias("__pyquery_source_name__"),
+                        pl.lit(ext_val).alias("__pyquery_source_ext__")
+                    ])
+
+                lfs.append(current_lf)
+
+        except Exception as e:
+            print(f"Error loading {f}: {e}")
+
+    if not lfs:
+        return None
+
+    # Build metadata
+    metadata = {
+        "input_type": "folder" if len(files) > 1 else "file",
+        "input_format": ext,
+        "file_list": files,
+        "file_count": len(files),
+        "process_individual": process_individual,
+        "source_info_included": include_source_info,
+        "clean_headers": clean_headers
+    }
+
+    # Decision: Return list or concatenated
+    if process_individual and len(lfs) > 1:
+        return lfs, metadata
+    else:
+        combined = lfs[0]
+        if len(lfs) > 1:
+            combined = pl.concat(lfs, how="diagonal")
+        return combined, metadata
+
+
+def load_from_sql(connection_string: str, query: str) -> Optional[pl.LazyFrame]:
+    try:
+        # connectorx returns eager Arrow/DataFrame, we make it lazy
+        # This is strictly backend logic (IO)
+        df_arrow = cx.read_sql(connection_string, query, return_type="arrow")
+        df = pl.from_arrow(df_arrow)
+
+        # Ensure it's a DataFrame before calling lazy
+        if isinstance(df, pl.Series):
+            df = df.to_frame()
+
+        return df.lazy()
+    except Exception as e:
+        print(f"SQL Error: {e}")
+        return None
+
+
+def load_from_api(url: str) -> Optional[pl.LazyFrame]:
+    try:
+        # Enterprise Staged Loading: Stream to disk first
+        staging_dir = get_staging_dir()
+
+        file_name = f"api_dump_{uuid.uuid4()}.json"
+        file_path = os.path.join(staging_dir, file_name)
+
+        # Stream download (low memory usage)
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            with open(file_path, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+        # Return LazyFrame from disk
+        return pl.read_json(file_path).lazy()
+    except Exception as e:
+        print(f"API Error: {e}")
+        return None
+
+
+def export_worker(lazy_frame: Union[pl.LazyFrame, List[pl.LazyFrame]], params: Any, fmt: str, result_container: Dict[str, Any]):
+    try:
+        # Extract path safely from params (Dict or Pydantic)
+        base_path = params.get('path') if isinstance(
+            params, dict) else getattr(params, 'path', None)
+        if not base_path:
+            raise ValueError("Output path not specified")
+
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(base_path), exist_ok=True)
+
+        # --- RECURSIVE HANDLE LIST (Individual Files) ---
+        if isinstance(lazy_frame, list):
+            # Iterate and export each
+
+            # Decompose path: "folder/data.csv" -> "folder/data" + ".csv"
+            p_root, p_ext = os.path.splitext(base_path)
+
+            total_files = len(lazy_frame)
+            all_file_details = []
+
+            for i, lf in enumerate(lazy_frame):
+                # Construct sub-path
+                sub_path = f"{p_root}_{i}{p_ext}"
+
+                # Clone params to override path
+                if isinstance(params, dict):
+                    sub_params = params.copy()
+                    sub_params['path'] = sub_path
+                else:
+                    # Pydantic copy
+                    sub_params = params.model_copy()
+                    # Safe set (handling frozen?) usually Pydantic models aren't frozen unless specified
+                    setattr(sub_params, 'path', sub_path)
+
+                # Recursive call (safe because we pass single LF)
+                # We use a dummy container to catch potential errors per file
+                dummy_res = {}
+                export_worker(lf, sub_params, fmt, dummy_res)
+
+                if str(dummy_res.get('status', '')).startswith("Error"):
+                    raise RuntimeError(
+                        f"File {i} failed: {dummy_res['status']}")
+
+                if 'file_details' in dummy_res and dummy_res['file_details']:
+                    all_file_details.extend(dummy_res['file_details'])
+
+            result_container['status'] = "Done"
+            result_container['size_str'] = f"{total_files} files"
+            result_container['file_details'] = all_file_details
+            return
+
+        # --- SINGLE FILE EXPORT ---
+        # Re-assign for clarity
+        path = base_path
+
+        # OPTIMIZATION: Use Streaming Sinks where possible
+        if fmt == "CSV":
+            # sink_csv is streaming
+            lazy_frame.sink_csv(path)
+
+        elif fmt == "Parquet":
+            compression = params.get('compression', 'snappy') if isinstance(
+                params, dict) else getattr(params, 'compression', 'snappy')
+            valid_compression = cast(
+                Literal['snappy', 'zstd', 'gzip', 'lz4', 'uncompressed', 'brotli'], compression)
+            # sink_parquet is streaming
+            lazy_frame.sink_parquet(path, compression=valid_compression)
+
+        elif fmt == "IPC":
+            compression = params.get('compression', 'uncompressed') if isinstance(
+                params, dict) else getattr(params, 'compression', 'uncompressed')
+            valid_compression = cast(
+                Literal['uncompressed', 'lz4', 'zstd'], compression)
+            # sink_ipc is streaming
+            lazy_frame.sink_ipc(path, compression=valid_compression)
+
+        elif fmt == "NDJSON":
+            # sink_ndjson is streaming
+            lazy_frame.sink_ndjson(path)
+
+        elif fmt == "Excel":
+            # Native Polars (Fast Eager Write)
+            df = lazy_frame.collect()
+            df.write_excel(path)
+
+        elif fmt == "JSON":
+            # Native Polars (Fast Eager Write)
+            df = lazy_frame.collect()
+            df.write_json(path)
+
+        elif fmt == "SQLite":
+            # SQLite Export (Eager)
+            table = params.get('table', 'data') if isinstance(
+                params, dict) else getattr(params, 'table', 'data')
+            if_exists = params.get('if_exists', 'replace') if isinstance(
+                params, dict) else getattr(params, 'if_exists', 'replace')
+            valid_if_exists = cast(
+                Literal['fail', 'replace', 'append'], if_exists)
+
+            df = lazy_frame.collect()
+            # Construct connection string
+            # write_database supports "sqlite:///path.db"
+            uri = f"sqlite:///{path}"
+            df.write_database(table_name=table, connection=uri,
+                              if_table_exists=valid_if_exists, engine="sqlalchemy")
+
+        # --- FINAL METADATA ---
+        size_str = "Unknown"
+        if os.path.exists(path):
+            size_bytes = os.path.getsize(path)
+            size_mb = size_bytes / 1024 / 1024
+            if size_mb < 1:
+                size_str = f"{size_bytes / 1024:.2f} KB"
+            else:
+                size_str = f"{size_mb:.2f} MB"
+
+        result_container['status'] = "Done"
+        result_container['file_details'] = [{
+            "name": os.path.basename(path),
+            "path": path,
+            "size": size_str
+        }]
+    except Exception as e:
+        result_container['status'] = f"Error: {e}"
