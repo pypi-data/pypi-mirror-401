@@ -1,0 +1,59 @@
+{% for nav_item in nav %}
+{% if nav_item.title == "Lectures" %}
+    {% set icon = "bi-journals" %}
+{% elif nav_item.title == "Lab Activities" %}
+    {% set icon = "bi-pen" %}
+{% elif nav_item.title == "Your Assessment" %}
+    {% set icon = "bi-journal-code" %}
+{% elif nav_item.title == "Getting Started" %}
+    {% set icon = "bi-flag" %}
+{% elif nav_item.title == "Support" %}
+    {% set icon = "bi-info-circle" %}
+{% elif nav_item.title == "Module Essentials" %}
+    {% set icon = "bi-journal-bookmark" %}
+{% elif nav_item.title == "Linux" %}
+    {% set icon = "bi-ubuntu" %}
+{% elif nav_item.title == "macOS" %}
+    {% set icon = "bi-apple" %}
+{% elif nav_item.title == "Windows" %}
+    {% set icon = "bi-microsoft" %}
+{% elif nav_item.title == "Windows Subsystem for Linux" %}
+    {% set icon = "bi-terminal" %}
+{% elif 'Git' in nav_item.title %}
+    {% set icon = "bi-github" %}
+{% else %}
+    {% set icon = "bi-link-45deg" %}
+{% endif %}
+{% if nav_item.children %}
+<div class="group-link">
+    <h4>{{ nav_item.title }}</h4>
+    <ul>
+        {% for group_item in nav_item.children %}
+        <li>
+            <a href="#"
+               id="{{ nav_item.title|replace(' ', '-')|lower }}-{{ group_item.title|replace(' ', '-')|lower }}-button"
+               role="button">
+                <i class="bi bi-plus-square collapse-icon"></i>
+                {{ group_item.title }}
+            </a>
+            <ul class="collapse"
+                id="{{ nav_item.title|replace(' ', '-')|lower }}-{{ group_item.title|replace(' ', '-')|lower }}">
+                {% for item in group_item.children %}
+                <li>
+                    <a href="{{ item.url | url }}">
+                        {{ item.title }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+<a class="single-link" href="{{ nav_item.url | url }}">
+    <i class="bi {{ icon }}"></i>
+    {{ nav_item.title }}
+</a>
+{% endif %}
+{% endfor %}

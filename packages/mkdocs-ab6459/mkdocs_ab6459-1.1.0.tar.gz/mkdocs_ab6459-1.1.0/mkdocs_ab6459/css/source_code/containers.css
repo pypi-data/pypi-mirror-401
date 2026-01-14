@@ -1,0 +1,17 @@
+pre.highlight {
+    background: var(--bg-sidebar);
+    border-radius: var(--border-radius-sm);
+    display: block;
+    margin: var(--padding-lg) 0;
+    padding: var(--padding-md);
+    overflow-x: auto;
+    border: var(--border-width-sm) solid var(--border-color-table);
+}
+
+pre.highlight:last-of-type {
+    margin-bottom: 0;
+}
+
+pre.highlight:has(> [class*='terminaloutput']) {
+    background: var(--bg-container) !important;
+}

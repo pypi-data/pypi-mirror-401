@@ -1,0 +1,23 @@
+<header>
+    <div id="module-details" class="row">
+        <img alt="Phoneix of Coventry University Logo"
+             src="{{ 'images/logo.svg' | url }}"
+             style="width: 8vw;"/>
+        <h1>{{ config.module.code }}</h1>
+        <h1 class="fw-lighter">{{ config.module.title }}</h1>
+    </div>
+    <div class="row">
+        <select aria-label="Theme Style" onchange="toggle_theme(this.value)">
+            <option id="default-theme" selected>Select a Theme:</option>
+            <option id="light" value="light">Light</option>
+            <option id="dark" value="dark">Dark</option>
+            <option id="dyslexia" value="dyslexia">Dyslexia</option>
+        </select>
+        <select aria-label="Font Style" onchange="toggle_font(this.value)">
+            <option id="default-font" selected>Select a Font Style:</option>
+            <option id="normal" value="normal">Ubuntu Sans</option>
+            <option id="comic-sans" value="comic-sans">Comic Neu (Comic Sans)</option>
+        </select>
+    </div>
+
+</header>
