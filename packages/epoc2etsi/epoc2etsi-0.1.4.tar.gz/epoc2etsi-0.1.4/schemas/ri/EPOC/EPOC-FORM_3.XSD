@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_3#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_3#"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc"
+              schemaLocation="epoc-common.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Epoc_Form3" type="Epoc_Form3_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Under Regulation (EU) 2023/1543 of the European Parliament and of the Council ( 1 ), in cases where the
+        addressee cannot comply with its obligation to preserve the requested data under an EPOC-PR or to produce it
+        under an EPOC, cannot respect the specified deadline or does not provide the data exhaustively, this form should
+        be completed by the addressee and sent back to the issuing authority as well as, where a notification took place
+        and in other cases where applicable, to the enforcing authority referred to in the EPOC, without undue delay.
+        Where possible, the addressee shall preserve the data requested even where additional information is needed to
+        identify them precisely, unless the information in the EPOC/EPOC-PR is insufficient for that purpose. If
+        clarifications by the issuing authority are needed, the addressee shall seek them, without undue delay, using
+        this form.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="Epoc_Form3_Type">
+    <xsd:sequence>
+      <xsd:element name="SectionA" type="Epoc_Form3_SectionA_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION A: Certificate concerned
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionB" type="Epoc_Form3_SectionB_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION B: Relevant authority(ies)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionC" type="Epoc_Form3_SectionC_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION C: Addressee of the EPOC/EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionD" type="Epoc_Form3_NonExecutionReasons_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION D: Reasons for non-execution
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionE" type="Epoc_Form3_SectionE_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION E: Conflicting obligations arising from the law of a third country
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionF" type="Epoc_Form3_SectionF_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION F: Request for additional information/clarification
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionG" type="Epoc_Form3_SectionG_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION G: Preservation of data
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionH" type="Epoc_Form3_SectionH_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H: Contact details of the designated establishment/ legal representative of the service provider
+            Name of the designated establishment / legal representative of the service provider
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ************************************************* SECTION A ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionA_Type">
+    <xsd:sequence>
+      <xsd:element name="Instrument" type="epoc:Epoc_Instrument_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ************************************************* SECTION B ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionB_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingAuthority" type="eio:EioAuthorityType"/>
+      <xsd:element name="ValidatingAuthority" type="eio:EioAuthorityType"/>
+      <xsd:element name="EnforcingAuthority" type="eio:EioAuthorityType"/>
+      <xsd:element name="DateOfReceipt" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="DateOfIssue" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ************************************************* SECTION C ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionC_Type">
+    <xsd:sequence>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="FileNumber" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ************************************************* SECTION D ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_NonExecutionReasons_Type">
+    <xsd:sequence>
+      <xsd:element name="NonExecutionReason" type="Epoc_Form3_NonExecutionReason_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_Form3_NonExecutionReason_Type">
+    <xsd:sequence>
+      <xsd:element name="IdentifierId" type="epoc:Epoc_IdentifierId_Type" minOccurs="0"/>
+      <xsd:element name="Reasons" type="Epoc_Form3_Reasons_Type" minOccurs="0"/>
+      <xsd:element name="ExplanationOrOtherReason" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_Form3_Reasons_Type">
+    <xsd:sequence>
+      <xsd:element name="Reason" type="Epoc_Form3_Reason_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Epoc_Form3_Reason_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="INCOMPLETE"/>
+      <xsd:enumeration value="CONTAINS_MANIFEST_ERRORS"/>
+      <xsd:enumeration value="INSUFFICIENT_INFORMATION"/>
+      <xsd:enumeration value="NOT_STORED_AT_THE_TIME_OF_THE_RECEIPT"/>
+      <xsd:enumeration value="OTHER_REASONS_OF_DE_FACTO_IMPOSSIBILITY"/>
+      <xsd:enumeration value="NOT_ISSUED_OR_VALIDATED_AS_DEFINED_BY_REGULATION"/>
+      <xsd:enumeration value="TRAFFIC_DATA_REQUESTED_NOT_FOR_IDENTIFYING_USER"/>
+      <xsd:enumeration value="SERVICE_NOT_COVERED_BY_REGULATION"/>
+      <xsd:enumeration value="DATA_REQUESTED_IS_PROTECTED_BY_IMMUNITIES"/>
+      <xsd:enumeration value="CONFLICT_OF_LAWS"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- ************************************************* SECTION E ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionE_Type">
+    <xsd:sequence>
+      <xsd:element name="TitleOfLaw" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="ApplicableStatutoryProvision" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="NatureOfConflictingObligations" type="Epoc_Form3_NatureOfConflictingObligations_Type" minOccurs="0"/>
+      <xsd:element name="WhyLawIsApplicable" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="WhyConflictOfLawConsidered" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="LinkBetweenServiceProviderAndThirdCountry" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="ConsequencesForAddressee" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="AnyOtherRelevantInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_Form3_NatureOfConflictingObligations_Type">
+    <xsd:sequence>
+      <xsd:element name="NatureOfConflictingObligation" type="Epoc_Form3_NatureOfConflictingObligation_Type" minOccurs="0" maxOccurs="3"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_Form3_NatureOfConflictingObligation_Type">
+    <xsd:sequence>
+      <xsd:element name="Interest" type="Epoc_Form3_Interest_Type"/>
+      <xsd:element name="Description" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Epoc_Form3_Interest_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="FUNDAMENTAL_RIGHTS_OF_INDIVIDUALS"/>
+      <xsd:enumeration value="FUNDAMENTAL_INTERESTS_OF_THIRD_COUNTRY"/>
+      <xsd:enumeration value="OTHER_INTERESTS"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ************************************************* SECTION F ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionF_Type">
+    <xsd:sequence>
+      <xsd:element name="InformationRequiredFromIssuingAuthority" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ************************************************* SECTION G ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionG_Type">
+    <xsd:sequence>
+      <xsd:element name="PreservationOfData" type="Epoc_Form3_PreservationOfData_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_Form3_PreservationOfData_Type">
+    <xsd:sequence>
+      <xsd:element name="IdentifierId" type="epoc:Epoc_IdentifierId_Type" minOccurs="0"/>
+      <xsd:element name="PreservationStatus" type="Epoc_Form3_PreservationStatus_Type" minOccurs="0" maxOccurs="2"/>
+      <xsd:element name="AdditionalInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Epoc_Form3_PreservationStatus_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="PRESERVED"/>
+      <xsd:enumeration value="NOT_PRESERVED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ************************************************* SECTION H ************************************************* -->
+  <xsd:complexType name="Epoc_Form3_SectionH_Type">
+    <xsd:sequence>
+      <xsd:element name="ContactDetails" type="eio:EioAuthorityType" minOccurs="0"/>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Name of the issuing authority and/or its representative or authorised person</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SignatureOfAuthority" type="epoc:Epoc_SignatureOfAuthority_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

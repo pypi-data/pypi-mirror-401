@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL_ACK.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL_ACK.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports ======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ====================================================== -->
+
+  <xsd:element name="Toe_WithdrawalAck" type="Toe_WithdrawalAck_Type"/>
+
+  <xsd:complexType name="Toe_WithdrawalAck_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To2" type="civil:Civil_ReferenceNumbers_Type"/>
+      <xsd:element name="Section3To4" type="civil:Civil_WithdrawalConfirmation_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

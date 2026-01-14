@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_1#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_1#"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc"
+              schemaLocation="epoc-common.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Epoc_Form1" type="Epoc_Form1_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        EUROPEAN PRODUCTION ORDER CERTIFICATE (EPOC) FOR THE PRODUCTION OF ELECTRONIC EVIDENCE - Under Regulation (EU)
+        2023/1543 of the European Parliament and of the Council ( 1 ) the addressee of this European Production Order
+        Certificate (EPOC) must execute this EPOC and must transmit the requested data in accordance with the
+        deadline(s) specified in Section C of this EPOC to the competent authority indicated under point (a) of Section
+        L of this EPOC.
+        In all cases, the addressee must, upon receipt of the EPOC, act expeditiously to preserve the data requested,
+        unless the information in the EPOC does not allow it to identify those data. The data must continue to be
+        preserved until the data are produced or until the issuing authority or, where applicable, the enforcing
+        authority, indicates that it is no longer necessary to preserve and produce the data.
+        The addressee must take the necessary measures to ensure the confidentiality, secrecy and integrity of the EPOC
+        and of the data produced or preserved.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="Epoc_Form1_Type">
+    <xsd:sequence>
+      <xsd:element name="SectionA" type="epoc:Epoc_IssuingState_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION A: Issuing/validating authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionB" type="epoc:Epoc_AddresseePlusEmergencyCase_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION B: Addressee
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionC" type="Epoc_Form1_SectionC_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION C: Deadlines
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionD" type="Epoc_Form1_SectionD_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION D: Relation to a previous production/preservation request
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionEToF" type="epoc:Epoc_ElectronicEvidence_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION E: Information to support identification of the requested data
+            SECTION F: Electronic evidence to be produced
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionG" type="Epoc_Form1_SectionG_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION G: Information on the underlying conditions
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+
+      <xsd:element name="SectionH" type="Epoc_Form1_SectionH_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H: Information to the user
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionI" type="epoc:Epoc_DetailsOfIssuingAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION I: Details of the issuing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionJ" type="epoc:Epoc_DetailsOfValidatingAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION J: Details of the validating authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionK" type="Epoc_Form1_SectionK_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION K: Notification and details of the notified enforcing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionL" type="Epoc_Form1_SectionL_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION L: Transfer of data
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionM" type="Epoc_Form1_SectionM_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION M: Further information to be included
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ************************************************* SECTION C ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionC_Type">
+    <xsd:sequence>
+      <xsd:element name="DataProductionInRelationToDeadline" type="Epoc_Form1_DataProductionInRelationToDeadline_Type" minOccurs="0"/>
+      <xsd:element name="ProceduralOrOtherDeadlines" type="Epoc_Form1_ProceduralOrOtherDeadlines_Type" minOccurs="0"/>
+      <xsd:element name="AdditionalInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_DataProductionInRelationToDeadline_Type">
+    <xsd:choice>
+      <xsd:element name="WithinTenDays" type="Epoc_Form1_TenDayDeadline_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="WithinEightHours" type="Epoc_Form1_EightHoursDeadlineContainer_Type" minOccurs="0"/>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_EightHoursDeadlineContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Epoc_Form1_EightHoursDeadline_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_TenDayDeadline_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="AS_SOON_AS_POSSIBLE"/>
+      <xsd:enumeration value="AT_THE_END_OF_TEN_DAYS"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Epoc_Form1_EightHoursDeadline_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="IMMINENT_THREAT_TO_LIFE"/>
+      <xsd:enumeration value="IMMINENT_THREAT_TO_CRITICAL_INFRASTRUCTURE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="Epoc_Form1_ProceduralOrOtherDeadlines_Type">
+    <xsd:sequence>
+      <xsd:element name="Deadline" type="Epoc_Form1_Deadline_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_Deadline_Type">
+    <xsd:sequence>
+      <xsd:element name="Date" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="Description" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ************************************************* SECTION D ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionD_Type">
+    <xsd:sequence>
+      <xsd:element name="RelatedRequests" type="Epoc_Form1_RelatedRequests_Type" minOccurs="0"/>
+      <xsd:element name="OtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_RelatedRequests_Type">
+    <xsd:sequence>
+      <xsd:element name="Request" type="Epoc_Form1_RelatedRequest_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_RelatedRequest_Type">
+    <xsd:sequence>
+      <xsd:element name="Type" type="Epoc_Form1_Request_Type"/>
+      <xsd:element name="Instrument" type="epoc:Epoc_Instrument_Type" minOccurs="0"/>
+      <xsd:element name="GlobalCaseId" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Details" type="epoc:Epoc_CaseRequest_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_Request_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="OUT_OF_THE_SYSTEM"/>
+      <xsd:enumeration value="WITHIN_THE_SYSTEM"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ************************************************* SECTION G ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionG_Type">
+    <xsd:sequence>
+      <xsd:element name="PointAB" type="epoc:Epoc_InformationOnUnderlyingConditions_Type" minOccurs="0"/>
+      <xsd:element name="PointC" type="Epoc_Form1_PointC_Type" minOccurs="0"/>
+      <xsd:element name="PointD" type="Epoc_Form1_ControllerInformation_Type" minOccurs="0"/>
+      <xsd:element name="PointE" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_PointC_Type">
+    <xsd:sequence>
+      <xsd:element name="ConcernsOffences" type="Epoc_Form1_Offences_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OffencesCommittedByMeansOfInformationSystem" type="Epoc_Form1_OffencesCommittedByMeansOfInformationSystem_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_Offences_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="OFFENCES_PUNISHABLE_IN_THE_ISSUING_STATE"/>
+      <xsd:enumeration value="OFFENCES_COMMITTED_BY_MEANS_OF_INFORMATION_SYSTEM"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Epoc_Form1_OffencesCommittedByMeansOfInformationSystem_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="OFFENCES_AS_DEFINED_IN_ARTICLES_3_TO_8_DIRECTIVE_2019_713"/>
+      <xsd:enumeration value="OFFENCES_AS_DEFINED_IN_ARTICLES_3_TO_7_DIRECTIVE_2011_93_EU"/>
+      <xsd:enumeration value="OFFENCES_AS_DEFINED_IN_ARTICLES_3_TO_8_DIRECTIVE_2013_40_EU"/>
+      <xsd:enumeration value="OFFENCES_AS_DEFINED_IN_ARTICLES_3_TO_12_AND_14_DIRECTIVE_2017_541"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="Epoc_Form1_ControllerInformation_Type">
+    <xsd:sequence>
+      <xsd:element name="ServiceProviderActingAs" type="Epoc_Form1_ServiceProviderActingAs_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="ProcessingDataOnBehalfOfController" type="Epoc_Form1_ProcessingDataOnBehalfOfController_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="InformationAboutDataProduction" type="Epoc_Form1_InformationAboutDataProduction_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_ServiceProviderActingAs_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ACTING_AS_CONTROLLER"/>
+      <xsd:enumeration value="PROCESSING_DATA_ON_BEHALF_OF_CONTROLLER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Epoc_Form1_ProcessingDataOnBehalfOfController_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="CONTROLLER_CANNOT_BE_IDENTIFIED"/>
+      <xsd:enumeration value="ADDRESSING_CONTROLLER_DETRIMENTAL_TO_INVESTIGATION"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="Epoc_Form1_InformationAboutDataProduction_Type">
+    <xsd:sequence>
+      <xsd:element name="InformController" type="Epoc_Form1_InformController_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="Justification" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_InformController_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="PROCESSOR_SHALL_INFORM_CONTROLLER"/>
+      <xsd:enumeration value="PROCESSOR_SHALL_NOT_INFORM_CONTROLLER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ************************************************* SECTION H ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionH_Type">
+    <xsd:sequence>
+      <xsd:element name="DelayConditions" type="Epoc_Form1_DelayConditionsContainer_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_DelayConditionsContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Epoc_Form1_DelayConditions_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_DelayConditions_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="AVOID_OBSTRUCTING_LEGAL_PROCEDURES"/>
+      <xsd:enumeration value="AVOID_PREJUDICING_INVESTIGATION_OR_PROSECUTION"/>
+      <xsd:enumeration value="PROTECT_PUBLIC_SECURITY"/>
+      <xsd:enumeration value="PROTECT_NATIONAL_SECURITY"/>
+      <xsd:enumeration value="PROTECT_RIGHTS_AND_FREEDOMS_OF_OTHERS"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ************************************************* SECTION K ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionK_Type">
+    <xsd:sequence>
+      <xsd:element name="EnforcingAuthority" type="Epoc_Form1_EnforcingAuthorityContainer_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_EnforcingAuthorityContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="eio:EioAuthorityType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ************************************************* SECTION L ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionL_Type">
+    <xsd:sequence>
+      <xsd:element name="ToWhomTransferTheData" type="Epoc_Form1_AuthorityCompetence_Types" minOccurs="0"/>
+      <xsd:element name="TechnicalIdentifier" type="eio:AuthorityIdType" minOccurs="0"/>
+      <xsd:element name="NameAndContactDetails" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="PreferredFormatOrMeansOfDataTransfer" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Form1_AuthorityCompetence_Types">
+    <xsd:choice>
+      <xsd:element name="AuthorityCompetences" type="Epoc_Form1_AuthorityCompetence_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_AuthorityCompetence_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ISSUING_AUTHORITY"/>
+      <xsd:enumeration value="VALIDATING_AUTHORITY"/>
+      <xsd:enumeration value="OTHER_COMPETENT_AUTHORITY"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ************************************************* SECTION M ************************************************* -->
+  <xsd:complexType name="Epoc_Form1_SectionM_Type">
+    <xsd:sequence>
+      <xsd:element name="GroundsForFulfillingNecessityAndProportionality" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="SummaryDescriptionOfTheCase" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Offence" type="Epoc_Form1_Offence_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="AdditionalInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Form1_Offence_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="PARTICIPATION_IN_CRIMINAL_ORGANISATION">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">participation in a criminal organisation</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="TERRORISM">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">terrorism</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="TRAFFICKING_IN_HUMAN_BEINGS">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">trafficking in human beings</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SEXUAL_EXPLOITATION_OF_CHILDREN_AND_CHILD_PORNOGRAPHY">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">sexual exploitation of children and child pornography</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ILLICIT_TRAFFICKING_IN_NARCOTIC_DRUGS_AND_PSYCHOTROPIC_SUBSTANCES">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">illicit trafficking in narcotic drugs and psychotropic substances
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ILLICIT_TRAFFICKING_IN_WEAPONS_MUNITIONS_AND_EXPLOSIVES">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">illicit trafficking in weapons, munitions and explosives</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CORRUPTION">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">corruption</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FRAUD">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">fraud, including fraud and other criminal offences affecting the Union's
+            financial interests as defined in Directive (EU) 2017/1371 of the European Parliament and of the Council
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="LAUNDERING_OF_THE_PROCEEDS_OF_CRIME">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">laundering of the proceeds of crime</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="COUNTERFEITING_CURRENCY">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">counterfeiting currency, including the euro</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="COMPUTER_RELATED_CRIME">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">computer-related crime</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ENVIRONMENTAL_CRIME">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">environmental crime, including illicit trafficking in endangered animal
+            species and in endangered plant species and varieties
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FACILITATION_OF_UNAUTHORISED_ENTRY_AND_RESIDENCE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">facilitation of unauthorised entry and residence</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="MURDER_OR_GRIEVOUS_BODILY_INJURY">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">murder or grievous bodily injury</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ILLICIT_TRADE_IN_HUMAN_ORGANS_AND_TISSUE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">illicit trade in human organs and tissue</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="KIDNAPPING_ILLEGAL_RESTRAINT_OR_HOSTAGE_TAKING">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">kidnapping, illegal restraint or hostage-taking</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RACISM_AND_XENOPHOBIA">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">racism and xenophobia</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ORGANISED_OR_ARMED_ROBBERY">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">organised or armed robbery</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ILLICIT_TRAFFICKING_IN_CULTURAL_GOODS">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">illicit trafficking in cultural goods, including antiques and works of art
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SWINDLING">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">todo</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RACKETEERING_AND_EXTORTION">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">racketeering and extortion</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="COUNTERFEITING_AND_PIRACY_OF_PRODUCTS">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">counterfeiting and piracy of products</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FORGERY_OF_ADMINISTRATIVE_DOCUMENTS_AND_TRAFFICKING_THEREIN">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">forgery of administrative documents and trafficking therein
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FORGERY_OF_MEANS_OF_PAYMENT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">forgery of means of payment</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ILLICIT_TRAFFICKING_IN_HORMONAL_SUBSTANCES_AND_OTHER_GROWTH_PROMOTERS">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">illicit trafficking in hormonal substances and other growth promoters
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ILLICIT_TRAFFICKING_IN_NUCLEAR_OR_RADIOACTIVE_MATERIALS">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">illicit trafficking in nuclear or radioactive materials</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="TRAFFICKING_IN_STOLEN_VEHICLES">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">trafficking in stolen vehicles</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RAPE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">rape</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ARSON">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">arson</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CRIMES_WITHIN_THE_JURISDICTION_OF_THE_INTERNATIONAL_CRIMINAL_COURT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">crimes within the jurisdiction of the International Criminal Court
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="UNLAWFUL_SEIZURE_OF_AIRCRAFT_OR_SHIPS">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">unlawful seizure of aircraft or ships</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SABOTAGE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">sabotage</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

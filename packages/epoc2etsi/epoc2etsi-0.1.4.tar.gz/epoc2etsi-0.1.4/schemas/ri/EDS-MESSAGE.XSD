@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:eioA="http://data.europa.eu/edm/1/ns/forms/EIO-A#"
+  xmlns:eioB="http://data.europa.eu/edm/1/ns/forms/EIO-B#"
+  xmlns:eioC="http://data.europa.eu/edm/1/ns/forms/EIO-C#"
+  xmlns:epocForm1="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_1#"
+  xmlns:epocPrForm2="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_2#"
+  xmlns:epocForm3="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_3#"
+  xmlns:epocPrForm5="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_5#"
+  xmlns:epocPrForm6="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_6#"
+  xmlns:epocGoToCourtToDecide="http://data.europa.eu/edm/1/ns/forms/EPOC-GO_TO_COURT_TO_DECIDE#"
+  xmlns:epocGroundsForRefusal="http://data.europa.eu/edm/1/ns/forms/EPOC-GROUNDS_FOR_REFUSAL#"
+  xmlns:epocSetNewDeadline="http://data.europa.eu/edm/1/ns/forms/EPOC-SET_NEW_DEADLINE#"
+  xmlns:epocUpholdOrLiftDecision="http://data.europa.eu/edm/1/ns/forms/EPOC-UPHOLD_OR_LIFT_DECISION#"
+  xmlns:epocDataHasBeenPreserved="http://data.europa.eu/edm/1/ns/forms/EPOC-DATA_HAS_BEEN_PRESERVED#"
+  xmlns:epocOutcome="http://data.europa.eu/edm/1/ns/forms/EPOC-OUTCOME#"
+  xmlns:mlaRequest="http://data.europa.eu/edm/1/ns/forms/MLA-Request#"
+  xmlns:mlaDecision="http://data.europa.eu/edm/1/ns/forms/MLA-Decision#"
+  xmlns:commonFreeForm="http://data.europa.eu/edm/1/ns/forms/COMMON-FreeForm#"
+  xmlns:commonExceptionalForm="http://data.europa.eu/edm/1/ns/forms/COMMON-ExceptionalForm#"
+  xmlns:commonOutcome="http://data.europa.eu/edm/1/ns/forms/COMMON-Outcome#"
+  xmlns:commonRequestForAdditionalInformation="http://data.europa.eu/edm/1/ns/forms/COMMON-RequestForAdditionalInformation#"
+  xmlns:sodFormA="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_A.XSD#"
+  xmlns:sodFormAWithdrawal="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_A_WITHDRAWAL.XSD#"
+  xmlns:sodFormB="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B.XSD#"
+  xmlns:sodFormBRetransmissionNotice="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B_RETRANSMISSION_NOTICE.XSD#"
+  xmlns:sodFormBWithdrawal="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B_WITHDRAWAL.XSD#"
+  xmlns:sodFormC="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_C.XSD#"
+  xmlns:sodFormD="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_D.XSD#"
+  xmlns:sodFormE="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_E.XSD#"
+  xmlns:sodFormEReply="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_E_REPLY.XSD#"
+  xmlns:sodFormF="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_F.XSD#"
+  xmlns:sodFormG="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_G.XSD#"
+  xmlns:sodFormH="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_H.XSD#"
+  xmlns:sodFormI="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_I.XSD#"
+  xmlns:sodFormJ="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_J.XSD#"
+  xmlns:sodFormK="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_K.XSD#"
+  xmlns:sodWithdrawalAck="http://data.europa.eu/edm/1/ns/forms/SOD-WITHDRAWAL_ACK.XSD#"
+  xmlns:toeFormA="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_A.XSD#"
+  xmlns:toeFormB="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_B.XSD#"
+  xmlns:toeFormC="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_C.XSD#"
+  xmlns:toeFormD="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_D.XSD#"
+  xmlns:toeFormDReply="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_D_REPLY.XSD#"
+  xmlns:toeFormE="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_E.XSD#"
+  xmlns:toeFormF="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_F.XSD#"
+  xmlns:toeFormG="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_G.XSD#"
+  xmlns:toeFormH="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_H.XSD#"
+  xmlns:toeFormI="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_I.XSD#"
+  xmlns:toeFormJ="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_J.XSD#"
+  xmlns:toeFormK="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_K.XSD#"
+  xmlns:toeFormL="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L.XSD#"
+  xmlns:toeFormLDelayNotification="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L_DELAY_NOTIFICATION.XSD#"
+  xmlns:toeFormLForwardNotification="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L_FORWARD_NOTIFICATION.XSD#"
+  xmlns:toeFormM="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_M.XSD#"
+  xmlns:toeFormN="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_N.XSD#"
+  xmlns:toeWithdrawal="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL.XSD#"
+  xmlns:toeWithdrawalAck="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL_ACK.XSD#"
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EdsMessage#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EdsMessage#"
+
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <xsd:import schemaLocation="./EIO-A/Annex-A/EIO-A.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EIO-A#"/>
+  <xsd:import schemaLocation="./EIO-B/Annex-B/EIO-B.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EIO-B#"/>
+  <xsd:import schemaLocation="./EIO-C/Annex-C/EIO-C.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EIO-C#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-FORM_1.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_1#"/>
+  <xsd:import schemaLocation="./EPOC/EPOCPR-FORM_2.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_2#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-FORM_3.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-FORM_3#"/>
+  <xsd:import schemaLocation="./EPOC/EPOCPR-FORM_5.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_5#"/>
+  <xsd:import schemaLocation="./EPOC/EPOCPR-FORM_6.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_6#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-GO_TO_COURT_TO_DECIDE.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-GO_TO_COURT_TO_DECIDE#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-SET_NEW_DEADLINE.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-SET_NEW_DEADLINE#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-GROUNDS_FOR_REFUSAL.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-GROUNDS_FOR_REFUSAL#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-UPHOLD_OR_LIFT_DECISION.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-UPHOLD_OR_LIFT_DECISION#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-DATA_HAS_BEEN_PRESERVED.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-DATA_HAS_BEEN_PRESERVED#"/>
+  <xsd:import schemaLocation="./EPOC/EPOC-OUTCOME.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/EPOC-OUTCOME#"/>
+  <xsd:import schemaLocation="./MLA/MLA-REQUEST.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/MLA-Request#"/>
+  <xsd:import schemaLocation="./MLA/MLA-DECISION.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/MLA-Decision#"/>
+  <xsd:import schemaLocation="./COMMON_FORM/COMMON-EXCEPTIONAL_FORM.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/COMMON-ExceptionalForm#"/>
+  <xsd:import schemaLocation="./COMMON_FORM/COMMON-FREE_FORM.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/COMMON-FreeForm#"/>
+  <xsd:import schemaLocation="./COMMON_FORM/COMMON-OUTCOME.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/COMMON-Outcome#"/>
+  <xsd:import schemaLocation="./COMMON_FORM/COMMON-REQUEST_FOR_ADDITIONAL_INFORMATION.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/COMMON-RequestForAdditionalInformation#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_A.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_A.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_A_WITHDRAWAL.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_A_WITHDRAWAL.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_B.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B.XSD#"/>
+  <xsd:import schemaLocation="SOD/SOD-FORM_B_RETRANSMISSION_NOTICE.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B_RETRANSMISSION_NOTICE.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_B_WITHDRAWAL.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B_WITHDRAWAL.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_C.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_C.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_D.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_D.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_E.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_E.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_E_REPLY.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_E_REPLY.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_F.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_F.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_G.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_G.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_H.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_H.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_I.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_I.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_J.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_J.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-FORM_K.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_K.XSD#"/>
+  <xsd:import schemaLocation="./SOD/SOD-WITHDRAWAL_ACK.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/SOD-WITHDRAWAL_ACK.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_A.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_A.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_B.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_B.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_C.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_C.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_D.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_D.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_D_REPLY.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_D_REPLY.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_E.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_E.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_F.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_F.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_G.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_G.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_H.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_H.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_I.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_I.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_J.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_J.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_K.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_K.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_L.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_L_DELAY_NOTIFICATION.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L_DELAY_NOTIFICATION.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_L_FORWARD_NOTIFICATION.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L_FORWARD_NOTIFICATION.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_M.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_M.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-FORM_N.XSD" namespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_N.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-WITHDRAWAL.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL.XSD#"/>
+  <xsd:import schemaLocation="./TOE/TOE-WITHDRAWAL_ACK.XSD"
+              namespace="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL_ACK.XSD#"/>
+
+  <xsd:element name="edsMessage" type="EdsMessage"/>
+
+  <xsd:complexType name="EdsMessage">
+    <xsd:sequence>
+      <xsd:element name="formId" type="FormId"/>
+      <xsd:element name="parentFormId" type="FormId" minOccurs="0"/>
+      <xsd:element name="subject" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="form" type="EdsForm"/>
+      <xsd:element name="senderProtocolVersion" type="xsd:string"/>
+      <xsd:element name="issuerProtocolVersion" type="xsd:string"/>
+      <xsd:element name="globalCaseId" type="GlobalCaseId"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="FormId">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="GlobalCaseId">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Beneath information is for reference only. For current information on GlobalCaseId check "Protocol_Description"
+        document.
+
+        GlobalCaseId must uniquely identify Legal Case among different instances of DES in different countries.
+        GlobalCaseId has format:
+        INSTRUMENT-ISSUING_COUNTRY-EXECUTING_COUNTRY-ISSUE_DATE-ISSUE_DATE_SEQUENCE-DES_NATIONAL_INSTANCE_ID
+        Dash is a separator.
+        Example value: “EIO-AT-PL-2019-09-10-0012-1”.
+
+        INSTRUMENT:
+        - Instrument of the Legal Case. Must match the Service used.
+        - example: EIO
+
+        ISSUING_COUNTRY:
+        - Legal Case issuing country code in ISO-3166-1 Alpha 2 format.
+        - In case of EioAnnexASubmissionAction carried XML form must have the same Annex A -> Section A -> Issuing
+        country.
+        - example: AT
+
+        EXECUTING_COUNTRY:
+        - Legal Case executing country code in ISO-3166-1 Alpha 2 format.
+        - In case of EioAnnexASubmissionAction carried XML form must have the same Annex A -> Section A -> Executing
+        country.
+        - example: PL
+
+        ISSUE_DATE:
+        - Legal Case issue date. Dash is separator of the fields also in issue date.
+        - example: 2019-09-10
+
+        ISSUE_DATE_SEQUENCE:
+        - Sequential number of the issued Legal Cases on a given date by specific DES instance to a specific executing
+        country.
+        - Starts with 0001.
+        - example: 0012
+
+        DES_NATIONAL_INSTANCE_ID:
+        - DES instance unique positive (non-zero) id number. Uniqueness has to be preserved within same country.
+        Different countries may have the same national instance id’s configured.
+        - value has to be in range: from 0 to 2^31-1 (ZERO to max integer value in Java)
+        - value CANNOT be prefixed with zero(s)
+        - example (CORRECT) : 1234
+        - example (INCORRECT): 01234
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern
+        value="(EIO|MLA|ITN|EPOC|EPOCPR|SODA|SODB|SODX|TOEA|TOEL|TOEX)-[A-Z]{2}-[A-Z]{2}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4}-[0-9]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="EdsForm">
+    <xsd:choice>
+      <xsd:element name="annexA" type="eioA:EIO_A_Type"/>
+      <xsd:element name="annexB" type="eioB:EIO_B_Type"/>
+      <xsd:element name="annexC" type="eioC:EIO_C_Type"/>
+      <xsd:element name="epocForm1" type="epocForm1:Epoc_Form1_Type"/>
+      <xsd:element name="epocPrForm2" type="epocPrForm2:EpocPr_Form2_Type"/>
+      <xsd:element name="epocForm3" type="epocForm3:Epoc_Form3_Type"/>
+      <xsd:element name="epocPrForm5" type="epocPrForm5:EpocPr_Form5_Type"/>
+      <xsd:element name="epocPrForm6" type="epocPrForm6:EpocPr_Form6_Type"/>
+      <xsd:element name="epocGoToCourtToDecide" type="epocGoToCourtToDecide:Epoc_GoToCourtToDecide_Type"/>
+      <xsd:element name="epocGroundsForRefusal" type="epocGroundsForRefusal:Epoc_GroundsForRefusal_Type"/>
+      <xsd:element name="epocSetNewDeadline" type="epocSetNewDeadline:Epoc_SetNewDeadline_Type"/>
+      <xsd:element name="epocUpholdOrLiftDecision" type="epocUpholdOrLiftDecision:Epoc_UpholdOrLiftDecision_Type"/>
+      <xsd:element name="epocDataHasBeenPreserved" type="epocDataHasBeenPreserved:Epoc_DataHasBeenPreserved_Type"/>
+      <xsd:element name="epocOutcome" type="epocOutcome:Epoc_Outcome_Type"/>
+      <xsd:element name="mlaRequest" type="mlaRequest:MLA_Request_Type"/>
+      <xsd:element name="mlaDecision" type="mlaDecision:MlaDecision_Type"/>
+      <xsd:element name="exceptionalForm" type="commonExceptionalForm:ExceptionalForm_Type"/>
+      <xsd:element name="freeForm" type="commonFreeForm:FreeForm_Type"/>
+      <xsd:element name="outcome" type="commonOutcome:Outcome_Type"/>
+      <xsd:element name="requestForAdditionalInformation"
+                   type="commonRequestForAdditionalInformation:RequestForAdditionalInformation_Type"/>
+      <xsd:element name="sodFormA" type="sodFormA:Sod_FormA_Type"/>
+      <xsd:element name="sodFormAWithdrawal" type="sodFormAWithdrawal:Sod_FormAWithdrawal_Type"/>
+      <xsd:element name="sodFormB" type="sodFormB:Sod_FormB_Type"/>
+      <xsd:element name="sodFormBRetransmissionNotice"
+                   type="sodFormBRetransmissionNotice:Sod_FormBRetransmissionNotice_Type"/>
+      <xsd:element name="sodFormBWithdrawal" type="sodFormBWithdrawal:Sod_FormBWithdrawal_Type"/>
+      <xsd:element name="sodFormC" type="sodFormC:Sod_FormC_Type"/>
+      <xsd:element name="sodFormD" type="sodFormD:Sod_FormD_Type"/>
+      <xsd:element name="sodFormE" type="sodFormE:Sod_FormE_Type"/>
+      <xsd:element name="sodFormEReply" type="sodFormEReply:Sod_FormEReply_Type"/>
+      <xsd:element name="sodFormF" type="sodFormF:Sod_FormF_Type"/>
+      <xsd:element name="sodFormG" type="sodFormG:Sod_FormG_Type"/>
+      <xsd:element name="sodFormH" type="sodFormH:Sod_FormH_Type"/>
+      <xsd:element name="sodFormI" type="sodFormI:Sod_FormI_Type"/>
+      <xsd:element name="sodFormJ" type="sodFormJ:Sod_FormJ_Type"/>
+      <xsd:element name="sodFormK" type="sodFormK:Sod_FormK_Type"/>
+      <xsd:element name="sodWithdrawalAck" type="sodWithdrawalAck:Sod_WithdrawalAck_Type"/>
+      <xsd:element name="toeFormA" type="toeFormA:Toe_FormA_Type"/>
+      <xsd:element name="toeFormB" type="toeFormB:Toe_FormB_Type"/>
+      <xsd:element name="toeFormC" type="toeFormC:Toe_FormC_Type"/>
+      <xsd:element name="toeFormD" type="toeFormD:Toe_FormD_Type"/>
+      <xsd:element name="toeFormDReply" type="toeFormDReply:Toe_FormDReply_Type"/>
+      <xsd:element name="toeFormE" type="toeFormE:Toe_FormE_Type"/>
+      <xsd:element name="toeFormF" type="toeFormF:Toe_FormF_Type"/>
+      <xsd:element name="toeFormG" type="toeFormG:Toe_FormG_Type"/>
+      <xsd:element name="toeFormH" type="toeFormH:Toe_FormH_Type"/>
+      <xsd:element name="toeFormI" type="toeFormI:Toe_FormI_Type"/>
+      <xsd:element name="toeFormJ" type="toeFormJ:Toe_FormJ_Type"/>
+      <xsd:element name="toeFormK" type="toeFormK:Toe_FormK_Type"/>
+      <xsd:element name="toeFormL" type="toeFormL:Toe_FormL_Type"/>
+      <xsd:element name="toeFormLDelayNotification"
+                   type="toeFormLDelayNotification:Toe_FormLDelayNotification_Type"/>
+      <xsd:element name="toeFormLForwardNotification"
+                   type="toeFormLForwardNotification:Toe_FormLForwardNotification_Type"/>
+      <xsd:element name="toeFormM" type="toeFormM:Toe_FormM_Type"/>
+      <xsd:element name="toeFormN" type="toeFormN:Toe_FormN_Type"/>
+      <xsd:element name="toeWithdrawal" type="toeWithdrawal:Toe_Withdrawal_Type"/>
+      <xsd:element name="toeWithdrawalAck" type="toeWithdrawalAck:Toe_WithdrawalAck_Type"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+</xsd:schema>

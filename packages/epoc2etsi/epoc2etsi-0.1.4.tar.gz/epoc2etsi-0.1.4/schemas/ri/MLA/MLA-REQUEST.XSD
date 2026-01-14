@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/MLA-Request#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/MLA-Request#"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="MLA_Request" type="MLA_Request_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        MLA description
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="MLA_Request_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingAuthorityTechnicalIdentifier" type="eio:AuthorityIdType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority which issued the MLA
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Content" type="udt:TextType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Content
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Activities" type="ActivitiesType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Activities
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ActivitiesType">
+    <xsd:sequence>
+      <xsd:element name="Hearing" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Hearing
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="HearingByTelephoneConference" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            HearingByTelephoneConference
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="HearingByVideoConference" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            HearingByVideoConference
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InterceptionOfTelecommunications" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            InterceptionOfTelecommunications
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Search" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Search
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Seizure" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Seizure
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TakingOfEvidenceInCourt" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            TakingOfEvidenceInCourt
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherActivity" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            OtherActivity
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

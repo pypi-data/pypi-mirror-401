@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/sod"
+  xmlns="http://data.europa.eu/edm/1/ns/sod"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+
+  <xsd:complexType name="Sod_Addressee_Type">
+    <xsd:sequence>
+      <xsd:element name="EntityInfo" type="civil:Civil_EntityInfo_Type"/>
+      <xsd:element name="DateOfBirth" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="IdentificationNumberOrEquivalent" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="AnyOtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_ReferenceAndAddressee_Type">
+    <xsd:sequence>
+      <xsd:element name="ReferenceNumbers" type="civil:Civil_ReferenceNumbers_Type"/>
+      <xsd:element name="Addressee" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_MissingInformationDocuments_Type">
+    <xsd:sequence>
+      <xsd:element name="AddresseeIdentity" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="IdNumberOrEquivalent" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="InformationOther" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DocumentsToBeServed" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="ProofOfPayment" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DocumentsOther" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

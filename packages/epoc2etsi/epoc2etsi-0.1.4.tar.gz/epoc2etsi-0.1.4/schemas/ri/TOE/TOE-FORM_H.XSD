@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_H.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_H.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:toe="http://data.europa.eu/edm/1/ns/toe"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/toe" schemaLocation="./toe-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_FormH" type="Toe_FormH_Type"/>
+
+  <xsd:complexType name="Toe_FormH_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To4" type="toe:Toe_ReferenceIssuerExecutor_Type"/>
+      <xsd:element name="Section5To6" type="Toe_FormH_NonComplianceReasons_Type"/>
+      <xsd:element name="Section7" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_FormH_NonComplianceReasons_Type">
+    <xsd:sequence>
+      <xsd:element name="RequestedProcedureIncompatible" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="CarryingOutOfRequestedProcedureImpossible" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="UseOfCommunicationsTechnologyIncompatible" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="UseOfCommunicationsTechnologyImpossible" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

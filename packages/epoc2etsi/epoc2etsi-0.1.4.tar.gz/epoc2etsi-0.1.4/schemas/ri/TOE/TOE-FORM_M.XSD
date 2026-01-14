@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_M.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_M.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:toe="http://data.europa.eu/edm/1/ns/toe"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/toe"
+              schemaLocation="./toe-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_FormM" type="Toe_FormM_Type"/>
+
+  <xsd:complexType name="Toe_FormM_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To3" type="toe:Toe_ReferenceIssuer_Type"/>
+      <xsd:element name="Section4" type="civil:Civil_TransmissionEntity_Type"/>
+      <xsd:element name="Section5To6" type="Toe_FormM_InformationOnDirectTakingOfEvidence_Type"/>
+      <xsd:element name="Section7" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_FormM_InformationOnDirectTakingOfEvidence_Type">
+    <xsd:sequence>
+      <xsd:element name="DecisionType" type="Toe_FormM_DirectTakingOfEvidenceDecisionType_Type" minOccurs="0"/>
+      <xsd:element name="AcceptedUnderConditionsComment" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="AssistingAuthority" type="civil:Civil_TransmissionEntity_Type" minOccurs="0"/>
+      <xsd:element name="RefusalReason" type="Toe_FormM_RefusalReason_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Toe_FormM_DirectTakingOfEvidenceDecisionType_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ACCEPTED"/>
+      <xsd:enumeration value="ACCEPTED_UNDER_CONDITIONS"/>
+      <xsd:enumeration value="REFUSED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Toe_FormM_RefusalReason_Type">
+    <xsd:sequence>
+      <xsd:element name="NotInScopeOfRegulation" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="Incomplete" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="ContraryToPrinciples" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

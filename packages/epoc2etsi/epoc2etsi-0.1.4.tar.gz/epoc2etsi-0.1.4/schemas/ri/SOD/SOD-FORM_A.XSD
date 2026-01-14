@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_A.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_A.XSD#"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:sod="http://data.europa.eu/edm/1/ns/sod"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/sod"
+              schemaLocation="./sod-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Sod_FormA" type="Sod_FormA_Type"/>
+
+  <xsd:complexType name="Sod_FormA_Type">
+    <xsd:sequence>
+        <xsd:element name="Section0" type="udt:TextType"/>
+        <xsd:element name="Section1" type="civil:Civil_TransmissionEntity_Type"/>
+        <xsd:element name="Section2" type="civil:Civil_TransmissionEntity_Type" minOccurs="0"/>
+        <xsd:element name="Section3" type="civil:Civil_EntitiesInfo_Type"/>
+        <xsd:element name="Section4" type="sod:Sod_Addressee_Type"/>
+        <xsd:element name="Section5" type="Sod_FormA_MethodOfService_Type"/>
+        <xsd:element name="Section6" type="Sod_FormA_DocumentToBeServed_Type"/>
+        <xsd:element name="Section7" type="Sod_FormA_InformationLanguage_Type"/>
+        <xsd:element name="Section8" type="Sod_FormA_DocumentCopy_Type"/>
+        <xsd:element name="Section9" type="Sod_FormA_ReasonForNotTransmitting_Type"/>
+        <xsd:element name="Section10" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormA_MethodOfService_Type">
+    <xsd:sequence>
+      <xsd:element name="ServiceMethod" type="Sod_FormA_ServiceMethod_Type" minOccurs="0"/>
+      <xsd:element name="ParticularMethod" type="Sod_FormA_ParticularMethod_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormA_ServiceMethod_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="IN_ACCORDANCE_WITH_ADDRESSED_MS_LAW"/>
+      <xsd:enumeration value="BY_FOLLOWING_PARTICULAR_METHOD"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Sod_FormA_ParticularMethod_Type">
+    <xsd:sequence>
+      <xsd:element name="MethodDescription" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="IncompatibleWithAddressedMsLaw" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormA_DocumentToBeServed_Type">
+    <xsd:sequence>
+      <xsd:element name="DocumentNature" type="Sod_FormA_DocumentNature_Type" minOccurs="0"/>
+      <xsd:element name="DateOfServiceNoLongerNecessary" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="OriginalLanguages" type="civil:Civil_EuLanguages_Type"/>
+      <xsd:element name="OriginalLanguageOther" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="TranslationLanguages" type="civil:Civil_EuLanguages_Type"/>
+      <xsd:element name="TranslationLanguageOther" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="NumberOfEnclosures" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormA_DocumentNature_Type">
+    <xsd:sequence>
+      <xsd:element name="NatureType" type="Sod_FormA_NatureType_Type" minOccurs="0"/>
+      <xsd:element name="Judicial" type="Sod_FormA_Judicial_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormA_NatureType_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="JUDICIAL"/>
+      <xsd:enumeration value="EXTRAJUDICIAL"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Sod_FormA_Judicial_Type">
+    <xsd:sequence>
+      <xsd:element name="JudicialNatureType" type="Sod_FormA_JudicialNatureType_Type" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormA_JudicialNatureType_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="WRIT"/>
+      <xsd:enumeration value="DECISION"/>
+      <xsd:enumeration value="APPEAL"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:complexType name="Sod_FormA_InformationLanguage_Type">
+    <xsd:sequence>
+      <xsd:element name="OriginMsLanguages" type="civil:Civil_EuLanguages_Type"/>
+      <xsd:element name="OtherMsLanguages" type="civil:Civil_EuLanguages_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormA_DocumentCopy_Type">
+    <xsd:sequence>
+      <xsd:element name="DocumentCopy" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormA_ReasonForNotTransmitting_Type">
+    <xsd:sequence>
+      <xsd:element name="DisruptionOfTheDecentralisedItSystem" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="ExceptionalCircumstances" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

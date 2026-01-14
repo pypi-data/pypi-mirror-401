@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOC-GROUNDS_FOR_REFUSAL#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOC-GROUNDS_FOR_REFUSAL#"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ======================================================================= -->
+  <!-- ===== Import of EPOC Common Types                                 ===== -->
+  <!-- ======================================================================= -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc" schemaLocation="epoc-common.xsd"/>
+  <!-- ======================================================================= -->
+  <!-- ===== Import of Unqualified Data Types                            ===== -->
+  <!-- ======================================================================= -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Epoc_GroundsForRefusal" type="Epoc_GroundsForRefusal_Type"/>
+
+  <xsd:complexType name="Epoc_GroundsForRefusal_Type">
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element name="NoGrounds" type="xsd:boolean"/>
+        <xsd:element name="FullRefusal" type="Epoc_CoreRefusal_Type" minOccurs="0"/>
+        <xsd:element name="IdentifierRefusal" type="Epoc_IdentifierRefusal_Type" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:choice>
+      <xsd:element name="OtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ======================================================================== -->
+  <!-- ===== Refusal per identifier                                       ===== -->
+  <!-- ======================================================================== -->
+  <xsd:complexType name="Epoc_IdentifierRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="IdentifierId" type="epoc:Epoc_IdentifierId_Type"/>
+      <xsd:element name="Decision" type="Epoc_RefusalDecision_Type" minOccurs="0"/>
+      <xsd:choice>
+        <xsd:element name="FullRefusal" type="Epoc_SpecificDataRefusal_Type" minOccurs="0"/>
+        <xsd:element name="CategoriesRefusal" type="Epoc_CategoriesRefusal_Type" minOccurs="0"/>
+      </xsd:choice>
+      <xsd:element name="OtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ======================================================================== -->
+  <!-- ===== Refusal per identifier data category                         ===== -->
+  <!-- ======================================================================== -->
+  <xsd:complexType name="Epoc_CategoriesRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="SubscriberData" type="Epoc_SubscriberDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="UserIdentificationData" type="Epoc_UserIdentificationDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="TrafficData" type="Epoc_TrafficDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="ContentData" type="Epoc_ContentDataRefusal_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_SubscriberDataRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Refusal" type="Epoc_SpecificDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="FullRefusal" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="PartialRefusal" type="Epoc_SubscriberDataPartialRefusal_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_SubscriberDataPartialRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="epoc:Epoc_SubscriberDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_UserIdentificationDataRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Refusal" type="Epoc_SpecificDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="FullRefusal" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="PartialRefusal" type="Epoc_UserIdentificationDataPartialRefusal_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_UserIdentificationDataPartialRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_UserIdentificationOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_TrafficDataRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Refusal" type="Epoc_SpecificDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="FullRefusal" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="PartialRefusal" type="Epoc_TrafficDataPartialRefusal_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_TrafficDataPartialRefusal_Type">
+    <xsd:choice>
+      <xsd:sequence>
+        <xsd:element name="MobileTelephonyOptionRefusal" type="epoc:Epoc_MobileTelephonyOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="InternetOptionRefusal" type="epoc:Epoc_InternetDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:sequence>
+        <xsd:element name="HostingOptionRefusal" type="epoc:Epoc_HostingDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="OtherOptionRefusal" type="epoc:Epoc_OtherDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_ContentDataRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Refusal" type="Epoc_SpecificDataRefusal_Type" minOccurs="0"/>
+      <xsd:element name="FullRefusal" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="PartialRefusal" type="Epoc_ContentDataPartialRefusal_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_ContentDataPartialRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="epoc:Epoc_ContentDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ======================================================================== -->
+  <!-- ===== Refusal types                                                ===== -->
+  <!-- ======================================================================== -->
+  <xsd:complexType name="Epoc_CoreRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="Ground" type="Epoc_RefusalGround_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="Explanation" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="OtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_SpecificDataRefusal_Type">
+    <xsd:sequence>
+      <xsd:element name="CoreRefusal" type="Epoc_CoreRefusal_Type" minOccurs="0"/>
+      <xsd:element name="Data" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DateTimeRange" type="epoc:Epoc_DateTimeRange_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ======================================================================== -->
+  <!-- ===== Basic types                                                  ===== -->
+  <!-- ======================================================================== -->
+
+  <xsd:simpleType name="Epoc_UserIdentificationOption_Type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="CONNECTION_RECORDS"/>
+      <xsd:enumeration value="PRODUCTION_TIME_RANGE"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Epoc_RefusalGround_Type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="DATA_PROTECTED_BY_IMMUNITIES"/>
+      <xsd:enumeration value="FUNDAMENTAL_RIGHTS"/>
+      <xsd:enumeration value="NE_BIS_IN_IDEM"/>
+      <xsd:enumeration value="NOT_AN_OFFENCE_UNDER_LAW_OF_ENFORCING_STATE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Epoc_RefusalDecision_Type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="NO_GROUNDS_FOR_REFUSAL"/>
+      <xsd:enumeration value="REFUSE_ALL_DATA_FOR_IDENTIFIER"/>
+      <xsd:enumeration value="REFUSE_PARTIALLY_FOR_THIS_IDENTIFIER"/>
+      <xsd:enumeration value="APPLY_CONDITIONS_ON_THE_USE_OF_DATA_FOR_THIS_IDENTIFIER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

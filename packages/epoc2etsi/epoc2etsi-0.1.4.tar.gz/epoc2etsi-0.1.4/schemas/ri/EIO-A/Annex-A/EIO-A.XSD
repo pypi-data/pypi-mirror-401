@@ -1,0 +1,2270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================================ -->
+<!-- ===== Schema of European Investigation Order (EIO) Form Annexes A to C ===== -->
+<!-- ============================================================================ -->
+<!--
+The Directive 2014/41/EU regarding the European Investigation Order in
+criminal matters (the Directive) deals with the gathering and transfer of
+evidence, including electronic evidence, within the Union.
+
+The Directive is based on the principle of mutual recognition of judgements
+and judicial decisions and allows a judicial authority in one Member State
+(the "issuing authority") to request that specific investigative measures
+are carried out by an authority in another Member State (the "executing
+authority") to obtain evidence.
+
+The Directive became applicable on 22 May 2017 and was implemented by a
+large majority of Member States. It updated the legal framework for the
+gathering and transfer of evidence between Member States. In particular, it
+replaced the Convention on Mutual Assistance in Criminal Matters between
+the Member States of the European Union , which sets out the conditions for
+mutual legal assistance.
+
+It provides the following three standardised forms to facilitate the
+execution (set out in the annexes to the Directive):
+•   European Investigation Order (EIO), in Annex A;
+•   Confirmation of the Receipt of an EIO, in Annex B; and
+•   Notification of the interception of telecommunications without
+    technical assistance, in Annex C.
+ -->
+<!-- = Copyright Notice ================================================= -->
+<!--
+    European Investigation Order (EIO) Forms XML Schema 1.1
+    Copyright (C) European Union, 2018
+    Licensed under the ISA Open Metadata Licence
+
+    Suzanne Wigard (suzanne.wigard@ec.europa.eu),
+    Mario Hans (mh@dialogika.de)
+    Manfred Ries (mr@dialogika.de)
+    Wolfgang Keber (wk@dialogika.de)
+-->
+<!-- ===================================================== -->
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EIO-A#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EIO-A#"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:cva="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="EIO_A" type="EIO_A_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        ANNEX A EUROPEAN INVESTIGATION ORDER (EIO) - This EIO has been issued by a competent authority. The issuing
+        authority certifies that the issuing of this EIO is necessary and proportionate for the purpose of the
+        proceedings specified within it taking into account the rights of the suspected or accused person and that the
+        investigative measures requested could have been ordered under the same conditions in a similar domestic case. I
+        request that the investigative measure or measures specified below be carried out taking due account of the
+        confidentiality of the investigation and that the evidence obtained as a result of the execution of the EIO be
+        transferred.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="EIO_A_Type">
+    <xsd:sequence>
+      <xsd:element name="SectionA" type="SectionA_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION A
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionB" type="SectionB_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION B: Urgency
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionC" type="SectionC_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION C: Investigative measure(s) to be carried out
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionD" type="SectionD_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION D: Relation to an earlier EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionE" type="SectionE_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION E: Identity of the person concerned
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionF" type="SectionF_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION F: Type of proceedings for which the EIO is issued
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionG" type="SectionG_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION G: Grounds for issuing the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionH" type="SectionH_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H: Additional requirements for certain measures
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionI" type="SectionI_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION I: Formalities and procedures requested for the execution
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionJ" type="SectionJ_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION J: Legal remedies
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionK" type="SectionK_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION K: Details of the authority which issued the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionL" type="SectionL_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION L: Details of the judicial authority which validated the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionA_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingState" type="eio:CountryType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Issuing State
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ExecutingState" type="eio:CountryType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Executing State
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionB_Type">
+    <xsd:sequence>
+      <xsd:element name="EvidenceBeingConcealedOrDestroyed" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Evidence being concealed or destroyed
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ImminentTrialDate" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Imminent trial date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AnyOtherReason" type="AnyOtherReasonType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Any other reason
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ReasonForShorterTimeLimit" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please specify below: Time limits for execution of the EIO are laid down in Directive 2014/41/EU. However,
+            if a shorter or specific time limit is necessary, please provide the date and explain the reason for this
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ShorterTimeLimitDateTime" type="udt:DateTimeType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date and time (with Time Zone) for shorter time limit
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AnyOtherReasonType">
+    <xsd:sequence>
+      <xsd:element name="SuspectAccusedInCustody" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Suspect/accused in custody
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="NeedForCoordinationWithOtherRequestsAndOrOtherNationalMeasures" type="udt:IndicatorType"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Need for coordination with other requests and/or other national measures
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="StatuteOfLimitationsPrescription" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Statute of limitations (prescription)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ImmediateRiskToLifeHealth" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Immediate risk to life/health
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ExpiringTermForPreliminaryMeasures" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Expiring term for preliminary measures
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionC_Type">
+    <xsd:sequence>
+      <xsd:element name="TraditionalInvestigativeMeasures" type="TraditionalInvestigativeMeasures_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Traditional investigative measure(s)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InvestigativeMeasuresToCollectTheFollowingTypesOfEEvidence"
+                   type="InvestigativeMeasuresToCollectTheFollowingTypesOfEEvidence_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Investigative measure(s) to collect the following types of e-evidence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ObtainingInformationOrEvidenceAlreadyInThePossessionOfTheExecutingAuthority"
+                   type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Obtaining information or evidence which is already in the possession of the executing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ObtainingInformationContainedInDatabasesHeldByPoliceOrJudicialAuthorities"
+                   type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Obtaining information contained in databases held by police or judicial authorities
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Hearing" type="Hearing_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Hearing
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IdentificationOfPersonsHoldingASubscriptionOfASpecifiedPhoneNumberOrIpAddress"
+                   type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Identification of persons holding a subscription of a specified phone number or IP address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TemporaryTransferOfAPersonHeldInCustodyToTheIssuingState" type="udt:IndicatorType"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Temporary transfer of a person held in custody to the issuing State
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TemporaryTransferOfAPersonHeldInCustodyToTheExecutingState" type="udt:IndicatorType"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Temporary transfer of a person held in custody to the executing State
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="HearingByVideoconference" type="HearingByVideoconference_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Hearing by videoconference or other audiovisual transmission
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="HearingByTelephoneConference" type="HearingByTelephoneConference_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Hearing by telephone conference
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InformationOnBankAndOtherFinancialAccounts" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Information on bank and other financial accounts
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InformationOnBankingAndOtherFinancialOperations" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Information on banking and other financial operations
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InvestigativeMeasure" type="InvestigativeMeasure_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Investigative measure implying the gathering of evidence in real time, continuously and over a certain
+            period of time
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CovertInvestigation" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Covert investigation
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InterceptionOfTelecommunications" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Interception of telecommunications
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ProvisionalMeasures" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Provisional measure(s) to prevent the destruction, transformation, moving, transfer or disposal of an item
+            that may be used as evidence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TraditionalInvestigativeMeasures_Type">
+    <xsd:sequence>
+      <xsd:element name="Search" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Search
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Seizure" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Seizure
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SurrenderOfDocuments" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Surrender of documents
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SurrenderOfBusinessRecords" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Surrender of business records
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InvestigativeMeasuresToCollectTheFollowingTypesOfEEvidence_Type">
+    <xsd:sequence>
+      <xsd:element name="BasicSubscriberInformation" type="BasicSubscriberInformation_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Basic subscriber information - including, but not limited to
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TransactionalData" type="TransactionalData_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Transactional data
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CommunicationsContent" type="CommunicationsContent_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Communications content - including, but not limited to
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BasicSubscriberInformation_Type">
+    <xsd:sequence>
+      <xsd:element name="NameAddressDateOfBirthAndContactInformation" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            name, address, date of birth and contact information (e-mail address) of the user/subscription holder
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TypeOfServiceIncludingIdentifierAndAssociatedDevices" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            type of service, including identifier (phone number, IP-address, SIM-card number, MAC-address) and
+            associated device(s)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ProfileInformation" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            profile information (user name, profile photo)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TransactionalData_Type">
+    <xsd:sequence>
+      <xsd:element name="ConnectionLogs" type="ConnectionLogs_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Connection logs (traffic data) - including, but not limited to
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PaymentHistory" type="PaymentHistory_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Payment history - including, but not limited to
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherTransactionalData" type="OtherTransactionalData_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other transactional data - including, but not limited to
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ConnectionLogs_Type">
+    <xsd:sequence>
+      <xsd:element name="ForTelephony" type="ForTelephony_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            For (mobile) telephony
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ForInternet" type="ForInternet_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            For internet
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ForHosting" type="ForHosting_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            For hosting
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ForTelephony_Type">
+    <xsd:sequence>
+      <xsd:element name="OutgoingAndIncomingIds" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            outgoing (A) and incoming (B) identifiers (phone number, IMSI, IMEI)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TimeAndDuration" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            time and duration of connections
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CallAttempts" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            call attempts
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="BaseStationId" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            base station ID, including geographical information (X/Y coordinates), at the time of initiation and
+            termination of the connection
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="BearerTeleserviceUsed" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            bearer / teleservice used (e.g. UMTS, GPRS)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ForInternet_Type">
+    <xsd:sequence>
+      <xsd:element name="TimeAndDateOfLoginAndLogout" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            time and date of login and logout of the service
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherRoutingInformation" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            other routing information (source IP-address, destination IP-address(es), port number(s), browser, e-mail
+            header information, message-ID)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="BaseStationId" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            base station ID, including geographical information (X/Y coordinates), at the time of initiation and
+            termination of the connection
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="VolumeOfData" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            volume of data
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ForHosting_Type">
+    <xsd:sequence>
+      <xsd:element name="Logfiles" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            logfiles
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Tickets" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            tickets
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PaymentHistory_Type">
+    <xsd:sequence>
+      <xsd:element name="DebitOrCreditCardNumber" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            debit or credit card number, name of the card holder and expiration date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherMeansOfPayment" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            other means of payment (non-cash)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="OtherTransactionalData_Type">
+    <xsd:sequence>
+      <xsd:element name="PukCodes" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            PUK-codes
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PrepaidBalanceChargingHistory" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            prepaid balance charging history
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ContactsList" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            contacts list
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="CommunicationsContent_Type">
+    <xsd:sequence>
+      <xsd:element name="WebMailboxDump" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (web)mailbox dump
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OnlineStorageDump" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            online storage dump (user generated data)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Pagedump" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            pagedump
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="MessageLogBackup" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            message log/backup
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="VoicemailDump" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            voicemail dump
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ServerContents" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            server contents
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DeviceBackup" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            device backup
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Hearing_Type">
+    <xsd:sequence>
+      <xsd:element name="Witness" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            witness
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Expert" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            expert
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SuspectedOrAccusedPerson" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            suspected or accused person
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Victim" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            victim
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ThirdParty" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            third party
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="HearingByVideoconference_Type">
+    <xsd:sequence>
+      <xsd:element name="Witness" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            witness
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Expert" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            expert
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SuspectedOrAccusedPerson" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            suspected or accused person
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="HearingByTelephoneConference_Type">
+    <xsd:sequence>
+      <xsd:element name="Witness" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            witness
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Expert" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            expert
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InvestigativeMeasure_Type">
+    <xsd:sequence>
+      <xsd:element name="MonitoringOfBankingOrOtherFinancialOperations" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            monitoring of banking or other financial operations
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ControlledDeliveries" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            controlled deliveries
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Other" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            other
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionD_Type">
+    <xsd:sequence>
+      <xsd:element name="EarlierEio" type="EarlierEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Indicate whether this EIO supplements an earlier EIO. If applicable, provide information relevant to
+            identify the previous EIO (the date of issue of the EIO, the authority to which it was transmitted and, if
+            available, the date of transmission of the EIO, and reference numbers given by the issuing and executing
+            authorities)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherMemberstateEio" type="OtherMemberstateEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If relevant please indicate if an EIO has already been addressed to another Member State in the same case
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="EarlierEio_Type">
+    <xsd:sequence>
+      <xsd:element name="Eio" type="BasicEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            EIO:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="MlaRequest" type="BasicEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            MLA request:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Eaw" type="Eaw_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            EAW:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="FreezingConfiscationOrder" type="BasicEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Freezing/confiscation order:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherRequest" type="BasicEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other request:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="OtherMemberstateEio_Type">
+    <xsd:sequence>
+      <xsd:element name="Eio" type="BasicOtherMsEioInvestigativeMeasure_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            EIO:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="MlaRequest" type="BasicOtherMsEioInvestigativeMeasure_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            MLA request:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Eaw" type="BasicOtherMsEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            EAW:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="FreezingConfiscationOrder" type="BasicOtherMsEioInvestigativeMeasure_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Freezing/confiscation order:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherRequest" type="BasicOtherMsEioInvestigativeMeasure_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other request:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BasicEio_Type">
+    <xsd:sequence>
+      <xsd:element name="DateOfIssue" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of issue of the EIO:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Authority" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority to which the EIO was transmitted:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DateOfTransmission" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of transmission of the EIO:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ReferenceNumberOfIssuingAuthority" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Reference number of issuing authority:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ReferenceNumberOfExecutingAuthority" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Reference number of executing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Eaw_Type">
+    <xsd:sequence>
+      <xsd:element name="BasicEio" type="BasicEio_Type" minOccurs="0"/>
+      <xsd:element name="NameOfTheRequestedPerson" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Name of the requested person
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BasicOtherMsEio_Type">
+    <xsd:sequence>
+      <xsd:element name="DateOfIssue" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of issue of the EIO:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Authority" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority to which the EIO was transmitted:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="EurojustEjnContacted" type="EurojustEjnContacted_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Was Eurojust National Member / EJN Contact Point contacted
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="EurojustEjnContacted_Type">
+    <xsd:sequence>
+      <xsd:element name="YesEurojustNationalMember" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            yes, Eurojust National Member:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="YesEjnContactPointName" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            yes, EJN Contact point, name
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="No" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            no
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BasicOtherMsEioInvestigativeMeasure_Type">
+    <xsd:sequence>
+      <xsd:element name="BasicOtherMsEio" type="BasicOtherMsEio_Type" minOccurs="0"/>
+      <xsd:element name="TypeOfTheInvestigativeMeasure" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Type of the investigative measure requested:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionE_Type">
+    <xsd:sequence>
+      <xsd:element name="InformationOfNaturalLegalPerson" type="NaturalOrLegalPerson_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            State all information, as far as known, regarding the identity of the (i) natural or (ii) legal person(s)
+            concerned by the investigative measure (if more than one person is concerned, please provide the information
+            for each person)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="LocationWhereInvestigativeMeasureIsToBeCarriedOut" type="cva:CoreAddressType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If different from the address above, please give the location where investigative measure is to be carried
+            out
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AnyOtherInformationThatWillAssist" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Provide any other information that will assist with the execution of the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="NaturalOrLegalPerson_Type">
+    <xsd:sequence>
+      <xsd:element name="NaturalPerson" type="NaturalPerson_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="LegalPerson" type="LegalPerson_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="NaturalPerson_Type">
+    <xsd:sequence>
+      <xsd:element name="EioNaturalPerson" type="eio:EioPersonType" minOccurs="0"/>
+      <xsd:element name="PositionTheConcernedPersonCurrentlyHolds" type="PositionTheConcernedPersonCurrentlyHolds_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please describe the position the concerned person currently holds in the proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PositionTheConcernedPersonCurrentlyHolds_Type">
+    <xsd:sequence>
+      <xsd:element name="SuspectedOrAccusedPerson" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            suspected or accused person
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Victim" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            victim
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Witness" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            witness
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Expert" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            expert
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ThirdParty" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            third party
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            other (please specify)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="LegalPerson_Type">
+    <xsd:sequence>
+      <xsd:element name="EioLegalPerson" type="eio:EioBusinessType" minOccurs="0"/>
+      <xsd:element name="PositionTheConcernedPersonCurrentlyHolds" type="PositionTheConcernedPersonCurrentlyHolds_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please describe the position the concerned person currently holds in the proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionF_Type">
+    <xsd:sequence>
+      <xsd:element name="TypeOfProceedings" type="TypeOfProceedingsType" minOccurs="0"/>
+      <xsd:element name="InConnectionWith" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            d: in connection with proceedings referred to in points (a), (b), and (c) which relate to offences or
+            infringements for which a legal person may be held liable or punished in the issuing State.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TypeOfProceedingsType">
+    <xsd:choice>
+      <xsd:element name="WithRespectToCriminalProceedings" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            a: with respect to criminal proceedings brought by, or that may be brought before, a judicial authority in
+            respect of a criminal offence under the national law of the issuing State
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ProceedingsBroughtByAdministrativeAuthorities" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            b: proceedings brought by administrative authorities in respect of acts which are punishable under the
+            national law of the issuing State by virtue of being infringements of the rules of law, and where the
+            decision may give rise to proceedings before a court having jurisdiction in particular in criminal matters
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ProceedingsBroughtByJudicialAuthorities" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            c: proceedings brought by judicial authorities in respect of acts which are punishable under the national
+            law of the issuing State by virtue of being infringements of the rules of law, and where the decision may
+            give rise to proceedings before a court having jurisdiction in particular in criminal matters
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="SectionG_Type">
+    <xsd:sequence>
+      <xsd:element name="SummaryOfTheFacts" type="SummaryOfTheFacts_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Summary of the facts
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="NatureAndLegalClassification" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Nature and legal classification of the offence(s) for which the EIO is issued and the applicable statutory
+            provision/code
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PunishableOffence" type="PunishableOffence_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Is the offence for which the EIO is issued punishable in the issuing State by a custodial sentence or
+            detention order of a maximum of at least three years as defined by the law of the issuing State and included
+            in the list of offences set out below? (please tick the relevant box)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SummaryOfTheFacts_Type">
+    <xsd:sequence>
+      <xsd:element name="DateTimeOfOffence" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date, time (period of time) of offence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PlaceOfOffence" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Place of offence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="NameAndNationalityOfTheSuspect" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Name and nationality of the suspect/accused, if known
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PunishableOffence_Type">
+    <xsd:sequence>
+      <xsd:element name="ParticipationInACriminalOrganisation" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            participation in a criminal organisation
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Terrorism" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            terrorism
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TraffickingInHumanBeings" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            trafficking in human beings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SexualExploitationOfChildren" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            sexual exploitation of children and child pornography
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IllicitTraffickingInNarcoticDrugs" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            illicit trafficking in narcotic drugs and psychotropic substances
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IllicitTraffickingInWeapons" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            illicit trafficking in weapons, munitions and explosives
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Corruption" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            corruption
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Fraud" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            fraud, including that affecting the financial interests of the European Union within the meaning of the
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ConventionOnTheProtectionOfFinancialInterests" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Convention of 26 July 1995 on the protection of the European Communities� financial interests
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="LaunderingOfTheProceedsOfCrime" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            laundering of the proceeds of crime
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CounterfeitingCurrency" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            counterfeiting currency, including of the euro
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ComputerRelatedCrime" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            computer-related crime
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="EnvironmentalCrime" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            environmental crime, including illicit trafficking in endangered animal species and in endangered
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PlantSpeciesAndVarieties" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            plant species and varieties
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="FacilitationOfUnauthorisedEntryAndResidence" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            facilitation of unauthorised entry and residence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Murder" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            murder, grievous bodily injury
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IllicitTradeInHumanOrgans" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            illicit trade in human organs and tissue
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Kidnapping" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            kidnapping, illegal restraint and hostage-taking
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Racism" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            racism and xenophobia
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OrganisedRobbery" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            organised or armed robbery
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IllicitTraffickingInCulturalGoods" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            illicit trafficking in cultural goods, including antiques and works of art
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Swindling" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            swindling
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Racketeering" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            racketeering and extortion
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CounterfeitingAndPiracyOfProducts" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            counterfeiting and piracy of products
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ForgeryOfAdministrativeDocuments" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            forgery of administrative documents and trafficking therein
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ForgeryOfMeansOfPayment" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            forgery of means of payment
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IllicitTraffickingInHormonalSubstances" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            illicit trafficking in hormonal substances and other growth promoters
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IllicitTraffickingInNuclearMaterials" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            illicit trafficking in nuclear or radioactive materials
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TraffickingInStolenVehicles" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            trafficking in stolen vehicles
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Rape" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            rape
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Arson" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            arson
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CrimesWithinTheJurisdiction" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            crimes within the jurisdiction of the International Criminal Court
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="UnlawfulSeizureOfAircraftShips" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            unlawful seizure of aircraft/ships
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Sabotage" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            sabotage
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionH_Type">
+    <xsd:sequence>
+      <xsd:element name="TransferOfAPersonHeldInCustody" type="TransferOfAPersonHeldInCustody_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H1: Transfer of a person held in custody
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="VideoOrTelephoneConference" type="VideoOrTelephoneConference_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H2: Video or telephone conference or other audiovisual transmission
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ProvisionalMeasures" type="ProvisionalMeasures_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H3: Provisional measures
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InformationOnBank" type="InformationOnBank_Type" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H4: Information on bank and other financial accounts
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InvestigativeMeasures" type="InvestigativeMeasures_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H5: Investigative measures implying the gathering of evidence in real time, continuously and over a
+            certain period of time
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CovertInvestigations" type="CovertInvestigations_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H6: Covert investigations
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InterceptionOfTelecommunications" type="InterceptionOfTelecommunications_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION H7: Interception of telecommunications
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TransferOfAPersonHeldInCustody_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingStatePersonConsented" type="eio:PersonConsentedToMeasureType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If a temporary transfer to the issuing State of a person held in custody for the purpose of the
+            investigation is requested, please indicate whether the person consented to this measure
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ExecutingStatePersonConsented" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If a temporary transfer to the executing State of a person held in custody for the purpose of investigation
+            is requested, please indicate whether the person consented to this measure
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="VideoOrTelephoneConference_Type">
+    <xsd:sequence>
+      <xsd:element name="NameOfTheAuthority" type="NameOfTheAuthority_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please indicate the name of the authority that will conduct the hearing (contact details/language):
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ReasonsForRequesting" type="ReasonsForRequesting_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please indicate reasons for requesting this measure:
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="NameOfTheAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="AuthoritySameAsIssuing" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            The same as issuing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TechnicalDetails" type="TechnicalDetails_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Technical details
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="LanguageAndInterpretationArrangements" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Language and interpretation arrangements
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ProposedDatesForTheHearing" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Proposed dates for the hearing
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="HearingType" type="HearingType_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Hearing type
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ReasonsForRequesting_Type">
+    <xsd:sequence>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="HearingByVideoconferenceOrOther" type="HearingByVideoconferenceOrOther_Type" minOccurs="0"/>
+      <xsd:element name="HearingByTelephoneConference" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            hearing by telephone conference
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TechnicalDetails_Type">
+    <xsd:sequence>
+      <xsd:element name="SiteName" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Site name
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TimeZone" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Time zone
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="CommunicationSystem" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Communication system
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ContactsOfTechnician" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Contacts of technician (language)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PreTestDateAndTime" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Pre-test date and time
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="HearingType_Type">
+    <xsd:sequence>
+      <xsd:element name="WithinTrial" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Within trial (otherwise outside trial)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="HearingByVideoconferenceOrOther_Type">
+    <xsd:sequence>
+      <xsd:element name="HearingByVideoconference" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            hearing by videoconference or other audiovisual transmission
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SuspectedPersonHasGivenConsent" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            the suspected or accused person has given his/her consent
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ProvisionalMeasures_Type">
+    <xsd:sequence>
+      <xsd:element name="ItemTransferredToIssuingState" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            the item is to be transferred to the issuing State (otherwise: the item is to remain in the executing State)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ItemRemainsInExecutingState" type="ItemRemainsInExecutingState_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            if the item is to remain in the executing State, please indicate an estimated date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ItemRemainsInExecutingState_Type">
+    <xsd:sequence>
+      <xsd:element name="DateForLifting" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            estimated date for lifting of provisional measure
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DateForSubmission" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            estimated date for the submission of a subsequent request concerning the item
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InformationOnBank_Type">
+    <xsd:sequence>
+      <xsd:element name="BankAccountsRequestedReasons" type="BankAccountsRequestedReasons_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If information on bank accounts or other financial accounts that the person holds or controls is requested,
+            please indicate, for each of them, the reasons why you consider the measure relevant for the purpose of the
+            criminal proceedings and on what grounds you presume that banks in the executing State hold the account
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="BankingOperationsRequestedReasons" type="BankingOperationsRequestedReasons_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If information on banking operations or other financial operations is requested, please indicate, for each
+            of them, the reasons why you consider the measure relevant for the purpose of the criminal proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="RelevantPeriodAndRelatedAccounts" type="RelevantPeriodAndRelatedAccounts_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Indicate the relevant period of time and the related accounts
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BankAccountsRequestedReasons_Type">
+    <xsd:sequence>
+      <xsd:element name="BankAccountsThatThePersonHolds" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            information on bank accounts that the person holds or in respect of which he or she has the power of
+            attorney
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherFinancialAccountsThatThePersonHolds" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            information on other financial accounts that the person holds or in respect of which he or she has the power
+            of attorney
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BankingOperationsRequestedReasons_Type">
+    <xsd:sequence>
+      <xsd:element name="InformationOnBankingOperations" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            information on banking operations
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InformationOnOtherFinancialOperations" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            information on other financial operations
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="RelevantPeriodAndRelatedAccounts_Type">
+    <xsd:sequence>
+      <xsd:element name="NameOfTheBank" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Name of the bank
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AccountNumber" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Account number
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AccountHolder" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Account holder
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="RelevantTimePeriod" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Relevant time period
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InvestigativeMeasures_Type">
+    <xsd:sequence>
+      <xsd:element name="Reasons" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If such investigative measure is requested please indicate the reasons why you consider the requested
+            information relevant for the purpose of the criminal proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="CovertInvestigations_Type">
+    <xsd:sequence>
+      <xsd:element name="Reasons" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If covert investigation is requested please indicate the reasons why you consider the investigative measure
+            likely to be relevant for the purpose of the criminal proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InterceptionOfTelecommunications_Type">
+    <xsd:sequence>
+      <xsd:element name="Reasons" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If interception of telecommunications is requested please indicate the reasons why you consider the
+            investigative measure relevant for the purpose of the criminal proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InformationIdentifyingTheSubject" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            information for the purpose of identifying the subject of the interception
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DesiredDuration" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            the desired duration of the interception
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TechnicalData" type="TechnicalData_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            technical data (in particular the target identifier � such as mobile telephone, landline telephone, email
+            address, internet connection), to ensure that the EIO can be executed
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PreferenceConcerningTheMethodOfExecution" type="PreferenceConcerningTheMethodOfExecution_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please indicate your preference concerning the method of execution
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DesiredFormat" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Desired format for the recording/transmission of evidence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TechnicalData_Type">
+    <xsd:sequence>
+      <xsd:element name="TelephoneNumber" type="TelephoneNumberType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Telephone number
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="UserNameId" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            User name/ID
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IpAddress" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            IP address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ImeiNumber" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            IMEI number
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="EMailAddress" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            E-mail address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="MacAddress" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            MAC address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TelephoneNumberType">
+    <xsd:sequence>
+      <xsd:element name="Landline" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Landline
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Mobile" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Mobile
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PreferenceConcerningTheMethodOfExecution_Type">
+    <xsd:choice>
+      <xsd:element name="ImmediateTransmission" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            immediate transmission (otherwise recording and subsequent transmission)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="SectionI_Type">
+    <xsd:sequence>
+      <xsd:element name="ExecutingAuthorityComplyWith" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            It is requested that the executing authority comply with the following formalities and procedures (�)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IssuingStateAssistInExecutionContactDetails" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            It is requested that one or several officials of the issuing State assist in the execution of the EIO in
+            support of the competent authorities of the executing State
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="LanguagesForCommunication" type="eio:EioLanguageCodes" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Languages that may be used for communication
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionJ_Type">
+    <xsd:sequence>
+      <xsd:element name="LegalRemedyDetails" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please indicate if a legal remedy has already been sought against the issuing of an EIO, and if so please
+            provide further details (description of the legal remedy, including necessary steps to take and deadlines)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AuthoritySupplyingFurtherInformation" type="AuthoritySupplyingFurtherInformation_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority in the issuing State which can supply further information on procedures for seeking legal remedies
+            in the issuing State and on whether legal assistance and interpretation and translation is available
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AuthoritySupplyingFurtherInformation_Type">
+    <xsd:sequence>
+      <xsd:element name="AuthoritySupplyingFurtherInformationName" type="AuthoritySupplyingFurtherInformationName_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Name of authority supplying further information
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OtherAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other authority which can supply further information
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AuthoritySupplyingFurtherInformationName_Type">
+    <xsd:choice>
+      <xsd:element name="SameAsIssuingAuthority" type="udt:IndicatorType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Same as issuing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Other" type="udt:TextType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Other
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="SectionK_Type">
+    <xsd:sequence>
+      <xsd:element name="TypeOfAuthorityWhichIssuedTheEio" type="TypeOfAuthorityWhichIssuedTheEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Tick the type of authority which issued the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IssuingAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority which issued the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ContactDetailsForAdditionalInformation" type="ContactDetailsForAdditionalInformation_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If different from above, the contact details of the person(s) to contact for additional information or to
+            make practical arrangements for the transfer of evidence
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SignatureOfTheIssuingAuthority" type="SignatureOfAuthority_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Signature of the issuing authority and/or its representative certifying the content of the EIO as accurate
+            and correct
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TypeOfAuthorityWhichIssuedTheEio_Type">
+    <xsd:choice>
+      <xsd:element name="JudicialAuthority" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            judicial authority (otherwise any other competent authority as defined by the law of the issuing State,
+            please also complete section L)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="ContactDetailsForAdditionalInformation_Type">
+    <xsd:sequence>
+      <xsd:element name="NameTitleOrganisation" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Name/Title/Organisation
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Address" type="cva:CoreAddressType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Address
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="EMail" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            E-Mail
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ContactPhoneNo" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Contact Phone No
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SignatureOfAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Name
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PostHeld" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Post held (title/grade)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Date" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OfficialStamp" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Official stamp (if available)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SectionL_Type">
+    <xsd:sequence>
+      <xsd:element name="TypeOfJudicialAuthorityWhichHasValidatedThisEio"
+                   type="TypeOfJudicialAuthorityWhichHasValidatedThisEio_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please indicate the type of judicial authority which has validated this EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ValidatingAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority which validated the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="MainContactPointForExecutingAuthority" type="MainContactPointForExecutingAuthority_Type"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Please indicate if the main contact point for the executing authority should be the
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SignatureOfTheValidatingAuthority" type="SignatureOfAuthority_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Signature and details of the validating authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TypeOfJudicialAuthorityWhichHasValidatedThisEio_Type">
+    <xsd:sequence>
+      <xsd:element name="JudgeOrCourt" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            judge or court
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InvestigatingJudge" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            investigating judge
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PublicProsecutor" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            public prosecutor
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="MainContactPointForExecutingAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingAuthority" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            issuing authority (otherwise: validating authority)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+</xsd:schema>

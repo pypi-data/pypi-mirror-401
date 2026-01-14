@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/toe"
+  xmlns="http://data.europa.eu/edm/1/ns/toe"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+
+  <xsd:complexType name="Toe_ReferenceIssuer_Type">
+    <xsd:sequence>
+      <xsd:element name="ReferenceNumbers" type="civil:Civil_ReferenceNumbers_Type"/>
+      <xsd:element name="Issuer" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_ReferenceIssuerExecutor_Type">
+    <xsd:sequence>
+      <xsd:element name="ReferenceIssuer" type="Toe_ReferenceIssuer_Type"/>
+      <xsd:element name="Executor" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_NameTitleFunctionTask_Type">
+    <xsd:sequence>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Title" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Function" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Task" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_ExaminationOfWitness_Type">
+    <xsd:sequence>
+      <xsd:element name="EntityInfo" type="civil:Civil_EntityInfo_Type"/>
+      <xsd:element name="DateOfBirth" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="QuestionsOrFactsStatements" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="RightToRefuse" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_InformationOnDelay_Type">
+    <xsd:sequence>
+      <xsd:element name="AddressDeterminationInProgress" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="ServiceOfSummonsInProgress" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="PersonDidNotAppear" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="RequestRepliedOn" type="civil:Civil_DateContainer_Type" minOccurs="0"/>
+      <xsd:element name="PaymentRequestedOnNotReceived" type="civil:Civil_DateContainer_Type" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="EstimatedDateOfExecution" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

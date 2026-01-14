@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== -->
+<!-- ===== EU - Code List Schema Module                            ===== -->
+<!-- ====================================================================== -->
+<!--
+
+A subset of the ISO 639-2 code list containing only official eu languages
+
+ Courtesy of Judicial Information Agency of the Dutch Department of Security and Justice
+
+-->
+<xsd:schema xmlns:ccts="urn:un:unece:uncefact:documentation:standard:CoreComponentsTechnicalSpecification:2"
+            xmlns:clmEUEULanguageCode="http://data.ecodex.eu/codelist-EULanguageCode"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
+            elementFormDefault="qualified" targetNamespace="http://data.ecodex.eu/codelist-EULanguageCode" version="1.8"
+            xmlns="http://data.ecodex.eu/codelist-EULanguageCode">
+  <!-- ======================================================================= -->
+  <!-- Element Declarations                                                    -->
+  <!-- ======================================================================= -->
+  <!-- Root Element                                                            -->
+  <!-- ======================================================================= -->
+  <xsd:element name="EULanguage" type="clmEUEULanguageCode:EULanguageContentType"/>
+  <!-- ================================================================== -->
+  <!-- Type Definitions                                                   -->
+  <!-- ================================================================== -->
+  <!-- Type Definition: EULanguageContentType-->
+  <!-- ================================================================== -->
+  <xsd:simpleType name="EULanguageContentType">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="bul">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Bulgarian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="cze">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Czech</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="dan">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Danish</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="dut">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Dutch</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="eng">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>English</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="est">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Estonian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="fin">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Finnish</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="fre">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>French</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ger">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>German</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="gre">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Greek</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="hun">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Hungarian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ita">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Italian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="lav">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Latvian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="lit">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Lithuanian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="mlt">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Maltese</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="pol">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Polish</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="por">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Portuguese</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="rum">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Romanian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="slo">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Slovak</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="slv">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Slovenian</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="spa">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Spanish</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="swe">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Swedish</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>
+            <ccts:Name>Other</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

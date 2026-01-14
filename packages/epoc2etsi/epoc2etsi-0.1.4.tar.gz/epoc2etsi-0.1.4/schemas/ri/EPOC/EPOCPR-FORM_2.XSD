@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_2#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_2#"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc"
+              schemaLocation="epoc-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="EpocPr_Form2" type="EpocPr_Form2_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Under Regulation (EU) 2023/1543 of the European Parliament and of the Council ( 1 ) the addressee of this
+        European Preservation Order Certificate (EPOC-PR) must, without undue delay after receiving the EPOC-PR,
+        preserve the data requested. The preservation must cease after 60 days, unless extended by the issuing authority
+        by an additional 30 days, or the issuing authority confirms that a subsequent request for production has been
+        issued. If the issuing authority confirms within those time periods that a subsequent request for production has
+        been issued, the addressee must preserve the data for as long as necessary to produce the data once the
+        subsequent request for production is received.
+        The addressee must take necessary measures to ensure the confidentiality, secrecy and integrity of the EPOC-PR
+        and of the data preserved.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="EpocPr_Form2_Type">
+    <xsd:sequence>
+      <xsd:element name="SectionA" type="epoc:Epoc_IssuingState_Type" minOccurs="0"><!--TODO DEV-1 to be removed???-->
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION A: Issuing/validating authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionB" type="epoc:Epoc_AddresseePlusEmergencyCase_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION B: Addressee
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionC" type="epoc:Epoc_ElectronicEvidence_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION C: Information to support identification of the data requested to be preserved
+            SECTION D: Electronic evidence to be preserved
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionE" type="epoc:Epoc_InformationOnUnderlyingConditions_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION E: Information on the underlying conditions
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionF" type="epoc:Epoc_DetailsOfIssuingAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION F: Details of the issuing authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionG" type="epoc:Epoc_DetailsOfValidatingAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION G: Details of the validating authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

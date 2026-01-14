@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/MLA-Decision#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/MLA-Decision#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+
+  <xsd:element name="mlaDecision" type="MlaDecision_Type"/>
+
+  <xsd:complexType name="MlaDecision_Type">
+    <xsd:sequence>
+      <xsd:element name="Reason" type="udt:TextType" minOccurs="0"/>
+      <xsd:choice>
+        <xsd:element name="Decision" type="DecisionType"/>
+        <xsd:element name="ForwardedTo" type="eio:AuthorityIdType"/>
+      </xsd:choice>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="DecisionType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="RECOGNISED"/>
+      <xsd:enumeration value="RETURNED"/>
+      <xsd:enumeration value="REJECTED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/civil"
+  xmlns="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+
+  <xsd:complexType name="Civil_DoneAtDate_Type">
+    <xsd:sequence>
+      <xsd:element name="DoneAt" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Date" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_IndicatorContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_DateContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_TransmissionEntity_Type">
+    <xsd:sequence>
+      <xsd:element name="AuthorityId" type="eio:AuthorityIdType" minOccurs="0"/>
+      <xsd:element name="EntityInfo" type="Civil_EntityInfo_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_EntityInfo_Type">
+    <xsd:sequence>
+      <xsd:element name="Identity" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Address" type="Civil_Address_Type"/>
+      <xsd:element name="Tel" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Fax" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Email" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_EntitiesInfo_Type">
+    <xsd:sequence>
+      <xsd:element name="EntityInfo" type="Civil_EntityInfo_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_Address_Type">
+    <xsd:sequence>
+      <xsd:element name="StreetAndNumberOrPoBox" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Municipality" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="PostalCode" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Country" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Civil_EuLanguage_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="BG"/>
+      <xsd:enumeration value="ES"/>
+      <xsd:enumeration value="CS"/>
+      <xsd:enumeration value="DA"/>
+      <xsd:enumeration value="DE"/>
+      <xsd:enumeration value="ET"/>
+      <xsd:enumeration value="EL"/>
+      <xsd:enumeration value="EN"/>
+      <xsd:enumeration value="FR"/>
+      <xsd:enumeration value="GA"/>
+      <xsd:enumeration value="HR"/>
+      <xsd:enumeration value="IT"/>
+      <xsd:enumeration value="LV"/>
+      <xsd:enumeration value="LT"/>
+      <xsd:enumeration value="HU"/>
+      <xsd:enumeration value="MT"/>
+      <xsd:enumeration value="NL"/>
+      <xsd:enumeration value="PL"/>
+      <xsd:enumeration value="PT"/>
+      <xsd:enumeration value="RO"/>
+      <xsd:enumeration value="SK"/>
+      <xsd:enumeration value="SL"/>
+      <xsd:enumeration value="FI"/>
+      <xsd:enumeration value="SV"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Civil_EuLanguages_Type">
+    <xsd:sequence>
+      <xsd:element name="Language" type="Civil_EuLanguage_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_ReferenceNumbers_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingEntity" type="udt:TextType"/>
+      <xsd:element name="ExecutingEntity" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Civil_WithdrawalConfirmation_Type">
+    <xsd:sequence>
+      <xsd:element name="allOngoingLinkedActionsAborted" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="additionalComments" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B_WITHDRAWAL.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_B_WITHDRAWAL.XSD#"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:sod="http://data.europa.eu/edm/1/ns/sod"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/sod" schemaLocation="./sod-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Sod_FormBWithdrawal" type="Sod_FormBWithdrawal_Type"/>
+  <xsd:complexType name="Sod_FormBWithdrawal_Type">
+    <xsd:sequence>
+      <xsd:element name="Section0" type="sod:Sod_ReferenceAndAddressee_Type"/>
+      <xsd:element name="Section1" type="Sod_FormBWithdrawal_DateAndReasonOfWithdrawal_Type"/>
+      <xsd:element name="Section2" type="udt:TextType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormBWithdrawal_DateAndReasonOfWithdrawal_Type">
+    <xsd:sequence>
+      <xsd:element name="DateOfWithdrawal" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="RequestWithdrawnDueTo" type="Sod_FormBWithdrawal_RequestWithdrawnDueTo_Type" minOccurs="0"/>
+      <xsd:element name="AdditionalComments" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormBWithdrawal_RequestWithdrawnDueTo_Type">
+    <xsd:sequence>
+      <xsd:element name="Reason" type="Sod_FormBWithdrawal_Reason_Type" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormBWithdrawal_Reason_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="PERSON_TO_BE_SERVED_HAS_BEEN_LOCATED"/>
+      <xsd:enumeration value="EXECUTION_OF_THE_REQUEST_IS_NO_LONGER_NEEDED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

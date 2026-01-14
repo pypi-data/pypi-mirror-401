@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/COMMON-FreeForm#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/COMMON-FreeForm#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+
+  <xsd:element name="freeForm" type="FreeForm_Type"/>
+
+  <xsd:complexType name="FreeForm_Type">
+    <xsd:sequence>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

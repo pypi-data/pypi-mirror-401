@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================================ -->
+<!-- ===== Schema of European Investigation Order (EIO) Form Annexes A to C ===== -->
+<!-- ============================================================================ -->
+<!--
+The Directive 2014/41/EU regarding the European Investigation Order in
+criminal matters (the Directive) deals with the gathering and transfer of
+evidence, including electronic evidence, within the Union.
+
+The Directive is based on the principle of mutual recognition of judgements
+and judicial decisions and allows a judicial authority in one Member State
+(the "issuing authority") to request that specific investigative measures
+are carried out by an authority in another Member State (the "executing
+authority") to obtain evidence.
+
+The Directive became applicable on 22 May 2017 and was implemented by a
+large majority of Member States. It updated the legal framework for the
+gathering and transfer of evidence between Member States. In particular, it
+replaced the Convention on Mutual Assistance in Criminal Matters between
+the Member States of the European Union , which sets out the conditions for
+mutual legal assistance.
+
+It provides the following three standardised forms to facilitate the
+execution (set out in the annexes to the Directive):
+•   European Investigation Order (EIO), in Annex A;
+•   Confirmation of the Receipt of an EIO, in Annex B; and
+•   Notification of the interception of telecommunications without
+    technical assistance, in Annex C.
+ -->
+<!-- = Copyright Notice ================================================= -->
+<!--
+    European Investigation Order (EIO) Forms XML Schema 1.1
+    Copyright (C) European Union, 2018
+    Licensed under the ISA Open Metadata Licence
+
+    Suzanne Wigard (suzanne.wigard@ec.europa.eu),
+    Mario Hans (mh@dialogika.de)
+    Manfred Ries (mr@dialogika.de)
+    Wolfgang Keber (wk@dialogika.de)
+-->
+<!-- ===================================================== -->
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EIO-B#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EIO-B#"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="EIO_B" type="EIO_B_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        ANNEX B CONFIRMATION OF THE RECEIPT OF AN EIO - This form has to completed by the authority of the executing
+        State which received the EIO referred to below.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="EIO_B_Type">
+    <xsd:sequence>
+      <xsd:element name="PartA" type="PartA_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (A) THE EIO CONCERNED
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartB" type="PartB_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (B) THE AUTHORITY WHICH RECEIVED THE EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartC" type="PartC_Type" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (C) (WHERE APPLICABLE) THE COMPETENT AUTHORITHY TO WHOM THE EIO IS TRANSMITTED BY THE AUTHORITY UNDER (B)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartD" type="PartD_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (D) ANY OTHER INFORMATION WHICH MAY BE RELEVANT FOR THE ISSUING AUTHORITY
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartE" type="PartE_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (E) SIGNATURE AND DATE
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartA_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority which issued the EIO
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DateOfIssuing" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of issuing
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DateOfReceipt" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of receipt
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartB_Type">
+    <xsd:sequence>
+      <xsd:element name="ReceivingAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Receiving Authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartC_Type">
+    <xsd:sequence>
+      <xsd:element name="TargetAuthority" type="eio:EioAuthorityType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Authority to whom the EIO is transmitted by the authority under (B)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DateOfTransmission" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of transmission
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartD_Type">
+    <xsd:sequence>
+      <xsd:element name="AnyOtherInformation" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Any other information
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartE_Type">
+    <xsd:sequence>
+      <xsd:element name="Signature" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Signature
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Date" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OfficialStamp" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Official stamp (if available)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+</xsd:schema>

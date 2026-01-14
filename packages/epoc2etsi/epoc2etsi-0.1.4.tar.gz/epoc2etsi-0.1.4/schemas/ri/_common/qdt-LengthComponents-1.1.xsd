@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by wk (DIaLOGIKa GmbH) -->
+<!-- ===== Copyright Notice ============================== -->
+<!--
+	        Public Documents XML schema 1.0
+	        Copyright (C) European Union, 2018
+	        Licensed under the ISA Open Metadata Licence
+	        Original authors:
+	        Suzanne Wigard (suzanne.wigard@ec.europa.eu),
+	        Emidio Stani (emidio.stani@be.pwc.com),
+	        Ioana Novacean (ioana.novacean@be.pwc.com),
+	        Inge Gielis (inge.gielis@be.pwc.com),
+			Arne De Proft (arne.de.proft@be.pwc.com)
+
+			Wolfgang Keber (wk@dialogika.de)
+-->
+<!-- ===================================================== -->
+<xsd:schema targetNamespace="http://data.europa.eu/edm/1/ns/qdt" elementFormDefault="qualified"
+            attributeFormDefault="unqualified" version="1.0" xmlns="http://data.europa.eu/edm/1/ns/qdt"
+            xmlns:cvb="http://www.w3.org/ns/corevocabulary/BasicComponents"
+            xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/BasicComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-BasicComponents-1.1.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+  <!-- ============================================================ -->
+  <!-- AddressCountryMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="AddressCountryMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:AddressAdminUnitLocationOneType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- AddressCountryOfDeathMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="AddressCountryOfDeathMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LocationGeographicNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- AddressPlaceMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="AddressPlaceMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:AddressPostNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- AddressPostalCodeMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="AddressPostalCodeMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:AddressPostNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- AddressStreetPOBoxMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="AddressStreetPOBoxMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:AddressThoroughfareType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- AuthorityDesignationMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="AuthorityDesignationMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LegalEntityLegalNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- CountryNameMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="CountryNameMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LocationGeographicNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- GeographicIDMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="GeographicIDMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LocationGeographicIDType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- GeographicNameMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="GeographicNameMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LocationGeographicNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- IdentifierMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="IdentifierMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:JurisdictionIDType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="JurisdictionType">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="NameMaxLength65535" type="NameMaxLength65535Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="IdentifierMaxLength65535" type="IdentifierMaxLength65535Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="LocationType">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="GeographicID" type="GeographicIDMaxLength65535Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="GeographicName" type="GeographicNameMaxLength65535Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- NameMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="NameMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:JurisdictionNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- NationalityNameMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="NationalityNameMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:JurisdictionNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- PersonForenameMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="PersonForenameMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:PersonGivenNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- PersonNationalityMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="PersonNationalityMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:JurisdictionIDType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- PersonPlaceMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="PersonPlaceMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LocationGeographicNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- PersonSurnameAtBirthMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="PersonSurnameAtBirthMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:PersonBirthNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- PersonSurnameMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="PersonSurnameMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:PersonFamilyNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- PlaceNameMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="PlaceNameMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="cvb:LocationGeographicNameType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- StringMaxLength255-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="StringMaxLength255Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="udt:TextType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="255"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ============================================================ -->
+  <!-- StringMaxLength65535-->
+  <!-- ============================================================ -->
+  <xsd:complexType name="StringMaxLength65535Type">
+    <xsd:simpleContent>
+      <xsd:restriction base="udt:TextType">
+        <xsd:minLength value="0"/>
+        <xsd:maxLength value="65535"/>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+</xsd:schema>

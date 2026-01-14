@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/SOD-WITHDRAWAL_ACK.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/SOD-WITHDRAWAL_ACK.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:sod="http://data.europa.eu/edm/1/ns/sod"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/sod" schemaLocation="./sod-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Sod_WithdrawalAck" type="Sod_WithdrawalAck_Type"/>
+  <xsd:complexType name="Sod_WithdrawalAck_Type">
+    <xsd:sequence>
+      <xsd:element name="Section0" type="sod:Sod_ReferenceAndAddressee_Type"/>
+      <xsd:element name="Section1" type="civil:Civil_WithdrawalConfirmation_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

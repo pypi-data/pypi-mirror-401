@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_K.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_K.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:toe="http://data.europa.eu/edm/1/ns/toe"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/toe"
+              schemaLocation="./toe-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_FormK" type="Toe_FormK_Type"/>
+
+  <xsd:complexType name="Toe_FormK_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To4" type="toe:Toe_ReferenceIssuerExecutor_Type"/>
+      <xsd:element name="Section5To7" type="Toe_FormK_ExecutionOrNonExecution_Type"/>
+      <xsd:element name="Section8" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_FormK_ExecutionOrNonExecution_Type">
+    <xsd:sequence>
+      <xsd:element name="ResultOfExecutionType" type="Toe_FormK_ResultOfExecutionType_Type" minOccurs="0"/>
+      <xsd:element name="AttachedDocuments" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="RequestRefused" type="Toe_FormK_RequestRefused_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Toe_FormK_ResultOfExecutionType_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="EXECUTED"/>
+      <xsd:enumeration value="REFUSED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Toe_FormK_RequestRefused_Type">
+    <xsd:sequence>
+      <xsd:element name="PersonNotGivingEvidenceUnderLawOfMemberStateOf" type="Toe_FormK_PersonNotGivingEvidenceUnderLawOfMemberStateOfContainer_Type" minOccurs="0"/>
+      <xsd:element name="NotInRegulationScope" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="NotWithinFunctionsOfJudiciary" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="NotCompliedWithAdditionalInformationRequestDated" type="civil:Civil_DateContainer_Type" minOccurs="0"/>
+      <xsd:element name="DepositOrAdvanceNotMade" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="OtherReasons" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_FormK_PersonNotGivingEvidenceUnderLawOfMemberStateOfContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Toe_FormK_AuthoritySide_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Toe_FormK_AuthoritySide_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ISSUING"/>
+      <xsd:enumeration value="EXECUTING"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

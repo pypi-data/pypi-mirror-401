@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-WITHDRAWAL.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_Withdrawal" type="Toe_Withdrawal_Type"/>
+
+  <xsd:complexType name="Toe_Withdrawal_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To2" type="civil:Civil_ReferenceNumbers_Type"/>
+      <xsd:element name="Section3To5" type="Toe_Withdrawal_DateAndReasonOfWithdrawal_Type"/>
+      <xsd:element name="Section6" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_Withdrawal_DateAndReasonOfWithdrawal_Type">
+    <xsd:sequence>
+      <xsd:element name="DateOfWithdrawal" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="RequestIsBeingWithdrawnDueTo" type="Toe_Withdrawal_RequestWithdrawnDueTo_Type" minOccurs="0"/>
+      <xsd:element name="AdditionalComments" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_Withdrawal_RequestWithdrawnDueTo_Type">
+    <xsd:sequence>
+      <xsd:element name="Reason" type="Toe_Withdrawal_Reason_Type" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Toe_Withdrawal_Reason_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="TAKING_OF_EVIDENCE_NO_LONGER_NEEDED"/>
+      <xsd:enumeration value="COURT_CASE_HAS_BEEN_CLOSED_TERMINATED_SUSPENDED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

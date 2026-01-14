@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_K.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_K.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:sod="http://data.europa.eu/edm/1/ns/sod"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/sod" schemaLocation="./sod-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Sod_FormK" type="Sod_FormK_Type"/>
+  <xsd:complexType name="Sod_FormK_Type">
+    <xsd:sequence>
+      <xsd:element name="Section0" type="sod:Sod_ReferenceAndAddressee_Type"/>
+      <xsd:element name="Section1To4" type="Sod_FormK_ServiceOrNonService_Type"/>
+      <xsd:element name="Section5" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_ServiceOrNonService_Type">
+    <xsd:sequence>
+      <xsd:element name="ResultsOfServiceType" type="Sod_FormK_ResultsOfServiceType_Type" minOccurs="0"/>
+      <xsd:element name="CompletionOfServiceOfDocuments" type="Sod_FormK_CompletionOfServiceOfDocuments_Type"
+                   minOccurs="0"/>
+      <xsd:element name="NonServiceOfDocuments" type="Sod_FormK_NonServiceOfDocuments_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormK_ResultsOfServiceType_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="COMPLETION_OF_SERVICE"/>
+      <xsd:enumeration value="NON_SERVICE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Sod_FormK_CompletionOfServiceOfDocuments_Type">
+    <xsd:sequence>
+      <xsd:element name="DateAndAddressOfTheService" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DocumentServedInAccordanceWith" type="Sod_FormK_DocumentServedInAccordanceWithContainer_Type"
+                   minOccurs="0"/>
+      <xsd:element name="DocumentServedByTheFollowingParticularMethod" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="TheAddresseeOfTheDocumentWasInformed" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_DocumentServedInAccordanceWithContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Sod_FormK_DocumentServedInAccordanceWith_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_DocumentServedInAccordanceWith_Type">
+    <xsd:sequence>
+      <xsd:element name="DocumentHandedTo" type="Sod_FormK_DocumentHandedToContainer_Type" minOccurs="0"/>
+      <xsd:element name="DocumentServedByPostalServices" type="Sod_FormK_DocumentServedByPostalServicesContainer_Type"
+                   minOccurs="0"/>
+      <xsd:element name="DocumentServedElectronically" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DocumentServedByAnotherMethod" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_DocumentHandedToContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Sod_FormK_DocumentHandedTo_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_DocumentHandedTo_Type">
+    <xsd:sequence>
+      <xsd:element name="AddresseeInPerson" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="AnotherPerson" type="Sod_FormK_AnotherPersonContainer_Type" minOccurs="0"/>
+      <xsd:element name="AddresseesAddress" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="AnotherAddress" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_AnotherPersonContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Sod_FormK_AnotherPerson_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_AnotherPerson_Type">
+    <xsd:sequence>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="StreetAndNumberOrPoBox" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Place" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="PostalCode" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Country" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="NatureOfRelationship" type="Sod_FormK_NatureOfRelationship_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormK_NatureOfRelationship_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="FAMILY"/>
+      <xsd:enumeration value="EMPLOYEE"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Sod_FormK_DocumentServedByPostalServicesContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Sod_FormK_DocumentServedByPostalServices_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_DocumentServedByPostalServices_Type">
+    <xsd:sequence>
+      <xsd:element name="WithAcknowledgmentOfReceipt" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="FromTheAddressee" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="FromAnotherPerson" type="Sod_FormK_AnotherPersonContainer_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_NonServiceOfDocuments_Type">
+    <xsd:sequence>
+      <xsd:element name="ItWasNotPossibleWithinOneMonth" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="RefusalOfDocument" type="Sod_FormK_RefusalOfDocument_Type" minOccurs="0"/>
+      <xsd:element name="ReasonForNonServiceOfDocument" type="Sod_FormK_ReasonForNonServiceOfDocument_Type"
+                   minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_RefusalOfDocument_Type">
+    <xsd:sequence>
+      <xsd:element name="AddresseeRefusalDueToLanguageUsed"
+                   type="Sod_FormK_AddresseeRefusalDueToLanguageUsedContainer_Type" minOccurs="0"/>
+      <xsd:element name="DocumentAnnexedToThisCertificate" type="civil:Civil_IndicatorContainer_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_AddresseeRefusalDueToLanguageUsedContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Sod_FormK_AddresseeRefusalDueToLanguageUsed_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_AddresseeRefusalDueToLanguageUsed_Type">
+    <xsd:sequence>
+      <xsd:element name="DateOfAttempt" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="DateOfRefusal" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormK_ReasonForNonServiceOfDocument_Type">
+    <xsd:sequence>
+      <xsd:element name="AddressUnknownStepsToEstablishWereUndertaken" type="civil:Civil_IndicatorContainer_Type"
+                   minOccurs="0"/>
+      <xsd:element name="AddresseeCannotBeLocated" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="DocumentCouldNotBeServedBeforeTimeLimit" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DocumentAnnexedToThisCertificate" type="civil:Civil_IndicatorContainer_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

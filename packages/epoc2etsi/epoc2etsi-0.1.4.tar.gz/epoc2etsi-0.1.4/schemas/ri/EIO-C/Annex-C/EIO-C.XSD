@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================================ -->
+<!-- ===== Schema of European Investigation Order (EIO) Form Annexes A to C ===== -->
+<!-- ============================================================================ -->
+<!--
+The Directive 2014/41/EU regarding the European Investigation Order in
+criminal matters (the Directive) deals with the gathering and transfer of
+evidence, including electronic evidence, within the Union.
+
+The Directive is based on the principle of mutual recognition of judgements
+and judicial decisions and allows a judicial authority in one Member State
+(the "issuing authority") to request that specific investigative measures
+are carried out by an authority in another Member State (the "executing
+authority") to obtain evidence.
+
+The Directive became applicable on 22 May 2017 and was implemented by a
+large majority of Member States. It updated the legal framework for the
+gathering and transfer of evidence between Member States. In particular, it
+replaced the Convention on Mutual Assistance in Criminal Matters between
+the Member States of the European Union , which sets out the conditions for
+mutual legal assistance.
+
+It provides the following three standardised forms to facilitate the
+execution (set out in the annexes to the Directive):
+•   European Investigation Order (EIO), in Annex A;
+•   Confirmation of the Receipt of an EIO, in Annex B; and
+•   Notification of the interception of telecommunications without
+    technical assistance, in Annex C.
+ -->
+<!-- = Copyright Notice ================================================= -->
+<!--
+    European Investigation Order (EIO) Forms XML Schema 1.1
+    Copyright (C) European Union, 2018
+    Licensed under the ISA Open Metadata Licence
+
+    Suzanne Wigard (suzanne.wigard@ec.europa.eu),
+    Mario Hans (mh@dialogika.de)
+    Manfred Ries (mr@dialogika.de)
+    Wolfgang Keber (wk@dialogika.de)
+-->
+<!-- ===================================================== -->
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EIO-C#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EIO-C#"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="EIO_C" type="EIO_C_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        ANNEX C NOTIFICATION - This form is used in order to notify a Member State about the interception of
+        telecommunication that will be, is or has been carried out on its territory without its technical assistance.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="EIO_C_Type">
+    <xsd:sequence>
+      <xsd:element name="NotifiedMemberState" type="eio:CountryType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Pos : Notified Member State of the interception
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartA" type="PartA_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (A) THE COMPETENT AUTHORITY
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartB" type="PartB_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (B) INFORMATION CONCERNING THE INTERCEPTION
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PartC" type="PartC_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (C) SIGNATURE AND DATE
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartA_Type">
+    <xsd:sequence>
+      <xsd:element name="CompetentAuthority" type="eio:EioAuthorityType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            The competent authority
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DateOfIssuing" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date of issuing
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartB_Type">
+    <xsd:sequence>
+      <xsd:element name="InformationAboutStateOfPlay" type="InformationAboutStateOfPlayType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (I) Information about state of play: This notification takes place (please tick)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DurationOfTheInterception" type="DurationOfTheInterceptionType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (II) The (anticipated) duration of the interception (as known to the issuing authority)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TargetOfTheInterception" type="TargetOfTheInterceptionType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (III) Target of the interception: (telephone number, IP number or e-mail)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PersonConcerned" type="PersonConcernedType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (IV) Identity of the persons concerned
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PurposeOfInterception" type="PurposeOfInterceptionType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            (V) Information regarding the purpose of this interception
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PartC_Type">
+    <xsd:sequence>
+      <xsd:element name="Signature" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Signature
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Date" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Date
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OfficialStamp" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Official stamp (if available)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InformationAboutStateOfPlayType">
+    <xsd:choice>
+      <xsd:element name="PriorToTheInterception" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="DuringTheInterception" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="AfterTheInterception" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="DurationOfTheInterceptionType">
+    <xsd:sequence>
+      <xsd:element name="Duration" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="StartingFrom" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TargetOfTheInterceptionType">
+    <xsd:sequence>
+      <xsd:element name="TelNo" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="IPNo" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Email" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PersonConcernedType">
+    <xsd:sequence>
+      <xsd:element name="NaturalPerson" type="eio:EioPersonType" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="LegalPerson" type="eio:EioBusinessType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PurposeOfInterceptionType">
+    <xsd:sequence>
+      <xsd:element name="AuthorisedInASimilarCase" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            and whether the material obtained can be used in legal proceedings&quot;
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AlreadyOccured" type="udt:IndicatorType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            where the interception has already occurred, whether that material can be used in legal proceedings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+</xsd:schema>

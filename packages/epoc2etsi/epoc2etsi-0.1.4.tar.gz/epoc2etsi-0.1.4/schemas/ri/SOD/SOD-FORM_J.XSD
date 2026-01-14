@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_J.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/SOD-FORM_J.XSD#"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:sod="http://data.europa.eu/edm/1/ns/sod"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/sod" schemaLocation="./sod-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil" schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Sod_FormJ" type="Sod_FormJ_Type"/>
+  <xsd:complexType name="Sod_FormJ_Type">
+    <xsd:sequence>
+      <xsd:element name="Section0" type="sod:Sod_ReferenceAndAddressee_Type"/>
+      <xsd:element name="Section1" type="Sod_FormJ_StatusInformation_Type"/>
+      <xsd:element name="Section2" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormJ_StatusInformation_Type">
+    <xsd:sequence>
+      <xsd:element name="CannotBeExecuted" type="Sod_FormJ_CannotBeExecutedContainer_Type" minOccurs="0"/>
+      <xsd:element name="RequestWillBeExecutedBy" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormJ_CannotBeExecutedContainer_Type">
+    <xsd:sequence>
+      <xsd:element name="Value" type="Sod_FormJ_CannotBeExecuted_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Sod_FormJ_CannotBeExecuted_Type">
+    <xsd:sequence>
+      <xsd:element name="Reason" type="Sod_FormJ_CannotBeExecutedReason_Type" minOccurs="0"/>
+      <xsd:element name="RequestRepliedOn" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Sod_FormJ_CannotBeExecutedReason_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DETERMINATION_OF_ADDRESS_IN_PROGRESS"/>
+      <xsd:enumeration value="SERVICE_IN_PROGRESS_DELIVERY_NOT_CONFIRMED"/>
+      <xsd:enumeration value="SERVICE_IN_PROGRESS_REFUSAL_DEADLINE_NOT_EXPIRED"/>
+      <xsd:enumeration value="OPTIONS_NOT_EXHAUSTED"/>
+      <xsd:enumeration value="SERVICE_ALREADY_EXECUTED"/>
+      <xsd:enumeration value="REQUEST_REPLIED"/>
+      <xsd:enumeration value="REQUEST_FOR_ADDITIONAL_INFORMATION_OR_DOCUMENT_IS_PENDING"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOC-OUTCOME#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOC-OUTCOME#"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ======================================================================= -->
+  <!-- ===== Import of EPOC Common Types                                 ===== -->
+  <!-- ======================================================================= -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc" schemaLocation="epoc-common.xsd"/>
+  <!-- ======================================================================= -->
+  <!-- ===== Import of Unqualified Data Types                            ===== -->
+  <!-- ======================================================================= -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ======================================================================= -->
+
+  <xsd:element name="Epoc_Outcome" type="Epoc_Outcome_Type"/>
+
+  <xsd:complexType name="Epoc_Outcome_Type">
+    <xsd:sequence>
+      <xsd:element name="Identifiers" type="Epoc_IdentifierIds_Type"/>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Final" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_IdentifierIds_Type">
+    <xsd:sequence>
+      <xsd:element name="IdentifierId" type="epoc:Epoc_IdentifierId_Type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

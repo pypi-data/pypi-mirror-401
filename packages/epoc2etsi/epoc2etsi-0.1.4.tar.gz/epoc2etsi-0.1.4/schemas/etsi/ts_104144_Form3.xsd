@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:etsi="http://uri.etsi.org/03280/common/2017/07" xmlns:core="http://uri.etsi.org/03120/common/2019/10/Core" xmlns="http://uri.etsi.org/03120/common/2025/06/Form3Information" targetNamespace="http://uri.etsi.org/03120/common/2025/06/Form3Information" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:import namespace="http://uri.etsi.org/03120/common/2019/10/Core"/>
+    <xs:import namespace="http://uri.etsi.org/03280/common/2017/07"/>
+    <xs:complexType name="Form3Information">
+        <xs:complexContent>
+            <xs:extension base="core:HI1Object">
+                <xs:sequence>
+                    <xs:element name="NonExecutionReasons" type="ListOfNonExecutionReasons" minOccurs="0"/>
+                    <xs:element name="ConflictOfLaw" type="ConflictOfLaw" minOccurs="0"/>
+                    <xs:element name="RequestForClarification" type="RequestForClarification" minOccurs="0"/>
+                    <xs:element name="PreservationStatus" type="PreservationStatus" minOccurs="0"/>
+                    <xs:element name="AdditionalInformation" type="etsi:LongString" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ListOfNonExecutionReasons">
+        <xs:sequence>
+            <xs:element name="Reasons" type="NonExecutionReason" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="ExplanationOrOtherReason" type="etsi:LongString" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="NonExecutionReason">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="INCOMPLETE"/>
+            <xs:enumeration value="CONTAINS_MANIFEST_ERRORS"/>
+            <xs:enumeration value="INSUFFICIENT_INFORMATION"/>
+            <xs:enumeration value="NOT_STORED_AT_THE_TIME_OF_THE_RECEIPT"/>
+            <xs:enumeration value="OTHER_REASONS_OF_DE_FACTO_IMPOSSIBILITY"/>
+            <xs:enumeration value="NOT_ISSUED_OR_VALIDATED_AS_DEFINED_BY_REGULATION"/>
+            <xs:enumeration value="TRAFFIC_DATA_REQUESTED_NOT_FOR_IDENTIFYING_USER"/>
+            <xs:enumeration value="SERVICE_NOT_COVERED_BY_REGULATION"/>
+            <xs:enumeration value="DATA_REQUESTED_IS_PROTECTED_BY_IMMUNITIES"/>
+            <xs:enumeration value="CONFLICT_OF_LAWS"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="ConflictOfLaw">
+        <xs:sequence>
+            <xs:element name="TitleOfLaw" type="etsi:LongString" minOccurs="0"/>
+            <xs:element name="ApplicableStatutoryProvision" type="etsi:LongString" minOccurs="0"/>
+            <xs:element name="NatureOfConflictingObligations" type="NatureOfConflictingObligations" minOccurs="0"/>
+            <xs:element name="WhyLawIsApplicable" type="etsi:LongString" minOccurs="0"/>
+            <xs:element name="WhyConflictOfLawConsidered" type="etsi:LongString" minOccurs="0"/>
+            <xs:element name="LinkBetweenServiceProviderAndThirdCountry" type="etsi:LongString" minOccurs="0"/>
+            <xs:element name="ConsequencesForAddressee" type="etsi:LongString" minOccurs="0"/>
+            <xs:element name="AnyOtherRelevantInformation" type="etsi:LongString" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="NatureOfConflictingObligations">
+        <xs:sequence>
+            <xs:element name="NatureOfConflictingObligation" type="NatureOfConflictingObligation" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="NatureOfConflictingObligation">
+        <xs:sequence>
+            <xs:element name="Interest" type="InterestType"/>
+            <xs:element name="Description" type="etsi:LongString" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="InterestType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="FUNDAMENTAL_RIGHTS_OF_INDIVIDUALS"/>
+            <xs:enumeration value="FUNDAMENTAL_INTERESTS_OF_THIRD_COUNTRY"/>
+            <xs:enumeration value="OTHER_INTERESTS"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="RequestForClarification">
+        <xs:sequence>
+            <xs:element name="InformationRequiredFromIssuingAuthority" type="etsi:LongString" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="PreservationStatus">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="PRESERVED"/>
+            <xs:enumeration value="NOT_PRESERVED"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

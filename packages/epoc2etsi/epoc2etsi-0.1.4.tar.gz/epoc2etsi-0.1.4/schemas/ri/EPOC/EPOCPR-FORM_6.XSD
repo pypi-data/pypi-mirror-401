@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_6#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_6#"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc"
+              schemaLocation="epoc-common.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="EpocPr_Form6" type="EpocPr_Form6_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Under Regulation (EU) 2023/1543 of the European Parliament and of the Council ( 1 ), upon receipt of the
+        European Preservation Order Certificate (EPOC-PR) the addressee must, without undue delay, preserve the data
+        requested. The preservation must cease after 60 days, unless the issuing authority confirms that the subsequent
+        request for production has been issued. Within the 60 days, the issuing authority may extend the duration of the
+        preservation by an additional 30 days where necessary, to allow for the issuing of the subsequent request for
+        production, using the form set out in this Annex.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="EpocPr_Form6_Type">
+    <xsd:sequence>
+      <xsd:element name="SectionA" type="epoc:Epoc_IssuingAndContactAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION A: Issuing authority of the EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionB" type="epoc:Epoc_Addressee_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION B: Addressee of the EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionC" type="EpocPr_Form6_SectionC_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION C: Information on prior EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionD" type="epoc:Epoc_SignatureOfAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION D: Extension of the prior preservation order
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ************************************************* SECTION C ************************************************* -->
+  <xsd:complexType name="EpocPr_Form6_SectionC_Type">
+    <xsd:sequence>
+      <xsd:element name="DateRequestIssuance" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="DateTransmission" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="FileNumber" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="TransmissionReceiver" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

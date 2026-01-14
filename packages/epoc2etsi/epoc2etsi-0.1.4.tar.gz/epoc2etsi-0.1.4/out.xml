@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<HI1Message xmlns="http://uri.etsi.org/03120/common/2019/10/Core" xmlns:auth="http://uri.etsi.org/03120/common/2020/09/Authorisation" xmlns:doc="http://uri.etsi.org/03120/common/2020/09/Document" xmlns:task="http://uri.etsi.org/03120/common/2020/09/Task" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:common="http://uri.etsi.org/03120/common/2016/02/Common">
+ <Header>
+  <SenderIdentifier>
+   <CountryCode>XX</CountryCode>
+   <UniqueIdentifier>RI_API</UniqueIdentifier>
+  </SenderIdentifier>
+  <ReceiverIdentifier>
+   <CountryCode>XX</CountryCode>
+   <UniqueIdentifier>ServiceProviderID</UniqueIdentifier>
+  </ReceiverIdentifier>
+  <TransactionIdentifier>f3063537-5598-41ff-90cc-509bd9d70f43</TransactionIdentifier>
+  <Timestamp>2026-01-13T15:04:35.959632+00:00</Timestamp>
+  <Version>
+   <ETSIVersion>V1.22.1</ETSIVersion>
+   <NationalProfileOwner>EU</NationalProfileOwner>
+   <NationalProfileVersion>v1.3.1</NationalProfileVersion>
+  </Version>
+ </Header>
+ <Payload>
+  <RequestPayload>
+   <ActionRequests>
+    <ActionRequest>
+     <ActionIdentifier>0</ActionIdentifier>
+     <CREATE>
+      <HI1Object xsi:type="auth:AuthorisationObject">
+       <ObjectIdentifier>5759e27c-104b-4b60-b515-c605c03d1c64</ObjectIdentifier>
+       <CountryCode>DE</CountryCode>
+       <OwnerIdentifier>service-provider-1</OwnerIdentifier>
+       <auth:AuthorisationReference>EPOC-FR-DE-2026-01-13-0001-1</auth:AuthorisationReference>
+       <auth:AuthorisationLegalType>
+        <common:Owner>ETSI</common:Owner>
+        <common:Name>EPOCLegalType</common:Name>
+        <common:Value>EPOC</common:Value>
+       </auth:AuthorisationLegalType>
+       <auth:AuthorisationPriority>
+        <common:Owner>ETSI</common:Owner>
+        <common:Name>EPOCPriority</common:Name>
+        <common:Value>TenDaysASAP</common:Value>
+       </auth:AuthorisationPriority>
+       <auth:AuthorisationDesiredStatus>
+        <common:Owner>ETSI</common:Owner>
+        <common:Name>AuthorisationDesiredSatus</common:Name>
+        <common:Value>SubmittedToCSP</common:Value>
+       </auth:AuthorisationDesiredStatus>
+       <auth:AuthorisationCSPID>
+        <auth:CSPID>
+         <CountryCode>DE</CountryCode>
+         <UniqueIdentifier>service-provider-1</UniqueIdentifier>
+        </auth:CSPID>
+       </auth:AuthorisationCSPID>
+       <auth:AuthorisationApprovalDetails>
+        <common:ApprovalType>IssuingAuthority</common:ApprovalType>
+        <common:ApprovalReference>IA-1234</common:ApprovalReference>
+        <common:ApproverDetails>
+         <common:ApproverName>Issuing Authority - 1</common:ApproverName>
+         <common:ApproverContactDetails>
+          <common:Address></common:Address>
+         </common:ApproverContactDetails>
+         <common:ApproverContactDetails>
+          <common:Role>Point of Contact</common:Role>
+          <common:Address></common:Address>
+         </common:ApproverContactDetails>
+        </common:ApproverDetails>
+       </auth:AuthorisationApprovalDetails>
+       <auth:AuthorisationApprovalDetails>
+        <common:ApprovalType>ValidatingAuthority</common:ApprovalType>
+        <common:ApprovalReference>VA-1234</common:ApprovalReference>
+        <common:ApproverDetails>
+         <common:ApproverName>Issuing Authority - 2</common:ApproverName>
+         <common:ApproverContactDetails>
+          <common:EmailAddress>pr.tj-fort-de-france@justice.fr</common:EmailAddress>
+          <common:PhoneNumber>33596597200</common:PhoneNumber>
+          <common:FaxNumber>33596631005</common:FaxNumber>
+          <common:Address>Palais de Justice B.P. 633
+FORT DE FRANCE
+97200</common:Address>
+         </common:ApproverContactDetails>
+        </common:ApproverDetails>
+       </auth:AuthorisationApprovalDetails>
+       <auth:AuthorisationFlags>
+        <auth:AuthorisationFlag>
+         <common:Owner>ETSI</common:Owner>
+         <common:Name>EPOCAuthorisationFlag</common:Name>
+         <common:Value>DelayInformingUser</common:Value>
+        </auth:AuthorisationFlag>
+       </auth:AuthorisationFlags>
+       <auth:AuthorisationLegalEntity>Service Provider authority - 1</auth:AuthorisationLegalEntity>
+      </HI1Object>
+     </CREATE>
+    </ActionRequest>
+    <ActionRequest>
+     <ActionIdentifier>1</ActionIdentifier>
+     <CREATE>
+      <HI1Object xsi:type="task:LDTaskObject">
+       <ObjectIdentifier>54d8262d-72f2-4eb0-8ffc-58f9e5f5bf9e</ObjectIdentifier>
+       <CountryCode>DE</CountryCode>
+       <OwnerIdentifier>service-provider-1</OwnerIdentifier>
+       <AssociatedObjects>
+        <AssociatedObject>5759e27c-104b-4b60-b515-c605c03d1c64</AssociatedObject>
+       </AssociatedObjects>
+       <task:Reference>DE-service-provider-1-54d8262d-72f2-4eb0-8ffc-58f9e5f5bf9e-1</task:Reference>
+       <task:DesiredStatus>
+        <common:Owner>ETSI</common:Owner>
+        <common:Name>LDTaskDesiredStatus</common:Name>
+        <common:Value>AwaitingDisclosure</common:Value>
+       </task:DesiredStatus>
+       <task:RequestDetails>
+        <task:Type>
+         <common:Owner>ETSI</common:Owner>
+         <common:Name>SubscriberDataAndUserIdentifyingData</common:Name>
+         <common:Value>SubscriberData</common:Value>
+        </task:Type>
+        <task:StartTime>2025-01-01T06:00:00+00:00</task:StartTime>
+        <task:EndTime>2025-12-31T06:00:00+00:00</task:EndTime>
+        <task:RequestValues>
+         <task:RequestValue>
+          <task:FormatType>
+           <task:FormatOwner>ETSI</task:FormatOwner>
+           <task:FormatName>InternationalizedEmailAddress</task:FormatName>
+          </task:FormatType>
+          <task:Value>test@tester.com</task:Value>
+         </task:RequestValue>
+        </task:RequestValues>
+        <task:Subtype>
+         <task:RequestSubtype>
+          <common:Owner>ETSI</common:Owner>
+          <common:Name>EPOCRequestSubtype</common:Name>
+          <common:Value>UserInformation</common:Value>
+         </task:RequestSubtype>
+        </task:Subtype>
+       </task:RequestDetails>
+       <task:DeliveryDetails>
+        <task:LDDeliveryDestination>
+         <task:DeliveryAddress>
+          <task:EndpointID>
+           <CountryCode>DE</CountryCode>
+           <UniqueIdentifier>service-provider-1</UniqueIdentifier>
+          </task:EndpointID>
+         </task:DeliveryAddress>
+         <task:LDDeliveryProfile>
+          <common:Owner>ETSI</common:Owner>
+          <common:Name>EPOCDeliveryProfile</common:Name>
+          <common:Value>IssuingAuthority</common:Value>
+         </task:LDDeliveryProfile>
+        </task:LDDeliveryDestination>
+       </task:DeliveryDetails>
+       <task:ManualInformation>Section F, Subscriber Data:
+Other subscriber data from section F
+
+
+Section F, User Identification:
+Other identifying data from section F</task:ManualInformation>
+      </HI1Object>
+     </CREATE>
+    </ActionRequest>
+    <ActionRequest>
+     <ActionIdentifier>2</ActionIdentifier>
+     <CREATE>
+      <HI1Object xsi:type="doc:DocumentObject">
+       <ObjectIdentifier>356f32d2-8e9c-4cf4-8bf7-5f9974713a07</ObjectIdentifier>
+       <CountryCode>DE</CountryCode>
+       <OwnerIdentifier>service-provider-1</OwnerIdentifier>
+       <AssociatedObjects>
+        <AssociatedObject>5759e27c-104b-4b60-b515-c605c03d1c64</AssociatedObject>
+       </AssociatedObjects>
+       <doc:DocumentName>EPOC/EPOC-PR Form</doc:DocumentName>
+       <doc:DocumentType>
+        <common:Owner>ETSI</common:Owner>
+        <common:Name>EPOCDocumentType</common:Name>
+        <common:Value>Form1</common:Value>
+       </doc:DocumentType>
+       <doc:DocumentBody>
+        <doc:Contents>RVBPQy9FUE9DLVBSIEZvcm0=</doc:Contents>
+        <doc:ContentType>text/plain</doc:ContentType>
+       </doc:DocumentBody>
+      </HI1Object>
+     </CREATE>
+    </ActionRequest>
+   </ActionRequests>
+  </RequestPayload>
+ </Payload>
+</HI1Message>
+

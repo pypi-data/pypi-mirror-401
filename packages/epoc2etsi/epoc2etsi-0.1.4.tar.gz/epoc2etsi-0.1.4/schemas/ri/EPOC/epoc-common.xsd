@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <!-- ============================================ ISSUING STATE ================================================== -->
+  <xsd:complexType name="Epoc_IssuingState_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingState" type="eio:CountryTypeEU" minOccurs="0"/>
+      <!-- rest of the data would be stored in sections I and J -->
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_Addressee_Type">
+    <xsd:sequence>
+      <xsd:element name="Authority" type="eio:EioAuthorityType" minOccurs="0"/>
+      <xsd:element name="ServiceProviderConcerned" type="Epoc_ServiceProviderConcerned_Type" minOccurs="0"/>
+      <xsd:element name="Type" type="Epoc_TypeOfAddressee_Type" minOccurs="0"/>
+      <xsd:element name="AnyOtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Epoc_TypeOfAddressee_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DESIGNATED_ESTABLISHMENT"/>
+      <xsd:enumeration value="LEGAL_REPRESENTATIVE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_ServiceProviderConcerned_Type">
+    <xsd:sequence>
+      <xsd:element name="TechnicalIdentifier" type="eio:AuthorityIdType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Technical Identifier of the Addressee</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+
+      <xsd:element name="ServiceProviderName" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Name of Service Provider</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_AddresseePlusEmergencyCase_Type">
+    <xsd:sequence>
+      <xsd:element name="Addressee" type="Epoc_Addressee_Type" minOccurs="0"/>
+      <xsd:element name="EmergencyCase" type="udt:IndicatorType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ============================================= IDENTIFIERS =================================================== -->
+  <xsd:complexType name="Epoc_ElectronicEvidence_Type">
+    <xsd:sequence>
+      <xsd:element name="Evidence" type="Epoc_Evidence_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Epoc_Evidence_Type">
+    <xsd:sequence>
+      <xsd:element name="Identifier" type="Epoc_EvidenceIdentifier_Type" minOccurs="0"/>
+      <xsd:element name="DataCategories" type="Epoc_DataCategories_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_EvidenceIdentifier_Type">
+    <xsd:sequence>
+      <xsd:element name="Id" type="Epoc_IdentifierId_Type" minOccurs="0"/>
+      <xsd:element name="Type" type="Epoc_TypeOfIdentifier_Type" minOccurs="0"/>
+      <xsd:element name="Value" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="ServiceName" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="DateTimeRange" type="Epoc_DateTimeRange_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Epoc_IdentifierId_Type">
+    <xsd:restriction base="xsd:positiveInteger">
+      <xsd:minInclusive value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Epoc_TypeOfIdentifier_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="IPV_4"/>
+      <xsd:enumeration value="IPV_6"/>
+      <xsd:enumeration value="IP_ADDRESS_RANGE"/>
+      <xsd:enumeration value="IP_BLOCKS"/>
+      <xsd:enumeration value="EMAIL"/>
+      <xsd:enumeration value="PHONE_NUMBER"/>
+      <xsd:enumeration value="IMEI_NUMBER"/>
+      <xsd:enumeration value="MAC_ADDRESS"/>
+      <xsd:enumeration value="USER_ID"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_DateTimeRange_Type">
+    <xsd:sequence>
+      <xsd:element name="Start" type="udt:DateTimeType" minOccurs="0"/>
+      <xsd:element name="End" type="udt:DateTimeType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- =========================================== DATA CATEGORIES ================================================= -->
+  <xsd:complexType name="Epoc_DataCategories_Type">
+    <xsd:sequence>
+      <xsd:element name="Subscriber" type="Epoc_SubscriberData_Type" minOccurs="0"/>
+      <xsd:element name="UserIdentification" type="Epoc_UserIdentificationData_Type" minOccurs="0"/>
+      <xsd:element name="Traffic" type="Epoc_TrafficData_Type" minOccurs="0"/>
+      <xsd:element name="Content" type="Epoc_ContentData_Type" minOccurs="0"/>
+      <xsd:element name="OtherInformation" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_SubscriberData_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_SubscriberDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherText" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_SubscriberDataOption_Type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="USER_INFORMATION"/>
+      <xsd:enumeration value="REGISTRATION_INFORMATION"/>
+      <xsd:enumeration value="TYPE_OF_SERVICE_INFORMATION"/>
+      <xsd:enumeration value="PROFILE_INFORMATION"/>
+      <xsd:enumeration value="VALIDATION_OF_USE_OF_SERVICE_INFORMATION"/>
+      <xsd:enumeration value="DEBIT_OR_CREDIT_CARD_INFORMATION"/>
+      <xsd:enumeration value="PUK_CODES_INFORMATION"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_UserIdentificationData_Type">
+    <xsd:annotation>
+      <xsd:documentation>
+        <xsd:documentation>data requested for the sole purpose of identifying the user as defined in Article 3, point (10), of Regulation (EU) 2023/1543</xsd:documentation>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ConnectionRecords" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="ProductionTimeRange" type="Epoc_DateTimeRange_Type" minOccurs="0"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_TrafficData_Type">
+    <xsd:sequence>
+      <xsd:element name="MobileTelephony" type="Epoc_MobileTelephony_Type" minOccurs="0"/>
+      <xsd:element name="Internet" type="Epoc_InternetData_Type" minOccurs="0"/>
+      <xsd:element name="Hosting" type="Epoc_HostingData_Type" minOccurs="0"/>
+      <xsd:element name="Other" type="Epoc_OtherData_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_MobileTelephony_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_MobileTelephonyOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherText" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_MobileTelephonyOption_Type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="OUTGOING_AND_INCOMING_IDENTIFIERS"/>
+      <xsd:enumeration value="TIME_AND_DURATION_OF_CONNECTIONS"/>
+      <xsd:enumeration value="CALL_ATTEMPTS"/>
+      <xsd:enumeration value="BASE_STATION_INFORMATION"/>
+      <xsd:enumeration value="TELESERVICE_INFORMATION"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_InternetData_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_InternetDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherText" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_InternetDataOption_Type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="ROUTING_INFORMATION"/>
+      <xsd:enumeration value="BASE_STATION_INFORMATION"/>
+      <xsd:enumeration value="VOLUME_OF_DATA"/>
+      <xsd:enumeration value="DATE_AND_TIME_OF_CONNECTIONS"/>
+      <xsd:enumeration value="DURATION_OF_CONNECTION"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_HostingData_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_HostingDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherText" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_HostingDataOption_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="LOGFILES"/>
+      <xsd:enumeration value="TICKETS"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_OtherData_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_OtherDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherText" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_OtherDataOption_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="PURCHASE_HISTORY"/>
+      <xsd:enumeration value="PREPAID_BALANCE_CHARGING_HISTORY"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_ContentData_Type">
+    <xsd:sequence>
+      <xsd:element name="Option" type="Epoc_ContentDataOption_Type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OtherText" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_ContentDataOption_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="MAILBOX_DUMP"/>
+      <xsd:enumeration value="STORAGE_DUMP"/>
+      <xsd:enumeration value="PAGE_DUMP"/>
+      <xsd:enumeration value="MESSAGE_LOG"/>
+      <xsd:enumeration value="VOICEMAIL_DUMP"/>
+      <xsd:enumeration value="SERVER_CONTENTS"/>
+      <xsd:enumeration value="DEVICE_BACKUP"/>
+      <xsd:enumeration value="CONTACT_LIST"/>
+      <xsd:enumeration value="OTHER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- ============================================================================================================= -->
+  <xsd:complexType name="Epoc_InformationOnUnderlyingConditions_Type">
+    <xsd:sequence>
+      <xsd:element name="Concerns" type="Epoc_Concerns_Type" minOccurs="0"/>
+      <xsd:element name="NatureAndLegalClassificationOfOffences" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_Concerns_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="CRIMINAL_PROCEEDINGS"/>
+      <xsd:enumeration value="EXECUTION_OF_CUSTODIAL_SENTENCE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ====================================== ISSUING AUTHORITY ==================================================== -->
+  <xsd:complexType name="Epoc_DetailsOfIssuingAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingAndContactAuthority" type="Epoc_IssuingAndContactAuthority_Type"/>
+      <xsd:element name="Type" type="Epoc_IssuingAuthority_Type" minOccurs="0"/>
+      <xsd:element name="CaseWithoutValidation" type="udt:IndicatorType" minOccurs="0"/>
+      <xsd:element name="SignatureOfAuthority" type="Epoc_SignatureOfAuthority_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_IssuingAuthority_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="JUDGE_COURT_OR_INVESTIGATING_JUDGE"/>
+      <xsd:enumeration value="PUBLIC_PROSECUTOR"/>
+      <xsd:enumeration value="OTHER_COMPETENT_AUTHORITY"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ===================================== VALIDATING AUTHORITY ================================================== -->
+  <xsd:complexType name="Epoc_DetailsOfValidatingAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="Type" type="Epoc_ValidatingAuthority_Type" minOccurs="0"/>
+      <xsd:element name="Details" type="eio:EioAuthorityType" minOccurs="0"/>
+      <xsd:element name="Signature" type="Epoc_SignatureOfAuthority_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="Epoc_ValidatingAuthority_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="JUDGE"/>
+      <xsd:enumeration value="PUBLIC_PROSECUTOR"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ============================================================================================================= -->
+  <xsd:simpleType name="Epoc_Instrument_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="EPOC"/>
+      <xsd:enumeration value="EPOCPR"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Epoc_SignatureOfAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="Date" type="udt:DateType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Date of signature</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Signature" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Signature</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_IssuingAndContactAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuingAuthority" type="eio:EioAuthorityType" minOccurs="0"/>
+      <xsd:element name="ContactAuthority" type="Epoc_ContactAuthority_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_ContactAuthority_Type">
+    <xsd:sequence>
+      <xsd:element name="Authority" type="eio:EioAuthorityType" minOccurs="0"/>
+      <xsd:element name="ContactDetails" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_CaseRequest_Type">
+    <xsd:sequence>
+      <xsd:element name="Issuer" type="Epoc_CaseRequestParty_Type" minOccurs="0"/>
+      <xsd:element name="Addressee" type="Epoc_CaseRequestParty_Type" minOccurs="0"/>
+      <xsd:element name="CompetentAuthority" type="Epoc_CaseRequestParty_Type" minOccurs="0"/>
+      <xsd:element name="IssuedOn" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="TransmittedOn" type="udt:DateType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Epoc_CaseRequestParty_Type">
+    <xsd:sequence>
+      <xsd:element name="AuthorityId" type="eio:AuthorityIdType" minOccurs="0"/>
+      <xsd:element name="Name" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="FileNumber" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

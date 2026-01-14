@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOC-DATA_HAS_BEEN_PRESERVED#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOC-DATA_HAS_BEEN_PRESERVED#"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Epoc_DataHasBeenPreserved" type="Epoc_DataHasBeenPreserved_Type"/>
+
+  <xsd:complexType name="Epoc_DataHasBeenPreserved_Type">
+    <xsd:sequence>
+      <xsd:element name="PreservationDate" type="udt:DateTimeType" minOccurs="0"/>
+      <xsd:element name="Comment" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

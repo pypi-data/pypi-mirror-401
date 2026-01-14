@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ===== Copyright Notice ============================== -->
+<!--
+			European Investigation Order (EIO) XML schema 1.1
+	        Copyright (C) European Union, 2018
+	        Licensed under the ISA Open Metadata Licence
+	        Original authors:
+	        Suzanne Wigard (suzanne.wigard@ec.europa.eu),
+	        Emidio Stani (emidio.stani@be.pwc.com),
+	        Ioana Novacean (ioana.novacean@be.pwc.com),
+	        Inge Gielis (inge.gielis@be.pwc.com),
+			Arne De Proft (arne.de.proft@be.pwc.com)
+
+			Mario Hans (mh@dialogika.de)
+			Manfred Ries (mr@dialogika.de)
+			Wolfgang Keber (wk@dialogika.de)
+
+			26.11.2019/mr Version 1.0.1: added Authority's Technical Identifier to EioAuthorityType
+			03.03.2020/mr Version 1.0.2: removed GB (UK) from CountryType
+			
+-->
+<!-- ===================================================== -->
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/eio"
+  xmlns="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:cva="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+  xmlns:ids5ISO316612A="urn:un:unece:uncefact:identifierlist:standard:5:ISO316612A:SecondEdition2006"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:qdt="http://data.europa.eu/edm/1/ns/qdt"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:clmEUEULanguageCode="http://data.ecodex.eu/codelist-EULanguageCode"
+  xmlns:ccts="urn:un:unece:uncefact:documentation:standard:CoreComponentsTechnicalSpecification:2"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.1.0">
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="urn:un:unece:uncefact:identifierlist:standard:5:ISO316612A:SecondEdition2006"
+              schemaLocation="../_external/unece/ISO_ISOTwoletterCountryCode_SecondEdition2006.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/codelist/sex" schemaLocation="cls-codelist-Sex-1.1.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/qdt" schemaLocation="qdt-LengthComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <!-- ===================================================== -->
+  <xsd:complexType name="EioPersonType">
+    <xsd:complexContent>
+      <xsd:extension base="cva:CorePersonType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">This class extends the CorePersonType.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+          <xsd:element name="Nationality" type="qdt:NationalityNameMaxLength255Type" minOccurs="0"/>
+          <xsd:element name="Residence" type="cva:CoreAddressType" minOccurs="0"/>
+          <xsd:element name="Languages" type="udt:TextType" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="EioBusinessType">
+    <xsd:complexContent>
+      <xsd:extension base="cva:CoreBusinessType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">This class extends the CoreBusinessType.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+          <xsd:element name="NameOfRepresentative" type="qdt:NameMaxLength65535Type" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="AuthorityIdType">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Technical Identifier of the Authority</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="NationalId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Authority's Id from CDB (Courts Database for Criminal)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Country" type="CountryType">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Country of Origin</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="CountryTypeEU">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        This class contains elements related to a country.
+        Stereotype cvABIE
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="AT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>AUSTRIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="BE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>BELGIUM</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="BG">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>BULGARIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CY">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>CYPRUS</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CZ">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>CZECH REPUBLIC</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="DE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>GERMANY</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="DK">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>DENMARK</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="EE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>ESTONIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ES">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>SPAIN</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FI">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>FINLAND</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FR">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>FRANCE</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <!--
+      <xsd:enumeration value="GB">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>UNITED KINGDOM</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      -->
+      <xsd:enumeration value="EL">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>GREECE</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="HR">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>CROATIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="HU">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>HUNGARY</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <!--
+      <xsd:enumeration value="IE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>IRELAND</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      -->
+      <xsd:enumeration value="IT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>ITALY</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="LT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>LITHUANIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="LU">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>LUXEMBOURG</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="LV">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>LATVIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="MT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>MALTA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="NL">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>NETHERLANDS</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="PL">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>POLAND</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="PT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>PORTUGAL</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RO">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>ROMANIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SE">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>SWEDEN</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SI">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>SLOVENIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SK">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>SLOVAKIA</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- New Country Type : start -->
+  <xsd:simpleType name="CountryTypeTest">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        This class contains elements related to a country.
+        Stereotype cvABIE
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:token">
+
+      <xsd:enumeration value="XA">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>Atos-Env-1</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="XB">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>Atos-Env-2</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="XC">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>Atos-Env-3</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="QN">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>DGJUST-Env-1</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="QM">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>DGJUST-Env-2</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="QT">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            <ccts:Name>DGJUST-TestBed-1</ccts:Name>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+
+
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="CountryType">
+    <xsd:union memberTypes="CountryTypeEU CountryTypeTest"/>
+  </xsd:simpleType>
+
+  <!-- New Country Type : end -->
+
+  <xsd:simpleType name="PersonConsentedToMeasureType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="person consented"/>
+      <xsd:enumeration value="person did not consent"/>
+      <xsd:enumeration value="request the person's consent"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="EioAuthorityType">
+    <xsd:sequence>
+      <xsd:element name="NameOfAuthority" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Official name of the authority</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="NameOfRepresentative" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Name of its representative</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="PostHeld" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Post held (title/grade)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Address" type="cva:CoreAddressType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Address</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="TelNo" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Tel. No (country code) (area/city code)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="FaxNo" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Fax No (country code) (area/city code)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Email" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">E-Mail</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="FileReference" type="udt:TextType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">File reference</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="LanguagesToCommunicate" type="EioLanguageCodes" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Language(s) that may be used for communication</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AuthorityTechnicalIdentifier" type="AuthorityIdType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">Technical Identifier of the Authority</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="EioLanguageCodes">
+    <xsd:sequence>
+      <xsd:element name="EuLanguage" type="clmEUEULanguageCode:EULanguageContentType" minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="Other" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

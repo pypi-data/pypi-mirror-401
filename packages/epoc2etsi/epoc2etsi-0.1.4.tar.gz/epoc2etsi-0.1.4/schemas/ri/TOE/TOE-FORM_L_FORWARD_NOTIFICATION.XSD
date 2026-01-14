@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L_FORWARD_NOTIFICATION.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_L_FORWARD_NOTIFICATION.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:toe="http://data.europa.eu/edm/1/ns/toe"
+  elementFormDefault="qualified"
+  version="1.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/toe"
+              schemaLocation="./toe-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_FormLForwardNotification" type="Toe_FormLForwardNotification_Type"/>
+
+  <xsd:complexType name="Toe_FormLForwardNotification_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To3" type="toe:Toe_ReferenceIssuer_Type"/>
+      <xsd:element name="Section4" type="civil:Civil_TransmissionEntity_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

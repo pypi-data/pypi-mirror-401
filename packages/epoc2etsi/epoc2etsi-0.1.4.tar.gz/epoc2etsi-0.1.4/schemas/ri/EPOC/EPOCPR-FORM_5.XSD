@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_5#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/EPOCPR-FORM_5#"
+  xmlns:epoc="http://data.europa.eu/edm/1/ns/epoc"
+  xmlns:eio="http://data.europa.eu/edm/1/ns/eio"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="0.27.0">
+
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/epoc"
+              schemaLocation="epoc-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/eio"
+              schemaLocation="../_common/eio-AggregatedComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="EpocPr_Form5" type="EpocPr_Form5_Type">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Under Regulation (EU) 2023/1543 of the European Parliament and of the Council ( 1 ), upon receipt of the
+        European Preservation Order Certificate (EPOC-PR) the addressee must, without undue delay, preserve the data
+        requested. The preservation must cease after 60 days, unless extended by the issuing authority by an additional
+        30 days, or the issuing authority confirms that the subsequent request for production has been issued, using the
+        form set out in this Annex.
+        Following that confirmation, the addressee must preserve the data for as long as necessary to produce the data
+        once the subsequent request for production is received.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="EpocPr_Form5_Type">
+    <xsd:sequence>
+      <xsd:element name="SectionA" type="epoc:Epoc_IssuingAndContactAuthority_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION A: Issuing authority of the EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionB" type="epoc:Epoc_Addressee_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION B: Addressee of the EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionC" type="EpocPr_Form5_SectionC_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION C: Information about the EPOC-PR
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SectionD" type="EpocPr_Form5_SectionD_Type">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            SECTION D: Confirmation
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ************************************************* SECTION C ************************************************* -->
+  <xsd:complexType name="EpocPr_Form5_SectionC_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuedOn" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="TransmittedOn" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="FileReference" type="udt:TextType" minOccurs="0"/>
+      <xsd:element name="ExtendedOn" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="Extended" type="xsd:boolean" minOccurs="0"/>
+      <xsd:element name="EpocPrExtendedByIssuingAuthority" type="eio:EioAuthorityType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ************************************************* SECTION D ************************************************* -->
+  <xsd:complexType name="EpocPr_Form5_SectionD_Type">
+    <xsd:sequence>
+      <xsd:element name="IssuedRequest" type="EpocPr_Form5_IssuedRequest_Type" minOccurs="0"/>
+      <xsd:element name="SignatureOfAuthority" type="epoc:Epoc_SignatureOfAuthority_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="EpocPr_Form5_IssuedRequest_Type">
+    <xsd:sequence>
+      <xsd:element name="Request" type="epoc:Epoc_CaseRequest_Type" minOccurs="0"/>
+      <xsd:element name="Type" type="EpocPr_Form5_IssuedRequestInstrument_Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="EpocPr_Form5_IssuedRequestInstrument_Type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="EPOC"/>
+      <xsd:enumeration value="EIO"/>
+      <xsd:enumeration value="MLA"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

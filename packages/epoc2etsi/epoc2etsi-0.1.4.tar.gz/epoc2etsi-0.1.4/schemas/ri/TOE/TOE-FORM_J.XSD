@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_J.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_J.XSD#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:toe="http://data.europa.eu/edm/1/ns/toe"
+  elementFormDefault="qualified"
+  version="1.0">
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://www.w3.org/ns/corevocabulary/AggregateComponents"
+              schemaLocation="../_external/Core_Vocabularies_XML_Schema_v1.1/xsd/CoreVocabularies-AggregateComponents-1.1.xsd"/>
+  <xsd:import namespace="http://data.ecodex.eu/codelist-EULanguageCode"
+              schemaLocation="../_external/MLACase_BD009001_2/codelist/standard/Europeanunion_EULanguage_.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/toe"
+              schemaLocation="./toe-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_FormJ" type="Toe_FormJ_Type"/>
+
+  <xsd:complexType name="Toe_FormJ_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To4" type="toe:Toe_ReferenceIssuerExecutor_Type"/>
+      <xsd:element name="Section5To6" type="toe:Toe_InformationOnDelay_Type"/>
+      <xsd:element name="Section7" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

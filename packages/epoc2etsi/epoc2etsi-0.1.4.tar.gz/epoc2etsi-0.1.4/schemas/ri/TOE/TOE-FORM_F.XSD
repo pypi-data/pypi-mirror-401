@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+  targetNamespace="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_F.XSD#"
+  xmlns="http://data.europa.eu/edm/1/ns/forms/TOE-FORM_F.XSD#"
+  xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:civil="http://data.europa.eu/edm/1/ns/civil"
+  xmlns:toe="http://data.europa.eu/edm/1/ns/toe"
+  elementFormDefault="qualified"
+  version="1.0">
+  <!-- ===== Imports======================================== -->
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/civil"
+              schemaLocation="../_common/civil-common.xsd"/>
+  <xsd:import namespace="http://data.europa.eu/edm/1/ns/toe"
+              schemaLocation="./toe-common.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+              schemaLocation="../_external/UBL-2.1/xsdrt/common/UBL-UnqualifiedDataTypes-2.1.xsd"/>
+  <!-- ===================================================== -->
+
+  <xsd:element name="Toe_FormF" type="Toe_FormF_Type"/>
+
+  <xsd:complexType name="Toe_FormF_Type">
+    <xsd:sequence>
+      <xsd:element name="Section1To4" type="toe:Toe_ReferenceIssuerExecutor_Type"/>
+      <xsd:element name="Section5" type="Toe_FormF_InformationAboutRequest_Type"/>
+      <xsd:element name="Section6" type="civil:Civil_DoneAtDate_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Toe_FormF_InformationAboutRequest_Type">
+    <xsd:sequence>
+      <xsd:element name="RequestSent" type="udt:DateType" minOccurs="0"/>
+      <xsd:element name="AcknowledgementOfReceipt" type="civil:Civil_DateContainer_Type" minOccurs="0"/>
+      <xsd:element name="NotificationOfDelay" type="civil:Civil_DateContainer_Type" minOccurs="0"/>
+      <xsd:element name="OtherInfo" type="udt:TextType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>
