@@ -1,0 +1,19 @@
+[project]
+name = "llmops-observability"
+version = "10.0.5"
+description = "LLMOps Observability SDK with direct Langfuse integration and SQS event streaming"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "langfuse>=2.0.0",
+    "httpx",
+    "python-dotenv",
+    "boto3",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
