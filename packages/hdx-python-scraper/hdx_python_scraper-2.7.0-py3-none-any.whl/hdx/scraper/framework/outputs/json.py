@@ -1,0 +1,269 @@
+import logging
+from os.path import join
+from typing import Any
+
+from hdx.utilities.dictandlist import dict_of_lists_add
+from hdx.utilities.saver import save_json
+
+from .base import BaseOutput
+
+try:
+    from pandas import DataFrame
+except ImportError:
+    DataFrame = None
+
+
+from ..utilities import match_template
+from ..utilities.reader import Read
+
+logger = logging.getLogger(__name__)
+
+
+class JsonFile(BaseOutput):
+    """JsonFile class enabling writing to JSON files.
+
+    Args:
+        configuration: Configuration for Google Sheets
+        updatetabs: Tabs to update
+        suffix: A suffix to add to keys. Default is _data.
+    """
+
+    def __init__(self, configuration, updatetabs, suffix="_data"):
+        super().__init__(updatetabs)
+        self.configuration = configuration
+        self.json = {}
+        self.suffix = suffix
+
+    def add_data_row(self, key: str, row: dict) -> None:
+        """Add row to JSON under a key
+
+        Args:
+            key: Key in JSON to update
+            rows: List of dictionaries
+
+        Returns:
+            None
+        """
+        dict_of_lists_add(self.json, f"{key}{self.suffix}", row)
+
+    def add_dataframe_rows(
+        self, key: str, df: DataFrame, hxltags: dict | None = None
+    ) -> None:
+        """Add rows from dataframe under a key
+
+        Args:
+            key: Key in JSON to update
+            df: Dataframe containing rows
+            hxltags: HXL tag mapping. Default is None.
+
+        Returns:
+            None
+        """
+        if hxltags:
+            df = df.rename(columns=hxltags)
+        self.json[f"{key}{self.suffix}"] = df.to_dict(orient="records")
+
+    def add_data_rows_by_key(
+        self,
+        key: str,
+        countryiso: str,
+        rows: list[dict],
+        hxltags: dict | None = None,
+    ) -> None:
+        """Add rows under both a key and an ISO 3 country code subkey
+
+        Args:
+            key: Key in JSON to update
+            countryiso: Country to use as subkey
+            rows: List of dictionaries
+            hxltags: HXL tag mapping. Default is None.
+
+        Returns:
+            None
+        """
+        fullname = f"{key}{self.suffix}"
+        jsondict = self.json.get(fullname, {})
+        jsondict[countryiso] = []
+        for row in rows:
+            if hxltags:
+                newrow = {}
+                for header, hxltag in hxltags.items():
+                    newrow[hxltag] = row[header]
+            else:
+                newrow = row
+            jsondict[countryiso].append(newrow)
+        self.json[fullname] = jsondict
+
+    def generate_json_from_list(self, key: str, rows: list[dict]) -> None:
+        """Generate JSON from key and rows list
+
+        Args:
+            key: Key in JSON to update
+            rows: List of dictionaries
+
+        Returns:
+            None
+        """
+        hxltags = rows[1]
+        for row in rows[2:]:
+            newrow = {}
+            for i, hxltag in enumerate(hxltags):
+                value = row[i]
+                if value in [None, ""]:
+                    continue
+                newrow[hxltag] = str(value)
+            self.add_data_row(key, newrow)
+
+    def generate_json_from_df(
+        self, key: str, df: DataFrame, hxltags: dict | None
+    ) -> None:
+        """Generate JSON from key and dataframe
+
+        Args:
+            key: Key in JSON to update
+            df: Dataframe containing rows
+            hxltags: HXL tag mapping. Default is None.
+
+        Returns:
+            None
+        """
+        for i, row in df.iterrows():
+            newrow = {}
+            row = row.to_dict()
+            for i, hxltag in enumerate(hxltags):
+                value = row.get(hxltag)
+                if value in [None, ""]:
+                    value = None
+                newrow[hxltags.get(hxltag)] = str(value)
+            self.add_data_row(key, newrow)
+
+    def update_tab(
+        self,
+        tabname: str,
+        values: list | DataFrame,
+        hxltags: dict | None = None,
+    ) -> None:
+        """Update tab with values
+
+        Args:
+            tabname: Tab to update
+            values: Values in a list of lists or a DataFrame
+            hxltags: HXL tag mapping. Default is None.
+
+        Returns:
+            None
+        """
+        if tabname not in self.updatetabs:
+            return
+        if isinstance(values, list):
+            self.generate_json_from_list(tabname, values)
+        else:
+            # isinstance(values, DataFrame)
+            self.generate_json_from_df(tabname, values, hxltags)
+
+    def add_additional(self) -> None:
+        """Download JSON files and add them under keys defined in the configuration
+
+        Returns:
+            None
+        """
+        reader = Read.get_reader()
+        for datasetinfo in self.configuration.get("additional_inputs", []):
+            headers, iterator = reader.read(datasetinfo)
+            hxl_row = next(iterator)
+            if not isinstance(hxl_row, dict):
+                hxl_row = hxl_row.value
+            name = datasetinfo["name"]
+            for row in iterator:
+                newrow = {}
+                if not isinstance(row, dict):
+                    row = row.value
+                for key in row:
+                    hxltag = hxl_row[key]
+                    if hxltag != "":
+                        newrow[hxl_row[key]] = row[key]
+                self.add_data_row(name, newrow)
+
+    def save(self, folder: str | None = None, **kwargs: Any) -> list[str]:
+        """Save JSON file and any addition subsets of that JSON defined in the additional configuration
+
+        Args:
+            folder: Folder to save to. Default is None.
+            **kwargs: Variables to use when evaluating template arguments
+
+        Returns:
+            List of file paths
+        """
+        filepaths = []
+        filepath = self.configuration["output"]
+        if folder:
+            filepath = join(folder, filepath)
+        logger.info(f"Writing JSON to {filepath}")
+        save_json(self.json, filepath)
+        filepaths.append(filepath)
+        for kwarg in kwargs:
+            globals()[kwarg] = kwargs[kwarg]
+        additional = self.configuration.get("additional_outputs", [])
+        for filedetails in additional:
+            json = {}
+            remove = filedetails.get("remove")
+            if remove is None:
+                tabs = filedetails["tabs"]
+            else:
+                tabs = []
+                for key in self.json.keys():
+                    tab = key.replace(f"{self.suffix}", "")
+                    if tab not in remove:
+                        tabs.append({"tab": tab})
+            for tabdetails in tabs:
+                key = f"{tabdetails['tab']}{self.suffix}"
+                newjson = self.json.get(key)
+                filters = tabdetails.get("filters", {})
+                hxltags = tabdetails.get("output")
+                if (filters or hxltags or remove) and isinstance(newjson, list):
+                    rows = []
+                    for row in newjson:
+                        ignore_row = False
+                        for filter, allowed_values in filters.items():
+                            value = row.get(filter)
+                            if value:
+                                if isinstance(allowed_values, str):
+                                    (
+                                        template_string,
+                                        match_string,
+                                    ) = match_template(allowed_values)
+                                    if template_string:
+                                        allowed_values = eval(
+                                            allowed_values.replace(
+                                                template_string, match_string
+                                            )
+                                        )
+                                if isinstance(allowed_values, list):
+                                    if value not in allowed_values:
+                                        ignore_row = True
+                                        break
+                                elif value != allowed_values:
+                                    ignore_row = True
+                                    break
+                        if ignore_row:
+                            continue
+                        if hxltags is None:
+                            newrow = row
+                        else:
+                            newrow = {}
+                            for hxltag in hxltags:
+                                if hxltag in row:
+                                    newrow[hxltag] = row[hxltag]
+                        rows.append(newrow)
+                    newjson = rows
+                newkey = tabdetails.get("key", key)
+                json[newkey] = newjson
+            if not json:
+                continue
+            filedetailspath = filedetails["filepath"]
+            if folder:
+                filedetailspath = join(folder, filedetailspath)
+            logger.info(f"Writing JSON to {filedetailspath}")
+            save_json(json, filedetailspath)
+            filepaths.append(filedetailspath)
+        return filepaths
