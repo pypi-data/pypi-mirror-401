@@ -1,0 +1,184 @@
+# utpd-oauth-client
+
+Client library for the [utpd-oauth](../utpd-oauth) service, with framework integrations for FastAPI and NiceGUI.
+
+## Installation
+
+```fish
+uv add utpd-oauth-client
+```
+
+The only dependency is `httpx`. Framework integrations assume you already have the relevant framework installed.
+
+## Usage
+
+### Core Client (Framework-Agnostic)
+
+The core client works anywhere - scripts, CLI tools, any web framework:
+
+```python
+from utpd_oauth_client import OAuthClient
+
+client = OAuthClient("https://utpd-oauth.ward.au")
+
+# Step 1: Get the URL to redirect users to
+login_url = client.login_url("https://myapp.com/auth/callback")
+# -> "https://utpd-oauth.ward.au/login?next_url=https%3A%2F%2Fmyapp.com%2Fauth%2Fcallback"
+
+# Step 2: After OAuth completes, exchange the token_code for an access_token
+access_token = await client.exchange(token_code)
+```
+
+### FastAPI Integration
+
+The FastAPI integration provides a router factory that handles the OAuth redirect flow:
+
+```python
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
+from starlette.responses import Response
+
+from utpd_oauth_client import OAuthClient
+from utpd_oauth_client.fastapi import create_auth_router
+
+app = FastAPI()
+client = OAuthClient(settings.oauth_service_url)
+
+
+async def handle_token(token: str, request: Request) -> Response:
+    """Called after successful OAuth with the access_token."""
+    # Store token, create session, look up user, etc.
+    request.session["access_token"] = token
+    return RedirectResponse("/")
+
+
+router = create_auth_router(
+    client=client,
+    public_base_url=settings.public_base_url,  # e.g. "https://myapp.com"
+    on_token=handle_token,
+)
+app.include_router(router)
+```
+
+This creates two endpoints:
+- `GET /auth/start` - Redirects user to utpd-oauth to begin the flow
+- `GET /auth/callback` - Receives the token_code, exchanges it, calls your handler
+
+### NiceGUI Integration
+
+The NiceGUI integration adds OAuth routes to your NiceGUI app:
+
+```python
+import os
+
+from nicegui import app, ui
+from starlette.requests import Request
+from starlette.responses import RedirectResponse, Response
+
+from utpd_oauth_client import OAuthClient
+from utpd_oauth_client.nicegui import setup_oauth_routes
+
+client = OAuthClient(os.getenv("OAUTH_SERVICE_URL"))
+
+
+async def handle_token(token: str, request: Request) -> Response:
+    """Called after successful OAuth with the access_token."""
+    app.storage.user["access_token"] = token
+    app.storage.user["authenticated"] = True
+    return RedirectResponse("/")
+
+
+setup_oauth_routes(
+    app=app,
+    client=client,
+    public_base_url=os.getenv("PUBLIC_BASE_URL"),
+    on_token=handle_token,
+)
+
+
+@ui.page("/")
+def main_page() -> None:
+    if not app.storage.user.get("authenticated"):
+        ui.link("Login with Untappd", "/auth/start")
+    else:
+        ui.label(f"Welcome! Your token: {app.storage.user.get('access_token', '')[:10]}...")
+```
+
+## Configuration
+
+Both integrations accept these parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `client` | required | `OAuthClient` instance |
+| `public_base_url` | required | Your app's public URL (for callback) |
+| `on_token` | required | Async callback receiving `(token, request)` |
+| `start_path` | `/auth/start` | Path for the "begin OAuth" endpoint |
+| `callback_path` | `/auth/callback` | Path for the callback endpoint |
+| `error_handler` | None | Optional async callback for handling errors |
+
+## Error Handling
+
+The client raises `TokenExchangeError` when the exchange fails:
+
+```python
+from utpd_oauth_client import OAuthClient, TokenExchangeError
+
+client = OAuthClient("https://utpd-oauth.ward.au")
+
+try:
+    token = await client.exchange(token_code)
+except TokenExchangeError as e:
+    print(f"Exchange failed: {e}")
+    print(f"Status code: {e.status_code}")
+    print(f"Detail: {e.detail}")
+```
+
+For framework integrations, you can provide a custom error handler:
+
+```python
+async def handle_error(exc: TokenExchangeError, request: Request) -> Response:
+    # Log the error, show a friendly message, etc.
+    return RedirectResponse("/login?error=oauth_failed")
+
+
+router = create_auth_router(
+    client=client,
+    public_base_url=settings.public_base_url,
+    on_token=handle_token,
+    error_handler=handle_error,
+)
+```
+
+## Development
+
+```fish
+cd utpd-oauth-client
+uv sync --all-groups
+uv run pytest
+```
+
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant YourApp
+    participant utpd-oauth-client
+    participant utpd-oauth
+    participant Untappd
+
+    User->>YourApp: GET /auth/start
+    YourApp->>utpd-oauth-client: client.login_url(callback_url)
+    utpd-oauth-client-->>YourApp: redirect URL
+    YourApp->>utpd-oauth: Redirect to /login
+    utpd-oauth->>Untappd: Redirect to OAuth
+    Untappd->>utpd-oauth: Callback with code
+    utpd-oauth->>YourApp: Redirect to /auth/callback?token_code=...
+    YourApp->>utpd-oauth-client: client.exchange(token_code)
+    utpd-oauth-client->>utpd-oauth: POST /get-token
+    utpd-oauth-->>utpd-oauth-client: { access_token }
+    utpd-oauth-client-->>YourApp: access_token
+    YourApp->>YourApp: on_token(access_token, request)
+    YourApp-->>User: Redirect to app
+```
