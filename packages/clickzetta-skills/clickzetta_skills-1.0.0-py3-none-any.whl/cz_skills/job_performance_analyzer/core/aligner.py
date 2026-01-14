@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""Stage 对齐器 - 对齐 Plan 和 Profile 的 Stage 数据"""
+from typing import Dict, List, Any
+
+class StageAligner:
+    def __init__(self, parsed_data: Dict[str, Any]):
+        self.plan_stages = parsed_data.get('plan_stages', {})
+        self.profile_stages = parsed_data.get('profile_stages', {})
+        self._aligned_stages = {}
+        self._stage_metrics = {}
+        self._operator_analysis = []
+        self._total_job_time = 0
+    
+    def align(self) -> Dict[str, Any]:
+        self._calculate_stage_metrics()
+        self._align_stages()
+        self._analyze_operators()
+        return {
+            'aligned_stages': self._aligned_stages,
+            'stage_metrics': self._stage_metrics,
+            'operator_analysis': self._operator_analysis,
+            'total_job_time': self._total_job_time,
+        }
+    
+    def _calculate_stage_metrics(self):
+        for stage_id, stage_data in self.profile_stages.items():
+            dop = sum(int(float(c)) for c in stage_data.get('taskCountDetail', {}).values())
+            elapsed_ms = int(stage_data.get('endTime', 0)) - int(stage_data.get('startTime', 0))
+            io_stats = stage_data.get('inputOutputStats', {})
+            self._stage_metrics[stage_id] = {
+                'elapsed_ms': elapsed_ms, 'dop': dop,
+                'input_bytes': int(io_stats.get('inputBytes', 0)),
+                'output_bytes': int(io_stats.get('outputBytes', 0)),
+                'spill_bytes': int(io_stats.get('spillingBytes', 0)),
+            }
+            self._total_job_time += elapsed_ms
+    
+    def _align_stages(self):
+        for stage_id in self.plan_stages:
+            if stage_id in self.profile_stages:
+                self._aligned_stages[stage_id] = {
+                    'stage_id': stage_id,
+                    'plan': self.plan_stages[stage_id],
+                    'profile': self.profile_stages[stage_id],
+                    'metrics': self._stage_metrics.get(stage_id, {}),
+                }
+    
+    def _analyze_operators(self):
+        for stage_id, stage_data in self._aligned_stages.items():
+            profile = stage_data.get('profile', {})
+            metrics = stage_data.get('metrics', {})
+            if 'operatorSummary' not in profile:
+                continue
+            for op_id, op_data in profile['operatorSummary'].items():
+                wall_time = op_data.get('wallTimeNs', {})
+                max_ms = int(wall_time.get('max', 0)) / 1_000_000
+                avg_ms = int(wall_time.get('avg', 0)) / 1_000_000
+                stage_elapsed = metrics.get('elapsed_ms', 0)
+                self._operator_analysis.append({
+                    'stage_id': stage_id, 'operator_id': op_id,
+                    'max_time_ms': max_ms, 'avg_time_ms': avg_ms,
+                    'stage_pct': (max_ms / stage_elapsed * 100) if stage_elapsed else 0,
+                    'total_pct': (max_ms / self._total_job_time * 100) if self._total_job_time else 0,
+                    'skew_ratio': max_ms / avg_ms if avg_ms > 0 else 1.0,
+                    'operator_data': op_data,
+                })
+        self._operator_analysis.sort(key=lambda x: x['max_time_ms'], reverse=True)
+    
+    def get_top_stages(self, n: int = 10) -> List[tuple]:
+        return sorted(self._stage_metrics.items(), key=lambda x: x[1]['elapsed_ms'], reverse=True)[:n]
+    
+    def get_top_operators(self, n: int = 10) -> List[Dict]:
+        return self._operator_analysis[:n]
