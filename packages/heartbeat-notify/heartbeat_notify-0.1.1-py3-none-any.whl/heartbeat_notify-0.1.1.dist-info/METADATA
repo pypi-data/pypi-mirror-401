@@ -1,0 +1,40 @@
+Metadata-Version: 2.4
+Name: heartbeat-notify
+Version: 0.1.1
+Summary: A tool to monitor file updates and notify via Discord webhook if stalled.
+Author-email: User <user@example.com>
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.8
+Requires-Dist: click
+Requires-Dist: pydantic
+Requires-Dist: pyyaml
+Requires-Dist: requests
+Description-Content-Type: text/markdown
+
+# Heartbeat Notify
+
+A Python tool to monitor file modification times and send Discord notifications if a file hasn't been updated for a specified duration.
+
+## Installation
+
+```bash
+# Install from PyPI
+pip install heartbeat-notify
+
+# Install locally (editable mode)
+pip install -e .
+
+# Install locally (using uv)
+uv pip install .
+```
+
+## Usage
+
+1. Create a configuration file (e.g., `config.yaml`).
+2. Run the monitor:
+
+```bash
+heartbeat-notify --config config.yaml
+```
