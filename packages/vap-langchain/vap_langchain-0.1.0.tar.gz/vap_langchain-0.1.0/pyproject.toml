@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vap-langchain"
+version = "0.1.0"
+description = "LangChain tools for VAP - Video/Audio Production for AI Agents"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "VAP Team", email = "hello@vapagent.com" }
+]
+keywords = ["langchain", "ai", "video", "audio", "agents", "tools"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "vap-sdk>=0.1.0",
+    "langchain-core>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+
+[project.urls]
+Homepage = "https://vapagent.com"
+Documentation = "https://docs.vapagent.com"
+Repository = "https://github.com/vapagentmedia/vap-langchain"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vap_langchain"]
