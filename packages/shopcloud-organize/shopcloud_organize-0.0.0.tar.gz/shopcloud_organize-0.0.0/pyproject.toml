@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    # "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "F401",
+    "C901",  # too complex
+]
+
+[project]
+name = "shopcloud_organize"
+dynamic = ["version"]
+description = "CLI tool for task management @talk-point"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Konstantin Stoldt", email = "konstantin.stoldt@talk-point.de"}
+]
+keywords = ["CLI"]
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "requests",
+    "shopcloud-secrethub",
+    "tqdm",
+]
+
+[project.urls]
+Homepage = "https://github.com/Talk-Point/shopcloud-organize"
+
+[project.scripts]
+organize = "shopcloud_organize.cli:main"
