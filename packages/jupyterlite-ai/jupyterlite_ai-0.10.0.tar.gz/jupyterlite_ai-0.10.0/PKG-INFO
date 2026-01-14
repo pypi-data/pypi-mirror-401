@@ -1,0 +1,116 @@
+Metadata-Version: 2.4
+Name: jupyterlite_ai
+Version: 0.10.0
+Dynamic: Keywords
+Summary: AI code completions and chat for JupyterLite
+Project-URL: Homepage, https://github.com/jupyterlite/ai
+Project-URL: Bug Tracker, https://github.com/jupyterlite/ai/issues
+Project-URL: Repository, https://github.com/jupyterlite/ai.git
+Author: JupyterLite Contributors
+License: BSD 3-Clause License
+        
+        Copyright (c) 2024, JupyterLite Contributors
+        Copyright (c) 2024, Jeremy Tuloup
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+        
+        3. Neither the name of the copyright holder nor the names of its
+           contributors may be used to endorse or promote products derived from
+           this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+License-File: LICENSE
+Classifier: Framework :: Jupyter
+Classifier: Framework :: Jupyter :: JupyterLab
+Classifier: Framework :: Jupyter :: JupyterLab :: 4
+Classifier: Framework :: Jupyter :: JupyterLab :: Extensions
+Classifier: Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Requires-Dist: jupyter-secrets-manager<0.5,>=0.4
+Requires-Dist: jupyterlab-diff<0.7,>=0.6.0
+Provides-Extra: docs
+Requires-Dist: jupyter-book; extra == 'docs'
+Provides-Extra: jupyter
+Requires-Dist: jupyterlab>=4.4.0; extra == 'jupyter'
+Requires-Dist: jupyterlite>=0.6.0a0; extra == 'jupyter'
+Requires-Dist: notebook>=7.4.0; extra == 'jupyter'
+Provides-Extra: test
+Requires-Dist: fastmcp<3,>=2.12.4; extra == 'test'
+Requires-Dist: starlette<0.49,>=0.48.0; extra == 'test'
+Description-Content-Type: text/markdown
+
+# jupyterlite-ai
+
+[![Github Actions Status](https://github.com/jupyterlite/ai/workflows/Build/badge.svg)](https://github.com/jupyterlite/ai/actions/workflows/build.yml)
+[![Documentation Status](https://readthedocs.org/projects/jupyterlite-ai/badge/?version=latest)](https://jupyterlite-ai.readthedocs.io/en/latest/?badge=latest)
+[![lite-badge](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://jupyterlite.github.io/ai/lab/index.html)
+
+AI code completions and chat for JupyterLab, Notebook 7 and JupyterLite.
+
+[a screencast showing the Jupyterlite AI extension in JupyterLite](https://github.com/user-attachments/assets/e33d7d84-53ca-4835-a034-b6757476c98b)
+
+## Requirements
+
+- JupyterLab >= 4.4.0 or Notebook >= 7.4.0
+
+## Try it in your browser
+
+You can try the extension in your browser using JupyterLite:
+
+[![lite-badge](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://jupyterlite.github.io/ai/lab/index.html)
+
+## Install
+
+To install the extension, execute:
+
+```bash
+pip install jupyterlite-ai
+```
+
+To install requirements (JupyterLab, JupyterLite and Notebook):
+
+```bash
+pip install jupyterlite-ai[jupyter]
+```
+
+## Documentation
+
+For detailed usage instructions, including how to configure AI providers, see the [documentation](https://jupyterlite-ai.readthedocs.io/).
+
+## Uninstall
+
+To remove the extension, execute:
+
+```bash
+pip uninstall jupyterlite-ai
+```
+
+## Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.md)
