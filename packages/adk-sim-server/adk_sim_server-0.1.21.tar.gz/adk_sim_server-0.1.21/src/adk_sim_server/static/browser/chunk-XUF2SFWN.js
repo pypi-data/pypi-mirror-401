@@ -1,0 +1,1 @@
+import{a as t}from"./chunk-RAYLCXYG.js";import"./chunk-OL2EQS2U.js";var s=[{path:"",loadComponent:()=>import("./chunk-FLKQCCPG.js").then(o=>o.SessionListComponent)}];export{t as SessionListComponent,s as sessionListRoutes};
