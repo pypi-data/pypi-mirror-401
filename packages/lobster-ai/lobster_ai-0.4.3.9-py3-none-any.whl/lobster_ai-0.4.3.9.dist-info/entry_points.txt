@@ -1,0 +1,6 @@
+[console_scripts]
+lobster = lobster.cli:app
+
+[lobster.services]
+publication_processing = lobster.services.orchestration.publication_processing_service:PublicationProcessingService
+publication_queue = lobster.core.publication_queue:PublicationQueue
