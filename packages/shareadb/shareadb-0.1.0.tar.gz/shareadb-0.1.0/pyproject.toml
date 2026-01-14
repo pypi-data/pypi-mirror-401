@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shareadb"
+version = "0.1.0"
+description = "Share local adb devices with remote users via TCP proxy"
+requires-python = ">=3.8"
+# No external dependencies required; uses Python standard library only.
+dependencies = []
+
+[project.scripts]
+shareadbpy = "shareadb.cli:main"
