@@ -1,0 +1,118 @@
+Metadata-Version: 2.4
+Name: lim-mm-cli
+Version: 0.1.7
+Summary: CLI tool for LIM-compatible micro model project scaffolding
+Author-email: Solution Eden <solutionedencom@gmail.com>
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typer[all]
+Requires-Dist: jsonschema
+Requires-Dist: requests
+Dynamic: license-file
+
+# LIM MM CLI: Command Line Interface for Micro Model Management
+
+## 🎯 LIM Concept
+**LIM (Large Integration Model)** aims to be an open source, realtime data retrieval and micro model training enhancement framework.
+
+### Philosophy: "Human Socialism Model Network"
+LIM represents a paradigm shift from monolithic "God Models" (LLMs) to a **decentralized, collaborative network of specialized intelligence**.
+
+- **Socialism of Intelligence**: Democratized AI through community-driven micro models.
+- **Model on the Air**: Intelligence is fluid. MMs are lightweight, rapidly trainable, and deployable (MaaS).
+- **The Anti-Monolith**: Unlike traditional LLMs, LIM routes intent to the *exact* source of truth or specialist model.
+- **LIM > MCP**: While MCP standardizes connections, LIM resolves the *execution* problem by autonomously routing queries.
+
+## Core Architecture (The L-I-M Trinity)
+
+### **L** - Large Integration Model (The Conductor)
+- **Role**: Intent Understanding & Routing.
+- **Function**: The "Generalist" that parses queries and directs them into the network.
+
+### **I** - Integration Network (The Nervous System)
+- **Role**: Discovery, Transport, & Protocol.
+- **Function**: The infrastructure layer connecting the Conductor to the Specialists.
+
+### **M** - Micro Model (The Specialist) / MMS
+- **Role**: Domain-Specific Execution.
+- **Philosophy**: Minimize context, rapid training, and hot-swappable.
+
+## CLI Commands
+The `lim` CLI is the primary interface for managing the Micro Model lifecycle.
+
+### Project Management
+```bash
+mm start <name>         # Create a new micro model project from template
+mm validate             # Verify MM compliance (checks /meta.json service health)
+mm build                # Containerize the current MM
+mm run                  # Execute the project locally (python run/start.py)
+```
+
+### Registry Operations
+```bash
+mm push                 # Publish the MM to the LIM repository
+mm pull <mm1,mm2>       # Retrieve MMs into local models/ directory
+mm list [name]          # Display metadata and status of an MM
+```
+
+## Micro Model Service (MMS) Standard
+All MMs must adhere to the Open Source MMS Standard for interoperability:
+
+### Structure
+- **`meta.json`**: The contract. Defines input/output schemas and configuration.
+- **`mms/`**: Service logic (API, Agents, RAG).
+- **`models/`**: Model artifacts (weights, embeddings).
+- **`data/`**: Specialized datasets or knowledge base.
+- **`run/`**: Execution scripts & Docker config.
+
+```
+my-model/
+├── meta.json           # Model configuration and metadata
+├── mms/                # Service implementation
+│   ├── app/            # Application logic
+│   └── tests/          # Tests
+├── models/             # AI Model artifacts
+├── data/               # Domain-specific data
+├── run/
+│   ├── start.py        # Entry point
+│   └── docker/         # Dockerfile & compose
+├── requirements.txt    # Dependencies
+└── README.md           # Documentation
+```
+
+### Protocol
+- **Discovery**: Must expose `docker.internal.network:8000/meta.json`.
+- **Git-Based**: MMs are versioned and distributed via Git repositories.
+
+## Getting Started
+
+1. **Install the CLI**:
+   ```bash
+   pip install lim-mm-cli
+   ```
+
+2. **Create a new model**:
+   ```bash
+   mm start my-model
+   cd my-model
+   ```
+
+3. **Configure & Validate**:
+   Edit `meta.json` and run:
+   ```bash
+   mm validate
+   mm run
+   ```
+
+4. **Deploy**:
+   ```bash
+   mm build
+   mm push
+   ```
+
+## Technology Stack
+- **Backend**: Python, Quart (Async)
+- **Infra**: Docker, MySQL
+- **Ops**: Loki, Grafana
+- **Interface**: CLI, REST API
