@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Feedback Enhanced - 桌面版</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 0.5s forwards;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 1s forwards, spin 1s linear 1s infinite;
+        }
+        
+        .status {
+            font-size: 1rem;
+            opacity: 0.8;
+            animation: fadeIn 1s ease-in-out 1.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo">🖥️ MCP Feedback Enhanced</div>
+        <div class="subtitle">桌面版正在启动...</div>
+        <div class="spinner"></div>
+        <div class="status" id="status">正在连接到后端服务...</div>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        // 检测是否在 Tauri 环境中
+        const isTauri = window.__TAURI__ !== undefined;
+        
+        // 后端服务 URL
+        const backendUrl = 'http://127.0.0.1:8765';
+        
+        // 状态更新函数
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        // 错误显示函数
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        // 检查后端服务是否可用
+        async function checkBackendService() {
+            try {
+                updateStatus('正在检查后端服务...');
+                const response = await fetch(backendUrl + '/health', {
+                    method: 'GET',
+                    timeout: 5000
+                });
+                
+                if (response.ok) {
+                    updateStatus('后端服务已就绪，正在载入界面...');
+                    // 延迟一下再重定向，让用户看到状态
+                    setTimeout(() => {
+                        window.location.href = backendUrl;
+                    }, 1000);
+                } else {
+                    throw new Error(`后端服务回应错误: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('检查后端服务失败:', error);
+                updateStatus('正在重试连接...');
+                
+                // 如果是网路错误，直接尝试重定向
+                if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                    setTimeout(() => {
+                        window.location.href = backendUrl;
+                    }, 2000);
+                } else {
+                    showError('无法连接到后端服务，请确保服务正在运行');
+                }
+            }
+        }
+        
+        // 如果不是 Tauri 环境，直接重定向
+        if (!isTauri) {
+            updateStatus('正在重定向到 Web 界面...');
+            setTimeout(() => {
+                window.location.href = backendUrl;
+            }, 1000);
+        } else {
+            // Tauri 环境中，检查后端服务
+            setTimeout(checkBackendService, 1000);
+        }
+        
+        // 如果 5 秒后还没有重定向，强制重定向
+        setTimeout(() => {
+            if (window.location.href.includes('index.html')) {
+                updateStatus('强制重定向到后端服务...');
+                window.location.href = backendUrl;
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
