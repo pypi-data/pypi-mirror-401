@@ -1,0 +1,113 @@
+# 锐飞(ryfi)
+
+锐飞(ryfi): find icon，在源图查找图标。
+
+该工具可让游戏辅助开发者方便地进行找图定位，从而实现游戏自动搬砖任务。
+
+## 基本操作
+
+依赖库
+pip install opencv-python PyQt5 numpy
+
+PyQt5 需要图形显示相关的系统库，安装所有可能的图形依赖：apt install -y libgl1-mesa-glx libglu1-mesa libxrender1 libxext6 libx11-6 libglib2.0-0 libxcb-* libx11-xcb-dev libxkbcommon-x11-0 xvfb mesa-utils
+
+🎯 图标选择与查找工具使用指南
+
+📁 基本操作：
+- 打开图片：选择要处理的图像文件
+- 选择查找图标：选择要查找的目标图标
+- 保存选中图标：将选框内的区域保存为图标
+
+🎯 选框控制：
+- 固定大小模式：启用后点击图片创建固定大小的选框
+- 坐标控制：精确设置选框的位置和大小
+- 移动按钮：微调选框位置
+- 大小按钮：调整选框尺寸
+
+🔍 查找功能：
+- 匹配阈值：设置匹配的敏感度（0-1）
+- 查找区域：指定查找范围（全图、四分图、九宫图）
+- 多种查找方式：灰度、彩色、各颜色通道
+
+📐 区域代码说明：
+- 全图：f0 (整个图像)
+- 四分图：
+    f1: 左上角 | f2: 右上角
+    f3: 左下角 | f4: 右下角
+- 九宫图：
+    n1: 左上 | n2: 中上 | n3: 右上
+    n4: 左中 | n5: 中心 | n6: 右中
+    n7: 左下 | n8: 中下 | n9: 右下
+
+🖱️ 视图控制：
+- 缩放：放大、缩小、适应窗口、原始大小
+- 拖动：Alt+左键 或 中键拖动图片
+- 删除选框：Delete 或 Backspace 键
+
+💡 提示：
+- 使用 WSAD 代表上下左右键微调选框位置
+- Ctrl+方向键：移动5像素
+- Shift+方向键：移动10像素
+- 固定大小模式适合批量提取相同尺寸的图标
+
+## 联系信息
+
+- **更多内容**: 请前往 [锐码官网](http://rymaa.cn) 查阅
+- **Pypi 源包仓库**: [https://pypi.org/project/ryfi](https://pypi.org/project/ryfi)
+- **Gitee 源码仓库**: [https://gitee.com/rybby/ryfi](https://gitee.com/rybby/ryfi)
+- **作者**: 锐白
+- **主页**: [rybby.cn](http://rybby.cn), [ry.rymaa.cn](http://ry.rymaa.cn)
+- **邮箱**: rybby@163.com
+
+## 许可证信息
+
+### 主要许可证
+
+**版权所有 2025 锐码[rymaa.cn](http://rymaa.cn) - rybby@163.com**
+
+本软件采用 GPL v3 开源许可证。使用PyQt5库 (Riverbank Computing, GPL v3)。本程序为自由软件，在自由软件基金会发布的GNU通用公共许可证（第3版或更新版本）的条款下分发。详情请见 <https://www.gnu.org/licenses/gpl-3.0.html> 或应用目录里的 LICENSE 文件。
+
+#### Python 库许可证
+
+| 模块 | 许可证 | 备注 |
+|:---:|:---:|:---:|
+| os | PSF License | Python 标准库 |
+| sys | PSF License | Python 标准库 |
+| argparse | PSF License | Python 标准库 |
+| subprocess | PSF License | Python 标准库 |
+| pathlib | PSF License | Python 3.4+ 标准库 |
+| cv2 (OpenCV) | Apache 2.0 License | 第三方库，计算机视觉库 |
+| numpy | BSD 3-Clause License | 第三方库，科学计算基础库 |
+| PyQt5 | GPL v3 或 商业许可 | 第三方库，Qt框架的Python绑定 |
+| PyQt5.QtWidgets | GPL v3 或 商业许可 | PyQt5 的子模块，包含GUI控件 |
+| PyQt5.QtCore | GPL v3 或 商业许可 | PyQt5 的子模块，提供核心非GUI功能 |
+| PyQt5.QtGui | GPL v3 或 商业许可 | PyQt5 的子模块，提供图形用户界面组件 |
+
+## 许可证兼容性
+
+所有这些许可证都是**开源友好**且**商业友好**的：
+
+### 共同特点：
+- ✅ 允许商业使用
+- ✅ 允许修改
+- ✅ 允许分发
+
+### 主要要求：
+- 📝 保留原始版权声明
+- 📝 在分发时包含许可证文本
+
+## 实际使用建议
+
+- **合规使用**：所有这些模块都可以在商业项目中使用
+- **无需担心**：Python 标准库的许可证设计就是为了方便开发者
+- **建议做法**：在您的项目 LICENSE 文件中 或 README.md 文件中提及使用了 Python 标准库
+
+## 技术支持
+
+如有问题或建议，请通过以下方式联系：
+- 邮箱: rybby@163.com
+- 官网: 锐码[rymaa.cn](http://rymaa.cn)
+
+---
+
+*版权所有 2025 锐码[rymaa.cn](http://rymaa.cn)*
