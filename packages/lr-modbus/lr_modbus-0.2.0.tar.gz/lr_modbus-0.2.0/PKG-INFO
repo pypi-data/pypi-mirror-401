@@ -1,0 +1,94 @@
+Metadata-Version: 2.4
+Name: lr-modbus
+Version: 0.2.0
+Summary: Modbus RTU helpers for FT231XS-based RS-485 HIL setups
+Author-email: Jonas Estberger <jonas.estberger@lumenradio.com>
+License: MIT
+Requires-Python: >=3.9
+Requires-Dist: pyserial>=3.5
+Provides-Extra: dev
+Requires-Dist: black>=25.9.0; extra == 'dev'
+Requires-Dist: build>=1.2.1; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: twine>=5.1.1; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# lr-modbus
+
+Lightweight Modbus RTU helpers tailored for FTDI-based hardware-in-the-loop setups. The package powers the CLI and automation utilities that ship with the UART<->RS-485 development board, but the components stand on their own and can be embedded into any Modbus RTU workflow.
+
+## Features
+- Blocking client with helpers for holding-register reads, single-register writes, and raw function dispatch
+- Reference server with a thread-safe in-memory data model, optional listen-only mode, and deterministic shutdown hooks
+- CRC-safe frame codec plus transactional serial transport tuned for half-duplex FTDI adapters
+- Batteries-included CLI (`lr-modbus`) for quick experiments, scripting, and test automation
+
+## Installation
+```bash
+python -m pip install lr-modbus
+```
+
+For development work inside this repository, install in editable mode together with the extra tooling:
+```bash
+python -m pip install -e python/lr_modbus[dev]
+```
+
+## Quick Start
+### CLI
+```bash
+# Launch a server that seeds two holding registers and exits after 50 requests
+lr-modbus --port /dev/ttyUSB0 server --holding 0=0x2A,1=0x1337 --max-requests 50
+
+# Read two registers from another adapter
+lr-modbus --port /dev/ttyUSB1 client --action read-holding --address 0 --count 2
+
+# Write a single register
+lr-modbus --port /dev/ttyUSB1 client --action write-single --address 5 --value 1234
+```
+
+The CLI targets the FT231XS + MAX1487CSA+ stack on the dev board, defaults to 115200-8N1, enforces Modbus RTU `t3.5` frame gaps, and gives each transaction a 2 s deadline. That means two adapters attached to the same host can verify their RS-485 link with no extra flags, while the `--timeout` option lets you shrink or grow the overall window. Common overrides include:
+
+```bash
+lr-modbus --port /dev/ttyUSB0 --baudrate 19200 --stopbits 1 --timeout 2 client --action read-holding --address 0 --count 4
+```
+
+Use `lr-modbus --help` for the full option matrix, including how to seed holding registers or stop the server after a fixed number of requests for HIL scripting.
+
+### Library usage
+```python
+from lr_modbus import ModbusClient, ModbusServer, InMemoryDataModel
+from lr_modbus.transport import SerialDeviceConfig, create_serial_transport
+
+config = SerialDeviceConfig(port="/dev/ttyUSB0")
+transport = create_serial_transport(config)
+client = ModbusClient(transport, unit_id=1)
+
+with transport:
+    registers = client.read_holding_registers(0, 4)
+    client.write_single_register(10, 0xBEEF)
+```
+
+To host a test server in the same script:
+```python
+data_model = InMemoryDataModel({0: 0x2A})
+server = ModbusServer(transport, unit_id=1, data_model=data_model)
+server.serve_forever(max_requests=10)
+```
+
+The transport exposes `transact()`, `read_frame()`, and `write_frame()` helpers for advanced use-cases such as bit-banging DE/RE GPIO hooks.
+
+## Testing
+```bash
+make test
+```
+
+The target wires up `pytest` with coverage against the `lr_modbus` and `lr_dmx` packages. Tests rely on transport factories, so no physical hardware is required.
+
+## Versioning & publishing
+Package metadata lives in `python/lr_modbus/pyproject.toml` alongside the version marker in `python/lr_modbus/lr_modbus/__init__.py`. To publish a release from this repository root:
+```bash
+python -m pip install -e python/lr_modbus[dev]
+python -m build python/lr_modbus -o dist/lr_modbus
+python -m twine upload dist/lr_modbus/*
+```
