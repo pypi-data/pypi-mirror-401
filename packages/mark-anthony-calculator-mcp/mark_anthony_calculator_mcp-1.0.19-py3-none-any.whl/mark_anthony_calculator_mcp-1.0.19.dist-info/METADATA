@@ -1,0 +1,119 @@
+Metadata-Version: 2.4
+Name: mark-anthony-calculator-mcp
+Version: 1.0.19
+Summary: A Model Context Protocol server for calculator operations
+Project-URL: Homepage, https://github.com/yourusername/calculator-mcp
+Project-URL: Repository, https://github.com/yourusername/calculator-mcp
+Author: Your Name
+License: MIT
+License-File: LICENSE
+Keywords: calculator,mcp,model-context-protocol
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: mcp>=0.9.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Calculator MCP Server
+
+A Model Context Protocol (MCP) server that provides calculator operations (add, subtract, multiply, divide).
+
+## Installation
+
+### Via npx (Node.js - recommended)
+
+```bash
+npx @mark.anthony987654321/calculator-mcp
+```
+
+### Via uvx (Python - recommended)
+
+```bash
+uvx calculator-mcp
+```
+
+### Local Installation
+
+**Node.js:**
+```bash
+npm install
+npm start
+```
+
+**Python:**
+```bash
+pip install -e .
+python -m calculator_mcp
+```
+
+## Available Tools
+
+- **add**: Add two numbers together
+- **subtract**: Subtract the second number from the first number
+- **multiply**: Multiply two numbers together
+- **divide**: Divide the first number by the second number
+
+## Usage
+
+This MCP server is designed to be used with MCP-compatible clients. Configure your MCP client to use this server.
+
+### Example Configuration
+
+For use with Claude Desktop or other MCP clients, add to your MCP configuration:
+
+**Using npx (Node.js):**
+```json
+{
+  "mcpServers": {
+    "calculator": {
+      "command": "npx",
+      "args": ["@mark.anthony987654321/calculator-mcp"]
+    }
+  }
+}
+```
+
+**Using uvx (Python):**
+```json
+{
+  "mcpServers": {
+    "calculator": {
+      "command": "uvx",
+      "args": ["calculator-mcp"]
+    }
+  }
+}
+```
+
+## Development
+
+**Node.js:**
+```bash
+# Install dependencies
+npm install
+
+# Run the server
+npm start
+```
+
+**Python:**
+```bash
+# Install dependencies
+pip install -e ".[dev]"
+
+# Run the server
+python -m calculator_mcp
+```
+
+## License
+
+MIT
