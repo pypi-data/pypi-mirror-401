@@ -1,0 +1,63 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format .
+        language: system
+        pass_filenames: false
+
+      - id: ruff-fix
+        name: ruff fix
+        entry: uv run ruff check --fix --quiet --exit-zero .
+        language: system
+        pass_filenames: false
+
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check .
+        language: system
+        pass_filenames: false
+
+      - id: mypy
+        name: mypy
+        entry: uv run mypy .
+        language: system
+        pass_filenames: false
+
+      # Test cli (ensure imports are correct)
+      - id: test-cli
+        name: Test cli with help
+        entry: uv run --no-dev uvrev --help
+        language: system
+        pass_filenames: false
+
+      # Run doctests under coverage (no reports yet; just collect data)
+      - id: pytest-doctest
+        name: pytest (doctest src)
+        entry: uv run coverage run --parallel-mode --source=src -m pytest --doctest-modules src
+        language: system
+        pass_filenames: false
+
+      # Run tests under coverage (no reports yet; just collect data)
+      - id: pytest-tests
+        name: pytest (tests)
+        entry: uv run coverage run --parallel-mode --source=src -m pytest tests
+        language: system
+        pass_filenames: false
+
+      # Combine + always output coverage + always generate HTML + enforce minimum
+      # Runs alone AFTER all other hooks (pre-commit will not run it concurrently).
+      - id: coverage-report
+        name: coverage (combine, html, report, fail-under)
+        entry: >
+          bash -c
+          'uv run coverage combine &&
+           uv run coverage html --fail-under=0 &&
+           uv run coverage xml --fail-under=0 &&
+           uv run coverage report --show-missing'
+        language: system
+        verbose: true
+        pass_filenames: false
+        require_serial: true
+
