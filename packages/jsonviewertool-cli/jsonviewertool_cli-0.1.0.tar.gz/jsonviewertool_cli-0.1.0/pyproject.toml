@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jsonviewertool-cli"
+version = "0.1.0"
+description = "A lightweight CLI to validate/format/minify JSON and convert YAML to JSON. Website: https://jsonviewertool.com"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name = "jsonviewertool" }
+]
+keywords = ["json", "yaml", "cli", "formatter", "validator", "converter"]
+license = { text = "MIT" }
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Environment :: Console",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://jsonviewertool.com"
+"YAML to JSON" = "https://jsonviewertool.com/yaml-to-json"
+Repository = "https://github.com/coderaviverma/json-viewer-tools"
+
+[project.scripts]
+jsonviewertool = "jsonviewertool_cli.cli:main"
+
+[project.optional-dependencies]
+yaml = ["PyYAML>=6.0.1"]

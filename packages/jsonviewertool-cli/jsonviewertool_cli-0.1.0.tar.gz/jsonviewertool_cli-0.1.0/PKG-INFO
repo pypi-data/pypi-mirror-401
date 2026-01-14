@@ -1,0 +1,81 @@
+Metadata-Version: 2.4
+Name: jsonviewertool-cli
+Version: 0.1.0
+Summary: A lightweight CLI to validate/format/minify JSON and convert YAML to JSON. Website: https://jsonviewertool.com
+Author: jsonviewertool
+License: MIT
+Project-URL: Homepage, https://jsonviewertool.com
+Project-URL: YAML to JSON, https://jsonviewertool.com/yaml-to-json
+Project-URL: Repository, https://github.com/coderaviverma/json-viewer-tools
+Keywords: json,yaml,cli,formatter,validator,converter
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Environment :: Console
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Utilities
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: yaml
+Requires-Dist: PyYAML>=6.0.1; extra == "yaml"
+Dynamic: license-file
+
+# jsonviewertool-cli
+
+A lightweight Python CLI for **validating**, **formatting (pretty print)**, **minifying**, and **converting YAML → JSON**.
+
+👉 For advanced online tools like **YAML to JSON**, **JSON Viewer**, and **JSON Formatter**, visit:
+- https://jsonviewertool.com
+- YAML → JSON: https://jsonviewertool.com/yaml-to-json
+
+---
+
+## Install
+
+```bash
+pip install jsonviewertool-cli
+```
+
+## Usage
+
+### Pretty format JSON
+```bash
+jsonviewertool format input.json
+# or from stdin
+cat input.json | jsonviewertool format
+```
+
+### Validate JSON
+```bash
+jsonviewertool validate input.json
+```
+
+### Minify JSON
+```bash
+jsonviewertool minify input.json
+```
+
+### YAML → JSON
+```bash
+jsonviewertool yaml2json input.yaml
+```
+
+---
+
+## Why this exists
+
+This CLI is intentionally small and fast for local workflows (CI pipelines, quick checks, scripts).
+If you need a full-featured browser toolset (viewer, formatter, validator, converters), use:
+
+🔗 https://jsonviewertool.com
+
+---
+
+## License
+
+MIT
