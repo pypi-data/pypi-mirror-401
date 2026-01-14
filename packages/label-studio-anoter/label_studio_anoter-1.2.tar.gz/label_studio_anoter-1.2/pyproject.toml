@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=70.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "label_studio_anoter"
+version = "1.2"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ['label_studio', 'label_studio_anoter', 'label_studio_yolo', 'yolo', 'pre_annotation', 'label_studio_pre_annotation']
+authors = [
+    { name = "Naseem AP", email = "naseem@eternalrobotics.com" },
+    { name = "Naseem AP", email = "naseemalassampattil@gmail.com" },
+]
+maintainers = [
+    { name = "Naseem AP", email = "naseemalassampattil@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Operating System :: POSIX :: Linux",
+]
+
+dependencies = [
+    'label-studio-sdk>=2.0.16',
+    'ultralytics>=8.3.248',
+    'Pillow>=12.1.0',
+    'tqdm>=4.67.1',
+    'requests>=2.32.5'
+]
