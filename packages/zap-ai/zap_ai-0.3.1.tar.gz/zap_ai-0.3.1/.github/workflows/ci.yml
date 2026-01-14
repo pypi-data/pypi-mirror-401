@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Check linting
+        run: uv run ruff check .
+
+  test:
+    name: Test
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run unit tests
+        run: |
+          if [ "${{ matrix.python-version }}" = "3.11" ]; then
+            uv run pytest tests/unit/ -v --cov=src/zap_ai --cov-report=xml
+          else
+            uv run pytest tests/unit/ -v
+          fi
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  integration-test:
+    name: Integration Test
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Install Temporal CLI
+        uses: temporalio/setup-temporal@v0
+
+      - name: Start Temporal server
+        run: |
+          temporal server start-dev --headless &
+          for i in {1..30}; do
+            if temporal workflow list --namespace default 2>/dev/null; then
+              echo "Temporal server is ready"
+              break
+            fi
+            echo "Waiting for Temporal server... ($i/30)"
+            sleep 1
+          done
+
+      - name: Run integration tests
+        run: uv run pytest tests/integration/ -v --tb=short
