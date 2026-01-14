@@ -1,0 +1,151 @@
+Metadata-Version: 2.4
+Name: airflow_deploy_softwrd
+Version: 0.0.9
+Summary: A Flask application to handle postman webhooks for deploying and taking down repositories.
+Home-page: https://github.com/softwrdai/airflow_deploy_softwrd
+Author: Md Robiuddin
+Author-email: robiuddin@softwrd.ai
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: Microsoft :: Windows
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Flask
+Requires-Dist: boto3
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Airflow Deploy Softwrd
+
+This is a Flask application that handles GitHub webhook POST requests for deploying and taking down repositories using Docker Compose. It is designed for managing Airflow deployments of softwrd in-house hosted repositories.
+
+## Features
+- Deploy specified branches of a repository on push events (via `/payload`).
+- Bring down specified branches of a repository (via `/putdown`).
+- Retrieve secrets from AWS Secrets Manager for environment and Airflow variables.
+- Automatically configure environment variables from secrets.
+- Supports both HTTPS and SSH cloning (configurable).
+- Runs deployment and takedown logic in background threads for responsiveness.
+
+## Prerequisites
+- Python 3.9 or higher
+- Docker and Docker Compose
+- AWS credentials setup if using Secrets Manager
+
+## Installation
+
+You can install the package from PyPI:
+
+```bash
+pip install airflow_deploy_softwrd
+```
+
+## Configuration
+
+### AWS Credentials Setup
+Set up your AWS credentials using the following command:
+```bash
+$Env:AWS_ACCESS_KEY_ID = "your-access-key-id"
+$Env:AWS_SECRET_ACCESS_KEY = "your-secret-access-key"
+```
+you must have to set up your AWS credentials in your environment variables before running the application.
+
+## Usage
+
+To run the server, use the following command:
+
+```bash
+airflow_deploy_softwrd /path/to/your/working/directory /path/to/config.json
+```
+
+### Command Line Arguments
+- `/path/to/your/working/directory`: The base directory where repositories will be cloned and operated.
+- `/path/to/config.json`: Path to the configuration file containing allowed branches.
+
+### Configuration File
+Create a JSON configuration file, e.g., `config.json`, with the following contents to specify allowed branches and SSH support:
+Set `"SSH": true` if you want to clone repositories using SSH instead of HTTPS.
+
+```json
+{
+  "allowed_branches": ["develop", "main", "Airflow-Changelog"],
+  "SSH": false
+}
+```
+
+
+
+
+### Required AWS Secrets
+Set up the following secrets in AWS Secrets Manager:
+- `airflow_deployment_env`: Secret containing environment variables for deploying Airflow (as a JSON object).
+- `airflow_variables_env`: Secret containing Airflow variable configurations (as a JSON object).
+
+### POSTMAN Webhooks
+Set up your webhook sender (e.g., GitHub or POSTMAN) to point to the following endpoints of your running Flask application:
+
+- **Deploy a branch:**
+  - `http://localhost:6969/payload`
+
+- **Bring down a branch:**
+  - `http://localhost:6969/putdown`
+
+## Example Webhook Payloads
+
+### Deploy a Branch
+The webhook payloads for both endpoints should include the following fields:
+
+**Branch Name Format:**
+- You can provide the branch name as either just the branch name (e.g., `main`) or prefixed with `refs/heads/` (e.g., `refs/heads/main`).
+- Other formats such as `refs/<branch_name>` or `heads/<branch_name>` are not supported and will break the application.
+
+```json
+{
+  "ref": "refs/heads/main",
+  "repository": {
+    "clone_url": "https://github.com/yourusername/yourrepo.git",
+    "name": "yourrepo"
+  },
+  "head_commit": {
+    "message": "Your commit message"
+  }
+}
+```
+
+### Bring Down a Branch
+The webhook for bringing down a branch should contain similar information:
+
+```json
+{
+  "ref": "refs/heads/main",
+  "repository": {
+    "clone_url": "https://github.com/yourusername/yourrepo.git",
+    "name": "yourrepo"
+  },
+  "head_commit": {
+    "message": "Your commit message"
+  }
+}
+```
+
+## Additional Notes
+
+- The application must be started with two arguments: the base path for repositories and the path to the config file.
+- Only branches listed in `allowed_branches` in your config file will be processed.
+- If `SSH` is set to true in the config, repositories will be cloned using SSH URLs.
+- All deployment and takedown operations are run in background threads for non-blocking webhook responses.
+
+## Contact
+
+Maintainer: [Md Robiuddin](mailto:robiuddin@softwrd.ai)
+
+Project Link: [Repository URL](https://github.com/softwrdai/airflow_deploy_softwrd/)
