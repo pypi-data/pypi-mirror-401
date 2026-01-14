@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "async-gelf-client"
+version = "0.1.0"
+description = "Async UDP client for sending GELF messages to Graylog"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Ivan Sheiko", email = "gazziiii777@gmail.com"}
+]
+keywords = ["gelf", "graylog", "logging", "async", "udp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Logging",
+]
+
+[project.urls]
+Homepage = "https://github.com/gazziiii777"
+Repository = "https://github.com/gazziiii777/async-gelf-client"
+
+[tool.setuptools]
+packages = ["async_gelf_client"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
