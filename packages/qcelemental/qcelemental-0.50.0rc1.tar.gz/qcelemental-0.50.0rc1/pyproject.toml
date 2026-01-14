@@ -1,0 +1,125 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+homepage = "https://github.com/MolSSI/QCElemental"
+changelog = "https://github.com/MolSSI/QCElemental/blob/master/docs/changelog.rst"
+documentation = "https://molssi.github.io/QCElemental/"
+issues = "https://github.com/MolSSI/QCElemental/issues"
+
+[project]
+name = "qcelemental"
+#version = "0.30.0"
+dynamic = ["version"]
+requires-python = ">=3.9"
+description = "Core data structures for Quantum Chemistry."
+authors = [
+  { name="The QCArchive Development Team", email="qcarchive@molssi.org" },
+]
+license = { file="LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Framework :: Pydantic",
+    "Framework :: Pydantic :: 2",
+]
+dependencies = [
+    "numpy; python_version <'3.14'",
+    "numpy >=2.3.3; python_version >='3.14'",
+    "pint >=0.24",
+    "pydantic >=2.0; python_version <'3.14'",
+    "pydantic >=2.12; python_version >='3.14'",
+]
+
+[project.optional-dependencies]
+standard = [
+    "msgpack",
+    "jsonschema",
+]
+viz = [
+    "nglview",  # !py38  # insufficient on pypi as also need `dot`. python-graphviz sufficient in conda. !py314
+    "setuptools >=68.0.0; python_version>='3.12'",  # nglview needs pkg_resources
+                # setuptools is needed temporarily to avoid pkg_resources error with ngl_view. remove from here after next nglview release beyond v1.3.4
+    "ipykernel <6.0",
+]
+align = [
+    "networkx <3.0", 
+    "scipy",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "codecov",
+]
+lint = [
+    "pre-commit",
+    "black >=25.1.0,<26.0a0",  # if running outside of pre-commit
+    "isort >=6.1.0",  # if running outside of pre-commit
+    # "mypy",
+    # "autoflake",
+    # "flake8",
+]
+docs = [  # probably >=py39
+    "numpydoc",
+    "docutils",
+    "sphinx >=7.0.0",
+    "sphinxcontrib-napoleon",
+    "sphinx-rtd-theme",
+    "autodoc-pydantic",
+    "sphinx-automodapi",
+    "sphinx-autodoc-typehints",
+    "pydantic ==2.5.0",  # for now
+    "pydantic-settings ==2.2.0",  # for now
+]
+
+#[tool.poetry.dependencies]
+#packaging = ">=24.1"
+#pytest = { version = "^7.2.2", optional = true }
+
+#[tool.poetry.group.dev.dependencies]
+#msgpack = "^1.0.8"
+#    { version = "^1.22", python = "<3.10" },
+#    { version = "^2.3", python = ">=3.10,<4.0.0" }
+#]
+
+[tool.black]
+line-length = 120
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.coverage.run]
+branch = true
+omit = ["*/tests/*", "*/migrations/*", "*site-packages*", "*__init__.py"]
+
+[tool.mypy]
+plugins = "pydantic.mypy"
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[tool.setuptools]
+packages = ["qcelemental"]
+
+[tool.setuptools.package-data]
+
+[tool.setuptools_scm]
+
+[tool.versioningit.vcs]
+default-tag = "0.0.99" # useful for CI/shallow clones

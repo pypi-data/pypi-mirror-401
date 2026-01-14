@@ -1,0 +1,45 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    # will fail with git < 1.8.5
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=250"]
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        stages: [pre-commit]
+        exclude: "raw_data/nist_data/"
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.1.0
+    hooks:
+      - id: isort
+  - repo: https://github.com/psf/black
+    rev: 25.9.0
+    hooks:
+      - id: black
+  # TODO: Support flake8 when the repo is ready
+  # - repo: https://github.com/PyCQA/flake8
+  #   rev: 5.0.4
+  #   hooks:
+  #     - id: flake8
+  # TODO: Support mypy when the repo is ready
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.1.1
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies:
+  #         [tokenize-rt==3.2.0, pydantic>=1.0.0]
+  - repo: local
+    hooks:
+      - id: tests
+        name: tests
+        stages: [pre-push]
+        language: system
+        entry: bash scripts/test.sh
+        types: [python]
+        pass_filenames: false

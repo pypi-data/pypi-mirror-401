@@ -1,0 +1,46 @@
+pint>=0.24
+
+[:python_version < "3.14"]
+numpy
+pydantic>=2.0
+
+[:python_version >= "3.14"]
+numpy>=2.3.3
+pydantic>=2.12
+
+[align]
+networkx<3.0
+scipy
+
+[docs]
+numpydoc
+docutils
+sphinx>=7.0.0
+sphinxcontrib-napoleon
+sphinx-rtd-theme
+autodoc-pydantic
+sphinx-automodapi
+sphinx-autodoc-typehints
+pydantic==2.5.0
+pydantic-settings==2.2.0
+
+[lint]
+pre-commit
+black<26.0a0,>=25.1.0
+isort>=6.1.0
+
+[standard]
+msgpack
+jsonschema
+
+[test]
+pytest
+pytest-cov
+codecov
+
+[viz]
+nglview
+ipykernel<6.0
+
+[viz:python_version >= "3.12"]
+setuptools>=68.0.0

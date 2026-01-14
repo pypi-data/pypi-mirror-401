@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - next2024
+      - next2025
+      - next2026
+  pull_request:
+    branches:
+      - master
+      - next2024
+      - next2025
+      - next2026
+  schedule:
+    - cron: "9 16 * * 1"
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        pydantic-version: ["2"]
+        runs-on: [ubuntu-latest, windows-latest]
+    name: "🐍 ${{ matrix.python-version }} • ${{ matrix.pydantic-version }} • ${{ matrix.runs-on }}"
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install pydantic for py314
+        if: false
+        # if: matrix.python-version == '3.14.0-rc.3'
+        run: pip install pydantic==2.12.0b1
+      - name: Install QCElemental (full deps)
+        if: matrix.python-version != '3.10' && matrix.python-version != '3.12' && matrix.python-version != '3.14'
+        run: pip install '.[test,viz,align,standard]'
+      - name: Install QCElemental (min deps)
+        if: matrix.python-version == '3.10' || matrix.python-version == '3.12' || matrix.python-version == '3.14'
+        run: pip install '.[test]'
+      - name: Run tests
+        run: pytest -rws -v --cov=qcelemental --color=yes --cov-report=xml  #-k "not pubchem_multiout_g"
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+      - name: QCSchema Examples Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        #if: github.event_name == 'push' && github.repository == 'MolSSI/QCElemental' && ( startsWith( github.ref, 'refs/tags/' ) || github.ref == 'refs/heads/master' )
+        if: false
+        with:
+          branch: qcschema-examples
+          folder: qcelemental/tests/qcschema_instances
+
+  build_documentation:
+    needs: [test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        name: Set up Python
+        with:
+          python-version: "3.10"
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+      - name: Install repo
+        run: pip install '.[docs]'
+      - name: Build Documentation
+        run: sphinx-build docs/ build/docs
+      - name: GitHub Pages Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: github.event_name == 'push' && github.repository == 'MolSSI/QCElemental' && ( startsWith( github.ref, 'refs/tags/' ) || github.ref == 'refs/heads/master' )
+        with:
+          branch: gh-pages
+          folder: build/docs/
