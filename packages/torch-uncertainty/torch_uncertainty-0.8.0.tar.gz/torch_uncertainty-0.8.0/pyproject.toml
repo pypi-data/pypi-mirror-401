@@ -1,0 +1,237 @@
+[build-system]
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
+
+[project]
+name = "torch_uncertainty"
+version = "0.8.0"
+authors = [
+    { name = "ENSTA U2IS AI", email = "olivier.laurent@ensta.fr" },
+    { name = "Adrien Lafage", email = "adrienlafage@outlook.com" },
+    { name = "Olivier Laurent", email = "olivier.ar.laurent@gmail.com" },
+]
+description = "Uncertainty quantification library in PyTorch"
+readme = "README.md"
+requires-python = ">=3.10,<=3.14"
+keywords = [
+    "bayesian-network",
+    "ensembles",
+    "neural-networks",
+    "predictive-uncertainty",
+    "reliable-ai",
+    "trustworthy-machine-learning",
+    "uncertainty",
+    "uncertainty-quantification",
+]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "timm",
+    "lightning[pytorch-extra]>=2.0,<2.7",
+    "torch>=2.1,<2.9",
+    "torchvision>=0.16",
+    "einops",
+    "seaborn",
+]
+
+[dependency-groups]
+dev = [
+  {include-group = "lint"},
+  {include-group = "test"},
+  {include-group = "docs"},
+]
+
+lint = [
+  "ruff==0.14.11",
+  "pre-commit",
+  "pre-commit-hooks",
+]
+test = [
+  "torch_uncertainty[all]",
+  "pytest-cov",
+]
+docs = [
+    "sphinx==7.4.7",
+    "pydata-sphinx-theme",
+    "sphinx-copybutton",
+    "sphinx-gallery",
+    "sphinx-design",
+    "sphinx-codeautolink",
+    "sphinx_design",
+    "sphinxcontrib-sass",
+]
+
+
+[project.optional-dependencies]
+all = [
+  "torch_uncertainty[experiments,image,distribution,timeseries,others]",
+]
+experiments = ["tensorboard", "huggingface-hub>=0.31", "safetensors"]
+image = ["kornia", "h5py", "opencv-python", "torch-uncertainty-assets"]
+distribution = ["scipy"]
+timeseries = ["tslearn"]
+others = [
+  "scikit-learn",
+  "curvlinops-for-pytorch<3",
+  "laplace-torch",
+  "glest==0.0.1a1",
+]
+
+cpu = [
+  "torch>=2.1.0,<2.9",
+  "torchvision>=0.16.0",
+]
+gpu = [
+  "torch>=2.1.0,<2.9",
+  "torchvision>=0.16.0",
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cpu" },
+    { extra = "gpu" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu128", extra = "gpu" },
+]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu128", extra = "gpu" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[project.urls]
+homepage = "https://torch-uncertainty.github.io/"
+documentation = "https://torch-uncertainty.github.io/quickstart.html"
+repository = "https://github.com/ENSTA-U2IS-AI/torch-uncertainty.git"
+
+[tool.flit.module]
+name = "torch_uncertainty"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "__pycache__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "venv",
+]
+
+[tool.ruff.lint]
+extend-select = [
+    "A",
+    "ARG",
+    "B",
+    "BLE",
+    "C4",
+    "D",
+    "ERA",
+    "F",
+    "FURB",
+    "G",
+    "I",
+    "INT",
+    "ISC",
+    "ICN",
+    "N",
+    "NPY",
+    "PERF",
+    "PIE",
+    "PT",
+    "PTH",
+    "PYI",
+    "Q",
+    "RET",
+    "RUF",
+    "RSE",
+    "S",
+    "SIM",
+    "T20",
+    "TC",
+    "TCH",
+    "TID",
+    "TRY",
+    "UP",
+    "YTT",
+]
+ignore = [
+    "ARG002",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D107",
+    "D205",
+    "D206",
+    "ISC001",
+    "N818",
+    "N812",
+    "PT011",
+    "RUF012",
+    "S101",
+    "TRY003",
+]
+pydocstyle.convention = "google"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 80
+
+[tool.coverage.run]
+branch = true
+include = ["*/torch-uncertainty/*"]
+omit = [
+    "*/tests/*",
+    "*/datasets/*",
+    ".venv/*",
+    "*/venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "coverage: ignore",
+    "raise NotImplementedError",
+    "raise ImportError",
+]
+ignore_errors = true
