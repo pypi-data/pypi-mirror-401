@@ -1,0 +1,173 @@
+Metadata-Version: 2.4
+Name: cpcontest-setup
+Version: 1.0.0
+Summary: Generador automático de estructuras para concursos de programación competitiva modo Colombiano
+Home-page: https://github.com/josuerom/cpcontest-setup
+Author: josuerom
+Author-email: josuerom <josueromram3@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/josuerom/cpcontest-setup
+Project-URL: Bug Tracker, https://github.com/josuerom/cpcontest-setup/issues
+Keywords: CP,competitive programming,codeforces,RPC,HackerRank,VJudge,CodeChef,contests,automation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# cpcontest-setup
+
+Generador automático universal para concursos de programación competitiva modo Colombiano año 2026.
+
+## Características
+
+- Soporte multiplataforma: Windows, Linux, MacOS
+- Múltiples plataformas: Codeforces, VJudge, CodeChef, HackerRank, RPC
+- Integración con API's
+- Detección automática de PDFs para RPC
+- Plantillas personalizables
+- Apertura automática en VSCode
+
+## Instalación
+```bash
+pip install cpcontest-setup
+```
+
+## Uso
+```bash
+cpcontest
+```
+
+El programa te guiará paso a paso:
+
+1. Selecciona la plataforma (1-5)
+2. Ingresa el ID del concurso (si aplica)
+3. Selecciona el lenguaje de programación
+4. ¡Listo! Los archivos se crean automáticamente
+
+## Estructura de Directorios
+
+## Plataformas con API
+````
+Workspace/Competitive-Programming/Contests/
+└── {Plataforma}/
+    └── {Año}/
+        └── {ContestID}/
+            ├── A.cpp (o .java, .py)
+            ├── B.cpp
+            ├── C.cpp
+            └── in1
+````
+
+## Plataformas sin API:
+````
+Workspace/Competitive-Programming/Contests/RPC/
+└── {Año}/
+    └── Rnd{Número}/
+        ├── A/
+        │   ├── A.cpp
+        │   └── in1
+        ├── B/
+        │   ├── B.cpp
+        │   └── in1
+        └── problemset.pdf
+````
+
+
+# Configuración de Plantillas
+
+Coloca tus plantillas en:
+
+
+Windows: `D:\Workspace\Competitive-Programming\Templates\`
+
+
+Linux: `/home/{usuario}/Workspace/Competitive-Programming/Templates/`
+
+
+MacOS: `/Users/{usuario}/Workspace/Competitive-Programming/Templates/`
+
+
+# Nombres de plantillas:
+
+- tem.cpp - Plantilla C++ general
+- tem_rpc.cpp - Plantilla C++ para RPC
+- tem.java - Plantilla Java
+- tem.py - Plantilla Python
+
+# Marcadores en Plantillas
+
+Puedes usar estos marcadores en tus plantillas:
+
+* $%U%$ - Nombre de usuario
+* $%D%$ - Día actual
+* $%M%$ - Mes actual
+* $%Y%$ - Año actual
+* $%R%$ - Número de ronda (solo RPC)
+* $%file%$ - Nombre del archivo
+
+# Ejemplo de Plantilla C++
+
+````cpp
+/*
+ * Autor: $%U%$
+ * Fecha: $%D%$/$%M%$/$%Y%$
+ * Problema: $%file%$
+*/
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int main() {
+   ios_base::sync_with_stdio(false);
+   cin.tie(nullptr);  
+   // Tu código aquí
+}
+````
+
+## Plataformas Soportadas
+
+1. **Codeforces** - Obtiene nombres de problemas automáticamente vía API
+2. **VJudge** - Crea archivos genéricos (A, B, C...)
+3. **CodeChef** - Crea archivos genéricos
+4. **HackerRank** - Crea archivos genéricos
+5. **RPC** - Estructura especial con subcarpetas + búsqueda de PDF
+
+## Requisitos
+
+- Python 3.10+
+- VSCode
+
+## Contribuir
+
+Las contribuciones son bienvenidas! Por favor:
+
+1. Fork del proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit de tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
+
+## Autor
+
+El loco empedernido **josuerom**.
+
+## Agradecimientos
+
+- Comunidad de programación competitiva de Colombia
+- A las plataformas por sus API públicas
+- Todos los contribuidores del proyecto
+
+---
