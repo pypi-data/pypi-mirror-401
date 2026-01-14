@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brokkr-diagnostics"
+version = "0.3.0"
+description = "NVIDIA GPU and InfiniBand diagnostics toolkit"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.24.4",
+    "nvidia-gpu-admin-tools>=2025.11.21",
+    "termcolor>=2.4.0",
+    "prompt_toolkit>=3.0.0",
+]
+authors = [
+    {name = "Brokkr", email = "fabricio.policarpo@hydrahost.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.scripts]
+brokkr-diagnostics = "brokkr_diagnostics.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+    "pyinstaller>=6.0.0",
+]
+
+[tool.setuptools]
+package-dir = {"brokkr_diagnostics" = "."}
+packages = [
+    "brokkr_diagnostics",
+    "brokkr_diagnostics.common",
+    "brokkr_diagnostics.drivers", 
+    "brokkr_diagnostics.hardware",
+    "brokkr_diagnostics.services",
+    "brokkr_diagnostics.system",
+    "brokkr_diagnostics.ib",
+    "brokkr_diagnostics.cc",
+    "brokkr_diagnostics.tests",
+    "brokkr_diagnostics.troubleshoot"
+]
