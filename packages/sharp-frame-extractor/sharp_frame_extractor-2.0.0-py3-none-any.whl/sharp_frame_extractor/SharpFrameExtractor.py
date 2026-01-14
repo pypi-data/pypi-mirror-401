@@ -1,0 +1,321 @@
+import math
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import partial
+from itertools import chain
+from typing import Self, Sequence
+
+import numpy as np
+
+from sharp_frame_extractor.analyzer.frame_analyzer_base import FrameAnalyzerResult, FrameAnalyzerTask
+from sharp_frame_extractor.analyzer.frame_analyzer_pool import FrameAnalyzerWorkerPool
+from sharp_frame_extractor.args_utils import MIN_MEMORY_LIMIT, default_concurrency, default_memory_limit_mb
+from sharp_frame_extractor.event import Event
+from sharp_frame_extractor.memory.shared_ndarray import SharedNDArrayRef, SharedNDArrayStoreBase
+from sharp_frame_extractor.memory.shared_ndarray_pool import PooledSharedNDArrayStore
+from sharp_frame_extractor.models import (
+    BlockAnalyzedEvent,
+    BlockEvent,
+    BlockFrameExtracted,
+    ExtractionResult,
+    ExtractionTask,
+    TaskAnalyzedEvent,
+    TaskEvent,
+    TaskFinishedEvent,
+    TaskPreparedEvent,
+    TaskStartedEvent,
+    VideoFrameInfo,
+)
+from sharp_frame_extractor.output.frame_output_handler_base import FrameOutputHandlerBase
+from sharp_frame_extractor.reader.av_video_reader import AvVideoReader
+from sharp_frame_extractor.reader.batched_video_reader import BatchedVideoReader
+from sharp_frame_extractor.reader.video_reader import PixelFormat, VideoReader, VideoReaderFactory
+from sharp_frame_extractor.worker.Future import Future
+
+
+class SharpFrameExtractor:
+    def __init__(
+        self,
+        output_handlers: Sequence[FrameOutputHandlerBase],
+        max_video_jobs: int | None = None,
+        max_workers: int | None = None,
+        memory_limit_mb: int | None = None,
+        max_bach_size: int = 32,
+        video_reader_factory: VideoReaderFactory | None = None,
+    ):
+        default_jobs, default_workers = default_concurrency()
+        default_memory_limit = default_memory_limit_mb()
+
+        self._output_handlers = output_handlers
+
+        self._max_video_jobs = max_video_jobs or default_jobs
+        self._max_workers = max_workers or default_workers
+        self._total_memory_limit_mb = memory_limit_mb or default_memory_limit
+        self.memory_limit_per_job_mb = max(
+            MIN_MEMORY_LIMIT, math.ceil(self._total_memory_limit_mb / self._max_video_jobs)
+        )
+        self._max_bach_size = max_bach_size
+        self._video_reader_factory: VideoReaderFactory = video_reader_factory or AvVideoReader
+
+        self._analyzer_pool = FrameAnalyzerWorkerPool(self._max_workers)
+
+        # callbacks
+        self.on_task_event: Event[TaskEvent] = Event()
+        self.on_block_event: Event[BlockEvent] = Event()
+
+        # internal defaults
+        self._analysis_pixel_format = PixelFormat.GRAY
+        self._extraction_pixel_format = PixelFormat.BGR24
+
+    def start(self):
+        self._analyzer_pool.start()
+
+        for handler in self._output_handlers:
+            handler.open()
+
+    def process(self, tasks: list[ExtractionTask]) -> list[ExtractionResult]:
+        results: list[ExtractionResult] = []
+
+        # Sequential execution for debugging or single worker
+        if self._max_video_jobs <= 1:
+            for task in tasks:
+                result = self._process_extraction_task(task)
+                results.append(result)
+            return results
+
+        # Parallel threaded execution with ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=self._max_video_jobs) as executor:
+            futures = {}
+            for task in tasks:
+                # Submit tasks to executor and track their futures
+                future = executor.submit(self._process_extraction_task, task)
+                futures[future] = task
+
+            # Process tasks as workers become available
+            for future in as_completed(futures):
+                # Wait for the future to complete
+                result = future.result()
+                results.append(result)
+
+        # order results by input id
+        results.sort(key=lambda r: r.task_id)
+
+        return results
+
+    def stop(self):
+        self._analyzer_pool.stop()
+
+        for handler in self._output_handlers:
+            handler.close()
+
+    def _process_extraction_task(self, task: ExtractionTask) -> ExtractionResult:
+        self.on_task_event(TaskStartedEvent(task))
+
+        video_path = task.video_path
+        options = task.options
+
+        # create video reader
+        video_reader = self._video_reader_factory(video_path)
+
+        # read video info
+        video_info = video_reader.probe()
+
+        # calculate frame interval for selecting the amount of output frames
+        if options.frame_interval_seconds is not None:
+            frame_interval = max(1, int(round(options.frame_interval_seconds * video_info.fps)))
+        elif options.total_frame_count is not None:
+            frame_interval = max(1, int(math.ceil(video_info.total_frames / options.total_frame_count)))
+        else:
+            raise ValueError('Please provide either "--every" or "--count".')
+
+        # total frames to extract
+        total_frames = int(math.ceil(video_info.total_frames / frame_interval))
+
+        # calculate possible stream block size
+        possible_block_size = self._calculate_block_size(
+            video_info.width, video_info.height, self._extraction_pixel_format.channels, self.memory_limit_per_job_mb
+        )
+
+        # Distribute memory among the worker buffers
+        batch_size = min(self._max_bach_size, max(1, possible_block_size // self._max_workers))
+
+        # setup progress bar for analysis
+        total_sub_tasks = int(math.ceil(video_info.total_frames / batch_size))
+        self.on_task_event(TaskPreparedEvent(task, total_blocks=total_sub_tasks, total_frames=total_frames))
+
+        # prepare shared memory store
+        buffer_size = video_info.width * video_info.height * self._analysis_pixel_format.channels * batch_size
+
+        # limit buffers to max workers to prevent over-allocation
+        with PooledSharedNDArrayStore(item_size=buffer_size, n_buffers=self._max_workers) as store:
+            # analyze video first
+            interval_ids, frame_ids, scores = self._analyze_frames(
+                video_reader, task, batch_size, frame_interval, store
+            )
+            self.on_task_event(TaskAnalyzedEvent(task, total_blocks=total_sub_tasks, total_frames=total_frames))
+
+        # extraction run
+        self._extract_frames(video_reader, task, interval_ids, frame_ids, scores)
+
+        self.on_task_event(TaskFinishedEvent(task))
+
+        video_reader.release()
+        return ExtractionResult(task.task_id)
+
+    def _analyze_frames(
+        self,
+        video_reader: VideoReader,
+        task: ExtractionTask,
+        batch_size: int,
+        frame_interval: int,
+        store: SharedNDArrayStoreBase,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        submitted_tasks: list[Future] = []
+        analysis_results: list[FrameAnalyzerResult] = []
+
+        batched_reader = BatchedVideoReader(video_reader, batch_size)
+
+        # analysis run
+        block_index = 0
+        for frames in batched_reader.read_frames(self._analysis_pixel_format, copy=False):
+            # create shared memory
+            shared_memory_ref = store.put(frames, worker_writeable=False)
+
+            # analyze video block
+            worker_task = self._analyzer_pool.submit_task(FrameAnalyzerTask(block_index, shared_memory_ref))
+            worker_task.add_done_callback(
+                partial(
+                    self._on_block_finished,
+                    results=analysis_results,
+                    task=task,
+                    shared_memory_ref=shared_memory_ref,
+                    store=store,
+                )
+            )
+            submitted_tasks.append(worker_task)
+
+            block_index += 1
+
+        # wait for all tasks to be done
+        for worker_task in submitted_tasks:
+            worker_task.wait()
+            worker_task.clear()
+
+        # select best frames per interval
+        analysis_results.sort(key=lambda e: e.block_index)
+        raw_frame_scores = list(chain.from_iterable(r.scores for r in analysis_results))
+        best_frames_per_interval = self._select_best_frames_per_interval(raw_frame_scores, frame_interval)
+
+        return best_frames_per_interval
+
+    def _on_block_finished(
+        self,
+        future: Future[FrameAnalyzerResult],
+        results: list[FrameAnalyzerResult],
+        task: ExtractionTask,
+        shared_memory_ref: SharedNDArrayRef,
+        store: SharedNDArrayStoreBase,
+    ):
+        # append result to results list
+        result = future.result()
+        results.append(result)
+
+        # release memory
+        store.release(shared_memory_ref)
+        self.on_block_event(BlockAnalyzedEvent(task, result.block_index, result))
+
+    def _extract_frames(
+        self,
+        video_reader: VideoReader,
+        task: ExtractionTask,
+        interval_ids: np.ndarray,
+        frame_ids: np.ndarray,
+        scores: np.ndarray,
+    ):
+        # setup output handlers for this task
+        for handler in self._output_handlers:
+            handler.prepare_task(task)
+
+        current_frame_idx = 0
+        target_idx = 0
+        num_targets = len(frame_ids)
+
+        if num_targets == 0:
+            return
+
+        next_target_frame = frame_ids[target_idx]
+
+        for frame in video_reader.read_frames(self._extraction_pixel_format):
+            if current_frame_idx == next_target_frame:
+                # Extract this frame
+                frame_id = int(frame_ids[target_idx])
+                interval_id = int(interval_ids[target_idx])
+                score = float(scores[target_idx])
+
+                frame_info = VideoFrameInfo(interval_index=interval_id, frame_index=frame_id, score=score, frame=frame)
+                for handler in self._output_handlers:
+                    handler.handle_block(task, frame_info)
+
+                self.on_block_event(BlockFrameExtracted(task=task, frame_info=frame_info))
+
+                # Move to next target
+                target_idx += 1
+                if target_idx >= num_targets:
+                    break
+                next_target_frame = frame_ids[target_idx]
+
+            current_frame_idx += 1
+
+    @staticmethod
+    def _calculate_block_size(
+        width: int, height: int, channels: int, memory_limit_mb: int, safe_factor: float = 0.8
+    ) -> int:
+        frame_size_bytes = width * height * channels
+        memory_limit_bytes = memory_limit_mb * 1024 * 1024
+
+        # Allow using up to n% of the limit for the buffer to be safe
+        safe_memory_bytes = memory_limit_bytes * safe_factor
+
+        count = int(safe_memory_bytes / frame_size_bytes)
+        return max(1, count)
+
+    @staticmethod
+    def _select_best_frames_per_interval(
+        raw_frame_scores: list[float],
+        frame_interval: int,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        if frame_interval <= 0:
+            raise ValueError("frame_interval must be > 0")
+
+        scores = np.asarray(raw_frame_scores, dtype=np.float32)
+        n = int(scores.size)
+        if n == 0:
+            return (
+                np.empty((0,), dtype=np.int64),  # interval_index
+                np.empty((0,), dtype=np.int64),  # frame_index
+                np.empty((0,), dtype=np.float32),  # score
+            )
+
+        interval_index = np.arange(n, dtype=np.int64) // frame_interval
+        num_intervals = int(interval_index[-1]) + 1
+
+        best_frame_index = np.zeros(num_intervals, dtype=np.int64)
+        best_score = np.full(num_intervals, -np.inf, dtype=np.float32)
+
+        for frame_index in range(n):
+            ii = interval_index[frame_index]
+            s = scores[frame_index]
+            if s > best_score[ii]:
+                best_score[ii] = s
+                best_frame_index[ii] = frame_index
+
+        out_interval_index = np.arange(num_intervals, dtype=np.int64)
+
+        order = np.argsort(best_frame_index, kind="stable")
+        return out_interval_index[order], best_frame_index[order], best_score[order]
+
+    def __enter__(self) -> Self:
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
