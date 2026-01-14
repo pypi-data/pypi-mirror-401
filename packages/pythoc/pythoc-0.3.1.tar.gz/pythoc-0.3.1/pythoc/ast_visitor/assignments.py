@@ -1,0 +1,473 @@
+"""
+Assignments mixin for LLVMIRVisitor
+"""
+
+import ast
+import builtins
+from typing import Optional, Any
+from llvmlite import ir
+from ..valueref import ValueRef, ensure_ir, wrap_value, get_type, get_type_hint
+from ..logger import logger
+from ..ir_helpers import safe_store, safe_load, is_const, is_volatile
+from ..builtin_entities import (
+    i8, i16, i32, i64,
+    u8, u16, u32, u64,
+    f32, f64, ptr,
+    sizeof, nullptr,
+    get_builtin_entity,
+    is_builtin_type,
+    is_builtin_function,
+    TYPE_MAP,
+)
+from ..builtin_entities import bool as pc_bool
+from ..registry import get_unified_registry, infer_struct_from_access
+
+
+class AssignmentsMixin:
+    """Mixin containing assignments-related visitor methods"""
+    
+    def visit_lvalue(self, node: ast.AST) -> ValueRef:
+        """Compute lvalue for assignment target, returns ValueRef with kind='address'
+        
+        Unified implementation: delegates to visit_expression which returns ValueRef
+        with both loaded value and address, then extracts the address for lvalue context.
+        """
+        if isinstance(node, ast.Tuple):
+            logger.error("Tuple unpacking should be handled by caller", node=node, exc_type=ValueError)
+        
+        result = self.visit_expression(node)
+        return result.as_lvalue()
+
+    def _apply_assign_decay(self, value_ref: ValueRef) -> ValueRef:
+        """Apply assignment decay to rvalue if its type supports it.
+        
+        This implements C-like array-to-pointer decay for untyped assignments.
+        Uses duck typing: if type_hint has handle_assign_decay method, call it.
+        
+        Args:
+            value_ref: The rvalue to potentially decay
+            
+        Returns:
+            Decayed ValueRef if applicable, otherwise original value_ref
+        """
+        type_hint = value_ref.get_pc_type()
+        # Duck typing: check if type has handle_assign_decay method
+        if hasattr(type_hint, 'handle_assign_decay'):
+            return type_hint.handle_assign_decay(self, value_ref)
+        
+        return value_ref
+
+    def _check_linear_rvalue_copy(self, rvalue: ValueRef, node) -> None:
+        """Check if rvalue is a linear token - forbid copy.
+        
+        Linear tokens cannot be copied; they must be moved explicitly.
+        Raises error via logger if attempting to copy a linear token.
+        
+        This is a syntactic check - any direct assignment of a linear variable
+        (without move()) is an error, regardless of the current state.
+        
+        Args:
+            rvalue: The rvalue being assigned
+            node: AST node for error reporting (lineno)
+        """
+        logger.debug(f"_check_linear_rvalue_copy: rvalue={rvalue}, var_name={getattr(rvalue, 'var_name', None)}, linear_path={getattr(rvalue, 'linear_path', None)}")
+        if not (hasattr(rvalue, 'var_name') and rvalue.var_name and 
+                hasattr(rvalue, 'linear_path') and rvalue.linear_path is not None):
+            return
+        
+        # Check if the rvalue's type is linear
+        if not self._is_linear_type(rvalue.type_hint):
+            return
+        
+        # Format path for error message
+        if rvalue.linear_path:
+            path_str = f"{rvalue.var_name}[{']['.join(map(str, rvalue.linear_path))}]"
+        else:
+            path_str = rvalue.var_name
+        logger.error(
+            f"Cannot assign linear token '{path_str}' "
+            f"(use move() to transfer ownership)",
+            node
+        )
+
+    def visit_lvalue_or_define(self, node: ast.AST, value_ref: ValueRef, pc_type=None, source="inference") -> ValueRef:
+        """Visit lvalue or define new variable if it doesn't exist
+        
+        Args:
+            node: AST node (usually ast.Name)
+            value_ref: ValueRef to infer type from (optional)
+            pc_type: Explicit PC type (optional, overrides inference)
+            source: Source for variable declaration
+            
+        Returns:
+            ValueRef with kind='address' (lvalue)
+        """
+        if not isinstance(node, ast.Name):
+            # For complex expressions, just return lvalue
+            return self.visit_lvalue(node)
+        
+        var_info = self.lookup_variable(node.id)
+        if var_info:
+            # Variable exists, return lvalue
+            return self.visit_lvalue(node)
+        else:
+            # Variable doesn't exist, create it
+            # Infer pc_type from value_ref if not provided
+            # For Python values, this returns PythonType which has zero-sized LLVM type {}
+            if pc_type is None and value_ref is not None:
+                pc_type = self.infer_pc_type_from_value(value_ref)
+            
+            if pc_type is None:
+                logger.error(f"Cannot determine type for new variable '{node.id}'", node=node, exc_type=TypeError)
+            
+            # Create alloca and declare variable
+            # For pyconst/PythonType, this creates a zero-sized alloca {}
+            llvm_type = pc_type.get_llvm_type(self.module.context)
+            alloca = self._create_alloca_in_entry(llvm_type, f"{node.id}_addr")
+            
+            self.declare_variable(
+                name=node.id,
+                type_hint=pc_type,
+                alloca=alloca,
+                source=source,
+                line_number=getattr(node, 'lineno', 0)
+            )
+            
+            # Return lvalue for the new variable with linear tracking info
+            from ..valueref import wrap_value
+            return wrap_value(
+                alloca,
+                kind='address',
+                type_hint=pc_type,
+                address=alloca,
+                var_name=node.id,
+                linear_path=()
+            )
+    
+    def _store_to_lvalue(self, lvalue: ValueRef, rvalue: ValueRef, node: ast.AST = None):
+        """Store value to lvalue with type conversion and qualifier checks
+        
+        Special handling for pyconst fields (zero-sized, no actual store).
+        """
+        target_pc_type = lvalue.get_pc_type()
+        
+        # Special case: pyconst target - zero-sized, assignment is a no-op
+        # Must check before convert() since Python values don't have ir_value
+        from ..builtin_entities.python_type import PythonType
+        if isinstance(target_pc_type, PythonType):
+            # Type check: if target is pyconst[X], rvalue must be X
+            if target_pc_type.is_constant():
+                expected_value = target_pc_type.get_constant_value()
+                if rvalue.is_python_value():
+                    actual_value = rvalue.value
+                else:
+                    logger.error(f"Cannot store to pyconst target: {lvalue}={rvalue}", node=node, exc_type=TypeError)
+                if actual_value != expected_value:
+                    logger.error(f"Cannot store to pyconst target: {lvalue}={rvalue}", node=node, exc_type=TypeError)
+            # pyconst fields are zero-sized, assignment is a no-op after type check
+            return
+        
+        # Convert value to target type (type_converter will handle Python value promotion)
+        rvalue = self.type_converter.convert(rvalue, target_pc_type)
+        
+        # Use safe_store for qualifier-aware storage (handles const check + volatile)
+        safe_store(self.builder, ensure_ir(rvalue), ensure_ir(lvalue), target_pc_type, node=node)
+
+    def _assign_to_target(self, target: ast.AST, rvalue: ValueRef, node, pc_type=None) -> None:
+        """Unified single-target assignment: lvalue resolution, linear checks, store, and linear registration.
+        
+        Args:
+            target: AST node for assignment target (ast.Name, ast.Attribute, ast.Subscript, ast.Tuple)
+            rvalue: Value to assign
+            node: AST node for error reporting
+            pc_type: Explicit PC type (optional, overrides inference)
+        """
+        # Handle nested tuple unpacking recursively
+        if isinstance(target, ast.Tuple):
+            self._handle_tuple_unpacking(target, node, rvalue, node)
+            return
+        
+        # Special case: Python value assigned to a simple Name
+        # Python values don't have addresses, so we directly bind them to var_registry
+        # without creating an alloca
+        if isinstance(target, ast.Name) and rvalue.is_python_value():
+            from ..context import VariableInfo
+            from ..builtin_entities.python_type import PythonType
+            
+            var_name = target.id
+            
+            # Check if variable exists in var_registry (not user_globals)
+            existing_in_registry = self.ctx.var_registry.lookup(var_name)
+            
+            if existing_in_registry is None:
+                # New variable OR shadowing a user_globals variable
+                # Either way, declare it in var_registry
+                pc_type = pc_type or rvalue.get_pc_type()
+                if pc_type is None:
+                    pc_type = PythonType.wrap(rvalue.get_python_value(), is_constant=True)
+                
+                # Set type_hint on the value_ref
+                rvalue_copy = rvalue
+                if rvalue_copy.type_hint is None:
+                    rvalue_copy = wrap_value(
+                        rvalue.value,
+                        kind=rvalue.kind,
+                        type_hint=pc_type
+                    )
+                
+                var_info = VariableInfo(
+                    name=var_name,
+                    value_ref=rvalue_copy,
+                    alloca=None,  # No alloca for Python values
+                    source="python_value_assign"
+                )
+                self.ctx.var_registry.declare(var_info, allow_shadow=True)
+                return
+            else:
+                # Variable exists in var_registry - if it's also a Python value, update it
+                if existing_in_registry.alloca is None:
+                    existing_in_registry.value_ref = rvalue
+                    return
+                # Otherwise fall through to normal assignment (will likely fail)
+        
+        decayed_rvalue = self._apply_assign_decay(rvalue)
+        
+        # Get or create lvalue
+        lvalue = self.visit_lvalue_or_define(target, value_ref=decayed_rvalue, pc_type=pc_type, source="inference")
+        
+        # Store value to lvalue
+        self._store_to_lvalue(lvalue, decayed_rvalue, node)
+        
+        # Handle linear token registration
+        rvalue_pc_type = rvalue.get_pc_type()
+        if self._is_linear_type(rvalue_pc_type):
+            lvalue_var_name = getattr(lvalue, 'var_name', None)
+            lvalue_linear_path = getattr(lvalue, 'linear_path', None)
+            
+            if lvalue_var_name and lvalue_linear_path is not None:
+                # Check if rvalue is undefined
+                from llvmlite import ir as llvm_ir
+                is_undefined = (
+                    rvalue.kind == 'value' and 
+                    isinstance(rvalue.value, llvm_ir.Constant) and
+                    hasattr(rvalue.value, 'constant') and
+                    rvalue.value.constant == llvm_ir.Undefined
+                )
+                
+                if hasattr(rvalue, 'var_name') and rvalue.var_name:
+                    # Variable reference - transfer ownership
+                    self._register_linear_token(lvalue_var_name, lvalue.type_hint, node, path=lvalue_linear_path)
+                    self._transfer_linear_ownership(rvalue, reason="assignment", node=node)
+                elif not is_undefined:
+                    # Initialized value (function return, linear(), etc.)
+                    self._register_linear_token(lvalue_var_name, lvalue.type_hint, node, path=lvalue_linear_path)
+    
+    def _store_to_new_lvalue(self, node, var_name, pc_type, rvalue: ValueRef):
+        """Create new lvalue for assignment"""
+        # Create alloca
+        llvm_type = pc_type.get_llvm_type(self.module.context)
+        alloca = self._create_alloca_in_entry(llvm_type, f"{var_name}_addr")
+        
+        # Declare variable
+        self.declare_variable(
+            name=var_name,
+            type_hint=pc_type,
+            alloca=alloca,
+            source="annotation",
+            line_number=node.lineno
+        )
+        
+        # Store value
+        rvalue_ir = ensure_ir(rvalue)
+        
+        # Special handling for arrays: if rvalue is already a pointer to array,
+        # we need to copy the array contents (load + store), not store the pointer
+        if isinstance(rvalue_ir.type, ir.PointerType) and isinstance(rvalue_ir.type.pointee, ir.ArrayType):
+            # Array literal case: rvalue is pointer to array, need to copy contents
+            if isinstance(llvm_type, ir.ArrayType):
+                # Load the array value and store to new alloca
+                array_value = self.builder.load(rvalue_ir)
+                self.builder.store(array_value, alloca)
+            else:
+                # Non-array target type, just store normally
+                self.builder.store(rvalue_ir, alloca)
+        else:
+            # Normal case: store value directly
+            self.builder.store(rvalue_ir, alloca)
+    
+    def visit_Assign(self, node: ast.Assign):
+        """Handle assignment statements with automatic type inference"""
+        # Evaluate rvalue once
+        rvalue = self.visit_expression(node.value)
+        
+        # Check if rvalue is an active linear token (forbid copy)
+        self._check_linear_rvalue_copy(rvalue, node)
+        
+        # Handle multiple targets
+        for target in node.targets:
+            if isinstance(target, ast.Tuple):
+                self._handle_tuple_unpacking(target, node.value, rvalue, node)
+            else:
+                self._assign_to_target(target, rvalue, node)
+    
+    def _handle_tuple_unpacking(self, target: ast.Tuple, value_node: ast.AST, rvalue: ValueRef, node: ast.AST):
+        """Handle tuple unpacking assignment
+        
+        Supports:
+        - Python tuple/list unpacking: a, b = (1, 2)
+        - Struct type with _elements (compile-time): a, b = struct_from_tuple
+        - Runtime struct unpacking: a, b = func() where func returns struct
+        """
+        from ..valueref import wrap_value, ValueRef
+        from ..builtin_entities.python_type import PythonType
+        
+        # Case 1: Python value (compile-time)
+        if rvalue.is_python_value():
+            py_val = rvalue.get_python_value()
+            
+            # Get elements from either _elements attribute or tuple/list directly
+            if hasattr(py_val, '_elements') and py_val._elements is not None:
+                elements = py_val._elements
+            elif isinstance(py_val, (tuple, list)):
+                elements = py_val
+            else:
+                logger.error(f"Cannot unpack Python value of type {type(py_val)}", node=value_node, exc_type=TypeError)
+            
+            if len(elements) != len(target.elts):
+                logger.error(f"Unpacking mismatch: {len(target.elts)} variables, {len(elements)} values",
+                            node=target, exc_type=TypeError)
+            
+            for elem, elt in zip(elements, target.elts):
+                if isinstance(elem, ValueRef):
+                    self._assign_to_target(elt, elem, target)
+                else:
+                    val_ref = wrap_value(elem, kind='python',
+                                       type_hint=PythonType.wrap(elem, is_constant=True))
+                    self._assign_to_target(elt, val_ref, target)
+            return
+        
+        # Case 2: Runtime struct unpacking
+        if hasattr(rvalue, 'type_hint') and hasattr(rvalue.type_hint, '_field_types'):
+            struct_type = rvalue.type_hint
+            field_types = struct_type._field_types
+            
+            if len(target.elts) != len(field_types):
+                logger.error(f"Unpacking mismatch: {len(target.elts)} variables, {len(field_types)} fields",
+                            node=target, exc_type=TypeError)
+            
+            for i, elt in enumerate(target.elts):
+                field_pc_type = field_types[i]
+                
+                # Special handling for pyconst fields (zero-sized, value is in type)
+                if isinstance(field_pc_type, PythonType) and field_pc_type.is_constant():
+                    const_value = field_pc_type.get_constant_value()
+                    field_val_ref = wrap_value(const_value, kind='python', type_hint=field_pc_type)
+                else:
+                    # Regular field: extract from LLVM struct
+                    module_context = self.module.context if self.module else None
+                    llvm_index = struct_type._get_llvm_field_index(i, module_context)
+                    if llvm_index == -1:
+                        logger.error(f"Zero-sized field [{i}] has no LLVM representation", node=node, exc_type=RuntimeError)
+                    field_value = self.builder.extract_value(ensure_ir(rvalue), llvm_index)
+                    field_val_ref = wrap_value(field_value, type_hint=field_pc_type, node=node)
+                
+                self._assign_to_target(elt, field_val_ref, target, pc_type=field_pc_type)
+            return
+        
+        logger.error(f"Unsupported unpacking type: {rvalue.type_hint}.", node=value_node, exc_type=TypeError)
+
+    def visit_AnnAssign(self, node: ast.AnnAssign):
+        """Handle annotated assignment statements (variable declarations with types)
+        
+        Now uses the new context system to track PC types alongside LLVM types.
+        Supports static local variables (converted to global variables with internal linkage).
+        """
+        if not isinstance(node.target, ast.Name):
+            logger.error("AnnAssign only supports simple names", node=node, exc_type=RuntimeError)
+        var_name = node.target.id
+        
+        # Check if variable already exists in CURRENT scope - AnnAssign is declaration, not reassignment
+        # Allow shadowing variables from outer scopes (C-like behavior)
+        if self.ctx.var_registry.is_declared_in_current_scope(var_name):
+            existing = self.ctx.var_registry.lookup(var_name)
+            logger.error(
+                f"Cannot redeclare variable '{var_name}': already declared in this scope at line {existing.line_number} "
+                f"(attempting redeclaration at line {node.lineno})",
+                node=node, exc_type=RuntimeError
+            )
+        
+        # Get PC type from annotation
+        is_static_var = False
+        if not hasattr(node, 'annotation'):
+            raise RuntimeError("AnnAssign requires annotation")
+
+        pc_type = self.get_pc_type_from_annotation(node.annotation)
+        if pc_type is None:
+            import ast as ast_module
+            annotation_str = ast_module.unparse(node.annotation) if hasattr(ast_module, 'unparse') else str(node.annotation)
+            logger.error(
+                f"AnnAssign requires valid PC type annotation. annotation: {annotation_str}", node)
+
+        # Now parse the RHS
+        if node is None or node.value is None:
+            # No initialization value - create undefined value (matches C behavior)
+            llvm_type = pc_type.get_llvm_type(self.module.context)
+            undef_value = ir.Constant(llvm_type, ir.Undefined)
+            rvalue = wrap_value(undef_value, kind="value", type_hint=pc_type)
+        else:
+            rvalue = self.visit_expression(node.value)
+
+            # If the type of RHS does not match pc_type, convert it
+            if rvalue.type_hint != pc_type:
+                rvalue = self.type_converter.convert(rvalue, pc_type)
+            
+        # Store the value
+        self._store_to_new_lvalue(node, var_name, pc_type, rvalue)
+        
+        # Handle linear token registration for the new variable
+        if self._is_linear_type(pc_type):
+            # Check if rvalue is undefined
+            from llvmlite import ir as llvm_ir
+            is_undefined = (
+                rvalue.kind == 'value' and 
+                isinstance(rvalue.value, llvm_ir.Constant) and
+                rvalue.value.constant == llvm_ir.Undefined
+            )
+            
+            if hasattr(rvalue, 'var_name') and rvalue.var_name:
+                # Variable reference - transfer ownership
+                self._register_linear_token(var_name, pc_type, node, path=())
+                self._transfer_linear_ownership(rvalue, reason="assignment", node=node)
+            elif not is_undefined:
+                # Initialized value (function return, linear(), etc.)
+                self._register_linear_token(var_name, pc_type, node, path=())
+    
+
+    def visit_AugAssign(self, node: ast.AugAssign):
+        """Handle augmented assignment statements (+=, -=, *=, etc.)"""
+        # Don't process if current block is already terminated
+        if self.builder.block.is_terminated:
+            return
+        
+        # Get the lvalue (address) of the target
+        target_addr = self.visit_lvalue(node.target)
+        
+        # Load current value
+        current_value = self.builder.load(ensure_ir(target_addr))
+        current_val_ref = wrap_value(current_value, kind="value", type_hint=target_addr.type_hint)
+        
+        # Evaluate the right-hand side
+        rhs_value = self.visit_expression(node.value)
+        
+        # Create a fake BinOp node to reuse binary operation logic
+        fake_binop = ast.BinOp(
+            left=ast.Name(id='_dummy_'),
+            op=node.op,
+            right=ast.Name(id='_dummy_')
+        )
+        
+        # Perform the operation using unified binary operation logic
+        result = self._perform_binary_operation(fake_binop.op, current_val_ref, rhs_value, node)
+        
+        # Store the result back
+        self.builder.store(ensure_ir(result), ensure_ir(target_addr))
