@@ -1,0 +1,714 @@
+Metadata-Version: 2.4
+Name: callbotics-sdk
+Version: 1.1.0
+Summary: Python SDK for the Callbotics Core API
+Home-page: https://github.com/callbotics/callbotics-sdk
+Author: Callbotics
+Author-email: support@callbotics.com
+Keywords: callbotics,api,sdk,telephony,voice,ai,automation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Communications :: Telephony
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: httpx>=0.24.0
+Provides-Extra: websocket
+Requires-Dist: websockets>=11.0; extra == "websocket"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Callbotics SDK
+
+Official Python SDK for the Callbotics Core API.
+
+## Installation
+
+```bash
+pip install callbotics-sdk
+
+# With WebSocket support
+pip install callbotics-sdk[websocket]
+```
+
+## Quick Start
+
+```python
+from callbotics_sdk import CallboticsClient
+
+# Initialize the client
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+# List campaigns
+campaigns = client.campaigns.list(page=1, per_page=10)
+print(f"Found {campaigns.total_records} campaigns")
+
+# Create a new campaign
+campaign = client.campaigns.create(
+    name="My Campaign",
+    organisation_id="org-123",
+    agent_id="agent-456",
+    direction="outbound",
+    concurrency=5
+)
+
+# Start the campaign
+client.campaigns.start(campaign["id"])
+```
+
+## Authentication
+
+The SDK supports two authentication methods:
+
+### Bearer Token
+```python
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+```
+
+### API Key
+```python
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    api_key="your-api-key"
+)
+```
+
+### Update Token at Runtime
+```python
+client.set_token("new-token")
+```
+
+## Available Resources
+
+| Resource | Description |
+|----------|-------------|
+| `client.users` | User management |
+| `client.organisations` | Organisation management |
+| `client.campaigns` | Campaign management |
+| `client.calls` | Call management |
+| `client.agents` | Agent configuration |
+| `client.contacts` | Contact list management |
+| `client.prompts` | Prompt templates |
+| `client.voice_configs` | Voice configuration |
+| `client.llm_configs` | LLM configuration |
+| `client.stt_configs` | Speech-to-Text configuration |
+| `client.telephony` | Telephony configuration |
+| `client.billing` | Billing and usage |
+| `client.call_logs` | Call logs and reports |
+| `client.analytics` | Dashboard analytics |
+| `client.workflows` | Workflow management |
+| `client.roles` | Role management |
+| `client.actions` | Action management |
+| `client.live_monitoring` | Real-time monitoring (REST + WebSocket) |
+
+## Examples
+
+### Complete Outbound Campaign Setup
+
+This example shows the full workflow for creating and running an outbound calling campaign.
+
+```python
+from callbotics_sdk import CallboticsClient, CallboticsError
+
+# Initialize client
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+# Step 1: Create the campaign
+campaign = client.campaigns.create(
+    name="Q1 Sales Outreach",
+    organisation_id="org-123",
+    agent_id="agent-456",           # Your AI agent ID
+    direction="outbound",
+    concurrency=10,                  # Max simultaneous calls
+    telephony_config_id="tel-789",  # Telephony provider config
+    from_number="+18001234567"      # Caller ID number
+)
+campaign_id = campaign["id"]
+print(f"Campaign created: {campaign_id}")
+
+# Step 2: Create a contact list for the campaign
+contact_list = client.contacts.create(
+    list_name="Sales Leads - January",
+    campaign_id=campaign_id
+)
+contact_list_id = contact_list["id"]
+print(f"Contact list created: {contact_list_id}")
+
+# Step 3: Upload contacts from Excel/CSV file
+with open("leads.xlsx", "rb") as f:
+    result = client.contacts.upload(contact_list_id, f, filename="leads.xlsx")
+print(f"Contacts uploaded: {result}")
+
+# Step 4: Start the campaign
+client.campaigns.start(campaign_id)
+print("Campaign started!")
+
+# Step 5: Monitor campaign progress
+import time
+while True:
+    campaign_status = client.campaigns.get(campaign_id)
+    status = campaign_status.get("status")
+    print(f"Status: {status}")
+
+    if status == "completed":
+        print("Campaign completed!")
+        break
+    elif status == "paused":
+        print("Campaign is paused")
+        break
+
+    time.sleep(30)  # Check every 30 seconds
+```
+
+### Outbound Calling - Single Call
+
+Make a single outbound call with custom contact data.
+
+```python
+from callbotics_sdk import CallboticsClient
+
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+# Make a single outbound call
+call = client.calls.create(
+    campaign_id="campaign-123",
+    to_number="+14155551234",
+    from_number="+18001234567",      # Optional: override campaign default
+    contact_data={                    # Custom data available to AI agent
+        "first_name": "John",
+        "last_name": "Smith",
+        "company": "Acme Corp",
+        "appointment_date": "2024-02-15",
+        "account_number": "ACC-12345"
+    }
+)
+
+print(f"Call initiated: {call['id']}")
+print(f"Status: {call.get('status', 'queued')}")
+```
+
+### Outbound Calling - Batch Calls
+
+Queue multiple calls programmatically without using contact lists.
+
+```python
+from callbotics_sdk import CallboticsClient, CallboticsError
+
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+# List of contacts to call
+contacts = [
+    {"phone": "+14155551001", "name": "Alice Johnson", "account": "A001"},
+    {"phone": "+14155551002", "name": "Bob Williams", "account": "A002"},
+    {"phone": "+14155551003", "name": "Carol Davis", "account": "A003"},
+]
+
+campaign_id = "campaign-123"
+queued_calls = []
+
+for contact in contacts:
+    try:
+        call = client.calls.create(
+            campaign_id=campaign_id,
+            to_number=contact["phone"],
+            contact_data={
+                "name": contact["name"],
+                "account_number": contact["account"]
+            }
+        )
+        queued_calls.append(call)
+        print(f"Queued call to {contact['name']}: {call['id']}")
+    except CallboticsError as e:
+        print(f"Failed to queue call to {contact['name']}: {e.message}")
+
+print(f"\nTotal calls queued: {len(queued_calls)}")
+```
+
+### Campaign Management - Full Lifecycle
+
+```python
+from callbotics_sdk import CallboticsClient
+
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+# List all campaigns for an organization
+campaigns = client.campaigns.list(
+    organisation_id="org-123",
+    status="ongoing",           # Filter: pending, ongoing, paused, completed
+    direction="outbound",       # Filter: outbound, inbound
+    page=1,
+    per_page=20
+)
+
+print(f"Found {campaigns.total_records} campaigns")
+for campaign in campaigns.items:
+    print(f"  - {campaign['name']} ({campaign['status']})")
+
+# Get specific campaign details
+campaign = client.campaigns.get("campaign-123")
+print(f"\nCampaign: {campaign['name']}")
+print(f"  Direction: {campaign['direction']}")
+print(f"  Concurrency: {campaign['concurrency']}")
+print(f"  Status: {campaign['status']}")
+
+# Campaign controls
+campaign_id = "campaign-123"
+
+# Start campaign - begins dialing contacts
+client.campaigns.start(campaign_id)
+print("Campaign started")
+
+# Pause campaign - stops new calls, existing calls continue
+client.campaigns.pause(campaign_id)
+print("Campaign paused")
+
+# Reset campaign - resets all contact statuses to retry
+client.campaigns.reset(campaign_id)
+print("Campaign reset")
+
+# Update campaign settings
+client.campaigns.update(
+    campaign_id=campaign_id,
+    name="Updated Campaign Name",
+    concurrency=15  # Increase concurrent calls
+)
+print("Campaign updated")
+
+# Check available concurrency
+concurrency = client.campaigns.get_available_concurrency(campaign_id)
+print(f"Available concurrency: {concurrency}")
+```
+
+### Contact List Management
+
+```python
+from callbotics_sdk import CallboticsClient
+
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+campaign_id = "campaign-123"
+
+# Get sample Excel template for proper format
+sample_excel = client.contacts.get_sample_excel(campaign_id)
+with open("contact_template.xlsx", "wb") as f:
+    f.write(sample_excel)
+print("Downloaded contact template")
+
+# Create a new contact list
+contact_list = client.contacts.create(
+    list_name="February Leads",
+    campaign_id=campaign_id
+)
+list_id = contact_list["id"]
+
+# Upload contacts from file
+with open("february_leads.xlsx", "rb") as f:
+    result = client.contacts.upload(list_id, f, filename="february_leads.xlsx")
+print(f"Upload result: {result}")
+
+# List all contact lists for a campaign
+contact_lists = client.contacts.list(campaign_id=campaign_id)
+for cl in contact_lists.items:
+    print(f"  - {cl['list_name']}: {cl.get('total_contacts', 0)} contacts")
+
+# Get active (pending) contacts
+active = client.contacts.get_active_contacts(campaign_id)
+print(f"Active contacts waiting to be called: {len(active)}")
+
+# Get available timezones for scheduling
+timezones = client.contacts.get_timezones()
+print(f"Available timezones: {len(timezones)}")
+```
+
+### Complete AI Agent Setup (LLM + TTS + STT)
+
+This example shows how to configure LLM, Voice (TTS), STT, create an AI agent, and use it in a campaign.
+
+```python
+from callbotics_sdk import CallboticsClient
+
+client = CallboticsClient(
+    base_url="https://api.callbotics.ai",
+    token="your-bearer-token"
+)
+
+# ============================================================
+# STEP 1: Create LLM Configuration
+# ============================================================
+llm_config = client.llm_configs.create(
+    name="GPT-4 Sales Agent",
+    provider="openai",              # openai, anthropic, etc.
+    model="gpt-4-turbo",
+    temperature=0.7,
+    max_tokens=1024
+)
+llm_config_id = llm_config["id"]
+print(f"LLM Config created: {llm_config_id}")
+
+# ============================================================
+# STEP 2: Create Voice Configuration (TTS - Text-to-Speech)
+# ============================================================
+voice_config = client.voice_configs.create(
+    name="Professional Female Voice",
+    provider="elevenlabs",          # elevenlabs, azure, google, etc.
+    voice_id="21m00Tcm4TlvDq8ikWAM"  # Provider-specific voice ID
+)
+voice_config_id = voice_config["id"]
+print(f"Voice Config created: {voice_config_id}")
+
+# ============================================================
+# STEP 3: Create STT Configuration (Speech-to-Text)
+# ============================================================
+stt_config = client.stt_configs.create(
+    name="English STT - Deepgram",
+    provider="deepgram",            # deepgram, google, azure, etc.
+    language="en-US"
+)
+stt_config_id = stt_config["id"]
+print(f"STT Config created: {stt_config_id}")
+
+# ============================================================
+# STEP 4: Create Prompt Template
+# ============================================================
+prompt = client.prompts.create(
+    name="Sales Outreach Prompt",
+    system_prompt="""You are a friendly sales representative for Acme Corp.
+Your goal is to schedule a product demo with the prospect.
+Be professional, helpful, and respect their time.
+If they're not interested, thank them politely and end the call.""",
+    initial_message="Hi {{first_name}}, this is Sarah from Acme Corp. How are you today?"
+)
+prompt_id = prompt["id"]
+print(f"Prompt created: {prompt_id}")
+
+# ============================================================
+# STEP 5: Create AI Agent (combines all configurations)
+# ============================================================
+agent = client.agents.create(
+    name="Sales Demo Scheduler",
+    organisation_id="org-123",
+    prompt_id=prompt_id,
+    llm_config_id=llm_config_id,
+    voice_config_id=voice_config_id,
+    stt_config_id=stt_config_id
+)
+agent_id = agent["id"]
+print(f"Agent created: {agent_id}")
+
+# ============================================================
+# STEP 6: Create Campaign with the Agent
+# ============================================================
+campaign = client.campaigns.create(
+    name="Q1 Demo Outreach",
+    organisation_id="org-123",
+    agent_id=agent_id,              # Use our configured agent
+    direction="outbound",
+    concurrency=10,
+    telephony_config_id="tel-789",
+    from_number="+18001234567"
+)
+campaign_id = campaign["id"]
+print(f"Campaign created: {campaign_id}")
+
+# ============================================================
+# STEP 7: Upload contacts and start campaign
+# ============================================================
+contact_list = client.contacts.create(
+    list_name="Demo Prospects",
+    campaign_id=campaign_id
+)
+
+with open("prospects.xlsx", "rb") as f:
+    client.contacts.upload(contact_list["id"], f)
+
+# Start the campaign
+client.campaigns.start(campaign_id)
+print("Campaign started with AI agent!")
+```
+
+### Managing LLM Configurations
+
+```python
+# List available LLM configs
+llm_configs = client.llm_configs.list()
+for config in llm_configs.items:
+    print(f"{config['name']} - {config['provider']}/{config['model']}")
+
+# Update LLM config
+client.llm_configs.update(
+    config_id="llm-123",
+    temperature=0.5,
+    max_tokens=2048
+)
+
+# Assign LLM to a company/organization
+client.llm_configs.assign_to_company(
+    config_id="llm-123",
+    company_id="company-456"
+)
+
+# Get LLMs assigned to a company
+assigned = client.llm_configs.get_assigned_llms("company-456")
+```
+
+### Managing Voice Configurations (TTS)
+
+```python
+# List voice configs
+voices = client.voice_configs.list()
+for voice in voices.items:
+    print(f"{voice['name']} - {voice['provider']}")
+
+# Create voice config with additional settings
+voice = client.voice_configs.create(
+    name="Custom Voice",
+    provider="elevenlabs",
+    voice_id="voice-id-from-provider",
+    stability=0.5,
+    similarity_boost=0.75
+)
+
+# Assign to company
+client.voice_configs.assign_to_company(
+    config_id=voice["id"],
+    company_id="company-456"
+)
+```
+
+### Managing STT Configurations
+
+```python
+# List STT configs
+stt_configs = client.stt_configs.list()
+for stt in stt_configs.items:
+    print(f"{stt['name']} - {stt['provider']} ({stt.get('language', 'en')})")
+
+# Create STT config
+stt = client.stt_configs.create(
+    name="Spanish STT",
+    provider="deepgram",
+    language="es"
+)
+
+# Assign to company
+client.stt_configs.assign_to_company(
+    config_id=stt["id"],
+    company_id="company-456"
+)
+```
+
+### Updating Agent Configuration
+
+```python
+# Update agent to use different LLM/Voice/STT
+client.agents.update(
+    agent_id="agent-123",
+    llm_config_id="new-llm-config-id",
+    voice_config_id="new-voice-config-id",
+    stt_config_id="new-stt-config-id"
+)
+
+# Update just the prompt
+client.agents.update(
+    agent_id="agent-123",
+    prompt_id="new-prompt-id"
+)
+```
+
+### User Management
+
+```python
+# List users
+users = client.users.list(page=1, per_page=20)
+for user in users.items:
+    print(f"{user['email']} - {user['role_name']}")
+
+# Create a user
+new_user = client.users.create(
+    email="john@example.com",
+    password="secure-password",
+    first_name="John",
+    last_name="Doe",
+    role_id="role-123"
+)
+
+# Update a user
+client.users.update(user_id="user-123", first_name="Jane")
+
+# Delete a user
+client.users.delete(user_id="user-123")
+```
+
+### Analytics
+
+```python
+# Get call counts
+counts = client.analytics.get_calls_count(
+    org_id="org-123",
+    start_date="2024-01-01",
+    end_date="2024-01-31"
+)
+
+# Get disposition distribution
+distribution = client.analytics.get_disposition_distribution(
+    campaign_id="campaign-123"
+)
+```
+
+## Real-Time Monitoring (WebSocket)
+
+The SDK includes WebSocket support for real-time monitoring.
+
+### Live Campaigns
+
+```python
+import asyncio
+
+async def monitor_campaigns():
+    async with client.live_monitoring.connect_campaigns() as ws:
+        async for message in ws:
+            if message["type"] == "live_campaigns":
+                data = message["data"]
+                print(f"Active campaigns: {data['total_active_campaigns']}")
+                for campaign in data["campaigns"]:
+                    print(f"  - {campaign['campaign_name']}: {campaign['active_calls_count']} calls")
+
+asyncio.run(monitor_campaigns())
+```
+
+### Live Transcript
+
+```python
+async def monitor_transcript(call_id: str):
+    async with client.live_monitoring.connect_transcript(call_id) as ws:
+        async for message in ws:
+            if message["type"] == "transcript_init":
+                print("Initial transcript received")
+            elif message["type"] == "transcript_delta":
+                for item in message["data"]["items"]:
+                    # item contains the transcript message
+                    print(item)
+
+asyncio.run(monitor_transcript("call-123"))
+```
+
+### Campaign Calls
+
+```python
+async def monitor_campaign_calls(campaign_id: str):
+    async with client.live_monitoring.connect_campaign_calls(campaign_id) as ws:
+        async for message in ws:
+            if message["type"] == "campaign_calls":
+                data = message["data"]
+                print(f"Calls in {data['campaign_name']}: {data['calls_count']}")
+
+asyncio.run(monitor_campaign_calls("campaign-123"))
+```
+
+## Pagination
+
+List methods return a `PaginatedResponse` object:
+
+```python
+response = client.campaigns.list(page=1, per_page=10)
+
+print(f"Total: {response.total_records}")
+print(f"Page: {response.current_page} of {response.total_pages}")
+print(f"Has next: {response.has_next}")
+print(f"Has prev: {response.has_prev}")
+
+for item in response.items:
+    print(item)
+```
+
+## Error Handling
+
+```python
+from callbotics_sdk import (
+    CallboticsError,
+    AuthenticationError,
+    NotFoundError,
+    ValidationError,
+    RateLimitError,
+    ServerError,
+)
+
+try:
+    campaign = client.campaigns.get("invalid-id")
+except NotFoundError as e:
+    print(f"Campaign not found: {e.message}")
+except ValidationError as e:
+    print(f"Validation error: {e.message}")
+    print(f"Errors: {e.errors}")
+except AuthenticationError as e:
+    print(f"Auth failed: {e.message}")
+except RateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after} seconds")
+except ServerError as e:
+    print(f"Server error: {e.message}")
+except CallboticsError as e:
+    print(f"API error [{e.status_code}]: {e.message}")
+```
+
+## Context Manager Support
+
+```python
+# Sync
+with CallboticsClient(base_url="...", token="...") as client:
+    campaigns = client.campaigns.list()
+
+# Async
+async with CallboticsClient(base_url="...", token="...") as client:
+    campaigns = client.campaigns.list()
+```
+
+## Requirements
+
+- Python 3.9+
+- httpx >= 0.24.0
+- websockets >= 11.0 (optional, for WebSocket support)
+
+## License
+
+MIT License
