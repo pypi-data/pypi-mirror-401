@@ -1,0 +1,113 @@
+[build-system]
+requires = ["maturin>=1.10,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "xiangting"
+version = "5.0.3"
+description = "Python bindings for xiangting"
+authors = [{ name = "Apricot S." }]
+license = "MIT"
+license-files = ["LICENSE", "THIRD-PARTY-NOTICES.md"]
+readme = "README.md"
+requires-python = ">=3.12"
+keywords = ["mahjong", "riichi", "shanten", "xiangting"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Games/Entertainment :: Board Games",
+]
+
+[project.urls]
+Repository = "https://github.com/Apricot-S/xiangting-py"
+
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+    { include-group = "docs" },
+    { include-group = "typing" },
+    { include-group = "build" },
+]
+lint = [
+    "ruff>=0.14.6,<0.15",
+]
+test = [
+    "pytest>=9.0.1,<10",
+    "pytest-benchmark>=5.2.3,<6",
+    "mahjong>=1.4.0",
+    "kago-utils>=0.1.4",
+]
+docs = [
+    "sphinx>=9.1.0,<10",
+    "sphinx-rtd-theme>=3.1.0,<4",
+]
+typing = [
+    "mypy>=1.18.2,<2",
+]
+build = [
+    "maturin>=1.10.2,<2",
+]
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+
+[tool.pytest]
+minversion = "9.0"
+strict = true
+testpaths = ["tests"]
+addopts = ["--benchmark-skip"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["python"]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D", # pydocstyle
+
+    # "C901",    # complex-structure
+    "ANN002",  # missing-type-args
+    "ANN003",  # missing-type-kwargs
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
+    "PLR0911", # too-many-return-statements
+    "PLR0912", # too-many-branches
+    "PLR0913", # too-many-arguments
+    "PLR0915", # too-many-statements
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["xiangting", "tests"]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 72
+ignore-overlong-task-comments = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"docs/**.py" = ["ALL"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"./examples/*" = [
+    "S101",    # assert
+    "INP001",  # implicit-namespace-package
+    "PLR2004", # magic-value-comparison
+]
+"./tests/*" = [
+    "S101",    # assert
+    "PLR2004", # magic-value-comparison
+]
+
+[tool.mypy]
+exclude = ["^docs/.*\\.py$"]
