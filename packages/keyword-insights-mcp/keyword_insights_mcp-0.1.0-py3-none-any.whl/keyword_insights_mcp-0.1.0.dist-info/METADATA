@@ -1,0 +1,157 @@
+Metadata-Version: 2.4
+Name: keyword-insights-mcp
+Version: 0.1.0
+Summary: MCP server for Keyword Insights API
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp>=1.0.0
+Description-Content-Type: text/markdown
+
+# Keyword Insights MCP Server
+
+An MCP (Model Context Protocol) server that provides tools for interacting with the [Keyword Insights API](https://keywordinsights.ai/).
+
+## Features
+
+- **23 tools** covering all Keyword Insights API endpoints
+- Automatic authentication with token caching
+- Async HTTP client for optimal performance
+- Full support for keyword clustering, ranking, content briefs, and writer agent
+- Pagination support for large result sets
+- Explicit parameter schemas for better AI model understanding
+- **Compact responses** - ~70% smaller output (no whitespace, nulls/empties stripped)
+
+## Installation
+
+```bash
+cd keyword-insights-mcp
+pip install -e .
+```
+
+## Configuration
+
+Set your Keyword Insights credentials as environment variables:
+
+```bash
+export KEYWORD_INSIGHTS_EMAIL="your-email@example.com"
+export KEYWORD_INSIGHTS_PASSWORD="your-password"
+```
+
+On Windows (PowerShell):
+```powershell
+$env:KEYWORD_INSIGHTS_EMAIL = "your-email@example.com"
+$env:KEYWORD_INSIGHTS_PASSWORD = "your-password"
+```
+
+## Usage
+
+### With Claude Desktop
+
+Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "keyword-insights": {
+      "command": "python",
+      "args": ["-m", "keyword_insights_mcp.server"],
+      "env": {
+        "KEYWORD_INSIGHTS_EMAIL": "your-email@example.com",
+        "KEYWORD_INSIGHTS_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
+### With Claude Code
+
+Add to your project's `.mcp.json` or Claude Code settings:
+
+```json
+{
+  "mcpServers": {
+    "keyword-insights": {
+      "command": "python",
+      "args": ["-m", "keyword_insights_mcp.server"],
+      "env": {
+        "KEYWORD_INSIGHTS_EMAIL": "your-email@example.com",
+        "KEYWORD_INSIGHTS_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
+### Testing with MCP Inspector
+
+```bash
+mcp dev src/keyword_insights_mcp/server.py
+```
+
+## Available Tools
+
+### User
+- `get_user` - Get account data, credit balance, and subscription info
+
+### Keyword Ranking
+- `create_advanced_ranking_order` - Analyze SERP for a single keyword
+  - Required: `keyword`, `location`, `language`
+  - Optional: `device`, `domain`, `include_word_count`
+- `get_advanced_ranking_order` - Get ranking order results
+- `create_advanced_ranking_batch_order` - Analyze SERP for multiple keywords
+- `get_advanced_ranking_batch_order` - Get batch ranking results
+
+### Content Brief
+- `get_content_brief_languages` - List supported languages
+- `create_content_brief` - Create a content brief from SERP analysis
+  - Required: `keyword`, `language`, `location`
+- `get_content_brief` - Get brief results by `brief_id`
+- `list_content_briefs` - List all briefs
+
+### Keyword Content
+- `create_keyword_content_order` - Extract content insights (PAA, Reddit/Quora questions, meta titles/descriptions)
+  - Required: `keyword`, `language`, `location`, `content_insights`
+  - Optional: `device`
+  - Credit costs: paa/reddit/quora = 50 credits, meta_titles/descriptions = 200 credits each
+- `get_keyword_content_order` - Get content order results
+
+### Keyword Insights (Clustering)
+- `get_insights_languages` - List supported languages
+- `get_insights_locations` - List locations (returns first 20 by default)
+- `search_insights_locations` - Search locations by name (recommended)
+- `create_insights_order` - Create keyword clustering order
+  - Required: `project_name`, `keywords`, `search_volumes`, `language`, `location`, `insights`
+  - Optional: `clustering_method`, `grouping_accuracy`, `hub_creation_method`, `device`, `url`, `folder_id`
+  - Insights options: `cluster`, `context`, `rank`, `title_ai`
+- `get_insights_order` - Get clustering order status/results
+- `get_insights_order_cost` - Estimate order cost before creating
+  - Required: `n_keywords`, `insights`
+- `get_insights_order_json` - Get clustered data with pagination
+  - Required: `order_id`
+  - Optional: `page_size` (default 50), `page_number`, `sort_by`, `ascending`
+- `export_insights_order_xlsx` - Export to Excel file
+- `list_insights_orders` - List orders by count or date range
+
+### Writer Agent
+- `get_writer_agent_options` - Get available content types, tones, and POV options
+- `create_writer_agent_order` - Generate AI article outline, plan, and content
+  - Required: `keyword`
+  - Optional: `language_code`, `location_name`, `content_type`, `point_of_view`, `folder_id`, `additional_insights`
+- `get_writer_agent_order` - Get generated content results
+
+## Example Usage
+
+Once configured, you can ask Claude to:
+
+- "Get my Keyword Insights account balance"
+- "Search for locations matching 'Mexico'"
+- "Estimate the cost of clustering 500 keywords with cluster and context insights"
+- "Create a keyword insights order for these keywords with their search volumes"
+- "Get page 2 of the clustered results for order abc123"
+- "Create a content brief for 'best running shoes' in English for the United States"
+- "Generate an article about 'sustainable gardening tips'"
+
+## License
+
+MIT
