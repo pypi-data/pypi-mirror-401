@@ -1,0 +1,55 @@
+# TOPSIS Package
+
+A lightweight and easy-to-use Python package for the Technique for Order of Preference by Similarity to Ideal Solution (TOPSIS) method.
+
+## Introduction
+
+TOPSIS is a multi-criteria decision analysis method, which is used to find the best alternative from a set of feasible alternatives. This package provides a command-line tool to perform TOPSIS analysis on a given dataset.
+
+## Installation
+
+Install the package from PyPI using pip:
+
+```bash
+pip install Topsis-Aayushi-102103676
+```
+
+## Usage
+
+This package provides a command-line interface `topsis` that you can use directly from your terminal.
+
+### Syntax
+
+```bash
+topsis <input_file> <weights> <impacts> <result_file>
+```
+
+### Arguments
+
+-   `<input_file>`: The path to your input data file (must be a `.csv` or `.xlsx` file). The file must contain only numeric values, with the first column being the model name and the rest being the numeric criteria.
+-   `<weights>`: A comma-separated string of weights for each criterion (e.g., `"1,1,1,1"`).
+-   `<impacts>`: A comma-separated string of impacts for each criterion, where `+` denotes a beneficial criterion and `-` denotes a non-beneficial (cost) criterion (e.g., `"+,+,-,+"`).
+-   `<result_file>`: The name of the output file (e.g., `result.csv`) where the results with TOPSIS scores and ranks will be saved.
+
+### Example
+
+Suppose you have an input file `data.csv`:
+
+| Model | Price | Storage | Camera | Performance |
+| :---- | :---- | :------ | :----- | :---------- |
+| M1    | 250   | 16      | 12     | 8           |
+| M2    | 200   | 16      | 8      | 7           |
+| M3    | 300   | 32      | 16     | 9           |
+| M4    | 275   | 32      | 8      | 8           |
+
+To run the TOPSIS analysis on this data, you would use the following command:
+
+```bash
+topsis data.csv "1,1,1,1" "-,+,+,+" result.csv
+```
+
+This will generate a `result.csv` file with the TOPSIS scores and ranks for each model.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
