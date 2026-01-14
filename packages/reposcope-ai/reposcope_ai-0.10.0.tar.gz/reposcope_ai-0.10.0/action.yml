@@ -1,0 +1,64 @@
+name: RepoScope Analyze Repo
+description: Run RepoScope on a repository and upload .reposcope/ as workflow artifacts. Optionally post a concise PR comment.
+author: RepoScope AI
+
+branding:
+  icon: book
+  color: blue
+
+inputs:
+  python-version:
+    description: Python version to use
+    default: "3.11"
+  install-source:
+    description: Install RepoScope from PyPI (pypi) or from this action repository (repo)
+    default: "pypi"
+  reposcope-version:
+    description: RepoScope version to install from PyPI
+    default: "latest"
+  enable-ai:
+    description: Enable AI explanations mode (requires REPOSCOPE_OPENAI_API_KEY)
+    default: "false"
+  post-comment:
+    description: Post a concise PR comment with top risks and artifact link
+    default: "false"
+  github-token:
+    description: GitHub token used for commenting (required if post-comment is true)
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install RepoScope
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        if [ "${{ inputs.install-source }}" = "repo" ]; then
+          python -m pip install "$GITHUB_ACTION_PATH"
+        else
+          if [ "${{ inputs.reposcope-version }}" = "latest" ]; then
+            python -m pip install reposcope-ai
+          else
+            python -m pip install "reposcope-ai==${{ inputs.reposcope-version }}"
+          fi
+        fi
+
+    - name: Run RepoScope
+      shell: bash
+      run: |
+        if [ "${{ inputs.enable-ai }}" = "true" ]; then
+          reposcope analyze . --ai
+        else
+          reposcope analyze .
+        fi
+
+    - name: Upload RepoScope Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: reposcope
+        path: .reposcope
+        if-no-files-found: error
