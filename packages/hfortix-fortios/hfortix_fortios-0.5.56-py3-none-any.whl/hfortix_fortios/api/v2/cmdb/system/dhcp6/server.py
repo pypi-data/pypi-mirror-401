@@ -1,0 +1,971 @@
+"""
+FortiOS CMDB - System dhcp6 server
+
+Configuration endpoint for managing cmdb system/dhcp6/server objects.
+
+API Endpoints:
+    GET    /cmdb/system/dhcp6/server
+    POST   /cmdb/system/dhcp6/server
+    PUT    /cmdb/system/dhcp6/server/{identifier}
+    DELETE /cmdb/system/dhcp6/server/{identifier}
+
+Example Usage:
+    >>> from hfortix_fortios import FortiOS
+    >>> fgt = FortiOS(host="192.168.1.99", token="your-api-token")
+    >>>
+    >>> # List all items
+    >>> items = fgt.api.cmdb.system_dhcp6_server.get()
+    >>>
+    >>> # Create with auto-normalization (strings/lists converted automatically)
+    >>> result = fgt.api.cmdb.system_dhcp6_server.post(
+    ...     name="example",
+    ...     srcintf="port1",  # Auto-converted to [{'name': 'port1'}]
+    ...     dstintf=["port2", "port3"],  # Auto-converted to list of dicts
+    ... )
+
+Important:
+    - Use **POST** to create new objects
+    - Use **PUT** to update existing objects
+    - Use **GET** to retrieve configuration
+    - Use **DELETE** to remove objects
+    - **Auto-normalization**: List fields accept strings or lists, automatically
+      converted to FortiOS format [{'name': '...'}]
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Union
+
+if TYPE_CHECKING:
+    from collections.abc import Coroutine
+    from hfortix_core.http.interface import IHTTPClient
+    from hfortix_fortios.models import FortiObject
+
+# Import helper functions from central _helpers module
+from hfortix_fortios._helpers import (
+    build_api_payload,
+    build_cmdb_payload,  # Keep for backward compatibility / manual usage
+    is_success,
+    normalize_table_field,  # For table field normalization
+)
+# Import metadata mixin for schema introspection
+from hfortix_fortios._helpers.metadata_mixin import MetadataMixin
+
+# Import Protocol-based type hints (eliminates need for local @overload decorators)
+from hfortix_fortios._protocols import CRUDEndpoint
+
+class Server(CRUDEndpoint, MetadataMixin):
+    """Server Operations."""
+    
+    # Configure metadata mixin to use this endpoint's helper module
+    _helper_module_name = "server"
+    
+    # ========================================================================
+    # Table Fields Metadata (for normalization)
+    # Auto-generated from schema - supports flexible input formats
+    # ========================================================================
+    _TABLE_FIELDS = {
+        "options": {
+            "mkey": "id",
+            "required_fields": ['id', 'code'],
+            "example": "[{'id': 1, 'code': 1}]",
+        },
+        "prefix_range": {
+            "mkey": "id",
+            "required_fields": ['id', 'start-prefix', 'end-prefix', 'prefix-length'],
+            "example": "[{'id': 1, 'start-prefix': 'value', 'end-prefix': 'value', 'prefix-length': 1}]",
+        },
+        "ip_range": {
+            "mkey": "id",
+            "required_fields": ['id', 'start-ip', 'end-ip'],
+            "example": "[{'id': 1, 'start-ip': 'value', 'end-ip': 'value'}]",
+        },
+    }
+    
+    # ========================================================================
+    # Capabilities (from schema metadata)
+    # ========================================================================
+    SUPPORTS_CREATE = True
+    SUPPORTS_READ = True
+    SUPPORTS_UPDATE = True
+    SUPPORTS_DELETE = True
+    SUPPORTS_MOVE = True
+    SUPPORTS_CLONE = True
+    SUPPORTS_FILTERING = True
+    SUPPORTS_PAGINATION = True
+    SUPPORTS_SEARCH = False
+    SUPPORTS_SORTING = False
+
+    def __init__(self, client: "IHTTPClient"):
+        """Initialize Server endpoint."""
+        self._client = client
+
+    # ========================================================================
+    # GET Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def get(
+        self,
+        id: int | None = None,
+        filter: list[str] | None = None,
+        count: int | None = None,
+        start: int | None = None,
+        payload_dict: dict[str, Any] | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Retrieve system/dhcp6/server configuration.
+
+        Configure DHCPv6 servers.
+
+        Args:
+            id: Integer identifier to retrieve specific object.
+                If None, returns all objects.
+            filter: List of filter expressions to limit results.
+                Each filter uses format: "field==value" or "field!=value"
+                Operators: ==, !=, =@ (contains), !@ (not contains), <=, <, >=, >
+                Multiple filters use AND logic. For OR, use comma in single string.
+                Example: ["name==test", "status==enable"] or ["name==test,name==prod"]
+            count: Maximum number of entries to return (pagination).
+            start: Starting entry index for pagination (0-based).
+            payload_dict: Additional query parameters for advanced options:
+                - datasource (bool): Include datasource information
+                - with_meta (bool): Include metadata about each object
+                - with_contents_hash (bool): Include checksum of object contents
+                - format (list[str]): Property names to include (e.g., ["policyid", "srcintf"])
+                - scope (str): Query scope - "global", "vdom", or "both"
+                - action (str): Special actions - "schema", "default"
+                See FortiOS REST API documentation for complete list.
+            vdom: Virtual domain name. Use True for global, string for specific VDOM, None for default.
+            raw_json: If True, return raw API response without processing.
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional query parameters passed directly to API.
+
+        Returns:
+            Configuration data as dict. Returns Coroutine if using async client.
+            
+            Response structure:
+                - http_method: GET
+                - results: Configuration object(s)
+                - vdom: Virtual domain
+                - path: API path
+                - name: Object name (single object queries)
+                - status: success/error
+                - http_status: HTTP status code
+                - build: FortiOS build number
+
+        Examples:
+            >>> # Get all system/dhcp6/server objects
+            >>> result = fgt.api.cmdb.system_dhcp6_server.get()
+            >>> print(f"Found {len(result['results'])} objects")
+            
+            >>> # Get specific system/dhcp6/server by id
+            >>> result = fgt.api.cmdb.system_dhcp6_server.get(id=1)
+            >>> print(result['results'])
+            
+            >>> # Get with filter
+            >>> result = fgt.api.cmdb.system_dhcp6_server.get(
+            ...     filter=["name==test", "status==enable"]
+            ... )
+            
+            >>> # Get with pagination
+            >>> result = fgt.api.cmdb.system_dhcp6_server.get(
+            ...     start=0, count=100
+            ... )
+            
+            >>> # Get schema information  
+            >>> schema = fgt.api.cmdb.system_dhcp6_server.get_schema()
+
+        See Also:
+            - post(): Create new system/dhcp6/server object
+            - put(): Update existing system/dhcp6/server object
+            - delete(): Remove system/dhcp6/server object
+            - exists(): Check if object exists
+            - get_schema(): Get endpoint schema/metadata
+        """
+        params = payload_dict.copy() if payload_dict else {}
+        
+        # Add explicit query parameters
+        if filter is not None:
+            params["filter"] = filter
+        if count is not None:
+            params["count"] = count
+        if start is not None:
+            params["start"] = start
+        
+        if id:
+            endpoint = "/system.dhcp6/server/" + str(id)
+            unwrap_single = True
+        else:
+            endpoint = "/system.dhcp6/server"
+            unwrap_single = False
+        
+        params.update(kwargs)
+        return self._client.get(
+            "cmdb", endpoint, params=params, vdom=vdom, raw_json=raw_json, response_mode=response_mode, unwrap_single=unwrap_single
+        )
+
+    def get_schema(
+        self,
+        vdom: str | None = None,
+        format: str = "schema",
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Get schema/metadata for this endpoint.
+        
+        Returns the FortiOS schema definition including available fields,
+        their types, required vs optional properties, enum values, nested
+        structures, and default values.
+        
+        This queries the live firewall for its current schema, which may
+        vary between FortiOS versions.
+        
+        Args:
+            vdom: Virtual domain. None uses default VDOM.
+            format: Schema format - "schema" (FortiOS native) or "json-schema" (JSON Schema standard).
+                Defaults to "schema".
+                
+        Returns:
+            Schema definition as dict. Returns Coroutine if using async client.
+            
+        Example:
+            >>> # Get FortiOS native schema
+            >>> schema = fgt.api.cmdb.system_dhcp6_server.get_schema()
+            >>> print(schema['results'])
+            
+            >>> # Get JSON Schema format (if supported)
+            >>> json_schema = fgt.api.cmdb.system_dhcp6_server.get_schema(format="json-schema")
+        
+        Note:
+            Not all endpoints support all schema formats. The "schema" format
+            is most widely supported.
+        """
+        return self.get(action=format, vdom=vdom)
+
+
+    # ========================================================================
+    # PUT Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def put(
+        self,
+        payload_dict: dict[str, Any] | None = None,
+        id: int | None = None,
+        status: Literal["disable", "enable"] | None = None,
+        rapid_commit: Literal["disable", "enable"] | None = None,
+        lease_time: int | None = None,
+        dns_service: Literal["delegated", "default", "specify"] | None = None,
+        dns_search_list: Literal["delegated", "specify"] | None = None,
+        dns_server1: str | None = None,
+        dns_server2: str | None = None,
+        dns_server3: str | None = None,
+        dns_server4: str | None = None,
+        domain: str | None = None,
+        subnet: str | None = None,
+        interface: str | None = None,
+        delegated_prefix_route: Literal["disable", "enable"] | None = None,
+        options: str | list[str] | list[dict[str, Any]] | None = None,
+        upstream_interface: str | None = None,
+        delegated_prefix_iaid: int | None = None,
+        ip_mode: Literal["range", "delegated"] | None = None,
+        prefix_mode: Literal["dhcp6", "ra"] | None = None,
+        prefix_range: str | list[str] | list[dict[str, Any]] | None = None,
+        ip_range: str | list[str] | list[dict[str, Any]] | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Update existing system/dhcp6/server object.
+
+        Configure DHCPv6 servers.
+
+        Args:
+            payload_dict: Object data as dict. Must include id (primary key).
+            id: ID.
+            status: Enable/disable this DHCPv6 configuration.
+            rapid_commit: Enable/disable allow/disallow rapid commit.
+            lease_time: Lease time in seconds, 0 means unlimited.
+            dns_service: Options for assigning DNS servers to DHCPv6 clients.
+            dns_search_list: DNS search list options.
+            dns_server1: DNS server 1.
+            dns_server2: DNS server 2.
+            dns_server3: DNS server 3.
+            dns_server4: DNS server 4.
+            domain: Domain name suffix for the IP addresses that the DHCP server assigns to clients.
+            subnet: Subnet or subnet-id if the IP mode is delegated.
+            interface: DHCP server can assign IP configurations to clients connected to this interface.
+            delegated_prefix_route: Enable/disable automatically adding of routing for delegated prefix.
+            options: DHCPv6 options.
+                Default format: [{'id': 1, 'code': 1}]
+                Required format: List of dicts with keys: id, code
+                  (String format not allowed due to multiple required fields)
+            upstream_interface: Interface name from where delegated information is provided.
+            delegated_prefix_iaid: IAID of obtained delegated-prefix from the upstream interface.
+            ip_mode: Method used to assign client IP.
+            prefix_mode: Assigning a prefix from a DHCPv6 client or RA.
+            prefix_range: DHCP prefix configuration.
+                Default format: [{'id': 1, 'start-prefix': 'value', 'end-prefix': 'value', 'prefix-length': 1}]
+                Required format: List of dicts with keys: id, start-prefix, end-prefix, prefix-length
+                  (String format not allowed due to multiple required fields)
+            ip_range: DHCP IP range configuration.
+                Default format: [{'id': 1, 'start-ip': 'value', 'end-ip': 'value'}]
+                Required format: List of dicts with keys: id, start-ip, end-ip
+                  (String format not allowed due to multiple required fields)
+            vdom: Virtual domain name.
+            raw_json: If True, return raw API response.
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional parameters
+
+        Returns:
+            API response dict
+
+        Raises:
+            ValueError: If id is missing from payload
+
+        Examples:
+            >>> # Update specific fields
+            >>> result = fgt.api.cmdb.system_dhcp6_server.put(
+            ...     id=1,
+            ...     # ... fields to update
+            ... )
+            
+            >>> # Update using payload dict
+            >>> payload = {
+            ...     "id": 1,
+            ...     "field1": "new-value",
+            ... }
+            >>> result = fgt.api.cmdb.system_dhcp6_server.put(payload_dict=payload)
+
+        See Also:
+            - post(): Create new object
+            - set(): Intelligent create or update
+        """
+        # Apply normalization for table fields (supports flexible input formats)
+        if options is not None:
+            options = normalize_table_field(
+                options,
+                mkey="id",
+                required_fields=['id', 'code'],
+                field_name="options",
+                example="[{'id': 1, 'code': 1}]",
+            )
+        if prefix_range is not None:
+            prefix_range = normalize_table_field(
+                prefix_range,
+                mkey="id",
+                required_fields=['id', 'start-prefix', 'end-prefix', 'prefix-length'],
+                field_name="prefix_range",
+                example="[{'id': 1, 'start-prefix': 'value', 'end-prefix': 'value', 'prefix-length': 1}]",
+            )
+        if ip_range is not None:
+            ip_range = normalize_table_field(
+                ip_range,
+                mkey="id",
+                required_fields=['id', 'start-ip', 'end-ip'],
+                field_name="ip_range",
+                example="[{'id': 1, 'start-ip': 'value', 'end-ip': 'value'}]",
+            )
+        
+        # Build payload using helper function with auto-normalization
+        # This automatically converts strings/lists to [{'name': '...'}] format for list fields
+        # To disable auto-normalization, use build_cmdb_payload directly
+        payload_data = build_api_payload(
+            id=id,
+            status=status,
+            rapid_commit=rapid_commit,
+            lease_time=lease_time,
+            dns_service=dns_service,
+            dns_search_list=dns_search_list,
+            dns_server1=dns_server1,
+            dns_server2=dns_server2,
+            dns_server3=dns_server3,
+            dns_server4=dns_server4,
+            domain=domain,
+            subnet=subnet,
+            interface=interface,
+            delegated_prefix_route=delegated_prefix_route,
+            options=options,
+            upstream_interface=upstream_interface,
+            delegated_prefix_iaid=delegated_prefix_iaid,
+            ip_mode=ip_mode,
+            prefix_mode=prefix_mode,
+            prefix_range=prefix_range,
+            ip_range=ip_range,
+            data=payload_dict,
+        )
+        
+        # Check for deprecated fields and warn users
+        from ._helpers.server import DEPRECATED_FIELDS
+        if DEPRECATED_FIELDS:
+            from hfortix_core import check_deprecated_fields
+            check_deprecated_fields(
+                payload=payload_data,
+                deprecated_fields=DEPRECATED_FIELDS,
+                endpoint="cmdb/system/dhcp6/server",
+            )
+        
+        id_value = payload_data.get("id")
+        if not id_value:
+            raise ValueError("id is required for PUT")
+        endpoint = "/system.dhcp6/server/" + str(id_value)
+
+        return self._client.put(
+            "cmdb", endpoint, data=payload_data, params=kwargs, vdom=vdom, raw_json=raw_json, response_mode=response_mode
+        )
+
+    # ========================================================================
+    # POST Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def post(
+        self,
+        payload_dict: dict[str, Any] | None = None,
+        id: int | None = None,
+        status: Literal["disable", "enable"] | None = None,
+        rapid_commit: Literal["disable", "enable"] | None = None,
+        lease_time: int | None = None,
+        dns_service: Literal["delegated", "default", "specify"] | None = None,
+        dns_search_list: Literal["delegated", "specify"] | None = None,
+        dns_server1: str | None = None,
+        dns_server2: str | None = None,
+        dns_server3: str | None = None,
+        dns_server4: str | None = None,
+        domain: str | None = None,
+        subnet: str | None = None,
+        interface: str | None = None,
+        delegated_prefix_route: Literal["disable", "enable"] | None = None,
+        options: str | list[str] | list[dict[str, Any]] | None = None,
+        upstream_interface: str | None = None,
+        delegated_prefix_iaid: int | None = None,
+        ip_mode: Literal["range", "delegated"] | None = None,
+        prefix_mode: Literal["dhcp6", "ra"] | None = None,
+        prefix_range: str | list[str] | list[dict[str, Any]] | None = None,
+        ip_range: str | list[str] | list[dict[str, Any]] | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Create new system/dhcp6/server object.
+
+        Configure DHCPv6 servers.
+
+        Args:
+            payload_dict: Complete object data as dict. Alternative to individual parameters.
+            id: ID.
+            status: Enable/disable this DHCPv6 configuration.
+            rapid_commit: Enable/disable allow/disallow rapid commit.
+            lease_time: Lease time in seconds, 0 means unlimited.
+            dns_service: Options for assigning DNS servers to DHCPv6 clients.
+            dns_search_list: DNS search list options.
+            dns_server1: DNS server 1.
+            dns_server2: DNS server 2.
+            dns_server3: DNS server 3.
+            dns_server4: DNS server 4.
+            domain: Domain name suffix for the IP addresses that the DHCP server assigns to clients.
+            subnet: Subnet or subnet-id if the IP mode is delegated.
+            interface: DHCP server can assign IP configurations to clients connected to this interface.
+            delegated_prefix_route: Enable/disable automatically adding of routing for delegated prefix.
+            options: DHCPv6 options.
+                Default format: [{'id': 1, 'code': 1}]
+                Required format: List of dicts with keys: id, code
+                  (String format not allowed due to multiple required fields)
+            upstream_interface: Interface name from where delegated information is provided.
+            delegated_prefix_iaid: IAID of obtained delegated-prefix from the upstream interface.
+            ip_mode: Method used to assign client IP.
+            prefix_mode: Assigning a prefix from a DHCPv6 client or RA.
+            prefix_range: DHCP prefix configuration.
+                Default format: [{'id': 1, 'start-prefix': 'value', 'end-prefix': 'value', 'prefix-length': 1}]
+                Required format: List of dicts with keys: id, start-prefix, end-prefix, prefix-length
+                  (String format not allowed due to multiple required fields)
+            ip_range: DHCP IP range configuration.
+                Default format: [{'id': 1, 'start-ip': 'value', 'end-ip': 'value'}]
+                Required format: List of dicts with keys: id, start-ip, end-ip
+                  (String format not allowed due to multiple required fields)
+            vdom: Virtual domain name. Use True for global, string for specific VDOM.
+            raw_json: If True, return raw API response without processing.
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional parameters
+
+        Returns:
+            API response dict containing created object with assigned id.
+
+        Examples:
+            >>> # Create using individual parameters
+            >>> result = fgt.api.cmdb.system_dhcp6_server.post(
+            ...     name="example",
+            ...     # ... other required fields
+            ... )
+            >>> print(f"Created id: {result['results']}")
+            
+            >>> # Create using payload dict
+            >>> payload = Server.defaults()  # Start with defaults
+            >>> payload['name'] = 'my-object'
+            >>> result = fgt.api.cmdb.system_dhcp6_server.post(payload_dict=payload)
+
+        Note:
+            Required fields: {{ ", ".join(Server.required_fields()) }}
+            
+            Use Server.help('field_name') to get field details.
+
+        See Also:
+            - get(): Retrieve objects
+            - put(): Update existing object
+            - set(): Intelligent create or update
+        """
+        # Apply normalization for table fields (supports flexible input formats)
+        if options is not None:
+            options = normalize_table_field(
+                options,
+                mkey="id",
+                required_fields=['id', 'code'],
+                field_name="options",
+                example="[{'id': 1, 'code': 1}]",
+            )
+        if prefix_range is not None:
+            prefix_range = normalize_table_field(
+                prefix_range,
+                mkey="id",
+                required_fields=['id', 'start-prefix', 'end-prefix', 'prefix-length'],
+                field_name="prefix_range",
+                example="[{'id': 1, 'start-prefix': 'value', 'end-prefix': 'value', 'prefix-length': 1}]",
+            )
+        if ip_range is not None:
+            ip_range = normalize_table_field(
+                ip_range,
+                mkey="id",
+                required_fields=['id', 'start-ip', 'end-ip'],
+                field_name="ip_range",
+                example="[{'id': 1, 'start-ip': 'value', 'end-ip': 'value'}]",
+            )
+        
+        # Build payload using helper function with auto-normalization
+        # This automatically converts strings/lists to [{'name': '...'}] format for list fields
+        # To disable auto-normalization, use build_cmdb_payload directly
+        payload_data = build_api_payload(
+            id=id,
+            status=status,
+            rapid_commit=rapid_commit,
+            lease_time=lease_time,
+            dns_service=dns_service,
+            dns_search_list=dns_search_list,
+            dns_server1=dns_server1,
+            dns_server2=dns_server2,
+            dns_server3=dns_server3,
+            dns_server4=dns_server4,
+            domain=domain,
+            subnet=subnet,
+            interface=interface,
+            delegated_prefix_route=delegated_prefix_route,
+            options=options,
+            upstream_interface=upstream_interface,
+            delegated_prefix_iaid=delegated_prefix_iaid,
+            ip_mode=ip_mode,
+            prefix_mode=prefix_mode,
+            prefix_range=prefix_range,
+            ip_range=ip_range,
+            data=payload_dict,
+        )
+
+        # Check for deprecated fields and warn users
+        from ._helpers.server import DEPRECATED_FIELDS
+        if DEPRECATED_FIELDS:
+            from hfortix_core import check_deprecated_fields
+            check_deprecated_fields(
+                payload=payload_data,
+                deprecated_fields=DEPRECATED_FIELDS,
+                endpoint="cmdb/system/dhcp6/server",
+            )
+
+        endpoint = "/system.dhcp6/server"
+        return self._client.post(
+            "cmdb", endpoint, data=payload_data, params=kwargs, vdom=vdom, raw_json=raw_json, response_mode=response_mode
+        )
+
+    # ========================================================================
+    # DELETE Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def delete(
+        self,
+        id: int | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Delete system/dhcp6/server object.
+
+        Configure DHCPv6 servers.
+
+        Args:
+            id: Primary key identifier
+            vdom: Virtual domain name
+            raw_json: If True, return raw API response
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional parameters
+
+        Returns:
+            API response dict
+
+        Raises:
+            ValueError: If id is not provided
+
+        Examples:
+            >>> # Delete specific object
+            >>> result = fgt.api.cmdb.system_dhcp6_server.delete(id=1)
+            
+            >>> # Check for errors
+            >>> if result.get('status') != 'success':
+            ...     print(f"Delete failed: {result.get('error')}")
+
+        See Also:
+            - exists(): Check if object exists before deleting
+            - get(): Retrieve object to verify it exists
+        """
+        if not id:
+            raise ValueError("id is required for DELETE")
+        endpoint = "/system.dhcp6/server/" + str(id)
+
+        return self._client.delete(
+            "cmdb", endpoint, params=kwargs, vdom=vdom, raw_json=raw_json, response_mode=response_mode
+        )
+
+    def exists(
+        self,
+        id: int,
+        vdom: str | bool | None = None,
+    ) -> Union[bool, Coroutine[Any, Any, bool]]:
+        """
+        Check if system/dhcp6/server object exists.
+
+        Verifies whether an object exists by attempting to retrieve it and checking the response status.
+
+        Args:
+            id: Primary key identifier
+            vdom: Virtual domain name
+
+        Returns:
+            True if object exists, False otherwise
+
+        Examples:
+            >>> # Check if object exists before operations
+            >>> if fgt.api.cmdb.system_dhcp6_server.exists(id=1):
+            ...     print("Object exists")
+            ... else:
+            ...     print("Object not found")
+            
+            >>> # Conditional delete
+            >>> if fgt.api.cmdb.system_dhcp6_server.exists(id=1):
+            ...     fgt.api.cmdb.system_dhcp6_server.delete(id=1)
+
+        See Also:
+            - get(): Retrieve full object data
+            - set(): Create or update automatically based on existence
+        """
+        # Try to fetch the object - 404 means it doesn't exist
+        try:
+            response = self.get(
+                id=id,
+                vdom=vdom,
+                raw_json=True
+            )
+            
+            if isinstance(response, dict):
+                # Synchronous response - check status
+                return is_success(response)
+            else:
+                # Asynchronous response
+                async def _check() -> bool:
+                    r = await response
+                    return is_success(r)
+                return _check()
+        except Exception as e:
+            # 404 means object doesn't exist - return False
+            # Any other error should be re-raised
+            error_str = str(e)
+            if '404' in error_str or 'Not Found' in error_str or 'ResourceNotFoundError' in str(type(e)):
+                return False
+            raise
+
+
+    def set(
+        self,
+        payload_dict: dict[str, Any] | None = None,
+        id: int | None = None,
+        status: Literal["disable", "enable"] | None = None,
+        rapid_commit: Literal["disable", "enable"] | None = None,
+        lease_time: int | None = None,
+        dns_service: Literal["delegated", "default", "specify"] | None = None,
+        dns_search_list: Literal["delegated", "specify"] | None = None,
+        dns_server1: str | None = None,
+        dns_server2: str | None = None,
+        dns_server3: str | None = None,
+        dns_server4: str | None = None,
+        domain: str | None = None,
+        subnet: str | None = None,
+        interface: str | None = None,
+        delegated_prefix_route: Literal["disable", "enable"] | None = None,
+        options: str | list[str] | list[dict[str, Any]] | None = None,
+        upstream_interface: str | None = None,
+        delegated_prefix_iaid: int | None = None,
+        ip_mode: Literal["range", "delegated"] | None = None,
+        prefix_mode: Literal["dhcp6", "ra"] | None = None,
+        prefix_range: str | list[str] | list[dict[str, Any]] | None = None,
+        ip_range: str | list[str] | list[dict[str, Any]] | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Create or update system/dhcp6/server object (intelligent operation).
+
+        Automatically determines whether to create (POST) or update (PUT) based on
+        whether the resource exists. Requires the primary key (id) in the payload.
+
+        Args:
+            payload_dict: Resource data including id (primary key)
+            id: Field id
+            status: Field status
+            rapid_commit: Field rapid-commit
+            lease_time: Field lease-time
+            dns_service: Field dns-service
+            dns_search_list: Field dns-search-list
+            dns_server1: Field dns-server1
+            dns_server2: Field dns-server2
+            dns_server3: Field dns-server3
+            dns_server4: Field dns-server4
+            domain: Field domain
+            subnet: Field subnet
+            interface: Field interface
+            delegated_prefix_route: Field delegated-prefix-route
+            options: Field options
+            upstream_interface: Field upstream-interface
+            delegated_prefix_iaid: Field delegated-prefix-iaid
+            ip_mode: Field ip-mode
+            prefix_mode: Field prefix-mode
+            prefix_range: Field prefix-range
+            ip_range: Field ip-range
+            vdom: Virtual domain name
+            raw_json: If True, return raw API response
+            response_mode: Override client-level response_mode
+            **kwargs: Additional parameters passed to PUT or POST
+
+        Returns:
+            API response dictionary
+
+        Raises:
+            ValueError: If id is missing from payload
+
+        Examples:
+            >>> # Intelligent create or update using field parameters
+            >>> result = fgt.api.cmdb.system_dhcp6_server.set(
+            ...     id=1,
+            ...     # ... other fields
+            ... )
+            
+            >>> # Or using payload dict
+            >>> payload = {
+            ...     "id": 1,
+            ...     "field1": "value1",
+            ...     "field2": "value2",
+            ... }
+            >>> result = fgt.api.cmdb.system_dhcp6_server.set(payload_dict=payload)
+            >>> # Will POST if object doesn't exist, PUT if it does
+            
+            >>> # Idempotent configuration
+            >>> for obj_data in configuration_list:
+            ...     fgt.api.cmdb.system_dhcp6_server.set(payload_dict=obj_data)
+            >>> # Safely applies configuration regardless of current state
+
+        Note:
+            This method internally calls exists() then either post() or put().
+            For performance-critical code with known state, call post() or put() directly.
+
+        See Also:
+            - post(): Create new object
+            - put(): Update existing object
+            - exists(): Check existence manually
+        """
+        # Build payload using helper function with auto-normalization
+        payload_data = build_api_payload(
+            id=id,
+            status=status,
+            rapid_commit=rapid_commit,
+            lease_time=lease_time,
+            dns_service=dns_service,
+            dns_search_list=dns_search_list,
+            dns_server1=dns_server1,
+            dns_server2=dns_server2,
+            dns_server3=dns_server3,
+            dns_server4=dns_server4,
+            domain=domain,
+            subnet=subnet,
+            interface=interface,
+            delegated_prefix_route=delegated_prefix_route,
+            options=options,
+            upstream_interface=upstream_interface,
+            delegated_prefix_iaid=delegated_prefix_iaid,
+            ip_mode=ip_mode,
+            prefix_mode=prefix_mode,
+            prefix_range=prefix_range,
+            ip_range=ip_range,
+            data=payload_dict,
+        )
+        
+        mkey_value = payload_data.get("id")
+        if not mkey_value:
+            raise ValueError("id is required for set()")
+        
+        # Check if resource exists
+        if self.exists(id=mkey_value, vdom=vdom):
+            # Update existing resource
+            return self.put(payload_dict=payload_data, vdom=vdom, raw_json=raw_json, response_mode=response_mode, **kwargs)
+        else:
+            # Create new resource
+            return self.post(payload_dict=payload_data, vdom=vdom, raw_json=raw_json, response_mode=response_mode, **kwargs)
+
+    # ========================================================================
+    # Action: Move
+    # ========================================================================
+    
+    def move(
+        self,
+        id: int,
+        action: Literal["before", "after"],
+        reference_id: int,
+        vdom: str | bool | None = None,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Move system/dhcp6/server object to a new position.
+        
+        Reorders objects by moving one before or after another.
+        
+        Args:
+            id: Identifier of object to move
+            action: Move "before" or "after" reference object
+            reference_id: Identifier of reference object
+            vdom: Virtual domain name
+            **kwargs: Additional parameters
+            
+        Returns:
+            API response dictionary
+            
+        Example:
+            >>> # Move policy 100 before policy 50
+            >>> fgt.api.cmdb.system_dhcp6_server.move(
+            ...     id=100,
+            ...     action="before",
+            ...     reference_id=50
+            ... )
+        """
+        return self._client.request(
+            method="PUT",
+            path=f"/api/v2/cmdb/system.dhcp6/server",
+            params={
+                "id": id,
+                "action": "move",
+                action: reference_id,
+                "vdom": vdom,
+                **kwargs,
+            },
+        )
+
+    # ========================================================================
+    # Action: Clone
+    # ========================================================================
+    
+    def clone(
+        self,
+        id: int,
+        new_id: int,
+        vdom: str | bool | None = None,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Clone system/dhcp6/server object.
+        
+        Creates a copy of an existing object with a new identifier.
+        
+        Args:
+            id: Identifier of object to clone
+            new_id: Identifier for the cloned object
+            vdom: Virtual domain name
+            **kwargs: Additional parameters
+            
+        Returns:
+            API response dictionary
+            
+        Example:
+            >>> # Clone an existing object
+            >>> fgt.api.cmdb.system_dhcp6_server.clone(
+            ...     id=1,
+            ...     new_id=100
+            ... )
+        """
+        return self._client.request(
+            method="POST",
+            path=f"/api/v2/cmdb/system.dhcp6/server",
+            params={
+                "id": id,
+                "new_id": new_id,
+                "action": "clone",
+                "vdom": vdom,
+                **kwargs,
+            },
+        )
+
+    # ========================================================================
+    # Helper: Check Existence
+    # ========================================================================
+    
+    def exists(
+        self,
+        id: int,
+        vdom: str | bool | None = None,
+    ) -> bool:
+        """
+        Check if system/dhcp6/server object exists.
+        
+        Args:
+            id: Identifier to check
+            vdom: Virtual domain name
+            
+        Returns:
+            True if object exists, False otherwise
+            
+        Example:
+            >>> # Check before creating
+            >>> if not fgt.api.cmdb.system_dhcp6_server.exists(id=1):
+            ...     fgt.api.cmdb.system_dhcp6_server.post(payload_dict=data)
+        """
+        # Try to fetch the object - 404 means it doesn't exist
+        try:
+            response = self.get(
+                id=id,
+                vdom=vdom,
+                raw_json=True
+            )
+            # Check if response indicates success
+            return is_success(response)
+        except Exception as e:
+            # 404 means object doesn't exist - return False
+            # Any other error should be re-raised
+            error_str = str(e)
+            if '404' in error_str or 'Not Found' in error_str or 'ResourceNotFoundError' in str(type(e)):
+                return False
+            raise
+
