@@ -1,0 +1,73 @@
+[project]
+name = "open-cowork"
+dynamic = ["version", "dependencies", "optional-dependencies"]
+description = "Open-Cowork"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {text = "Apache License 2.0"}
+authors = [
+  {name = "open-cowork team"},
+  {email = "xx@yy.com"}
+]
+keywords = ["Open-Cowork", "Software"]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: Apache Software License"
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "cowork.version.__version__"}
+dependencies = {file = "requirements/framework.txt"}
+
+[tool.setuptools.dynamic.optional-dependencies]
+docs = {file = "requirements/docs.txt"}
+tests = {file = "requirements/tests.txt"}
+
+[project.urls]
+Homepage = "https://github.com"
+
+[project.scripts]
+cowork = "cowork.cli.cli:run_cmd"
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cowork*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+include = "\\.pyi?$"
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | cowork/.*/__pycache__
+)/
+'''
+
+[tool.ruff]
+select = ["E", "W", "F", "I"]
+ignore = ["E501"]
+target-version = "py311"
+line-length = 88
