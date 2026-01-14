@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "promptscope"
+version = "0.1.1"
+description = "Effortless Observability for LLM Prompts. Version, diff, replay, export, and guard costs with ease."
+authors = ["PromptScope Dev <hello@promptscope.dev>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/promptscope-dev/promptscope"
+repository = "https://github.com/promptscope-dev/promptscope"
+documentation = "https://github.com/promptscope-dev/promptscope/blob/main/README.md"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/promptscope-dev/promptscope/issues"
+"Changelog" = "https://github.com/promptscope-dev/promptscope/releases"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+openai = ">=1.0,<2.0"
+requests = ">=2.31,<3.0"
+pydantic = ">=2.6,<3.0"
+pydantic-settings = ">=2.2,<3.0"
+
+[tool.poetry.scripts]
+promptscope = "promptscope.cli.main:main"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pre-commit = "*"
+ruff = "*"
+pytest-asyncio = "*"
+pytest-mock = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
