@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vap-mcp"
+version = "0.1.0"
+description = "VAP MCP Server - Media generation tools for Claude Desktop"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "VAP Team", email = "support@vapagent.com" }
+]
+keywords = [
+    "mcp",
+    "claude",
+    "claude-desktop",
+    "ai",
+    "media",
+    "image-generation",
+    "video-generation",
+    "vap",
+    "vapagent"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.25.0",
+]
+
+[project.urls]
+Homepage = "https://vapagent.com"
+Documentation = "https://docs.vapagent.com"
+Repository = "https://github.com/vapagent/vap-mcp"
+Issues = "https://github.com/vapagent/vap-mcp/issues"
+
+[project.scripts]
+vap-mcp = "vap_mcp:main"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/README.md",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vap_mcp"]
