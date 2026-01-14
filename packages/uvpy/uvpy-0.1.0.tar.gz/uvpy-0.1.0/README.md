@@ -1,0 +1,127 @@
+# uvpy - Portable Python App Framework
+
+**Version 0.1.0** | **Python 3.12**
+
+A fully portable, offline-capable CLI framework for modular Python apps.
+
+## Features
+
+- **Portable**: Bundled Python, no system dependencies
+- **Offline**: All packages from local `pypi/` mirror
+- **Isolated**: Each app has its own venv (via uv)
+- **Secure**: Sandbox - localhost only, no telemetry
+- **Modular**: Apps as plugins in `apps/`
+
+## Dual Mode Operation
+
+uvpy supports two modes:
+
+1. **Portable Mode**: With bundled Python, uv binary, and offline packages
+2. **Installed Mode**: `pip install uvpy` - uses system Python, apps from `./apps/`
+
+## Quickstart
+
+### Portable Mode
+
+```bash
+# 1. Install portable Python (once)
+curl -LO https://github.com/indygreg/python-build-standalone/releases/download/20240224/cpython-3.12.2+20240224-x86_64-unknown-linux-gnu-install_only.tar.gz
+tar xzf cpython-*.tar.gz
+
+# 2. Run an app
+./uvpy hello
+./uvpy --list-apps
+```
+
+### Installed Mode
+
+```bash
+pip install uvpy
+uvpy --list-apps
+uvpy hello
+```
+
+## Structure
+
+```
+uvpy/
+├── uvpy             # Launcher (Linux/macOS)
+├── uvpy.bat         # Launcher (Windows)
+├── src/uvpy/        # Package source
+├── python/          # Portable Python 3.12
+├── apps/            # App modules
+├── pypi/            # Offline packages (.whl)
+└── bin/             # uv binary
+```
+
+## Commands
+
+```bash
+./uvpy --help              # Help
+./uvpy --list-apps         # List apps
+./uvpy <app>               # Run app
+
+# Portable mode only:
+./uvpy venv --list         # Show venv status
+./uvpy venv <app>          # Create venv (offline)
+./uvpy venv <app> --online # Create venv (online)
+
+./uvpy download --list     # Show packages in pypi/
+./uvpy download --online numpy pandas  # Download packages
+```
+
+## Creating a New App
+
+```bash
+mkdir -p apps/myapp
+```
+
+**apps/myapp/manifest.json:**
+```json
+{
+  "name": "myapp",
+  "version": "1.0.0",
+  "description": "My application"
+}
+```
+
+**apps/myapp/pyproject.toml:**
+```toml
+[project]
+name = "myapp"
+version = "1.0.0"
+dependencies = ["numpy==1.26.4"]
+```
+
+**apps/myapp/main.py:**
+```python
+def register(subparser):
+    subparser.add_argument("--name", default="World")
+
+def run(args):
+    import numpy as np
+    print(f"Hello {args.name}! NumPy version: {np.__version__}")
+    return 0
+```
+
+```bash
+./uvpy venv myapp    # Create venv
+./uvpy myapp         # Run app
+```
+
+## Security Sandbox
+
+uvpy includes a security sandbox that:
+
+- Blocks all network connections except localhost
+- Disables telemetry (Streamlit, Matplotlib, etc.)
+- Sets headless backends for GUI libraries
+
+```python
+from uvpy import activate_sandbox
+activate_sandbox()
+```
+
+## License
+
+MIT License - see [LICENSE](LICENSE)
