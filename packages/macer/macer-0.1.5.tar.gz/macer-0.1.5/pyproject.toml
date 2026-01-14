@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "macer"
+dynamic = ["version"]
+description = "Machine-learning accelerated Atomic Computational Environment for automated Research workflows"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "ase",
+    "pymatgen",
+    "emmet-core",
+    "monty",
+    "phonopy==2.47.1",
+    "seekpath==2.1.0",
+    "vise==0.9.5",
+    "pydefect==0.9.11",
+    "mattersim==1.2.0",
+]
+
+authors = [
+    { name = "Soungmin Bae", email = "soungminbae@gmail.com" },
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "macer.__version__"}
+
+[project.optional-dependencies]
+chgnet = ["chgnet"]
+m3gnet = ["matgl"]
+mattersim = ["mattersim"]
+mace = ["mace-torch"]
+sevennet = ["sevenn"]
+fairchem = ["fairchem-core"]
+orb = ["orb-core"]
+
+[project.scripts]
+macer = "macer.cli.main:main"
+macer_phonopy = "macer.cli.phonopy_main:main"
+macer_pydefect = "macer.cli.pydefect_main:main"
+macer_util = "macer.cli.util_main:main"
+
+[tool.setuptools.packages.find]
+# This tells setuptools to find packages in the current directory ('.')
+# and include 'macer' as a package.
+where = ["."]
+include = ["macer*"]
+
+[tool.setuptools.package-data]
+macer = ["*.yaml", "mlff-model/mattersim-v1.0.0-1M.pth"]
