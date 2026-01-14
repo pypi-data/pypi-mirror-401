@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "load-pools"
+version = "0.1.18"
+description = "CLI tool for uploading HuggingFace datasets and GitHub repos to Load S3 with tags"
+authors = [
+  { name = "Load Network", email = "info@decent.land" },
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = [
+  "load-network",
+  "s3-agent",
+  "huggingface",
+  "github",
+  "dataset",
+  "ans104",
+]
+dependencies = [
+  "click>=8.0",
+  "requests>=2.28",
+  "GitPython>=3.1",
+]
+
+[project.scripts]
+load-pools = "load_pools.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/loadnetwork/pool-cli"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
