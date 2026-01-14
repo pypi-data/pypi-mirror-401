@@ -1,0 +1,33 @@
+include LICENSE
+include README.md
+
+# 排除大体积文档/资源目录，避免进入发行包
+prune docs
+prune wiki
+prune vue
+prune assets
+prune docker
+prune dist
+prune example
+prune logs
+recursive-include src/mcpstore *.py
+recursive-include src/mcpstore *.json
+recursive-include src/mcpstore *.md
+recursive-include src/mcpstore *.txt
+recursive-include src/mcpstore *.yaml
+recursive-include src/mcpstore *.yml
+
+# 排除测试文件和临时文件
+global-exclude test_*.py
+global-exclude *_test.py
+global-exclude tests/*
+global-exclude __pycache__/*
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.egg-info/*
+global-exclude .pytest_cache/*
+global-exclude .coverage
+global-exclude coverage.xml
+global-exclude *.log
+global-exclude 临时*global-exclude 测试*
+global-exclude 非src测试*

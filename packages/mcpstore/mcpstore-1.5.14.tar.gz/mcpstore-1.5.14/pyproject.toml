@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcpstore"
+version = "1.5.14"
+description = "A composable, ready-to-use MCP toolkit for agents and rapid integration."
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "fastapi>=0.115.12",
+    "fastmcp>=2.7.1",
+    "httpx>=0.28.1",        
+    "pydantic>=2.11.5",
+    "uvicorn>=0.30.0",
+    "typer>=0.9.0",
+    "py-key-value-aio>=0.1.0",
+    "toml>=0.10.2",
+]
+
+authors = [
+    {name = "ooooofish", email = "ooooofish@126.com"}
+]
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/whillhill/mcpstore"
+"Bug Tracker" = "https://github.com/whillhill/mcpstore/issues"
+
+[project.scripts]
+mcpstore = "mcpstore.cli.main:main"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true
+
+
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*", "*test*", "web*", "mcpservice*"]
+
+
+
+[tool.uv]
+index-url = "https://pypi.org/simple"
