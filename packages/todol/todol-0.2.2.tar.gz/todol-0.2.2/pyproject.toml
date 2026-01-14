@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "todol"
+version = "0.2.2"
+description = "A python cli todo app"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+
+dependencies = [
+    "prompt_toolkit>=3.0.52",
+    "platformdirs>=4.4.0",
+    "rich>=14.2.0"
+]
+
+[project.scripts]
+todol = "todol.main:main"
