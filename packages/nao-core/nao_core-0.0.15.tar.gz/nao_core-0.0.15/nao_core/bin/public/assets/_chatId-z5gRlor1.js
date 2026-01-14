@@ -1,0 +1,1 @@
+import{d as t,e as a,j as e}from"./index-CGg3ZQH6.js";import{S as n,C as r}from"./chat-messages-DUR3D342.js";function m(){const{chatId:s}=t({from:"/$chatId"});return a({chatId:s}).isFetching?e.jsx("div",{className:"flex flex-1 items-center justify-center",children:e.jsx(n,{})}):e.jsx(r,{},s)}export{m as component};
