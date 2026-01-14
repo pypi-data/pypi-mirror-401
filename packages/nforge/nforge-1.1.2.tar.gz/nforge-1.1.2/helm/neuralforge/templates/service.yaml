@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "neuralforge.fullname" . }}
+  labels:
+    {{- include "neuralforge.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    {{- if .Values.grpc.enabled }}
+    - port: {{ .Values.service.grpcPort }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+    {{- end }}
+    {{- if .Values.metrics.enabled }}
+    - port: {{ .Values.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    {{- end }}
+  selector:
+    {{- include "neuralforge.selectorLabels" . | nindent 4 }}

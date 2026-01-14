@@ -1,0 +1,169 @@
+# NeuralForge Helm Chart Values
+# Override these values in your values.yaml or via --set
+
+# Application settings
+app:
+  name: neuralforge
+  version: "1.1.0"
+
+# Deployment settings
+replicaCount: 1
+
+image:
+  repository: neuralforge/serving
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# Service settings
+service:
+  type: ClusterIP
+  httpPort: 8000
+  grpcPort: 50051
+  annotations: {}
+
+# Model configuration
+model:
+  name: ""
+  version: "latest"
+  preload: true
+
+# Resource limits
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+
+# GPU support
+gpu:
+  enabled: false
+  count: 0
+  # nvidia.com/gpu or amd.com/gpu
+  resourceName: nvidia.com/gpu
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilization: 80
+  targetMemoryUtilization: 80
+  scaleUpCooldown: 60
+  scaleDownCooldown: 300
+
+# Health probes
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /ready
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Environment variables
+env: []
+# - name: MODEL_CACHE_DIR
+#   value: /models
+
+# ConfigMap for configuration files
+configMap:
+  enabled: false
+  name: ""
+  # data:
+  #   config.yaml: |
+  #     key: value
+
+# Secret for sensitive data
+secret:
+  enabled: false
+  name: ""
+  # data:
+  #   api-key: base64-encoded-value
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: neuralforge.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: neuralforge-tls
+  #    hosts:
+  #      - neuralforge.local
+
+# Service account
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+
+# Container security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels: {}
+
+# Extra volumes
+extraVolumes: []
+# - name: model-cache
+#   emptyDir: {}
+
+# Extra volume mounts
+extraVolumeMounts: []
+# - name: model-cache
+#   mountPath: /models
+
+# OpenTelemetry configuration
+observability:
+  enabled: false
+  otlpEndpoint: ""
+  sampleRate: 1.0
+
+# gRPC settings
+grpc:
+  enabled: true
+  reflection: true
+  maxMessageSize: 104857600  # 100MB
+
+# Metrics (Prometheus)
+metrics:
+  enabled: false
+  port: 9090
+  path: /metrics
+  serviceMonitor:
+    enabled: false
+    interval: 30s

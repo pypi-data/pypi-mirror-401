@@ -1,0 +1,39 @@
+# Core dependencies
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+uvicorn[standard]>=0.23.0
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Async and HTTP
+httpx>=0.24.0
+aiofiles>=23.0.0
+asyncio>=3.4.3
+
+# Database
+sqlalchemy[asyncio]>=2.0.0
+alembic>=1.11.0
+asyncpg>=0.28.0  # PostgreSQL async driver
+aiomysql>=0.2.0  # MySQL async driver
+aiosqlite>=0.19.0  # SQLite async driver
+
+# Caching
+redis>=4.6.0
+hiredis>=2.2.0  # Faster Redis parsing
+
+# Observability
+prometheus-client>=0.17.0
+opentelemetry-api>=1.19.0
+opentelemetry-sdk>=1.19.0
+opentelemetry-instrumentation>=0.40b0
+
+# Data validation and serialization
+orjson>=3.9.0  # Fast JSON
+msgpack>=1.0.5  # Fast serialization
+
+# Utilities
+python-dotenv>=1.0.0
+click>=8.1.0  # CLI framework
+rich>=13.5.0  # Beautiful terminal output
+tenacity>=8.2.0  # Retry logic

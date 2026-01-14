@@ -1,0 +1,48 @@
+# Include documentation
+include README.md
+include LICENSE
+include CHANGELOG.md
+include QUICKSTART.md
+include requirements.txt
+include requirements-dev.txt
+include requirements-ml.txt
+
+# Include configuration files
+include setup.py
+include setup.cfg
+include pyproject.toml
+include pytest.ini
+
+# Include package data
+recursive-include neuralforge *.py
+recursive-include neuralforge *.pyi
+recursive-include neuralforge *.typed
+
+# Include proto files
+recursive-include neuralforge *.proto
+
+# Include helm chart
+recursive-include helm *
+
+# Exclude development files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude .git*
+global-exclude *.egg-info
+
+# Exclude test and build directories
+prune tests
+prune examples
+prune docs
+prune scripts
+prune .agent
+prune venv
+prune .venv
+prune build
+prune dist
+prune htmlcov
+prune .pytest_cache
+prune .mypy_cache
