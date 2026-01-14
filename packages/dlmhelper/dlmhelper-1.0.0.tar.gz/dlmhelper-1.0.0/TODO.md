@@ -1,0 +1,4 @@
+- add option to extend timeseries at beginning or end to allow for forecasting
+- griddata -> add get_sub_grid
+- add model error directly to results when results are created by ensemble
+- add option to weight with error when averaging gridded data

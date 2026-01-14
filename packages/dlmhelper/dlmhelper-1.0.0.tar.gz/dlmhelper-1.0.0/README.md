@@ -1,0 +1,34 @@
+# dlmhelper
+
+This package includes functions and custom data types to help with performing and analyzing dynamic linear model fits. 
+
+The initial version of this code was developed for the analysis performed in 'Zonal variability of methane trends derived from satellite data' (Hachmeister et al., 2023 ; DOI: [10.5194/acp-24-577-2024](https://doi.org/10.5194/acp-24-577-2024)).
+
+Version v0.1.0 of this package is also used by the supplementary example code provided for the above mentioned paper, available on [Zenodo](http://www.doi.org/10.5281/zenodo.8178927).
+
+
+## Requirements
+
+- numpy
+- matplotlib
+- statsmodels
+- tabulate
+
+## Version
+
+v1.0.0
+
+## Installation
+
+Install from PyPI using:
+
+    pip install dlmhelper
+
+## Usage
+
+Look at the Nile or Manua Loa example from the _examples_ folder for a basic introduction.
+
+Documentation is available [here](https://jonashach.github.io/dlmhelper/build/html/index.html)
+
+## Known issues
+- Sometimes variances (e.g., trend_cov) are negative. This is a numerical artifact from the underlying fitting routine used by the statsmodels package
