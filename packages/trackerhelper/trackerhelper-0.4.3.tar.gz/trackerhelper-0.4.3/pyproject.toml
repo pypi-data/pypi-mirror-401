@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trackerhelper"
+version = "0.4.3"
+description = "Utilities for music discography folders (stats, BBCode, normalize)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "0BSD"
+license-files = ["LICENSE"]
+authors = [{ name = "pryid" }]
+keywords = ["audio", "bbcode", "chromaprint", "discography", "ffprobe", "music"]
+dependencies = ["requests", "rich"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/pryid/trackerhelper"
+Issues = "https://github.com/pryid/trackerhelper/issues"
+
+[project.optional-dependencies]
+dev = ["ruff", "ty", "types-requests"]
+
+[project.scripts]
+trackerhelper = "trackerhelper.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trackerhelper*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = ["tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["F"]
