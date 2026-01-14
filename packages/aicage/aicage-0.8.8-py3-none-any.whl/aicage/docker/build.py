@@ -1,0 +1,177 @@
+from __future__ import annotations
+
+import subprocess
+from logging import Logger
+from pathlib import Path
+
+from aicage._logging import get_logger
+from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.config.resources import find_packaged_path
+from aicage.config.runtime_config import RunConfig
+from aicage.docker.errors import DockerError
+
+
+def run_build(
+    run_config: RunConfig,
+    base_image_ref: str,
+    image_ref: str,
+    log_path: Path,
+) -> None:
+    logger = get_logger()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"[aicage] Building local image {image_ref} (logs: {log_path})...")
+    logger.info("Building local image %s (logs: %s)", image_ref, log_path)
+
+    dockerfile_path = find_packaged_path("agent-build/Dockerfile")
+    build_root = _build_context_dir(run_config, dockerfile_path)
+    # Docker SDK does not support BuildKit; keep CLI build for compatibility.
+    # See: https://github.com/docker/docker-py/issues/2230
+    command = [
+        "docker",
+        "build",
+        "--no-cache",
+        "--file",
+        str(dockerfile_path),
+        "--build-arg",
+        f"BASE_IMAGE={base_image_ref}",
+        "--build-arg",
+        f"AGENT={run_config.agent}",
+        "--tag",
+        image_ref,
+        str(build_root),
+    ]
+    with log_path.open("w", encoding="utf-8") as log_handle:
+        result = subprocess.run(command, check=False, stdout=log_handle, stderr=subprocess.STDOUT)
+    if result.returncode != 0:
+        logger.error("Local image build failed for %s (logs: %s)", image_ref, log_path)
+        raise DockerError(
+            f"Local image build failed for {image_ref}. See log at {log_path}."
+        )
+
+    logger.info("Local image build succeeded for %s", image_ref)
+
+
+def run_extended_build(
+    run_config: RunConfig,
+    base_image_ref: str,
+    extensions: list[ExtensionMetadata],
+    log_path: Path,
+) -> None:
+    logger = get_logger()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"[aicage] Building extended image {run_config.selection.image_ref} (logs: {log_path})...")
+    logger.info("Building extended image %s (logs: %s)", run_config.selection.image_ref, log_path)
+
+    dockerfile_builtin = find_packaged_path("extension-build/Dockerfile")
+    current_image_ref = base_image_ref
+    intermediate_refs: list[str] = []
+    with log_path.open("w", encoding="utf-8") as log_handle:
+        for idx, extension in enumerate(extensions):
+            target_ref = (
+                run_config.selection.image_ref
+                if idx == len(extensions) - 1
+                else _intermediate_image_ref(run_config, extension, idx)
+            )
+            if target_ref != run_config.selection.image_ref:
+                intermediate_refs.append(target_ref)
+            dockerfile_path = extension.dockerfile_path or dockerfile_builtin
+            # Docker SDK does not support BuildKit; keep CLI build for compatibility.
+            # See: https://github.com/docker/docker-py/issues/2230
+            command = [
+                "docker",
+                "build",
+                "--no-cache",
+                "--file",
+                str(dockerfile_path),
+                "--build-arg",
+                f"BASE_IMAGE={current_image_ref}",
+                "--build-arg",
+                f"EXTENSION={extension.extension_id}",
+                "--tag",
+                target_ref,
+                str(extension.directory),
+            ]
+            result = subprocess.run(command, check=False, stdout=log_handle, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                logger.error(
+                    "Extended image build failed for %s (logs: %s)",
+                    run_config.selection.image_ref,
+                    log_path,
+                )
+                raise DockerError(
+                    f"Extended image build failed for {run_config.selection.image_ref}. See log at {log_path}."
+                )
+            current_image_ref = target_ref
+    _cleanup_intermediate_images(intermediate_refs, logger)
+    logger.info("Extended image build succeeded for %s", run_config.selection.image_ref)
+
+
+def run_custom_base_build(
+    dockerfile_path: Path,
+    build_root: Path,
+    from_image: str,
+    image_ref: str,
+    log_path: Path,
+) -> None:
+    logger = get_logger()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"[aicage] Building custom base image {image_ref} (logs: {log_path})...")
+    logger.info("Building custom base image %s (logs: %s)", image_ref, log_path)
+
+    command = [
+        "docker",
+        "build",
+        "--no-cache",
+        "--file",
+        str(dockerfile_path),
+        "--build-arg",
+        f"FROM_IMAGE={from_image}",
+        "--tag",
+        image_ref,
+        str(build_root),
+    ]
+    with log_path.open("w", encoding="utf-8") as log_handle:
+        result = subprocess.run(command, check=False, stdout=log_handle, stderr=subprocess.STDOUT)
+    if result.returncode != 0:
+        logger.error("Custom base image build failed for %s (logs: %s)", image_ref, log_path)
+        raise DockerError(
+            f"Custom base image build failed for {image_ref}. See log at {log_path}."
+        )
+
+    logger.info("Custom base image build succeeded for %s", image_ref)
+
+
+def _build_context_dir(run_config: RunConfig, dockerfile_path: Path) -> Path:
+    agent_metadata = run_config.context.images_metadata.agents[run_config.agent]
+    local_definition_dir = agent_metadata.local_definition_dir
+    if local_definition_dir is None:
+        return dockerfile_path.parent
+    if local_definition_dir.is_relative_to(dockerfile_path.parent):
+        return dockerfile_path.parent
+    return local_definition_dir.parent.parent
+
+
+def _intermediate_image_ref(run_config: RunConfig, extension: ExtensionMetadata, idx: int) -> str:
+    repository, _ = _parse_image_ref(run_config.selection.image_ref)
+    tag = f"tmp-{run_config.agent}-{run_config.selection.base}-{idx + 1}-{extension.extension_id}"
+    tag = tag.lower().replace("/", "-")
+    return f"{repository}:{tag}"
+
+
+def _parse_image_ref(image_ref: str) -> tuple[str, str]:
+    repository, sep, tag = image_ref.rpartition(":")
+    if not sep:
+        raise DockerError(f"Image ref '{image_ref}' is missing a tag.")
+    return repository, tag
+
+
+def _cleanup_intermediate_images(intermediate_refs: list[str], logger: Logger) -> None:
+    for image_ref in intermediate_refs:
+        result = subprocess.run(
+            ["docker", "image", "rm", "-f", image_ref],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        if result.returncode != 0:
+            logger.info("Failed to remove intermediate image %s", image_ref)
