@@ -1,0 +1,48 @@
+Metadata-Version: 2.4
+Name: oarslily
+Version: 0.1.3a4
+Summary: Add your description here
+License: MIT
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: osslili>=1.6.1
+Requires-Dist: python-levenshtein>=0.27.3
+Requires-Dist: python-tlsh>=4.5.0
+Requires-Dist: typer>=0.21.1
+Dynamic: license-file
+
+# Package manager
+This project uses [uv](https://github.com/astral-sh/uv) to manage python packages.
+```
+# On macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+# Installing deps
+Sync the project dependencies with:
+```
+uv sync
+```
+
+This will create a virtual environment and install all required packages.
+
+# venv
+Activate with:
+```
+source .venv/bin/activate
+```
+
+# Executing
+Run with
+```
+uv run main.py
+```
+
+# Additional notes
+`osslili` supports additional drop-in matchers by simply installing them. These packages are addditionally added.
+
+```
+python-Levenshtein
+python-tlsh
+```
