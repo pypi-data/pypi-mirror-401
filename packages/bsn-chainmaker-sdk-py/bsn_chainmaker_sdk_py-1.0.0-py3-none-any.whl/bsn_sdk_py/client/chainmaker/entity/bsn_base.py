@@ -1,0 +1,16 @@
+from bsn_sdk_py.client.config import Config
+
+
+class BsnBase(object):
+    """
+    :description  : basic assembly class for Chainmaker
+    """
+    
+    def __init__(self):
+        pass
+
+    def set_config(self, config: Config) -> object:
+        self.config = config
+
+
+
