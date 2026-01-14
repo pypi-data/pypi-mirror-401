@@ -1,0 +1,158 @@
+Metadata-Version: 2.4
+Name: wbal
+Version: 0.4.0
+Summary: Weights & Biases Agent Library - A minimal framework for building LLM agents
+Requires-Python: <3.14,>=3.13
+Requires-Dist: openai<1.100.0,>=1.0.0
+Requires-Dist: pydantic>=2.12.5
+Requires-Dist: pytest>=9.0.2
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: weave>=0.52.22
+Description-Content-Type: text/markdown
+
+# WBAL
+
+**W**eights & **B**iases **A**gent **L**ibrary - A minimal framework for building LLM agents.
+
+## Overview
+
+WBAL provides three core primitives:
+
+- **Agent** - Orchestrates the perceive-invoke-do loop
+- **Environment** - Provides tools and context
+- **LM** - Language model interface
+
+All components inherit from `WBALObject` (Pydantic BaseModel + `observe()` method).
+
+## Quick Start
+
+Requires `OPENAI_API_KEY` in your environment.
+
+```python
+import weave
+from wbal import Environment, OpenAIWBAgent, weaveTool, GPT5MiniTester
+
+weave.init('my-project')
+
+class MyEnv(Environment):
+    env = "You are a helpful assistant."
+    include_tools_in_observe = True
+
+    @weaveTool
+    def greet(self, name: str) -> str:
+        """Greet someone by name."""
+        return f"Hello, {name}!"
+
+agent = OpenAIWBAgent(
+    lm=GPT5MiniTester(),
+    env=MyEnv(task="Say hello to Alice"),
+    maxSteps=5,
+    system_prompt="Use tools when helpful. Call exit() when you're done.",
+)
+agent.run()
+```
+
+## Installation
+
+From PyPI:
+
+```bash
+pip install wbal
+```
+
+From source (for local development):
+
+```bash
+git clone <this-repo>
+cd wbal
+uv sync
+```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [USER.md](USER.md) | Usage guide, API reference, examples |
+| [DEVELOPER.md](DEVELOPER.md) | Architecture, contributing, testing |
+| [Agent_Instructions.md](Agent_Instructions.md) | Agent/environment guidance |
+
+## CLI
+
+```bash
+# Run (baseline, non-interactive)
+wbal run --project my-project --task "Say hello to Alice, then call exit()"
+
+# Chat (interactive via tool calls)
+wbal chat --project my-project --task "Say hello to Alice"
+
+# Poll (runs once or on an interval)
+wbal poll --project my-project --task "Check status" --interval 300
+
+# Run from a YAML agent manifest
+wbal run --project my-project --agent-spec path/to/agent.yaml --task "Do the thing"
+```
+
+## YAML Agents
+
+WBAL supports YAML-based agent manifests that let you configure:
+- model + max steps
+- prompt files (YAML)
+- tool modules to attach to the agent/env
+- explicit subagent delegation (DAG) via `run_agent`
+
+See `examples/agents/README.md`.
+
+## Agent Bundles (WandBSwarm-compatible)
+
+WBAL can run “agent bundles” that expose `run.sh` (required) and `install.sh` (optional),
+with the same env var contract as WandBSwarm (`AGENT_DIR`, `TASK_DIR`, `WORKSPACE`, etc.).
+
+```bash
+wbal bundle validate --agent-dir path/to/agent
+wbal bundle run --agent-dir path/to/agent --task-dir path/to/task --workspace-dir ./workspace
+```
+
+## API
+
+```python
+from wbal import (
+    # Core
+    Agent, Environment, StatefulEnvironment, LM,
+
+    # Models
+    GPT5Large, GPT5MiniTester,
+
+    # Decorators
+    weaveTool, tool,
+
+    # Mixins
+    ExitableAgent,
+
+    # Helpers
+    tool_timeout, format_openai_tool_response,
+)
+```
+
+## Examples
+
+See [`examples/`](examples/) for complete implementations.
+- `examples/zagent_v1.py` - Orchestrator-style agent with persistent notes + bash tool
+
+Run locally:
+```bash
+uv run python examples/zagent_v1.py --task "Inspect this repo, take notes, then exit()"
+```
+
+## Structure
+
+```
+wbal/
+├── wbal/
+│   ├── agent.py        # Agent class
+│   ├── environment.py  # Environment, StatefulEnvironment
+│   ├── lm.py           # LM, GPT5Large, GPT5MiniTester
+│   ├── helper.py       # Tool decorators and utilities
+│   └── mixins.py       # ExitableAgent
+├── tests/
+└── examples/
+```
