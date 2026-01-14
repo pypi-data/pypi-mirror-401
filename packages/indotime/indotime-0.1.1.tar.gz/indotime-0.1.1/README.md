@@ -1,0 +1,52 @@
+
+# IndoTime
+
+`indotime` adalah library Python sederhana yang dirancang untuk menampilkan waktu dan tanggal khusus untuk zona waktu Indonesia bagian Barat (WIB, UTC+7). Library ini dibuat dengan Python murni tanpa dependensi eksternal, sehingga ringan dan mudah digunakan untuk proyek-proyek sederhana, termasuk untuk keperluan edukasi seperti tugas sekolah.
+
+## Fitur
+
+- **Python Murni**: Tidak memerlukan library pihak ketiga.
+- **Timezone WIB**: Secara default diatur ke UTC+7.
+- **Bahasa Indonesia**: Nama hari dan bulan ditampilkan dalam Bahasa Indonesia.
+- **Fleksibel**: Mendukung berbagai cara pemanggilan untuk membuat objek waktu.
+- **Berorientasi Objek (OOP)**: Dibuat dengan struktur kelas yang rapi dan mudah dipahami.
+
+## Instalasi
+
+Anda dapat menginstal `indotime` menggunakan pip:
+
+```bash
+pip install indotime
+```
+
+## Contoh Penggunaan
+
+Berikut adalah cara dasar menggunakan library `indotime`:
+
+```python
+from indotime import IndoTime
+
+# 1. Waktu lengkap saat ini
+sekarang = IndoTime()
+print(f"Lengkap: {sekarang.lengkap()}")
+# Output: Senin, 13 Januari 2025, 10:30:00 WIB
+
+# 2. Hanya tanggal
+print(f"Tanggal: {sekarang.tanggal()}-{sekarang.bulan()}-{sekarang.tahun()}")
+# Output: 13-01-2025
+
+# 3. Hanya jam
+print(f"Jam: {sekarang.jam()}")
+# Output: 10:30:00
+
+# 4. Mendapatkan komponen waktu secara spesifik
+print(f"Hari ini hari {sekarang.hari()}")
+# Output: Hari ini hari Senin
+
+print(f"Sekarang bulan {sekarang.bulan_string()}")
+# Output: Sekarang bulan Januari
+```
+
+## Kontribusi
+
+Proyek ini bersifat open source dan dibuat untuk tujuan edukasi. Jika Anda menemukan bug atau memiliki ide untuk perbaikan, jangan ragu untuk membuat *issue* atau *pull request*.
