@@ -1,0 +1,167 @@
+Metadata-Version: 2.4
+Name: forecastEval
+Version: 0.2.3
+Summary: A lightweight Python framework for rigorous and statistically grounded forecast evaluation, with baseline comparison, horizon-stratified analysis, and Diebold–Mariano testing.
+Author-email: Bruna Azevedo <bcado@isep.ipp.pt>, Luís Gomes <log@isep.ipp.pt>, Zita Vale <zav@isep.ipp.pt>
+License-Expression: GPL-3.0-only
+Project-URL: Homepage, https://github.com/gecad-group/BCADO_forecast-eval
+Project-URL: Issues, https://github.com/gecad-group/BCADO_forecast-eval/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# forecastEval — A Lightweight Framework for Rigorous Forecast Evaluation
+
+[![PyPI](https://img.shields.io/pypi/v/forecastEval.svg)](https://pypi.org/project/forecastEval/)
+[![Python](https://img.shields.io/pypi/pyversions/forecastEval.svg)](https://pypi.org/project/forecastEval/)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Scope](https://img.shields.io/badge/scope-time--series%20forecasting-success)](#scope)
+[![Evaluation](https://img.shields.io/badge/evaluation-baseline%20%2B%20horizon%20%2B%20DM%20test-informational)](#methodological-coverage)
+[![Reports](https://img.shields.io/badge/reports-console%20%2B%20HTML-brightgreen)](#outputs)
+[![Status](https://img.shields.io/badge/status-active%20development-orange)](#development-status)
+
+**forecastEval** is an open-source Python library that implements a **lightweight, unified framework for rigorous forecast evaluation**.  
+It is designed to reduce the practical barriers to adopting evaluation best practices by providing an accessible API, interpretative reporting, and statistically grounded comparison against appropriate baselines.
+
+- **Repository:** https://github.com/gecad-group/BCADO_forecast-eval  
+- **PyPI package:** https://pypi.org/project/forecastEval/
+
+---
+
+## Abstract
+
+Forecast evaluation is frequently undermined by (i) insufficient baseline awareness, (ii) reliance on aggregated metrics that hide horizon-dependent failure modes, and (iii) absence of statistical validation for performance differences.  
+`forecastEval` operationalises a consolidated evaluation framework through a single interface, providing:
+
+1. **Baseline-aware evaluation** using MASE and skill scores, supporting persistence and seasonal naïve baselines;
+2. **Horizon-stratified reporting** to expose performance variation across lead times;
+3. **Diebold–Mariano statistical testing** with autocorrelation-adjusted variance estimation for principled significance assessment.
+
+The library outputs both a **detailed console report** with interpretative guidance and an **interactive HTML dashboard** for transparent communication of results.
+
+---
+
+## Scope
+
+`forecastEval` is intended for:
+- academic benchmarking and reproducible evaluation pipelines;
+- practitioners validating model readiness for deployment;
+- settings where **point forecasts** are produced for time series with potential trend, seasonality, and noise.
+
+Current focus: **point forecast evaluation** (with planned extensions for probabilistic forecasting and regime-aware stratification).
+
+---
+
+## Methodological Coverage
+
+The framework is implemented via a unified `ForecastEvaluator` class.
+
+### Guideline 1 — Baseline-aware performance validation
+**Objective:** ensure meaningful gains over defensible baselines.
+
+- Automatic comparison against:
+  - **Persistence (naïve)**
+  - **Seasonal naïve**
+- Primary error scaling and interpretability via **MASE**
+- **Skill scores** to contextualise performance relative to baseline behaviour
+- Explicit interpretative outcomes (e.g., *PASS/FAIL* recommendations)
+
+### Guideline 2 — Horizon-stratified reporting
+**Objective:** avoid misleading conclusions from aggregated metrics.
+
+- Horizon windows are user-definable (e.g., `(0, 8), (8, 16), (16, 24)`)
+- Produces horizon-specific metrics and summaries
+- Architecture supports extension for:
+  - **Guideline 2b:** regime-aware stratification (domain-specific)
+  - **Guideline 2c:** uncertainty quantification / probabilistic evaluation
+
+### Guideline 3 — Statistical significance testing (Diebold–Mariano)
+**Objective:** distinguish real performance differences from sampling noise.
+
+- Diebold–Mariano test implemented for loss differentials
+- Variance estimation adjusted for autocorrelation
+- Enables principled acceptance/rejection of “model improves on baseline” claims
+
+---
+
+## Outputs
+
+`forecastEval` produces two complementary outputs:
+
+1. **Console report**
+   - structured metrics, baseline comparison, DM test results
+   - interpretative guidance and deployment-oriented conclusions
+
+2. **Interactive HTML dashboard**
+   - collapsible sections, colour-coded status badges
+   - baseline comparison tables and horizon-wise breakdowns
+   - intended for communication and auditability
+
+> The HTML report is generated with `generate_html_report(...)`.
+
+---
+
+## Installation
+
+```bash
+pip install forecastEval
+```
+
+### Dependencies
+
+Minimal runtime depencendies:
+- ``numpy``
+- ``scikit-learn``
+- ``pandas``
+
+## Quick Start
+```bash
+from forecast_eval import ForecastEvaluator
+
+evaluator = ForecastEvaluator(seasonal_period=12)
+
+results = evaluator.evaluate(
+    y_true=y_test,
+    y_pred=y_pred,
+    y_train=y_train,
+    seasonal=True,
+    return_loss_series=True,
+    stratify_by_horizon=True,
+    horizon_indices=[(0, 8), (8, 16), (16, 24)]
+)
+
+print(evaluator.summary_report())
+evaluator.generate_html_report("report.html")
+```
+
+### Required inputs:
+- y_train: training time series;
+- y_true: test observations;
+- y_pred: model predictions;
+- seasonal_period: seasonal cycle length.
+
+A complete end-to-end example script is provided in the repository: ``example.py``. It demonstrates synthetic data generation, model forecasting, baseline comparison, statistical testing, and report generation.
+
+## Development Status
+
+The project is under **active development**.
+
+### Current coverage:
+- point forecast evaluation;
+- Guidelines 1, 2a, and 3.
+
+### Planned extensions:
+- probabilistic forecasting evaluation (Guideline 2c);
+- automated and regime-aware stratification (Guideline 2b).
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
+- Redistribution and modification are permitted under GPL-3.0 terms.
+- Derivative works must remain under the same license.
+- The software is provided without warranty.
+
+See the ``LICENSE`` file for full details.
