@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling>=1.26", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pycharge"
+dynamic = ["version"]
+authors = [{name = "Matthew Filipovich", email = "matthew.filipovich@physics.ox.ac.uk"}]
+description = "Python library for differentiable electrodynamics simulations with jax."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+  "jax",
+  "optimistix"
+]
+keywords = [
+  "electrodynamics",
+  "jax",
+  "physics",
+  "inverse design",
+  "differentiable optics"
+]
+
+[project.urls]
+Homepage = "https://github.com/MatthewFilipovich/pycharge"
+Documentation = "https://pycharge.readthedocs.io/"
+Tracker = "https://github.com/MatthewFilipovich/pycharge/issues"
+Changelog = "https://github.com/MatthewFilipovich/pycharge/releases"
+
+[project.optional-dependencies]
+dev = [
+  "coverage",
+  "pre-commit",
+  "pyright",
+  "pytest",
+  "ruff",
+  "scipy"
+]
+docs = [
+  "sphinx-autoapi",
+  "pydata-sphinx-theme",
+  "sphinx-copybutton",
+  "sphinx-gallery",
+  "sphinx-design",
+  "matplotlib"
+] 
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4"]
+ignore = ["B905"]
+
+[tool.coverage.report]
+omit = ["tests/*"]
+exclude_lines = [
+  "if TYPE_CHECKING:"
+]
+
+[tool.coverage.run]
+omit = ["tests/*"]
