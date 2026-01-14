@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cyberOffensive"
+version = "0.0.1"
+description = "Educational cross-platform system toolkit! Mainly windows focused!"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+  { name="Arpit Jaiswal", email="arpitjaiswal9526@gmail.com" }
+]
+dependencies = [
+  "requests",
+  "psutil"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cyberOffensive"]
