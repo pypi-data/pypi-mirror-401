@@ -1,0 +1,19 @@
+# Note: The input file is now provided as a command-line argument
+# Usage: uv run kamasi <audio_file.mp3>
+
+audio:
+  separate_vocals: true  # Activer/Désactiver Demucs
+  device: "cuda"         # "cuda" pour GPU NVIDIA ou "cpu"
+  model: "htdemucs"      # htdemucs, htdemucs_ft, mdx_extra
+
+transcription:
+  model_size: "tiny"     # tiny, base, small, medium, large-v3
+  language: "fr"         # Code langue (fr, en, etc.) ou null pour auto-detect
+  compute_type: "int8"   # float16 pour GPU, int8 pour CPU
+
+refinement:
+  enabled: true
+  ollama_url: "http://localhost:11434"
+  model_name: "mistral-nemo:12b"
+  prompt: |
+    Write here your instruction for the LLM to follow.
