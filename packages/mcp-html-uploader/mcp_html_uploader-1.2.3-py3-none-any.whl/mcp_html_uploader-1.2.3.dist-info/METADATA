@@ -1,0 +1,234 @@
+Metadata-Version: 2.4
+Name: mcp-html-uploader
+Version: 1.2.3
+Summary: MCP 服务器 - 提供 HTML 文件创建和阿里云 OSS 上传功能
+Author-email: Your Name <your.email@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/mcp-html-uploader
+Project-URL: Repository, https://github.com/yourusername/mcp-html-uploader
+Keywords: mcp,html,upload,file-server
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=0.9.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: oss2>=2.18.0
+Dynamic: license-file
+
+# HTML 文件创建和上传 MCP 服务器
+
+这是一个基于 Model Context Protocol (MCP) 的 Python 服务器，提供三个核心功能：
+
+1. 创建 HTML 文件
+2. 上传文件到服务器
+3. 创建 HTML 文件并立即上传（组合工具）
+
+## 功能说明
+
+### 1. create_html - 创建 HTML 内容
+
+根据提供的内容生成格式良好的 HTML 代码并返回（不保存文件）。
+
+参数：
+- `content` (必需): HTML 文件的主体内容，可以是完整的 HTML 代码或仅内容片段
+
+说明：
+- 直接返回完整的 HTML 代码
+- 不保存到本地文件系统（避免权限问题）
+- 标题默认为"文档"
+- 适用于任何沙箱环境
+
+示例：
+```json
+{
+  "content": "<h1>欢迎</h1><p>这是我的第一个页面</p>"
+}
+```
+
+返回示例：
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档</title>
+</head>
+<body>
+<h1>欢迎</h1><p>这是我的第一个页面</p>
+</body>
+</html>
+```
+
+### 2. upload_file - 上传文件
+
+上传文件到指定的服务器 API 接口，返回文件 URL。
+
+参数：
+- `file_path` (必需): 要上传的文件路径（相对或绝对路径）
+- `token` (必需): API 认证 Token
+
+说明：
+- 使用 form-data 格式，字段名固定为 `file`
+- Token 设置在请求头中
+- 返回服务器响应中 `body.fileUrl` 的值
+
+示例：
+```json
+{
+  "file_path": "./page_20260112_143000.html",
+  "token": "your-api-token-here"
+}
+```
+
+返回示例：
+```
+https://example.com/uploads/your-file.html
+```
+
+上传接口：`https://v5.kaleido.guru/api/proxyStorage/NoAuth/upload_file`
+
+### 3. create_and_upload_html - 创建并上传 HTML 文件
+
+创建 HTML 内容并立即上传到服务器，一步完成两个操作，返回文件 URL。
+
+参数：
+- `content` (必需): HTML 文件的主体内容，可以是完整的 HTML 代码或仅内容片段
+- `token` (必需): API 认证 Token
+
+说明：
+- 文件名自动生成格式：`page_YYYYMMDD_HHMMSS.html`
+- **内存操作，不保存本地文件**（避免文件系统权限问题）
+- 使用 form-data 格式，字段名固定为 `file`
+- Token 设置在请求头中
+- 返回服务器响应中 `body.fileUrl` 的值
+- 适用于任何沙箱环境（如 Claude Desktop）
+
+示例：
+```json
+{
+  "content": "<h1>欢迎</h1><p>这是我的第一个页面</p>",
+  "token": "your-api-token-here"
+}
+```
+
+返回示例：
+```
+https://example.com/uploads/page_20260112_143000.html
+```
+
+## 安装
+
+1. 确保已安装 Python 3.10 或更高版本
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+## 配置 MCP 客户端
+
+### Claude Desktop 配置
+
+编辑 Claude Desktop 配置文件：
+
+MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+添加以下配置：
+
+```json
+{
+  "mcpServers": {
+    "html-file-server": {
+      "command": "python3",
+      "args": [
+        "/Users/liujingjing/ljj/work/mcp-creat-upload-html/server.py"
+      ]
+    }
+  }
+}
+```
+
+注意：将路径替换为你的实际项目路径。
+
+## 运行
+
+MCP 服务器通过标准输入/输出 (stdio) 与客户端通信，通常由 MCP 客户端（如 Claude Desktop）自动启动。
+
+你也可以手动测试服务器：
+
+```bash
+python3 server.py
+```
+
+## 使用示例
+
+### 创建 HTML 内容
+
+生成 HTML 代码：
+```
+请使用 create_html 工具创建 HTML 内容，内容是"<h1>你好世界</h1>"
+```
+
+这会返回完整的 HTML 代码，不会保存到本地文件
+
+### 上传文件
+
+```
+请使用 upload_file 工具将 page_20260112_143000.html 文件上传到服务器，token 是 xxx
+```
+
+### 创建并上传 HTML 文件（一步完成，推荐）
+
+```
+请创建一个包含"<h1>欢迎来到我的网站</h1><p>这是首页内容</p>"的 HTML 页面并立即上传到服务器，token 是 xxx
+```
+
+这个工具会：
+1. 在内存中生成完整的 HTML 内容
+2. 自动生成文件名（例如：`page_20260112_143000.html`）
+3. 直接上传到服务器（不保存本地文件）
+4. 返回文件 URL
+
+**优势：无需本地文件系统权限，适用于任何沙箱环境！**
+
+## 项目结构
+
+```
+mcp-creat-upload-html/
+├── server.py          # MCP 服务器主文件
+├── requirements.txt   # Python 依赖
+└── README.md         # 项目说明文档
+```
+
+## 技术栈
+
+- Python 3.10+
+- MCP (Model Context Protocol) SDK
+- httpx (异步 HTTP 客户端)
+
+## 注意事项
+
+1. 确保有足够的文件系统权限来创建和读取文件
+2. 上传大文件时注意网络超时设置（当前为 30 秒）
+3. 上传接口需要网络连接
+4. 文件路径支持相对路径和绝对路径
+
+## 常见问题
+
+Q: 如何修改上传接口地址？
+A: 编辑 `server.py` 文件中的 `UPLOAD_API_URL` 变量。
+
+Q: 支持哪些文件类型上传？
+A: 支持所有文件类型，服务器会自动检测 MIME 类型。
+
+Q: HTML 文件编码是什么？
+A: 使用 UTF-8 编码，确保支持中文等多语言字符。
+
