@@ -1,0 +1,1808 @@
+#!/usr/bin/python3.10
+########################################################################################
+# finance.py - Financial impact assessment module.                                     #
+#                                                                                      #
+# Author: Phil Sandwell, Ben Winchester                                                #
+# Copyright: Phil Sandwell, 2021                                                       #
+# License: Open source                                                                 #
+# Most recent update: 05/08/2021                                                       #
+#                                                                                      #
+# For more information, please email:                                                  #
+#     philip.sandwell@gmail.com                                                        #
+########################################################################################
+"""
+finance.py - The finance module for CLOVER.
+
+When assessing the impact of a system, the financial impact, i.e., the costs, need to be
+considered. This module assesses the costs of a system based on the financial
+information and system-sizing information provided.
+
+"""
+
+import collections
+
+from logging import Logger
+from typing import Any
+
+import numpy as np  # pylint: disable=import-error
+import pandas as pd  # pylint: disable=import-error
+
+from .__utils__ import ImpactingComponent, update_diesel_costs
+from ..__utils__ import (
+    BColours,
+    ColumnHeader,
+    hourly_profile_to_daily_sum,
+    InputFileError,
+    Inverter,
+    Location,
+    ProgrammerJudgementFault,
+    ResourceType,
+    Scenario,
+    TechnicalAppraisal,
+)
+from ..conversion.conversion import Converter, converter_cost
+
+__all__ = (
+    "CAPACITY_COST",
+    "CONNECTION_COST",
+    "connections_expenditure",
+    "COST",
+    "COST_DECREASE",
+    "COSTS",
+    "diesel_fuel_expenditure",
+    "DISCOUNT_RATE",
+    "discounted_energy_total",
+    "discounted_equipment_cost",
+    "expenditure",
+    "FIXED_COST",
+    "GENERAL_OM",
+    "get_total_equipment_costs",
+    "ImpactingComponent",
+    "independent_expenditure",
+    "OM",
+    "total_om",
+)
+
+# Capacity cost:
+#   Keyword used to denote the capacity-based costs of a component.
+CAPACITY_COST: str = "capacity_cost"
+
+# Connection cost:
+#   Keyword used to denote the connection cost for a household within the community.
+CONNECTION_COST = "connection_cost"
+
+# Cost:
+#   Keyword used to denote the cost of a component.
+COST: str = "cost"
+
+# Costs:
+#   Keyword used for parsing device-specific cost information.
+COSTS: str = "costs"
+
+# Cost decrease:
+#   Keyword used to denote the cost decrease of a component.
+COST_DECREASE: str = "cost_decrease"
+
+# Discount rate:
+#   Keyword used to denote the discount rate.
+DISCOUNT_RATE = "discount_rate"
+
+# Finance impact:
+#   Default `str` used as the format for specifying unique financial impacts.
+FINANCE_IMPACT: str = "{type}_{name}"
+
+# Fixed cost:
+#   Keyword used to denote the fixed misc. costs of a componnet of the system.
+FIXED_COST: str = "fixed_cost"
+
+# General OM:
+#   Keyword used to denote general O&M costs of the system.
+GENERAL_OM = "general_o&m"
+
+# Installation cost:
+#   Keyword used to denote the installation cost of a component.
+INSTALLATION_COST: str = "installation_cost"
+
+# Installation cost decrease:
+#   Keyword used to denote the installation cost decrease of a component.
+INSTALLATION_COST_DECREASE: str = "installation_cost_decrease"
+
+# OM:
+#   Keyword used to denote O&M costs.
+OM = "o&m"
+
+
+####################
+# Helper functions #
+####################
+
+
+def _component_cost(
+    component_cost: float,
+    component_cost_decrease: float,
+    component_size: float,
+    installation_year: int = 0,
+) -> float:
+    """
+    Computes and returns the cost the system componenet based on the parameters.
+
+    The various system component costs are comnputed using the following formula:
+        size * cost * (1 - 0.01 * cost_decrease) ** installation_year
+
+    Inputs:
+        - component_cost:
+            The cost of the component being considered.
+        - component_cost_decrease:
+            The cost decrease of the component being considered.
+        - component_size:
+            The size of the component within the minigrid system.
+        - installation_year:
+            The year that the component was installed.
+
+    Outputs:
+        - The undiscounted cost of the component.
+
+    """
+
+    system_wide_cost = component_cost * component_size
+    annual_reduction = 0.01 * component_cost_decrease
+    return float(system_wide_cost * (1 - annual_reduction) ** installation_year)
+
+
+def _component_installation_cost(
+    component_size: float,
+    installation_cost: float,
+    installation_cost_decrease: float,
+    installation_year: int = 0,
+) -> float:
+    """
+    Calculates cost of system installation.
+
+    The formula used is:
+        installation_cost = (
+            component_size * installation_cost * (
+                1 - 0.01 * installation_cost_decrease
+            ) ** installation_year
+        )
+
+    Inputs:
+        - component_size:
+            The size of the component within the minigrid system.
+        - installation_cost:
+            The cost of the installation.
+        - installation_cost_decrease:
+            The decrease in the cost of the installation.
+        - installation_year:
+            The installation year.
+
+    Outputs:
+        The undiscounted installation cost.
+
+    """
+
+    total_component_installation_cost = component_size * installation_cost
+    annual_reduction = 0.01 * installation_cost_decrease
+
+    return (
+        total_component_installation_cost
+        * (1.0 - annual_reduction) ** installation_year
+    )
+
+
+def _component_om(
+    component_om_cost: float,
+    component_size: float,
+    finance_inputs: dict[str, Any],
+    logger: Logger,
+    *,
+    start_year: int,
+    end_year: int,
+) -> float:
+    """
+    Computes the O&M cost of a component.
+
+    """
+
+    om_cost_daily = (component_size * component_om_cost) / 365
+    total_daily_cost = pd.DataFrame([om_cost_daily] * (end_year - start_year) * 365)
+
+    return discounted_energy_total(
+        finance_inputs,
+        logger,
+        total_daily_cost,
+        start_year=start_year,
+        end_year=end_year,
+    )
+
+
+def _daily_discount_rate(discount_rate: float) -> float:
+    """
+    Calculates equivalent discount rate at a daily resolution
+
+    Inputs:
+        - discount_rate:
+            The discount rate.
+
+    Outputs:
+        - The daily discount rate.
+
+    """
+
+    return float(((1.0 + discount_rate) ** (1.0 / 365.0)) - 1.0)
+
+
+def _discounted_fraction(
+    discount_rate: float, *, start_year: int = 0, end_year: int = 20
+) -> pd.DataFrame:
+    """
+    Calculates the discounted fraction at a daily resolution
+
+    Inputs:
+        - discount_rate:
+            The discount rate.
+        - start_year:
+            Start year of simulation period
+        - end_year:
+            End year of simulation period
+
+    Outputs:
+        Discounted fraction for each day of the simulation as a
+        :class:`pandas.DataFrame` instance.
+
+    """
+
+    # Intialise various variables.
+    start_day = int(start_year * 365)
+    end_day = int(end_year * 365)
+
+    # Convert the discount rate into the denominator.
+    r_d = _daily_discount_rate(discount_rate)
+    denominator = 1.0 + r_d
+
+    # Compute a list containing all the discounted fractions over the time period.
+    discounted_fraction_array = [
+        denominator**-time for time in range(start_day, end_day)
+    ]
+
+    return pd.DataFrame(discounted_fraction_array)
+
+
+def _inverter_expenditure(  # pylint: disable=too-many-locals
+    finance_inputs: dict[str, Any],
+    inverter: Inverter,
+    location: Location,
+    logger: Logger,
+    scenario: Scenario,
+    yearly_load_statistics: pd.DataFrame,
+    *,
+    start_year: int,
+    end_year: int,
+) -> float:
+    """
+    Calculates cost of inverters based on load calculations
+
+    Inputs:
+        - finance_inputs:
+            The finance-input information for the system.
+        - inverter:
+            The inverter being modelled.
+        - location:
+            The location being considered.
+        - logger:
+            The :class:`logging.Logger` to use for the run.
+        - yearly_load_statistics:
+            The yearly-load statistics for the system.
+        - scenario:
+            The :class:`Scenario` currently being considered.
+        - start_year:
+            Start year of simulation period
+        - end_year:
+            End year of simulation period
+
+    Outputs:
+        Discounted cost
+
+    """
+
+    # Initialise inverter replacement periods
+    replacement_intervals = pd.DataFrame(
+        np.arange(0, location.max_years, inverter.lifetime)
+    )
+    replacement_intervals.columns = pd.Index([ColumnHeader.INSTALLATION_YEAR.value])
+
+    # Check if inverter should be replaced in the specified time interval
+    if not any(
+        replacement_intervals[ColumnHeader.INSTALLATION_YEAR.value].isin(
+            list(np.array(range(start_year, end_year)))
+        )
+    ):
+        inverter_discounted_cost = float(0.0)
+        return inverter_discounted_cost
+
+    # Initialise inverter sizing calculation
+    max_power = []
+    inverter_size: list[float] = []
+    for i in range(len(replacement_intervals)):
+        # Calculate maximum power in interval years
+        start = replacement_intervals[ColumnHeader.INSTALLATION_YEAR.value].iloc[i]
+        end = start + inverter.lifetime
+        max_power_interval = (
+            yearly_load_statistics[ColumnHeader.MAXIMUM.value].iloc[start:end].max()
+        )
+        max_power.append(max_power_interval)
+        # Calculate resulting inverter size
+        inverter_size_interval: float = (
+            np.ceil(0.001 * max_power_interval / inverter.size_increment)
+            * inverter.size_increment
+        )
+        inverter_size.append(inverter_size_interval)
+    inverter_size_data_frame: pd.DataFrame = pd.DataFrame(inverter_size)
+    inverter_size_data_frame.columns = pd.Index([ColumnHeader.INVERTER_SIZE.value])
+    inverter_info = pd.concat([replacement_intervals, inverter_size_data_frame], axis=1)
+    # Calculate
+    inverter_info[ColumnHeader.DISCOUNT_RATE.value] = [
+        (1 - finance_inputs[DISCOUNT_RATE])
+        ** inverter_info[ColumnHeader.INSTALLATION_YEAR.value].iloc[i]
+        for i in range(len(inverter_info))
+    ]
+    inverter_info["Inverter cost ($/kW)"] = [
+        finance_inputs[ImpactingComponent.INVERTER.value][COST]
+        * (1 - 0.01 * finance_inputs[ImpactingComponent.INVERTER.value][COST_DECREASE])
+        ** inverter_info[ColumnHeader.INSTALLATION_YEAR.value].iloc[i]
+        for i in range(len(inverter_info))
+    ]
+
+    # If a static inverter size has been used, use this, otherwise, use the dynamically
+    # calculated values.
+    if scenario.fixed_inverter_size and any(
+        inverter_info[ColumnHeader.INVERTER_SIZE.value] > scenario.fixed_inverter_size
+    ):
+        logger.info(
+            "The static inverter size specified, %s, was below that calculated "
+            "within CLOVER. Calculated inverter sizes:\n%s",
+            scenario.fixed_inverter_size,
+            "\n".join(
+                [
+                    f"Size for year {year}: {size} kW"
+                    for year, size in zip(
+                        replacement_intervals[ColumnHeader.INSTALLATION_YEAR.value],
+                        inverter_info[ColumnHeader.INVERTER_SIZE.value],
+                    )
+                ]
+            ),
+        )
+
+    inverter_info[ColumnHeader.DISCOUNTED_EXPENDITURE.value] = [
+        inverter_info[ColumnHeader.DISCOUNT_RATE.value].iloc[i]
+        * (
+            inverter_info[ColumnHeader.INVERTER_SIZE.value].iloc[i]
+            if not scenario.fixed_inverter_size
+            else scenario.fixed_inverter_size
+        )
+        * inverter_info["Inverter cost ($/kW)"].iloc[i]
+        for i in range(len(inverter_info))
+    ]
+    inverter_discounted_cost = np.sum(
+        inverter_info.iloc[  # type: ignore [call-overload]
+            inverter_info.index[
+                inverter_info[ColumnHeader.INSTALLATION_YEAR.value].isin(
+                    list(np.array(range(start_year, end_year)))
+                )
+            ]
+        ][
+            ColumnHeader.DISCOUNTED_EXPENDITURE.value
+        ]  # type: ignore [index]
+    ).round(2)
+
+    return inverter_discounted_cost
+
+
+def _misc_costs(
+    diesel_size: float,
+    misc_capacity_cost: float,
+    misc_fixed_cost: float,
+    pv_array_size: dict[str, float],
+) -> float:
+    """
+    Calculates cost of miscellaneous capacity-related costs
+
+    Inputs:
+        - diesel_size:
+            Capacity of diesel generator being installed
+        - misc_capacity_cost:
+            The misc. costs of the system which scale with the capacity of the system.
+        - misc_fixed_cost:
+            The misc. costs of the system which do not scale with the capacity of the
+            system and which are fixed.
+        - pv_array_size:
+            Capacity of PV being installed
+
+    Outputs:
+        The undiscounted cost.
+
+    """
+
+    total_misc_capacity_cost = (
+        sum(pv_array_size.values()) + diesel_size
+    ) * misc_capacity_cost
+
+    return total_misc_capacity_cost + misc_fixed_cost
+
+
+###############################
+# Externally facing functions #
+###############################
+
+
+def get_total_equipment_costs(  # pylint: disable=too-many-locals, too-many-statements
+    buffer_tanks: float,
+    clean_water_tanks: float,
+    converters: dict[Converter, int],
+    diesel_size: float,
+    finance_inputs: dict[str, Any],
+    heat_exchangers: float,
+    hot_water_tanks: float,
+    logger: Logger,
+    pv_array_size: dict[str, float],
+    cw_pvt_array_size: dict[str, float],
+    hw_pvt_array_size: dict[str, float],
+    scenario: Scenario,
+    cw_st_array_size: dict[str, float],
+    hw_st_array_size: dict[str, float],
+    storage_size: float,
+    technical_appraisal: TechnicalAppraisal,
+    installation_year: int = 0,
+) -> tuple[float, dict[ResourceType, float]]:
+    """
+    Calculates all equipment costs.
+
+    Inputs:
+        - buffer_tanks:
+            The number of buffer tanks being installed.
+        - clean_water_tanks:
+            The number of clean-water tanks being installed.
+        - converters:
+            A mapping between converter names and the size of each that was added to the
+            system this iteration.
+        - diesel_size:
+            Capacity of diesel generator being installed.
+        - finance_inputs:
+            The finance-input information, parsed from the finance-inputs file.
+        - heat_exchangers:
+            The number of heat exchangers being installed.
+        - hot_water_tanks:
+            The number of hot-water tanks being installed.
+        - logger:
+            The logger to use for the run.
+        - scenario:
+            The scenario for the run(s) being carried out.
+        - pv_array_size:
+            Capacity of PV being installed.
+        - pvt_array_size:
+            Capacity of PV-T being installed.
+        - storage_size:
+            Capacity of battery storage being installed.
+        - technical_appraisal:
+            The technical appraisal for the system.
+        - installation_year:
+            ColumnHeader.INSTALLATION_YEAR.value
+
+    Outputs:
+        - Additional installation costs.
+        - The total costs of each component of the system as a `dict` mapping
+          :class:`ResourceType` to the cost for the subsystem associated with that
+          resource type.
+
+    """
+
+    if technical_appraisal.power_consumed_fraction is None:
+        logger.error(
+            "%sNo power consumed fraction was calculated. This is needed.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise ProgrammerJudgementFault(
+            "impact.finance",
+            "No power consumed fraction on technical appraisal despite being needed.",
+        )
+
+    # Instantiate a mapping for storing total cost information.
+    subsystem_costs: dict[ResourceType, float] = collections.defaultdict(float)
+
+    # Calculate the various system costs.
+    # compoennts.
+    bos_cost = _component_cost(
+        finance_inputs[ImpactingComponent.BOS.value][COST],
+        finance_inputs[ImpactingComponent.BOS.value][COST_DECREASE],
+        sum(pv_array_size.values()),
+        installation_year,
+    )
+
+    if ImpactingComponent.BUFFER_TANK.value not in finance_inputs and buffer_tanks > 0:
+        logger.error(
+            "%sNo buffer tank financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "tank inputs",
+            "No buffer tank financial input information provided and a non-zero number "
+            "of clean-water tanks are being considered.",
+        )
+    buffer_tank_cost: float = 0
+    buffer_tank_installation_cost: float = 0
+    if buffer_tanks > 0:
+        buffer_tank_cost = _component_cost(
+            finance_inputs[ImpactingComponent.BUFFER_TANK.value][COST],
+            finance_inputs[ImpactingComponent.BUFFER_TANK.value][COST_DECREASE],
+            buffer_tanks,
+            installation_year,
+        )
+        buffer_tank_installation_cost = _component_installation_cost(
+            buffer_tanks,
+            finance_inputs[ImpactingComponent.BUFFER_TANK.value][INSTALLATION_COST],
+            finance_inputs[ImpactingComponent.BUFFER_TANK.value][
+                INSTALLATION_COST_DECREASE
+            ],
+            installation_year,
+        )
+
+    if (
+        ImpactingComponent.CLEAN_WATER_TANK.value not in finance_inputs
+        and clean_water_tanks > 0
+    ):
+        logger.error(
+            "%sNo clean-water tank financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "tank inputs",
+            "No clean-water financial input information provided and a non-zero "
+            "number of clean-water tanks are being considered.",
+        )
+    clean_water_tank_cost: float = 0
+    clean_water_tank_installation_cost: float = 0
+    if clean_water_tanks > 0:
+        clean_water_tank_cost = _component_cost(
+            finance_inputs[ImpactingComponent.CLEAN_WATER_TANK.value][COST],
+            finance_inputs[ImpactingComponent.CLEAN_WATER_TANK.value][COST_DECREASE],
+            clean_water_tanks,
+            installation_year,
+        )
+        clean_water_tank_installation_cost = _component_installation_cost(
+            clean_water_tanks,
+            finance_inputs[ImpactingComponent.CLEAN_WATER_TANK.value][
+                INSTALLATION_COST
+            ],
+            finance_inputs[ImpactingComponent.CLEAN_WATER_TANK.value][
+                INSTALLATION_COST_DECREASE
+            ],
+            installation_year,
+        )
+
+    # Sum up the converter costs for each of the relevant subsystems.
+    cumulative_converter_costs: float = 0
+    cumulative_converter_installation_costs: float = 0
+    for resource_type in [ResourceType.CLEAN_WATER, ResourceType.HOT_CLEAN_WATER]:
+        converter_costs = sum(
+            converter_cost(
+                converter,
+                finance_inputs[
+                    FINANCE_IMPACT.format(
+                        type=ImpactingComponent.CONVERTER.value, name=converter.name
+                    )
+                ],
+                size,
+            )
+            for converter, size in converters.items()
+            if converter.output_resource_type == resource_type
+        )
+        cumulative_converter_costs += converter_costs
+        # NOTE: Converters use CapEx and OpEx costs and so do not use installation costs.
+        converter_installation_costs = 0
+        cumulative_converter_installation_costs += converter_installation_costs
+        subsystem_costs[resource_type] += converter_costs + converter_installation_costs
+        logger.debug(
+            "Converter costs determined for resource %s: %s",
+            resource_type.value,
+            converter_costs + converter_installation_costs,
+        )
+
+    diesel_cost = _component_cost(
+        finance_inputs[ImpactingComponent.DIESEL.value][COST],
+        finance_inputs[ImpactingComponent.DIESEL.value][COST_DECREASE],
+        diesel_size,
+        installation_year,
+    )
+    diesel_installation_cost = _component_installation_cost(
+        diesel_size,
+        finance_inputs[ImpactingComponent.DIESEL.value][INSTALLATION_COST],
+        finance_inputs[ImpactingComponent.DIESEL.value][INSTALLATION_COST_DECREASE],
+        installation_year,
+    )
+
+    if (
+        ImpactingComponent.HEAT_EXCHANGER.value not in finance_inputs
+        and heat_exchangers > 0
+    ):
+        logger.error(
+            "%sNo heat exchanger financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "heat exchanger inputs",
+            "No heat exchanger financial input information provided and a non-zero "
+            "number of clean-water tanks are being considered.",
+        )
+    heat_exchanger_cost: float = 0
+    heat_exchanger_installation_cost: float = 0
+    if heat_exchangers > 0:
+        heat_exchanger_cost = _component_cost(
+            finance_inputs[ImpactingComponent.HEAT_EXCHANGER.value][COST],
+            finance_inputs[ImpactingComponent.HEAT_EXCHANGER.value][COST_DECREASE],
+            heat_exchangers,
+            installation_year,
+        )
+        heat_exchanger_installation_cost = _component_installation_cost(
+            heat_exchangers,
+            finance_inputs[ImpactingComponent.HEAT_EXCHANGER.value][INSTALLATION_COST],
+            finance_inputs[ImpactingComponent.HEAT_EXCHANGER.value][
+                INSTALLATION_COST_DECREASE
+            ],
+            installation_year,
+        )
+
+    if (
+        ImpactingComponent.HOT_WATER_TANK.value not in finance_inputs
+        and hot_water_tanks > 0
+    ):
+        logger.error(
+            "%sNo hot-water tank financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "tank inputs",
+            "No hot-water financial input information provided and a non-zero "
+            "number of clean-water tanks are being considered.",
+        )
+    hot_water_tank_cost: float = 0
+    hot_water_tank_installation_cost: float = 0
+    if hot_water_tanks > 0:
+        hot_water_tank_cost = _component_cost(
+            finance_inputs[ImpactingComponent.HOT_WATER_TANK.value][COST],
+            finance_inputs[ImpactingComponent.HOT_WATER_TANK.value][COST_DECREASE],
+            hot_water_tanks,
+            installation_year,
+        )
+        hot_water_tank_installation_cost = _component_installation_cost(
+            hot_water_tanks,
+            finance_inputs[ImpactingComponent.HOT_WATER_TANK.value][INSTALLATION_COST],
+            finance_inputs[ImpactingComponent.HOT_WATER_TANK.value][
+                INSTALLATION_COST_DECREASE
+            ],
+            installation_year,
+        )
+
+    pv_cost = sum(
+        _component_cost(
+            finance_inputs[ImpactingComponent.PV.value][panel_name][COST],
+            finance_inputs[ImpactingComponent.PV.value][panel_name][COST_DECREASE],
+            array_size,
+            installation_year,
+        )
+        for panel_name, array_size in pv_array_size.items()
+    )
+    pv_installation_cost = sum(
+        _component_installation_cost(
+            array_size,
+            finance_inputs[ImpactingComponent.PV.value][panel_name][INSTALLATION_COST],
+            finance_inputs[ImpactingComponent.PV.value][panel_name][
+                INSTALLATION_COST_DECREASE
+            ],
+            installation_year,
+        )
+        for panel_name, array_size in pv_array_size.items()
+    )
+
+    if (
+        ImpactingComponent.PV_T.value not in finance_inputs
+        and sum(cw_pvt_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo PV-T financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No PV-T financial input information provided and a non-zero number of "
+            "clean-water PV-T panels are being considered.",
+        )
+
+    cw_pvt_cost: float = 0
+    cw_pvt_installation_cost: float = 0
+    if sum(cw_pvt_array_size.values()) > 0:
+        cw_pvt_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][COST],
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][
+                    COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in cw_pvt_array_size.items()
+        )
+        cw_pvt_installation_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][
+                    INSTALLATION_COST
+                ],
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][
+                    INSTALLATION_COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in cw_pvt_array_size.items()
+        )
+
+    if (
+        ImpactingComponent.PV_T.value not in finance_inputs
+        and sum(hw_pvt_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo PV-T financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No PV-T financial input information provided and a non-zero number of "
+            "hot-water PV-T panels are being considered.",
+        )
+
+    hw_pvt_cost: float = 0
+    hw_pvt_installation_cost: float = 0
+    if sum(hw_pvt_array_size.values()) > 0:
+        hw_pvt_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][COST],
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][
+                    COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in hw_pvt_array_size.items()
+        )
+        hw_pvt_installation_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][
+                    INSTALLATION_COST
+                ],
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][
+                    INSTALLATION_COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in hw_pvt_array_size.items()
+        )
+
+    if (
+        ImpactingComponent.SOLAR_THERMAL.value not in finance_inputs
+        and sum(cw_st_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo ST financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No ST financial input information provided and a non-zero number of clean-"
+            "water ST collectors are being considered.",
+        )
+
+    cw_st_cost: float = 0
+    cw_st_installation_cost: float = 0
+    if sum(cw_st_array_size.values()) > 0:
+        cw_st_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    COST
+                ],
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in cw_st_array_size.items()
+        )
+        cw_st_installation_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    INSTALLATION_COST
+                ],
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    INSTALLATION_COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in cw_st_array_size.items()
+        )
+
+    hw_st_cost: float = 0
+    hw_st_installation_cost: float = 0
+    if sum(hw_st_array_size.values()) > 0:
+        hw_st_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    COST
+                ],
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in hw_st_array_size.items()
+        )
+        hw_st_installation_cost = sum(
+            _component_cost(
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    INSTALLATION_COST
+                ],
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][
+                    INSTALLATION_COST_DECREASE
+                ],
+                array_size,
+                installation_year,
+            )
+            for panel_name, array_size in hw_st_array_size.items()
+        )
+
+    storage_cost = _component_cost(
+        finance_inputs[ImpactingComponent.STORAGE.value][COST],
+        finance_inputs[ImpactingComponent.STORAGE.value][COST_DECREASE],
+        storage_size,
+        installation_year,
+    )
+    storage_installation_cost = _component_cost(
+        finance_inputs[ImpactingComponent.STORAGE.value].get(INSTALLATION_COST, 0),
+        finance_inputs[ImpactingComponent.STORAGE.value].get(
+            INSTALLATION_COST_DECREASE, 0
+        ),
+        storage_size,
+        installation_year,
+    )
+
+    # Determine the capacity-based misc. costs associated with the system.
+    try:
+        misc_capacity_cost: float = finance_inputs[ImpactingComponent.MISC.value][
+            CAPACITY_COST
+        ]
+    except KeyError:
+        logger.warning(
+            "Using %s for misc. capacity costs is depreceated. Consider using %s.",
+            COST,
+            CAPACITY_COST,
+        )
+        try:
+            misc_capacity_cost = finance_inputs[ImpactingComponent.MISC.value][COST]
+        except KeyError:
+            logger.error(
+                "Neither %s nor the depreceated keyword %s used for misc. system costs.",
+                CAPACITY_COST,
+                COST,
+            )
+            raise
+
+    try:
+        misc_fixed_cost: float = finance_inputs[ImpactingComponent.MISC.value][
+            FIXED_COST
+        ]
+    except KeyError:
+        logger.warning(
+            "Missing fixed capacity costs in finance inputs file, assuming zero."
+        )
+        misc_fixed_cost = 0
+
+    misc_costs: float = _misc_costs(
+        diesel_size,
+        misc_capacity_cost,
+        misc_fixed_cost,  # if installation_year == 0 else 0,
+        pv_array_size,
+    )
+
+    # Compute the various subsystem costs.
+    if scenario.desalination_scenario is not None:
+        # Compute the clean-water subsystem costs.
+        subsystem_costs[ResourceType.CLEAN_WATER] += (
+            buffer_tank_cost
+            + buffer_tank_installation_cost
+            + clean_water_tank_cost
+            + clean_water_tank_installation_cost
+            + cw_pvt_cost
+            + cw_pvt_installation_cost
+            + cw_st_cost
+            + cw_st_installation_cost
+            + heat_exchanger_cost
+            + heat_exchanger_installation_cost
+            + (
+                bos_cost
+                + misc_costs
+                + pv_cost
+                + pv_installation_cost
+                + storage_cost
+                + storage_installation_cost
+            )
+            * technical_appraisal.power_consumed_fraction[ResourceType.CLEAN_WATER]
+        )
+
+    # Compute the electric subsystem costs.
+    subsystem_costs[ResourceType.ELECTRIC] += (
+        bos_cost
+        + misc_costs
+        + pv_cost
+        + pv_installation_cost
+        + storage_cost
+        + storage_installation_cost
+    ) * technical_appraisal.power_consumed_fraction[ResourceType.ELECTRIC]
+
+    # Compute the hot-water subsystem costs.
+    subsystem_costs[ResourceType.HOT_CLEAN_WATER] += (
+        hw_pvt_cost
+        + hw_pvt_installation_cost
+        + hw_st_cost
+        + hw_st_installation_cost
+        + hot_water_tank_cost
+        + hot_water_tank_installation_cost
+        + (
+            bos_cost
+            + misc_costs
+            + pv_cost
+            + pv_installation_cost
+            + storage_cost
+            + storage_installation_cost
+        )
+        * technical_appraisal.power_consumed_fraction[ResourceType.HOT_CLEAN_WATER]
+    )
+
+    # Compute the costs associated when carrying out prioritisation desalination.
+    update_diesel_costs(
+        diesel_cost + diesel_installation_cost,
+        scenario,
+        subsystem_costs,
+        technical_appraisal,
+    )
+
+    # Compute the total installation cost
+    total_installation_cost = (
+        buffer_tank_installation_cost
+        + clean_water_tank_installation_cost
+        + cumulative_converter_installation_costs
+        + diesel_installation_cost
+        + heat_exchanger_installation_cost
+        + hot_water_tank_installation_cost
+        + pv_installation_cost
+        + cw_pvt_installation_cost
+        + hw_pvt_installation_cost
+        + cw_st_installation_cost
+        + hw_st_installation_cost
+        + storage_installation_cost
+    )
+
+    return (
+        bos_cost
+        + buffer_tank_cost
+        + clean_water_tank_cost
+        + cumulative_converter_costs
+        + diesel_cost
+        + heat_exchanger_cost
+        + hot_water_tank_cost
+        + misc_costs
+        + pv_cost
+        + cw_pvt_cost
+        + hw_pvt_cost
+        + cw_st_cost
+        + hw_st_cost
+        + storage_cost
+        + total_installation_cost,
+        subsystem_costs,
+    )
+
+
+def connections_expenditure(
+    finance_inputs: dict[str, Any], households: pd.Series, installation_year: int = 0
+) -> float:
+    """
+    Calculates cost of connecting households to the system
+
+    Inputs:
+        - finance_inputs:
+            The finance input information.
+        - households:
+            A :class:`pd.Series` of households from Energy_System().simulation(...)
+        - year:
+            ColumnHeader.INSTALLATION_YEAR.value
+
+    Outputs:
+        Discounted cost
+
+    """
+
+    # NOTE: The "!= 0 else 0" fix is to ensure that installations include initial
+    # hosueholds which need to be connected to new minigrids.
+    new_connections = np.max(households) - (  # type: ignore [call-arg, call-overload]
+        np.min(households)  # type: ignore [call-overload]
+        if installation_year != 0
+        else 0
+    )  # type: ignore [call-arg, call-overload]
+    undiscounted_cost = float(
+        finance_inputs[ImpactingComponent.HOUSEHOLDS.value][CONNECTION_COST]
+        * new_connections
+    )
+    discount_fraction: float = (
+        1.0 - finance_inputs[DISCOUNT_RATE]
+    ) ** installation_year
+    total_discounted_cost = undiscounted_cost * discount_fraction
+
+    # Section in comments allows a more accurate consideration of the discounted cost
+    # for new connections, but substantially increases the processing time.
+
+    # new_connections = [0]
+    # for t in range(int(households.shape[0])-1):
+    #     new_connections.append(households['Households'][t+1] - households['Households'][t])
+    # new_connections = pd.DataFrame(new_connections)
+    # new_connections_daily = hourly_profile_to_daily_sum(new_connections)
+    # total_daily_cost = connection_cost * new_connections_daily
+    # total_discounted_cost = self.discounted_cost_total(total_daily_cost,start_year,end_year)
+
+    return total_discounted_cost
+
+
+def diesel_fuel_expenditure(
+    diesel_fuel_usage_hourly: pd.Series,
+    finance_inputs: dict[str, Any],
+    logger: Logger,
+    *,
+    start_year: int = 0,
+    end_year: int = 20,
+) -> float:
+    """
+    Calculates cost of diesel fuel used by the system
+
+    Inputs:
+        - diesel_fuel_usage_hourly:
+            Output from Energy_System().simulation(...)
+        - finance_inputs:
+            The finance input information.
+        - logger:
+            The logger to use for the run.
+        - start_year:
+            Start year of simulation period
+        - end_year:
+            End year of simulation period
+
+    Outputs:
+        Discounted cost
+
+    """
+
+    diesel_fuel_usage_daily = hourly_profile_to_daily_sum(diesel_fuel_usage_hourly)
+    start_day = start_year * 365
+    end_day = end_year * 365
+    r_y = 0.01 * finance_inputs[ImpactingComponent.DIESEL_FUEL.value][COST_DECREASE]
+    r_d = ((1.0 + r_y) ** (1.0 / 365.0)) - 1.0
+    diesel_price_daily: pd.DataFrame = pd.DataFrame(
+        [
+            finance_inputs[ImpactingComponent.DIESEL_FUEL.value][COST]
+            * (1.0 - r_d) ** day
+            for day in range(start_day, end_day)
+        ]
+    )
+
+    total_daily_cost = pd.DataFrame(diesel_fuel_usage_daily * diesel_price_daily[0])  # type: ignore [call-overload]
+    total_discounted_cost = discounted_energy_total(
+        finance_inputs,
+        logger,
+        total_daily_cost,
+        start_year=start_year,
+        end_year=end_year,
+    )
+
+    return total_discounted_cost
+
+
+def discounted_energy_total(
+    finance_inputs: dict[str, Any],
+    logger: Logger,
+    total_daily: pd.DataFrame | pd.Series,
+    *,
+    start_year: int = 0,
+    end_year: int = 20,
+) -> float:
+    """
+    Calculates the total discounted cost of some parameter.
+
+    Inputs:
+        - finance_inputs:
+            The finance input information.
+        - logger:
+            The logger to use for the run.
+        - total_daily:
+            Undiscounted energy at a daily resolution
+        - start_year:
+            Start year of simulation period
+        - end_year:
+            End year of simulation period
+
+    Outputs:
+        The discounted energy total cost.
+
+    """
+
+    try:
+        discount_rate = finance_inputs[DISCOUNT_RATE]
+    except KeyError:
+        logger.error(
+            "%sNo discount rate in the finance inputs, missing key: %s%s",
+            BColours.fail,
+            DISCOUNT_RATE,
+            BColours.endc,
+        )
+        raise
+
+    if isinstance(total_daily, pd.DataFrame):
+        total_daily = total_daily[0]  # type: ignore [call-overload]
+
+    discounted_fraction = _discounted_fraction(
+        discount_rate, start_year=start_year, end_year=end_year
+    )
+    discounted_energy = pd.DataFrame(discounted_fraction[0] * total_daily)  # type: ignore [call-overload]
+    return float(np.sum(discounted_energy).iloc[0])  # type: ignore
+
+
+def discounted_equipment_cost(  # pylint: disable=too-many-locals
+    buffer_tanks: int,
+    clean_water_tanks: int,
+    converters: dict[Converter, int],
+    diesel_size: float,
+    finance_inputs: dict[str, Any],
+    heat_exchangers: int,
+    hot_water_tanks: int,
+    logger: Logger,
+    pv_array_size: dict[str, float],
+    cw_pvt_array_size: dict[str, float],
+    hw_pvt_array_size: dict[str, float],
+    scenario: Scenario,
+    cw_st_array_size: dict[str, float],
+    hw_st_array_size: dict[str, float],
+    storage_size: float,
+    technical_appraisal: TechnicalAppraisal,
+    installation_year: int = 0,
+) -> tuple[float, dict[ResourceType, float]]:
+    """
+    Calculates cost of all equipment costs
+
+    Inputs:
+        - buffer_tanks:
+            The number of buffer tanks being installed.
+        - clean_water_tanks:
+            The number of clean-water tanks being installed.
+        - converters:
+            A mapping between converter names and the size of each that was added to the
+            system this iteration.
+        - diesel_size:
+            Capacity of diesel generator being installed
+        - finance_inputs:
+            The finance input information.
+        - heat_exchangers:
+            The number of heat exchangers being installed.
+        - hot_water_tanks:
+            The number of hot-water tanks being installed.
+        - logger:
+            The logger to use for the run.
+        - scenario:
+            The scenario currently being considered.
+        - pv_array_size:
+            Capacity of PV being installed
+        - pvt_array_size:
+            Capacity of PV-T being installed
+        - storage_size:
+            Capacity of battery storage being installed
+        - technical_appraisal:
+            The :class:`TechnicalAppraisal` for the system being considered.
+        - installation_year:
+            ColumnHeader.INSTALLATION_YEAR.value
+    Outputs:
+        - Any additional equipment costs not associated with a specific subsystem.
+        - A mapping between :class:`ResourceType` entries and the discounted costs
+          associated with that subsystem.
+
+    """
+
+    additional_costs, undiscounted_costs = get_total_equipment_costs(
+        buffer_tanks,
+        clean_water_tanks,
+        converters,
+        diesel_size,
+        finance_inputs,
+        heat_exchangers,
+        hot_water_tanks,
+        logger,
+        pv_array_size,
+        cw_pvt_array_size,
+        hw_pvt_array_size,
+        scenario,
+        cw_st_array_size,
+        hw_st_array_size,
+        storage_size,
+        technical_appraisal,
+        installation_year,
+    )
+    discount_fraction = (
+        1.0 - float(finance_inputs[DISCOUNT_RATE])
+    ) ** installation_year
+
+    return (
+        additional_costs * discount_fraction,
+        {key: value * discount_fraction for key, value in undiscounted_costs.items()},
+    )
+
+
+def expenditure(
+    component: ImpactingComponent,
+    finance_inputs: dict[str, Any],
+    hourly_usage: pd.Series,
+    logger: Logger,
+    *,
+    start_year: int = 0,
+    end_year: int = 20,
+) -> float:
+    """
+    Calculates cost of the usage of a component.
+
+    Inputs:
+        - component:
+            The component to consider.
+        - finance_inputs:
+            The financial input information.
+        - hourly_usage:
+            Output from Energy_System().simulation(...)
+        - start_year:
+            Start year of simulation period
+        - end_year:
+            End year of simulation period
+
+    Outputs:
+        Discounted cost
+
+    """
+
+    hourly_cost = hourly_usage * finance_inputs[component.value][COST]
+    total_daily_cost = hourly_profile_to_daily_sum(hourly_cost)
+    total_discounted_cost = discounted_energy_total(
+        finance_inputs,
+        logger,
+        total_daily_cost,
+        start_year=start_year,
+        end_year=end_year,
+    )
+    return total_discounted_cost
+
+
+def independent_expenditure(
+    finance_inputs: dict[str, Any],
+    inverter: Inverter,
+    location: Location,
+    logger: Logger,
+    scenario: Scenario,
+    yearly_load_statistics: pd.DataFrame,
+    *,
+    start_year: int,
+    end_year: int,
+) -> float:
+    """
+    Calculates cost of equipment which is independent of simulation periods
+
+    Inputs:
+        - finance_inputs:
+            The financial input information.
+        - inverter:
+            The inverter being modelled.
+        - location:
+            The location currently being considered.
+        - logger:
+            The :class:`logging.Logger` to use for the run.
+        - yearly_load_statistics:
+            The yearly load statistics information.
+        - scenario:
+            The :class:`Scenario` currently being considered.
+        - start_year:
+            Start year of simulation period
+        - end_year:
+            End year of simulation period
+
+    Outputs:
+        Discounted cost
+
+    """
+
+    inverter_expenditure = _inverter_expenditure(
+        finance_inputs,
+        inverter,
+        location,
+        logger,
+        scenario,
+        yearly_load_statistics,
+        start_year=start_year,
+        end_year=end_year,
+    )
+    total_expenditure = inverter_expenditure  # ... + other components as required
+    return total_expenditure
+
+
+def total_om(  # pylint: disable=too-many-locals
+    buffer_tanks: int,
+    clean_water_tanks: int,
+    converters: dict[Converter, int] | None,
+    diesel_size: float,
+    finance_inputs: dict[str, Any],
+    heat_exchangers: int,
+    hot_water_tanks: int,
+    logger: Logger,
+    pv_array_size: dict[str, float],
+    cw_pvt_array_size: dict[str, float],
+    hw_pvt_array_size: dict[str, float],
+    scenario: Scenario,
+    cw_st_array_size: dict[str, float],
+    hw_st_array_size: dict[str, float],
+    storage_size: float,
+    technical_appraisal: TechnicalAppraisal,
+    *,
+    start_year: int = 0,
+    end_year: int = 20,
+) -> tuple[float, dict[ResourceType, float]]:
+    """
+    Calculates total O&M cost over the simulation period
+
+    Inputs:
+        - buffer_tanks:
+            The number of buffer tanks installed.
+        - clean_water_tanks:
+            The number of clean-water tanks installed.
+        - converters:
+            A mapping between converter instances and the size of each that was added to
+            the system this iteration.
+        - diesel_size:
+            Capacity of diesel generator installed.
+        - finance_inputs:
+            Finance input information.
+        - heat_exchangers:
+            The number of heat exchangers installed.
+        - hot_water_tanks:
+            The number of hot-water tanks installed.
+        - logger:
+            The logger to use for the run.
+        - pv_array_size:
+            Capacity of PV installed.
+        - pvt_array_size:
+            Capacity of PV-T installed.
+        - scenario:
+            The scenario for the run(s) being carried out.
+        - storage_size:
+            Capacity of battery storage installed.
+        - technical_appraisal:
+            The technical appraisal for the system.
+        - start_year:
+            Start year of simulation period.
+        - end_year:
+            End year of simulation period.
+
+    Outputs:
+        - A mapping between :class:`ResourceType` and the O&M costs of this.
+
+    """
+
+    if technical_appraisal.power_consumed_fraction is None:
+        logger.error(
+            "%sNo power consumed fraction was calculated. This is needed.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise ProgrammerJudgementFault(
+            "impact.finance",
+            "No power consumed fraction on technical appraisal despite being needed.",
+        )
+
+    # Instantiate a mapping for storing total cost information.
+    subsystem_costs: dict[ResourceType, float] = collections.defaultdict(float)
+
+    if ImpactingComponent.BUFFER_TANK.value not in finance_inputs and buffer_tanks > 0:
+        logger.error(
+            "%sNo buffer-tank financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "tank inputs",
+            "No buffer-tank financial input information provided and a non-zero number "
+            "of buffer tanks are being considered.",
+        )
+    buffer_tank_om: float = 0
+    if buffer_tanks > 0:
+        buffer_tank_om = _component_om(
+            finance_inputs[ImpactingComponent.BUFFER_TANK.value][OM],
+            buffer_tanks,
+            finance_inputs,
+            logger,
+            start_year=start_year,
+            end_year=end_year,
+        )
+
+    if (
+        ImpactingComponent.CLEAN_WATER_TANK.value not in finance_inputs
+        and clean_water_tanks > 0
+    ):
+        logger.error(
+            "%sNo clean-water-tank financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "tank inputs",
+            "No clean-water tank financial input information provided and a non-zero "
+            "number of clean-water tanks are being considered.",
+        )
+    clean_water_tank_om: float = 0
+    if clean_water_tanks > 0:
+        clean_water_tank_om = _component_om(
+            finance_inputs[ImpactingComponent.CLEAN_WATER_TANK.value][OM],
+            clean_water_tanks,
+            finance_inputs,
+            logger,
+            start_year=start_year,
+            end_year=end_year,
+        )
+
+    if converters is not None:
+        for resource_type in [ResourceType.CLEAN_WATER, ResourceType.HOT_CLEAN_WATER]:
+            converter_om = sum(
+                _component_om(
+                    finance_inputs[
+                        FINANCE_IMPACT.format(
+                            type=ImpactingComponent.CONVERTER.value, name=converter
+                        )
+                    ][OM],
+                    size,
+                    finance_inputs,
+                    logger,
+                    start_year=start_year,
+                    end_year=end_year,
+                )
+                for converter, size in converters.items()
+                if resource_type == converter.output_resource_type
+            )
+            subsystem_costs[resource_type] += converter_om
+            logger.debug(
+                "Converter OM costs determined for resource %s: %s",
+                resource_type.value,
+                converter_om,
+            )
+
+    else:
+        logger.debug(
+            "No converters were installed in the system, hence no OM costs to compute."
+        )
+
+    diesel_om = _component_om(
+        finance_inputs[ImpactingComponent.DIESEL.value][OM],
+        diesel_size,
+        finance_inputs,
+        logger,
+        start_year=start_year,
+        end_year=end_year,
+    )
+
+    general_om = _component_om(
+        finance_inputs[GENERAL_OM],
+        1,
+        finance_inputs,
+        logger,
+        start_year=start_year,
+        end_year=end_year,
+    )
+
+    if (
+        ImpactingComponent.HEAT_EXCHANGER.value not in finance_inputs
+        and heat_exchangers > 0
+    ):
+        logger.error(
+            "%sNo heat-exchanger financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "heat exchanger inputs",
+            "No heat-exchanger financial input information provided and a non-zero "
+            "number of heat exchangers are being considered.",
+        )
+    heat_exchanger_om: float = 0
+    if heat_exchangers > 0:
+        heat_exchanger_om = _component_om(
+            finance_inputs[ImpactingComponent.HEAT_EXCHANGER.value][OM],
+            heat_exchangers,
+            finance_inputs,
+            logger,
+            start_year=start_year,
+            end_year=end_year,
+        )
+
+    if (
+        ImpactingComponent.HOT_WATER_TANK.value not in finance_inputs
+        and hot_water_tanks > 0
+    ):
+        logger.error(
+            "%sNo hot-water-tank financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "tank inputs",
+            "No hot-water tank financial input information provided and a non-zero "
+            "number of clean-water tanks are being considered.",
+        )
+    hot_water_tank_om: float = 0
+    if hot_water_tanks > 0:
+        hot_water_tank_om = _component_om(
+            finance_inputs[ImpactingComponent.HOT_WATER_TANK.value][OM],
+            hot_water_tanks,
+            finance_inputs,
+            logger,
+            start_year=start_year,
+            end_year=end_year,
+        )
+
+    pv_om = sum(
+        _component_om(
+            finance_inputs[ImpactingComponent.PV.value][panel_name][OM],
+            array_size,
+            finance_inputs,
+            logger,
+            start_year=start_year,
+            end_year=end_year,
+        )
+        for panel_name, array_size in pv_array_size.items()
+    )
+
+    if (
+        ImpactingComponent.PV_T.value not in finance_inputs
+        and sum(cw_pvt_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo PV-T financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No PV-T financial input information provided and a non-zero number of "
+            "clean-water PV-T panels are being considered.",
+        )
+
+    cw_pvt_om: float = 0
+    if sum(cw_pvt_array_size.values()) > 0:
+        cw_pvt_om = sum(
+            _component_om(
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][OM],
+                array_size,
+                finance_inputs,
+                logger,
+                start_year=start_year,
+                end_year=end_year,
+            )
+            for panel_name, array_size in cw_pvt_array_size.items()
+        )
+
+    if (
+        ImpactingComponent.PV_T.value not in finance_inputs
+        and sum(hw_pvt_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo PV-T financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No PV-T financial input information provided and a non-zero number of "
+            "hot-water PV-T panels are being considered.",
+        )
+
+    hw_pvt_om: float = 0
+    if sum(hw_pvt_array_size.values()) > 0:
+        hw_pvt_om = sum(
+            _component_om(
+                finance_inputs[ImpactingComponent.PV_T.value][panel_name][OM],
+                array_size,
+                finance_inputs,
+                logger,
+                start_year=start_year,
+                end_year=end_year,
+            )
+            for panel_name, array_size in hw_pvt_array_size.items()
+        )
+
+    if (
+        ImpactingComponent.SOLAR_THERMAL.value not in finance_inputs
+        and sum(cw_st_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo ST financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No ST financial input information provided and a non-zero number of clean-"
+            "water ST collectors are being considered.",
+        )
+
+    cw_st_om: float = 0
+    if sum(cw_st_array_size.values()) > 0:
+        cw_st_om = sum(
+            _component_om(
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][OM],
+                array_size,
+                finance_inputs,
+                logger,
+                start_year=start_year,
+                end_year=end_year,
+            )
+            for panel_name, array_size in cw_st_array_size.items()
+        )
+
+    if (
+        ImpactingComponent.SOLAR_THERMAL.value not in finance_inputs
+        and sum(hw_st_array_size.values()) > 0
+    ):
+        logger.error(
+            "%sNo ST financial input information provided.%s",
+            BColours.fail,
+            BColours.endc,
+        )
+        raise InputFileError(
+            "finance inputs",
+            "No ST financial input information provided and a non-zero number of hot-"
+            "water ST panels are being considered.",
+        )
+
+    hw_st_om: float = 0
+    if sum(hw_st_array_size.values()) > 0:
+        hw_st_om = sum(
+            _component_om(
+                finance_inputs[ImpactingComponent.SOLAR_THERMAL.value][panel_name][OM],
+                array_size,
+                finance_inputs,
+                logger,
+                start_year=start_year,
+                end_year=end_year,
+            )
+            for panel_name, array_size in hw_st_array_size.items()
+        )
+
+    storage_om = _component_om(
+        finance_inputs[ImpactingComponent.STORAGE.value][OM],
+        storage_size,
+        finance_inputs,
+        logger,
+        start_year=start_year,
+        end_year=end_year,
+    )
+
+    # Compute the clean-water subsystem costs.
+    if scenario.desalination_scenario is not None:
+        subsystem_costs[ResourceType.CLEAN_WATER] += (
+            buffer_tank_om
+            + clean_water_tank_om
+            + cw_pvt_om
+            + cw_st_om
+            + heat_exchanger_om
+            + (
+                (general_om + pv_om + storage_om)
+                * technical_appraisal.power_consumed_fraction[ResourceType.CLEAN_WATER]
+            )
+        )
+
+    # Compute the electric subsystem costs.
+    subsystem_costs[ResourceType.ELECTRIC] += (
+        general_om + pv_om + storage_om
+    ) * technical_appraisal.power_consumed_fraction[ResourceType.ELECTRIC]
+
+    # Compute the hot-water subsystem costs.
+    subsystem_costs[ResourceType.HOT_CLEAN_WATER] += (
+        hot_water_tank_om
+        + hw_pvt_om
+        + hw_st_om
+        + (general_om + pv_om + storage_om)
+        * technical_appraisal.power_consumed_fraction[ResourceType.HOT_CLEAN_WATER]
+    )
+
+    # Compute the costs associated when carrying out prioritisation desalination.
+    update_diesel_costs(
+        diesel_om,
+        scenario,
+        subsystem_costs,
+        technical_appraisal,
+    )
+
+    return (0, subsystem_costs)
+
+
+# #%%
+# # ==============================================================================
+# #   EQUIPMENT EXPENDITURE (DISCOUNTED)
+# #       Find system equipment capital expenditure (discounted) for new equipment
+# # ==============================================================================
+
+
+# #   Grid extension components
+# def get_grid_extension_cost(self, grid_extension_distance, year):
+#     """
+#     Function:
+#         Calculates cost of extending the grid network to a community
+#     Inputs:
+#         grid_extension_distance     Distance to the existing grid network
+#         year                        ColumnHeader.INSTALLATION_YEAR.value
+#     Outputs:
+#         Discounted cost
+#     """
+#     grid_extension_cost = self.finance_inputs.iloc["Grid extension cost"]  # per km
+#     grid_infrastructure_cost = self.finance_inputs.iloc["Grid infrastructure cost"]
+#     discount_fraction = (1.0 - self.finance_inputs.iloc[ColumnHeader.DISCOUNT_RATE.value]) ** year
+#     return (
+#         grid_extension_distance * grid_extension_cost * discount_fraction
+#         + grid_infrastructure_cost
+#     )
+
+
+# #%%
+# # =============================================================================
+# #   EQUIPMENT EXPENDITURE (DISCOUNTED) ON INDEPENDENT EXPENDITURE
+# #       Find expenditure (discounted) on items independent of simulation periods
+# # =============================================================================
+
+
+# #%%
+# # ==============================================================================
+# #   EXPENDITURE (DISCOUNTED) ON RUNNING COSTS
+# #       Find expenditure (discounted) incurred during the simulation period
+# # ==============================================================================
+
+# #%%
+# # ==============================================================================
+# #   FINANCING CALCULATIONS
+# #       Functions to calculate discount rates and discounted expenditures
+# # ==============================================================================
+
+
+# #   Calculate LCUE using total discounted costs ($) and discounted energy (kWh)
+# def get_LCUE(self, total_discounted_costs, total_discounted_energy):
+#     """
+#     Function:
+#         Calculates the levelised cost of used electricity (LCUE)
+#     Inputs:
+#         total_discounted_costs        Discounted costs total
+#         total_discounted_energy       Discounted energy total
+#     Outputs:
+#         Levelised cost of used electricity
+#     """
+#     return total_discounted_costs / total_discounted_energy
