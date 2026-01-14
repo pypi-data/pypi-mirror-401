@@ -1,0 +1,317 @@
+Metadata-Version: 2.4
+Name: ds-cache-cleaner
+Version: 0.4.0
+Summary: Clean up cached data from ML/data science libraries
+Project-URL: Documentation, https://github.com/bpiwowar/ds-cache-cleaner#readme
+Project-URL: Issues, https://github.com/bpiwowar/ds-cache-cleaner/issues
+Project-URL: Source, https://github.com/bpiwowar/ds-cache-cleaner
+Author-email: Your Name <you@example.com>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: cache,cleanup,data-science,huggingface,machine-learning
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: System :: Filesystems
+Requires-Python: >=3.10
+Requires-Dist: click>=8.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: rich>=13.0
+Requires-Dist: textual>=0.40
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0; extra == 'dev'
+Requires-Dist: pytest-timeout>=2.0; extra == 'dev'
+Requires-Dist: pytest>=8.0; extra == 'dev'
+Requires-Dist: ruff>=0.1; extra == 'dev'
+Requires-Dist: textual-dev>=1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# ds-cache-cleaner
+
+Clean up cached data from ML/data science libraries.
+
+## Supported Caches
+
+- **HuggingFace Models** - `~/.cache/huggingface/hub` (models)
+- **HuggingFace Datasets (Hub)** - `~/.cache/huggingface/hub` (datasets)
+- **Transformers** - `~/.cache/huggingface/transformers`
+- **HF Datasets** - `~/.cache/huggingface/datasets`
+- **ir_datasets** - `~/.ir_datasets`
+- **datamaestro (cache)** - `~/datamaestro/cache` (partial downloads, processing)
+- **datamaestro (data)** - `~/datamaestro/data` (downloaded datasets)
+
+## Installation
+
+```bash
+pip install ds-cache-cleaner
+```
+
+Or with uv:
+
+```bash
+uv pip install ds-cache-cleaner
+```
+
+## Usage
+
+### List caches
+
+```bash
+ds-cache-cleaner list
+```
+
+### Show cache entries
+
+```bash
+ds-cache-cleaner show
+ds-cache-cleaner show -c "HuggingFace Hub"
+```
+
+### Clean caches
+
+```bash
+# Interactive mode
+ds-cache-cleaner clean
+
+# Clean specific cache
+ds-cache-cleaner clean -c "HuggingFace Hub"
+
+# Clean all without prompting
+ds-cache-cleaner clean --all
+
+# Dry run
+ds-cache-cleaner clean --dry-run
+```
+
+### Interactive TUI
+
+```bash
+ds-cache-cleaner tui
+```
+
+## Library Integration
+
+ML libraries can integrate with ds-cache-cleaner to provide rich metadata about their cached data. This enables better descriptions, accurate last-access times, and custom library-specific metadata.
+
+### Metadata Format
+
+The metadata is stored in a `ds-cache-cleaner/` folder inside each cache directory:
+
+```
+~/.cache/mylib/
+├── ds-cache-cleaner/
+│   ├── lock                    # Lock file for concurrent access
+│   ├── information.json        # Cache info and parts list
+│   └── part_models.json        # Entries for "models" part
+└── ... (actual cache data)
+```
+
+### Using the CacheRegistry API
+
+```python
+from ds_cache_cleaner import CacheRegistry
+
+# Initialize once for your library
+registry = CacheRegistry(
+    cache_path="~/.cache/mylib",
+    library="mylib",
+    description="My ML Library cache",
+)
+
+# Register a part (e.g., models, datasets)
+registry.register_part("models", "Downloaded model weights")
+
+# When downloading a new model
+registry.register_entry(
+    part="models",
+    path="bert-base",  # relative path within cache
+    description="BERT base model",
+    size=438_000_000,
+)
+
+# When accessing an existing entry (updates last_access time)
+registry.touch("models", "bert-base")
+
+# When deleting an entry (removes from metadata)
+registry.remove("models", "bert-base")
+```
+
+### Custom Metadata
+
+You can store library-specific metadata using the `metadata` parameter:
+
+```python
+# Store custom metadata when registering an entry
+registry.register_entry(
+    part="models",
+    path="bert-base-uncased",
+    description="BERT base uncased model",
+    size=438_000_000,
+    metadata={
+        "model_type": "bert",
+        "revision": "main",
+        "tags": ["encoder", "uncased", "english"],
+        "framework": "pytorch",
+    },
+)
+
+# Retrieve entry with its metadata
+entry = registry.get_entry("models", "bert-base-uncased")
+if entry:
+    print(entry.metadata)  # {"model_type": "bert", ...}
+```
+
+### Full API Reference
+
+#### CacheRegistry
+
+| Method | Description |
+|--------|-------------|
+| `register_part(name, description="")` | Register a new part (e.g., "models", "datasets") |
+| `register_entry(part, path, description="", size=None, metadata=None)` | Register or update a cache entry |
+| `touch(part, path)` | Update last access time for an entry |
+| `remove(part, path) -> bool` | Remove entry from metadata (returns True if found) |
+| `update_size(part, path, size)` | Update the size of an entry |
+| `get_entry(part, path) -> EntryMetadata \| None` | Get metadata for a specific entry |
+| `list_entries(part) -> list[EntryMetadata]` | List all entries in a part |
+| `list_parts() -> list[PartInfo]` | List all parts in the cache |
+| `parts.<name>` | Access a part via attribute notation (see below) |
+
+#### Parts Accessor
+
+The `parts` property provides a convenient attribute-style API:
+
+```python
+# Instead of:
+registry.register_entry("models", entry)
+registry.get_entry("models", "bert")
+registry.list_entries("models")
+
+# You can use:
+registry.parts.models.register(entry)
+registry.parts.models.get("bert")
+registry.parts.models.list()
+```
+
+**PartAccessor methods:**
+
+| Method | Description |
+|--------|-------------|
+| `register(path, ...)` | Register an entry (same args as `register_entry`) |
+| `get(path)` | Get an entry by path |
+| `get_entry(path)` | Alias for `get()` |
+| `list()` | List all entries |
+| `touch(path)` | Update last access time |
+| `remove(path)` | Remove an entry |
+| `update_size(path, size)` | Update entry size |
+
+#### Data Classes
+
+The metadata system uses standard Python dataclasses with pydantic validation:
+
+```python
+from ds_cache_cleaner import EntryMetadata, PartInfo
+
+# EntryMetadata fields
+@dataclass
+class EntryMetadata:
+    path: str                           # Relative path within cache (required)
+    description: str = ""               # Human-readable description
+    created: datetime | None = None     # When the entry was created
+    last_access: datetime | None = None # Last access time
+    size: int | None = None             # Size in bytes
+    metadata: dict[str, Any] = {}       # Library-specific metadata
+
+# PartInfo fields
+@dataclass
+class PartInfo:
+    name: str          # Part name (e.g., "models")
+    description: str = ""  # Human-readable description
+```
+
+#### Custom Entry Classes
+
+For type-safe entries, subclass `EntryMetadata` with your own fields. Extra fields are automatically serialized into the `metadata` dict and reconstructed on read:
+
+```python
+from dataclasses import dataclass, field
+from ds_cache_cleaner import CacheRegistry, EntryMetadata
+
+@dataclass
+class ModelEntry(EntryMetadata):
+    """Custom entry for ML models."""
+    model_type: str = ""
+    revision: str = ""
+    tags: list[str] = field(default_factory=list)
+
+# Create registry with custom entry type
+registry = CacheRegistry(
+    cache_path="~/.cache/mylib",
+    library="mylib",
+    entry_types={"models": ModelEntry},  # Map part name to entry type
+)
+
+registry.register_part("models", "Model weights")
+
+# Register using custom entry instance
+entry = ModelEntry(
+    path="bert-base",
+    description="BERT model",
+    model_type="bert",
+    revision="v1.0",
+    tags=["encoder", "english"],
+)
+registry.register_entry("models", entry)
+
+# Get entry returns the correct type
+model = registry.get_entry("models", "bert-base")
+assert isinstance(model, ModelEntry)
+print(model.model_type)  # "bert"
+print(model.tags)        # ["encoder", "english"]
+
+# List entries also returns custom types
+for entry in registry.list_entries("models"):
+    print(f"{entry.path}: {entry.model_type}")
+```
+
+The JSON format remains backward compatible - extra fields are stored in the `metadata` dict:
+
+```json
+{
+  "path": "bert-base",
+  "description": "BERT model",
+  "metadata": {
+    "model_type": "bert",
+    "revision": "v1.0",
+    "tags": ["encoder", "english"]
+  }
+}
+```
+
+## Development
+
+```bash
+# Install with dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+hatch run test
+
+# Lint
+hatch run lint:check
+
+# Format
+hatch run lint:fix
+```
+
+## License
+
+MIT
