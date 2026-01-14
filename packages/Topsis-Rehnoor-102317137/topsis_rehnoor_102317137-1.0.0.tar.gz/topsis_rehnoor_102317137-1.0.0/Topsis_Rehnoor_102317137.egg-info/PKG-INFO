@@ -1,0 +1,224 @@
+Metadata-Version: 2.4
+Name: Topsis-Rehnoor-102317137
+Version: 1.0.0
+Summary: A Python package for TOPSIS (Technique for Order Preference by Similarity to Ideal Solution) - Multi-Criteria Decision Making
+Home-page: https://github.com/Rehnoor-Aulakh/Topsis-Rehnoor-102317137
+Author: Rehnoor Aulakh
+Author-email: aulakhrehnoor@gmail.com
+Keywords: topsis,mcdm,multi-criteria decision making,decision analysis,ranking
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas>=1.0.0
+Requires-Dist: numpy>=1.18.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+<div align="center">
+
+# 🎯 TOPSIS
+
+### Technique for Order Preference by Similarity to Ideal Solution
+
+[![PyPI version](https://img.shields.io/pypi/v/Topsis-Rehnoor-102317137?color=blue&style=for-the-badge)](https://pypi.org/project/Topsis-Rehnoor-102317137/)
+[![Python](https://img.shields.io/badge/Python-3.x-yellow?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Downloads](https://img.shields.io/pypi/dm/Topsis-Rehnoor-102317137?style=for-the-badge&color=purple)](https://pypi.org/project/Topsis-Rehnoor-102317137/)
+
+<br/>
+
+*A powerful multi-criteria decision-making (MCDM) technique used to rank alternatives based on their distance from an ideal best and an ideal worst solution.*
+
+<br/>
+
+[📦 Installation](#-installation) • [🚀 Quick Start](#-usage) • [📖 Documentation](#-input-file-format) • [👤 Author](#-author)
+
+</div>
+
+---
+
+<br/>
+
+## 💡 About
+
+This Python package provides a **clean, efficient, and command-line friendly implementation of TOPSIS**, designed as part of an academic assignment and packaged professionally for real-world usage via **PyPI**.
+
+<br/>
+
+## ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| ✅ **Standard Compliant** | Fully compliant with standard TOPSIS methodology |
+| 🖥️ **CLI Support** | Easy-to-use command-line interface |
+| 🛡️ **Robust Validation** | Comprehensive input validation and error handling |
+| ⚖️ **Customizable** | Supports customizable weights and impacts |
+| 📊 **Ranked Output** | Outputs ranked results with TOPSIS score |
+| 🪶 **Lightweight** | Minimal dependencies, easy installation via `pip` |
+
+<br/>
+
+---
+
+## 📦 Installation
+
+Install directly from **PyPI** using pip:
+
+```bash
+pip install Topsis-Rehnoor-102317137
+```
+
+<br/>
+
+---
+
+## 🖥️ Usage
+
+Run the package from the command line:
+
+```bash
+python -m topsis <input_file.csv> "<weights>" "<impacts>" <output_file.csv>
+```
+
+### 🔹 Example
+
+```bash
+python -m topsis data.csv "1,1,1,2" "+,+,-,+" result.csv
+```
+
+<br/>
+
+---
+
+## 📂 Input File Format
+
+> ⚠️ **Requirements:**
+
+- ✔️ Input file must be a **CSV file**
+- ✔️ Must contain at least **3 criteria columns**
+- ✔️ First column → **Alternative names** (non-numeric)
+- ✔️ Remaining columns → **Numeric criteria values** only
+
+<br/>
+
+### 📋 Sample Input (`data.csv`)
+
+| Model | Cost | Performance | Maintenance | Mileage |
+|:-----:|:----:|:-----------:|:-----------:|:-------:|
+| M1    | 250  | 7.5         | 5           | 18      |
+| M2    | 300  | 8.0         | 6           | 20      |
+| M3    | 200  | 6.5         | 4           | 15      |
+
+<br/>
+
+---
+
+## 📤 Output File
+
+The output CSV file contains:
+
+- 📌 All original columns
+- 📊 **Topsis Score**
+- 🏆 **Rank** *(Rank 1 = Best Alternative)*
+
+<br/>
+
+### 📋 Sample Output
+
+| Model | Cost | Performance | Maintenance | Mileage | Topsis Score | Rank |
+|:-----:|:----:|:-----------:|:-----------:|:-------:|:------------:|:----:|
+| M2    | 300  | 8.0         | 6           | 20      | 0.72         | 🥇 1 |
+| M1    | 250  | 7.5         | 5           | 18      | 0.58         | 🥈 2 |
+| M3    | 200  | 6.5         | 4           | 15      | 0.31         | 🥉 3 |
+
+<br/>
+
+---
+
+## 🔬 Behind the Scenes (TOPSIS Steps)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    TOPSIS Algorithm                          │
+├─────────────────────────────────────────────────────────────┤
+│  1️⃣  Normalize the decision matrix                          │
+│  2️⃣  Apply user-defined weights                             │
+│  3️⃣  Determine ideal best and worst solutions               │
+│  4️⃣  Calculate Euclidean distances (S⁺ and S⁻)              │
+│  5️⃣  Compute TOPSIS performance score                       │
+│  6️⃣  Rank alternatives based on scores                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+<br/>
+
+---
+
+## 🛠️ Technologies Used
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![PyPI](https://img.shields.io/badge/PyPI-3775A9?style=for-the-badge&logo=pypi&logoColor=white)
+
+</div>
+
+<br/>
+
+---
+
+## 👤 Author
+
+<div align="center">
+
+**Rehnoor Aulakh**
+
+*Computer Science Student*
+
+[![Email](https://img.shields.io/badge/Email-raulakh__be23%40thapar.edu-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:aulakhrehnoor@gmail.com)
+
+</div>
+
+<br/>
+
+---
+
+## 📄 License
+
+<div align="center">
+
+This project is licensed under the **MIT License**.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
+<div align="center">
+
+⭐ **If you found this helpful, please consider giving it a star!** ⭐
+
+</div>
