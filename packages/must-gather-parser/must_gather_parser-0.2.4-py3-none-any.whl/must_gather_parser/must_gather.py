@@ -1,0 +1,222 @@
+import logging
+import os
+import re
+import asyncio
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+from concurrent.futures import ProcessPoolExecutor
+from itertools import chain
+from importlib import resources
+from typing import List, AsyncIterator
+
+import aiofiles
+import yaml
+try:
+    BaseSafeLoader = yaml.CSafeLoader
+except AttributeError:
+    BaseSafeLoader = yaml.SafeLoader
+
+
+logger = logging.getLogger(__name__)
+
+must_gather_timestamp_pattern = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)\s+([+-]\d{4})")
+
+
+def parse_k8s_file_as_list(f):
+    with open(f, 'rb') as file:
+        unstruct = yaml.load(file, Loader=K8sSafeLoader)
+    if "items" in unstruct:
+        return unstruct
+    return {"apiVersion": "v1", "kind": "List", "items": [unstruct]}
+
+def parse_crd_file(f):
+    with open(f, 'rb') as file:
+        return yaml.load(file, Loader=K8sSafeLoader)
+
+class K8sSafeLoader(BaseSafeLoader):
+    """Custom loader for K8s manifests with special handling."""
+    pass
+
+def construct_undefined(loader, node):
+    """Treat undefined tags as strings."""
+    if isinstance(node, yaml.ScalarNode):
+        return loader.construct_scalar(node)
+    elif isinstance(node, yaml.SequenceNode):
+        return loader.construct_sequence(node)
+    elif isinstance(node, yaml.MappingNode):
+        return loader.construct_mapping(node)
+
+# Handle all undefined tags
+K8sSafeLoader.add_constructor(None, construct_undefined)
+
+
+def parse_log_datetime(line: str) -> datetime:
+    match = must_gather_timestamp_pattern.match(line)
+    if not match:
+        return None
+    timestamp_str, offset_str = match.groups()
+
+    # --- Normalize second's fractions up to 6 chars ---
+    # es: "2025-06-29 06:41:53.304214614" -> "2025-06-29 06:41:53.304214"
+    if '.' in timestamp_str:
+        base, frac = timestamp_str.split('.')
+        frac = (frac + "000000")[:6] 
+        timestamp_str = f"{base}.{frac}"
+
+    dt = datetime.strptime(timestamp_str + offset_str, "%Y-%m-%d %H:%M:%S.%f%z")
+    return dt.astimezone(timezone.utc)
+
+
+class MustGather:
+    def __init__(self):
+        self.path = None
+        self.root_dirs = {}
+        self.timestamp = None
+        self.crds = {}
+        self.apis = {}
+        self.executor = ProcessPoolExecutor(
+            max_workers=min(os.cpu_count() or 4, 16)
+        )
+        self.semaphore = asyncio.Semaphore(min(os.cpu_count() or 4, 16))
+        with resources.open_text("must_gather_parser", "api_resources.json") as f:
+            self.apis = json.load(f)
+
+
+    def _get_cpu_limit(default=1):
+        try:
+            with open("/sys/fs/cgroup/cpu.max") as f:
+                quota, period = f.read().strip().split()
+                if quota != "max":
+                    return max(1, int(int(quota) / int(period)))
+        except Exception:
+            pass
+        return default
+
+
+    def use(self, path):
+        self.path = Path(path).expanduser()
+        self.root_dirs = self._root_dirs()
+        if not self.path.exists():
+            raise FileNotFoundError(f'{self.path} does not exist')
+        
+        if not self.root_dirs:
+            raise ValueError(f'Invalid must-gather: no "timestamp" file found in {self.path} subdirectories')
+        self.crds = self.apis.copy()
+        self._collect_crds()
+
+
+    def close(self):
+        if self.executor is not None:
+            self.executor.shutdown(wait=True)
+
+
+    def _root_dirs(self):
+        root_dirs = {}
+        for path in self.path.rglob("timestamp"):
+            root_dirs[path.parent.absolute().as_posix()] = {"timestamp" : self._get_must_gather_timestamp(path)}
+        if len(root_dirs) > 1:
+            root_dirs_list= list(root_dirs.keys())
+            if root_dirs_list[0] in root_dirs_list[1]:
+                root_dirs.pop(root_dirs_list[0], None)
+        if root_dirs:
+            self.timestamp = min([v["timestamp"] for v in root_dirs.values()]) 
+        return root_dirs
+
+
+    def _get_must_gather_timestamp(self, timestamp_path):
+        with open(timestamp_path, 'r', encoding='utf-8') as timestamp_file_open:
+            return parse_log_datetime(timestamp_file_open.readline().strip())
+    
+
+    def _collect_crds(self):
+        crd_files = chain.from_iterable(
+            (Path(must_gather) / "cluster-scoped-resources" / "apiextensions.k8s.io" / "customresourcedefinitions").glob('*.yaml') 
+            for must_gather in self.root_dirs.keys()
+        )
+        results = self.executor.map(parse_crd_file, crd_files)
+        for crd in results:
+            crd_group = crd.get("spec", {}).get("group", "")
+            if crd_group not in self.crds:
+                self.crds[crd.get("spec", {}).get("group", "")] = {}
+            plural_name = crd.get("spec", {}).get("names", {}).get("plural", "")
+            self.crds[crd_group][plural_name] = {"namespaced": crd.get("spec", {}).get("scope") == "Namespaced"}
+    
+
+    def _get_resource_paths(self, resource_kind_plural, group, namespace, all_namespaces, namespaced):
+        sub_folder = "namespaces" if namespaced else "cluster-scoped"
+        path = "" if not namespaced else ("*/" if (all_namespaces or not namespace) else f"{namespace}/")  
+        logging.debug(f'checking for resources into: "<MUST_GATHER>/{sub_folder}/{path}{group}/{resource_kind_plural}/*"')
+        resource_paths = list(chain.from_iterable(
+            (Path(f'{must_gather}/{sub_folder}')).glob(f'{path}{group}/{resource_kind_plural}/*') 
+            for must_gather in self.root_dirs.keys()
+        ))
+        
+        # pods exception 
+        if resource_kind_plural=="pods" and group=="core" and (len(self.root_dirs) > 1 or (len(self.root_dirs) == 1 and not resource_paths)):
+                logging.debug(f'checking for resources into: "<MUST_GATHER>/{sub_folder}/{path}{resource_kind_plural}/*/*.yaml"')
+                resource_paths.extend(list(chain.from_iterable(
+                    (Path(f'{must_gather}/{sub_folder}')).glob(f'{path}{resource_kind_plural}/*/*.yaml') 
+                    for must_gather in self.root_dirs.keys()
+                )))
+        
+        if not resource_paths:
+            logging.debug(f'checking for resources into: "<MUST_GATHER>/{sub_folder}/{path}{group}/{resource_kind_plural}.yaml"')
+            resource_paths = list(chain.from_iterable(
+                (Path(f'{must_gather}/{sub_folder}')).glob(f'{path}{group}/{resource_kind_plural}.yaml') 
+                for must_gather in self.root_dirs.keys()
+            ))
+
+        return resource_paths
+
+
+    async def get_resources(self, resource_kind_plural: str, group: str, namespace: str | None = "default", resource_name: List[str] = [], all_namespaces: bool | None = False, **kwargs):
+        group = "core" if group in {"", "v1"} else group
+        if (namespaced:=kwargs.get("is_namespaced")) is None or not isinstance(namespaced, bool):
+            namespaced = self.crds.get(group, {}).get(resource_kind_plural, {}).get("namespaced", None)
+        resource_paths = self._get_resource_paths(resource_kind_plural, group, namespace, all_namespaces, namespaced)
+        loop = asyncio.get_running_loop()
+        async with self.semaphore:
+            tasks = [
+                loop.run_in_executor(self.executor, parse_k8s_file_as_list, path)
+                for path in resource_paths
+            ]
+            results = await asyncio.gather(*tasks)
+        uid_map = set()
+        logging.debug(f"found {len(results)} results before applying deduplication")
+        all_docs = [
+            resource
+            for items in results
+            for resource in items.get("items", [])
+            if (uid := resource.get("metadata", {}).get("uid")) not in uid_map
+            and (not resource_name or resource.get("metadata", {}).get("name", "") in resource_name) and not uid_map.add(uid)
+        ]
+        return {"apiVersion": "v1", "kind": "List", "items": all_docs}
+    
+    async def logs_pod(self, namespace, pod_name, container_name, fallback_to_previous=True) -> AsyncIterator[str]:
+        container_previous_log_file = None
+        container_log_file = None
+        tail = ""
+        log_files = chain.from_iterable(
+                (Path(f'{must_gather}/namespaces/{namespace}/pods/{pod_name}/{container_name}/{container_name}/logs')).glob('*.log') 
+                for must_gather in self.root_dirs.keys()
+            )
+        for log_file in log_files:
+            if log_file.name == "current.log" and log_file.stat().st_size > 0:
+                container_log_file = log_file
+                break
+            if fallback_to_previous and log_file.name == "previous.log" and log_file.stat().st_size > 0 and container_previous_log_file is None:
+                container_previous_log_file = log_file
+
+        container_log_file = container_log_file or container_previous_log_file
+        if not container_log_file:
+            return 
+        if container_log_file:
+            async with aiofiles.open(container_log_file, encoding="utf-8") as f:
+                while chunk := await f.read(64 * 1024):
+                    lines = (tail + chunk).split("\n")
+                    tail = lines[-1]
+                    for line in lines[:-1]:
+                        yield line
+                if tail:
+                    yield tail
