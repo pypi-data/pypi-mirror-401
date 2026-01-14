@@ -1,0 +1,54 @@
+[project]
+name = "chess-pyspec"
+version = "1.0.1"
+description = "Python SPEC modules and tools"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Kevin Welsh", email = "kevin.welsh@verdantevolution.com" }]
+dependencies = ["cython>=3.2.3", "h5py>=3.0.0", "numpy", "pyee>=13.0.0"]
+urls = { "Homepage" = "https://github.com/Verdant-Evolution/chess-pyspec" }
+
+[project.optional-dependencies]
+dev = [
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "python-docs-theme"
+]
+test = ["pytest-asyncio", "pytest-cov", "pytest-timeout"]
+
+[tool.setuptools]
+packages = [
+    "pyspec",
+    "pyspec.shared_memory",
+    "pyspec._connection",
+    "pyspec.file",
+    "pyspec.server",
+    "pyspec.client"
+]
+ext-modules = [
+    { name = "pyspec.shared_memory.shared_memory", sources = [
+        "pyspec/shared_memory/datashm_py.c",
+        "pyspec/shared_memory/sps.c",
+    ], include-dirs = ["pyspec/shared_memory"] },
+]
+
+[tool.setuptools.package-data]
+"pyspec.shared_memory" = ["*.h"]
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=80.9.0", "wheel", "cython"]
+
+[tool.coverage.report]
+omit = ["pyspec/shared_memory/**", "pyspec/file/**"]
+
+[tool.coverage.run]
+patch = ["subprocess"]
+
+[tool.cibuildwheel]
+# Disable pypi builds
+skip = "pp*"
+# Build with UV
+build-frontend = "build[uv]"
