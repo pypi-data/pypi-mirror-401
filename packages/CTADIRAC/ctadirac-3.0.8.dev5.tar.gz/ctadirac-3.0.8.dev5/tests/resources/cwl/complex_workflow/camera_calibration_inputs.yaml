@@ -1,0 +1,32 @@
+dl0_pedestal_data:
+  - class: File
+    path: test/data/pedestals_LST_dark.simtel.gz
+  - class: File
+    path: test/data/pedestals_LST_half_moon.simtel.gz
+dl0_flatfield_data:
+  - class: File
+    path: test/data/flasher_LST_dark.simtel.gz
+  - class: File
+    path: test/data/flasher_LST_half_moon.simtel.gz
+ped_process_config:
+  - class: File
+    path: test/config/process_pedestal.yaml
+ped_img_pix_stats_config:
+  class: File
+  path: test/config/pixelstats_pedestal.yaml
+ff_process_config:
+  - class: File
+    path: test/config/process_flatfield.yaml
+merge_config:
+  - class: File
+    path: test/config/merge_config.yaml
+ff_img_pix_stats_config:
+  class: File
+  path: test/config/pixelstats_flatfield_image.yaml
+ff_time_pix_stats_config:
+  class: File
+  path: test/config/pixelstats_flatfield_time.yaml
+camcalib_coeffs_config:
+  class: File
+  path: test/config/camera_calibration.yaml
+output_filename: camera_calibration_lst1.mon.dl1.h5
