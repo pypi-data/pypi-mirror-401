@@ -1,0 +1,238 @@
+Metadata-Version: 2.4
+Name: mtcli-percentlevels
+Version: 1.0.0
+Summary: Plugin mtcli para exibição de níveis percentuais
+License-Expression: GPL-3.0
+License-File: LICENSE
+Author: Valmir França
+Author-email: vfranca3@gmail.com
+Requires-Python: >=3.10,<3.14
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: click (>=8.3.0,<9.0.0)
+Requires-Dist: metatrader5 (>=5.0.5370,<6.0.0)
+Requires-Dist: mtcli (>=3.2.0)
+Description-Content-Type: text/markdown
+
+# mtcli-percentlevels
+
+Plugin do **mtcli** para exibição de **níveis percentuais verticais** em relação ao **fechamento D-1** ou **ajuste D-1**, com foco em **preparação de pregão**, **leitura objetiva de risco** e **definição prévia de zonas de preço**.
+
+Projetado para **day trade na B3**, com saída **100% textual**, compatível com **NVDA / JAWS**, e integração natural com metodologias baseadas em **VWAP, Auction Market Theory e RA-VWAP**.
+
+---
+
+## Funcionalidade
+
+O plugin exibe **níveis percentuais simétricos**, calculados a partir de um preço de referência do pregão anterior.
+
+### 📌 Preço de referência (configurável)
+- `close` → Fechamento D-1 (**padrão**)
+- `ajuste` → Ajuste D-1
+
+### 📌 Variações percentuais
+- Passo configurável (padrão: **0,5%**)
+- Variação total configurável (padrão: **3%**)
+- Cálculo simétrico (acima e abaixo do referencial)
+
+### 📌 Layout de saída
+- Exibição **vertical**
+- Preço de referência **centralizado**
+- Variações **positivas acima**
+- Variações **negativas abaixo**
+- Ordenação **decrescente em ambos os lados**
+  - Positivos: `+3.0 → +0.5`
+  - Negativos: `-0.5 → -3.0`
+
+---
+
+## Exemplo de saída
+
+```text
+Ativo: WING26
+----------------------------------------
++3.0%  169141
++2.5%  168320
++2.0%  167498
++1.5%  166677
++1.0%  165856
++0.5%  165035
+----------------------------------------
+CLOSE  164215
+----------------------------------------
+-0.5%  163394
+-1.0%  162573
+-1.5%  161752
+-2.0%  160931
+-2.5%  160109
+-3.0%  159288
+````
+
+---
+
+## Instalação
+
+### Requisitos
+
+* Python 3.10+
+* MetaTrader 5 instalado e configurado
+* Biblioteca Python `MetaTrader5`
+* `mtcli`
+
+### Instalação local
+
+```bash
+pip install .
+```
+
+Ou via Poetry (desenvolvimento):
+
+```bash
+poetry install
+```
+
+---
+
+## Uso
+
+```bash
+mt pl --symbol WING26
+```
+
+### Opções do comando
+
+| Opção            | Descrição                                 | Padrão      |
+| ---------------- | ----------------------------------------- | ----------- |
+| `--symbol`, `-s` | Ativo negociado no MT5                    | obrigatório |
+| `--ref`          | Preço de referência (`close` ou `ajuste`) | `close`     |
+| `--step`         | Passo percentual                          | `0.5`       |
+| `--total`        | Variação percentual total                 | `3.0`       |
+
+### Exemplos
+
+```bash
+mt pl --symbol WING26
+```
+
+```bash
+mt pl --symbol WING26 --ref ajuste
+```
+
+```bash
+mt pl --symbol WING26 --step 1 --total 5
+```
+
+---
+
+## Arquitetura
+
+O plugin segue o padrão **MVC explícito**, adotado no ecossistema `mtcli`.
+
+```text
+mtcli_percentlevels/
+├── cli.py          # Interface Click
+├── controller.py   # Orquestração
+├── model.py        # Dados e cálculos
+├── view.py         # Formatação e saída
+├── conf.py         # Configurações globais
+└── __init__.py
+```
+
+### Model
+
+* Usa `copy_rates_from_pos`
+* Não depende de datas ou timezone
+* Funciona corretamente em:
+
+  * dias úteis
+  * fins de semana
+  * feriados
+* Preço de referência sempre do **último pregão válido**
+
+### View
+
+* Responsável apenas pela apresentação
+* Formatação numérica baseada em `DIGITOS`
+* Saída linear e previsível (acessibilidade)
+
+### Controller
+
+* Coordena model e view
+* Sem regras de negócio
+
+---
+
+## Decisões de projeto
+
+### 🔑 Identificação do pregão
+
+> O pregão anterior **nunca é identificado por data**, apenas pela posição do candle diário no MT5.
+
+Isso evita erros comuns relacionados a:
+
+* timezone
+* execução fora do horário de pregão
+* feriados e fins de semana
+
+### 🔑 Preço central como âncora
+
+O preço de referência (close ou ajuste) é tratado como:
+
+* ponto neutro
+* base para risco
+* eixo de decisão pré-trade
+
+---
+
+## Integração com outros plugins
+
+Este plugin é complementar a:
+
+* `mtcli-prevsession`
+* `mtcli-vwap`
+* `mtcli-vap`
+* `mtcli-timesales`
+
+Permitindo:
+
+* checklist pré-trade automático
+* definição objetiva de zonas
+* leitura de confluência com volume
+
+---
+
+## Limitações conhecidas
+
+* O ajuste utilizado corresponde ao **close do candle D1**
+* Ajuste oficial da B3 pode diferir
+
+> Versões futuras podem incorporar ajuste oficial via Times & Trades.
+
+---
+
+## Roadmap (ideias futuras)
+
+* [ ] Flag `--json`
+* [ ] Destaque de zonas (ex: equilíbrio / extensão)
+* [ ] Integração direta com checklist RA-VWAP
+* [ ] Ajuste oficial da B3
+
+---
+
+## Licença
+
+GPL
+
+---
+
+## Autor
+
+Valmir França
+Day trader · Desenvolvedor Python · Arquitetura CLI
+Volume · VWAP · Auction Market Theory
+
+```
+
