@@ -1,0 +1,15 @@
+# Include documentation
+include LICENSE
+include README.md
+include README.EN.md
+include CHANGELOG.md
+include CHANGELOG.EN.md
+include pyproject.toml
+
+# Include package data
+recursive-include pytuck *.py
+include pytuck/py.typed
+
+# Exclude tests and examples from source distributions
+prune tests
+prune examples
