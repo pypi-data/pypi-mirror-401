@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.atuin.sh)",
+      "Bash(uv pip install:*)",
+      "Bash(uv venv:*)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(python -c \"\nfrom one_claude.core.scanner import ClaudeScanner\nfrom one_claude.core.models import MessageType\n\nscanner = ClaudeScanner\\(\\)\nprojects = scanner.scan_all\\(\\)\n\n# Find a session with messages\nfor p in projects:\n    if p.sessions:\n        session = p.sessions[0]\n        print\\(f''Session: {session.title}''\\)\n        print\\(f''Project: {session.project_display}''\\)\n        print\\(f''Messages: {session.message_count}''\\)\n        \n        # Load message tree\n        tree = scanner.load_session_messages\\(session\\)\n        messages = tree.get_main_thread\\(\\)\n        \n        print\\(f''Main thread: {len\\(messages\\)} messages''\\)\n        \n        # Show first few messages\n        for msg in messages[:3]:\n            if msg.type == MessageType.USER:\n                print\\(f''  USER: {msg.text_content[:80]}...''\\)\n            elif msg.type == MessageType.ASSISTANT:\n                tools = '', ''.join\\(t.name for t in msg.tool_uses\\) if msg.tool_uses else ''none''\n                print\\(f''  ASST: {msg.text_content[:60]}... [tools: {tools}]''\\)\n        break\n\")",
+      "Bash(python -m one_claude:*)",
+      "Bash(timeout 2 python:*)",
+      "Bash(uv run python:*)",
+      "Bash(docker push:*)",
+      "Bash(timeout 30 uv run python:*)",
+      "Bash(timeout 15 uv run python:*)",
+      "Bash(timeout 60 uv run python:*)",
+      "Bash(timeout 10 uv run python:*)",
+      "Bash(timeout 5 uv run python:*)",
+      "Bash(timeout 3 uv run:*)",
+      "Bash(grep:*)",
+      "Bash(tree:*)"
+    ]
+  }
+}
