@@ -1,0 +1,146 @@
+Metadata-Version: 2.4
+Name: originec
+Version: 0.1.1
+Summary: 
+Author: tomooki
+Author-email: tomooki0414@gmail.com
+Requires-Python: >=3.11
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Dist: freesimplegui (>=5.2.0.post1,<6.0.0)
+Requires-Dist: numpy (>=2.4.1,<3.0.0)
+Requires-Dist: originpro (>=1.1.14,<2.0.0)
+Requires-Dist: pandas (>=2.3.3,<3.0.0)
+Requires-Dist: scipy (>=1.17.0,<2.0.0)
+Description-Content-Type: text/markdown
+
+# OriginEC
+
+A Python tool for visualizing and analyzing electrochemical measurement data using OriginPro.
+
+## Overview
+
+OriginEC is a tool that automatically processes data obtained from electrochemical measurement devices (Gamry, BioLogic EC-Lab) and creates graphs in OriginPro. Data processing can be easily performed through a GUI interface.
+
+## Features
+
+- **Cyclic Voltammetry (CV) Data Processing**
+  - Import and process CV data from Gamry format (.DTA, .txt)
+  - Import and process CV data from BioLogic EC-Lab format
+  - Normalization to current density by electrode area
+  - Automatic scaling
+  - Graph creation in OriginPro
+
+- **Charge/Discharge Data Processing (BioLogic EC-Lab)**
+  - Import charge/discharge data from EC-Lab
+  - Automatic separation of charge and discharge cycles
+  - Automatic cycle number calculation
+  - Charge/discharge curve creation in OriginPro
+
+- **GUI Interface**
+  - File selection
+  - Processing method selection (CV_Gamry, CV_Biologic, ChDis_ECLab)
+  - Parameter input (electrode diameter, scan rate, etc.)
+
+## Requirements
+
+- Python >= 3.11
+- OriginPro (must be installed)
+
+### Dependencies
+
+- originpro >= 1.1.14
+- pandas >= 2.3.3
+- numpy >= 2.4.1
+- scipy >= 1.17.0
+- FreeSimpleGUI >= 5.2.0.post1
+
+## Installation
+
+```bash
+pip install originec
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/tomooki/originec.git
+cd originec
+poetry install
+```
+
+## Usage
+
+### Launch in GUI Mode
+
+```python
+from originec.origin_UI import main
+
+main()
+```
+
+Or from command line:
+
+```bash
+python -m originec.origin_UI
+```
+
+### Programmatic Usage
+
+#### Processing Gamry CV Data
+
+```python
+from originec.CV.cvorigin import CVMakerGamry
+
+# Specify list of file paths
+file_list = ["path/to/file1.DTA", "path/to/file2.DTA"]
+
+# Normalize to current density by specifying electrode diameter (mm)
+diameter = 3.0  # 3mm diameter electrode
+CVMakerGamry(file_list, diameter=diameter)
+```
+
+#### Processing BioLogic CV Data
+
+```python
+from originec.CV.cvorigin import CVMakerBiologic
+
+# Copy data to clipboard from BioLogic EC-Lab (Alt+D) before running
+CVMakerBiologic()
+```
+
+#### Processing BioLogic Charge/Discharge Data
+
+```python
+from originec.Biologic.chdis_bio import ECLabChDisMaker
+
+# Copy data to clipboard from EC-Lab before running
+ECLabChDisMaker()
+```
+
+## Data Formats
+
+### Gamry Format
+- `.DTA` files: Gamry raw data files
+- `.txt` files: Tab-delimited exported data
+
+### BioLogic EC-Lab Format
+- Data copied to clipboard from EC-Lab using `Alt+D`
+- CV data: Potential (Ewe/V) and current (I/mA, I/A, I/μA, etc.)
+- Charge/discharge data: Capacity (Capacity/mA.h/g) and potential (E/V)
+
+## License
+
+Please contact the project owner regarding the license for this project.
+
+## Author
+
+tomooki (tomooki0414@gmail.com)
+
+## Version
+
+0.1.0
+
