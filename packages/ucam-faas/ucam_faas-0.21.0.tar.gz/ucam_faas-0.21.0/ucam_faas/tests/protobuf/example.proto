@@ -1,0 +1,11 @@
+// To generate the Python module, run protoc (from the apt protobuf-compiler
+// package is fine):
+// $ protoc --proto_path=. --python_out=. --pyi_out=. example.proto
+
+syntax = "proto3";
+
+message ExampleRecord {
+  string query = 1;
+  int32 page_number = 2;
+  int32 results_per_page = 3;
+}
