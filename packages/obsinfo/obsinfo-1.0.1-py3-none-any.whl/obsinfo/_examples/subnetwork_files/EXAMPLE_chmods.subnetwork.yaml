@@ -1,0 +1,57 @@
+---
+format_version: "1.0"
+revision:
+    authors:
+        - {$ref: "persons/EXAMPLE.person.yaml"}
+    date: "2017-10-04"
+subnetwork:
+    operators:
+        - agency: "INSU-IPGP OBS Park"
+    network:
+        code: "4G"
+        description: "ORIENTED STATIONS"
+        start_date: "2007-07-01"
+        end_date: "2025-12-31"
+    stations:
+        "LSVW":
+            site: "Lucky Strike Volcano West"
+            start_date: "2015-04-22T12:00:00Z"
+            end_date: "2016-05-28T21:01:00Z"
+            location_code: "00"
+            instrumentation:
+                base: {$ref: "instrumentation_bases/EXAMPLE_CBBOBS.instrumentation_base.yaml"}
+                datalogger_configuration : "125sps"
+                modifications:
+                    equipment: {model: "Custom Model"}
+                channel_modifications:
+                    "*": {start_date: '2015-05-28T00:00:00Z',
+                          datalogger: {serial_number: "1794224"},
+                          sensor: {serial_number: '845'}}
+                    "H": {end_date: '2015-07-12T20:02:30Z',
+                          sensor: {serial_number: '0142'}}
+                    "1": {end_date: '2015-06-04T02:54:30Z',
+                          orientation:  {code: '1', 
+                                         azimuth.deg: {value: 33, uncertainty: 5,
+                                                       measurement_method: "Ppol"}}}
+                    "2": {orientation:  {code: '2',
+                                         azimuth.deg: {value: 123, uncertainty: 5,
+                                                       measurement_method: "Ppol"}}}
+            locations:
+                "00":
+                    base: {$ref: 'location_bases/EXAMPLE.location_base.yaml'}
+                    configuration: "SEA_SURFACE"
+                    position: {lon.deg: -32.32504, lat.deg: 37.29744, elev.m: -2030}
+            processing:
+                - clock_correction:
+                    drift:
+                        base: {$ref: "timing_bases/EXAMPLE.timing_base.yaml"}
+                        type: 'piecewise_linear'
+                        syncs_instrument_reference:
+                            - ["2015-04-21T21:06:00Z", "2015-04-21T21:06:00Z"]
+                            - ["2016-05-28T20:59:03Z", "2016-05-28T20:59:00.32Z"]
+notes:
+    - "An example with several channel modifications (dates, serial numbers, orientations)"
+    - "Values specified under '*' are applied to all channels"
+    - "Values specified using specific subsource codes ('H', '1', '2' applies"
+    - " only to those channels, overriding anything specifired in '*'"
+    
