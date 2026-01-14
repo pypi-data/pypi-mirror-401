@@ -1,0 +1,104 @@
+[build-system]
+build-backend = 'mesonpy'
+requires = [
+    "meson >= 1.5.1",
+    "meson-python",
+    "numpy>=2.0",
+    "setuptools-scm[simple]>=8",
+    "wheel"
+]
+
+[project]
+authors = [
+    {email = "tim@cerazone.net", name = "Tim Cera"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "cltoolbox >= 2.0.0",
+    "dateparser",
+    "filelock",
+    "numpy",
+    "packaging",
+    "pandas[excel]",
+    "pint!=0.21.*",
+    "pint-pandas",
+    "pydantic",
+    "python-dateutil",
+    "scipy",
+    "tabulate"
+]
+description = "Read and write Watershed Data Management (WDM) files"
+dynamic = ["version"]
+keywords = [
+    "HSPF",
+    "WDM",
+    "data",
+    "data_management",
+    "fortran",
+    "hydrological",
+    "hydrology",
+    "simulation",
+    "watershed"
+]
+license = {text = "BSD-3-Clause"}
+name = "wdmtoolbox"
+readme = "README.rst"
+requires-python = ">=3.10"
+
+[project.scripts]
+wdmtoolbox = "wdmtoolbox.wdmtoolbox:main"
+
+[project.urls]
+bitbucket = "https://bitbucket.org/timcera/wdmtoolbox/src/main/"
+documentation = "https://timcera.bitbucket.io/wdmtoolbox/docs/index.html"
+github = "https://github.com/timcera/wdmtoolbox"
+
+[tool.check-manifest]
+ignore = ["docs/_function_autosummary/*"]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+update_changelog_on_bump = true
+version = "16.0.12"
+version_files = ["VERSION"]
+
+[tool.isort]
+profile = "black"
+
+[tool.meson-python.args]
+setup = ['--default-library=shared']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE.txt"]
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[tool.setuptools.package-data]
+wdmtoolbox = ["message.wdm"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
