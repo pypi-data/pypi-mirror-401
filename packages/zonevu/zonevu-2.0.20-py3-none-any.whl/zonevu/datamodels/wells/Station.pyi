@@ -1,0 +1,36 @@
+from ...datamodels.DataModel import DataModel as DataModel
+from ...datamodels.Helpers import MakeIsodateOptionalField as MakeIsodateOptionalField
+from dataclasses import dataclass, field
+from dataclasses_json import config
+from datetime import datetime
+from enum import IntFlag, StrEnum
+
+class StationValidityEnum(StrEnum):
+    Valid = 'Valid'
+    InvalidData = 'InvalidData'
+    Duplicate = 'Duplicate'
+    OutOfOrder = 'OutOfOrder'
+
+class StationStateEnum(IntFlag):
+    NotSet = 0
+    UserIgnored = 1
+    UserEntered = 2
+    TieXYZ = 4
+
+@dataclass
+class Station(DataModel):
+    md: float = field(default=0, metadata=config(field_name='MD'))
+    tvd: float | None = field(default=0, metadata=config(field_name='TVD'))
+    inclination: float | None = ...
+    azimuth: float | None = ...
+    elevation: float | None = ...
+    delta_x: float | None = ...
+    delta_y: float | None = ...
+    vx: float | None = field(default=None, metadata=config(field_name='VX'))
+    time: datetime | None = ...
+    latitude: float | None = ...
+    longitude: float | None = ...
+    validity: StationValidityEnum | None = ...
+    state: StationStateEnum | None = field(default=None, metadata=config(decoder=_decode_station_state, encoder=_encode_station_state))
+    @property
+    def valid(self) -> bool: ...
