@@ -1,0 +1,1617 @@
+from typing import TypedDict, Literal, NotRequired, Any, Coroutine, Union, overload, Generator, final
+from hfortix_fortios.models import FortiObject
+from hfortix_core.types import MutationResponse, RawAPIResponse
+
+# Payload TypedDict for IDE autocomplete (for POST/PUT - fields are optional via total=False)
+# NOTE: We intentionally DON'T use NotRequired wrapper because:
+# 1. total=False already makes all fields optional
+# 2. NotRequired[Literal[...]] prevents Pylance from validating Literal values in dict literals
+class MobileTunnelPayload(TypedDict, total=False):
+    """
+    Type hints for system/mobile_tunnel payload fields.
+    
+    Configure Mobile tunnels, an implementation of Network Mobility (NEMO) extensions for Mobile IPv4 RFC5177.
+    
+    **Related Resources:**
+
+    Dependencies (resources this endpoint references):
+        - :class:`~.system.interface.InterfaceEndpoint` (via: roaming-interface)
+
+    **Usage:**
+        payload: MobileTunnelPayload = {
+            "field": "value",  # <- autocomplete shows all fields
+        }
+    """
+    name: str  # Tunnel name. | MaxLen: 15
+    status: Literal["disable", "enable"]  # Enable/disable this mobile tunnel. | Default: enable
+    roaming_interface: str  # Select the associated interface name from availabl | MaxLen: 15
+    home_agent: str  # IPv4 address of the NEMO HA | Default: 0.0.0.0
+    home_address: str  # Home IP address (Format: xxx.xxx.xxx.xxx). | Default: 0.0.0.0
+    renew_interval: int  # Time before lifetime expiration to send NMMO HA re | Default: 60 | Min: 5 | Max: 60
+    lifetime: int  # NMMO HA registration request lifetime | Default: 65535 | Min: 180 | Max: 65535
+    reg_interval: int  # NMMO HA registration interval | Default: 5 | Min: 5 | Max: 300
+    reg_retry: int  # Maximum number of NMMO HA registration retries | Default: 3 | Min: 1 | Max: 30
+    n_mhae_spi: int  # NEMO authentication SPI (default: 256). | Default: 256 | Min: 0 | Max: 4294967295
+    n_mhae_key_type: Literal["ascii", "base64"]  # NEMO authentication key type (ASCII or base64). | Default: ascii
+    n_mhae_key: str  # NEMO authentication key.
+    hash_algorithm: Literal["hmac-md5"]  # Hash Algorithm (Keyed MD5). | Default: hmac-md5
+    tunnel_mode: Literal["gre"]  # NEMO tunnel mode (GRE tunnel). | Default: gre
+    network: list[dict[str, Any]]  # NEMO network configuration.
+
+# Nested TypedDicts for table field children (dict mode)
+
+class MobileTunnelNetworkItem(TypedDict):
+    """Type hints for network table item fields (dict mode).
+    
+    Provides IDE autocomplete for nested table field items.
+    All fields are present in API responses.
+    """
+    
+    id: int  # Network entry ID. | Default: 0 | Min: 0 | Max: 4294967295
+    interface: str  # Select the associated interface name from availabl | MaxLen: 15
+    prefix: str  # Class IP and Netmask with correction | Default: 0.0.0.0 0.0.0.0
+
+
+# Nested classes for table field children (object mode)
+
+@final
+class MobileTunnelNetworkObject:
+    """Typed object for network table items.
+    
+    Provides IDE autocomplete for nested table field attributes.
+    At runtime, this is a FortiObject instance.
+    """
+    
+    # Network entry ID. | Default: 0 | Min: 0 | Max: 4294967295
+    id: int
+    # Select the associated interface name from available options. | MaxLen: 15
+    interface: str
+    # Class IP and Netmask with correction | Default: 0.0.0.0 0.0.0.0
+    prefix: str
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> dict[str, Any]: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+
+# Response TypedDict for GET returns (all fields present in API response)
+class MobileTunnelResponse(TypedDict):
+    """
+    Type hints for system/mobile_tunnel API response fields.
+    
+    All fields are present in the response from the FortiGate API.
+    """
+    name: str  # Tunnel name. | MaxLen: 15
+    status: Literal["disable", "enable"]  # Enable/disable this mobile tunnel. | Default: enable
+    roaming_interface: str  # Select the associated interface name from availabl | MaxLen: 15
+    home_agent: str  # IPv4 address of the NEMO HA | Default: 0.0.0.0
+    home_address: str  # Home IP address (Format: xxx.xxx.xxx.xxx). | Default: 0.0.0.0
+    renew_interval: int  # Time before lifetime expiration to send NMMO HA re | Default: 60 | Min: 5 | Max: 60
+    lifetime: int  # NMMO HA registration request lifetime | Default: 65535 | Min: 180 | Max: 65535
+    reg_interval: int  # NMMO HA registration interval | Default: 5 | Min: 5 | Max: 300
+    reg_retry: int  # Maximum number of NMMO HA registration retries | Default: 3 | Min: 1 | Max: 30
+    n_mhae_spi: int  # NEMO authentication SPI (default: 256). | Default: 256 | Min: 0 | Max: 4294967295
+    n_mhae_key_type: Literal["ascii", "base64"]  # NEMO authentication key type (ASCII or base64). | Default: ascii
+    n_mhae_key: str  # NEMO authentication key.
+    hash_algorithm: Literal["hmac-md5"]  # Hash Algorithm (Keyed MD5). | Default: hmac-md5
+    tunnel_mode: Literal["gre"]  # NEMO tunnel mode (GRE tunnel). | Default: gre
+    network: list[MobileTunnelNetworkItem]  # NEMO network configuration.
+
+
+@final
+class MobileTunnelObject:
+    """Typed FortiObject for system/mobile_tunnel with IDE autocomplete support.
+    
+    This is a typed wrapper that provides IDE autocomplete for API response fields.
+    At runtime, this is actually a FortiObject instance.
+    """
+    
+    # Tunnel name. | MaxLen: 15
+    name: str
+    # Enable/disable this mobile tunnel. | Default: enable
+    status: Literal["disable", "enable"]
+    # Select the associated interface name from available options. | MaxLen: 15
+    roaming_interface: str
+    # IPv4 address of the NEMO HA (Format: xxx.xxx.xxx.xxx). | Default: 0.0.0.0
+    home_agent: str
+    # Home IP address (Format: xxx.xxx.xxx.xxx). | Default: 0.0.0.0
+    home_address: str
+    # Time before lifetime expiration to send NMMO HA re-registrat | Default: 60 | Min: 5 | Max: 60
+    renew_interval: int
+    # NMMO HA registration request lifetime | Default: 65535 | Min: 180 | Max: 65535
+    lifetime: int
+    # NMMO HA registration interval (5 - 300, default = 5). | Default: 5 | Min: 5 | Max: 300
+    reg_interval: int
+    # Maximum number of NMMO HA registration retries | Default: 3 | Min: 1 | Max: 30
+    reg_retry: int
+    # NEMO authentication SPI (default: 256). | Default: 256 | Min: 0 | Max: 4294967295
+    n_mhae_spi: int
+    # NEMO authentication key type (ASCII or base64). | Default: ascii
+    n_mhae_key_type: Literal["ascii", "base64"]
+    # NEMO authentication key.
+    n_mhae_key: str
+    # Hash Algorithm (Keyed MD5). | Default: hmac-md5
+    hash_algorithm: Literal["hmac-md5"]
+    # NEMO tunnel mode (GRE tunnel). | Default: gre
+    tunnel_mode: Literal["gre"]
+    # NEMO network configuration.
+    network: list[MobileTunnelNetworkObject]
+    
+    # Common API response fields
+    status: str
+    http_status: int | None
+    vdom: str | None
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> MobileTunnelPayload: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+class MobileTunnel:
+    """
+    Configure Mobile tunnels, an implementation of Network Mobility (NEMO) extensions for Mobile IPv4 RFC5177.
+    
+    Path: system/mobile_tunnel
+    Category: cmdb
+    Primary Key: name
+    """
+    
+    # ================================================================
+    # DEFAULT MODE OVERLOADS (no response_mode) - MUST BE FIRST
+    # These match when response_mode is NOT passed (client default is "dict")
+    # Pylance matches overloads top-to-bottom, so these must come first!
+    # ================================================================
+    
+    # Default mode: mkey as positional arg -> returns typed dict
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> MobileTunnelResponse: ...
+    
+    # Default mode: mkey as keyword arg -> returns typed dict
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> MobileTunnelResponse: ...
+    
+    # Default mode: no mkey -> returns list of typed dicts
+    @overload
+    def get(
+        self,
+        name: None = None,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> list[MobileTunnelResponse]: ...
+    
+    # ================================================================
+    # EXPLICIT response_mode="object" OVERLOADS
+    # ================================================================
+    
+    # Object mode: mkey as positional arg -> returns single object
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # Object mode: mkey as keyword arg -> returns single object
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # Object mode: no mkey -> returns list of objects
+    @overload
+    def get(
+        self,
+        *,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> list[MobileTunnelObject]: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        response_mode: Literal["object"] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Dict mode with mkey provided as positional arg (single dict)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelResponse: ...
+    
+    # Dict mode with mkey provided as keyword arg (single dict)
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelResponse: ...
+    
+    # Dict mode - list of dicts (no mkey/name provided) - keyword-only signature
+    @overload
+    def get(
+        self,
+        *,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> list[MobileTunnelResponse]: ...
+    
+    # Fallback overload for all other cases
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], list[dict[str, Any]], FortiObject, list[FortiObject]]: ...
+    
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: str | None = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelObject | list[MobileTunnelObject] | dict[str, Any] | list[dict[str, Any]]: ...
+    
+    def get_schema(
+        self,
+        vdom: str | None = ...,
+        format: str = ...,
+    ) -> dict[str, Any]: ...
+    
+    # POST overloads
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # PUT overloads
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # DELETE overloads
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # Helper methods
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+# ================================================================
+# MODE-SPECIFIC CLASSES FOR CLIENT-LEVEL response_mode SUPPORT
+# ================================================================
+
+class MobileTunnelDictMode:
+    """MobileTunnel endpoint for dict response mode (default for this client).
+    
+    By default returns MobileTunnelResponse (TypedDict).
+    Can be overridden per-call with response_mode="object" to return MobileTunnelObject.
+    """
+    
+    # raw_json=True returns RawAPIResponse regardless of response_mode
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Object mode override with mkey (single item)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # Object mode override without mkey (list)
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> list[MobileTunnelObject]: ...
+    
+    # Dict mode with mkey (single item) - default
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelResponse: ...
+    
+    # Dict mode without mkey (list) - default
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> list[MobileTunnelResponse]: ...
+
+    # raw_json=True returns RawAPIResponse for POST
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # POST - Object mode override
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # POST - Default overload (returns MutationResponse)
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # POST - Dict mode (default for DictMode class)
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # raw_json=True returns RawAPIResponse for PUT
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # PUT - Object mode override
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # PUT - Default overload (returns MutationResponse)
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # PUT - Dict mode (default for DictMode class)
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # raw_json=True returns RawAPIResponse for DELETE
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # DELETE - Object mode override
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # DELETE - Default overload (returns MutationResponse)
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # DELETE - Dict mode (default for DictMode class)
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # Helper methods (inherited from base class)
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+class MobileTunnelObjectMode:
+    """MobileTunnel endpoint for object response mode (default for this client).
+    
+    By default returns MobileTunnelObject (FortiObject).
+    Can be overridden per-call with response_mode="dict" to return MobileTunnelResponse (TypedDict).
+    """
+    
+    # raw_json=True returns RawAPIResponse for GET
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Dict mode override with mkey (single item)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MobileTunnelResponse: ...
+    
+    # Dict mode override without mkey (list)
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> list[MobileTunnelResponse]: ...
+    
+    # Object mode with mkey (single item) - default
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["object"] | None = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # Object mode without mkey (list) - default
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["object"] | None = ...,
+        **kwargs: Any,
+    ) -> list[MobileTunnelObject]: ...
+
+    # raw_json=True returns RawAPIResponse for POST
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # POST - Dict mode override
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # POST - Object mode override (requires explicit response_mode="object")
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # POST - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # POST - Default for ObjectMode (returns MutationResponse like DictMode)
+    def post(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # PUT - Dict mode override
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns RawAPIResponse for PUT
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # PUT - Object mode override (requires explicit response_mode="object")
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # PUT - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # PUT - Default for ObjectMode (returns MutationResponse like DictMode)
+    def put(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # raw_json=True returns RawAPIResponse for DELETE
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # DELETE - Dict mode override
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # DELETE - Object mode override (requires explicit response_mode="object")
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # DELETE - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MobileTunnelObject: ...
+    
+    # DELETE - Default for ObjectMode (returns MutationResponse like DictMode)
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # Helper methods (inherited from base class)
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: MobileTunnelPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["disable", "enable"] | None = ...,
+        roaming_interface: str | None = ...,
+        home_agent: str | None = ...,
+        home_address: str | None = ...,
+        renew_interval: int | None = ...,
+        lifetime: int | None = ...,
+        reg_interval: int | None = ...,
+        reg_retry: int | None = ...,
+        n_mhae_spi: int | None = ...,
+        n_mhae_key_type: Literal["ascii", "base64"] | None = ...,
+        n_mhae_key: str | None = ...,
+        hash_algorithm: Literal["hmac-md5"] | None = ...,
+        tunnel_mode: Literal["gre"] | None = ...,
+        network: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+__all__ = [
+    "MobileTunnel",
+    "MobileTunnelDictMode",
+    "MobileTunnelObjectMode",
+    "MobileTunnelPayload",
+    "MobileTunnelObject",
+]
