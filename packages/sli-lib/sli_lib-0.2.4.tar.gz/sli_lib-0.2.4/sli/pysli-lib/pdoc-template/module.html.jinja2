@@ -1,0 +1,34 @@
+{#
+We want to extend the default template instead of defining everything ourselves.
+#}
+{% extends "default/module.html.jinja2" %}
+{% block module_contents %}
+    {{ super() }}
+    {% if module.obj.__re_exports__ %}
+        <h1 id="re-exports"> Re-exports </h1>
+        <ul>
+        {% for r in module.obj.__re_exports__ %}
+            {% set m = module.members[r] %}
+            <li>
+                <code class="reexp" id="{{ m.qualname or m.name}}">
+                    {{ (m.taken_from) | link }}
+                </code>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
+{% block nav_members %}
+    {{ super() }}
+    {% if module.obj.__re_exports__ %}
+        <ul>
+        <li><a href="#re-exports"> Re-exports </a></li>
+        </ul>
+    {% endif %}
+{% endblock %}
+{% macro is_public(doc) %}
+    {% if doc.taken_from[0] != doc.modulename %}
+    {% else %}
+        {{ default_is_public(doc) }}
+    {% endif %}
+{% endmacro %}

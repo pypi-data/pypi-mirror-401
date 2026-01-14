@@ -1,0 +1,22 @@
+vocabulary {
+    type A := {e,j,f}
+    res_int: A -> Int
+    res_real: A -> Real
+    value_int: A -> Int
+    value_real: A -> Int
+    a, b: -> Int
+    c, d: -> Real
+}
+
+theory {
+    a() - b() * d() = c().
+    d() < 1.
+    d () > -1.
+    !x in A: res_int(x) = 5 - value_int(x).
+    !x in A: res_int(x) = - (value_int(x) - 5).
+    !x in A: res_real(x) = 5 - value_real(x).
+    !x in A: res_real(x) = 5.0 - value_real(x).
+    !x in A: res_real(x) = - (value_real(x) - 5.0).
+}
+
+structure {}
