@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.24.1"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bashers"
+version = "0.4.2"
+description = "Installable bash command helpers"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Sung Kim" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["bashers"]
+include = ["bashers/**"]
+shared-scripts = { "bashers/bashers" = "bashers" }
+exclude = ["bashers/__pycache__/*"]
+
+[tool.hatch.build.targets.sdist]
+include = ["bashers/**", "README.md", "pyproject.toml"]
+exclude = ["bashers/__pycache__/*"]
+
+[tool.semantic_release]
+branch = "main"
+version_toml = ["pyproject.toml:project.version"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
