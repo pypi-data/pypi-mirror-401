@@ -1,0 +1,327 @@
+
+
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+from typing import Any, Awaitable, Callable, Literal, overload, Optional
+
+from pyee.asyncio import AsyncIOEventEmitter
+
+from .connection import Connection
+from .data import DataType, ErrorStr
+from .protocol import Command, Header
+
+
+class ServerConnectionEventEmitter(AsyncIOEventEmitter):
+    """
+    Defines the typed events emitted by the ServerConnection.
+    """
+
+    @overload
+    def emit(self, event: Literal["close"]) -> bool: ...
+    @overload
+    def on(self, event: Literal["close"], func: Callable[[], Any]) -> Callable[[], Any]:
+        """
+        Register an event listener for the 'close' event.
+
+        A 'close' event is emitted whenever the client connection is closed.
+        """
+
+    @overload
+    def emit(self, event: Literal["abort"]) -> bool: ...
+    @overload
+    def on(self, event: Literal["abort"], func: Callable[[], Any]) -> Callable[[], Any]:
+        """
+        Register an event listener for the 'abort' event.
+
+        An 'abort' event is emitted whenever the client sends an ABORT command.
+        The server should treat this like a "^C" from the keyboard with respect to any currently executing commands.
+        """
+
+    @overload
+    def emit(self, event: Literal["hello"], sequence_number: int) -> bool: ...
+    @overload
+    def on(
+        self, event: Literal["hello"], func: Callable[[int], Any]
+    ) -> Callable[[int], Any]:
+        """
+        Register an event listener for the 'hello' event.
+
+        A 'hello' event is emitted whenever the client sends a HELLO command.
+        The server should respond with a HELLO_REPLY message.
+        """
+
+    @overload
+    def emit(self, event: Literal["remote-cmd-no-return"], command: str) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["remote-cmd-no-return"],
+        func: Callable[[str], Any],
+    ) -> Callable[[str], Any]:
+        """
+        Register an event listener for the 'remote-cmd-no-return' event.
+
+        A 'remote-cmd-no-return' event is emitted whenever the client sends a command
+        that does not expect a return value.
+        """
+
+    @overload
+    def emit(
+        self, event: Literal["remote-cmd"], sequence_number: int, command: str
+    ) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["remote-cmd"],
+        func: Callable[[int, str], Awaitable[DataType]],
+    ) -> Callable[[int, str], Awaitable[DataType]]:
+        """
+        Register an event listener for the 'remote-cmd' event.
+
+        A 'remote-cmd' event is emitted whenever the client sends a command
+        that expects a return value.
+        """
+
+    @overload
+    def emit(
+        self, event: Literal["remote-func-no-return"], function_call: str
+    ) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["remote-func-no-return"],
+        func: Callable[[str], Any],
+    ) -> Callable[[str], Any]:
+        """
+        Register an event listener for the 'remote-func-no-return' event.
+
+        A 'remote-func-no-return' event is emitted whenever the client calls a function
+        that does not expect a return value.
+
+        A function call is represented as a string, e.g. "my_function(1, 'arg2')".
+        """
+
+    @overload
+    def emit(
+        self, event: Literal["remote-func"], sequence_number: int, function_call: str
+    ) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["remote-func"],
+        func: Callable[[int, str], Awaitable[DataType]],
+    ) -> Callable[[int, str], Awaitable[DataType]]:
+        """
+        Register an event listener for the 'remote-func' event.
+
+        A 'remote-func' event is emitted whenever the client calls a function
+        that expects a return value.
+
+        A function call is represented as a string, e.g. "my_function(1, 'arg2')".
+        """
+
+    @overload
+    def emit(
+        self, event: Literal["property-set"], property_name: str, value: DataType
+    ) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["property-set"],
+        func: Callable[[str, DataType], Any],
+    ) -> Callable[[str, DataType], Any]:
+        """
+        Register an event listener for the 'property-set' event.
+
+        A 'property-set' event is emitted whenever the client sets a property value on the server.
+        """
+
+    @overload
+    def emit(
+        self, event: Literal["property-get"], sequence_number: int, property_name: str
+    ) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["property-get"],
+        func: Callable[[int, str], Any],
+    ) -> Callable[[int, str], Any]:
+        """
+        Register an event listener for the 'property-get' event.
+
+        A 'property-get' event is emitted whenever the client requests a property value from the server.
+        """
+
+    @overload
+    def emit(self, event: Literal["property-watch"], property_name: str) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["property-watch"],
+        func: Callable[[str], Any],
+    ) -> Callable[[str], Any]:
+        """
+        Register an event listener for the 'property-watch' event.
+
+        A 'property-watch' event is emitted whenever the client registers to watch a property on the server.
+        The server should start sending events to the client when the property value changes.
+        """
+
+    @overload
+    def emit(self, event: Literal["property-unwatch"], property_name: str) -> bool: ...
+    @overload
+    def on(
+        self,
+        event: Literal["property-unwatch"],
+        func: Callable[[str], Any],
+    ) -> Callable[[str], Any]:
+        """
+        Register an event listener for the 'property-unwatch' event.
+
+        A 'property-unwatch' event is emitted whenever the client unregisters from watching a property on the server.
+        The server should stop sending events to the client when the property value changes.
+        """
+
+    @overload
+    def on(
+        self, event: Literal["message"], func: Callable[["ServerConnection.Message"], Any]
+    ) -> Callable[["ServerConnection.Message"], Any]:
+        """
+        Register an event listener for the 'message' event.
+
+        A 'message' event is emitted whenever a new message is received from the client.
+        Consider using the more specific events defined in this class instead.
+        """
+
+    def emit(self, event: str, *args: Any) -> bool:  # type: ignore[override]
+        return super().emit(event, *args)
+
+    def on(self, event: str, func: Optional[Callable[..., Any]] = None):  # type: ignore[override]
+        if func is None:
+            return super().on(event)
+        return super().on(event, func)
+
+
+class ServerConnection(Connection, ServerConnectionEventEmitter):
+    def __init__(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+        """
+        Initialize a server connection with the given stream reader and writer.
+
+        Args:
+            reader (asyncio.StreamReader): The stream reader for the connection.
+            writer (asyncio.StreamWriter): The stream writer for the connection.
+        """
+        Connection.__init__(self, reader, writer)
+        self.on("message", self._dispatch_typed_message_events)
+        self.logger = logging.getLogger("pyspec.server").getChild(
+            f"{self.host}:{self.port}"
+        )
+
+    def _dispatch_typed_message_events(self, msg: "ServerConnection.Message") -> None:
+        """
+        Given a received message, emit the appropriate typed event based on the message command.
+        Validates the message data type where possible.
+
+        Args:
+            msg (ServerConnection.Message): The received message.
+        """
+
+        cmd = msg.header.command
+        if cmd == Command.CLOSE:
+            self.emit("close")
+        elif cmd == Command.ABORT:
+            self.emit("abort")
+        elif cmd == Command.HELLO:
+            self.emit("hello", msg.header.sequence_number)
+        elif cmd == Command.CHAN_SEND:
+            self.emit("property-set", msg.header.name, msg.data)
+        elif cmd == Command.CHAN_READ:
+            self.emit("property-get", msg.header.sequence_number, msg.header.name)
+        elif cmd == Command.REGISTER:
+            self.emit("property-watch", msg.header.name)
+        elif cmd == Command.UNREGISTER:
+            self.emit("property-unwatch", msg.header.name)
+        elif cmd in (Command.CMD, Command.CMD_WITH_RETURN, Command.FUNC, Command.FUNC_WITH_RETURN):
+            if not isinstance(msg.data, str):
+                raise TypeError(f"Expected command data to be str, got {type(msg.data)}")
+            if cmd == Command.CMD:
+                self.emit("remote-cmd-no-return", msg.data)
+            elif cmd == Command.CMD_WITH_RETURN:
+                self.emit("remote-cmd", msg.header.sequence_number, msg.data)
+            elif cmd == Command.FUNC:
+                self.emit("remote-func-no-return", msg.data)
+            elif cmd == Command.FUNC_WITH_RETURN:
+                self.emit("remote-func", msg.header.sequence_number, msg.data)
+        else:
+            raise ValueError(f"Unknown command: {msg.header.command}")
+
+    async def prop_send(self, property: str, value) -> None:
+        """
+        Sends a property value to the client.
+
+        Args:
+            property (str): The property name.
+            value: The value to send.
+        """
+        await self._send(Header(Command.EVENT, name=property), data=value)
+
+    async def serve_forever(self) -> None:
+        """
+        Runs the server connection, handling requests until the connection is closed.
+        """
+        if self._listener is None:
+            raise RuntimeError("Connection is not started.")
+        await self._listener
+
+    async def reply(self, sequence_number: int, data: DataType) -> None:
+        """
+        Sends a reply to the client for a given sequence number.
+
+        Args:
+            sequence_number (int): The sequence number to reply to.
+            data (DataType): The data to send in the reply.
+        """
+        await self._send(
+            Header(Command.REPLY, sequence_number=sequence_number), data=data
+        )
+
+    async def reply_error(self, sequence_number: int, error_message: str) -> None:
+        """
+        Sends an error reply to the client for a given sequence number.
+
+        Args:
+            sequence_number (int): The sequence number to reply to.
+            error_message (str): The error message to send.
+        """
+        await self._send(
+            Header(Command.REPLY, sequence_number=sequence_number),
+            data=ErrorStr(error_message),
+        )
+
+    @asynccontextmanager
+    async def catch_reply_exceptions(self, sequence_number: int):
+        """
+        Context manager to catch and handle exceptions during reply handling.
+
+        Args:
+            sequence_number (int): The sequence number for the reply.
+        """
+        try:
+            yield
+        except Exception as e:
+            self.logger.error(
+                "Exception occurred while handling command (%s): `%s`",
+                sequence_number,
+                e,
+            )
+            await self.reply_error(sequence_number, str(e))
+
+    async def hello_reply(self, sequence_number: int) -> None:
+        """
+        Sends a HELLO_REPLY message to the client for a given sequence number.
+
+        Args:
+            sequence_number (int): The sequence number to reply to.
+        """
+        await self._send(Header(Command.HELLO_REPLY, sequence_number=sequence_number))
