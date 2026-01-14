@@ -1,0 +1,17 @@
+FIELD_MAP = {
+    "BOOL": 1,
+    "TINYINT": 2,
+    "SMALLINT": 2,
+    "INT": 2,
+    "BIGINT": 2,
+    "SERIAL": 2,
+    "FLOAT": 3,
+    "DOUBLE": 3,
+    "TEXT": 4,
+    "JSON": 5,
+    "TIMESTAMP": 7,
+    "INTERVAL": 8,
+    "DATE": 6,
+    "VECTOR": 9,
+    "UUID": 10,
+}
