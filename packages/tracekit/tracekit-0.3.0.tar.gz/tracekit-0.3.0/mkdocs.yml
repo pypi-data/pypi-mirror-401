@@ -1,0 +1,163 @@
+site_name: TraceKit
+site_url: https://lair-click-bats.github.io/tracekit
+site_description: Signal analysis framework for oscilloscope and logic analyzer data
+site_author: lair-click-bats
+
+repo_name: lair-click-bats/tracekit
+repo_url: https://github.com/lair-click-bats/tracekit
+
+# Exclude files from documentation build
+exclude_docs: |
+  images/architecture/README.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search
+  - mike:
+      version_selector: true
+      css_dir: css
+      javascript_dir: js
+      canonical_version: latest
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      slide_effect: slide
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: true
+      auto_caption: false
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_bases: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_root_members_full_path: false
+            show_object_full_path: false
+            show_category_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            heading_level: 2
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            merge_init_into_class: true
+            docstring_section_style: table
+            show_if_no_docstring: false
+            inherited_members: false
+            filters:
+              - "!^_"
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Getting Started: getting-started.md
+      - Installation: installation.md
+      - User Guide: user-guide.md
+  - Tutorials:
+      - Overview: tutorials/index.md
+      - Loading Data: tutorials/01-loading-data.md
+      - Basic Measurements: tutorials/02-basic-measurements.md
+      - Digital Signals: tutorials/03-digital-signals.md
+      - Spectral Analysis: tutorials/04-spectral-analysis.md
+      - Protocol Decoding: tutorials/05-protocol-decoding.md
+      - Report Generation: tutorials/06-report-generation.md
+  - Examples:
+      - Overview: examples/index.md
+      - Examples Reference: examples-reference.md
+  - Guides:
+      - Overview: guides/index.md
+      - Loading Waveforms: guides/loading-waveforms.md
+      - Power Analysis: guides/power-analysis-guide.md
+      - Component Analysis: guides/component-analysis-guide.md
+      - EMC Compliance Testing: guides/emc-compliance-guide.md
+      - Expert API: guides/expert-guide.md
+      - NaN Handling: guides/nan-handling.md
+      - Signal Intelligence: guides/signal-intelligence.md
+      - Troubleshooting: guides/troubleshooting.md
+      - Best Practices: guides/best-practices.md
+      - GPU Acceleration: guides/gpu-acceleration.md
+      - Report Customization: guides/report-customization.md
+      - Synthetic Test Data: guides/synthetic-test-data.md
+      - Public Test Data Sources: guides/public-test-data-sources.md
+      - Test Data Migration: guides/test-data-migration.md
+      - Deployment: guides/deployment.md
+      - GitHub Repository Setup: guides/github-repository-setup.md
+  - API Reference:
+      - Overview: api/index.md
+      - Analysis API: api/analysis.md
+      - Power Analysis: api/power-analysis.md
+      - Component Analysis: api/component-analysis.md
+      - Comparison & Limits: api/comparison-and-limits.md
+      - EMC Compliance: api/emc-compliance.md
+      - Session Management: api/session-management.md
+      - Workflows: api/workflows.md
+      - Pipelines: api/pipelines.md
+      - Expert API: api/expert-api.md
+      - Loader API: api/loader.md
+      - Export API: api/export.md
+      - Reporting API: api/reporting.md
+      - Visualization API: api/visualization.md
+  - Reference:
+      - Overview: reference/index.md
+      - Supported Formats: reference/supported-formats.md
+      - Protocol Decoders: reference/protocol-decoders.md
+      - Standards Compliance: reference/standards-compliance.md
+  - Testing:
+      - Overview: testing/index.md
+      - OOM Prevention: testing/oom-prevention.md
+  - CLI Reference: cli.md
+  - Error Codes: error-codes.md
+  - Contributing: contributing.md
+  - Code of Conduct: code-of-conduct.md
+  - Changelog: changelog.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3

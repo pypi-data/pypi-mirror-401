@@ -1,0 +1,676 @@
+#:schema https://json.schemastore.org/any.json
+
+# =============================================================================
+# pyproject.toml - Claude Code Template Repository
+# =============================================================================
+# Modern Python 3.12+ configuration following 2024 best practices
+# =============================================================================
+#
+# SCHEMA DIRECTIVE NOTE:
+# The #:schema directive above prevents false positive validation errors from
+# VS Code's Even Better TOML extension. The [tool.ruff.lint] syntax is valid
+# TOML v1.0.0 and follows official Ruff documentation, but the extension
+# incorrectly flags it as invalid. This directive resolves the issue.
+
+[project]
+name = "tracekit"
+version = "0.3.0"
+description = "IEEE-compliant signal analysis and protocol reverse engineering: waveform measurements, multi-protocol decoding, state machine inference, CRC recovery"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+keywords = [
+    "signal-analysis",
+    "oscilloscope",
+    "logic-analyzer",
+    "protocol-decoder",
+    "waveform-analysis",
+    "reverse-engineering",
+    "protocol-inference",
+    "state-machine-learning",
+    "spectral-analysis",
+    "jitter-analysis",
+    "signal-integrity",
+    "eye-diagram",
+    "uart",
+    "spi",
+    "i2c",
+    "can",
+    "jtag",
+    "swd",
+    "lin",
+    "flexray",
+    "ieee-1241",
+    "ieee-181",
+    "ieee-2414",
+    "emc-testing",
+    "cispr",
+    "embedded-systems",
+    "hardware-debugging",
+    "automotive",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Manufacturing",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: System :: Hardware",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "matplotlib>=3.7.0",
+    "click>=8.1.0",
+    "psutil>=5.9.0",
+    "pandas>=2.0.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+    "tm-data-types>=0.3.0",
+    "plotly>=6.5.0",
+    "bokeh>=3.8.1",
+    "reportlab>=4.4.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "pytest-timeout>=2.3.0",
+    "types-PyYAML>=6.0",
+    "yamllint>=1.35",
+    "check-jsonschema>=0.29.0",
+    "interrogate>=1.7.0",
+]
+reporting = [
+    "reportlab>=4.0.0",
+    "python-pptx>=0.6.21",
+]
+hdf5 = [
+    "h5py>=3.0.0",
+]
+jupyter = [
+    "ipython>=8.0.0",
+    "jupyter>=1.0.0",
+]
+automotive = [
+    "cantools>=39.4.0",  # DBC parsing and CAN message encoding/decoding
+    "asammdf>=7.4.0,<8.0.0",    # MDF4/MF4 file support (automotive data logging) - using 7.x for numpy 1.x compat
+    "python-can>=4.4.0", # CAN interface and file format support (BLF, ASC)
+]
+all = [
+    "tracekit[dev,reporting,hdf5,jupyter,automotive]",
+]
+
+[project.scripts]
+tracekit = "tracekit.cli.main:main"
+
+[project.urls]
+Homepage = "https://github.com/lair-click-bats/tracekit"
+Documentation = "https://github.com/lair-click-bats/tracekit/tree/main/docs"
+Repository = "https://github.com/lair-click-bats/tracekit"
+Changelog = "https://github.com/lair-click-bats/tracekit/blob/main/CHANGELOG.md"
+"Issue Tracker" = "https://github.com/lair-click-bats/tracekit/issues"
+Discussions = "https://github.com/lair-click-bats/tracekit/discussions"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tracekit"]
+
+# =============================================================================
+# pytest - Testing Framework
+# =============================================================================
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = [
+    "--import-mode=importlib",
+    "-v",                          # Verbose output
+    "-ra",                         # Show summary of all test outcomes
+    "--strict-markers",            # Enforce marker registration
+    "--strict-config",             # Strict configuration validation
+    "--tb=short",                  # Short traceback format
+    # NOTE: Do NOT add --maxprocesses or --max-worker-restart here!
+    # These are pytest-xdist options that only work with -n flag.
+    # Add them on command line when needed: pytest -n 4 --maxprocesses=4
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+markers = [
+    # Test Level Markers
+    "unit: Unit tests (fast, isolated, no I/O)",
+    "integration: Integration tests (slower, multiple components)",
+    "stress: Stress tests (high load, memory intensive)",
+    "performance: Performance benchmark tests",
+    "benchmark: Performance benchmark tests (alias for performance)",
+    "compliance: Standards compliance tests (IEEE, JEDEC)",
+    "validation: Ground truth validation tests",
+    "regression: Regression tests for fixed bugs",
+
+    # Domain Markers - Top Level
+    "analyzer: Analyzer module tests",
+    "loader: Loader module tests",
+    "inference: Protocol inference tests",
+    "exporter: Exporter module tests",
+    "core: Core functionality tests",
+    "cli: CLI/command-line interface tests",
+    "visualization: Visualization tests",
+    "workflow: Workflow-specific tests",
+
+    # Subdomain Markers - Analyzers
+    "digital: Digital signal analysis tests",
+    "spectral: Spectral analysis tests",
+    "statistical: Statistical analysis tests",
+    "protocol: Protocol analysis tests",
+    "pattern: Pattern recognition/detection tests",
+    "power: Power analysis tests",
+    "jitter: Jitter measurement and analysis tests",
+    "eye: Eye diagram generation and analysis tests",
+    "packet: Packet analysis tests",
+
+    # Subdomain Markers - Other
+    "search: Search module tests",
+    "optimization: Optimization and search tests",
+    "comparison: Comparison module tests",
+    "quality: Signal quality assessment tests",
+    "exploratory: Exploratory analysis tests",
+    "streaming: Streaming and real-time processing tests",
+
+    # Speed/Resource Markers
+    "slow: Tests taking >1 second to run",
+    "memory_intensive: Tests requiring significant memory (>100MB)",
+    "scalability: Scalability tests",
+
+    # Dependency Markers
+    "requires_data: Tests requiring test_data directory",
+    "requires_optional: Tests requiring optional dependencies",
+
+    # Special Test Types
+    "hypothesis: Property-based tests using Hypothesis",
+    "fuzz: Tests that use random input generation",
+    "edge_cases: Edge case tests",
+
+    # Requirements Traceability
+    "requirement: Links test to specific requirement ID",
+]
+timeout = 60                         # Default test timeout in seconds
+timeout_method = "thread"
+timeout_func_only = false            # Apply timeout to entire test including fixtures
+console_output_style = "progress"
+
+# pytest-benchmark configuration
+# Note: Some options are CLI-only, not configfile options
+# Use: pytest --benchmark-min-rounds=5 --benchmark-warmup=on --benchmark-disable-gc
+
+# pytest-xdist configuration (prevents OOM when running parallel tests)
+# Use: pytest -n 4 --maxprocesses=4 --max-worker-restart=2
+# Recommendation: For memory safety, use -n 2 on systems with <16GB RAM
+
+# pytest-testmon configuration (incremental testing - run only affected tests)
+# Enabled by default for local development. Use --testmon to activate.
+# See: https://testmon.org/
+
+# pytest-randomly configuration (randomize test order to detect dependencies)
+# Enabled by default. Use --randomly-seed=last to repeat last run's order.
+# Use --randomly-dont-shuffle to disable for debugging.
+
+# pytest-rerunfailures configuration (retry flaky tests)
+# Not enabled by default. Use --reruns 2 --reruns-delay 1 to activate.
+# CI uses this automatically for flaky test detection.
+
+# pytest-split configuration (duration-based test sharding for CI)
+# Use: pytest --splits 8 --group 1 to run first of 8 groups
+# CI uses this for balanced parallel execution.
+
+# pytest-memray configuration (memory profiling)
+# Use: pytest --memray to enable memory profiling
+# Use: pytest --memray --most-allocations=10 to show top allocators
+
+# =============================================================================
+# Hypothesis - Property-Based Testing
+# =============================================================================
+# NOTE: Hypothesis profiles are registered programmatically in tests/conftest.py
+# using the pytest_configure hook. This is the correct way to configure Hypothesis
+# profiles as the [tool.hypothesis] section in pyproject.toml is not supported
+# by Hypothesis.
+#
+# Available profiles: default, fast, ci, debug
+# See tests/conftest.py for profile definitions and tests/HYPOTHESIS_TESTING_GUIDE.md
+# for usage instructions.
+
+# =============================================================================
+# coverage - Test Coverage
+# =============================================================================
+
+[tool.coverage.run]
+source = ["src/tracekit"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    # Standard exclusions
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "raise AssertionError",
+    "@abstractmethod",
+    "@overload",
+    "if __name__ == .__main__.:",
+    # Protocol and type checking
+    "class .*\\bProtocol\\):",
+    # Defensive code
+    "except ImportError:",
+]
+# Coverage threshold: Enforced via Codecov (aggregate across all CI jobs)
+# Note: fail_under not set here to allow individual CI jobs to test subsets
+# Aggregate coverage is enforced by Codecov requiring 80% across all jobs
+# For local testing: pytest --cov=src/tracekit --cov-report=term-missing
+show_missing = true
+skip_empty = true
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+# =============================================================================
+# Ruff - Linting and Formatting
+# =============================================================================
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    "analysis_archives",
+    "archive",
+    ".coordination",
+    ".claude",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+    "C4",     # flake8-comprehensions
+    "PTH",    # flake8-use-pathlib
+    "RUF",    # Ruff-specific rules
+    "PERF",   # Perflint (performance)
+    "PLC",    # Pylint convention
+    "PLE",    # Pylint error
+    "PLW",    # Pylint warning
+    "TCH",    # flake8-type-checking
+    "ARG",    # flake8-unused-arguments
+]
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    # Intentional style choices for this codebase:
+    "PLC0415", # import-outside-top-level: Lazy imports for optional dependencies
+    "SIM102",  # collapsible-if: Explicit nesting improves readability
+    "SIM105",  # suppressible-exception: try/except is often clearer than contextlib.suppress
+    "SIM108",  # if-else-block-instead-of-if-exp: Explicit blocks for clarity
+    "SIM116",  # if-else-block-instead-of-dict-lookup: Dict lookup not always clearer
+    "SIM117",  # multiple-with-statements: Separate statements can be clearer
+    "PTH110",  # os-path-exists: os.path is acceptable
+    "PTH123",  # builtin-open: Standard open() is fine for most use cases
+    "PERF401", # manual-list-comprehension: Conditional appends are clearer as loops
+    "PERF402", # manual-list-copy: Explicit list() call is fine
+    "PERF403", # manual-dict-comprehension: Explicit dict building is fine
+    "ARG001",  # unused-function-argument: API compatibility requires extra args
+    "ARG002",  # unused-method-argument: API compatibility requires extra args
+    "TC010",   # runtime-string-union: Low priority typing improvement
+    "TC002",   # typing-only-third-party-import: Low priority
+    "TC003",   # typing-only-standard-library-import: Low priority
+    "TC004",   # runtime-import-in-type-checking-block: Can be tricky to refactor
+    "PLW0603", # global-statement: Sometimes necessary for module-level state
+    "PLW2901", # redefined-loop-name: Often intentional in nested loops
+    "PLW3301", # nested-min-max: Readability preference
+    "RUF005",  # collection-literal-concatenation: Style choice
+    "RUF043",  # implicit-optional: Regex patterns with metacharacters
+    "RUF046",  # unnecessary-cast-to-int: Often needed for mypy
+    "RUF059",  # unpacked-variable-never-used: Common in tests where not all return values are needed
+    "UP007",   # non-pep604-annotation-union: May need Union for compatibility
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = [
+    "E402",     # Module level import not at top (organized imports are intentional)
+]
+"tests/**/*.py" = [
+    "ARG001",   # Unused function argument (test fixtures may not use all args)
+    "ARG002",   # Unused method argument (test methods may not use all args)
+    "ARG004",   # Unused static method argument (mock methods may not use args)
+    "ARG005",   # Unused lambda argument (test lambdas may not use all args)
+    "B007",     # Unused loop variable (tests may iterate without using value)
+    "B017",     # Blind exception (tests may use generic Exception)
+    "E402",     # Module import not at top (matplotlib.use() must be early)
+    "E721",     # Type comparison (tests may compare exc_type directly)
+    "E741",     # Ambiguous variable name (short names like 'l' acceptable in tests)
+    "F841",     # Local variable assigned but never used (subprocess results in tests)
+    "PLC0415",  # Import should be at top (test-specific imports are fine)
+    "PLR2004",  # Magic value used in comparison
+    "PLW0127",  # Self-assignment (tests may have intentional self-assignment)
+    "PTH109",   # os.getcwd() (tests may use os module for compatibility)
+    "RUF001",   # Ambiguous unicode character (tests may use unicode symbols)
+    "RUF003",   # Ambiguous unicode in comment (tests may use math symbols)
+    "RUF012",   # ClassVar for mutable class attrs (test mocks don't need ClassVar)
+    "SIM113",   # Use enumerate (tests may prefer explicit counter logic)
+    "PERF401",  # List comprehension (readability in tests is more important)
+]
+"scripts/**/*.py" = [
+    "PERF401",  # List comprehension (conditional appends are clearer as loops)
+]
+"src/tracekit/exploratory/*.py" = [
+    "RUF002",   # Mathematical symbols in docstrings are intentional
+]
+"src/tracekit/visualization/*.py" = [
+    "RUF002",   # Mathematical symbols in docstrings are intentional
+]
+"src/tracekit/integrations/llm.py" = [
+    "PLC0415",  # Conditional imports for optional dependencies
+    "F401",     # Imports checked dynamically
+]
+"src/tracekit/exporters/*.py" = [
+    "F401",     # Imports used in generated code/templates
+]
+"src/tracekit/dsl/interpreter.py" = [
+    "F401",     # Dynamic loading requires import presence
+]
+"src/tracekit/workflows/signal_integrity.py" = [
+    "F401",     # Import used in conditional code path
+]
+"test_*.py" = [
+    "ARG001",   # Unused function argument
+    "ARG002",   # Unused method argument
+    "ARG005",   # Unused lambda argument
+    "B007",     # Unused loop variable
+    "E741",     # Ambiguous variable name
+    "F841",     # Local variable assigned but never used
+    "PLC0415",  # Import should be at top
+    "PLR2004",  # Magic value used in comparison
+    "PLW0127",  # Self-assignment
+    "PTH109",   # os.getcwd()
+    "RUF001",   # Ambiguous unicode character
+    "RUF003",   # Ambiguous unicode in comment
+    "RUF012",   # ClassVar for mutable class attrs
+    "SIM113",   # Use enumerate
+    "PERF401",  # List comprehension
+]
+"examples/*.py" = [
+    "ARG001",   # Unused function argument (demo code may not use all args)
+    "F841",     # Local variable assigned but never used (demo assignments)
+]
+"test_data/**/*.py" = [
+    "E741",     # Ambiguous variable name (data generation scripts)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# =============================================================================
+# mypy - Static Type Checking
+# =============================================================================
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+show_error_codes = true
+warn_unreachable = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = false  # Disabled - many ignores are conditional on optional deps
+enable_error_code = ["ignore-without-code", "redundant-cast", "truthy-bool"]
+exclude = [
+    "^tests/",
+    "^examples/",
+    "^scripts/",
+    "^test_data/",
+    "^\\.venv/",
+    "^build/",
+    "^tmp/",
+    "^analysis_archives/",
+    "^archive/",
+]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+# =============================================================================
+# Third-party libraries without type stubs
+# =============================================================================
+
+# Core scientific computing - no complete stubs available
+[[tool.mypy.overrides]]
+module = [
+    "numpy",
+    "numpy.*",
+    "scipy",
+    "scipy.*",
+    "matplotlib",
+    "matplotlib.*",
+    "pandas",
+    "pandas.*",
+]
+ignore_missing_imports = true
+
+# Signal processing and wavelets
+[[tool.mypy.overrides]]
+module = [
+    "pywt",
+    "pywt.*",
+]
+ignore_missing_imports = true
+
+# Internal modules that may not exist
+[[tool.mypy.overrides]]
+module = [
+    "tracekit.loaders.binary",
+    "tracekit.loaders.csv",
+    "tracekit.loaders.hdf5",
+]
+ignore_missing_imports = true
+
+# DSL commands with dynamic imports
+[[tool.mypy.overrides]]
+module = ["tracekit.dsl.commands"]
+disable_error_code = ["attr-defined"]
+
+# CLI and system utilities
+[[tool.mypy.overrides]]
+module = [
+    "click",
+    "click.*",
+    "psutil",
+    "psutil.*",
+]
+ignore_missing_imports = true
+
+# Configuration and templating
+[[tool.mypy.overrides]]
+module = [
+    "yaml",
+    "yaml.*",
+    "jinja2",
+    "jinja2.*",
+    "jsonschema",
+    "jsonschema.*",
+]
+ignore_missing_imports = true
+
+# Optional dependencies - reporting
+[[tool.mypy.overrides]]
+module = [
+    "reportlab",
+    "reportlab.*",
+    "pptx",
+    "pptx.*",
+]
+ignore_missing_imports = true
+
+# Optional dependencies - data formats
+[[tool.mypy.overrides]]
+module = [
+    "h5py",
+    "h5py.*",
+    "nptdms",
+    "nptdms.*",
+    "weasyprint",
+    "weasyprint.*",
+    "docx",
+    "docx.*",
+]
+ignore_missing_imports = true
+
+# Optional dependencies - Jupyter
+[[tool.mypy.overrides]]
+module = [
+    "IPython",
+    "IPython.*",
+    "jupyter",
+    "jupyter.*",
+]
+ignore_missing_imports = true
+
+# Optional dependencies - visualization
+[[tool.mypy.overrides]]
+module = [
+    "PIL",
+    "PIL.*",
+    "plotly",
+    "plotly.*",
+]
+ignore_missing_imports = true
+
+# =============================================================================
+# Bandit - Security Linting
+# =============================================================================
+
+[tool.bandit]
+exclude_dirs = ["tests", "examples", "scripts", ".venv", "build", "dist"]
+skips = [
+    "B101",  # assert_used: Assertions are acceptable in library code for invariants
+    "B311",  # random: Non-cryptographic random is fine for signal processing
+]
+
+# =============================================================================
+# interrogate - Docstring Coverage
+# =============================================================================
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = false
+ignore-nested-functions = false
+ignore-nested-classes = true
+fail-under = 95
+exclude = ["tests", "examples", "scripts"]
+verbose = 2
+quiet = false
+color = true
+generate-badge = "docs/badges/"
+badge-format = "svg"
+
+# =============================================================================
+# vulture - Dead Code Detection
+# =============================================================================
+
+[tool.vulture]
+exclude = ["tests/", "examples/", "scripts/", ".venv/"]
+ignore_decorators = ["@pytest.fixture", "@pytest.mark.*", "@click.command"]
+ignore_names = ["visit_*", "setUp", "tearDown", "test_*"]
+min_confidence = 80
+paths = ["src/tracekit"]
+sort_by_size = true
+
+# =============================================================================
+# pydocstyle - Docstring Style Checking
+# =============================================================================
+
+[tool.pydocstyle]
+convention = "google"
+add-ignore = ["D100", "D104"]  # D100: Missing docstring in public module, D104: Missing docstring in public package
+match = "(?!test_).*\\.py"  # Skip test files
+match-dir = "^(?!tests|examples|scripts|\\.venv|build|dist).*"  # Skip test/example directories
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.2",
+    "darglint>=1.8.1",
+    "diff-cover>=10.2.0",
+    "h5py>=3.15.1",
+    "hypothesis>=6.148.8",
+    "import-linter>=2.9",
+    "interrogate>=1.7.0",
+    "jsonschema>=4.25.1",
+    "linkchecker>=10.6.0",
+    "mike>=2.1.3",
+    "mkdocs>=1.6.1",
+    "mkdocs-glightbox>=0.5.2",
+    "mkdocs-material>=9.7.1",
+    "mkdocstrings>=1.0.0",
+    "mkdocstrings-python>=2.0.1",
+    "mypy>=1.13.0",
+    "pre-commit>=4.5.1",
+    "pydeps>=3.0.2",
+    "pydocstyle>=6.3.0",
+    "pylint>=4.0.4",
+    "pytest>=9.0.2",
+    "pytest-benchmark>=5.2.3",
+    "pytest-cov>=7.0.0",
+    "pytest-deadfixtures>=3.0.0",
+    "pytest-memray>=1.8.0",
+    "pytest-randomly>=4.0.1",
+    "pytest-rerunfailures>=16.1",
+    "pytest-split>=0.2.0",
+    "pytest-testmon>=2.2.0",
+    "pytest-timeout>=2.4.0",
+    "pytest-xdist>=3.8.0",
+    "pywavelets>=1.9.0",
+    "radon>=6.0.1",
+    "ruff>=0.14.0",
+    "safety>=3.7.0",
+    "vulture>=2.14",
+    "wily>=1.12.2",
+]
+reporting = [
+    "reportlab>=4.4.7",
+]

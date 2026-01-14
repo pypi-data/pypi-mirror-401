@@ -1,0 +1,149 @@
+# =============================================================================
+# Example: Device/Source Mapping Configuration
+# =============================================================================
+#
+# This example demonstrates how to map device IDs to human-readable names
+# and configure device-specific parameters for data interpretation.
+#
+# Usage:
+#   from tracekit.loaders import load_binary_packets
+#   traces = load_binary_packets(
+#       "capture.bin",
+#       format_config="packet_format.yaml",
+#       device_config="device_mapping.yaml"
+#   )
+#
+# =============================================================================
+
+# Configuration metadata
+name: "example_device_mapping"
+version: "1.0"
+description: "Example device mapping for multi-source DAQ system"
+
+# Device definitions
+# Keys are device IDs (hex or decimal) that appear in packet headers
+devices:
+  # Test/diagnostic device
+  0x01:
+    name: "Pattern Generator"
+    short_name: "PGEN"
+    description: "Test pattern generation module for system diagnostics"
+    category: "diagnostic"
+    sample_rate: 100e6
+    channels: 4
+    properties:
+      test_mode: true
+      pattern_types: ["counter", "prbs", "walking_ones"]
+
+  # Control interface devices
+  0x2B:
+    name: "Controller Alpha"
+    short_name: "CTRL-A"
+    description: "Primary control interface module"
+    category: "control"
+    sample_rate: 100e6
+    channels: 4
+    properties:
+      address_width: 12
+      data_width: 12
+      bus_type: "parallel"
+
+  0x55:
+    name: "Register Bank"
+    short_name: "REGS"
+    description: "Binary register storage and control"
+    category: "storage"
+    sample_rate: 100e6
+    channels: 4
+    properties:
+      register_count: 16
+      register_width: 12
+
+  0x7F:
+    name: "Buffer Controller"
+    short_name: "BUF"
+    description: "Data buffer and flow control"
+    category: "buffer"
+    sample_rate: 100e6
+    channels: 4
+    properties:
+      buffer_depth: 1024
+      flow_control: true
+
+  0xA9:
+    name: "Status Monitor"
+    short_name: "STAT"
+    description: "System status and priority handling"
+    category: "monitor"
+    sample_rate: 100e6
+    channels: 4
+    properties:
+      priority_levels: 8
+      interrupt_support: true
+
+  0xD3:
+    name: "Mode Controller"
+    short_name: "MODE"
+    description: "Operating mode and configuration control"
+    category: "control"
+    sample_rate: 100e6
+    channels: 4
+    properties:
+      modes: ["idle", "active", "test", "maintenance"]
+
+# Category definitions (optional - for grouping/filtering)
+categories:
+  diagnostic:
+    description: "Test and diagnostic equipment"
+    color: "#FFD700" # Gold
+
+  control:
+    description: "Control and command interfaces"
+    color: "#00BFFF" # Deep sky blue
+
+  storage:
+    description: "Data storage and registers"
+    color: "#32CD32" # Lime green
+
+  buffer:
+    description: "Buffering and flow control"
+    color: "#FF6347" # Tomato
+
+  monitor:
+    description: "Status monitoring and reporting"
+    color: "#DA70D6" # Orchid
+
+# Channel/lane configuration
+channels:
+  1:
+    name: "Lane 1"
+    description: "Primary data lane"
+    default_threshold: 1.65 # Volts
+
+  2:
+    name: "Lane 2"
+    description: "Secondary data lane"
+    default_threshold: 1.65
+
+  3:
+    name: "Lane 3"
+    description: "Tertiary data lane"
+    default_threshold: 1.65
+
+  4:
+    name: "Lane 4"
+    description: "Auxiliary data lane"
+    default_threshold: 1.65
+
+# Unknown device handling
+unknown_device:
+  policy: "warn" # "error" - raise exception, "warn" - log warning, "ignore" - silent
+  default_name: "Unknown Device"
+  default_category: "unknown"
+
+# Device filtering (optional - for selective loading)
+filters:
+  enabled: false
+  # include_devices: [0x01, 0x2B]  # Only load these devices
+  # exclude_devices: [0xD3]        # Exclude these devices
+  # include_categories: ["control", "storage"]

@@ -1,0 +1,77 @@
+[importlinter]
+root_package = tracekit
+
+# Contract 1: Loaders should not import analyzers
+# Loaders are responsible for loading data, not analyzing it
+[importlinter:contract:loaders-no-analyzers]
+name = Loaders should not import analyzers
+type = forbidden
+source_modules =
+    tracekit.loaders
+forbidden_modules =
+    tracekit.analyzers
+
+# Contract 2: Analyzers should not import loaders
+# Analyzers work on data structures, not file formats
+[importlinter:contract:analyzers-no-loaders]
+name = Analyzers should not import loaders
+type = forbidden
+source_modules =
+    tracekit.analyzers
+forbidden_modules =
+    tracekit.loaders
+
+# Contract 3: Exporters should not import loaders
+# Exporters output data, loaders input data - no cross dependency
+[importlinter:contract:exporters-no-loaders]
+name = Exporters should not import loaders
+type = forbidden
+source_modules =
+    tracekit.exporters
+forbidden_modules =
+    tracekit.loaders
+
+# Contract 4: Inference should not import loaders
+# Inference works on data structures, not file formats
+[importlinter:contract:inference-no-loaders]
+name = Inference should not import loaders
+type = forbidden
+source_modules =
+    tracekit.inference
+forbidden_modules =
+    tracekit.loaders
+
+# Contract 5: No circular dependencies in core modules
+# Prevent circular imports between major packages
+[importlinter:contract:no-circular-core]
+name = No circular dependencies in core modules
+type = independence
+modules =
+    tracekit.loaders
+    tracekit.analyzers
+    tracekit.exporters
+    tracekit.inference
+    tracekit.reporting
+    tracekit.visualization
+
+# Contract 6: Visualization should not import loaders
+# Visualization works on data, not file loading
+[importlinter:contract:visualization-no-loaders]
+name = Visualization should not import loaders
+type = forbidden
+source_modules =
+    tracekit.visualization
+forbidden_modules =
+    tracekit.loaders
+
+# Contract 7: Core should not have circular dependencies
+# Core utilities should be foundational
+[importlinter:contract:core-no-circular]
+name = Core should not import high-level modules
+type = forbidden
+source_modules =
+    tracekit.core
+forbidden_modules =
+    tracekit.analyzers
+    tracekit.reporting
+    tracekit.workflows

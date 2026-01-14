@@ -1,0 +1,276 @@
+name: Performance Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - "src/tracekit/**"
+      - "tests/performance/**"
+      - "pyproject.toml"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Monday at 3 AM UTC
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+  pull-requests: write # For posting benchmark comments
+
+jobs:
+  benchmark:
+    name: Run Performance Benchmarks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Needed for baseline comparison
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install uv
+        run: |
+          pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Download baseline results
+        id: download-baseline
+        continue-on-error: true
+        run: |
+          # Try to download baseline from main branch
+          if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            git show origin/main:tests/performance/baseline_results.json > baseline.json 2>/dev/null || {
+              echo "No baseline found in main branch, will create empty baseline"
+              echo '{"benchmarks": []}' > baseline.json
+            }
+            echo "baseline_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "No main branch found, creating empty baseline"
+            echo '{"benchmarks": []}' > baseline.json
+            echo "baseline_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run benchmarks
+        run: |
+          uv run pytest tests/performance/test_benchmarks.py \
+            --benchmark-only \
+            --benchmark-json=benchmark_results.json \
+            --benchmark-sort=mean \
+            --benchmark-min-rounds=5 \
+            --benchmark-warmup=on \
+            --benchmark-autosave \
+            --benchmark-save-data \
+            -v
+
+      - name: Compare with baseline
+        if: github.event_name == 'pull_request' && steps.download-baseline.outputs.baseline_exists == 'true'
+        id: compare
+        continue-on-error: true
+        run: |
+          # Run comparison with 15% threshold (stricter than before)
+          uv run python scripts/compare_benchmarks.py \
+            baseline.json \
+            benchmark_results.json \
+            --threshold 15 > comparison.txt || true
+
+          # Store exit code for later
+          COMPARE_EXIT=$?
+          echo "compare_exit=$COMPARE_EXIT" >> $GITHUB_OUTPUT
+
+          # Display comparison results
+          cat comparison.txt
+
+          # Also generate JSON output for programmatic analysis
+          uv run python scripts/compare_benchmarks.py \
+            baseline.json \
+            benchmark_results.json \
+            --threshold 15 \
+            --json > comparison.json || true
+
+      - name: Post benchmark comment
+        if: github.event_name == 'pull_request' && steps.download-baseline.outputs.baseline_exists == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read comparison results
+            let comparison = '';
+            let comparisonJson = null;
+            try {
+              comparison = fs.readFileSync('comparison.txt', 'utf8');
+            } catch (err) {
+              comparison = 'Failed to read comparison results';
+            }
+
+            try {
+              comparisonJson = JSON.parse(fs.readFileSync('comparison.json', 'utf8'));
+            } catch (err) {
+              // JSON not available
+            }
+
+            // Build status message
+            let statusIcon = '✅';
+            let statusText = 'No significant regressions';
+            let threshold = comparisonJson?.threshold || 15;
+
+            if (process.env.COMPARE_EXIT === '1') {
+              statusIcon = '⚠️';
+              statusText = `Performance regressions detected (>${threshold}%)`;
+            }
+
+            // Add summary counts if available
+            let summary = '';
+            if (comparisonJson) {
+              const regCount = comparisonJson.regressions?.length || 0;
+              const impCount = comparisonJson.improvements?.length || 0;
+
+              if (regCount > 0 || impCount > 0) {
+                summary = '\n\n**Summary:**\n';
+                if (regCount > 0) {
+                  summary += `- 🔴 ${regCount} regression${regCount > 1 ? 's' : ''} (>${threshold}%)\n`;
+                }
+                if (impCount > 0) {
+                  summary += `- 🟢 ${impCount} improvement${impCount > 1 ? 's' : ''} (>5%)\n`;
+                }
+              }
+            }
+
+            // Create comment body
+            const body = `## ${statusIcon} Performance Benchmark Results
+
+            ${statusText}${summary}
+
+            <details>
+            <summary>📊 Detailed Benchmark Comparison vs. main (threshold: ${threshold}%)</summary>
+
+            \`\`\`
+            ${comparison}
+            \`\`\`
+
+            </details>
+
+            *Benchmark runs use 5+ rounds with warmup. Threshold for regressions: ${threshold}%*
+            `;
+
+            // Find and update or create comment
+            const comments = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const existingComment = comments.data.find(comment =>
+              comment.body.includes('Performance Benchmark Results')
+            );
+
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
+        env:
+          COMPARE_EXIT: ${{ steps.compare.outputs.compare_exit }}
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v6
+        with:
+          name: benchmark-results
+          path: |
+            benchmark_results.json
+            comparison.txt
+            comparison.json
+          retention-days: 30
+
+      - name: Update baseline (main branch only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # Copy results to baseline location
+          cp benchmark_results.json tests/performance/baseline_results.json
+
+          # Commit and push if changed
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          if git diff --quiet tests/performance/baseline_results.json; then
+            echo "No changes to baseline"
+          else
+            git add tests/performance/baseline_results.json
+            git commit -m "chore: update performance baseline [skip ci]"
+            git push
+          fi
+
+      - name: Fail if regressions detected
+        if: github.event_name == 'pull_request' && steps.compare.outputs.compare_exit == '1'
+        run: |
+          echo "::error::Performance regressions detected. See benchmark comparison for details."
+          exit 1
+
+  benchmark-matrix:
+    name: Benchmark on ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    if: github.event_name == 'schedule' # Only run full matrix weekly
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install uv
+        run: |
+          pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Run benchmarks
+        run: |
+          uv run pytest tests/performance/test_benchmarks.py \
+            --benchmark-only \
+            --benchmark-json=benchmark_results_${{ matrix.os }}_py${{ matrix.python-version }}.json \
+            --benchmark-sort=mean \
+            --benchmark-min-rounds=5 \
+            -v
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v6
+        with:
+          name: benchmark-results-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: benchmark_results_*.json
+          retention-days: 90

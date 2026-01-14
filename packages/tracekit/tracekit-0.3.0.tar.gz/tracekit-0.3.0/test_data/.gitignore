@@ -1,0 +1,36 @@
+
+# =============================================================================
+# Validation Test Data - DO NOT COMMIT
+# =============================================================================
+# See TEST_DATA_ANALYSIS.md for data management strategy
+# Full 506 MB dataset should be external (GitHub release or private)
+# Only curated minimal subset (~15 MB) should be version controlled
+
+test_data/
+tracekit_test_data/
+Data_Capture.zip
+Scope4.zip
+*.wfm
+*.tss
+validation_output.log
+comprehensive_validation_output.log
+validation_report.json
+comprehensive_validation_report.json
+organize_test_dataset.py
+validation_suite.py
+comprehensive_validation.py
+
+# Validation artifacts (keep markdown reports, ignore scripts/logs)
+VALIDATION_FINDINGS.md
+VALIDATION_EXECUTIVE_SUMMARY.md
+CONTEXT_MANAGEMENT_ANALYSIS.md
+TEST_DATA_ANALYSIS.md
+RESTORATION_COMPLETE.md
+
+# =============================================================================
+# EXCEPTION: Real Captures Directory
+# =============================================================================
+# The real_captures/ directory IS version controlled
+# It contains curated, optimized test data for integration testing and demos
+!real_captures/
+!real_captures/**

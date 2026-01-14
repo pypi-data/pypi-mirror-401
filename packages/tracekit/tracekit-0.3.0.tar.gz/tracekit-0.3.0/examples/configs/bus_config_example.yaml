@@ -1,0 +1,188 @@
+# =============================================================================
+# Example: Parallel Bus Configuration
+# =============================================================================
+#
+# This example demonstrates how to configure multi-bit parallel bus decoding
+# for protocols with address and data buses (e.g., legacy minicomputers,
+# embedded systems, FPGA interfaces).
+#
+# Usage:
+#   from tracekit.analyzers.digital import decode_bus
+#   transactions = decode_bus(traces, config="bus_config.yaml")
+#
+# =============================================================================
+
+# Bus identification
+name: "parallel_bus_12bit"
+version: "1.0"
+description: "Example 12-bit parallel bus with timing pulses"
+
+# Global settings
+settings:
+  active_low: true # Signals are active-low (inverted)
+  sample_on: "rising" # Sample on clock/timing pulse: "rising", "falling", "both"
+  bit_numbering: "lsb_0" # "lsb_0" (bit 0 is LSB) or "msb_0" (bit 0 is MSB)
+
+# Data bus definition
+data_bus:
+  name: "data"
+  width: 12
+  description: "12-bit bidirectional data bus"
+  active_low: true
+  # Map channel indices to bit positions
+  bits:
+    - { channel: 0, bit: 0, name: "D0" }
+    - { channel: 1, bit: 1, name: "D1" }
+    - { channel: 2, bit: 2, name: "D2" }
+    - { channel: 3, bit: 3, name: "D3" }
+    - { channel: 4, bit: 4, name: "D4" }
+    - { channel: 5, bit: 5, name: "D5" }
+    - { channel: 6, bit: 6, name: "D6" }
+    - { channel: 7, bit: 7, name: "D7" }
+    - { channel: 8, bit: 8, name: "D8" }
+    - { channel: 9, bit: 9, name: "D9" }
+    - { channel: 10, bit: 10, name: "D10" }
+    - { channel: 11, bit: 11, name: "D11" }
+
+# Address bus definition
+address_bus:
+  name: "address"
+  width: 12
+  description: "12-bit memory address bus"
+  active_low: true
+  bits:
+    - { channel: 12, bit: 0, name: "MA0" }
+    - { channel: 13, bit: 1, name: "MA1" }
+    - { channel: 14, bit: 2, name: "MA2" }
+    - { channel: 15, bit: 3, name: "MA3" }
+    - { channel: 16, bit: 4, name: "MA4" }
+    - { channel: 17, bit: 5, name: "MA5" }
+    - { channel: 18, bit: 6, name: "MA6" }
+    - { channel: 19, bit: 7, name: "MA7" }
+    - { channel: 20, bit: 8, name: "MA8" }
+    - { channel: 21, bit: 9, name: "MA9" }
+    - { channel: 22, bit: 10, name: "MA10" }
+    - { channel: 23, bit: 11, name: "MA11" }
+
+# Control signals
+control_signals:
+  - name: "timing_pulse_1"
+    channel: 24
+    active_low: false
+    description: "Timing pulse 1 - fetch cycle start"
+    short_name: "TP1"
+
+  - name: "timing_pulse_2"
+    channel: 25
+    active_low: false
+    description: "Timing pulse 2 - memory access"
+    short_name: "TP2"
+
+  - name: "timing_pulse_3"
+    channel: 26
+    active_low: false
+    description: "Timing pulse 3 - data transfer"
+    short_name: "TP3"
+
+  - name: "timing_pulse_4"
+    channel: 27
+    active_low: false
+    description: "Timing pulse 4 - cycle complete"
+    short_name: "TP4"
+
+  - name: "read"
+    channel: 28
+    active_low: true
+    description: "Memory read strobe"
+    short_name: "RD"
+
+  - name: "write"
+    channel: 29
+    active_low: true
+    description: "Memory write strobe"
+    short_name: "WR"
+
+  - name: "io_transfer"
+    channel: 30
+    active_low: true
+    description: "I/O transfer (vs memory)"
+    short_name: "IOT"
+
+  - name: "interrupt_request"
+    channel: 31
+    active_low: true
+    description: "Interrupt request"
+    short_name: "IRQ"
+
+# Timing constraints (for validation)
+timing:
+  clock_period_ns: 1000 # 1 MHz base clock
+  setup_time_ns: 50
+  hold_time_ns: 30
+  pulse_width_ns:
+    timing_pulse: 100
+    read_strobe: 200
+    write_strobe: 200
+
+# Transaction decoding rules
+transactions:
+  # Define how to recognize different transaction types
+  types:
+    - name: "memory_read"
+      conditions:
+        read: true
+        write: false
+        io_transfer: false
+      sample_on: "timing_pulse_3"
+      capture:
+        address: "address_bus"
+        data: "data_bus"
+
+    - name: "memory_write"
+      conditions:
+        read: false
+        write: true
+        io_transfer: false
+      sample_on: "timing_pulse_3"
+      capture:
+        address: "address_bus"
+        data: "data_bus"
+
+    - name: "io_read"
+      conditions:
+        read: true
+        io_transfer: true
+      sample_on: "timing_pulse_3"
+      capture:
+        address: "address_bus"
+        data: "data_bus"
+
+    - name: "io_write"
+      conditions:
+        write: true
+        io_transfer: true
+      sample_on: "timing_pulse_3"
+      capture:
+        address: "address_bus"
+        data: "data_bus"
+
+# Optional: Instruction decoding (if data bus carries instruction opcodes)
+instruction_decode:
+  enabled: true
+  opcode_bits: [9, 11] # Bits 9-11 of data word contain opcode
+  opcodes:
+    0b000: { name: "AND", description: "Logical AND" }
+    0b001: { name: "ADD", description: "Add to accumulator" }
+    0b010: { name: "ISZ", description: "Increment and skip if zero" }
+    0b011: { name: "DCA", description: "Deposit and clear accumulator" }
+    0b100: { name: "JMS", description: "Jump to subroutine" }
+    0b101: { name: "JMP", description: "Jump" }
+    0b110: { name: "IOT", description: "I/O transfer" }
+    0b111: { name: "OPR", description: "Operate" }
+
+# Output formatting
+output:
+  format: "transaction" # "raw", "transaction", "annotated"
+  timestamp_format: "relative_us" # "absolute", "relative_us", "sample_index"
+  include_raw_values: true
+  hex_format: true

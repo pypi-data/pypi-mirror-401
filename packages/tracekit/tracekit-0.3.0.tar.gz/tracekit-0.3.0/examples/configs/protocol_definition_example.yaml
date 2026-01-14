@@ -1,0 +1,238 @@
+# =============================================================================
+# Example: Protocol Definition (DSL)
+# =============================================================================
+#
+# This example demonstrates how to define a custom binary protocol for
+# automatic decoder/encoder generation. The DSL supports fields with
+# various types, conditionals, arrays, and validation.
+#
+# Usage:
+#   from tracekit.inference.protocol_dsl import ProtocolDecoder
+#   decoder = ProtocolDecoder.load("protocol_definition.yaml")
+#   message = decoder.decode(binary_data)
+#
+# =============================================================================
+
+# Protocol metadata
+name: "sensor_telemetry_v2"
+version: "2.0"
+description: "Example sensor telemetry protocol with multiple message types"
+
+# Global settings
+settings:
+  endian: "big" # Default byte order: "big", "little", "native"
+  alignment: 1 # Byte alignment (1 = no padding)
+  strict: true # Fail on unknown fields or extra data
+
+# Message framing (how to find message boundaries)
+framing:
+  type: "length_prefix" # "delimiter", "length_prefix", "fixed"
+  sync:
+    pattern: [0xAA, 0x55]
+    required: true
+  length_field:
+    offset: 2 # Offset from sync
+    size: 2 # Bytes
+    endian: "big"
+    includes_header: false # Length value excludes header bytes
+
+# Field definitions
+fields:
+  # Sync word - constant value for message detection
+  - name: "sync"
+    type: "bytes"
+    size: 2
+    value: [0xAA, 0x55]
+    description: "Synchronization pattern"
+    validation:
+      expected: [0xAA, 0x55]
+      on_mismatch: "error"
+
+  # Message length
+  - name: "length"
+    type: "uint16"
+    endian: "big"
+    description: "Payload length in bytes"
+
+  # Message type determines structure of remaining fields
+  - name: "msg_type"
+    type: "uint8"
+    description: "Message type identifier"
+    enum:
+      0x01:
+        name: "data"
+        description: "Sensor data message"
+      0x02:
+        name: "status"
+        description: "System status message"
+      0x03:
+        name: "command"
+        description: "Command/control message"
+      0x04:
+        name: "response"
+        description: "Command response message"
+      0xFF:
+        name: "error"
+        description: "Error notification"
+
+  # Flags byte with bitfield extraction
+  - name: "flags"
+    type: "bitfield"
+    size: 1
+    fields:
+      priority: { bits: [6, 7], description: "Priority level (0-3)" }
+      encrypted: { bit: 5, description: "Payload encrypted" }
+      compressed: { bit: 4, description: "Payload compressed" }
+      sequence_wrap: { bit: 3, description: "Sequence number wrapped" }
+      reserved: { bits: [0, 2], description: "Reserved" }
+
+  # Sequence number for ordering
+  - name: "sequence"
+    type: "uint16"
+    endian: "big"
+    description: "Message sequence number"
+    validation:
+      min: 0
+      max: 65535
+
+  # Timestamp
+  - name: "timestamp"
+    type: "uint32"
+    endian: "big"
+    description: "Unix timestamp (seconds)"
+
+  # Sensor ID (only in data messages)
+  - name: "sensor_id"
+    type: "uint16"
+    endian: "big"
+    condition: "msg_type == 0x01"
+    description: "Sensor identifier"
+
+  # Sensor readings (only in data messages)
+  - name: "readings"
+    type: "array"
+    condition: "msg_type == 0x01"
+    count_field: null # Count derived from remaining length
+    element:
+      type: "struct"
+      fields:
+        - name: "channel"
+          type: "uint8"
+          description: "Measurement channel"
+        - name: "value"
+          type: "float32"
+          endian: "big"
+          description: "Measurement value"
+        - name: "quality"
+          type: "uint8"
+          description: "Quality indicator (0-100)"
+
+  # Status fields (only in status messages)
+  - name: "status_code"
+    type: "uint16"
+    endian: "big"
+    condition: "msg_type == 0x02"
+    description: "System status code"
+
+  - name: "uptime"
+    type: "uint32"
+    endian: "big"
+    condition: "msg_type == 0x02"
+    description: "System uptime in seconds"
+
+  - name: "memory_usage"
+    type: "uint8"
+    condition: "msg_type == 0x02"
+    description: "Memory usage percentage"
+
+  # Command fields (only in command messages)
+  - name: "command_id"
+    type: "uint16"
+    endian: "big"
+    condition: "msg_type == 0x03"
+    description: "Command identifier"
+
+  - name: "command_data"
+    type: "bytes"
+    condition: "msg_type == 0x03"
+    size: "length - 12" # Remaining bytes after header
+    description: "Command payload"
+
+  # Response fields (only in response messages)
+  - name: "response_to"
+    type: "uint16"
+    endian: "big"
+    condition: "msg_type == 0x04"
+    description: "Sequence number of command being responded to"
+
+  - name: "result_code"
+    type: "int16"
+    endian: "big"
+    condition: "msg_type == 0x04"
+    description: "Result code (0=success, negative=error)"
+
+  - name: "response_data"
+    type: "bytes"
+    condition: "msg_type == 0x04"
+    size: "length - 14"
+    description: "Response payload"
+
+  # Error fields (only in error messages)
+  - name: "error_code"
+    type: "uint16"
+    endian: "big"
+    condition: "msg_type == 0xFF"
+    description: "Error code"
+
+  - name: "error_message"
+    type: "string"
+    encoding: "utf-8"
+    condition: "msg_type == 0xFF"
+    size: "length - 12"
+    description: "Human-readable error message"
+
+  # Checksum (all messages)
+  - name: "checksum"
+    type: "uint16"
+    endian: "big"
+    description: "CRC-16 checksum"
+    validation:
+      algorithm: "crc16_ccitt"
+      scope: "all_prior" # Calculate over all bytes before checksum
+      on_mismatch: "warn"
+
+# Computed/virtual fields (derived from other fields)
+computed_fields:
+  - name: "priority_level"
+    expression: "flags.priority"
+    description: "Extracted priority level"
+
+  - name: "is_encrypted"
+    expression: "flags.encrypted == 1"
+    description: "Whether payload is encrypted"
+
+  - name: "message_type_name"
+    expression: "enum_name(msg_type)"
+    description: "Human-readable message type"
+
+# Decoding hints
+decoding:
+  # For streaming/incremental decoding
+  min_header_size: 10 # Bytes needed to determine message length
+  max_message_size: 65535
+
+  # Error recovery
+  resync_on_error: true
+  max_resync_distance: 1024
+
+# Encoding rules (for encoder generation)
+encoding:
+  # Auto-fill these fields when encoding
+  auto_fill:
+    sync: true
+    length: true
+    checksum: true
+
+  # Validation before encoding
+  validate_required_fields: true
+  validate_field_ranges: true
