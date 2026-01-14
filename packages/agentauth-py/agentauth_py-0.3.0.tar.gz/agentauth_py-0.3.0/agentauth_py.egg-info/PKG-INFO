@@ -1,0 +1,327 @@
+Metadata-Version: 2.4
+Name: agentauth-py
+Version: 0.3.0
+Summary: AI Agent session management SDK
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: cryptography>=41.0.0
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: browser-cookie3>=0.19.0
+Requires-Dist: keyring>=24.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Dynamic: license-file
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/jacobgadek/agent-auth/main/logo/agent-auth-logo.svg" alt="AgentAuth" width="200" />
+
+# AgentAuth
+
+**Persistent auth for AI agents. Works on any site, today.**
+
+No website integration required. No OAuth adoption needed. Just secure session management that works.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://img.shields.io/pypi/v/agentauth-py.svg)](https://pypi.org/project/agentauth-py/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Dev.to](https://img.shields.io/badge/read-blog%20post-black?logo=dev.to)](https://dev.to/jacobgadek/reverse-engineering-chromes-cookie-encryption-to-authenticate-ai-agents-212i)
+
+[Quick Start](#quick-start) • [LangChain](#langchain-integration) • [n8n](#n8n-integration) • [How It Works](#how-it-works) • [Roadmap](#roadmap)
+
+</div>
+
+---
+
+## The Problem
+
+```python
+# What every agent developer does today
+cookies = {"session_id": "abc123..."}  # Hardcoded. Breaks constantly. Security nightmare.
+```
+
+Sessions expire. Cookies leak into git history. No audit trail. No access control.
+
+## The Solution
+
+```python
+from agent_auth import Vault
+
+vault = Vault()
+cookies = vault.get_session("linkedin.com")  # Encrypted. Scoped. Audited.
+```
+
+```bash
+pip install agentauth-py
+```
+
+**Works on sites as they exist today.** No website changes. No OAuth adoption. No waiting for the ecosystem.
+
+---
+
+## See It In Action
+
+![One command to grab cookies from Chrome](https://raw.githubusercontent.com/jacobgadek/agent-auth/main/docs/images/grab-demo.gif)
+
+*Agent automatically authenticates using stored session—no manual login, no hardcoded cookies.*
+
+---
+
+## How It Works
+
+1. **Log into any site** in Chrome (you probably already are)
+2. **Run `agent-auth grab <domain>`** — cookies are encrypted and stored locally
+3. **Your agent retrieves them** securely on-demand
+
+No extension required. No copy-paste. One command.
+
+---
+
+## Quick Start
+
+```bash
+pip install agentauth-py
+agent-auth grab linkedin.com
+```
+
+That's it. Your LinkedIn session is now stored in an encrypted vault.
+
+The `grab` command reads cookies directly from Chrome—no extension needed, no manual export.
+
+```python
+from agent_auth import Vault
+
+vault = Vault()
+cookies = vault.get_session("linkedin.com")
+
+# Use with requests, Playwright, or any HTTP library
+import requests
+response = requests.get("https://linkedin.com/feed", cookies=cookies)
+```
+
+Works with any site you're logged into:
+
+```bash
+agent-auth grab github.com
+agent-auth grab notion.so
+agent-auth grab twitter.com
+```
+
+---
+
+## Multiple Chrome Profiles
+
+If you use multiple Chrome profiles, specify which one to grab from:
+```bash
+agent-auth grab linkedin.com --profile "Profile 1"
+agent-auth grab github.com --profile "Work"
+```
+
+To find your profile names:
+```bash
+# Mac
+ls ~/Library/Application\ Support/Google/Chrome/
+
+# Linux
+ls ~/.config/google-chrome/
+
+# Windows
+dir %LOCALAPPDATA%\Google\Chrome\User Data\
+```
+
+Default profile is used if no --profile flag is specified.
+
+---
+
+## ☁️ Remote Servers (VPS / Headless / Docker)
+
+Running n8n or scripts on a server without Chrome? Sync your local session:
+
+**On your local machine:**
+```bash
+agent-auth grab linkedin.com
+agent-auth export
+```
+
+**Copy to server:**
+```bash
+scp ~/.agent-auth/vault-export.enc user@your-server:~/
+```
+
+**On your server:**
+```bash
+pip install agentauth-py
+agent-auth import ~/vault-export.enc
+```
+
+Your server can now access your authenticated sessions.
+
+---
+
+## Why AgentAuth?
+
+| Without AgentAuth | With AgentAuth |
+|---|---|
+| Hardcoded cookies in code | Encrypted vault storage |
+| Sessions in git history | Secrets separate from code |
+| Any code can access anything | Scoped access per agent |
+| No idea what accessed what | Full audit logging |
+| Sessions break silently | Expiration notifications |
+
+---
+
+## LangChain Integration
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+from agent_auth.langchain import get_agentauth_tools
+
+tools = get_agentauth_tools(
+    agent_name="sales-bot",
+    vault_password="your-vault-password"  # Password auto-retrieved from system keyring if not provided
+)
+
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+agent = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# Agent automatically uses stored sessions
+response = agent.run("Get my LinkedIn notifications")
+```
+
+**Available tools:**
+- `authenticated_request` — Make HTTP requests with stored session cookies
+- `get_session_cookies` — Retrieve cookies for custom requests
+
+---
+
+## n8n Integration
+
+Use AgentAuth in your n8n workflows with our community node.
+
+```bash
+npm install n8n-nodes-agentauth
+```
+
+The node lets you:
+- Store and retrieve session cookies in n8n workflows
+- Use authenticated sessions with HTTP Request nodes
+- Build automation flows that require login
+
+📦 [View on npm](https://www.npmjs.com/package/n8n-nodes-agentauth) | [GitHub](https://github.com/jacobgadek/n8n-nodes-agentauth)
+
+---
+
+## Playwright Integration
+
+```python
+from playwright.sync_api import sync_playwright
+from agent_auth import Vault
+
+vault = Vault()
+cookies = vault.get_session("github.com")
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    context = browser.new_context()
+    context.add_cookies(cookies)
+    
+    page = context.new_page()
+    page.goto("https://github.com/notifications")
+    # Already authenticated!
+```
+
+---
+
+## CLI Reference
+
+| Command | Description |
+|---------|-------------|
+| `agent-auth grab <domain>` | Grab cookies from Chrome |
+| `agent-auth grab <domain> --profile "Name"` | Grab from specific Chrome profile |
+| `agent-auth list` | List all stored sessions |
+| `agent-auth delete <domain>` | Delete a stored session |
+| `agent-auth refresh <domain>` | Re-grab cookies for a domain |
+| `agent-auth export` | Export vault for remote server |
+| `agent-auth import <file>` | Import vault on remote server |
+| `agent-auth version` | Show current version |
+| `agent-auth status` | Check vault health and stats |
+
+---
+
+## Security
+
+- **AES-256 encryption** with PBKDF2 key derivation (100k iterations)
+- **Ed25519 keypairs** for agent identity
+- **Scoped access** — agents only access approved domains
+- **Audit logging** — every access logged with timestamp
+- **SQLite storage** — encrypted database at `~/.agent-auth/vault.db`
+
+---
+
+## Roadmap
+
+- [x] Chrome extension for cookie export
+- [x] Encrypted local vault
+- [x] Direct Chrome cookie extraction (`agent-auth grab`)
+- [x] Playwright integration
+- [x] LangChain integration
+- [x] **n8n integration** — [n8n-nodes-agentauth](https://github.com/jacobgadek/n8n-nodes-agentauth)
+- [ ] Firefox extension
+- [ ] Selenium examples
+- [ ] Cloud vault sync
+
+---
+
+## Examples
+
+Working demos available in the [`examples/`](./examples) folder.
+
+### GitHub Agent Demo
+
+**Setup:**
+
+```bash
+# 1. Create the agent
+agent-auth create-agent github-agent --scopes github.com
+
+# 2. Export cookies from github.com using Chrome extension
+
+# 3. Add the session
+agent-auth add github.com
+```
+
+**Run:**
+
+```bash
+PYTHONPATH=. python examples/github_agent.py
+```
+
+---
+
+## Contributing
+
+PRs welcome. Check out the [issues](https://github.com/jacobgadek/agent-auth/issues) for feature requests.
+
+---
+
+## License
+
+MIT
+
+<div align="center">
+
+⭐ **Star us if AgentAuth helps your agents authenticate!**
+
+</div>
