@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+_bashers_find_lib() {
+  local dir
+  dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/_bashers_lib" ]]; then
+      echo "$dir/_bashers_lib"
+      return 0
+    fi
+    local parent="$(dirname "$dir")"
+    [[ "$parent" == "$dir" ]] && break
+    dir="$parent"
+  done
+  return 1
+}
+
+_bashers_lib="$(_bashers_find_lib)"
+[[ -n "$_bashers_lib" ]] && source "$_bashers_lib"
+
+update() {
+  local dry_run=0
+  local pkg=""
+
+  for arg in "$@"; do
+    case "$arg" in
+      -h|--help)
+        _bashers_color_init
+        _bashers_print_title "update"
+        _bashers_print_usage "update [--dry-run] [package]"
+        _bashers_print_section "Description"
+        _bashers_print_bullet "Update Python dependencies in the current project."
+        _bashers_print_section "Notes"
+        _bashers_print_bullet "If [package] is provided, updates just that package (with fuzzy matching)."
+        _bashers_print_bullet "Works with uv or poetry projects."
+        _bashers_print_section "Options"
+        _bashers_print_kv "--dry-run" "Print the commands without executing"
+        return 0
+        ;;
+      --dry-run)
+        dry_run=1
+        ;;
+      --*)
+        echo "[update]: usage: update [--dry-run] [package]" >&2
+        return 2
+        ;;
+      *)
+        if [[ -z "$pkg" ]]; then
+          pkg="$arg"
+        else
+          echo "[update]: usage: update [--dry-run] [package]" >&2
+          return 2
+        fi
+        ;;
+    esac
+  done
+
+  _need() { command -v "$1" >/dev/null 2>&1 || { echo "[update]: $1 not on PATH" >&2; return 127; }; }
+  _has_project() { [[ -f pyproject.toml ]] && grep -qE '^\[project\]' pyproject.toml; }
+  _has_poetry() { [[ -f pyproject.toml ]] && grep -qE '^\[tool\.poetry\]' pyproject.toml; }
+  _has_prerelease() {
+    [[ -f pyproject.toml ]] && grep -qE '[0-9]+\.[0-9]+(\.[0-9]+)?[a-zA-Z]|\.(a|b|rc|dev|pre|alpha|beta)[0-9]' pyproject.toml
+  }
+
+  local packages_cmd=""
+  if [[ -f uv.lock ]] || _has_project; then
+    _need uv || return $?
+    packages_cmd="uv pip list 2>/dev/null | tail -n +3 | awk '{print \$1}'"
+  elif [[ -f poetry.lock ]] || _has_poetry; then
+    _need poetry || return $?
+    packages_cmd="poetry show 2>/dev/null | grep -E '^name\s+:' | sed 's/^name\s*:\s*//'"
+  else
+    echo "[update]: no uv/poetry project found in $(pwd)" >&2
+    return 2
+  fi
+
+  if [[ -n "$pkg" ]]; then
+    local matches=$(eval "$packages_cmd" | grep -iE "$pkg")
+    local count=$(echo "$matches" | grep -c . || echo "0")
+    [[ "$count" -eq 0 ]] && { echo "[update]: no packages found matching '$pkg'" >&2; return 1; }
+    [[ "$count" -gt 1 ]] && { _need fzf || return 127; pkg=$(echo "$matches" | fzf --prompt="Package> "); }
+    [[ -z "$pkg" ]] && return 1
+  fi
+
+  if [[ -f uv.lock ]] || _has_project; then
+    local prerelease_flag=""
+    _has_prerelease && prerelease_flag="--prerelease allow"
+    if (( dry_run )); then
+      [[ -z "$pkg" ]] && echo "uv lock --upgrade $prerelease_flag" || echo "uv lock --upgrade-package \"$pkg\" $prerelease_flag"
+      echo "uv sync --all-extras"
+      return 0
+    fi
+    [[ -z "$pkg" ]] && uv lock --upgrade $prerelease_flag || uv lock --upgrade-package "$pkg" $prerelease_flag
+    uv sync --all-extras
+  else
+    local prerelease_flag=""
+    _has_prerelease && prerelease_flag="--allow-prereleases"
+    if (( dry_run )); then
+      [[ -z "$pkg" ]] && echo "poetry update $prerelease_flag" || echo "poetry update \"$pkg\" $prerelease_flag"
+      return 0
+    fi
+    [[ -z "$pkg" ]] && poetry update $prerelease_flag || poetry update "$pkg" $prerelease_flag
+  fi
+  return $?
+}
