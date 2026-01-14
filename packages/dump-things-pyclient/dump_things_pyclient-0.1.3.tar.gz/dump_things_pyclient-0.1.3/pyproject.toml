@@ -1,0 +1,27 @@
+[project]
+name = "dump-things-pyclient"
+version = "0.1.3"
+description = "A client library and some CLI command for dump-things-services"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    {name="Christian Mönch", email="christian.moench@web.de"},
+]
+dependencies = [
+    "requests>=2.32.5",
+]
+
+[project.optional-dependencies]
+ttl = [
+    "dump-things-service>=5.3.0",
+]
+tests = [
+    "pytest>=9.0.1",
+]
+
+[project.scripts]
+auto-curate = "dump_things_pyclient.commands.auto_curate:main"
+read-pages = "dump_things_pyclient.commands.read_pages:main"
+get-records = "dump_things_pyclient.commands.get_records:main"
+json2ttl = "dump_things_pyclient.commands.json2ttl:main"
+post-records = "dump_things_pyclient.commands.post_records:main"
