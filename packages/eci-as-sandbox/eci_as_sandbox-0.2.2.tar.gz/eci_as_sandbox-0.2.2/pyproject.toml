@@ -1,0 +1,53 @@
+[project]
+name = "eci-as-sandbox"
+version = "0.2.2"
+description = "ECI-backed sandbox manager with an Agent interface."
+requires-python = ">=3.9"
+readme = "README.md"
+dependencies = [
+    "alibabacloud-eci20180808>=2.0.8",
+    "python-dotenv>=1.0.0",
+    "websocket-client>=1.9.0",
+    "websockets>=15.0.1",
+]
+
+[project.license]
+text = "Apache-2.0"
+
+[project.urls]
+Homepage = "https://github.com/AndersonBY/eci-as-sandbox"
+Repository = "https://github.com/AndersonBY/eci-as-sandbox"
+Issues = "https://github.com/AndersonBY/eci-as-sandbox/issues"
+
+[build-system]
+requires = [
+    "pdm-backend>=2.0.0",
+]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+package-dir = "src"
+
+[tool.pdm.build]
+includes = [
+    "src/eci_as_sandbox",
+]
+excludes = [
+    "examples/**",
+    ".env",
+    "**/.env",
+    ".env.*",
+]
+
+[tool.pdm.scripts.lint]
+composite = [
+    "ruff check --fix .",
+    "ruff format .",
+    "pyright",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.11",
+    "pyright>=1.1.408",
+]
