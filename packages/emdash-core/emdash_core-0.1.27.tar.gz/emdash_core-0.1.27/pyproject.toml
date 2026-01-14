@@ -1,0 +1,67 @@
+[tool.poetry]
+name = "emdash-core"
+version = "0.1.27"
+description = "EmDash Core - FastAPI server for code intelligence"
+authors = ["Em Dash Team"]
+packages = [{include = "emdash_core"}]
+include = [
+    { path = "emdash_core/skills/**/*.md", format = ["sdist", "wheel"] },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+# Server
+fastapi = ">=0.109.0"
+uvicorn = {extras = ["standard"], version = ">=0.27.0"}
+sse-starlette = ">=2.0.0"
+
+# Database
+kuzu = ">=0.4.0"
+supabase = ">=2.0.0"
+
+# LLM
+openai = ">=1.0.0"
+
+# Vector operations
+numpy = ">=1.26.0"
+sentence-transformers = ">=2.2.0"
+
+# Code Analysis
+astroid = "^3.0.1"
+
+# Git
+gitpython = "^3.1.40"
+pygithub = "^2.1.1"
+
+# Analytics
+networkx = "^3.2.1"
+python-louvain = "^0.16"
+
+# HTTP
+httpx = ">=0.25.0"
+
+# Web Search
+duckduckgo-search = ">=6.0.0"
+beautifulsoup4 = ">=4.12.0"
+
+# Utilities
+pydantic = "^2.5.0"
+pydantic-settings = "^2.0.0"
+python-dotenv = "^1.0.0"
+loguru = "^0.7.2"
+tqdm = "^4.66.1"
+pillow = "^10.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+pytest-asyncio = "^0.23.0"
+
+[tool.poetry.scripts]
+emdash-core = "emdash_core.server:main"
+emdash-checkpoint = "emdash_core.checkpoint.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
