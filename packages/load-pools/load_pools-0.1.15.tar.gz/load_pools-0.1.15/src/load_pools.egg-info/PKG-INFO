@@ -1,0 +1,178 @@
+Metadata-Version: 2.4
+Name: load-pools
+Version: 0.1.15
+Summary: CLI tool for uploading HuggingFace datasets and GitHub repos to Load S3 with tags
+Author-email: Load Network <info@decent.land>
+License: MIT
+Project-URL: Homepage, https://github.com/loadnetwork/pool-cli
+Keywords: load-network,s3-agent,huggingface,github,dataset,ans104
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0
+Requires-Dist: requests>=2.28
+Requires-Dist: GitPython>=3.1
+
+# Load Pools CLI
+
+A command-line tool for uploading HuggingFace datasets and GitHub repositories to Load S3 and tagging them for use with Load's data pools.
+
+## Features
+
+- **GitHub repository upload**: Clone and upload entire repos with file-by-file tagging
+- **HuggingFace integration**: Upload datasets by path
+- **Automatic tagging**: Data-Protocol, Path, Filename, and Content-Type to make data discoverable
+- **Query support**: All uploads are queryable via s3-agent's tag query API
+
+## Installation
+
+### Prerequisites
+
+A Load Network account API key from [cloud.load.network](https://cloud.load.network). HuggingFace calls may ask for a HuggingFace API key, freely available for registered users [here](https://huggingface.co/settings/tokens)
+## Usage
+
+### Upload a GitHub Repository
+
+Upload all files from a GitHub repository with proper folder structure tagging:
+
+```bash
+load-pools create --github https://github.com/owner/repo --auth YOUR_LOAD_API_KEY
+```
+
+**What happens:**
+1. Repository is cloned to a temporary directory
+2. Each file is uploaded individually to s3-agent
+3. Files are tagged with:
+   - `Data-Protocol: "owner/repo"`
+   - `Path: "folder/subfolder"` (relative path from repo root)
+   - `Filename: "file.ext"`
+   - `Content-Type: "mime/type"`
+
+**Example tags for file `images/grayscale/9582.png`:**
+```json
+[
+  {"key": "Data-Protocol", "value": "owner/repo"},
+  {"key": "Path", "value": "images/grayscale"},
+  {"key": "Filename", "value": "9582.png"},
+  {"key": "Content-Type", "value": "image/png"}
+]
+```
+
+### Upload a HuggingFace Dataset
+
+Upload a HuggingFace dataset. Tables are uploaded row by row, with proper tagging.
+
+```bash
+load-pools create --hugging-face username/dataset-name --auth YOUR_LOAD_API_KEY 
+```
+
+For private datasets or to bypass anonymous rate limits, pass `--hf-auth <YOUR_TOKEN>`.
+
+**What happens:**
+1. HuggingFace dataset is downloaded
+2. Table rows are extracted into individual dataitems
+3. Rows are uploaded to s3-agent with metadata tags
+
+### Command Options
+
+```
+load-pools create [OPTIONS]
+
+Options:
+  --github TEXT          GitHub repository URL
+  --hugging-face TEXT    HuggingFace repository slug (user/repo)
+  --auth TEXT            Load account API key [required]
+  -v, --verbose          Show detailed upload progress
+  --help                 Show help message
+```
+
+## Querying Uploaded Data
+
+After uploading, you can query your data using the s3-agent tags API.
+
+### Query all files from a GitHub repository:
+
+```bash
+curl -X POST https://load-s3-agent.load.network/tags/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": [
+      {"key": "Data-Protocol", "value": "owner/repo"}
+    ]
+  }'
+```
+
+### Query files in a specific folder:
+
+```bash
+curl -X POST https://load-s3-agent.load.network/tags/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": [
+      {"key": "Data-Protocol", "value": "owner/repo"},
+      {"key": "Path", "value": "images/grayscale"}
+    ]
+  }'
+```
+
+### Query by filename:
+
+```bash
+curl -X POST https://load-s3-agent.load.network/tags/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": [
+      {"key": "Data-Protocol", "value": "owner/repo"},
+      {"key": "Filename", "value": "9582.png"}
+    ]
+  }'
+```
+
+### Query by content type:
+
+```bash
+curl -X POST https://load-s3-agent.load.network/tags/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": [
+      {"key": "Data-Protocol", "value": "owner/repo"},
+      {"key": "Content-Type", "value": "image/png"}
+    ]
+  }'
+```
+
+## Examples
+
+### Upload a dataset repository:
+
+```bash
+load-pools create \
+  --github https://github.com/username/my-dataset \
+  --auth load_acc_xxxxxxxxxxxxx
+```
+
+### Upload with verbose output:
+
+```bash
+load-pools create \
+  --github https://github.com/ml-datasets/images \
+  --auth load_acc_xxxxxxxxxxxxx \
+  --verbose
+```
+
+### Upload a HuggingFace dataset:
+
+```bash
+load-pools create \
+  --hugging-face openai/graphwalks \
+  --auth load_acc_xxxxxxxxxxxxx
+```
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Related Projects
+
+- [xans104](https://github.com/loadnetwork/xans104) - HuggingFace model uploader with ANS-104
+- [Load Network](https://load.network) - Decentralized data storage network
+- [s3-agent](docs.load.network) - Load S3 Agent API
