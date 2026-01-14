@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spark-json-flatten"
+version = "0.1.1"
+description = "Recursively flatten complex PySpark DataFrames with nested structs and arrays"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+authors = [
+    { name = "Gaurav Singh Bisht" }
+]
+
+dependencies = [
+    "pyspark>=3.0.0"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Database"
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
