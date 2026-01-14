@@ -1,0 +1,200 @@
+from __future__ import annotations
+
+from contextlib import asynccontextmanager
+from typing import Any, Callable, TypeVar
+
+from pyspec._connection import ClientConnection
+from pyspec._connection.data import DataType
+
+from ._motor import Motor
+from ._remote_property_table import (
+    EventStream,
+    Property,
+    PropertyGroup,
+    RemotePropertyTable,
+)
+from ._status import Status
+
+T = TypeVar("T", bound=DataType)
+
+
+class Client(PropertyGroup):
+    """
+    Represents a client that connects to a PySpec server.
+
+    This is the main entry point for users of the pyspec.client package. Methods allow access to motor control, status monitoring, variable access, and command execution.
+
+    Args:
+        host (str): The hostname or IP address of the server.
+        port (int): The port number of the server.
+    """
+
+    def __init__(self, host: str, port: int):
+        self._connection = ClientConnection(host, port)
+        self._remote_property_table = RemotePropertyTable(self._connection)
+        super().__init__("", self._remote_property_table)
+
+    async def __aenter__(self):
+        await self._connection.__aenter__()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self._connection.__aexit__(exc_type, exc, tb)
+
+    def status(self) -> Status:
+        """
+        The status properties reflect changes in the server state that may affect the server's ability to execute client commands or control hardware.
+
+        Returns:
+            Status: The status property group. See the pyspec.client._status.Status class for details.
+        """
+        return Status(self._remote_property_table)
+
+    def motor(self, motor_name: str) -> Motor:
+        """
+        The motor properties are used to control the motors.
+        The parameters for the commands that are sent from the client and the values in the replies and events that are sent from the server are always transmitted as ASCII strings in the data that follows the packet header.
+
+        Args:
+            motor_name (str): The name of the motor to control.
+        Returns:
+            Motor: The motor property group. See the pyspec.client._motor.Motor class for details.
+        """
+        return Motor(motor_name, self._connection, self._remote_property_table)
+
+    def var(
+        self, var_name: str, coerce: Callable[[Any], T] | None = None
+    ) -> Property[T]:
+        """
+        The var properties allow values of any variables to be transferred between the server and the client.
+        Enter only the variable name; the property will be created as: var/{var_name}
+
+        var/var_name
+
+        .. code-block:: none
+
+            on("change")
+                Sent to clients who have registered when the variable var_name changes value.
+            get
+                Returns the value of the var_name in the data, if var_name is an existing variable on the server.
+            set
+                Sets the value of var_name on the server to the contents of data.
+
+
+        All data types (numbers, strings, associative arrays and data arrays) are supported.
+
+        For built-in associative arrays (A[], S[] and possibly G[], Q[], Z[], U[] and UB[], depending on geometry), only existing elements can be set.
+
+        Properties can be created for individual elements of associative arrays by using the syntax var_name = "array_name[element_key]"
+
+        Args:
+            var_name (str): The name of the variable on the server.
+            coerce (Callable[[Any], T], optional): An optional function to coerce the data to a specific type.
+
+        Returns:
+            :class:`pyspec.client._remote_property_table.Property``[T]`: The property representing the variable on the server.
+        """
+        return self._property(f"var/{var_name}", coerce)
+
+    def output(self, filename: str) -> EventStream[str]:
+        """
+        The output property puts copies of the strings written to files or to the screen in events sent to clients.
+
+        output/filename
+
+        .. code-block:: none
+
+            on("change"):
+                Sent when the server sends output to the file or device given by filename, where filename can be the built-in name "tty" or a file or device name. The data will be a string representing the output.
+
+            Once a client has registered for output events from a particular file, the server will keep track of the client's request as the file is opened and closed.
+            File names are given relative to the server's current directory and can be relative or absolute path names, just as with the built-in commands that refer to files.
+
+            (The output property was introduced in spec release 5.07.04-1.)
+
+        Args:
+            filename (str): The file or device name to monitor output for.
+
+        Returns:
+            EventStream[str]: An event stream for output events.
+        """
+        return self._readonly_property(f"output/{filename}", str)
+
+    def count(self) -> Property[bool]:
+        """
+        The count property provides a count of the number of commands executed by the server since it was started.
+
+        scaler/.all./count
+        .. code-block:: none
+
+            on("change")
+                Sent when counting starts (data is True) and when counting stops (data is False).
+            get
+                Data indicates counting (True) or not counting (False).
+            set
+                If data is nonzero, the server pushes a "count_em data\\\\n" onto the command queue.
+                If data is False, counting is aborted as if a ^C had been typed at the server.
+
+
+        Returns:
+            :class:`pyspec.client._remote_property_table.Property``[bool]`: The property representing the count state.
+        """
+        return self._property("scaler/.all./count", bool)
+
+    async def call(self, function_name: str, *args: str | float | int) -> DataType:
+        """
+        Call a remote function on the server.
+
+        Args:
+            function_name (str): The name of the remote function to call.
+            *args (str | float | int): The arguments to pass to the remote function.
+        Returns:
+            DataType: The result of the remote function call.
+        """
+        return await self._connection.remote_func(function_name, *args)
+
+    async def exec(self, command: str) -> DataType:
+        """
+        Execute a command on the server.
+
+        Args:
+            command (str): The command to execute.
+        Returns:
+            DataType: The result of the command execution.
+        """
+        return await self._connection.remote_cmd(command)
+
+    @asynccontextmanager
+    async def synchronized_motors(self, *, timeout: float | None = None):
+        """
+        Context manager to enable synchronized motor operations for the client.
+
+        While this context is active, motor movements will be held. Upon exiting the context, the movements will be initialized simultaneously.
+
+        Example usage:
+
+        .. code-block:: python
+
+            async with client.synchronized_motors():
+                # Motor movement will be held in here.
+                await motor1.move(position)
+                await motor2.move(position)
+
+                # Motors will not start moving yet.
+                await asyncio.sleep(1)  # Simulate other operations
+                # Motors will start moving simultaneously here.
+
+            # Outside of the context, all motors have completed their movements.
+
+        Args:
+            timeout (float, optional): Maximum time to wait for all motors to complete, in seconds. If None, wait indefinitely.
+        Yields:
+            None
+        Raises:
+            RuntimeError: If there are pending motor motions from a previous context.
+        """
+        async with self._connection.synchronized_motors(timeout=timeout):
+            yield
+
+
+__all__ = ["Client"]
