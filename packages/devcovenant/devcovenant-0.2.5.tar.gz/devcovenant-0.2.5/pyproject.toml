@@ -1,0 +1,28 @@
+[project]
+name = "devcovenant"
+version = "0.2.5"
+description = "Self-enforcing development policy engine"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "PyYAML>=6.0.2",
+  "semver>=3.0.2",
+]
+[tool.setuptools]
+include-package-data = true
+[project.scripts]
+devcovenant = "devcovenant.cli:main"
+[tool.black]
+line-length = 79
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.format]
+
+[tool.setuptools.packages.find]
+include = ["devcovenant*"]
