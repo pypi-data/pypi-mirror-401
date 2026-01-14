@@ -1,0 +1,48 @@
+Metadata-Version: 2.4
+Name: cactus_schema
+Version: 0.0.10
+Summary: Public facing models for the various CACTUS APIs
+Author-email: Mike Turner <mike.turner@anu.edu.au>, Josh Vote <joshua.vote@anu.edu.au>, Lachlan Watson <lachlan.watson@anu.edu.au>
+Maintainer-email: Mike Turner <mike.turner@anu.edu.au>, Josh Vote <joshua.vote@anu.edu.au>, Lachlan Watson <lachlan.watson@anu.edu.au>
+Keywords: CSIP-AUS,CACTUS,schema,models
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development
+Classifier: Typing :: Typed
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: cactus_test_definitions>=1.0.0
+Requires-Dist: dataclass-wizard<1,>=0.35.0
+Provides-Extra: dev
+Requires-Dist: bandit; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: coverage; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: flake8-bugbear; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: assertical; extra == "test"
+Dynamic: license-file
+
+# cactus-schema
+
+Public facing models for the various CACTUS APIs
+
+## Usage
+
+
+`pip install cactus-schema`
+
+
+## Development
+
+Clone repo - then run:
+
+`pip install -e .[dev,test,client]`
+
+`pytest`
