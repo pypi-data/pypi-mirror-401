@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "Cython>=0.29.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openarmx-arm-driver"
+version = "1.1.10"
+description = "Python SDK for OpenArmX robotic arm control via CAN bus"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "LicenseRef-OpenArmX-Research-Education-v1.0"
+license-files = ["LICENSE"]
+
+authors = [
+  { name="Wei Lindong", email="weilindong02@gmail.com" }
+]
+
+keywords = ["robotics", "can-bus", "motor-control", "robstride", "openarmx"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "python-can>=4.0.0",
+    "PyYAML>=5.4.0",
+]
+
+[project.urls]
+Homepage = "https://www.openarmx.com"
+Documentation = "https://docs.openarmx.com"
+Repository = "https://www.openarmx.com"
+Issues = "https://www.openarmx.com"
+
+[tool.setuptools]
+packages = ["openarmx_arm_driver", "openarmx_arm_driver.config", "openarmx_arm_driver._lib"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+openarmx_arm_driver = [
+    "config/*.yaml",
+    "_lib/*.so",
+    "_lib/__init__.py"
+]
+
+[tool.setuptools.exclude-package-data]
+openarmx_arm_driver = [
+    "_lib/*.py",
+    "!_lib/__init__.py",
+    "_lib/_backup_py",
+    "_lib/_backup_py/*"
+]

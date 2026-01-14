@@ -1,0 +1,24 @@
+# 包含编译脚本
+include build_so.py
+include clean_so.py
+include README.md
+include LICENSE
+
+# 包含配置文件
+recursive-include src/openarmx_arm_driver/config *.yaml
+
+# 只包含 _lib 的 __init__.py 和已编译的 .so 文件
+include src/openarmx_arm_driver/_lib/__init__.py
+recursive-include src/openarmx_arm_driver/_lib *.so
+
+# 排除 _lib 中的 .py 源码文件（除了 __init__.py）
+global-exclude src/openarmx_arm_driver/_lib/*.py
+include src/openarmx_arm_driver/_lib/__init__.py
+
+# 完全排除 _backup_py 目录
+prune src/openarmx_arm_driver/_lib/_backup_py
+
+# 排除其他不需要的文件
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude .DS_Store
