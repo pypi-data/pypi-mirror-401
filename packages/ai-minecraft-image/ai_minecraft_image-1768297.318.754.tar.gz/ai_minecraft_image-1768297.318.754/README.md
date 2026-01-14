@@ -1,0 +1,96 @@
+# ai-minecraft-image
+
+The `ai-minecraft-image` package provides a simple and automated way to generate Minecraft skins from images, leveraging the capabilities showcased at https://supermaker.ai/image/blog/how-to-turn-your-image-into-minecraft-skin/. This library simplifies the process, making it accessible to developers and Minecraft enthusiasts alike.
+
+## Installation
+
+Install the package using pip:
+bash
+pip install ai-minecraft-image
+
+## Basic Usage
+
+Here are a few examples demonstrating how to use the `ai-minecraft-image` package:
+
+**1. Generating a skin from a local image file:**
+python
+from ai_minecraft_image import generate_skin
+
+image_path = "path/to/your/image.jpg"
+output_path = "path/to/your/output/skin.png"
+
+try:
+    generate_skin(image_path, output_path)
+    print(f"Skin generated successfully at: {output_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+**2. Generating a skin from an image URL:**
+python
+from ai_minecraft_image import generate_skin_from_url
+
+image_url = "https://example.com/image.png"
+output_path = "path/to/your/output/skin.png"
+
+try:
+    generate_skin_from_url(image_url, output_path)
+    print(f"Skin generated successfully at: {output_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+**3. Handling potential errors:**
+python
+from ai_minecraft_image import generate_skin
+
+image_path = "invalid/path/to/image.jpg"
+output_path = "path/to/your/output/skin.png"
+
+try:
+    generate_skin(image_path, output_path)
+    print(f"Skin generated successfully at: {output_path}")
+except FileNotFoundError:
+    print("Error: Image file not found.")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+
+**4. Specifying skin resolution:**
+python
+from ai_minecraft_image import generate_skin
+
+image_path = "path/to/your/image.jpg"
+output_path = "path/to/your/output/skin.png"
+resolution = (64, 64) # Default is (64,64), other supported resolution is (128,128)
+
+try:
+    generate_skin(image_path, output_path, resolution=resolution)
+    print(f"Skin generated successfully at: {output_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+**5. Using a custom algorithm (advanced):**
+python
+from ai_minecraft_image import generate_skin
+from ai_minecraft_image.algorithms import simple_algorithm
+
+image_path = "path/to/your/image.jpg"
+output_path = "path/to/your/output/skin.png"
+
+try:
+    generate_skin(image_path, output_path, algorithm=simple_algorithm)
+    print(f"Skin generated successfully at: {output_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+## Features
+
+*   **Image to Skin Conversion:** Automatically transforms images into Minecraft skin files.
+*   **URL Support:** Generates skins directly from image URLs.
+*   **Error Handling:** Provides robust error handling for common issues.
+*   **Customizable Resolution:** Allows specifying the desired skin resolution.
+*   **Algorithmic Options**: Supports different algorithms for image processing, allowing for customized skin creation.
+
+## License
+
+MIT License
+
+This project is a gateway to the ai-minecraft-image ecosystem. For advanced features and full capabilities, please visit: https://supermaker.ai/image/blog/how-to-turn-your-image-into-minecraft-skin/
