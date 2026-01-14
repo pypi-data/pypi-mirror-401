@@ -1,0 +1,156 @@
+# Translate docx
+
+<p align="left" width="250">
+    <a href="https://github.com/pixelprotest/translate-docx/actions">
+        <img src="https://github.com/pixelprotest/translate-docx/actions/workflows/tests.yml/badge.svg" alt="Tests Status">
+    </a>
+    <a href="">
+        <img src="https://img.shields.io/github/v/release/pixelprotest/translate-docx">
+    </a>
+    <a href="">
+        <img src="https://img.shields.io/badge/python-3.13%20--%203.14-blue">
+    </a>
+    <a href="https://github.com/pixelprotest/translate-docx/blob/main/LICENSE">
+        <img src="https://img.shields.io/badge/license-MIT-blue?style=flat">
+    </a>
+</p>
+
+A CLI tool and python library for translating `.docx` files, with a focus on preserving all text formatting.
+
+## Key Features
+
+- **Lossless round-trip** - Extract and rebuild preserves all formatting
+- **Citation preservation** - Superscripts (references) stay in original language
+- **Bypass markers** - Protect specific content from translation with custom markers
+- **Pluggable translators** - Use any translation backend
+- **Section-based** - Documents split by bold headers automatically
+
+## Installation
+
+```bash
+pip install translate-docx
+```
+
+## Usage from Command Line 
+
+```bash
+# Basic translation e.g. from spanish to english
+translate-docx input.docx output.docx -s es -t en
+
+# With options
+translate-docx input.docx output.docx -s es -t en --delay 1.0 --verbose
+
+# Show document info
+translate-docx info document.docx
+```
+
+## Usage as a Package
+```python
+from translate_docx import (
+    extract_document, 
+    translate_document, 
+    rebuild_document, 
+    GoogleTranslatorWrapper
+)
+
+doc = extract_document("input.docx")
+translator = GoogleTranslatorWrapper(delay_between_calls=0.5, max_retries=3)
+translated = translate_document(doc, translator, "es", "en")
+rebuild_document(translated, "output.docx", template_path="input.docx")
+```
+
+## Protecting Content with Bypass Markers
+
+Sometimes you want to prevent specific content from being translated (like timestamps, references, or technical terms). You can use **bypass markers** to protect this content.
+
+### How It Works
+
+Wrap content in your source document with `[[ marker: content ]]` syntax, where `marker` is any alphanumeric name you choose (e.g., `tc`, `note`, `ref`). Then configure your translator to recognize these markers.
+
+### Command Line Usage
+
+```bash
+# Protect timecodes marked with [[ tc: ... ]]
+translate-docx translate input.docx output.docx -s nl -t en --bypass-markers tc
+
+# Protect multiple marker types
+translate-docx translate input.docx output.docx -s nl -t en --bypass-markers tc,note,ref
+```
+
+### Python API Usage
+
+```python
+from translate_docx import GoogleTranslatorWrapper, extract_translate_rebuild
+
+# Configure translator with bypass markers
+translator = GoogleTranslatorWrapper(
+    delay_between_calls=0.5,
+    bypass_markers=['tc', 'note', 'ref']  # Protect these marker types
+)
+
+extract_translate_rebuild('input.docx', 'output.docx', translator, 'nl', 'en')
+```
+
+### Example Document Markup
+
+In your Word document, mark content to protect:
+
+```
+Original text with [[ tc: 00:06:01, 00:06:09 ]] timestamps.
+
+Important [[ note: Technical term - do not translate ]] for reference.
+
+See citation [[ ref: Smith et al. 2020 ]] for details.
+```
+
+After translation, the markers and their content are preserved:
+
+```
+Translated English text with [[ tc: 00:06:01, 00:06:09 ]] timestamps.
+
+Important [[ note: Technical term - do not translate ]] for reference.
+
+See citation [[ ref: Smith et al. 2020 ]] for details.
+```
+
+### Marker Rules
+
+- Marker names must be **alphanumeric only** (letters and numbers, no special characters)
+- Marker names are **case-insensitive** (`tc`, `TC`, and `Tc` are all the same)
+- You can use any marker names that make sense for your use case
+- Common examples: `tc` (timecodes), `note`, `ref` (references), `term`, `cite`
+
+### Use Cases
+
+- **Timestamps**: `[[ tc: 00:06:01 ]]` for video/film timecodes
+- **Technical terms**: `[[ term: API endpoint ]]` for specialized vocabulary
+- **References**: `[[ ref: Smith2020 ]]` for citations
+- **Notes**: `[[ note: internal comment ]]` for content that shouldn't be translated
+- **Code**: `[[ code: function_name() ]]` for code snippets in documentation
+
+## Supported Language Codes
+```
+ar - Arabic
+zh - Chinese (Simplified)
+nl - Dutch
+en - English
+fr - French
+de - German
+it - Italian
+ja - Japanese
+ko - Korean
+pl - Polish
+pt - Portuguese
+ru - Russian
+es - Spanish
+tr - Turkish
+```
+
+## Known Limitations
+- Tables and images not yet supported
+- Headers/footers not yet supported
+- Translated text may reflow (layout not guaranteed)
+
+## License
+
+MIT License. This project is for personal use.

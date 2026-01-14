@@ -1,0 +1,85 @@
+"""DOCX Translator - Extract, translate, and rebuild DOCX documents."""
+
+__version__ = "0.1.0"
+
+from translate_docx.cli import app as cli_app
+from translate_docx.extractor import (
+    extract_document,
+    extract_line_numbering,
+    extract_metadata,
+    extract_page_settings,
+    extract_paragraph,
+    extract_paragraph_formatting,
+    extract_run_formatting,
+    extract_text_run,
+    is_section_header,
+    split_into_sections,
+)
+from translate_docx.models import (
+    Document,
+    DocumentMetadata,
+    Hyperlink,
+    LineNumbering,
+    PageSettings,
+    Paragraph,
+    ParagraphFormatting,
+    RunFormatting,
+    Section,
+    TextRun,
+)
+from translate_docx.rebuilder import (
+    add_paragraph_to_document,
+    apply_line_numbering,
+    apply_metadata,
+    apply_page_settings,
+    apply_paragraph_formatting,
+    apply_run_formatting,
+    rebuild_document,
+)
+from translate_docx.translator import (
+    CallbackTranslator,
+    GoogleTranslatorWrapper,
+    ManualTranslator,
+    NoOpTranslator,
+    TranslatorInterface,
+    extract_translate_rebuild,
+    translate_document,
+)
+
+__all__ = [
+    "Document",
+    "DocumentMetadata",
+    "Hyperlink",
+    "LineNumbering",
+    "PageSettings",
+    "Paragraph",
+    "ParagraphFormatting",
+    "RunFormatting",
+    "Section",
+    "TextRun",
+    "extract_document",
+    "extract_paragraph",
+    "extract_text_run",
+    "extract_run_formatting",
+    "extract_paragraph_formatting",
+    "extract_metadata",
+    "extract_page_settings",
+    "extract_line_numbering",
+    "is_section_header",
+    "split_into_sections",
+    "rebuild_document",
+    "add_paragraph_to_document",
+    "apply_run_formatting",
+    "apply_paragraph_formatting",
+    "apply_page_settings",
+    "apply_line_numbering",
+    "apply_metadata",
+    "TranslatorInterface",
+    "CallbackTranslator",
+    "ManualTranslator",
+    "NoOpTranslator",
+    "GoogleTranslatorWrapper",
+    "translate_document",
+    "extract_translate_rebuild",
+    "cli_app",
+]
