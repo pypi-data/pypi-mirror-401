@@ -1,0 +1,173 @@
+Metadata-Version: 2.4
+Name: mcp-gmail-reader
+Version: 0.1.0
+Summary: MCP server for Gmail - search emails, read messages, download attachments
+Project-URL: Homepage, https://github.com/Maheidem/gmail-mcp
+Project-URL: Repository, https://github.com/Maheidem/gmail-mcp
+Project-URL: Issues, https://github.com/Maheidem/gmail-mcp/issues
+Author: Marcos Heidemann
+License-Expression: MIT
+License-File: LICENSE
+Keywords: ai,claude,email,gmail,mcp,model-context-protocol
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.10
+Requires-Dist: google-api-python-client
+Requires-Dist: google-auth-httplib2
+Requires-Dist: google-auth-oauthlib
+Requires-Dist: mcp[cli]
+Description-Content-Type: text/markdown
+
+# Gmail MCP Server
+
+An MCP (Model Context Protocol) server that provides Gmail integration for AI assistants like Claude. Search emails, read messages, and download attachments directly from your Gmail account.
+
+## Features
+
+- **Search emails** using Gmail's powerful search syntax (`from:`, `subject:`, `has:attachment`, etc.)
+- **Read full email content** including body and attachment metadata
+- **Download attachments** to your local filesystem
+
+## Requirements
+
+- Python 3.10+
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+- A Google Cloud project with Gmail API enabled
+
+## Installation
+
+### 1. Clone and install dependencies
+
+```bash
+git clone https://github.com/yourusername/gmail-mcp.git
+cd gmail-mcp
+uv sync
+```
+
+### 2. Set up Google Cloud credentials
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project (or select existing)
+3. Enable the [Gmail API](https://console.cloud.google.com/apis/library/gmail.googleapis.com)
+4. Go to **APIs & Services > Credentials**
+5. Click **Create Credentials > OAuth client ID**
+6. Select **Desktop app** as application type
+7. Download the JSON file
+
+### 3. Configure credentials
+
+Save the downloaded credentials file:
+
+```bash
+mkdir -p ~/.gmail-mcp
+mv ~/Downloads/client_secret_*.json ~/.gmail-mcp/gcp-oauth.keys.json
+```
+
+Or set via environment variable:
+```bash
+export GMAIL_CREDENTIALS_PATH=/path/to/your/credentials.json
+```
+
+### 4. First-time authorization
+
+Run the server once to complete OAuth:
+
+```bash
+uv run python -m gmail_mcp
+```
+
+A browser window will open for you to authorize access. The token is saved to `~/.gmail-mcp/token.json` for future use.
+
+## Usage with Claude Desktop
+
+Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+
+**macOS/Linux:**
+```json
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/gmail-mcp", "python", "-m", "gmail_mcp"]
+    }
+  }
+}
+```
+
+**Windows:**
+```json
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "uv",
+      "args": ["run", "--directory", "C:/path/to/gmail-mcp", "python", "-m", "gmail_mcp"]
+    }
+  }
+}
+```
+
+## Available Tools
+
+### `search_emails`
+Search Gmail using Gmail search syntax.
+
+```
+search_emails(query="from:example@gmail.com", max_results=10)
+```
+
+**Query examples:**
+- `from:example@gmail.com` - emails from specific sender
+- `subject:invoice` - emails with subject containing "invoice"
+- `has:attachment` - emails with attachments
+- `after:2024/01/01` - emails after date
+- `is:unread` - unread emails
+- `label:important` - emails with specific label
+
+### `get_email`
+Get full email content by message ID.
+
+```
+get_email(message_id="abc123")
+```
+
+Returns: id, from, to, subject, date, body, attachments
+
+### `download_attachment`
+Download email attachment to specified path.
+
+```
+download_attachment(
+    message_id="abc123",
+    attachment_id="xyz789",
+    save_path="/path/to/save/file.pdf"
+)
+```
+
+## Development
+
+```bash
+# Run with MCP inspector
+uv run mcp dev src/gmail_mcp/server.py
+
+# Run tests
+uv run pytest
+
+# Lint
+uv run ruff check src/
+```
+
+## Security Notes
+
+- Only `gmail.readonly` scope is used - this server cannot send or modify emails
+- OAuth tokens are stored locally in `~/.gmail-mcp/token.json`
+- Never commit credentials or tokens to version control
+
+## License
+
+MIT
