@@ -1,0 +1,238 @@
+Metadata-Version: 2.4
+Name: nsx-ai
+Version: 1.0.2
+Summary: Neuro-Symbolic AI Framework with Agentic Capabilities
+Home-page: https://github.com/ananya868/nsx
+Author: Ananya Kumar
+Author-email: ananya8154@gmail.com
+Project-URL: Bug Tracker, https://github.com/yourusername/nsx/issues
+Project-URL: Documentation, https://github.com/yourusername/nsx/wiki
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch>=2.0.0
+Requires-Dist: numpy
+Requires-Dist: litellm
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+---
+
+# NSX-AI
+> **Give your Neural Networks "Common Sense".**
+
+[![PyPI Version](https://img.shields.io/pypi/v/nsx-ai?color=blue)](https://pypi.org/project/nsx-ai/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+Deep Learning is amazing at **seeing** (recognizing a cat, reading handwriting), but it's terrible at **thinking** (following rules, understanding relationships).
+
+**NSX-AI** fixes this. It is a bridge that connects **PyTorch** with **Symbolic Logic**.
+*   It lets you train models using **Rules** instead of just labeled data.
+*   It stops your AI from making "stupid" mistakes (Hallucinations/Safety violations).
+*   It allows you to talk to your model in **Plain English** to define logic.
+
+It's fast, scalable, and ready for messy real-world data.
+
+---
+
+## 📦 Installation
+```bash
+pip install nsx-ai
+```
+
+---
+
+## ⚡ Quick Start
+If you know what Neuro-Symbolic AI is, here is how you use NSX in 30 seconds.
+
+**Goal:** Train a network to learn that **"If digit is Zero, it implies it is Even"** without providing labels.
+
+```python
+import torch
+import nsx.nsai as ns
+
+# 1. Define Logic Primitives
+x = ns.Variable("x")
+IsZero = ns.Predicate("IsZero", 1) # Unary Predicate
+IsEven = ns.Predicate("IsEven", 1)
+
+# 2. Define the Rule: Zero -> Even
+rule = IsEven(x) << IsZero(x)
+
+# 3. Connect to PyTorch
+# 'net' is your standard torch.nn.Module
+model = ns.NeuroSymbolicModel(net)
+model.register(IsZero, output_index=0)
+model.register(IsEven, output_index=1)
+
+# 4. Train
+# SemanticLoss minimizes rule violations
+criterion = ns.SemanticLoss(model.concept_map)
+loss = criterion([rule], data_binding={x: images}) 
+loss.backward()
+```
+
+---
+
+## 🌍 Real-World Use Cases
+Why do you need this? Because pure Deep Learning fails in these scenarios.
+
+### 🏥 Case 1: Healthcare & Safety Compliance
+**The Problem:**
+You are building an AI to prescribe medicines. A standard Neural Network might look at patient history and predict "High Dose" for a **Child** just because it saw a similar pattern in an adult. **This is dangerous.**
+
+**Why Normal AI Fails:** It learns correlations, not safety rules.
+
+**The NSX Solution:**
+You inject a **Hard Constraint** (Logic) into the training.
+
+```python
+# Logic: If Patient is a Child, do NOT prescribe Adult Meds.
+# ~ means NOT
+rule_safety = ~PrescribeAdultMeds(x) << IsChild(x)
+
+# Result:
+# Even if the Neural Net "thinks" (99% prob) that the meds are okay,
+# the Logic Layer forces the gradient down, teaching the model:
+# "No matter what, this is illegal."
+```
+✅ **Benefit:** Guaranteed Safety Guardrails in critical systems.
+
+---
+
+### 💳 Case 2: Financial Fraud (Relational Logic)
+**The Problem:**
+You want to detect money laundering. A standard model looks at one transaction at a time. It sees "User A sent $500". Looks normal. It sees "User B sent $500". Looks normal.
+It **misses** the fact that A sent to B, and B sent back to A (Circular Trading).
+
+**Why Normal AI Fails:** It treats data points as isolated islands.
+
+**The NSX Solution:**
+NSX supports **Relational Logic ($O(N^2)$ Broadcasting)**. It looks at pairs of data.
+
+```python
+# x and y are two different transactions
+IsFraud(x) << (Transfer(x, y) & Transfer(y, x) & HighAmount(x))
+
+# Result:
+# The model learns to look at the RELATIONSHIP between transaction x and y.
+# It detects the cycle that a simple classifier would miss.
+```
+✅ **Benefit:** Detect complex patterns like Circular Trading or Social Graph anomalies.
+
+---
+
+### 🏗️ Case 3: Industrial Safety (Zero-Shot Learning)
+**The Problem:**
+You need to detect if workers are wearing safety gear. You have 10,000 site images but **zero labels**. You don't have time to manually draw boxes around helmets for weeks.
+
+**Why Normal AI Fails:** No Labels = No Training.
+
+**The NSX Solution:**
+You define what "Safe" means using logic, and let the model figure out the rest.
+
+```python
+# You don't need 'Safe' labels. You just tell the AI:
+# "Safe means Helmet AND Vest."
+IsSafe(x) << (HasHelmet(x) & HasVest(x))
+
+# Result:
+# The model aligns its internal representation of 'Helmet' and 'Vest'
+# to maximize the truth of this rule. It labels itself!
+```
+✅ **Benefit:** Save months of data labeling time and cost.
+
+**Explore the full set of example here -**
+
+---
+
+## Agentic Capabilities
+Don't want to write code? **Talk to your data.**
+NSX includes an Agent module powered by LLMs (OpenAI/DeepSeek/etc).
+
+```python
+from nsx.nsai.agent import LogicTranslator, get_client
+
+# 1. Connect Agent
+client = get_client("gpt-4o")
+translator = LogicTranslator(client)
+
+# 2. Speak Logic
+rule = translator.text_to_rules(
+    "A transaction is suspicious if it happens at night and is from a foreign IP.",
+    predicates=[IsSuspicious, IsNight, IsForeign]
+)
+
+print(rule[0])
+# Output: IsSuspicious(x) :- IsNight(x) & IsForeign(x)
+```
+
+### 🕵️‍♂️ Automated Rule Discovery
+New to a dataset? Don't know what rules to write?
+Let the Agent **discover** logic for you.
+
+```python
+from nsx.nsai.agent import RuleMiner
+
+miner = RuleMiner(client)
+
+# Give it a description of your data
+suggestions = miner.propose_rules(
+    data_description="Credit card transactions with columns: Amount, Location, Time.",
+    predicates=[IsFraud, HighAmount, ForeignLoc]
+)
+
+print(suggestions[0])
+# Output Hypothesis: IsFraud(x) :- HighAmount(x) & ForeignLoc(x)
+```
+
+### 🛡️ Hallucination Guardrails
+Building a Chatbot? Ensure it doesn't lie or violate safety policies.
+NSX can act as a **Logic Firewall** for LLM outputs.
+
+```python
+from nsx.nsai.agent import LogicGuard
+
+guard = LogicGuard(client)
+
+# Define Truth
+hard_rule = IsSafe(x) << HasHelmet(x)
+
+# Check AI response
+ai_response = "The worker is safe because he is wearing a cap."
+check = guard.verify(ai_response, rules=[hard_rule])
+
+print(check['is_safe']) 
+# Output: False (Violation: Cap is not a Helmet)
+```
+
+Explore docs for more!
+
+---
+
+## ⚙️ Advanced Features
+*   **Log-Space Arithmetic:** We use `LogProductTNorms` to ensure gradients don't vanish even in deep logic trees.
+*   **Vectorized Compiler:** Logic rules are compiled into a static Computation Graph (`nn.Module`) for maximum GPU speed.
+*   **Auto-Broadcasting:** Handles single inputs vs matrix inputs automatically.
+---
+
+## 📄 License
+MIT License. Free for Research and Commercial Use.
+
+---
+*Built for the future of Hybrid AI.*
