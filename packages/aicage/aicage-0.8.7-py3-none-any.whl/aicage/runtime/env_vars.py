@@ -1,0 +1,9 @@
+"""Shared environment variable names used for container setup."""
+
+AICAGE_UID = "AICAGE_UID"
+AICAGE_GID = "AICAGE_GID"
+AICAGE_USER = "AICAGE_USER"
+AICAGE_WORKSPACE = "AICAGE_WORKSPACE"
+
+AICAGE_AGENT_CONFIG_PATH = "AICAGE_AGENT_CONFIG_PATH"
+
