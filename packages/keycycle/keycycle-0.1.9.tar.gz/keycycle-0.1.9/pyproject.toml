@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keycycle"
+version = "0.1.9"
+authors = [
+  { name="William Jin", email="jinwilliam.jin@gmail.com" },
+]
+description = "A thread-safe key rotation and rate limiting manager for API keys."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+]
+dependencies = [
+    "python-dotenv",
+    "sqlalchemy",
+    "pymysql", 
+    "rich",
+    "PyYAML",
+]
+
+[project.optional-dependencies]
+openai = ["openai"]
+agno = ["agno"]
+cohere = ["cohere"]
+cerebras = ["cerebras-cloud-sdk"]
+groq = ["groq"]
+openrouter = ["openrouter"]
+all = ["openai", "agno", "cohere", "cerebras-cloud-sdk", "groq", "openrouter"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["keycycle*"]
+
+[tool.setuptools.package-data]
+keycycle = ["config/models/*.yaml"]  
