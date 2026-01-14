@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: markmap-export
+Version: 0.1.1
+Summary: Export Markmap mind maps to high-resolution PNG images
+Project-URL: Homepage, https://github.com/metrovoc/markmap-export
+Project-URL: Repository, https://github.com/metrovoc/markmap-export
+Author-email: metrovoc <metrovoc@gmail.com>
+License: MIT
+Keywords: export,markmap,mindmap,png,screenshot
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Multimedia :: Graphics :: Capture :: Screen Capture
+Requires-Python: >=3.9
+Requires-Dist: playwright>=1.40.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: typer>=0.9.0
+Description-Content-Type: text/markdown
+
+# markmap-export
+
+Export [Markmap](https://markmap.js.org/) mind maps to high-resolution PNG images.
+
+## Why?
+
+Markmap uses SVG with `<foreignObject>` for KaTeX and syntax highlighting, which breaks standard screenshot tools and SVG converters. This tool uses Playwright to render the actual browser output at any resolution.
+
+## Install
+
+```bash
+uv tool install markmap-export
+markmap-export --install-browser
+```
+
+## Usage
+
+```bash
+# Auto-detect optimal size (recommended)
+markmap-export mindmap.html
+
+# Specify output path
+markmap-export mindmap.html -o output.png
+
+# Custom dimensions and scale
+markmap-export mindmap.html -w 3000 -H 4000 -s 2
+```
+
+## Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-o, --output` | Output PNG path | Same as input |
+| `-w, --width` | Viewport width | Auto-detect |
+| `-H, --height` | Viewport height | Auto-detect |
+| `-s, --scale` | Device scale factor | 2.0 (Retina) |
+| `--wait` | Render wait time (ms) | 2000 |
+| `-q, --quiet` | Suppress output | False |
+
+## License
+
+MIT
