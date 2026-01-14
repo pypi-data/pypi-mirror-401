@@ -1,0 +1,142 @@
+Metadata-Version: 2.1
+Name: kurral
+Version: 0.4.1
+Summary: Security testing and observability for AI agents - find vulnerabilities before production
+Author: Kurral Team
+Author-email: Kurral Team <team@kurral.com>
+Project-URL: Homepage, https://kurral.com
+Project-URL: Documentation, https://docs.kurral.com
+Project-URL: Repository, https://github.com/kurral-security/kurral
+Project-URL: Issues, https://github.com/kurral-security/kurral/issues
+Keywords: llm,testing,replay,determinism,agents,langchain,ai-agents,regression-testing,ab-testing,mcp,model-context-protocol,observability,security,vulnerability-detection,sse,streaming,otlp,opentelemetry
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Security
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: click>=8.1.7
+Requires-Dist: rich>=13.7.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: httpx>=0.24.0
+Provides-Extra: all
+Requires-Dist: kurral-unified[anthropic,dev,google,groq,langchain,mcp,openai,security]; extra == "all"
+Provides-Extra: anthropic
+Requires-Dist: anthropic>=0.18.0; extra == "anthropic"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest>=7.4.3; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.12.0; extra == "dev"
+Requires-Dist: ruff>=0.1.9; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"
+Requires-Dist: build>=1.0.0; extra == "dev"
+Requires-Dist: twine>=4.0.0; extra == "dev"
+Provides-Extra: google
+Requires-Dist: google-generativeai>=0.3.0; extra == "google"
+Provides-Extra: groq
+Requires-Dist: groq>=0.4.0; extra == "groq"
+Provides-Extra: langchain
+Requires-Dist: langchain>=0.1.0; extra == "langchain"
+Requires-Dist: langchain-openai>=0.0.5; extra == "langchain"
+Provides-Extra: mcp
+Requires-Dist: fastapi>=0.100.0; extra == "mcp"
+Requires-Dist: uvicorn>=0.23.0; extra == "mcp"
+Requires-Dist: httpx>=0.24.0; extra == "mcp"
+Requires-Dist: sse-starlette>=1.6.0; extra == "mcp"
+Provides-Extra: openai
+Requires-Dist: openai>=1.0.0; extra == "openai"
+Provides-Extra: security
+Requires-Dist: faker>=22.0.0; extra == "security"
+
+# Kurral Security Platform
+
+AI Agent Security Assessment Platform - Proactively find vulnerabilities in your AI agents before attackers do.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Kurral Platform                          │
+├─────────────────┬─────────────────┬─────────────────────────┤
+│   Frontend      │    Backend      │    CLI (kurral)         │
+│   (Next.js)     │    (FastAPI)    │    (Python)             │
+│   app.kurral.com│    Render       │    pip install kurral   │
+└─────────────────┴─────────────────┴─────────────────────────┘
+```
+
+## Quick Start
+
+### CLI Installation
+
+```bash
+pip install kurral
+```
+
+### Run Security Assessment
+
+```bash
+# Assess an MCP agent
+kurral assess --target http://localhost:3000/mcp
+
+# View results in dashboard
+# → app.kurral.com/dashboard
+```
+
+## Project Structure
+
+```
+├── frontend/          # Next.js dashboard (Vercel)
+├── backend/           # FastAPI API server (Render)
+├── kurral/            # Core library (MCP proxy, assessment)
+├── kurral_security/   # CLI and assessment tools
+├── examples/          # Demo agents (ShopBot)
+└── docs/              # Documentation
+```
+
+## Development
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+# → http://localhost:3000
+```
+
+### Backend
+
+```bash
+cd backend
+poetry install
+uvicorn app.main:app --reload
+# → http://localhost:8000
+```
+
+### Environment Variables
+
+See:
+- `frontend/.env.local.example`
+- `backend/.env.example`
+
+## Deployment
+
+- **Frontend**: Vercel (auto-deploy from main)
+- **Backend**: Render (Docker, auto-deploy from main)
+- **Database**: Neon PostgreSQL
+
+## License
+
+Proprietary - Kurral Security Inc.
