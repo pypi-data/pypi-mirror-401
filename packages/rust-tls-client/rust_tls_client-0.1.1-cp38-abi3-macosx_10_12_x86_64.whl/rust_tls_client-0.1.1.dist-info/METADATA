@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: rust_tls_client
+Version: 0.1.1
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Rust
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+License-File: LICENSE
+Summary: The fastest python HTTP client that can impersonate web browsers
+Keywords: requests,httpx,http,http-client,tls-fingerprint,ja3,ja4,impersonate,browser-impersonation,web-scraping,crawler,reverse-engineering
+Author: wang
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Homepage, https://github.com/wwwww/
+
+# Rust Tls Client
+
+
+### 介绍
+基于 rust wreq和wreq_util 编译到python的 tls 请求库
+
+模拟 chrome 请求头顺序和 cookie分割发送策略
+```shell
+GET /signin?next=%2Fmission%2Fdaily%2Fredeem HTTP/2
+:method: GET
+:authority: www.v2ex.com
+:scheme: https
+:path: /signin?next=%2Fmission%2Fdaily%2Fredeem
+user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+accept: */*
+sec-fetch-site: none
+sec-fetch-mode: cors
+sec-fetch-dest: empty
+sec-fetch-storage-access: active
+accept-encoding: gzip, deflate, br, zstd
+accept-language: en,en-US;q=0.9,zh-CN;q=0.8,zh;q=0.7,ru;q=0.6
+cookie: _ga=GA1.2.1675575356.1750432365
+cookie: FCCDCF=%5Bnull%2Cnull%2Cnull%2C%5B%22CQZsTEAQZsTEAEsACBENCBFoAP_gAEPgACiQK1IB_C7EbCFCiDJ3IKMEMAhHABBAYsAwAAYBAwAADBIQIAQCgkEYBASAFCACCAAAKASBAAAgCAAAAUAAIAAVAABAAAwAIBAIIAAAgAAAAEAIAAAACIAAEQCAAAAEAEAAkAgAAAIASAAAAAAAAACBAAAAAAAAAAAAAAAABAAAAQAAQAAAAAAAiAAAAAAAABAIAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAABAAAAAAAQR2QD-F2I2EKFEGCuQUYIYBCuACAAxYBgAAwCBgAAGCQgQAgFJIIkCAEAIEAAEAAAQAgCAABQEBAAAIAAAAAqAACAABgAQCAQQIABAAAAgIAAAAAAEQAAIgEAAAAIAIABABAAAAQAkAAAAAAAAAECAAAAAAAAAAAAAAAAAAAAAEABgAAAAAABEAAAAAAAACAQIAAA%22%2C%222~61.89.122.161.184.196.230.314.442.445.494.550.576.827.1029.1033.1046.1047.1051.1097.1126.1166.1301.1342.1415.1725.1765.1942.1958.1987.2068.2072.2074.2107.2213.2219.2223.2224.2328.2331.2387.2416.2501.2567.2568.2575.2657.2686.2778.2869.2878.2908.2920.2963.3005.3023.3100.3126.3219.3234.3235.3253.3309.3731.6931.8931.13731.15731.33931~dv.%22%2C%225D55DE1F-1304-4471-9D9C-D19BCEC0C04A%22%5D%2Cnull%2Cnull%2C%5B%5B32%2C%22%5B%5C%22420cfe06-6394-43c0-ba1c-8fdc38643c72%5C%22%2C%5B1761636987%2C63000000%5D%5D%22%5D%5D%5D
+cookie: V2EX_LANG=zhcn
+cookie: PB3_SESSION="2|1:0|10:1767579631|11:PB3_SESSION|36:djJleDoxNTQuOTIuMTMwLjkzOjQ2MzA4NTgy|c272fded339300f44dffb8f93275fc603f2ef96b8a2d497f872a2984be2b2ce0"
+cookie: _gid=GA1.2.1131117405.1767952329
+cookie: __gads=ID=b8fbeab9e8f510fd:T=1750432365:RT=1767954783:S=ALNI_MYyjkJ-gpGCy6vntPOb8daD2mSOew
+cookie: __gpi=UID=00001135321a585c:T=1750432365:RT=1767954783:S=ALNI_MaSg-aqHFii45QkMrTYsKNCuwcFKg
+cookie: __eoi=ID=0bd1b724883e09d4:T=1766045702:RT=1767954783:S=AA-AfjaJVxeIDtEZDgn1nbxSPRQ6
+cookie: _ga_5RR9SH3ZV1=GS2.2.s1767954785$o312$g1$t1767954829$j16$l0$h0
+cookie: FCNEC=%5B%5B%22AKsRol-ZKjIiRwUt-jIgMLRlveLAj-8Qmh6NrxQ9UK8KJ59k5aWrLWFrjAL-ubqDvL-jWXt1dhqRp3VNlmDg5IutANQkLHadTe1Amgl_1peXj8biJwiewZ00Fr1AHHUMIVhG90edSAodTnV97URImTkFievKB55_8w%3D%3D%22%5D%5D
+priority: u=1, i
+```
+
+### 编译过程
+```shell
+# 安装 maturin（Rust-Python 构建工具）
+pip install maturin
+
+# 以开发模式构建和安装
+maturin develop --release
+
+# 发布到pypi
+maturin publish
+
+```
