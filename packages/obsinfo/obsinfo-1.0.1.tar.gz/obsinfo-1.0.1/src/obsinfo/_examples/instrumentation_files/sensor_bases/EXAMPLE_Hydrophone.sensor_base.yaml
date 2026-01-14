@@ -1,0 +1,31 @@
+---
+format_version: "1.0"
+revision: 
+    date: "2017-11-30"
+    authors: 
+        - $ref: "persons/EXAMPLE.person.yaml"
+sensor_base:
+    notes: 
+        - "dip value of 90 assumes positive output = pressure decrease (seafloor down => pressure up)"
+    equipment:
+        model: "HTI-04-PLC-ULF"
+        type: "Hydrophone"
+        description: "Example hydrophone, 0.01-XXX Hz"
+        manufacturer: "ACME, inc"
+        vendor: "various"
+    seed_codes:
+        band: "broadband"
+        instrument: "D"
+    stages:
+        - base:
+            description : "SENSOR - Example HYDROPHONE"
+            input_units :  {name: "Pa", description: "PRESSURE"}
+            output_units : {name: "V", description: "VOLTS"}
+            gain: {value: 0.000195, frequency: 10}
+            filter:
+                type: "PolesZeros"
+                transfer_function_type: "LAPLACE (RADIANS/SECOND)"
+                zeros:
+                    - '0.0 + 0.0j'
+                poles:
+                    - '0.093928 + 0.000j'
