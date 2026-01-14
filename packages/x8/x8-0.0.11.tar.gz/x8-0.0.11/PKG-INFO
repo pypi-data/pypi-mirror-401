@@ -1,0 +1,430 @@
+Metadata-Version: 2.4
+Name: x8
+Version: 0.0.11
+Summary: x8 client
+Project-URL: Homepage, https://github.com/x8-labs/x8
+Project-URL: Repository, https://github.com/x8-labs/x8
+Project-URL: Documentation, https://github.com/x8-labs/x8
+Author-email: x8 <slenin@gmail.com>
+License: MIT
+License-File: LICENSE
+Keywords: client,x8
+Requires-Python: >=3.11
+Requires-Dist: antlr4-python3-runtime
+Requires-Dist: docstring-parser
+Requires-Dist: pydantic
+Requires-Dist: pyyaml
+Provides-Extra: ai-all
+Requires-Dist: av; extra == 'ai-all'
+Requires-Dist: google-auth; extra == 'ai-all'
+Requires-Dist: google-genai; extra == 'ai-all'
+Requires-Dist: httpx; extra == 'ai-all'
+Requires-Dist: openai; extra == 'ai-all'
+Requires-Dist: pillow; extra == 'ai-all'
+Provides-Extra: ai-text-generation-google
+Requires-Dist: av; extra == 'ai-text-generation-google'
+Requires-Dist: google-genai; extra == 'ai-text-generation-google'
+Requires-Dist: httpx; extra == 'ai-text-generation-google'
+Requires-Dist: pillow; extra == 'ai-text-generation-google'
+Provides-Extra: ai-text-generation-openai
+Requires-Dist: av; extra == 'ai-text-generation-openai'
+Requires-Dist: httpx; extra == 'ai-text-generation-openai'
+Requires-Dist: openai; extra == 'ai-text-generation-openai'
+Requires-Dist: pillow; extra == 'ai-text-generation-openai'
+Provides-Extra: ai-video-generation-google
+Requires-Dist: av; extra == 'ai-video-generation-google'
+Requires-Dist: google-auth; extra == 'ai-video-generation-google'
+Requires-Dist: httpx; extra == 'ai-video-generation-google'
+Requires-Dist: pillow; extra == 'ai-video-generation-google'
+Provides-Extra: ai-video-generation-openai
+Requires-Dist: av; extra == 'ai-video-generation-openai'
+Requires-Dist: httpx; extra == 'ai-video-generation-openai'
+Requires-Dist: openai; extra == 'ai-video-generation-openai'
+Requires-Dist: pillow; extra == 'ai-video-generation-openai'
+Provides-Extra: all
+Requires-Dist: aiohttp; extra == 'all'
+Requires-Dist: av==16.0.1; extra == 'all'
+Requires-Dist: azure-appconfiguration; extra == 'all'
+Requires-Dist: azure-containerregistry; extra == 'all'
+Requires-Dist: azure-cosmos; extra == 'all'
+Requires-Dist: azure-identity; extra == 'all'
+Requires-Dist: azure-keyvault-secrets; extra == 'all'
+Requires-Dist: azure-mgmt-appcontainers; extra == 'all'
+Requires-Dist: azure-mgmt-authorization; extra == 'all'
+Requires-Dist: azure-mgmt-containerinstance; extra == 'all'
+Requires-Dist: azure-mgmt-containerregistry; extra == 'all'
+Requires-Dist: azure-mgmt-containerservice; extra == 'all'
+Requires-Dist: azure-mgmt-resource; extra == 'all'
+Requires-Dist: azure-servicebus; extra == 'all'
+Requires-Dist: azure-storage-blob; extra == 'all'
+Requires-Dist: azure-storage-queue; extra == 'all'
+Requires-Dist: boto3; extra == 'all'
+Requires-Dist: chromadb; extra == 'all'
+Requires-Dist: docker; extra == 'all'
+Requires-Dist: elasticsearch; extra == 'all'
+Requires-Dist: fastapi; extra == 'all'
+Requires-Dist: google-api-python-client; extra == 'all'
+Requires-Dist: google-auth; extra == 'all'
+Requires-Dist: google-cloud-artifact-registry; extra == 'all'
+Requires-Dist: google-cloud-build; extra == 'all'
+Requires-Dist: google-cloud-firestore; extra == 'all'
+Requires-Dist: google-cloud-pubsub; extra == 'all'
+Requires-Dist: google-cloud-run; extra == 'all'
+Requires-Dist: google-cloud-secret-manager; extra == 'all'
+Requires-Dist: google-cloud-storage; extra == 'all'
+Requires-Dist: google-genai; extra == 'all'
+Requires-Dist: httpx; extra == 'all'
+Requires-Dist: hvac; extra == 'all'
+Requires-Dist: kubernetes; extra == 'all'
+Requires-Dist: m3u8; extra == 'all'
+Requires-Dist: motor; extra == 'all'
+Requires-Dist: openai; extra == 'all'
+Requires-Dist: pillow; extra == 'all'
+Requires-Dist: pinecone-client; extra == 'all'
+Requires-Dist: psycopg[binary]; extra == 'all'
+Requires-Dist: pyjwt; extra == 'all'
+Requires-Dist: pymemcache; extra == 'all'
+Requires-Dist: pymilvus; extra == 'all'
+Requires-Dist: pymongo; extra == 'all'
+Requires-Dist: python-dotenv; extra == 'all'
+Requires-Dist: pyyaml; extra == 'all'
+Requires-Dist: qdrant-client; extra == 'all'
+Requires-Dist: redis; extra == 'all'
+Requires-Dist: uvicorn; extra == 'all'
+Requires-Dist: weaviate-client; extra == 'all'
+Provides-Extra: composite-all
+Provides-Extra: composite-choice-default
+Provides-Extra: composite-script-default
+Provides-Extra: compute-all
+Requires-Dist: azure-containerregistry; extra == 'compute-all'
+Requires-Dist: azure-identity; extra == 'compute-all'
+Requires-Dist: azure-mgmt-appcontainers; extra == 'compute-all'
+Requires-Dist: azure-mgmt-authorization; extra == 'compute-all'
+Requires-Dist: azure-mgmt-containerinstance; extra == 'compute-all'
+Requires-Dist: azure-mgmt-containerregistry; extra == 'compute-all'
+Requires-Dist: azure-mgmt-containerservice; extra == 'compute-all'
+Requires-Dist: azure-mgmt-resource; extra == 'compute-all'
+Requires-Dist: boto3; extra == 'compute-all'
+Requires-Dist: docker; extra == 'compute-all'
+Requires-Dist: google-api-python-client; extra == 'compute-all'
+Requires-Dist: google-cloud-artifact-registry; extra == 'compute-all'
+Requires-Dist: google-cloud-build; extra == 'compute-all'
+Requires-Dist: google-cloud-run; extra == 'compute-all'
+Requires-Dist: kubernetes; extra == 'compute-all'
+Provides-Extra: compute-container-deployment-amazon-elastic-container-service
+Requires-Dist: boto3; extra == 'compute-container-deployment-amazon-elastic-container-service'
+Requires-Dist: docker; extra == 'compute-container-deployment-amazon-elastic-container-service'
+Provides-Extra: compute-container-deployment-azure-container-apps
+Requires-Dist: azure-containerregistry; extra == 'compute-container-deployment-azure-container-apps'
+Requires-Dist: azure-identity; extra == 'compute-container-deployment-azure-container-apps'
+Requires-Dist: azure-mgmt-appcontainers; extra == 'compute-container-deployment-azure-container-apps'
+Requires-Dist: azure-mgmt-containerregistry; extra == 'compute-container-deployment-azure-container-apps'
+Requires-Dist: azure-mgmt-resource; extra == 'compute-container-deployment-azure-container-apps'
+Requires-Dist: docker; extra == 'compute-container-deployment-azure-container-apps'
+Provides-Extra: compute-container-deployment-azure-container-instances
+Requires-Dist: azure-containerregistry; extra == 'compute-container-deployment-azure-container-instances'
+Requires-Dist: azure-identity; extra == 'compute-container-deployment-azure-container-instances'
+Requires-Dist: azure-mgmt-containerinstance; extra == 'compute-container-deployment-azure-container-instances'
+Requires-Dist: azure-mgmt-containerregistry; extra == 'compute-container-deployment-azure-container-instances'
+Requires-Dist: azure-mgmt-resource; extra == 'compute-container-deployment-azure-container-instances'
+Requires-Dist: docker; extra == 'compute-container-deployment-azure-container-instances'
+Provides-Extra: compute-container-deployment-default
+Requires-Dist: docker; extra == 'compute-container-deployment-default'
+Provides-Extra: compute-container-deployment-docker-local
+Requires-Dist: docker; extra == 'compute-container-deployment-docker-local'
+Provides-Extra: compute-container-deployment-google-cloud-run
+Requires-Dist: docker; extra == 'compute-container-deployment-google-cloud-run'
+Requires-Dist: google-api-python-client; extra == 'compute-container-deployment-google-cloud-run'
+Requires-Dist: google-cloud-artifact-registry; extra == 'compute-container-deployment-google-cloud-run'
+Requires-Dist: google-cloud-build; extra == 'compute-container-deployment-google-cloud-run'
+Requires-Dist: google-cloud-run; extra == 'compute-container-deployment-google-cloud-run'
+Provides-Extra: compute-container-deployment-local
+Requires-Dist: docker; extra == 'compute-container-deployment-local'
+Provides-Extra: compute-container-registry-amazon-elastic-container-registry
+Requires-Dist: boto3; extra == 'compute-container-registry-amazon-elastic-container-registry'
+Requires-Dist: docker; extra == 'compute-container-registry-amazon-elastic-container-registry'
+Provides-Extra: compute-container-registry-azure-container-registry
+Requires-Dist: azure-containerregistry; extra == 'compute-container-registry-azure-container-registry'
+Requires-Dist: azure-mgmt-containerregistry; extra == 'compute-container-registry-azure-container-registry'
+Requires-Dist: docker; extra == 'compute-container-registry-azure-container-registry'
+Provides-Extra: compute-container-registry-google-artifact-registry
+Requires-Dist: docker; extra == 'compute-container-registry-google-artifact-registry'
+Requires-Dist: google-cloud-artifact-registry; extra == 'compute-container-registry-google-artifact-registry'
+Provides-Extra: compute-containerizer-default
+Requires-Dist: docker; extra == 'compute-containerizer-default'
+Provides-Extra: compute-containerizer-docker
+Requires-Dist: docker; extra == 'compute-containerizer-docker'
+Provides-Extra: compute-containerizer-local
+Requires-Dist: docker; extra == 'compute-containerizer-local'
+Provides-Extra: compute-kubernetes-azure-kubernetes-service
+Requires-Dist: azure-identity; extra == 'compute-kubernetes-azure-kubernetes-service'
+Requires-Dist: azure-mgmt-authorization; extra == 'compute-kubernetes-azure-kubernetes-service'
+Requires-Dist: azure-mgmt-containerservice; extra == 'compute-kubernetes-azure-kubernetes-service'
+Requires-Dist: azure-mgmt-resource; extra == 'compute-kubernetes-azure-kubernetes-service'
+Requires-Dist: docker; extra == 'compute-kubernetes-azure-kubernetes-service'
+Requires-Dist: kubernetes; extra == 'compute-kubernetes-azure-kubernetes-service'
+Provides-Extra: content-all
+Requires-Dist: av; extra == 'content-all'
+Requires-Dist: httpx; extra == 'content-all'
+Requires-Dist: m3u8; extra == 'content-all'
+Requires-Dist: pillow; extra == 'content-all'
+Provides-Extra: content-audio-av
+Requires-Dist: av; extra == 'content-audio-av'
+Requires-Dist: httpx; extra == 'content-audio-av'
+Provides-Extra: content-audio-default
+Requires-Dist: av; extra == 'content-audio-default'
+Requires-Dist: httpx; extra == 'content-audio-default'
+Provides-Extra: content-image-default
+Requires-Dist: httpx; extra == 'content-image-default'
+Requires-Dist: pillow; extra == 'content-image-default'
+Provides-Extra: content-image-pillow
+Requires-Dist: httpx; extra == 'content-image-pillow'
+Requires-Dist: pillow; extra == 'content-image-pillow'
+Provides-Extra: content-live-stream-av
+Requires-Dist: av; extra == 'content-live-stream-av'
+Requires-Dist: httpx; extra == 'content-live-stream-av'
+Requires-Dist: m3u8; extra == 'content-live-stream-av'
+Provides-Extra: content-live-stream-default
+Requires-Dist: av; extra == 'content-live-stream-default'
+Requires-Dist: httpx; extra == 'content-live-stream-default'
+Requires-Dist: m3u8; extra == 'content-live-stream-default'
+Provides-Extra: content-video-av
+Requires-Dist: av; extra == 'content-video-av'
+Requires-Dist: httpx; extra == 'content-video-av'
+Requires-Dist: pillow; extra == 'content-video-av'
+Provides-Extra: content-video-default
+Requires-Dist: av; extra == 'content-video-default'
+Requires-Dist: httpx; extra == 'content-video-default'
+Requires-Dist: pillow; extra == 'content-video-default'
+Provides-Extra: dev
+Requires-Dist: flake8; extra == 'dev'
+Requires-Dist: mypy; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-asyncio; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: types-pyyaml; extra == 'dev'
+Provides-Extra: interface-all
+Requires-Dist: fastapi; extra == 'interface-all'
+Requires-Dist: httpx; extra == 'interface-all'
+Requires-Dist: pyjwt; extra == 'interface-all'
+Requires-Dist: uvicorn; extra == 'interface-all'
+Provides-Extra: interface-api-default
+Requires-Dist: fastapi; extra == 'interface-api-default'
+Requires-Dist: uvicorn; extra == 'interface-api-default'
+Provides-Extra: interface-api-fastapi
+Requires-Dist: fastapi; extra == 'interface-api-fastapi'
+Requires-Dist: uvicorn; extra == 'interface-api-fastapi'
+Provides-Extra: interface-auth-api-key
+Provides-Extra: interface-auth-api-key-in-store
+Provides-Extra: interface-auth-auth0
+Requires-Dist: httpx; extra == 'interface-auth-auth0'
+Requires-Dist: pyjwt; extra == 'interface-auth-auth0'
+Provides-Extra: interface-auth-default
+Provides-Extra: interface-auth-mock
+Provides-Extra: interface-cli-default
+Provides-Extra: interface-worker-default
+Provides-Extra: messaging-all
+Requires-Dist: aiohttp; extra == 'messaging-all'
+Requires-Dist: azure-identity; extra == 'messaging-all'
+Requires-Dist: azure-servicebus; extra == 'messaging-all'
+Requires-Dist: azure-storage-queue; extra == 'messaging-all'
+Requires-Dist: boto3; extra == 'messaging-all'
+Requires-Dist: google-cloud-pubsub; extra == 'messaging-all'
+Requires-Dist: httpx; extra == 'messaging-all'
+Provides-Extra: messaging-pubsub-amazon-sns
+Requires-Dist: boto3; extra == 'messaging-pubsub-amazon-sns'
+Provides-Extra: messaging-pubsub-azure-service-bus
+Requires-Dist: aiohttp; extra == 'messaging-pubsub-azure-service-bus'
+Requires-Dist: azure-identity; extra == 'messaging-pubsub-azure-service-bus'
+Requires-Dist: azure-servicebus; extra == 'messaging-pubsub-azure-service-bus'
+Provides-Extra: messaging-pubsub-default
+Provides-Extra: messaging-pubsub-google-pubsub
+Requires-Dist: google-cloud-pubsub; extra == 'messaging-pubsub-google-pubsub'
+Provides-Extra: messaging-pubsub-hosted
+Requires-Dist: httpx; extra == 'messaging-pubsub-hosted'
+Provides-Extra: messaging-pubsub-local
+Provides-Extra: messaging-pubsub-memory
+Provides-Extra: messaging-pubsub-postgresql
+Requires-Dist: psycopg[binary]; extra == 'messaging-pubsub-postgresql'
+Provides-Extra: messaging-pubsub-redis
+Requires-Dist: redis; extra == 'messaging-pubsub-redis'
+Provides-Extra: messaging-pubsub-sqlite
+Provides-Extra: messaging-queue-amazon-sqs
+Requires-Dist: boto3; extra == 'messaging-queue-amazon-sqs'
+Provides-Extra: messaging-queue-azure-queue-storage
+Requires-Dist: azure-identity; extra == 'messaging-queue-azure-queue-storage'
+Requires-Dist: azure-storage-queue; extra == 'messaging-queue-azure-queue-storage'
+Provides-Extra: messaging-queue-azure-service-bus
+Requires-Dist: aiohttp; extra == 'messaging-queue-azure-service-bus'
+Requires-Dist: azure-identity; extra == 'messaging-queue-azure-service-bus'
+Requires-Dist: azure-servicebus; extra == 'messaging-queue-azure-service-bus'
+Provides-Extra: messaging-queue-default
+Provides-Extra: messaging-queue-google-pubsub
+Requires-Dist: google-cloud-pubsub; extra == 'messaging-queue-google-pubsub'
+Provides-Extra: messaging-queue-hosted
+Requires-Dist: httpx; extra == 'messaging-queue-hosted'
+Provides-Extra: messaging-queue-local
+Provides-Extra: messaging-queue-memory
+Provides-Extra: messaging-queue-postgresql
+Requires-Dist: psycopg[binary]; extra == 'messaging-queue-postgresql'
+Provides-Extra: messaging-queue-redis
+Requires-Dist: redis; extra == 'messaging-queue-redis'
+Provides-Extra: messaging-queue-sqlite
+Provides-Extra: storage-all
+Requires-Dist: aiohttp; extra == 'storage-all'
+Requires-Dist: azure-appconfiguration; extra == 'storage-all'
+Requires-Dist: azure-cosmos; extra == 'storage-all'
+Requires-Dist: azure-identity; extra == 'storage-all'
+Requires-Dist: azure-keyvault-secrets; extra == 'storage-all'
+Requires-Dist: azure-storage-blob; extra == 'storage-all'
+Requires-Dist: boto3; extra == 'storage-all'
+Requires-Dist: chromadb; extra == 'storage-all'
+Requires-Dist: elasticsearch; extra == 'storage-all'
+Requires-Dist: google-api-python-client; extra == 'storage-all'
+Requires-Dist: google-cloud-firestore; extra == 'storage-all'
+Requires-Dist: google-cloud-secret-manager; extra == 'storage-all'
+Requires-Dist: google-cloud-storage; extra == 'storage-all'
+Requires-Dist: httpx; extra == 'storage-all'
+Requires-Dist: hvac; extra == 'storage-all'
+Requires-Dist: motor; extra == 'storage-all'
+Requires-Dist: pinecone-client; extra == 'storage-all'
+Requires-Dist: psycopg[binary]; extra == 'storage-all'
+Requires-Dist: pymemcache; extra == 'storage-all'
+Requires-Dist: pymilvus; extra == 'storage-all'
+Requires-Dist: pymongo; extra == 'storage-all'
+Requires-Dist: python-dotenv; extra == 'storage-all'
+Requires-Dist: pyyaml; extra == 'storage-all'
+Requires-Dist: qdrant-client; extra == 'storage-all'
+Requires-Dist: redis; extra == 'storage-all'
+Requires-Dist: weaviate-client; extra == 'storage-all'
+Provides-Extra: storage-config-store-aws-parameter-store
+Requires-Dist: boto3; extra == 'storage-config-store-aws-parameter-store'
+Provides-Extra: storage-config-store-azure-app-configuration
+Requires-Dist: aiohttp; extra == 'storage-config-store-azure-app-configuration'
+Requires-Dist: azure-appconfiguration; extra == 'storage-config-store-azure-app-configuration'
+Requires-Dist: azure-identity; extra == 'storage-config-store-azure-app-configuration'
+Provides-Extra: storage-config-store-default
+Provides-Extra: storage-config-store-document-store-provider
+Provides-Extra: storage-config-store-env
+Provides-Extra: storage-config-store-env-file
+Requires-Dist: python-dotenv; extra == 'storage-config-store-env-file'
+Provides-Extra: storage-config-store-google-runtime-configurator
+Requires-Dist: google-api-python-client; extra == 'storage-config-store-google-runtime-configurator'
+Provides-Extra: storage-config-store-hosted
+Requires-Dist: httpx; extra == 'storage-config-store-hosted'
+Provides-Extra: storage-config-store-local
+Provides-Extra: storage-config-store-yaml-file
+Requires-Dist: pyyaml; extra == 'storage-config-store-yaml-file'
+Provides-Extra: storage-document-store-amazon-dynamodb
+Requires-Dist: boto3; extra == 'storage-document-store-amazon-dynamodb'
+Provides-Extra: storage-document-store-azure-cosmos-db
+Requires-Dist: azure-cosmos; extra == 'storage-document-store-azure-cosmos-db'
+Requires-Dist: azure-identity; extra == 'storage-document-store-azure-cosmos-db'
+Provides-Extra: storage-document-store-default
+Provides-Extra: storage-document-store-elasticsearch
+Requires-Dist: elasticsearch; extra == 'storage-document-store-elasticsearch'
+Provides-Extra: storage-document-store-google-firestore
+Requires-Dist: google-api-python-client; extra == 'storage-document-store-google-firestore'
+Requires-Dist: google-cloud-firestore; extra == 'storage-document-store-google-firestore'
+Provides-Extra: storage-document-store-hosted
+Requires-Dist: httpx; extra == 'storage-document-store-hosted'
+Provides-Extra: storage-document-store-local
+Provides-Extra: storage-document-store-memory
+Provides-Extra: storage-document-store-mongodb
+Requires-Dist: motor; extra == 'storage-document-store-mongodb'
+Requires-Dist: pymongo; extra == 'storage-document-store-mongodb'
+Provides-Extra: storage-document-store-postgresql
+Requires-Dist: psycopg[binary]; extra == 'storage-document-store-postgresql'
+Provides-Extra: storage-document-store-redis
+Requires-Dist: redis; extra == 'storage-document-store-redis'
+Provides-Extra: storage-document-store-sqlite
+Provides-Extra: storage-key-value-store-default
+Provides-Extra: storage-key-value-store-document-store-provider
+Provides-Extra: storage-key-value-store-dragonfly
+Requires-Dist: redis; extra == 'storage-key-value-store-dragonfly'
+Provides-Extra: storage-key-value-store-hosted
+Requires-Dist: httpx; extra == 'storage-key-value-store-hosted'
+Provides-Extra: storage-key-value-store-keydb
+Requires-Dist: redis; extra == 'storage-key-value-store-keydb'
+Provides-Extra: storage-key-value-store-local
+Provides-Extra: storage-key-value-store-memcached
+Requires-Dist: pymemcache; extra == 'storage-key-value-store-memcached'
+Provides-Extra: storage-key-value-store-memory
+Provides-Extra: storage-key-value-store-object-store-provider
+Provides-Extra: storage-key-value-store-postgresql
+Requires-Dist: psycopg[binary]; extra == 'storage-key-value-store-postgresql'
+Provides-Extra: storage-key-value-store-redis
+Requires-Dist: redis; extra == 'storage-key-value-store-redis'
+Provides-Extra: storage-key-value-store-redis-simple
+Requires-Dist: redis; extra == 'storage-key-value-store-redis-simple'
+Provides-Extra: storage-key-value-store-sqlite
+Provides-Extra: storage-key-value-store-valkey
+Requires-Dist: redis; extra == 'storage-key-value-store-valkey'
+Provides-Extra: storage-object-store-amazon-s3
+Requires-Dist: boto3; extra == 'storage-object-store-amazon-s3'
+Provides-Extra: storage-object-store-azure-blob-storage
+Requires-Dist: azure-identity; extra == 'storage-object-store-azure-blob-storage'
+Requires-Dist: azure-storage-blob; extra == 'storage-object-store-azure-blob-storage'
+Provides-Extra: storage-object-store-default
+Provides-Extra: storage-object-store-file-system
+Provides-Extra: storage-object-store-google-cloud-storage
+Requires-Dist: google-cloud-storage; extra == 'storage-object-store-google-cloud-storage'
+Provides-Extra: storage-object-store-hosted
+Requires-Dist: httpx; extra == 'storage-object-store-hosted'
+Provides-Extra: storage-object-store-local
+Provides-Extra: storage-search-store-elasticsearch
+Requires-Dist: elasticsearch; extra == 'storage-search-store-elasticsearch'
+Provides-Extra: storage-secret-store-amazon-secrets-manager
+Requires-Dist: boto3; extra == 'storage-secret-store-amazon-secrets-manager'
+Provides-Extra: storage-secret-store-azure-key-vault
+Requires-Dist: aiohttp; extra == 'storage-secret-store-azure-key-vault'
+Requires-Dist: azure-identity; extra == 'storage-secret-store-azure-key-vault'
+Requires-Dist: azure-keyvault-secrets; extra == 'storage-secret-store-azure-key-vault'
+Provides-Extra: storage-secret-store-default
+Provides-Extra: storage-secret-store-document-store-provider
+Provides-Extra: storage-secret-store-env
+Provides-Extra: storage-secret-store-env-file
+Requires-Dist: python-dotenv; extra == 'storage-secret-store-env-file'
+Provides-Extra: storage-secret-store-google-secret-manager
+Requires-Dist: google-cloud-secret-manager; extra == 'storage-secret-store-google-secret-manager'
+Provides-Extra: storage-secret-store-hashicorp-vault
+Requires-Dist: hvac; extra == 'storage-secret-store-hashicorp-vault'
+Provides-Extra: storage-secret-store-hosted
+Requires-Dist: httpx; extra == 'storage-secret-store-hosted'
+Provides-Extra: storage-secret-store-local
+Provides-Extra: storage-secret-store-yaml-file
+Requires-Dist: pyyaml; extra == 'storage-secret-store-yaml-file'
+Provides-Extra: storage-vector-store-chroma
+Requires-Dist: chromadb; extra == 'storage-vector-store-chroma'
+Provides-Extra: storage-vector-store-default
+Provides-Extra: storage-vector-store-hosted
+Requires-Dist: httpx; extra == 'storage-vector-store-hosted'
+Provides-Extra: storage-vector-store-local
+Requires-Dist: chromadb; extra == 'storage-vector-store-local'
+Provides-Extra: storage-vector-store-milvus
+Requires-Dist: pymilvus; extra == 'storage-vector-store-milvus'
+Provides-Extra: storage-vector-store-pinecone
+Requires-Dist: pinecone; extra == 'storage-vector-store-pinecone'
+Provides-Extra: storage-vector-store-qdrant
+Requires-Dist: qdrant-client; extra == 'storage-vector-store-qdrant'
+Provides-Extra: storage-vector-store-weaviate
+Requires-Dist: weaviate-client; extra == 'storage-vector-store-weaviate'
+Description-Content-Type: text/markdown
+
+# x8
+
+x8 Python client library that provides a unified interface to various providers across many foundational services.
+
+## Installation
+
+```bash
+pip install x8
+```
+
+## CLI
+
+This package installs the `x8` CLI entrypoint:
+
+```bash
+x8 --help
+```
