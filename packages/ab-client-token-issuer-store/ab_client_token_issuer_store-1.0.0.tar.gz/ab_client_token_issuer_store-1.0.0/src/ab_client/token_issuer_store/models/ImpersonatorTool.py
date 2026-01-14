@@ -1,0 +1,8 @@
+from enum import Enum
+
+
+class ImpersonatorTool(str, Enum):
+    PLAYWRIGHT = "PLAYWRIGHT"
+    PLAYWRIGHT_CDP = "PLAYWRIGHT_CDP"
+    PLAYWRIGHT_CDP_BROWSERLESS = "PLAYWRIGHT_CDP_BROWSERLESS"
+    TEMPLATE = "TEMPLATE"
