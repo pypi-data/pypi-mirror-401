@@ -1,0 +1,425 @@
+from __future__ import annotations
+
+import asyncio
+import dataclasses
+import logging
+import time
+import platform
+import struct
+from collections.abc import Callable
+from enum import IntEnum, StrEnum
+from typing import Any
+
+from bleak import BleakClient
+from bleak.assigned_numbers import AdvertisementDataType
+from bleak.backends.characteristic import BleakGATTCharacteristic
+from bleak.backends.device import BLEDevice
+from bleak.backends.scanner import (
+    AdvertisementData,
+    BaseBleakScanner,
+    get_platform_scanner_backend_type,
+)
+from bleak_retry_connector import establish_connection
+
+from .const import (
+    ALIRO_CHARACTERISTIC_UUID,
+    DISPLAY_UNIT_KEY,
+    HW_REVISION_STRING_CHARACTERISTIC_UUID,
+    IMPEDANCE_KEY,
+    SW_REVISION_STRING_CHARACTERISTIC_UUID,
+    UNIT_UPDATE_COMMAND,
+    WEIGHT_CHARACTERISTIC_UUID_NOTIFY,
+    WEIGHT_KEY,
+)
+
+_LOGGER = logging.getLogger(__name__)
+
+SYSTEM = platform.system()
+IS_LINUX = SYSTEM == "Linux"
+IS_MACOS = SYSTEM == "Darwin"
+
+
+if IS_LINUX:
+    from bleak.backends.bluezdbus.advertisement_monitor import OrPattern
+    from bleak.backends.bluezdbus.scanner import BlueZScannerArgs
+
+    # or_patterns is a workaround for the fact that passive scanning
+    # needs at least one matcher to be set. The below matcher
+    # will match all devices.
+    PASSIVE_SCANNER_ARGS = BlueZScannerArgs(
+        or_patterns=[
+            OrPattern(0, AdvertisementDataType.FLAGS, b"\x02"),
+            OrPattern(0, AdvertisementDataType.FLAGS, b"\x06"),
+            OrPattern(0, AdvertisementDataType.FLAGS, b"\x1a"),
+        ]
+    )
+
+
+class BluetoothScanningMode(StrEnum):
+    PASSIVE = "passive"
+    ACTIVE = "active"
+
+
+SCANNING_MODE_TO_BLEAK: dict[BluetoothScanningMode, str] = {
+    BluetoothScanningMode.ACTIVE: "active",
+    BluetoothScanningMode.PASSIVE: "passive",
+}
+
+
+class ConnectionStatus(IntEnum):
+    DISCONNECTED = 0
+    CONNECTING = 1
+    CONNECTED = 2
+
+
+class WeightUnit(IntEnum):
+    """Weight units."""
+
+    KG = 0  # Kilograms
+    LB = 1  # Pounds
+    ST = 2  # Stones
+
+
+@dataclasses.dataclass
+class ScaleData:
+    """
+    Response data with information about the scale and measurements.
+
+    Attributes:
+        name (str): Name of the scale device.
+        address (str): Bluetooth address of the scale.
+        hw_version (str): Hardware version of the scale.
+        sw_version (str): Software version of the scale.
+        display_unit (WeightUnit): Current display unit of the scale.
+        measurements (dict): Dictionary containing measurement data:
+            - "weight": Weight value in kilograms
+            - "impedance": Bioelectrical impedance value (if available)
+            - Additional body metrics when used with EtekcitySmartFitnessScaleWithBodyMetrics
+    """
+
+    name: str = ""
+    address: str = ""
+    hw_version: str = ""
+    sw_version: str = ""
+    display_unit: WeightUnit = WeightUnit.KG
+    measurements: dict[str, str | float | None] = dataclasses.field(
+        default_factory=dict
+    )
+
+
+def parse(payload: bytearray) -> dict[str, int | float | None]:
+    """
+    Parse raw data received from the scale.
+
+    Args:
+        payload (bytearray): Raw data received from the scale.
+
+    Returns:
+        dict: Dictionary containing parsed data with the following keys:
+            - "display_unit": Current display unit (0=kg, 1=lb, 2=st)
+            - "weight": Weight value in kilograms
+            - "impedance": Bioelectrical impedance value (if available)
+
+    Returns None if the payload format is invalid or unrecognized.
+    """
+    if (
+        payload is not None
+        and len(payload) == 22
+        and payload[19] == 1
+        and payload[0:2] == b"\xa5\x02"
+        and payload[3:5] == b"\x10\x00"
+        and payload[6:10] == b"\x01\x61\xa1\x00"
+    ):
+        data = dict[str, int | float | None]()
+        weight = struct.unpack("<I", payload[10:13].ljust(4, b"\x00"))[0]
+        impedance = struct.unpack("<H", payload[13:15])[0]
+        data[DISPLAY_UNIT_KEY] = int(payload[21])
+        data[WEIGHT_KEY] = round(float(weight) / 1000, 2)
+        if payload[20] == 1:
+            if impedance := struct.unpack("<H", payload[13:15])[0]:
+                data[IMPEDANCE_KEY] = int(impedance)
+        return data
+    return None
+
+
+class EtekcitySmartFitnessScale:
+    """
+    Interface for Etekcity Smart Fitness Scale.
+
+    This class handles BLE connection, data parsing, and unit conversion
+    for Etekcity smart scales. It manages the Bluetooth connection lifecycle
+    and processes notifications from the scale.
+    """
+
+    def __init__(
+        self,
+        address: str,
+        notification_callback: Callable[[ScaleData], None],
+        display_unit: WeightUnit = None,
+        scanning_mode: BluetoothScanningMode = BluetoothScanningMode.ACTIVE,
+        adapter: str | None = None,
+        bleak_scanner_backend: BaseBleakScanner = None,
+        cooldown_seconds: int = 0,
+        logger: logging.Logger | None = None,
+    ) -> None:
+        """
+        Initialize the scale interface.
+
+        Args:
+            address: Bluetooth address of the scale
+            notification_callback: Function to call when weight data is received
+            display_unit: Preferred weight unit (KG, LB, or ST). If specified,
+                          the scale will be instructed to change its display unit
+                          to this value upon connection.
+            scanning_mode: Mode for BLE scanning (ACTIVE or PASSIVE)
+            adapter: Bluetooth adapter to use (Linux only)
+            bleak_scanner_backend: Optional custom BLE scanner backend
+            cooldown_seconds: Optional cooldown period in seconds to ignore
+                              new advertisements after a disconnection.
+            logger: Optional logger instance. If not provided, uses the library's
+                    internal logger.
+        """
+        self._logger = logger or _LOGGER
+        self._logger.info(f"Initializing EtekcitySmartFitnessScale for address: {address}")
+
+        self.address = address
+        self._notification_callback = notification_callback
+        self._cooldown_seconds = cooldown_seconds
+        self._cooldown_end_time: float = 0
+
+        if bleak_scanner_backend is None:
+            scanner_kwargs: dict[str, Any] = {
+                "detection_callback": self._advertisement_callback,
+                "service_uuids": None,
+                "scanning_mode": BluetoothScanningMode.ACTIVE,
+                "bluez": {},
+                "cb": {},
+            }
+
+            if IS_LINUX:
+                # Only Linux supports multiple adapters
+                if adapter:
+                    scanner_kwargs["adapter"] = adapter
+                if scanning_mode == BluetoothScanningMode.PASSIVE:
+                    scanner_kwargs["bluez"] = PASSIVE_SCANNER_ARGS
+                    scanner_kwargs["scanning_mode"] = BluetoothScanningMode.PASSIVE
+            elif IS_MACOS:
+                # We want mac address on macOS
+                scanner_kwargs["cb"] = {"use_bdaddr": True}
+
+            PlatformBleakScanner, _ = get_platform_scanner_backend_type()
+            self._scanner = PlatformBleakScanner(**scanner_kwargs)
+        else:
+            self._scanner = bleak_scanner_backend
+            self._scanner.register_detection_callback(self._advertisement_callback)
+        
+        self._scanner_running: bool = False
+        self._client: BleakClient = None
+        self._hw_version: str = None
+        self._sw_version: str = None
+        self._display_unit: WeightUnit = None
+        self._unit_update_flag: bool = False
+        self._lock = asyncio.Lock()
+        self._unit_update_buff = bytearray.fromhex(UNIT_UPDATE_COMMAND)
+        if display_unit is not None:
+            self.display_unit = display_unit
+
+    @property
+    def hw_version(self) -> str:
+        return self._hw_version
+
+    @property
+    def sw_version(self) -> str:
+        return self._sw_version
+
+    @property
+    def display_unit(self):
+        return self._display_unit
+
+    @display_unit.setter
+    def display_unit(self, value):
+        if value is not None:
+            self._display_unit = value
+            self._unit_update_flag = True
+
+    async def async_start(self) -> None:
+        """Start the callbacks."""
+        self._logger.debug(
+            "Starting EtekcitySmartFitnessScale for address: %s", self.address
+        )
+
+        try:
+            async with self._lock:
+                await self._scanner.start()
+        except Exception as ex:
+            self._logger.error("Failed to start scanner: %s", ex)
+            raise
+
+    async def async_stop(self) -> None:
+        """Stop the callbacks."""
+        self._logger.debug(
+            "Stopping EtekcitySmartFitnessScale for address: %s", self.address
+        )
+        try:
+            async with self._lock:
+                await self._scanner.stop()
+        except Exception as ex:
+            self._logger.error("Failed to stop scanner: %s", ex)
+            raise
+
+    def _notification_handler(
+        self, _: BleakGATTCharacteristic, payload: bytearray, name: str, address: str
+    ) -> None:
+        """
+        Handle notifications received from the scale.
+
+        This method processes the raw data received from the scale's notification
+        characteristic and calls the notification callback with the parsed data.
+
+        Args:
+            _: The GATT characteristic that sent the notification (unused)
+            payload: Raw binary data received from the scale
+            name: Device name of the scale
+            address: Bluetooth address of the scale
+        """
+        if data := parse(payload):
+            self._logger.debug(
+                "Received stable weight notification from %s (%s): %s",
+                name,
+                address,
+                data,
+            )
+            device = ScaleData()
+            device.name = name
+            device.address = address
+            device.hw_version = self.hw_version
+            device.sw_version = self.sw_version
+            self._logger.debug("%s (%s): %s", name, address, data)
+            device.display_unit = WeightUnit(data.pop(DISPLAY_UNIT_KEY))
+
+            if self._display_unit is None:
+                self._display_unit = device.display_unit
+                self._unit_update_flag = False
+            else:
+                self._unit_update_flag = device.display_unit != self._display_unit
+
+            device.measurements = data
+            self._notification_callback(device)
+
+    def _unavailable_callback(self, _: BleakClient) -> None:
+        """
+        Handle disconnection events from the scale.
+
+        This method is called when the scale disconnects, either intentionally
+        or due to connection loss.
+
+        Args:
+            _: The BleakClient instance that disconnected
+        """
+        self._logger.debug("Scale disconnected")
+        disconnect_time = time.time()
+        self._cooldown_end_time = disconnect_time + self._cooldown_seconds
+        self._client = None
+
+    async def _advertisement_callback(
+        self, ble_device: BLEDevice, _: AdvertisementData
+    ) -> None:
+        """
+        Handle Bluetooth advertisements from the scale.
+
+        This method is called when an advertisement from the target scale
+        is detected. It establishes a connection to the scale and sets up
+        the necessary characteristics and notifications.
+
+        Args:
+            ble_device: The detected Bluetooth device
+            _: Advertisement data (unused)
+        """
+        if ble_device.address != self.address:
+            return
+
+        # Ignore advertisements received during cooldown period
+        # This prevents queued callbacks from being processed after cooldown expires
+        if self._cooldown_seconds > 0 and time.time() < self._cooldown_end_time:
+            self._logger.debug(
+                "Ignoring advertisement during cooldown period (cooldown ends at %s)",
+                self._cooldown_end_time
+            )
+            return
+
+        async with self._lock:
+            if self._client is not None:
+                return
+
+            try:
+                self._logger.debug("Connecting to scale: %s", self.address)
+                self._client = await establish_connection(
+                    BleakClient,
+                    ble_device,
+                    self.address,
+                    self._unavailable_callback,
+                )
+                self._logger.debug("Connected to scale: %s", self.address)
+            except Exception as ex:
+                self._logger.exception("Could not connect to scale: %s(%s)", type(ex), ex.args)
+                self._client = None
+                return
+
+        try:
+            # Ensure the client is connected before attempting operations
+            if not self._client or not self._client.is_connected:
+                self._logger.error("Client not connected, skipping setup")
+                return
+
+            if self._unit_update_flag:
+                if self._display_unit is not None:
+                    if unit_char := self._client.services.get_characteristic(ALIRO_CHARACTERISTIC_UUID):
+                        self._unit_update_buff[5] = 43 - self._display_unit
+                        self._unit_update_buff[10] = self._display_unit
+                        await self._client.write_gatt_char(
+                            unit_char, self._unit_update_buff, False
+                        )
+                        self._logger.debug(
+                            "Trying to update display unit to %s (buffer: %s)",
+                            self._display_unit,
+                            self._unit_update_buff.hex(),
+                        )
+                    else:
+                        self._logger.warning(
+                            "Unit update characteristic not found, skipping unit update"
+                        )
+
+            if weight_char := self._client.services.get_characteristic(WEIGHT_CHARACTERISTIC_UUID_NOTIFY):
+                await self._client.start_notify(
+                    weight_char,
+                    lambda char, data: self._notification_handler(
+                        char, data, ble_device.name, ble_device.address
+                    ),
+                )
+            else:
+                self._logger.error("Weight notification characteristic not found")
+                # With Bluetooth proxies, services may not be immediately available.
+                # Don't force disconnect - let it fail naturally or timeout.
+                return
+            
+            if not self._hw_version:
+                if hw_char := self._client.services.get_characteristic(HW_REVISION_STRING_CHARACTERISTIC_UUID):
+                    self._hw_version = (
+                        await self._client.read_gatt_char(hw_char)
+                    ).decode()
+                    self._logger.debug("Scale HW version: %s", self._hw_version)
+                else:
+                     self._logger.debug("HW version characteristic not found")
+
+            if sw_char := self._client.services.get_characteristic(SW_REVISION_STRING_CHARACTERISTIC_UUID):
+                self._sw_version = (
+                    await self._client.read_gatt_char(sw_char)
+                ).decode()
+                self._logger.debug("Scale SW version: %s", self._sw_version)
+            else:
+                self._logger.debug("SW version characteristic not found")
+                
+        except Exception as ex:
+            self._logger.exception("%s(%s)", type(ex), ex.args)
+            self._client = None
+            self._unit_update_flag = True
