@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pylipsync"
+version = "0.2.1"
+description = "A Python implementation of Hecomi's uLipSync for audio-based lip sync analysis."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+keywords = ["lip-sync", "audio", "phoneme", "mfcc", "speech-analysis", "animation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "librosa>=0.10.0",
+    "numpy>=1.20.0,<2.4.0",
+    "scipy>=1.7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/spava002/pyLipSync"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:audioread.rawread",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["pylipsync*"]
+
+[tool.setuptools.package-data]
+pylipsync = ["phonemes/**/*"]
