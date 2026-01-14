@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-server-currency-history"
+version = "0.1.0"
+description = "A Model Context Protocol (MCP) server for fetching historical currency exchange rates using the Frankfurter API."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "User", email = "user@example.com" },
+]
+keywords = ["mcp", "currency", "exchange-rates", "history", "frankfurter"]
+dependencies = [
+  "fastmcp",
+  "httpx",
+]
+
+[project.urls]
+Homepage = "https://github.com/example/mcp-server-currency-history"
+
+[project.scripts]
+mcp-server-currency-history = "mcp_server_currency_history.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_server_currency_history"]
