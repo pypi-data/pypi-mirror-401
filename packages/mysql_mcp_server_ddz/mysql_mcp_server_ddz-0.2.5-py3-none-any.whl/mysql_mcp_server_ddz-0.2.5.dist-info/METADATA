@@ -1,0 +1,352 @@
+Metadata-Version: 2.4
+Name: mysql_mcp_server_ddz
+Version: 0.2.5
+Summary: A Model Context Protocol (MCP) server that enables secure interaction with MySQL databases. This server allows AI assistants to list tables, read data, and execute SQL queries through a controlled interface, making database exploration and analysis safer and more structured.
+Author-email: "Dana K. Williams" <dana_w@designcomputer.com>
+License-File: LICENSE
+Requires-Python: >=3.11
+Requires-Dist: fastmcp
+Requires-Dist: mysql-connector-python>=9.1.0
+Description-Content-Type: text/markdown
+
+# MySQL MCP Server（基于 FastMCP 的 MySQL 工具服务器）
+
+一个基于 **Model Context Protocol (MCP)** 的 MySQL 服务器，使用 **FastMCP** 框架实现，
+用于让 AI 应用（例如 Claude Desktop、支持 MCP 的 IDE 等）安全地访问和操作 MySQL 数据库。
+
+> **定位**：这是一个“给大模型用的 MySQL 工具层”，不是传统意义上的 Web API 服务。
+>
+> 你可以把它理解成：把 MySQL 封装成一个 MCP Server，
+> 让 LLM 通过标准协议调用“列出表、查看表数据、执行 SQL”这类能力。
+
+---
+
+## 功能概览
+
+- **列出表**：
+  - 通过资源 `mysql://tables` 列出当前数据库下所有表名
+- **查看表数据**：
+  - 通过资源 `mysql://{table}/data` 读取指定表前 100 行，返回 CSV 文本
+- **执行 SQL**：
+  - 提供工具 `execute_sql(query: str)`，可以执行任意 SQL（读写都可以）
+  - 对 `SHOW TABLES` 做了专门格式处理，保持与历史版本兼容
+- **环境变量配置**：
+  - 所有数据库连接参数都来自环境变量，便于在本地 / 服务器 / 容器中统一管理
+- **日志完善**：
+  - 所有关键路径（连接、查询、错误）都有日志记录，便于调试
+
+---
+
+## 技术栈
+
+- **语言与运行环境**：
+  - Python 3.11+
+- **MCP 框架**：
+  - [`fastmcp`](https://pypi.org/project/fastmcp/) —— 高层 MCP Server 框架
+- **数据库驱动**：
+  - `mysql-connector-python`
+- **项目打包 / 构建**：
+  - `pyproject.toml` + `hatchling`
+- **测试**：
+  - `pytest` + `pytest-asyncio`（目前示例测试只覆盖配置和基本初始化）
+
+---
+
+## 安装与依赖
+
+> 建议使用 [`uv`](https://github.com/astral-sh/uv) 管理 Python 环境和依赖（更快、更干净）。
+
+### 1. 克隆仓库
+
+```bash
+git clone https://github.com/designcomputer/mysql_mcp_server_ddz.git
+cd mysql_mcp_server_ddz
+```
+
+### 2. 安装依赖（推荐 uv）
+
+在项目根目录执行：
+
+```bash
+uv pip install -r requirements.txt
+```
+
+如果你希望开发 /运行测试，还可以安装开发依赖：
+
+```bash
+uv pip install -r requirements-dev.txt
+```
+
+> 依赖的核心部分：
+>
+> - `fastmcp`
+> - `mysql-connector-python>=9.1.0`
+
+如果你是通过 PyPI 安装（发布包名称可能为 `mysql-mcp-server`），可以：
+
+```bash
+pip install mysql-mcp-server
+```
+
+> 具体包名以实际发布为准，这个仓库的源码已经适配 fastmcp。  
+> 若仅在本地使用，可以直接 `uv pip install -e .` 做可编辑安装。
+
+---
+
+## 数据库配置（环境变量）
+
+所有数据库连接信息都通过环境变量传入，这对本地、服务器、容器都适用。
+
+必须配置：
+
+```bash
+MYSQL_HOST=localhost      # 数据库主机
+MYSQL_PORT=3306           # 端口（可选，默认 3306）
+MYSQL_USER=root           # 数据库用户名
+MYSQL_PASSWORD=123456     # 数据库密码
+MYSQL_DATABASE=jspt       # 要连接的数据库名
+```
+
+可选配置（兼容性与高级配置）：
+
+```bash
+MYSQL_CHARSET=utf8mb4
+MYSQL_COLLATION=utf8mb4_unicode_ci
+MYSQL_SQL_MODE=TRADITIONAL
+```
+
+> 如果缺少 `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE` 中任意一个，
+> 在启动时会直接抛出 `ValueError("Missing required database configuration")`，
+> 这是为了避免“悄悄用错配置”。
+
+在 Windows `cmd` 中可以这样设置（示例）：
+
+```bat
+set MYSQL_HOST=localhost
+set MYSQL_PORT=3306
+set MYSQL_USER=root
+set MYSQL_PASSWORD=123456
+set MYSQL_DATABASE=jspt
+```
+
+在 PowerShell 中则是：
+
+```powershell
+$env:MYSQL_HOST  = "localhost"
+$env:MYSQL_PORT  = "3306"
+$env:MYSQL_USER  = "root"
+$env:MYSQL_PASSWORD = "123456"
+$env:MYSQL_DATABASE = "jspt"
+```
+
+---
+
+## 启动方式
+
+### 方式一：本地直接运行（开发调试）
+
+在项目根目录，确保已安装依赖并设置好环境变量：
+
+```bash
+uv run mysql_mcp_server_ddz
+```
+
+或使用 Python 模块方式（等价）：
+
+```bash
+python -m mysql_mcp_server_ddz.server
+```
+
+这两种方式最终都会调用包内的 `main()` 函数，启动 FastMCP Server，
+使用 **STDIO** 作为传输层，供 MCP 客户端连接。
+
+### 方式二：通过 `uvx` 命令（推荐给 MCP 客户端使用）
+
+如果你已经把本项目安装成一个脚本（例如通过 `uv pip install -e .`），
+那么可以直接使用：
+
+```bash
+uvx mysql_mcp_server_ddz
+```
+
+这会调用 `pyproject.toml` 中定义的脚本入口：
+
+```toml
+[project.scripts]
+mysql_mcp_server_ddz = "mysql_mcp_server_ddz:main"
+```
+
+---
+
+## 与 MCP 客户端集成示例
+
+### 1. Claude Desktop 配置示例
+
+在 `claude_desktop_config.json` 中添加：
+
+```json
+{
+  "mcpServers": {
+    "mysql": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "path/to/mysql_mcp_server_ddz",
+        "run",
+        "mysql_mcp_server_ddz"
+      ],
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "root",
+        "MYSQL_PASSWORD": "123456",
+        "MYSQL_DATABASE": "jspt"
+      }
+    }
+  }
+}
+```
+
+要点：
+
+- `command` 使用 `uv`，通过 `--directory` 指向你的项目路径
+- `args` 中调用 `run mysql_mcp_server_ddz`，实质上就是运行包内 `main()`
+- 数据库配置通过 `env` 字段传入
+
+### 2. VS Code MCP 插件 `mcp.json` 示例
+
+```json
+{
+  "servers": {
+    "mysql": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "mysql_mcp_server_ddz"
+      ],
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "root",
+        "MYSQL_PASSWORD": "123456",
+        "MYSQL_DATABASE": "jspt"
+      }
+    }
+  }
+}
+```
+
+要点：
+
+- VS Code 端通过 STDIO 与 MCP Server 通信
+- 使用 `uvx mysql_mcp_server_ddz` 启动 MCP Server
+- 数据库环境变量在 `env` 中配置
+
+### 3. 通过 Smithery 使用
+
+本仓库中提供了 `smithery.yaml`，已经从 Docker 改成本地 `uvx` 启动：
+
+- `smithery.yaml` 中的核心片段：
+
+```yaml
+commandFunction:
+  |-
+  (config) => ({
+    command: 'uvx',
+    args: ['mysql_mcp_server_ddz'],
+    env: {
+      MYSQL_HOST: config.mysqlHost,
+      MYSQL_PORT: String(config.mysqlPort),
+      MYSQL_USER: config.mysqlUser,
+      MYSQL_PASSWORD: config.mysqlPassword,
+      MYSQL_DATABASE: config.mysqlDatabase,
+    }
+  })
+```
+
+这意味着：
+
+- 在 Smithery UI 中填好 `mysqlHost/mysqlPort/...` 等配置
+- Smithery 会自动调用 `uvx mysql_mcp_server_ddz`，并把这些配置注入环境变量
+
+---
+
+## MCP 能力说明（Resources & Tools）
+
+核心逻辑位于 `src/mysql_mcp_server_ddz/server.py` 中：
+
+- **资源（Resources）**：
+  - `mysql://tables` → 函数 `list_tables()`
+    - 返回当前数据库所有表名的列表
+  - `mysql://{table}/data` → 函数 `read_table_data(table: str)`
+    - 返回指定表（如 `users`）前 100 行数据，CSV 格式字符串
+
+- **工具（Tools）**：
+  - `execute_sql(query: str)`
+    - 可执行任意 SQL 语句
+    - 对 `SHOW TABLES` 做了专门输出格式处理
+    - 对返回结果集的查询，统一转为 `header + rows` 的 CSV 文本
+    - 对非查询语句（INSERT/UPDATE/DELETE 等），返回“受影响行数”说明
+
+> 在生产环境中建议对 `execute_sql` 做一定限制（例如：只允许 SELECT），
+> 以避免通过 LLM 误删 / 误改数据。
+
+---
+
+## 测试
+
+目前提供了一个简单的单元测试文件：`tests/test_server.py`：
+
+- 验证 `app` 实例是否正确创建
+- 验证缺少关键环境变量时，`get_db_config` 会抛出 `ValueError`
+
+运行测试：
+
+```bash
+# 确保已安装开发依赖
+uv pip install -r requirements-dev.txt
+
+# 运行所有测试
+pytest
+```
+
+> 当前测试不依赖真实 MySQL，适合作为“快速回归”。
+> 如果你想做集成测试，可以参考原来的 `conftest.py` 思路，
+> 启动一个测试数据库，创建临时表，再调用资源/工具进行验证。
+
+---
+
+## 安全建议
+
+访问数据库本身就有一定风险，建议遵循以下原则：
+
+- 为 MCP Server 创建一个**权限受限的专用数据库用户**（不要使用 root）
+- 仅授予必要的权限（例如：只读环境只给 `SELECT`）
+- 对生产库要格外谨慎，可以只连从库或备份库
+- 对 `execute_sql` 工具在服务端做白名单 / 黑名单限制
+
+本仓库还提供了 `SECURITY.md`，里面有比较详细的 MySQL 权限管理建议，
+例如：如何创建只读用户、如何限制权限、如何审计访问等，建议在生产前认真阅读。
+
+---
+
+## 目录结构（关键部分）
+
+```text
+src/
+  mysql_mcp_server_ddz/
+    __init__.py      # 导出 app 和 main，供命令行脚本使用
+    server.py        # FastMCP 服务器核心逻辑（大量中文注释，适合学习）
+
+tests/
+  test_server.py     # 基础单元测试示例
+
+pyproject.toml       # 项目配置（依赖、脚本入口等）
+requirements.txt     # 运行时依赖
+requirements-dev.txt # 开发 / 测试依赖
+smithery.yaml        # Smithery 启动配置（uvx + 环境变量）
+Dockerfile           # 使用 Docker 部署时可选（不再强制依赖）
+SECURITY.md          # MySQL 权限与安全配置建议
+```
+
+---
