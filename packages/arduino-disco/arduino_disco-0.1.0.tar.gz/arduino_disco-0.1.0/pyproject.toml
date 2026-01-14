@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arduino-disco"
+version = "0.1.0"
+authors = [
+  { name="Christoph Schueler", email="cou12.gems@googlemail.com" },
+]
+description = "A library to discover Arduino boards connected via serial ports"
+readme = "README.md"
+keywords = ["arduino", "serial", "discovery", "embedded"]
+license = { text = "MIT" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pyserial",
+]
+
+[project.urls]
+Homepage = "https://github.com/christoph2/arduino-disco"
+
+[project.optional-dependencies]
+dev = [
+    "bumpver",
+    "pre-commit",
+]
+
+[project.scripts]
+arduino-disco = "arduinodisco.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.bumpver]
+current_version = "0.1.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'version = "{version}"',
+    'current_version = "{version}"',
+]
+"src/arduinodisco/__init__.py" = [
+    '__version__ = "{version}"',
+]
