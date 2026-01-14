@@ -1,0 +1,61 @@
+[build-system]
+requires = [ "poetry-core" ]
+build-backend = "poetry.core.masonry.api"
+
+[installer]
+no-binary = [ ":none:" ]
+
+[tool.poetry]
+name = "mpaws"
+version = "1.0.0"
+description = "Execute AWS CLI across multiple profiles and multiple regions in one go"
+license = "Apache-2.0"
+authors = [ "Cliffano Subagio <cliffano@gmail.com>" ]
+readme = "README.md"
+homepage = "https://github.com/cliffano/mpaws"
+repository = "https://github.com/cliffano/mpaws"
+documentation = "https://github.com/cliffano/mpaws"
+keywords = [
+  "mpaws",
+  "aws",
+  "cli",
+  "multi",
+  "multiple",
+  "profiles",
+  "regions"
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent"
+]
+
+  [[tool.poetry.packages]]
+  include = "mpaws"
+
+  [tool.poetry.scripts]
+  mpaws = "mpaws:cli"
+
+  [tool.poetry.dependencies]
+  python = "^3.10"
+  boto3 = "~1.38.27"
+  click = "~8.3.1"
+  conflog = "~2.1.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "~25.12.0"
+twine = "~6.2.0"
+wheel = "~0.45.1"
+
+[tool.poetry.group.test.dependencies]
+coverage = "~7.13.0"
+numpy = "1.26.4"
+pylint = "~4.0.4"
+pytest = "~9.0.2"
+radon = "~6.0.1"
+
+[tool.poetry.group.doc.dependencies]
+ansi2html = "~1.9.2"
+pylint-report = "~2.4.2"
+pytest-html = "~4.1.1"
+Sphinx = "8.1.3"
