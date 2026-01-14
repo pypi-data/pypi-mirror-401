@@ -1,0 +1,111 @@
+# canlab
+
+A general CAN framework API for Python - encode/decode CAN frames, parse DBC files, and work with CAN log files.
+
+## Installation
+
+```bash
+pip install canlab
+```
+or
+```bash
+uv add canlab
+```
+
+## Quick Start
+
+### Loading a DBC File
+
+```python
+from dbc.dbc_loader import extract_messages
+
+# Extract messages into MessageData objects
+messages = extract_messages("path/to/file.dbc")
+
+# Access message signals
+for message in messages:
+    print(f"Message ID: {message.dbc_id}")
+    for signal in message.signals:
+        print(f"  Signal: {signal.name}")
+```
+
+### Encoding CAN Frames
+
+```python
+from dbc.dbc_data import DbcData
+from encoder.frame_encoder import values_to_lsb, values_to_msb
+
+# Create a signal
+signal = DbcData(
+    value=98.6,
+    startBit=0,
+    numBits=16,
+    scale=0.1,
+    offset=0.0,
+    isSigned=False,
+    name="temperature",
+    isLSB=True
+)
+
+# Encode to LSB (Intel) format
+frame = values_to_lsb([signal])
+
+# Encode to MSB (Motorola) format
+msb_signal = DbcData(
+    value=50.0,
+    startBit=0,
+    numBits=16,
+    scale=0.1,
+    offset=0.0,
+    isSigned=False,
+    name="speed",
+    isLSB=False
+)
+frame = values_to_msb([msb_signal])
+```
+
+### Decoding CAN Frames
+
+```python
+from decoder.frame_decoder import lsb_to_value, msb_to_value
+
+# Decode from LSB format
+value = lsb_to_value(frame, signal)
+
+# Decode from MSB (Motorola) format
+value = msb_to_value(frame, signal)
+
+# Or use MessageData.decode() for automatic decoding
+decoded_values = message.decode(frame)
+# Returns: {"signal_name": physical_value, ...}
+```
+
+### Parsing ASC Log Files
+
+```python
+from log_reader.asc import parseASC, read_asc
+
+# Parse ASC file filtering by message IDs
+target_ids = [0x100, 0x200]
+df = parseASC("log.asc", target_ids)
+
+# Read all messages from ASC file
+df = read_asc("log.asc")
+```
+
+## Features
+
+- Load and parse DBC files
+- Encode physical values to CAN frames (LSB and MSB formats)
+- Decode CAN frames to physical values
+- Parse ASC log files
+- Convert between DBC IDs and bus IDs
+
+## Requirements
+
+- Python >= 3.12
+- polars >= 1.36.1
+
+## License
+
+MIT License - see LICENSE file for details.
