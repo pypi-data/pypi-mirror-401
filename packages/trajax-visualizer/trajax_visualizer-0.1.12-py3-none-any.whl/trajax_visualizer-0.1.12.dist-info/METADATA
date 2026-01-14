@@ -1,0 +1,79 @@
+Metadata-Version: 2.4
+Name: trajax-visualizer
+Version: 0.1.12
+Summary: Interactive visualization tool for trajax trajectory planning simulations
+Author-email: Zurab Mujirishvili <zurab.mujirishvili@fau.de>
+Keywords: robotics,simulation,trajectory planning,visualization
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: Typing :: Typed
+Requires-Python: >=3.13
+Requires-Dist: aiofiles>=25.1.0
+Requires-Dist: aiopath>=0.7.7
+Requires-Dist: msgspec>=0.20.0
+Requires-Dist: numpy>=2.0.0
+Requires-Dist: numtypes>=0.5.1
+Requires-Dist: trajax
+Description-Content-Type: text/markdown
+
+# trajax-visualizer
+
+Interactive visualization tool for [trajax](https://gitlab.com/risk-metrics/trajax) trajectory planning simulations.
+
+## Installation
+
+```bash
+pip install trajax-visualizer
+```
+
+Or with uv:
+
+```bash
+uv add trajax-visualizer
+```
+
+## Requirements
+
+- **Python 3.13+**
+- **Node.js 18+** (required at runtime for generating HTML visualizations)
+
+## Usage
+
+### Basic Usage
+
+```python
+from trajax_visualizer import visualizer, MpccSimulationResult
+
+# Create a visualizer instance
+mpcc_viz = visualizer.mpcc()
+
+# After running your simulation, create a result object
+result = MpccSimulationResult(
+    reference=trajectory,
+    states=states,
+    optimal_trajectories=optimal_trajectories,
+    nominal_trajectories=nominal_trajectories,
+    contouring_errors=contouring_errors,
+    lag_errors=lag_errors,
+    wheelbase=wheelbase,
+    max_contouring_error=max_contouring_error,
+    max_lag_error=max_lag_error,
+)
+
+# Generate visualization
+await mpcc_viz(result, key="my-simulation")
+```
+
+## Output
+
+Visualizations are saved as:
+- `<key>.json` - Raw simulation data
+- `<key>.html` - Interactive HTML visualization with Plotly
+
+## Development
+
+The bundled CLI (`visualizer/trajax_visualizer/assets/cli.js`) is included in the package distribution. See `visualizer/core/README.md` for build instructions.
