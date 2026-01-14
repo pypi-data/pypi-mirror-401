@@ -1,0 +1,97 @@
+Metadata-Version: 2.4
+Name: collective.ajaxify
+Version: 1.0.0
+Summary: collective.ajaxify is for asynchronous Classic-UI navigation using pat-inject.
+Home-page: https://github.com/collective/collective.ajaxify/
+Author: Johannes Raggam
+Author-email: thetetet@gmail.com
+License: gpl
+Keywords: plone classicui ajax pat-inject patternslib mockup
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Plone
+Classifier: Framework :: Plone :: 6.1
+Classifier: Framework :: Plone :: 6.2
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE.GPL
+License-File: LICENSE.rst
+Requires-Dist: setuptools
+Requires-Dist: Products.CMFPlone>=6.1
+Provides-Extra: test
+Requires-Dist: plone.app.testing; extra == "test"
+Requires-Dist: plone.browserlayer; extra == "test"
+Requires-Dist: plone.testing>=5.0.0; extra == "test"
+Requires-Dist: plone.restapi[test]; extra == "test"
+Requires-Dist: plone.app.robotframework; extra == "test"
+Requires-Dist: robotsuite; extra == "test"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# collective.ajaxify
+
+Ajaxify your Classic UI‌ Plone site!
+
+This is an experiment to ajaxify a whole Plone site.
+Use at your own risk!
+
+Some notes:
+
+- This package makes use of the Patternslib pat-inject library.
+
+- This package installs a custom Plone JavaScript bundle (`bundle-plone`) and
+  restores the original one when uninstalling the package again. If you use a
+  custom `bundle-plone` bundle yourself take care of the changes this package is
+  doing in the resource registry.
+
+- The custom `bundle-plone` uses the Mockup `thet-improvements` branch from
+  https://github.com/plone/mockup/pull/1509 This bundle mainly adds support the
+  the `navigate` event in the toolbar, the navigation marker and the structure
+  pattern. It also adds a `pat-base-url` pattern to update `data-base-url` after
+  `navigate` events.
+
+This approach was presented at the Ploneconf 2025 talk "Ajaxifying Plone" by
+Johannes Raggam:
+
+- https://thet.github.io/talk-ploneconf2025-ajaxify
+- https://github.com/thet/talk-ploneconf2025-ajaxify
+- https://www.youtube.com/watch?v=Y4Z4A9raEoE
+
+This package depends on features from Plone 6.2 and provides backports for
+Plone 6.1.
+
+## Installation
+
+```bash
+make zope-start
+```
+
+# Changelog
+
+## 1.0.0 (2026-01-13)
+
+- Plone 6.1 backport.
+  [petschki]
+
+- Initial release.
+  [thet]
