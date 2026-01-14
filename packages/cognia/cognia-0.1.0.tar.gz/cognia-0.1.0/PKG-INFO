@@ -1,0 +1,213 @@
+Metadata-Version: 2.4
+Name: cognia
+Version: 0.1.0
+Summary: Cognia – Automated Exploratory Data Analysis (EDA) with HTML reports
+Author-email: Kashish Pundir <your_email@gmail.com>
+License: MIT License
+        
+        Copyright (c) 2026 Kashish Pundir
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Homepage, https://github.com/KashishPundir/Cognia
+Project-URL: Repository, https://github.com/KashishPundir/Cognia
+Project-URL: Issues, https://github.com/KashishPundir/Cognia/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Dynamic: license-file
+
+
+<h1 align="center"> Cognia</h1>
+
+<h3><p align="center">
+   <b>Automated Exploratory Data Analysis</b>
+</p></h3>
+
+<p align="center">
+  Cognia is a Python library that automatically performs
+  <b>Exploratory Data Analysis (EDA)</b> and generates a
+  structured, insight-rich <b>HTML report</b>.
+</p>
+
+<p align="center">
+  Instead of writing repetitive and error-prone EDA scripts,
+  <b>Cognia thinks like a data analyst</b> and delivers clear insights,
+  visualizations, and warnings instantly.
+</p>
+
+
+## ✨ Why Cognia?
+
+Before building:
+
+- Machine Learning models
+- Statistical analyses
+- Dashboards or business insights
+
+You must understand your data.
+
+However, traditional EDA is often:
+
+❌ Time-consuming
+
+❌ Repetitive
+
+❌ Hard to standardize
+
+❌ Difficult to scale
+
+### 👉 Cognia automates this entire process.
+
+## 📁 Project Structure:
+
+```
+COGNIA/
+│
+├── cognia/                     # Core Cognia package
+│   ├── __init__.py             # Package initializer
+│   ├── alert.py                # Data quality alerts & warnings
+│   ├── corr.py                 # Correlation analysis utilities
+│   ├── interpret.py            # Distribution & insight interpretation
+│   ├── missing.py              # Missing value analysis
+│   ├── outliers.py             # Outlier detection logic
+│   ├── profiling.py            # Dataset profiling helpers
+│   ├── quick_eda.py             # Fast high-level EDA summary
+│   ├── report.py               # HTML report generation engine
+│   └── stats.py                # Statistical computations
+│
+├── demo/                       # Demo & example files
+│   ├── cognia_eda_report.html  # Sample generated EDA report
+│   ├── input_file.py           # Example usage script
+│   └── labtoprice.csv          # Sample dataset
+│
+├── pyproject.toml              # Build & dependency configuration
+├── README.md                   # Project documentation
+```
+
+## 🔍 What Cognia Analyzes:
+
+Cognia generates a complete EDA report covering:
+
+**📊 Dataset Overview:**
+
+-  Total rows & columns
+-  Data types
+- Duplicate records
+- Numeric vs categorical features
+
+**❓ Missing Value Analysis:**
+
+- Column-wise missing counts
+- Missing percentages
+- Data completeness indicators
+
+**📈 Statistical Summary:**
+
+- Mean, median, standard deviation
+- Min / Max values
+- Distribution characteristics
+
+**📉 Distribution & Shape Analysis:**
+
+- Histograms for numeric features
+- Skewness detection
+- Interpretable insights
+
+**🚨 Outlier Detection:**
+
+- Outlier counts per column
+- Severity-based alerts
+- Early modeling risk detection
+
+**🧩 Categorical Feature Analysis:**
+
+- Top categories
+- Frequency bar charts
+- Color-coded visualizations
+
+**🔗 Correlation Analysis (Smart & Scalable):**
+
+- Top correlated feature pairs (for large datasets)
+- Optional full correlation heatmap
+- Human-readable layout (no clutter)
+
+**⚠️ Alerts & Warnings:**
+
+- High missing values
+- Duplicate data risks
+- Extreme skewness & outliers
+- Potential modeling issues
+
+
+## 🧪 How to Use Cognia?
+
+```
+from cognia import eda_report
+
+eda_report(df)
+```
+
+✔️ That’s it.
+
+✔️ An HTML EDA report is generated instantly.
+
+✔️ No configuration required.
+
+
+## 📦 Installation:
+
+Clone the repository and install locally:
+
+```
+pip install -e .
+```
+
+## 🛠 Built With:
+
+🐍 Python 3.8+
+
+📦 pandas
+
+🔢 numpy
+
+📊 matplotlib
+
+📂 HTML
+
+Lightweight • Fast • Beginner-friendly • Extensible
+
+## 🏁 Philosophy:
+
+If you can load a DataFrame,
+you should be able to understand it.
+
+Cognia makes that possible.
+
+
+
+If you find Cognia useful, don’t forget to ⭐ star the repository and share it with fellow data enthusiasts.
+
+

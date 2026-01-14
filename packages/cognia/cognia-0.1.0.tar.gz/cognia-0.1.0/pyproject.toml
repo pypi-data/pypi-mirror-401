@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cognia"
+version = "0.1.0"
+description = "Cognia – Automated Exploratory Data Analysis (EDA) with HTML reports"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Kashish Pundir", email = "your_email@gmail.com" }
+]
+requires-python = ">=3.9"
+
+dependencies = [
+  "pandas",
+  "numpy",
+  "matplotlib"
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/KashishPundir/Cognia"
+Repository = "https://github.com/KashishPundir/Cognia"
+Issues = "https://github.com/KashishPundir/Cognia/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cognia*"]
