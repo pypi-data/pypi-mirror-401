@@ -1,0 +1,24 @@
+id: CONTEXT_SESSION
+target: system
+priority: 10
+category: context
+template: true
+
+description: |
+  Session context with iteration tracking
+
+content: |
+  ## Session State
+  - Turn: {{session_turn}} / {{session_max_turns}}
+  - Current time: {{datetime_context}}
+
+schema:
+  response:
+    type: string
+    required: true
+    description: "Your response to the user"
+
+  needs_clarification:
+    type: boolean
+    required: true
+    description: "True if you need more information from the user"

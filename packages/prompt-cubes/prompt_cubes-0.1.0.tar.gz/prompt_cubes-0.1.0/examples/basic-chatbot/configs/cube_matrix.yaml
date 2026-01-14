@@ -1,0 +1,32 @@
+# Cube assembly matrix for basic chatbot
+# Structure: {role}.{mode}.{iteration_key} → {system: [...], user: [...]}
+
+chatbot:
+  # Default mode - balanced responses
+  default:
+    iteration_any:
+      system:
+        - ROLE_CHATBOT
+        - CONTEXT_SESSION
+      user:
+        - USER_QUERY
+
+  # Concise mode - short answers
+  concise:
+    iteration_any:
+      system:
+        - ROLE_CHATBOT
+        - CONTEXT_SESSION
+        - MODE_CONCISE
+      user:
+        - USER_QUERY
+
+  # Detailed mode - thorough explanations
+  detailed:
+    iteration_any:
+      system:
+        - ROLE_CHATBOT
+        - CONTEXT_SESSION
+        - MODE_DETAILED
+      user:
+        - USER_QUERY

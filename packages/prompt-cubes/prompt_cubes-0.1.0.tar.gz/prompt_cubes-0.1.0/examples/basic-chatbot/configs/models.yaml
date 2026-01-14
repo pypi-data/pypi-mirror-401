@@ -1,0 +1,30 @@
+# Model configuration
+# Structure: role_models.{role}.{mode} → model_name
+
+defaults:
+  provider: openai
+  response_mime_type: application/json
+
+models:
+  gpt-4o:
+    provider: openai
+    temperature: 0.7
+    top_p: 0.95
+    max_output_tokens: 4096
+
+  gpt-4o-mini:
+    provider: openai
+    temperature: 0.5
+    max_output_tokens: 2048
+
+  claude-sonnet:
+    provider: anthropic
+    temperature: 0.7
+    max_output_tokens: 4096
+
+# Model assignments per role.mode
+role_models:
+  chatbot:
+    default: gpt-4o
+    concise: gpt-4o-mini
+    detailed: gpt-4o
