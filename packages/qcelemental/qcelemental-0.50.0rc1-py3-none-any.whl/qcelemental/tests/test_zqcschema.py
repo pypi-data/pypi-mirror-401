@@ -1,0 +1,32 @@
+import json
+import sys
+
+import pytest
+
+import qcelemental as qcel
+
+from .addons import _data_path
+
+
+@pytest.fixture(scope="module")
+def qcschema_models():
+    if sys.version_info >= (3, 14):
+        return {}
+    return {md.__name__: json.loads(md.schema_json()) for md in qcel.models.qcschema_models()}
+
+
+files = sorted(_data_path.rglob("*.json"))
+ids = [fl.parent.stem + "_" + fl.stem[5:] for fl in files]
+
+
+@pytest.mark.parametrize("fl", files, ids=ids)
+def hide_test_qcschema(fl, qcschema_models, request):
+    if "v2" in request.node.name or sys.version_info >= (3, 14):
+        pytest.skip()  # TODO v2 schema above
+    import jsonschema
+
+    model = fl.parent.stem
+    instance = json.loads(fl.read_text())
+
+    res = jsonschema.validate(instance, qcschema_models[model])
+    assert res is None
