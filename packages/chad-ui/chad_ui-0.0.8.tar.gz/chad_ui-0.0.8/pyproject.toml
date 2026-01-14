@@ -1,0 +1,22 @@
+[project]
+name = "chad-ui"
+version = "0.0.8"
+description = "Cotton/HTMX/AlpineJS Django components in the style of shadcn/ui"
+authors = [
+    {name = "Maxim Belyayev",email = "maximbelyayev@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "rich (>=14.2.0,<15.0.0)"
+]
+
+[project.scripts]
+chad-ui = 'chad_ui.main:cli'
+
+[tool.poetry]
+packages = [{include = "chad_ui", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
