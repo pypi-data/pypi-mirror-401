@@ -1,0 +1,23 @@
+[project]
+name = "gong-math-utils"
+version = "0.1.0"
+description = "example math utils"
+authors = [
+    {name = "hgim96715-lgtm",email = "hgim96715-lgtm@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+]
+
+[tool.poetry]
+packages = [{include = "gong_math_utils", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
+]
