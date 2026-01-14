@@ -1,0 +1,58 @@
+[project]
+name = "aiozabbix"
+version = "1.4.0"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.8.6",
+    "opentelemetry-api>=1.12.0",
+    "opentelemetry-semantic-conventions>=0.33b0",
+]
+
+description = "Asynchronous Zabbix API Python interface"
+license = { file = "LICENSE.txt" }
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+	{ name = "Nicklas Lindgren", email = "nili@modio.se" },
+	{ name = "D.S. Ljungmark", email = "spider@modio.se" },
+]
+keywords = ["zabbix", "monitoring", "api"]
+classifiers = [
+	"Framework :: AsyncIO",
+	"License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+	"Programming Language :: Python",
+	"Programming Language :: Python :: 3.6",
+]
+
+[project.urls]
+Repository = "https://gitlab.com/ModioAB/aiozabbix"
+
+[tool.setuptools]
+packages = ["aiozabbix"]
+
+[tool.coverage.run]
+omit = ["aiozabbix/test_*.py"]
+
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "flake8>=4.0.1",
+    "mypy>=0.971",
+    "pylint>=2.3.0",
+    "pytest>=7.0.1",
+    "pytest-aiohttp>=0.3.0",
+    "pytest-asyncio>=0.16.0",
+    "pytest-cov>=4.0.0",
+    "types-deprecated>=1.2.9.3",
+    "types-setuptools>=68.2.0.0",
+]
+
+
+[tool.pytest.ini_options]
+addopts = "--cov=aiozabbix --cov-report=term --cov-report=xml --junitxml=testreport.xml"
+junit_family = "xunit2"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
