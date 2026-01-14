@@ -1,0 +1,50 @@
+[project]
+name = "lsp-client"
+version = "0.3.1"
+description = "Full-featured, well-typed, and easy-to-use LSP client"
+readme = "README.md"
+authors = [{ name = "observerw", email = "wozluohd@gmail.com" }]
+requires-python = ">=3.12"
+keywords = ["Language Server Protocol", "LSP"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+]
+
+dependencies = [
+    "aioshutil>=1.6",
+    "anyio>=4.10.0",
+    "asyncer>=0.0.10",
+    "attrs>=25.3.0",
+    "loguru>=0.7.3",
+    "lsprotocol>=2025.0.0",
+    "pydantic-settings>=2.12.0",
+    "semver>=3.0.4",
+    "tenacity>=9.1.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.8.0",
+    "httpx>=0.28.1",
+    "aiofiles>=24.1.0",
+    "pdoc>=16.0.0",
+    "ty>=0.0.8",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.9,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+# Register custom markers
+markers = [
+    "integration: marks tests as integration tests",
+    "pyright: marks tests that require pyright-langserver",
+]
+norecursedirs = ["references", "scripts", "tests/fixtures"]
+testpaths = ["tests"]
