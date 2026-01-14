@@ -1,0 +1,42 @@
+[project]
+name = "synphony-mcp"
+version = "0.1.0"
+description = "MCP server for Synphony robotics data platform"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Synphony", email = "dev@synphony.co"}
+]
+keywords = ["mcp", "robotics", "video", "data", "synphony"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+]
+
+[project.urls]
+Homepage = "https://synphony.co"
+Documentation = "https://synphony.co/docs"
+Repository = "https://github.com/synphonyco/synphony-mcp"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+synphony-mcp = "synphony_mcp.server:main"
