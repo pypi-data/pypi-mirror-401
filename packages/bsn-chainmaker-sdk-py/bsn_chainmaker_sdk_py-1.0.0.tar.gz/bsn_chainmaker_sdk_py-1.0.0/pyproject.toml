@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bsn_chainmaker_sdk_py"
+version = "1.0.0"
+description = "BSN PCN Gateway SDK for Python - Chainmaker blockchain framework support"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "helailiang", email = "helailiang@reddatetech.com"}
+]
+keywords = [
+    "bsn",
+    "chainmaker",
+    "bsnbase",
+    "bsn_sdk_py",
+    "bsn_sdk_python",
+    "blockchain",
+    "pcn",
+    "gateway"
+]
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet",
+    "Intended Audience :: Developers",
+]
+dependencies = [
+    "hkdf==0.0.3",
+    "cryptography==41.0.2",
+    "fabric-sdk-py==0.8.1",
+    "pyOpenSSL==23.2.0",
+    "grpcio>=1.56.2",
+    "protobuf>=3.19.0",
+    "requests>=2.20.0",
+]
+
+[project.urls]
+Homepage = "http://gitlab.bsnbase.com:8088/sbp-di/oc/sbp-pcng-chainmaker-py-sdk"
+Repository = "http://gitlab.bsnbase.com:8088/sbp-di/oc/sbp-pcng-chainmaker-py-sdk"
+
+[tool.setuptools]
+# 自动发现包，排除测试目录
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bsn_sdk_py*"]
+exclude = [
+    "test*",
+    "*.test*",
+    "test.*",
+    "myenv*",
+    "docs*",
+    "bsn_sdk_py.test*",
+    "bsn_sdk_py.*.test*",
+]
+namespaces = false
+
+[tool.setuptools.package-data]
+"bsn_sdk_py" = ["trans/chainmaker/protos/**/*.proto"]
+
+# 注意: chainmaker-sdk-python 需要单独从 git 安装:
+# pip install git+https://git.chainmaker.org.cn/chainmaker/sdk-python.git@9f872c32ed80f48e8188042ac58e59e98b3e19e8
