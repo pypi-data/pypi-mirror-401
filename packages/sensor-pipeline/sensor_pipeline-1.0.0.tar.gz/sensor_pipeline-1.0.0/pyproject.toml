@@ -1,0 +1,43 @@
+[build-system]
+requires = [
+  "setuptools>=68",
+  "wheel",
+  "pybind11>=2.13.0",
+  "numpy>=1.26"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sensor_pipeline"
+version = "1.0.0"
+description = "Core API for acquiring, processing, visualizing, and storing sensor data in real-time"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dependencies = [
+  "numpy",
+  "pygfx>=0.1.13",
+  "jupyterlab",
+  "pyserial",
+  "fastplotlib",
+  "sqlitedict",
+  "pybind11",
+]
+
+[tool.setuptools.packages.find]
+include = ["sensor_core*"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+sensor_core = [
+  "native/fastring/*.hpp",
+  "native/fastring/*.h",
+]
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-* cp313-*"
+skip = "*musllinux* pp*"
+test-command = "python -c \"import sensor_core\""
+
