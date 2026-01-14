@@ -1,0 +1,105 @@
+name: CI
+on:
+  push:
+    branches: [main]
+    tags: [v*]
+  pull_request:
+    branches: [main]
+env:
+  RUSTUP_INIT: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        python-version: ['3.12', '3.13', '3.14']
+        marshmallow:
+          - marshmallow==2.20.5
+          - marshmallow[reco]==2.20.5
+          - marshmallow>=2,<3
+          - marshmallow[reco]>=2,<3
+          - marshmallow>=3,<4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: ${{ env.RUSTUP_INIT }} && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - run: echo ${{ matrix.python-version }} > .python-version
+      - run: make deps
+      - run: uv pip install '${{ matrix.marshmallow }}'
+      - run: make lint
+      - run: make test
+  build:
+    needs: [test]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            manylinux: "2_28"
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            manylinux: "2_28"
+          - os: macos-14
+            target: aarch64-apple-darwin
+            manylinux: "auto"
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+            manylinux: "auto"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup QEMU
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        uses: docker/setup-qemu-action@v3
+      - name: Set version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          sed -i.bak "s/^version = .*/version = \"$VERSION\"/" Cargo.toml && rm Cargo.toml.bak
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          args: --release --out dist -i python3.12 -i python3.13 -i python3.14
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: wheel-${{ matrix.os }}-${{ matrix.target }}
+          path: dist/*.whl
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: ${{ env.RUSTUP_INIT }} && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Set version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          sed -i "s/^version = .*/version = \"$VERSION\"/" Cargo.toml
+      - run: make build-sdist
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+  publish:
+    needs: [test, build, sdist]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-*
+          path: dist
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist
+      - run: uv publish dist/*
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
