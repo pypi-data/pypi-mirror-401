@@ -1,0 +1,23 @@
+[project]
+name = "originec"
+version = "0.1.1"
+description = ""
+authors = [
+    {name = "tomooki",email = "tomooki0414@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "originpro (>=1.1.14,<2.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "numpy (>=2.4.1,<3.0.0)",
+    "scipy (>=1.17.0,<2.0.0)",
+    "freesimplegui (>=5.2.0.post1,<6.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "originec", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
