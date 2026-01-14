@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bcpo_feature_selector"
+version = "0.1.0"
+description = "Binary Crested Porcupine Optimizer (BCPO) for feature selection"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Nguyễn Ngọc Thiện" }]
+license = { text = "MIT" }
+dependencies = [
+  "numpy>=1.22",
+  "scikit-learn>=1.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7",
+  "pytest-cov",
+  "flake8",
+]
+
+docs = [
+  "sphinx>=7.0",
+  "sphinx-rtd-theme",
+  "myst-parser",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

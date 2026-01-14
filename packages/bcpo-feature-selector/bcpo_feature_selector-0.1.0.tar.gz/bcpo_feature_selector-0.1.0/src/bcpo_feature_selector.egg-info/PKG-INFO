@@ -1,0 +1,174 @@
+Metadata-Version: 2.4
+Name: bcpo_feature_selector
+Version: 0.1.0
+Summary: Binary Crested Porcupine Optimizer (BCPO) for feature selection
+Author: Nguyễn Ngọc Thiện
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.22
+Requires-Dist: scikit-learn>=1.2
+Provides-Extra: dev
+Requires-Dist: pytest>=7; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=7.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme; extra == "docs"
+Requires-Dist: myst-parser; extra == "docs"
+Dynamic: license-file
+
+# bcpo-feature-selector
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+
+**bcpo-feature-selector** is a Python library that implements the **Binary Crested Porcupine Optimizer (BCPO)** for feature selection. It provides a robust, `scikit-learn` compatible interface to select the optimal subset of features for both classification and regression tasks.
+
+The library is based on the Crested Porcupine Optimizer (CPO), a nature-inspired meta-heuristic algorithm that mimics the defensive behaviors of the crested porcupine. By adapting CPO to a binary search space, `bcpo-feature-selector` efficiently explores the feature space to maximize model performance while minimizing the number of selected features.
+
+## Key Features
+
+-   **Scikit-learn Compatibility**: Designed to work seamlessly with `scikit-learn` estimators, pipelines, and cross-validation tools.
+-   **Dual Support**: Supports both **Classification** (`BCPOClassifierSelector`) and **Regression** (`BCPORegressorSelector`) tasks.
+-   **Customizable Metrics**: Optimizes for various built-in metrics (Accuracy, F1-score, ROC-AUC, MAE, MSE, R2) or accepts custom scoring functions.
+-   **Efficiency**: Leverages swarm intelligence to solve the NP-hard problem of feature selection more efficiently than exhaustive search.
+
+## Installation
+
+### From Source
+
+This project uses `pyproject.toml`. You can install it directly from the source:
+
+```bash
+# Clone the repository
+git clone https://github.com/ThienNguyen3001/bcpo-feature-selector.git
+cd bcpo-feature-selector
+
+# Install in editable mode
+pip install -e .
+```
+
+For development (including testing dependencies):
+
+```bash
+pip install -e .[dev]
+```
+
+## Quick Start
+
+### Classification Example
+
+Optimize accuracy using a Naive Bayes classifier on the Breast Cancer dataset.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from bcpo_feature_selector.classification import BCPOClassifierSelector
+
+# Load data
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize selector
+selector = BCPOClassifierSelector(
+    estimator=GaussianNB(),
+    metric="accuracy",
+    num_agents=30,
+    max_iter=50,
+    random_state=42,
+    verbose=1
+)
+
+# Fit and transform
+selector.fit(X_train, y_train)
+X_train_selected = selector.transform(X_train)
+X_test_selected = selector.transform(X_test)
+
+# Evaluate
+print(f"Original features: {X.shape[1]}")
+print(f"Selected features: {X_train_selected.shape[1]}")
+print(f"Selected indices: {selector.get_support(indices=True)}")
+
+# Train a model on selected features
+model = GaussianNB()
+model.fit(X_train_selected, y_train)
+y_pred = model.predict(X_test_selected)
+print(f"Test Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+```
+
+### Regression Example
+
+Optimize Mean Absolute Error (MAE) using ElasticNet on the Diabetes dataset.
+
+```python
+from sklearn.datasets import load_diabetes
+from sklearn.linear_model import ElasticNet
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error
+from bcpo_feature_selector.regression import BCPORegressorSelector
+
+# Load data
+X, y = load_diabetes(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize selector (Note: for regression, metrics like 'mae', 'mse' are minimized internally)
+selector = BCPORegressorSelector(
+    estimator=ElasticNet(random_state=42),
+    metric="mae",
+    num_agents=20,
+    max_iter=30,
+    random_state=42
+)
+
+# Fit
+selector.fit(X_train, y_train)
+
+# Transform
+X_train_sel = selector.transform(X_train)
+X_test_sel = selector.transform(X_test)
+
+print(f"Best internal validation score (MAE): {selector.best_score_:.4f}")
+print(f"Features reduced from {X.shape[1]} to {X_train_sel.shape[1]}")
+```
+
+## Configuration
+
+The `BCPOClassifierSelector` and `BCPORegressorSelector` expose several parameters to control the optimization process:
+
+-   `estimator`: The base estimator used to evaluate feature subsets (e.g., `RandomForestClassifier`, `LinearRegression`).
+-   `metric`: The metric to optimize.
+    -   **Classification**: `'accuracy'`, `'f1'`, `'precision'`, `'recall'`, `'roc_auc'`.
+    -   **Regression**: `'r2'`, `'mse'`, `'mae'`, `'rmse'`.
+-   `num_agents`: Number of search agents (population size). Higher values explore more but are slower.
+-   `max_iter`: Maximum number of iterations for the optimization.
+-   `w_error`: Weight for the error component in the fitness function (default: 0.9).
+-   `w_feature`: Weight for the feature reduction component (default: 0.1).
+-   `verbose`: Level of verbosity (0, 1, or 2).
+
+### The Fitness Function
+
+The library uses a weighted fitness function to balance prediction performance and dimensionality reduction:
+
+$$ Fitness = \alpha \times Error + \beta \times \frac{|S|}{|Total|} $$
+
+Where:
+- $Error = 1 - Metric$ (for maximization metrics)
+- $|S|$ is the number of selected features.
+- $\alpha$ (`w_error`) and $\beta$ (`w_feature`) control the trade-off.
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to report bugs, suggest features, or submit pull requests.
+
+This project enforces a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## References
+
