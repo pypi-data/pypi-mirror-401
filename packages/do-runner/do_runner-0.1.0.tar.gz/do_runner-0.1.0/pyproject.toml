@@ -1,0 +1,41 @@
+[project]
+name = "do-runner"
+version = "0.1.0"
+description = "Simple just- and xc-like task runner."
+authors = [
+    {name = "Cassandra Granade", email = "cgranade@cgranade.com"},
+]
+dependencies = [
+    "markdown-it-py",
+    "rich"
+]
+requires-python = ">=3.13"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.scripts]
+do = "do:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.pdm]
+distribution = true
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.11",
+    "ruff>=0.14.11",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "do.py",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+  "do.py",
+]
