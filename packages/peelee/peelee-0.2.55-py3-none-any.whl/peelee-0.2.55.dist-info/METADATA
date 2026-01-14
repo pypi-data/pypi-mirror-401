@@ -1,0 +1,348 @@
+Metadata-Version: 2.4
+Name: peelee
+Version: 0.2.55
+Summary: A python library to create countless palettes.
+License: MIT
+License-File: LICENSE
+Author: Bruce Wen
+Author-email: wenijinew@gmail.com
+Requires-Python: >=3.11,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Dist: loguru (>=0.7.3,<0.8.0)
+Description-Content-Type: text/markdown
+
+# Peelee
+
+A comprehensive Python library for creating countless color palettes, themes, and advanced color manipulations.
+
+## Features
+
+- **Advanced Palette Generation**: Create sophisticated color palettes with configurable parameters
+- **Theme Generation**: Generate themes from templates with automatic color replacement
+- **Color Utilities**: Comprehensive color conversion and manipulation functions
+- **Contrast Optimization**: Automatic accessibility compliance with contrast ratio adjustments
+- **Multiple Formats**: Support for JSON, plain text, and custom palette formats
+- **CLI Interface**: Command-line tools for quick palette generation
+
+## Installation
+
+```bash
+pip install peelee
+```
+
+Or using Poetry:
+
+```bash
+poetry add peelee
+```
+
+## Quick Start
+
+### Basic Palette Generation
+
+```python
+from peelee import generate_palette, Palette
+
+# Quick palette generation
+palette = generate_palette()
+print(palette)
+
+# Advanced palette with custom parameters
+custom_palette = Palette(
+    colors_total=7,
+    colors_gradations_total=60,
+    dark_base_color="#2D2A35",
+    palette_mode="DARK"
+).generate_palette()
+```
+
+### Color Utilities
+
+```python
+from peelee.color_utils import hex2hls, convert_to_best_dark_color
+
+# Color conversion
+hls_color = hex2hls("#FF5733")
+print(f"HLS: {hls_color}")
+
+# Contrast optimization for accessibility
+optimized_color = convert_to_best_dark_color(
+    background_color="#2D2A35",
+    foreground_color="#FFFFFF",
+    min_contrast_ratio=7,
+    max_contrast_ratio=21
+)
+```
+
+### Theme Generation
+
+```python
+from peelee import generate_new_theme
+
+# Generate theme from template
+theme_files = generate_new_theme(
+    original_theme_file="base_theme.json",
+    theme_root="./output",
+    theme_name="MyCustomTheme",
+    palette_colors=custom_palette
+)
+
+print(f"Generated theme: {theme_files[0]}")
+```
+
+## API Reference
+
+### Classes
+
+#### Palette
+
+Main class for palette generation with comprehensive configuration options.
+
+```python
+Palette(
+    colors_total=7,                    # Number of base colors
+    colors_gradations_total=60,        # Color gradations per base color
+    colors_min=10,                     # Minimum color value
+    colors_max=40,                     # Maximum color value
+    colors_saturation=0.55,            # Saturation level
+    colors_lightness=0.05,             # Lightness level
+    dark_colors_total=7,               # Dark color variants
+    dark_colors_gradations_total=60,   # Dark color gradations
+    dark_base_color="#2D2A35",         # Base color for dark themes
+    palette_mode="DARK"                # DARK, LIGHT, or RANDOM
+)
+```
+
+#### PaletteMode
+
+Enumeration for palette modes:
+- `PaletteMode.DARK`: Dark color schemes
+- `PaletteMode.LIGHT`: Light color schemes
+- `PaletteMode.RANDOM`: Random color schemes
+
+### Functions
+
+#### generate_palette(**kwargs)
+
+Quick palette generation with optional parameters.
+
+```python
+palette = generate_palette(
+    colors_total=5,
+    dark_base_color="#1E1E1E",
+    palette_mode="DARK"
+)
+```
+
+#### generate_new_theme(original_theme_file, theme_root, theme_name, **kwargs)
+
+Generate new theme from template with automatic color replacement.
+
+**Parameters:**
+- `original_theme_file`: Path to base theme file
+- `theme_root`: Output directory
+- `theme_name`: Name for generated theme
+- `palette_colors`: Custom palette colors (optional)
+
+**Returns:** Tuple of (theme_file, template_file, palette_file, picked_palette_file)
+
+### Color Utilities
+
+#### Conversion Functions
+
+```python
+from peelee.color_utils import hex2hls, hls2hex, hex2rgb, rgb2hex
+
+# Convert between color formats
+hls = hex2hls("#FF5733")
+hex_color = hls2hex((0.5, 0.5, 0.8))
+rgb = hex2rgb("#FF5733")
+hex_from_rgb = rgb2hex((255, 87, 51))
+```
+
+#### Color Manipulation
+
+```python
+from peelee.color_utils import darken, lighten, set_hls_values
+
+# Adjust color properties
+darker = darken("#FF5733", 0.3)
+lighter = lighten("#FF5733", 0.3)
+adjusted = set_hls_values("#FF5733", hue=0.6, saturation=0.8)
+```
+
+#### Contrast Optimization
+
+```python
+from peelee.color_utils import convert_to_best_dark_color, convert_to_best_light_color
+
+# Optimize for dark themes
+dark_optimized = convert_to_best_dark_color(
+    background_color="#2D2A35",
+    foreground_color="#FFFFFF",
+    min_contrast_ratio=7,
+    max_contrast_ratio=21
+)
+
+# Optimize for light themes
+light_optimized = convert_to_best_light_color(
+    foreground_color="#000000",
+    background_color="#FFFFFF",
+    min_contrast_ratio=7,
+    max_contrast_ratio=21
+)
+```
+
+## Configuration Options
+
+### Color Generation Parameters
+
+- `colors_total`: Number of base colors to generate (default: 7)
+- `colors_gradations_total`: Gradations per color (default: 60)
+- `colors_min/max`: RGB value range for colors (default: 10-40)
+- `colors_saturation`: Saturation level (default: 0.55)
+- `colors_lightness`: Lightness level (default: 0.05)
+
+### Dark Theme Parameters
+
+- `dark_colors_total`: Number of dark color variants (default: 7)
+- `dark_colors_gradations_total`: Dark color gradations (default: 60)
+- `dark_colors_min/max`: RGB range for dark colors (default: 20-40)
+- `dark_base_color`: Base color for dark themes
+
+### Advanced Options
+
+- `color_gradations_division_rate`: Color gradation distribution (default: 0.9)
+- `reversed_color_offset_rate`: Reversed color offset (default: 0.5)
+- `force_base_color_code`: Force specific color code override
+
+## CLI Usage
+
+Generate palettes from command line:
+
+```bash
+python -m peelee --colors_total 5 --palette_mode DARK --dark_base_color "#2D2A35"
+```
+
+### CLI Options
+
+- `-t, --colors_total`: Number of colors (default: 7)
+- `-g, --colors_gradations`: Color gradations (default: 60)
+- `-b, --dark_base_color`: Base color for dark themes
+- `-p, --palette_mode`: Palette mode (DARK/LIGHT/RANDOM)
+
+## Development
+
+### Requirements
+
+- Python 3.11+
+- loguru for logging
+
+### Setup
+
+```bash
+git clone https://github.com/wenijinew/peelee.git
+cd peelee
+poetry install
+poetry shell
+```
+
+### Testing
+
+```bash
+# Run tests
+pytest
+
+# Run with coverage
+pytest --cov=peelee
+
+# Run specific test
+pytest tests/peelee_test.py
+```
+
+### Code Quality
+
+The project uses pre-commit hooks for code quality:
+
+```bash
+# Install pre-commit hooks
+pre-commit install
+
+# Run manually
+pre-commit run --all-files
+```
+
+Tools used:
+- **Black**: Code formatting
+- **isort**: Import sorting
+- **flake8**: Linting
+- **mypy**: Type checking
+
+## Examples
+
+### Creating a Dark Theme Palette
+
+```python
+from peelee import Palette
+
+# Create a sophisticated dark theme palette
+dark_palette = Palette(
+    colors_total=8,
+    colors_gradations_total=80,
+    dark_base_color="#1E1E2E",
+    dark_colors_saturation=0.2,
+    dark_colors_lightness=0.1,
+    palette_mode="DARK"
+).generate_palette()
+
+# Use in your application
+for color_id, hex_color in dark_palette.items():
+    print(f"{color_id}: {hex_color}")
+```
+
+### Generating Multiple Theme Variants
+
+```python
+from peelee import generate_new_theme
+import os
+
+base_colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"]
+
+for i, color in enumerate(base_colors):
+    theme_files = generate_new_theme(
+        original_theme_file="templates/base.json",
+        theme_root=f"./themes/variant_{i+1}",
+        theme_name=f"CustomTheme_{i+1}",
+        palette_colors={"base_color": color}
+    )
+    print(f"Generated theme variant {i+1}: {theme_files[0]}")
+```
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and changes.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/wenijinew/peelee/issues)
+- **Documentation**: This README and inline code documentation
+- **Version**: 0.2.34
+
