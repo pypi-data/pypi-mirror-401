@@ -1,0 +1,19 @@
+[project]
+name = "mysql-server-ddz"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "LOVEDDZ", email = "1584934130@qq.com" }
+]
+requires-python = ">=3.14.2"
+dependencies = [
+    "mcp[cli]>=1.25.0",
+]
+
+[project.scripts]
+mysql-server-ddz = "mysql_server_ddz:main"
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
