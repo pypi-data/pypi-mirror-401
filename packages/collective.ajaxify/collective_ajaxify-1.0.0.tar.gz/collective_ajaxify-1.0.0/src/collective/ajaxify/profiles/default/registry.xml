@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<registry>
+
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/collective.ajaxify"
+  >
+    <value key="jscompilation">++resource++collective.ajaxify/scripts/collective-ajaxify.bundle.min.js</value>
+    <value key="enabled">True</value>
+    <value key="depends" />
+    <value key="expression" />
+  </records>
+
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone"
+  >
+    <value key="jscompilation">++resource++collective.ajaxify/scripts/remote.min.js</value>
+    <value key="depends">collective.ajaxify</value>
+  </records>
+
+</registry>
