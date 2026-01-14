@@ -1,0 +1,50 @@
+Metadata-Version: 2.4
+Name: forecastEval
+Version: 0.2.4
+Summary: A lightweight Python framework for rigorous and statistically grounded forecast evaluation, with baseline comparison, horizon-stratified analysis, and Diebold–Mariano testing.
+Author-email: Bruna Azevedo <bcado@isep.ipp.pt>, Luís Gomes <log@isep.ipp.pt>, Zita Vale <zav@isep.ipp.pt>
+License-Expression: GPL-3.0-only
+Project-URL: Homepage, https://github.com/gecad-group/BCADO_forecast-eval
+Project-URL: Issues, https://github.com/gecad-group/BCADO_forecast-eval/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# forecastEval
+
+**forecastEval** is an open-source Python library that provides a lightweight and unified framework for rigorous evaluation of time-series forecasts.
+
+The library is designed to address common shortcomings in forecasting practice, including insufficient baseline comparison, over-reliance on aggregated error metrics, and lack of statistical validation of performance differences.
+
+---
+
+## Key Features
+
+- **Baseline-aware evaluation**
+  - Automatic comparison against persistence (naïve) and seasonal naïve baselines
+  - Mean Absolute Scaled Error (MASE) and skill scores for interpretable performance assessment
+
+- **Horizon-stratified analysis**
+  - User-defined forecast horizon windows
+  - Detection of horizon-dependent performance degradation
+
+- **Statistical validation**
+  - Diebold–Mariano test for forecast comparison
+  - Autocorrelation-adjusted variance estimation
+
+- **Interpretative reporting**
+  - Clear PASS / FAIL recommendations for model deployment
+  - Human-readable console summaries
+
+- **Interactive HTML reports**
+  - Collapsible sections, visual summaries, and horizon-wise breakdowns
+
+---
+
+## Installation
+
+```bash
+pip install forecastEval
