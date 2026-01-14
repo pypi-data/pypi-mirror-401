@@ -1,0 +1,27 @@
+# This section defines the build system tools. You can usually just copy this.
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# This section contains metadata about your library.
+[project]
+name = "pippa-api"
+version = "0.1.0"
+authors = [
+  { name="Dr Graeme Benstead-Hume", email="ghume@icr.ac.uk" },
+]
+description = "A simple wrapper library for the Pippa API."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+# This is where you list your library's dependencies.
+dependencies = [
+    "requests",
+]
+[project.urls]
+Homepage = "https://github.com/mrgraeme/pippa_api"
+Issues = "https://github.com/mrgraeme/pippa_api/issues"
