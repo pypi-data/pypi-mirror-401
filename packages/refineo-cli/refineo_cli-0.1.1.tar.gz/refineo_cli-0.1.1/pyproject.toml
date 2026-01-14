@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "refineo-cli"
+version = "0.1.1"
+description = "Refineo AI Text Humanizer CLI - Transform AI-generated text into natural human writing"
+readme = "../README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Refineo" }]
+keywords = ["refineo", "ai", "humanizer", "text", "writing", "cli", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+]
+
+[project.scripts]
+refineo = "refineo_cli.cli:main"
+refineo-cli = "refineo_cli.cli:main"
+
+[project.urls]
+Homepage = "https://www.refineo.app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/refineo_cli"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

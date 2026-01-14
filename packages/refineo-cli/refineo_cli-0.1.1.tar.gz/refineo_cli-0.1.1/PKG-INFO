@@ -1,0 +1,190 @@
+Metadata-Version: 2.4
+Name: refineo-cli
+Version: 0.1.1
+Summary: Refineo AI Text Humanizer CLI - Transform AI-generated text into natural human writing
+Project-URL: Homepage, https://www.refineo.app
+Author: Refineo
+License-Expression: MIT
+Keywords: ai,cli,humanizer,mcp,refineo,text,writing
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Text Processing
+Requires-Python: >=3.10
+Provides-Extra: dev
+Requires-Dist: mypy>=1.13.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.8.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Refineo AI Tools
+
+[![npm version](https://img.shields.io/npm/v/refineo-cli)](https://www.npmjs.com/package/refineo-cli)
+[![PyPI version](https://img.shields.io/pypi/v/refineo-cli)](https://pypi.org/project/refineo-cli/)
+
+CLI and MCP tools for [Refineo](https://www.refineo.app) - Transform AI-generated text into natural human writing.
+
+## Quick Start
+
+### Node.js / TypeScript
+
+```bash
+# Using bunx (recommended)
+bunx refineo-cli login
+
+# Using npx
+npx refineo-cli login
+
+# Global install
+npm i -g refineo-cli && refineo login
+```
+
+### Python
+
+```bash
+# Using uvx (recommended)
+uvx refineo-cli login
+
+# Using pipx
+pipx run refineo-cli login
+
+# Global install
+pip install refineo-cli && refineo login
+```
+
+## Commands
+
+```bash
+refineo login              # Authenticate with your account
+refineo logout             # Clear stored credentials
+refineo stats              # Show usage statistics
+refineo humanize "text"    # Humanize AI-generated text
+```
+
+### Humanize Options
+
+```bash
+refineo humanize "text" --model enhanced    # Use enhanced model (default)
+refineo humanize "text" --model standard    # Use standard model
+refineo humanize --file input.txt           # Read from file
+refineo humanize --file input.txt --output output.txt  # Write to file
+echo "text" | refineo humanize              # Read from stdin
+```
+
+## Requirements
+
+- **Pro or Ultra subscription** - CLI/MCP access is a Pro+ feature
+- Node.js 18+ (for Node CLI)
+- Python 3.10+ (for Python CLI)
+
+## Authentication
+
+The CLI uses device code flow for secure authentication:
+
+1. Run `refineo login`
+2. A browser opens to authorize the device
+3. Sign in and confirm the device code
+4. Credentials are stored securely in `~/.refineo/`
+
+## MCP Integration
+
+Refineo provides an MCP server for integration with Claude Desktop, Cursor, and other AI assistants.
+
+### Tools Available
+
+| Tool | Description |
+|------|-------------|
+| `humanize_text` | Transform AI-generated text into natural human writing |
+| `get_usage` | Check remaining quota for current billing period |
+
+### Authentication Options
+
+**Option 1: API Key (Recommended for MCP)**
+
+API keys are long-lived (7 days to 1 year) and don't require refresh. Create one at [www.refineo.app/dashboard/api-keys](https://www.refineo.app/dashboard/api-keys).
+
+**Option 2: Bearer Token**
+
+Use the CLI to get a short-lived access token (15 minutes). Suitable for quick testing.
+
+### Setup for Claude Code
+
+Run this command (replace `sk_your_api_key` with your actual key):
+
+```bash
+claude mcp add-json refineo '{"type":"http","url":"https://www.refineo.app/mcp/mcp","headers":{"X-API-Key":"sk_your_api_key"}}'
+```
+
+### Setup for Claude Desktop (Native OAuth - Recommended)
+
+1. Open Claude Desktop → Settings → Connectors
+2. Click "Add custom connector"
+3. Enter URL: `https://www.refineo.app/mcp/mcp`
+4. Click Add → Sign in with your Refineo account
+
+No API key needed - uses OAuth authentication.
+
+### Setup for Claude Desktop / Cursor (API Key)
+
+Alternatively, use an API key with the config file:
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "refineo": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://www.refineo.app/mcp/mcp",
+        "--header",
+        "X-API-Key:sk_your_api_key_here"
+      ]
+    }
+  }
+}
+```
+
+> Requires Node.js. Uses [mcp-remote](https://github.com/geelen/mcp-remote) as a proxy.
+
+### Token Refresh
+
+- **API Keys**: No refresh needed until expiry (7d-1y). Create new keys at [dashboard/api-keys](https://www.refineo.app/dashboard/api-keys).
+- **Bearer Tokens**: Expire after 15 minutes. Run `refineo login` to refresh.
+
+## Development
+
+### Node CLI
+
+```bash
+cd node
+npm install
+npm run build
+npm start login
+```
+
+### Python CLI
+
+```bash
+cd python
+pip install -e ".[dev]"
+refineo login
+```
+
+## Links
+
+- [Refineo App](https://www.refineo.app)
+- [Pricing](https://www.refineo.app/pricing)
+- [Manage API Keys](https://www.refineo.app/dashboard/api-keys)
+- [Manage Connected Devices](https://www.refineo.app/dashboard/sessions)
+
+## License
+
+MIT
