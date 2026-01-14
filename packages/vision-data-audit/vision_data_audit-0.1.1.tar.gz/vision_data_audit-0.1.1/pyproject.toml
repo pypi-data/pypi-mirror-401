@@ -1,0 +1,25 @@
+[project]
+name = "vision-data-audit"
+version = "0.1.1"
+description = "Quick audit of an image folder: formats, sizes, mean/std, duplicates."
+readme = "README.md"
+authors = [
+    { name = "Naif Ganadily", email = "ganadilynaif@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "numpy>=1.26,<2.4",
+    "pillow>=12.1.0",
+]
+
+[project.scripts]
+vision-data-audit = "vision_data_audit.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
