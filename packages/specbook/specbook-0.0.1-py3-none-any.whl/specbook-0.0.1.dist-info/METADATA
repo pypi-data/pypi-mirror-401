@@ -1,0 +1,85 @@
+Metadata-Version: 2.4
+Name: specbook
+Version: 0.0.1
+Summary: CLI tool to collaborate on spec-driven development (SDD)
+Author: Christopher Correa
+License: BSD 3-Clause License
+        
+        Copyright (c) 2026, Christopher Correa
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+        
+        3. Neither the name of the copyright holder nor the names of its
+           contributors may be used to endorse or promote products derived from
+           this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+License-File: LICENSE
+Requires-Python: >=3.11
+Requires-Dist: jinja2>=3.1
+Requires-Dist: psutil>=5.9
+Requires-Dist: rich>=13
+Requires-Dist: starlette>=0.40
+Requires-Dist: typer>=0.9
+Requires-Dist: uvicorn>=0.30
+Provides-Extra: dev
+Requires-Dist: pyright>=1.1; extra == 'dev'
+Requires-Dist: pytest-cov>=4.1; extra == 'dev'
+Requires-Dist: pytest>=7.4; extra == 'dev'
+Description-Content-Type: text/markdown
+
+<img src="src/specbook/ui/web/static/specbook_leaf.png" alt="Specbook" width="64">
+
+# Specbook
+
+A browser-based viewer and editor for spec-driven development (SDD) projects. Specbook facilitates review, collaboration on specs, plans, and task lists.
+
+## How Does It Work?
+
+Specbook launches a local web server that renders your `specs/` directory in a clean, readable format.
+
+## Install
+
+```bash
+uv tool install specbook --from git+https://github.com/chriscorrea/specbook.git
+```
+
+## Usage
+
+From any directory in your project:
+
+```bash
+specbook
+```
+
+The server runs in the background—use `specbook stop` when you're done.
+
+## Development
+
+```bash
+git clone https://github.com/chriscorrea/specbook.git
+cd specbook
+uv sync
+uv run specbook
+```
+
+## License
+
+This project is licensed under the [BSD-3 License](LICENSE).
