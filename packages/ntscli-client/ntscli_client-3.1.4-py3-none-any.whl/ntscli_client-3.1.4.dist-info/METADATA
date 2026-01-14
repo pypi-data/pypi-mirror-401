@@ -1,0 +1,102 @@
+Metadata-Version: 2.4
+Name: ntscli-client
+Version: 3.1.4
+Summary: NTS-CLI - The Netflix Test Studio Command Line Interface (NTS-CLI) offers an alternative method for testing your Netflix application.
+Home-page: https://docs.nrd.netflix.com/docs/nrdp/cert/ntscli/
+Author: eco-eai@netflix.com
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click
+Requires-Dist: click-completion
+Requires-Dist: click-log
+Requires-Dist: colorama
+Requires-Dist: dataclasses; python_version < "3.8"
+Requires-Dist: furl
+Requires-Dist: requests
+Requires-Dist: requests_toolbelt
+Requires-Dist: uri
+Requires-Dist: xdg
+Provides-Extra: internal
+Requires-Dist: pytest>=7.0; extra == "internal"
+Requires-Dist: pytest-cov>=4.0; extra == "internal"
+Requires-Dist: pytest-mock>=3.10; extra == "internal"
+Requires-Dist: mock; extra == "internal"
+Requires-Dist: metatron; extra == "internal"
+Requires-Dist: behave; extra == "internal"
+Requires-Dist: flake8; extra == "internal"
+Requires-Dist: mypy; extra == "internal"
+Requires-Dist: pyinstaller; extra == "internal"
+Requires-Dist: semver; extra == "internal"
+Requires-Dist: tox; extra == "internal"
+Dynamic: author
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# NTS-CLI - The Netflix Test Studio Command Line Interface (NTS-CLI) offers an alternative method for testing your Netflix application.
+
+## Install
+
+```shell script
+pip3 install ntscli-client
+```
+
+Internal users can leverage the following command to pull builds including internal package extras
+
+```shell script
+pip3 install 'ntscli-client[internal]'
+```
+
+## Usage
+
+All NTS-CLI commands have --help options to document their usage
+
+```shell script
+nts --help
+```
+
+# Local Development
+
+## Setup
+
+```shell script
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install for Netflix internal development (includes all test and dev tools)
+pip install -e '.[internal]'
+
+# Or install base CLI only (external user experience)
+pip install -e .
+```
+
+## Running Tests
+
+```shell script
+# Run tests
+pytest
+
+# With coverage
+pytest --cov
+```
+
+## Teardown
+
+To clean up the virtual environment when you're done:
+
+```shell script
+# Deactivate the virtual environment
+deactivate
+
+# Remove the virtual environment directory
+rm -rf .venv
+```
+
+# CI/CD
+
+[Living Lucid document of NTS-CLI CI/CD](https://lucid.app/lucidchart/7f08dc8e-571d-4409-8bb9-036ad1c6c876/edit?viewport_loc=-802%2C-532%2C3741%2C2030%2C0_0&invitationId=inv_82b9b5de-6b77-4fd3-9897-2ed4b45e1013)
