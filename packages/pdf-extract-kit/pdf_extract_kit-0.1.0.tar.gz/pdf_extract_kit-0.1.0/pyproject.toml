@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools<70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-extract-kit"
+version = "0.1.0"
+authors = [
+    { name="Bin Wang", email="ictwangbin@gmail.com" }
+]
+description = "A Comprehensive Toolkit for High-Quality PDF Content Extraction."
+readme = "README.md"
+license = { file = "LICENSE.md" }
+requires-python = ">=3.10"
+keywords = ["pdf", "ocr", "layout-analysis", "formula-recognition", "content-extraction"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "omegaconf",
+    "matplotlib",
+    "pymupdf",
+    "ultralytics>=8.2.85",
+    "doclayout-yolo>=0.0.2b1",
+    "unimernet==0.2.1",
+    "paddleocr==2.7.3",
+    "struct-eqtable",
+    "opencv-python>=4.6.0",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+cpu = [
+    "paddlepaddle",
+]
+gpu = [
+    "paddlepaddle-gpu",
+    "lmdeploy",
+]
+# Legacy compatibility
+layout = ["transformers"]
+
+[project.urls]
+Homepage = "https://github.com/ledboot/PDF-Extract-Kit"
+Repository = "https://github.com/ledboot/PDF-Extract-Kit"
+Issues = "https://github.com/ledboot/PDF-Extract-Kit/issues"
+
+[tool.setuptools.packages.find]
+include = ["pdf_extract_kit*"]
+
+[tool.setuptools.package-data]
+pdf_extract_kit = ["*.yaml", "*.json", "*.txt"]
