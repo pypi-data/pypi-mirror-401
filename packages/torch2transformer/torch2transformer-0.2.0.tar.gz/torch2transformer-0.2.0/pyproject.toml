@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torch2transformer"
+dynamic = ["version", "description"]
+
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [{ name = "Louis MAI" }]
+requires-python = ">=3.9"
+
+dependencies = [
+    "torch",
+    "transformers>=4.30",
+]
+
+[project.urls]
+Homepage = "https://github.com/longmaisg/torch2transformer"
+Repository = "https://github.com/longmaisg/torch2transformer"
+
+[tool.setuptools]
+packages = ["torch2transformer"]
+
+[tool.setuptools.dynamic]
+version = { attr = "torch2transformer.version.__version__" }
+description = { file = "README.md" }
