@@ -1,0 +1,292 @@
+Metadata-Version: 2.4
+Name: nats-tui
+Version: 0.1.0
+Summary: A terminal UI for NATS cluster management
+Project-URL: Homepage, https://github.com/coreyellis/nats-tui
+Project-URL: Repository, https://github.com/coreyellis/nats-tui
+Project-URL: Issues, https://github.com/coreyellis/nats-tui/issues
+Author-email: Corey Ellis <corey@cmetech.io>
+License-Expression: MIT
+Keywords: jetstream,messaging,nats,terminal,textual,tui
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Requires-Dist: nats-py>=2.0.0
+Requires-Dist: platformdirs>=4.0.0
+Requires-Dist: rich-click>=1.9.0
+Requires-Dist: textual>=0.47.0
+Requires-Dist: tomlkit>=0.12.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.23.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# NATS TUI
+
+A terminal user interface for NATS cluster management, built with [Textual](https://textual.textualize.io/).
+
+## Features
+
+- **Connection Management**: Connect to NATS servers with optional authentication
+- **TLS Support**: Secure connections with CA certificates, mutual TLS, and insecure mode for self-signed certs
+- **Subject Browser**: Discover and browse subjects with hierarchical tree view
+- **Message Publishing**: Publish messages with custom payloads and headers
+- **Message Subscribing**: Subscribe to subjects with wildcard support and real-time display
+- **JetStream Streams**: Create, delete, purge, and manage JetStream streams
+- **JetStream Consumers**: Create, delete, pause/resume consumers
+- **Theming**: 19+ built-in themes including light and dark modes
+- **Configuration**: TOML-based config with named connection profiles
+
+## Installation
+
+```bash
+pip install nats-tui
+```
+
+## Quick Start
+
+```bash
+# Connect to local NATS server
+nats-tui -s nats://localhost:4222
+
+# Connect with TLS
+nats-tui -s tls://server:4222 --tls --tls-ca-cert /path/to/ca.crt
+
+# Use a saved connection profile
+nats-tui -P prod
+
+# Launch with a specific theme
+nats-tui -t nats-tui-light
+```
+
+## Usage
+
+```
+nats-tui [OPTIONS]
+
+Connection:
+  -s, --server URL      NATS server URL (nats:// or tls://)
+  -P, --profile NAME    Connection profile name from config file
+
+TLS:
+  --tls                 Enable TLS connection
+  --tls-ca-cert PATH    Path to CA certificate file
+  --tls-cert PATH       Path to client certificate (for mutual TLS)
+  --tls-key PATH        Path to client key (for mutual TLS)
+  --tls-insecure        Disable certificate verification (insecure)
+
+Configuration:
+  -c, --config PATH     Path to config file (TOML)
+  -t, --theme NAME      Theme name (see --help for available themes)
+  --version             Show version and exit
+  --help                Show help and exit
+```
+
+## TLS Connections
+
+nats-tui supports secure TLS connections to NATS servers.
+
+### Basic TLS with CA Certificate
+
+```bash
+nats-tui -s tls://server:4222 --tls --tls-ca-cert /path/to/ca.crt
+```
+
+### TLS with Self-Signed Certificates (Insecure)
+
+```bash
+nats-tui -s tls://server:4222 --tls --tls-ca-cert /path/to/ca.crt --tls-insecure
+```
+
+### Mutual TLS (mTLS) with Client Certificates
+
+```bash
+nats-tui -s tls://server:4222 --tls \
+  --tls-ca-cert /path/to/ca.crt \
+  --tls-cert /path/to/client.crt \
+  --tls-key /path/to/client.key
+```
+
+### TLS in Configuration Profiles
+
+```toml
+[profiles.prod]
+server = "tls://prod.example.com:4222"
+tls = true
+tls_ca_cert = "/path/to/ca.crt"
+
+[profiles.dev]
+server = "tls://dev.example.com:4222"
+tls = true
+tls_ca_cert = "/path/to/ca.crt"
+tls_insecure = true  # For self-signed certificates
+
+[profiles.mtls]
+server = "tls://secure.example.com:4222"
+tls = true
+tls_ca_cert = "/path/to/ca.crt"
+tls_cert = "/path/to/client.crt"
+tls_key = "/path/to/client.key"
+```
+
+TLS is automatically enabled when using `tls://` URLs.
+
+## Key Bindings
+
+| Key | Action |
+|-----|--------|
+| `q` | Quit |
+| `?` / `F1` | Show help |
+| `c` | Open connection dialog |
+| `d` | Disconnect |
+| `r` | Refresh current view |
+| `Escape` | Go back |
+| `j` | Switch to JetStream view |
+| `p` | Publish message |
+| `s` | Subscribe to subject |
+| `u` | Unsubscribe |
+| `n` | Create new stream/consumer |
+| `Delete` | Delete selected item |
+| `Space` | Pause/resume consumer |
+| `Shift+P` | Purge stream |
+| `Enter` | View consumers (in stream view) |
+
+## Configuration
+
+NATS TUI looks for configuration files in the following locations (in order of priority):
+
+1. `~/.config/nats-tui/config.toml`
+2. `./pyproject.toml` (under `[tool.nats-tui]`)
+3. `./.nats-tui.toml`
+4. `./nats-tui.toml`
+
+### Example Configuration
+
+```toml
+# Default profile to use when none specified
+default_profile = "local"
+
+# Default theme
+theme = "nats-tui"
+
+# Connection profiles
+[profiles.local]
+server = "nats://localhost:4222"
+
+[profiles.prod]
+server = "tls://prod.example.com:4222"
+username = "admin"
+password = "secret"
+tls = true
+tls_ca_cert = "/etc/nats/ca.crt"
+
+[profiles.staging]
+server = "tls://staging.example.com:4222"
+tls = true
+tls_ca_cert = "/etc/nats/ca.crt"
+tls_insecure = true
+
+# Custom key bindings (optional)
+[keybindings]
+quit = "ctrl+q"
+```
+
+### Using Profiles
+
+```bash
+# Use the default profile from config
+nats-tui
+
+# Use a specific profile
+nats-tui -P prod
+
+# Override profile server with CLI flag
+nats-tui -P prod -s tls://different-server:4222
+```
+
+## Themes
+
+NATS TUI includes 19+ themes. Use `-t` or `--theme` to select:
+
+```bash
+# Dark theme (default)
+nats-tui -t nats-tui
+
+# Light theme
+nats-tui -t nats-tui-light
+
+# Built-in Textual themes
+nats-tui -t dracula
+nats-tui -t monokai
+nats-tui -t nord
+```
+
+Run `nats-tui --help` to see all available themes.
+
+## Development
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/coreyellis/nats-tui.git
+cd nats-tui
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+
+# Install in development mode
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+pytest tests/ -v
+```
+
+### Running the App
+
+```bash
+# From source
+nats-tui
+
+# Or directly
+python -m nats_tui
+```
+
+## Requirements
+
+- Python 3.10+
+- NATS server (for actual usage)
+
+## Dependencies
+
+- [Textual](https://textual.textualize.io/) - TUI framework
+- [nats-py](https://github.com/nats-io/nats.py) - NATS client
+- [rich-click](https://github.com/ewels/rich-click) - CLI with Rich formatting
+- [tomlkit](https://github.com/sdispater/tomlkit) - TOML parsing
+- [platformdirs](https://github.com/platformdirs/platformdirs) - Platform-specific directories
+
+## License
+
+MIT
+
+## Related Projects
+
+- [NATS](https://nats.io/) - The NATS messaging system
+- [nats-py](https://github.com/nats-io/nats.py) - Python client for NATS
+- [Harlequin](https://harlequin.sh/) - SQL IDE for the terminal (inspiration for this project)

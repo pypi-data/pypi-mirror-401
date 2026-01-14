@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nats-tui"
+version = "0.1.0"
+description = "A terminal UI for NATS cluster management"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Corey Ellis", email = "corey@cmetech.io" }]
+keywords = ["nats", "tui", "terminal", "jetstream", "messaging", "textual"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dependencies = [
+    "textual>=0.47.0",
+    "rich-click>=1.9.0",
+    "nats-py>=2.0.0",
+    "tomlkit>=0.12.0",
+    "platformdirs>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[project.scripts]
+nats-tui = "nats_tui.cli:nats_tui"
+
+[project.urls]
+Homepage = "https://github.com/coreyellis/nats-tui"
+Repository = "https://github.com/coreyellis/nats-tui"
+Issues = "https://github.com/coreyellis/nats-tui/issues"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/nats_tui"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nats_tui"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
