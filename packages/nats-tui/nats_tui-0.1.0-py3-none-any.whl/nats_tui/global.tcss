@@ -1,0 +1,55 @@
+/* Global styles for NATS TUI */
+
+/* Scrollbar theming */
+* {
+    scrollbar-background: $background-lighten-1;
+    scrollbar-color: $panel;
+    scrollbar-color-hover: $primary;
+    scrollbar-color-active: $secondary;
+}
+
+/* Toast notifications */
+Toast {
+    width: auto;
+    background: $background;
+    border-left: wide $primary;
+    padding: 0 1;
+    margin: 0 0 1 0;
+}
+
+Toast.-information {
+    border-left: wide $primary;
+}
+
+Toast.-warning {
+    border-left: wide $secondary;
+}
+
+Toast.-error {
+    border-left: wide $error;
+}
+
+Toast .toast--title {
+    color: $primary;
+}
+
+/* Footer styling */
+Footer {
+    background: $background;
+    color: $secondary;
+}
+
+FooterKey {
+    background: $background;
+    color: $primary;
+}
+
+FooterKey:hover {
+    background: $boost;
+}
+
+/* Header styling */
+Header {
+    background: $primary;
+    color: $background;
+}
