@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "emdash-cli"
+version = "0.1.30"
+description = "EmDash CLI - Command-line interface for code intelligence"
+authors = ["Em Dash Team"]
+packages = [{include = "emdash_cli"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+# Core dependency (local dev) - use ">=0.1.4" for PyPI release
+emdash-core = ">=0.1.30"
+
+# CLI
+click = "^8.1.7"
+rich = ">=13.7.0"
+prompt_toolkit = "^3.0.43"
+
+# HTTP client
+httpx = ">=0.25.0"
+
+# Image support (optional, for clipboard paste)
+pillow = {version = ">=10.0.0", optional = true}
+
+[tool.poetry.extras]
+images = ["pillow"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+
+[tool.poetry.scripts]
+emdash = "emdash_cli.main:cli"
+em = "emdash_cli.main:start_coding_agent"
+"--" = "emdash_cli.main:start_coding_agent"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
