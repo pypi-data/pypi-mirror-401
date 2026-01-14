@@ -1,0 +1,48 @@
+[project]
+name = "quantlib-st"
+authors = [
+  { name="Rodion Lim", email="rodion.lim@gmail.com" },
+]
+version = "1.3.0"
+description = "A quantitative finance library and cli for systematic trading"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "numpy>=2.4.0",
+  "pandas>=2.3.3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pip>=25.3",
+  "pytest>=9.0.2",
+  "pyinstaller>=6.17.0",
+  "twine>=6.2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/rodionlim/quantlib-st"
+Issues = "https://github.com/rodionlim/quantlib-st/issues"
+
+[project.scripts]
+quantlib = "quantlib_st.cli.main:main"
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+pythonpath = ["src/quantlib_st"]
+
+[build-system]
+requires = ["setuptools>=80.9", "wheel"]
+build-backend = "setuptools.build_meta"
