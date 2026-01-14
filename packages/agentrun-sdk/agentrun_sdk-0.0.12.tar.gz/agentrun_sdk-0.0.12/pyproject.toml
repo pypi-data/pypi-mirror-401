@@ -1,0 +1,196 @@
+[project]
+name = "agentrun-sdk"
+version = "0.0.12"
+description = "Alibaba Cloud Agent Run SDK"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "crcmod>=1.7",
+    "pydantic>=2.12.4",
+    "httpx>=0.23.0",
+    "python-dotenv>=1.2.1",
+    "typing-extensions>=4.15.0",
+    "litellm>=1.79.3",
+    "alibabacloud-devs20230714>=2.4.1",
+    "pydash>=8.0.5",
+    "alibabacloud-agentrun20250910>=5.2.0",
+    "alibabacloud_tea_openapi>=0.4.2",
+    "alibabacloud_bailian20231229>=2.6.2",
+    "agentrun-mem0ai>=0.0.6",
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "ag-ui-protocol>=0.1.10",
+]
+
+langchain = [
+    "langchain>=1.0.0; python_version >= '3.10'",
+    "langchain-openai>=1.0.0; python_version >= '3.10'",
+]
+
+google-adk = [
+    "google-adk>=1.18.0",
+]
+
+agentscope = [
+    "agentscope>=0.1.6",
+]
+
+crewai = [
+    "crewai>=1.6.0",
+]
+
+pydantic-ai = [
+    "pydantic-ai>=1.22.0; python_version >= '3.10'",
+]
+
+playwright = [
+    "playwright>=1.40.0",
+]
+
+mcp = [
+    "mcp>=1.21.2; python_version >= '3.10'",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.10.7",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "pytest-asyncio>=1.2.0",
+    "respx>=0.21.0",
+    "isort==6.1.0",
+    "ruff>=0.14.3",
+    "mypy>=1.15.0",
+    "flit>=3.10.0",
+    "pyink>=24.10.0",
+    "pylint>=2.6.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0.3",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "langchain_mcp_adapters>=0.2.1",
+]
+
+[tool.pyink]
+# Format py files following Google style-guide
+line-length = 80
+unstable = true
+pyink-indentation = 4
+pyink-use-majority-quotes = true
+pyink-annotation-pragmas = [
+  "noqa",
+  "pylint:",
+  "type: ignore",
+  "pytype:",
+  "mypy:",
+  "pyright:",
+  "pyre-",
+]
+
+[tool.isort]
+profile = "google"
+single_line_exclusions = []
+line_length = 80                  # Prevent line wrap flickering.
+force_single_line = false
+multi_line_output = "GRID"
+use_parentheses = true
+include_trailing_comma = true
+known_first_party = ["agentrun"]
+known_third_party = ["alibabacloud_tea_openapi", "alibabacloud_devs20230714", "alibabacloud_agentrun20250910"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.mypy]
+python_version = "0.0.12"
+exclude = "tests/"
+plugins = ["pydantic.mypy"]
+# Start with non-strict mode, and switch to strict mode later.
+# strict = true
+disable_error_code = ["import-not-found", "import-untyped", "unused-ignore"]
+follow_imports = "skip"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+
+# ============================================================================
+# Coverage.py 配置
+# ============================================================================
+[tool.coverage.run]
+# 源代码目录
+source = ["agentrun"]
+# 启用分支覆盖率
+branch = true
+# 排除的文件模式
+omit = [
+    # 包初始化文件（主要是导出和延迟加载逻辑）
+    "agentrun/__init__.py",
+    # 测试文件
+    "*/tests/*",
+    "*_test.py",
+    "test_*.py",
+    "conftest.py",
+    # 模板文件（用于代码生成）
+    "*_async_template.py",
+    "*__async_template.py",
+    # 自动生成的 API 控制代码
+    "*/api/control.py",
+    # 代码生成和构建目录
+    "codegen/*",
+    "examples/*",
+    "build/*",
+    "*.egg-info/*",
+    # 缓存目录
+    "*__pycache__*",
+    # server 和 sandbox 模块
+    "agentrun/server/*",
+    "agentrun/sandbox/*",
+    # integration 模块（第三方集成，单独测试）
+    "agentrun/integration/*",
+    # MCP 客户端（需要外部 MCP 服务器）
+    "agentrun/toolset/api/mcp.py",
+    # OpenAPI 解析器（复杂的 HTTP/schema mocking）
+    "agentrun/toolset/api/openapi.py",
+    # 客户端模块（异步方法与同步方法逻辑相同，单测同步方法即可）
+    "agentrun/agent_runtime/client.py",
+    "agentrun/model/client.py",
+    "agentrun/credential/client.py",
+    # endpoint 模块（invoke_openai 需要 Data API，难以单测）
+    "agentrun/agent_runtime/endpoint.py",
+    # toolset 模块（call_tool 和 to_apiset 需要外部 API 调用）
+    "agentrun/toolset/toolset.py",
+    # runtime 模块（invoke_openai 需要 Data API）
+    "agentrun/agent_runtime/runtime.py",
+]
+
+[tool.coverage.report]
+# 排除的代码行模式
+exclude_lines = [
+    # 标准排除
+    "pragma: no cover",
+    # 类型检查导入
+    "if TYPE_CHECKING:",
+    # 调试断言
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # 抽象方法
+    "@abstractmethod",
+    # 防御性断言
+    "if __name__ == .__main__.:",
+]
+# 显示缺失的行
+show_missing = true
+# 精度
+precision = 2
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agentrun*", "alibabacloud_agentrun20250910*"]  # 包含子包和子模块，排除 codegen
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
