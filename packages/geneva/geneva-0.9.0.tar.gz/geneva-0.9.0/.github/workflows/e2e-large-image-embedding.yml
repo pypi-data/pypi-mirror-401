@@ -1,0 +1,141 @@
+name: E2E Bench - Large Image Embedding
+
+on:
+  # Manual trigger - can be run on any branch
+  workflow_dispatch:
+    inputs:
+      csp:
+        description: 'Cloud provider'
+        required: false
+        type: choice
+        options:
+          - gcp
+          - aws
+        default: 'gcp'
+      num_images:
+        description: 'Number of images to process'
+        required: false
+        default: '20'
+      batch_size:
+        description: 'Batch size for backfill operations'
+        required: false
+        default: '4'
+      dataset_path:
+        description: 'Existing dataset path (gs://.../table or s3://.../table)'
+        required: false
+        default: ''
+      benchmark_mode:
+        description: 'Use benchmark worker labels'
+        required: false
+        type: boolean
+        default: false
+      num_workers:
+        description: 'Fixed number of Ray workers'
+        required: false
+        default: ''
+  # Weekly schedule: Monday 2am Pacific = Tuesday 9am UTC (runs on main only)
+  schedule:
+    - cron: '0 9 * * 2'
+
+jobs:
+  e2e-bench-large-image-embedding-gcp:
+    # Scheduled runs are always on main, manual runs can be on any branch
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.ref == 'refs/heads/main')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: warp-ubuntu-latest-x64-8x
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.10"
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+      UV_CACHE_DIR: /tmp/.uv-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # For scheduled runs, checkout main. For manual runs, use the triggered branch
+          ref: ${{ github.event_name == 'schedule' && 'main' || github.ref }}
+          submodules: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - name: Set up Cloud SDK
+        if: ${{ inputs.csp == 'gcp' }}
+        uses: 'google-github-actions/setup-gcloud@v2'
+      - uses: 'google-github-actions/auth@v2'
+        if: ${{ inputs.csp == 'gcp' }}
+        with:
+          # use credentials for automatically deployed geneva service
+          # geneva-client-sa@lancedb-dev-enterprise-1.iam.gserviceaccount.com
+          credentials_json: ${{ secrets.GCP_GENEVA_CLIENT_SA_KEY }}
+      - id: 'get-credentials'
+        if: ${{ inputs.csp == 'gcp' }}
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: 'lancedb'
+          location: 'us-central1'
+          project_id: 'lancedb-dev-enterprise-1'
+      - name: Configure AWS Credentials
+        if: ${{ inputs.csp == 'aws' }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::054483968661:role/github_actions_role
+      - name: Set kubeconfig (AWS)
+        if: ${{ inputs.csp == 'aws' }}
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name lancedb
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y kubectl
+          uv sync --extra k8s --extra ${{ inputs.csp }} --locked
+          cd e2e/large_image_embedding && uv sync --locked
+      - name: Generate test slug
+        run: |
+          SLUG=$(printf "%05d" $((RANDOM % 10001)))
+          echo "SLUG=$SLUG" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=e2e-large-image-embedding-$SLUG" >> $GITHUB_ENV
+      - name: Run benchmark
+        run: |
+          CMD="RAY_ENABLE_UV_RUN_RUNTIME_ENV=0 uv run -m e2e.large_image_embedding.benchmarks.geneva_main \
+            --csp ${{ inputs.csp }} \
+            --slug $SLUG \
+            --cluster-name $CLUSTER_NAME \
+            --num-images ${{ inputs.num_images || '20' }} \
+            --batch-size ${{ inputs.batch_size || '4' }} \
+            --manifest-name large-image-embedding-udfs-v1"
+          if [ -n "${{ inputs.dataset_path }}" ]; then
+            CMD="$CMD --dataset-path '${{ inputs.dataset_path }}'"
+          fi
+          if [ "${{ inputs.benchmark_mode }}" = "true" ]; then
+            CMD="$CMD --benchmark-mode"
+          fi
+          if [ -n "${{ inputs.num_workers }}" ]; then
+            CMD="$CMD --num-workers ${{ inputs.num_workers }}"
+          fi
+          echo "Running: $CMD"
+          eval "$CMD"
+      - name: Refresh AWS Credentials for Cleanup
+        if: ${{ always() && inputs.csp == 'aws' }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::054483968661:role/github_actions_role
+      - name: Refresh kubeconfig (AWS)
+        if: ${{ always() && inputs.csp == 'aws' }}
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name lancedb
+      - name: Cleanup Ray Clusters
+        if: always()
+        run: |
+          echo "Deleting raycluster $CLUSTER_NAME"
+          kubectl delete raycluster -n geneva "$CLUSTER_NAME" --ignore-not-found --timeout=300s --wait
+      - name: Minimize uv cache
+        run: uv cache prune --ci
