@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llmflux"
+version = "0.1.1"
+description = "CLI tool for running LLM batch processing jobs on HPC systems"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Rohan Marwaha", email = "rohan13@illinois.edu"}
+]
+requires-python = ">=3.11"
+keywords = ["llm", "batch-processing", "slurm", "hpc", "ai", "machine-learning", "ollama", "vllm"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "pandas>=2.1.0",
+    "pyyaml>=6.0.1",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.6.0",
+    "datasets>=3.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/Center-for-AI-Innovation/ai-flux"
+Repository = "https://github.com/Center-for-AI-Innovation/ai-flux"
+Issues = "https://github.com/Center-for-AI-Innovation/ai-flux/issues"
+
+[project.scripts]
+aiflux = "aiflux.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"aiflux" = [
+    "templates/models/*/*.yaml",
+    "container/*.def",
+    "slurm/*.sh"
+] 
