@@ -1,0 +1,324 @@
+Metadata-Version: 2.4
+Name: tracekit
+Version: 0.3.0
+Summary: IEEE-compliant signal analysis and protocol reverse engineering: waveform measurements, multi-protocol decoding, state machine inference, CRC recovery
+Project-URL: Homepage, https://github.com/lair-click-bats/tracekit
+Project-URL: Documentation, https://github.com/lair-click-bats/tracekit/tree/main/docs
+Project-URL: Repository, https://github.com/lair-click-bats/tracekit
+Project-URL: Changelog, https://github.com/lair-click-bats/tracekit/blob/main/CHANGELOG.md
+Project-URL: Issue Tracker, https://github.com/lair-click-bats/tracekit/issues
+Project-URL: Discussions, https://github.com/lair-click-bats/tracekit/discussions
+License-Expression: MIT
+License-File: LICENSE
+Keywords: automotive,can,cispr,embedded-systems,emc-testing,eye-diagram,flexray,hardware-debugging,i2c,ieee-1241,ieee-181,ieee-2414,jitter-analysis,jtag,lin,logic-analyzer,oscilloscope,protocol-decoder,protocol-inference,reverse-engineering,signal-analysis,signal-integrity,spectral-analysis,spi,state-machine-learning,swd,uart,waveform-analysis
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Manufacturing
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: System :: Hardware
+Classifier: Typing :: Typed
+Requires-Python: >=3.12
+Requires-Dist: bokeh>=3.8.1
+Requires-Dist: click>=8.1.0
+Requires-Dist: jinja2>=3.1
+Requires-Dist: matplotlib>=3.7.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: plotly>=6.5.0
+Requires-Dist: psutil>=5.9.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: reportlab>=4.4.7
+Requires-Dist: scipy>=1.10.0
+Requires-Dist: tm-data-types>=0.3.0
+Provides-Extra: all
+Requires-Dist: asammdf<8.0.0,>=7.4.0; extra == 'all'
+Requires-Dist: cantools>=39.4.0; extra == 'all'
+Requires-Dist: check-jsonschema>=0.29.0; extra == 'all'
+Requires-Dist: h5py>=3.0.0; extra == 'all'
+Requires-Dist: interrogate>=1.7.0; extra == 'all'
+Requires-Dist: ipython>=8.0.0; extra == 'all'
+Requires-Dist: jupyter>=1.0.0; extra == 'all'
+Requires-Dist: pytest-cov>=6.0; extra == 'all'
+Requires-Dist: pytest-timeout>=2.3.0; extra == 'all'
+Requires-Dist: pytest>=8.0; extra == 'all'
+Requires-Dist: python-can>=4.4.0; extra == 'all'
+Requires-Dist: python-pptx>=0.6.21; extra == 'all'
+Requires-Dist: reportlab>=4.0.0; extra == 'all'
+Requires-Dist: types-pyyaml>=6.0; extra == 'all'
+Requires-Dist: yamllint>=1.35; extra == 'all'
+Provides-Extra: automotive
+Requires-Dist: asammdf<8.0.0,>=7.4.0; extra == 'automotive'
+Requires-Dist: cantools>=39.4.0; extra == 'automotive'
+Requires-Dist: python-can>=4.4.0; extra == 'automotive'
+Provides-Extra: dev
+Requires-Dist: check-jsonschema>=0.29.0; extra == 'dev'
+Requires-Dist: interrogate>=1.7.0; extra == 'dev'
+Requires-Dist: pytest-cov>=6.0; extra == 'dev'
+Requires-Dist: pytest-timeout>=2.3.0; extra == 'dev'
+Requires-Dist: pytest>=8.0; extra == 'dev'
+Requires-Dist: types-pyyaml>=6.0; extra == 'dev'
+Requires-Dist: yamllint>=1.35; extra == 'dev'
+Provides-Extra: hdf5
+Requires-Dist: h5py>=3.0.0; extra == 'hdf5'
+Provides-Extra: jupyter
+Requires-Dist: ipython>=8.0.0; extra == 'jupyter'
+Requires-Dist: jupyter>=1.0.0; extra == 'jupyter'
+Provides-Extra: reporting
+Requires-Dist: python-pptx>=0.6.21; extra == 'reporting'
+Requires-Dist: reportlab>=4.0.0; extra == 'reporting'
+Description-Content-Type: text/markdown
+
+# TraceKit
+
+[![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Flair-click-bats%2Ftracekit%2Fmain%2Fpyproject.toml&query=%24.project.version&label=version&color=blue)](https://github.com/lair-click-bats/tracekit/releases)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![IEEE](https://img.shields.io/badge/IEEE-compliant-informational.svg)](docs/)
+
+**IEEE-compliant signal analysis and protocol reverse engineering toolkit**
+
+TraceKit provides comprehensive waveform analysis, multi-protocol decoding (16+ protocols), and protocol reverse engineering capabilities. Features include automatic state machine inference, CRC parameter recovery, field boundary detection, and Wireshark dissector generation. Supports oscilloscope captures, logic analyzer data, and network packet traces with industry-standard measurement accuracy (IEEE 181, 1241, 2414).
+
+---
+
+## Why TraceKit?
+
+| Challenge                             | TraceKit Solution                                         |
+| ------------------------------------- | --------------------------------------------------------- |
+| Unknown protocol on captured waveform | **Protocol inference** with automatic parameter detection |
+| Analyzing proprietary bus protocols   | **State machine learning** from captured traffic          |
+| Validating signal integrity           | **IEEE-compliant measurements** (181, 1241, 2414)         |
+| Debugging embedded systems            | **16+ protocol decoders** (UART, SPI, I2C, CAN, JTAG...)  |
+| EMC pre-compliance testing            | **CISPR/FCC limit mask testing** with reports             |
+| Processing large captures             | **Streaming analysis** and lazy loading                   |
+
+---
+
+## Key Capabilities
+
+- **Waveform Measurements** - Rise/fall time, frequency, duty cycle, overshoot (IEEE 181-2011)
+- **Protocol Decoders** - UART, SPI, I2C, CAN, CAN-FD, 1-Wire, LIN, JTAG, SWD, I2S, USB, HDLC, Manchester, FlexRay
+- **Spectral Analysis** - FFT, PSD, THD, SNR, SINAD, ENOB, spectrograms, wavelets (IEEE 1241-2010)
+- **Signal Integrity** - Jitter decomposition, eye diagrams, S-parameter analysis, TDR (IEEE 2414-2020)
+- **File Format Support** - Tektronix WFM, Rigol, Sigrok, VCD, PCAP, TDMS, WAV, CSV, HDF5, Touchstone
+- **Power Analysis** - AC/DC power, efficiency, ripple, SOA testing, power factor
+- **EMC Compliance** - CISPR/FCC/CE limit mask testing with automated reporting
+- **Protocol Inference** - CRC reverse engineering, L\* active learning, field boundary detection
+
+---
+
+## Quick Start
+
+### Installation
+
+```bash
+# Using pip
+pip install tracekit
+
+# From source
+git clone https://github.com/lair-click-bats/tracekit.git
+cd tracekit
+pip install -e ".[dev]"
+```
+
+### 30-Second Example
+
+```python
+import tracekit as tk
+
+# Load waveform (auto-detects format)
+trace = tk.load("capture.wfm")
+
+# Make measurements
+print(f"Rise time: {tk.rise_time(trace):.2e} s")
+print(f"Frequency: {tk.frequency(trace):.2f} Hz")
+
+# Decode protocol
+uart = tk.decode_uart(trace, baudrate=115200)
+for frame in uart:
+    print(f"UART: {frame.data.hex()}")
+```
+
+**→ See [docs/getting-started.md](docs/getting-started.md) for complete introduction**
+
+**→ See [examples/](examples/) for 50+ working code examples**
+
+---
+
+## Documentation
+
+### For Users
+
+- **[Getting Started](docs/getting-started.md)** - 5-minute introduction with examples
+- **[User Guide](docs/user-guide.md)** - Comprehensive usage guide
+- **[API Reference](docs/api/index.md)** - Complete Python API documentation
+- **[Tutorials](docs/tutorials/index.md)** - Step-by-step learning path
+- **[Examples](examples/)** - 50+ working examples organized by category
+- **[Guides](docs/guides/index.md)** - Task-focused how-to guides
+
+### For Developers
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development workflow, PR process, commit format
+- **[Testing Guide](docs/testing/index.md)** - Running and writing tests
+- **[CLAUDE.md](CLAUDE.md)** - AI context: how to work effectively in this repo
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+
+---
+
+## Core Features
+
+### Signal Analysis
+
+IEEE-compliant measurements for characterization and validation. TraceKit implements standards IEEE 181-2011 (pulse), IEEE 1241-2010 (ADC), IEEE 2414-2020 (jitter).
+
+**→ See [docs/api/analysis.md](docs/api/analysis.md) for full measurement API**
+
+### Protocol Decoding
+
+Decode embedded protocols directly from waveforms. Supports 16+ protocols including serial (UART, SPI, I2C), automotive (CAN, LIN, FlexRay), and debug (JTAG, SWD).
+
+**→ See [docs/reference/protocol-decoders.md](docs/reference/protocol-decoders.md) for protocol list**
+
+**→ See [examples/04_protocol_decoding/](examples/04_protocol_decoding/) for examples**
+
+### Spectral Analysis
+
+Frequency-domain analysis with IEEE 1241-2010 compliance. FFT, PSD, ADC quality metrics (SNR, THD, SINAD, ENOB, SFDR), time-frequency analysis.
+
+**→ See [docs/tutorials/04-spectral-analysis.md](docs/tutorials/04-spectral-analysis.md)**
+
+### Signal Integrity
+
+High-speed digital validation: jitter measurements (IEEE 2414-2020), eye diagrams, S-parameters, TDR, channel equalization.
+
+**→ See [docs/guides/signal-integrity.md](docs/guides/signal-intelligence.md)**
+
+### Protocol Reverse Engineering
+
+Analyze unknown protocols with:
+
+- **CRC Polynomial Reverse Engineering** - Recover CRC parameters from samples
+- **L\* Active Learning** - Infer protocol state machines from traffic
+- **Field Boundary Detection** - Automatically detect binary field boundaries
+- **Wireshark Dissector Export** - Generate Wireshark dissectors from definitions
+
+**→ See [CHANGELOG.md](CHANGELOG.md) [Unreleased] section for latest features**
+
+**→ See [examples/05_export/](examples/05_export/) for Wireshark export examples**
+
+---
+
+## File Formats
+
+| Format        | Extensions           | Description                 |
+| ------------- | -------------------- | --------------------------- |
+| Tektronix WFM | `.wfm`               | Tektronix oscilloscopes     |
+| Rigol WFM     | `.wfm`               | Rigol oscilloscopes         |
+| Sigrok        | `.sr`                | Sigrok/PulseView captures   |
+| VCD           | `.vcd`               | Value Change Dump (digital) |
+| PCAP          | `.pcap`, `.pcapng`   | Network packet captures     |
+| TDMS          | `.tdms`              | NI LabVIEW                  |
+| Touchstone    | `.s1p`, `.s2p`, etc. | S-parameter data            |
+| WAV           | `.wav`               | Audio waveforms             |
+| CSV           | `.csv`               | Generic time-series         |
+| HDF5          | `.h5`, `.hdf5`       | Scientific data             |
+| NumPy         | `.npz`               | NumPy arrays                |
+
+**→ See [docs/guides/loading-waveforms.md](docs/guides/loading-waveforms.md) for format details**
+
+---
+
+## IEEE Standards Compliance
+
+TraceKit implements measurements according to industry standards:
+
+| Standard       | Domain                     | Measurements                |
+| -------------- | -------------------------- | --------------------------- |
+| IEEE 181-2011  | Pulse measurements         | Rise/fall time, slew rate   |
+| IEEE 1057-2017 | Digitizer characterization | Timing analysis             |
+| IEEE 1241-2010 | ADC testing                | SNR, SINAD, ENOB, THD, SFDR |
+| IEEE 2414-2020 | Jitter measurements        | TIE, period jitter, RJ/DJ   |
+| IEEE 1459      | Power measurements         | Power quality analysis      |
+| IEC 61000-4-7  | Power quality              | Harmonics analysis          |
+
+**→ See [docs/reference/standards-compliance.md](docs/reference/standards-compliance.md)**
+
+---
+
+## Development
+
+### Quick Start
+
+```bash
+# Install with development dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest tests/unit -v
+
+# Quality checks
+ruff check src/ tests/
+ruff format src/ tests/
+mypy src/
+```
+
+**→ See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guide**
+
+**→ See [docs/testing/index.md](docs/testing/index.md) for testing strategy**
+
+---
+
+## Project Structure
+
+```
+tracekit/
+├── src/tracekit/       # Source code
+│   ├── loaders/        # File format parsers
+│   ├── analyzers/      # Signal analysis (waveform, digital, spectral, jitter, protocols)
+│   ├── inference/      # Protocol reverse engineering
+│   ├── export/         # Wireshark dissectors, data export
+│   └── reporting/      # Report generation
+├── tests/              # Test suite (17,000+ tests)
+│   ├── unit/           # Unit tests
+│   ├── integration/    # Integration tests
+│   └── compliance/     # Standards compliance tests
+├── docs/               # Documentation
+├── examples/           # 50+ working code examples
+└── scripts/            # Development utilities
+```
+
+**→ See [docs/index.md](docs/index.md) for documentation structure**
+
+---
+
+## Links
+
+- **Documentation**: [docs/index.md](docs/index.md)
+- **Repository**: [github.com/lair-click-bats/tracekit](https://github.com/lair-click-bats/tracekit)
+- **Issues**: [github.com/lair-click-bats/tracekit/issues](https://github.com/lair-click-bats/tracekit/issues)
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **License**: [MIT](LICENSE)
+
+---
+
+## Citation
+
+If you use TraceKit in your research, please cite:
+
+```bibtex
+@software{tracekit2026,
+  title = {TraceKit: Digital Waveform and Protocol Reverse Engineering Toolkit},
+  author = {TraceKit Contributors},
+  year = {2026},
+  url = {https://github.com/lair-click-bats/tracekit}
+}
+```
