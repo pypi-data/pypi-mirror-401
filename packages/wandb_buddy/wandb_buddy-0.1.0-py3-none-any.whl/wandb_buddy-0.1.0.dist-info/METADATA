@@ -1,0 +1,60 @@
+Metadata-Version: 2.4
+Name: wandb_buddy
+Version: 0.1.0
+Summary: Utilities for W&B experiment analysis
+License: MIT
+Requires-Python: >=3.8
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: wandb>=0.22.0
+Provides-Extra: dev
+Requires-Dist: build; extra == 'dev'
+Requires-Dist: twine; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# wandb_buddy
+
+Utilities for W&B experiment analysis.
+
+## Installation
+
+```bash
+pip install wandb_buddy
+```
+
+Or install from source:
+
+```bash
+pip install -e .
+```
+
+## Usage
+
+```python
+import wandb_buddy as wb
+
+# Tag-based filtering (simple)
+df = wb.load_runs("your-entity", "your-project", tags=["experiment-v1"])
+
+# Exclude certain tags
+df = wb.load_runs("your-entity", "your-project", tags=["experiment-v1"], exclude_tags=["debug"])
+
+# Raw filters (flexible)
+df = wb.load_runs("your-entity", "your-project", filters={"config.lr": 0.001})
+
+# Combined tag and raw filters
+df = wb.load_runs("your-entity", "your-project", tags=["experiment-v1"], filters={"config.lr": 0.001})
+
+# Include all run states (not just finished)
+df = wb.load_runs("your-entity", "your-project", tags=["experiment-v1"], state="all")
+
+# Custom timeout
+df = wb.load_runs("your-entity", "your-project", tags=["experiment-v1"], timeout=10000)
+```
+
+The returned DataFrame contains: `name`, `id`, `state`, `created_at`, `heartbeat_at`, `tags`, `sweep_id`, plus all config and summary values from each run.
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+```
