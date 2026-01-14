@@ -1,0 +1,698 @@
+"""
+FortiOS CMDB - Firewall internet_service_reputation
+
+Configuration endpoint for managing cmdb firewall/internet_service_reputation objects.
+
+📖 **Read-Only Reference Table**
+   This endpoint provides read-only reference data (e.g., geography, timezone).
+   - GET operations return all available data
+   - POST/PUT/DELETE operations are not supported
+   - Querying by identifier returns all items (filter is ignored)
+
+API Endpoints:
+    GET    /cmdb/firewall/internet_service_reputation
+
+Example Usage:
+    >>> from hfortix_fortios import FortiOS
+    >>> fgt = FortiOS(host="192.168.1.99", token="your-api-token")
+    >>>
+    >>> # List all items
+    >>> items = fgt.api.cmdb.firewall_internet_service_reputation.get()
+
+Important:
+    - This is a **read-only** endpoint (reference data only)
+    - Use **GET** to retrieve available options
+    - Creation/modification/deletion not supported
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Union
+
+if TYPE_CHECKING:
+    from collections.abc import Coroutine
+    from hfortix_core.http.interface import IHTTPClient
+    from hfortix_fortios.models import FortiObject
+
+# Import helper functions from central _helpers module
+from hfortix_fortios._helpers import (
+    build_api_payload,
+    build_cmdb_payload,  # Keep for backward compatibility / manual usage
+    is_success,
+)
+# Import metadata mixin for schema introspection
+from hfortix_fortios._helpers.metadata_mixin import MetadataMixin
+
+# Import cache for readonly reference data
+from hfortix_core.cache import readonly_cache
+
+# Import Protocol-based type hints (eliminates need for local @overload decorators)
+from hfortix_fortios._protocols import CRUDEndpoint
+
+class InternetServiceReputation(CRUDEndpoint, MetadataMixin):
+    """InternetServiceReputation Operations."""
+    
+    # Configure metadata mixin to use this endpoint's helper module
+    _helper_module_name = "internet_service_reputation"
+    
+    # ========================================================================
+    # Capabilities (from schema metadata)
+    # ========================================================================
+    SUPPORTS_CREATE = True
+    SUPPORTS_READ = True
+    SUPPORTS_UPDATE = True
+    SUPPORTS_DELETE = True
+    SUPPORTS_MOVE = True
+    SUPPORTS_CLONE = True
+    SUPPORTS_FILTERING = True
+    SUPPORTS_PAGINATION = True
+    SUPPORTS_SEARCH = False
+    SUPPORTS_SORTING = False
+
+    def __init__(self, client: "IHTTPClient"):
+        """Initialize InternetServiceReputation endpoint."""
+        self._client = client
+
+    # ========================================================================
+    # GET Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def get(
+        self,
+        id: int | None = None,
+        filter: list[str] | None = None,
+        count: int | None = None,
+        start: int | None = None,
+        payload_dict: dict[str, Any] | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Retrieve firewall/internet_service_reputation configuration.
+
+        Show Internet Service reputation.
+
+        Args:
+            id: Integer identifier to retrieve specific object.
+                If None, returns all objects.
+            filter: List of filter expressions to limit results.
+                Each filter uses format: "field==value" or "field!=value"
+                Operators: ==, !=, =@ (contains), !@ (not contains), <=, <, >=, >
+                Multiple filters use AND logic. For OR, use comma in single string.
+                Example: ["name==test", "status==enable"] or ["name==test,name==prod"]
+            count: Maximum number of entries to return (pagination).
+            start: Starting entry index for pagination (0-based).
+            payload_dict: Additional query parameters for advanced options:
+                - datasource (bool): Include datasource information
+                - with_meta (bool): Include metadata about each object
+                - with_contents_hash (bool): Include checksum of object contents
+                - format (list[str]): Property names to include (e.g., ["policyid", "srcintf"])
+                - scope (str): Query scope - "global", "vdom", or "both"
+                - action (str): Special actions - "schema", "default"
+                See FortiOS REST API documentation for complete list.
+            vdom: Virtual domain name. Use True for global, string for specific VDOM, None for default.
+            raw_json: If True, return raw API response without processing.
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional query parameters passed directly to API.
+
+        Returns:
+            Configuration data as dict. Returns Coroutine if using async client.
+            
+            Response structure:
+                - http_method: GET
+                - results: Configuration object(s)
+                - vdom: Virtual domain
+                - path: API path
+                - name: Object name (single object queries)
+                - status: success/error
+                - http_status: HTTP status code
+                - build: FortiOS build number
+
+        Examples:
+            >>> # Get all firewall/internet_service_reputation objects
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.get()
+            >>> print(f"Found {len(result['results'])} objects")
+            
+            >>> # Get specific firewall/internet_service_reputation by id
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.get(id=1)
+            >>> print(result['results'])
+            
+            >>> # Get with filter
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.get(
+            ...     filter=["name==test", "status==enable"]
+            ... )
+            
+            >>> # Get with pagination
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.get(
+            ...     start=0, count=100
+            ... )
+            
+            >>> # Get schema information  
+            >>> schema = fgt.api.cmdb.firewall_internet_service_reputation.get_schema()
+
+        See Also:
+            - post(): Create new firewall/internet_service_reputation object
+            - put(): Update existing firewall/internet_service_reputation object
+            - delete(): Remove firewall/internet_service_reputation object
+            - exists(): Check if object exists
+            - get_schema(): Get endpoint schema/metadata
+        """
+        # Check cache for readonly reference data (24hr TTL)
+        cache_key = f"cmdb/firewall/internet_service_reputation"
+        
+        # Only use cache for full list queries (no identifier, no filters)
+        is_list_query = id is None and not filter and not payload_dict and not kwargs
+        
+        if is_list_query:
+            cached_data = readonly_cache.get(cache_key)
+            if cached_data is not None:
+                # Return cached data
+                if raw_json:
+                    return cached_data
+                return cached_data
+        
+        params = payload_dict.copy() if payload_dict else {}
+        
+        # Add explicit query parameters
+        if filter is not None:
+            params["filter"] = filter
+        if count is not None:
+            params["count"] = count
+        if start is not None:
+            params["start"] = start
+        
+        if id:
+            endpoint = "/firewall/internet-service-reputation/" + str(id)
+            unwrap_single = True
+        else:
+            endpoint = "/firewall/internet-service-reputation"
+            unwrap_single = False
+        
+        params.update(kwargs)
+        
+        # Fetch data and cache if this is a list query
+        response = self._client.get(
+            "cmdb", endpoint, params=params, vdom=vdom, raw_json=raw_json, response_mode=response_mode, unwrap_single=unwrap_single
+        )
+        
+        # Cache the response for list queries
+        if is_list_query:
+            if isinstance(response, dict):
+                readonly_cache.set(cache_key, response)
+            # For async responses, we can't cache easily without awaiting
+            # User will benefit from cache on subsequent sync calls
+        
+        return response
+
+    def get_schema(
+        self,
+        vdom: str | None = None,
+        format: str = "schema",
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Get schema/metadata for this endpoint.
+        
+        Returns the FortiOS schema definition including available fields,
+        their types, required vs optional properties, enum values, nested
+        structures, and default values.
+        
+        This queries the live firewall for its current schema, which may
+        vary between FortiOS versions.
+        
+        Args:
+            vdom: Virtual domain. None uses default VDOM.
+            format: Schema format - "schema" (FortiOS native) or "json-schema" (JSON Schema standard).
+                Defaults to "schema".
+                
+        Returns:
+            Schema definition as dict. Returns Coroutine if using async client.
+            
+        Example:
+            >>> # Get FortiOS native schema
+            >>> schema = fgt.api.cmdb.firewall_internet_service_reputation.get_schema()
+            >>> print(schema['results'])
+            
+            >>> # Get JSON Schema format (if supported)
+            >>> json_schema = fgt.api.cmdb.firewall_internet_service_reputation.get_schema(format="json-schema")
+        
+        Note:
+            Not all endpoints support all schema formats. The "schema" format
+            is most widely supported.
+        """
+        return self.get(action=format, vdom=vdom)
+
+
+    # ========================================================================
+    # PUT Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def put(
+        self,
+        payload_dict: dict[str, Any] | None = None,
+        id: int | None = None,
+        description: str | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Update existing firewall/internet_service_reputation object.
+
+        Show Internet Service reputation.
+
+        Args:
+            payload_dict: Object data as dict. Must include id (primary key).
+            id: Internet Service Reputation ID.
+            description: Description.
+            vdom: Virtual domain name.
+            raw_json: If True, return raw API response.
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional parameters
+
+        Returns:
+            API response dict
+
+        Raises:
+            ValueError: If id is missing from payload
+
+        Examples:
+            >>> # Update specific fields
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.put(
+            ...     id=1,
+            ...     # ... fields to update
+            ... )
+            
+            >>> # Update using payload dict
+            >>> payload = {
+            ...     "id": 1,
+            ...     "field1": "new-value",
+            ... }
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.put(payload_dict=payload)
+
+        See Also:
+            - post(): Create new object
+            - set(): Intelligent create or update
+        """
+        # Build payload using helper function with auto-normalization
+        # This automatically converts strings/lists to [{'name': '...'}] format for list fields
+        # To disable auto-normalization, use build_cmdb_payload directly
+        payload_data = build_api_payload(
+            id=id,
+            description=description,
+            data=payload_dict,
+        )
+        
+        # Check for deprecated fields and warn users
+        from ._helpers.internet_service_reputation import DEPRECATED_FIELDS
+        if DEPRECATED_FIELDS:
+            from hfortix_core import check_deprecated_fields
+            check_deprecated_fields(
+                payload=payload_data,
+                deprecated_fields=DEPRECATED_FIELDS,
+                endpoint="cmdb/firewall/internet_service_reputation",
+            )
+        
+        id_value = payload_data.get("id")
+        if not id_value:
+            raise ValueError("id is required for PUT")
+        endpoint = "/firewall/internet-service-reputation/" + str(id_value)
+
+        return self._client.put(
+            "cmdb", endpoint, data=payload_data, params=kwargs, vdom=vdom, raw_json=raw_json, response_mode=response_mode
+        )
+
+    # ========================================================================
+    # POST Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def post(
+        self,
+        payload_dict: dict[str, Any] | None = None,
+        id: int | None = None,
+        description: str | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Create new firewall/internet_service_reputation object.
+
+        Show Internet Service reputation.
+
+        Args:
+            payload_dict: Complete object data as dict. Alternative to individual parameters.
+            id: Internet Service Reputation ID.
+            description: Description.
+            vdom: Virtual domain name. Use True for global, string for specific VDOM.
+            raw_json: If True, return raw API response without processing.
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional parameters
+
+        Returns:
+            API response dict containing created object with assigned id.
+
+        Examples:
+            >>> # Create using individual parameters
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.post(
+            ...     name="example",
+            ...     # ... other required fields
+            ... )
+            >>> print(f"Created id: {result['results']}")
+            
+            >>> # Create using payload dict
+            >>> payload = InternetServiceReputation.defaults()  # Start with defaults
+            >>> payload['name'] = 'my-object'
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.post(payload_dict=payload)
+
+        Note:
+            Required fields: {{ ", ".join(InternetServiceReputation.required_fields()) }}
+            
+            Use InternetServiceReputation.help('field_name') to get field details.
+
+        See Also:
+            - get(): Retrieve objects
+            - put(): Update existing object
+            - set(): Intelligent create or update
+        """
+        # Build payload using helper function with auto-normalization
+        # This automatically converts strings/lists to [{'name': '...'}] format for list fields
+        # To disable auto-normalization, use build_cmdb_payload directly
+        payload_data = build_api_payload(
+            id=id,
+            description=description,
+            data=payload_dict,
+        )
+
+        # Check for deprecated fields and warn users
+        from ._helpers.internet_service_reputation import DEPRECATED_FIELDS
+        if DEPRECATED_FIELDS:
+            from hfortix_core import check_deprecated_fields
+            check_deprecated_fields(
+                payload=payload_data,
+                deprecated_fields=DEPRECATED_FIELDS,
+                endpoint="cmdb/firewall/internet_service_reputation",
+            )
+
+        endpoint = "/firewall/internet-service-reputation"
+        return self._client.post(
+            "cmdb", endpoint, data=payload_data, params=kwargs, vdom=vdom, raw_json=raw_json, response_mode=response_mode
+        )
+
+    # ========================================================================
+    # DELETE Method
+    # Type hints provided by CRUDEndpoint protocol (no local @overload needed)
+    # ========================================================================
+    
+    def delete(
+        self,
+        id: int | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ):  # type: ignore[no-untyped-def]
+        """
+        Delete firewall/internet_service_reputation object.
+
+        Show Internet Service reputation.
+
+        Args:
+            id: Primary key identifier
+            vdom: Virtual domain name
+            raw_json: If True, return raw API response
+            response_mode: Override client-level response_mode. "dict" returns dict, "object" returns FortiObject.
+            **kwargs: Additional parameters
+
+        Returns:
+            API response dict
+
+        Raises:
+            ValueError: If id is not provided
+
+        Examples:
+            >>> # Delete specific object
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.delete(id=1)
+            
+            >>> # Check for errors
+            >>> if result.get('status') != 'success':
+            ...     print(f"Delete failed: {result.get('error')}")
+
+        See Also:
+            - exists(): Check if object exists before deleting
+            - get(): Retrieve object to verify it exists
+        """
+        if not id:
+            raise ValueError("id is required for DELETE")
+        endpoint = "/firewall/internet-service-reputation/" + str(id)
+
+        return self._client.delete(
+            "cmdb", endpoint, params=kwargs, vdom=vdom, raw_json=raw_json, response_mode=response_mode
+        )
+
+    def exists(
+        self,
+        id: int,
+        vdom: str | bool | None = None,
+    ) -> Union[bool, Coroutine[Any, Any, bool]]:
+        """
+        Check if firewall/internet_service_reputation object exists.
+
+        Verifies whether an object exists by attempting to retrieve it and checking the response status.
+
+        Args:
+            id: Primary key identifier
+            vdom: Virtual domain name
+
+        Returns:
+            True if object exists, False otherwise
+
+        Examples:
+            >>> # Check if object exists before operations
+            >>> if fgt.api.cmdb.firewall_internet_service_reputation.exists(id=1):
+            ...     print("Object exists")
+            ... else:
+            ...     print("Object not found")
+            
+            >>> # Conditional delete
+            >>> if fgt.api.cmdb.firewall_internet_service_reputation.exists(id=1):
+            ...     fgt.api.cmdb.firewall_internet_service_reputation.delete(id=1)
+
+        See Also:
+            - get(): Retrieve full object data
+            - set(): Create or update automatically based on existence
+        """
+        # For readonly endpoints, check by fetching all items and scanning
+        # This is necessary because readonly endpoints don't support direct ID queries
+        response = self.get(vdom=vdom, raw_json=True)
+        
+        if isinstance(response, dict):
+            # Synchronous response
+            if not is_success(response):
+                return False
+            
+            results = response.get("results", [])
+            if not isinstance(results, list):
+                return False
+            
+            # Scan for matching identifier
+            return any(
+                item.get("id") == id
+                for item in results
+            )
+        else:
+            # Asynchronous response
+            async def _check() -> bool:
+                r = await response
+                if not is_success(r):
+                    return False
+                
+                results = r.get("results", [])
+                if not isinstance(results, list):
+                    return False
+                
+                return any(
+                    item.get("id") == id
+                    for item in results
+                )
+            return _check()
+
+
+    def set(
+        self,
+        payload_dict: dict[str, Any] | None = None,
+        id: int | None = None,
+        description: str | None = None,
+        vdom: str | bool | None = None,
+        raw_json: bool = False,
+        response_mode: Literal["dict", "object"] | None = None,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Create or update firewall/internet_service_reputation object (intelligent operation).
+
+        Automatically determines whether to create (POST) or update (PUT) based on
+        whether the resource exists. Requires the primary key (id) in the payload.
+
+        Args:
+            payload_dict: Resource data including id (primary key)
+            id: Field id
+            description: Field description
+            vdom: Virtual domain name
+            raw_json: If True, return raw API response
+            response_mode: Override client-level response_mode
+            **kwargs: Additional parameters passed to PUT or POST
+
+        Returns:
+            API response dictionary
+
+        Raises:
+            ValueError: If id is missing from payload
+
+        Examples:
+            >>> # Intelligent create or update using field parameters
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.set(
+            ...     id=1,
+            ...     # ... other fields
+            ... )
+            
+            >>> # Or using payload dict
+            >>> payload = {
+            ...     "id": 1,
+            ...     "field1": "value1",
+            ...     "field2": "value2",
+            ... }
+            >>> result = fgt.api.cmdb.firewall_internet_service_reputation.set(payload_dict=payload)
+            >>> # Will POST if object doesn't exist, PUT if it does
+            
+            >>> # Idempotent configuration
+            >>> for obj_data in configuration_list:
+            ...     fgt.api.cmdb.firewall_internet_service_reputation.set(payload_dict=obj_data)
+            >>> # Safely applies configuration regardless of current state
+
+        Note:
+            This method internally calls exists() then either post() or put().
+            For performance-critical code with known state, call post() or put() directly.
+
+        See Also:
+            - post(): Create new object
+            - put(): Update existing object
+            - exists(): Check existence manually
+        """
+        # Build payload using helper function with auto-normalization
+        payload_data = build_api_payload(
+            id=id,
+            description=description,
+            data=payload_dict,
+        )
+        
+        mkey_value = payload_data.get("id")
+        if not mkey_value:
+            raise ValueError("id is required for set()")
+        
+        # Check if resource exists
+        if self.exists(id=mkey_value, vdom=vdom):
+            # Update existing resource
+            return self.put(payload_dict=payload_data, vdom=vdom, raw_json=raw_json, response_mode=response_mode, **kwargs)
+        else:
+            # Create new resource
+            return self.post(payload_dict=payload_data, vdom=vdom, raw_json=raw_json, response_mode=response_mode, **kwargs)
+
+    # ========================================================================
+    # Action: Move
+    # ========================================================================
+    
+    def move(
+        self,
+        id: int,
+        action: Literal["before", "after"],
+        reference_id: int,
+        vdom: str | bool | None = None,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Move firewall/internet_service_reputation object to a new position.
+        
+        Reorders objects by moving one before or after another.
+        
+        Args:
+            id: Identifier of object to move
+            action: Move "before" or "after" reference object
+            reference_id: Identifier of reference object
+            vdom: Virtual domain name
+            **kwargs: Additional parameters
+            
+        Returns:
+            API response dictionary
+            
+        Example:
+            >>> # Move policy 100 before policy 50
+            >>> fgt.api.cmdb.firewall_internet_service_reputation.move(
+            ...     id=100,
+            ...     action="before",
+            ...     reference_id=50
+            ... )
+        """
+        return self._client.request(
+            method="PUT",
+            path=f"/api/v2/cmdb/firewall/internet-service-reputation",
+            params={
+                "id": id,
+                "action": "move",
+                action: reference_id,
+                "vdom": vdom,
+                **kwargs,
+            },
+        )
+
+    # ========================================================================
+    # Action: Clone
+    # ========================================================================
+    
+    def clone(
+        self,
+        id: int,
+        new_id: int,
+        vdom: str | bool | None = None,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], Coroutine[Any, Any, dict[str, Any]]]:
+        """
+        Clone firewall/internet_service_reputation object.
+        
+        Creates a copy of an existing object with a new identifier.
+        
+        Args:
+            id: Identifier of object to clone
+            new_id: Identifier for the cloned object
+            vdom: Virtual domain name
+            **kwargs: Additional parameters
+            
+        Returns:
+            API response dictionary
+            
+        Example:
+            >>> # Clone an existing object
+            >>> fgt.api.cmdb.firewall_internet_service_reputation.clone(
+            ...     id=1,
+            ...     new_id=100
+            ... )
+        """
+        return self._client.request(
+            method="POST",
+            path=f"/api/v2/cmdb/firewall/internet-service-reputation",
+            params={
+                "id": id,
+                "new_id": new_id,
+                "action": "clone",
+                "vdom": vdom,
+                **kwargs,
+            },
+        )
+
+
