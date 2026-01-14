@@ -1,0 +1,74 @@
+Metadata-Version: 2.4
+Name: hp-cap-parser
+Version: 0.3.0
+Summary: A library for parsing HP Content Aggregator for Products (CAP) data
+Project-URL: Homepage, https://github.com/Phalanx-Data-Labs/hp-cap-parser
+Project-URL: Repository, https://github.com/Phalanx-Data-Labs/hp-cap-parser
+Project-URL: Issues, https://github.com/Phalanx-Data-Labs/hp-cap-parser/issues
+Author-email: Adam Bako <bakoad@gmail.com>
+License: MIT
+License-File: LICENSE
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Provides-Extra: dev
+Requires-Dist: pytest-cov>=4.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# hp-cap-parser
+
+A Python library for parsing HP Content Aggregator for Products (CAP) data files. Provides a clean, simple API for extracting and analyzing CAP information from HP system outputs.
+
+## Installation
+
+```bash
+pip install hp-cap-parser
+```
+
+## Usage
+
+```python
+from hp_cap_parser import HPCapParser
+
+parser = HPCapParser()
+parser.parse_file("input.xml", "output_directory")
+```
+
+## Development
+
+### Setup
+
+```bash
+pip install -e .
+```
+
+### Running Tests
+
+```bash
+pytest
+```
+
+For verbose output:
+
+```bash
+pytest -v
+```
+
+For coverage report:
+
+```bash
+pytest --cov
+```
+
+TODO:
+
+Lifestyle & other image types : https://cap.hpcontent.com/support/solutions/articles/9000058002-working-with-images-in-cap
+
