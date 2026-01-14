@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maxsciencelib"
+version = "0.1.1"
+description = "Biblioteca de funções compartilhadas do time de Data Science da Maxpar"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name = "Daniel Antunes", email = "daniel.ant.cord@gmail.com" }
+]
+
+dependencies = [
+  "pandas>=1.5",
+  "numpy>=1.23",
+  "polars>=0.20.0",
+  "pyarrow>=14.0.0",
+  "snowflake-connector-python>=3.5.0",
+  "tableauserverclient>=0.25"
+]
+
+[project.optional-dependencies]
+selenium = [
+  "selenium>=4.15",
+  "fastexcel"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["maxsciencelib*"]
