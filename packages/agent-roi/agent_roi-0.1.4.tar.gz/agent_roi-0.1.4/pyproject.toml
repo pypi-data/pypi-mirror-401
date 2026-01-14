@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.24.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-roi"
+version = "0.1.4"
+description = "Production control plane for agentic AI: guardrails, confidence decisioning, immutable audit logging"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Tarek" }]
+dependencies = ["PyYAML>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+agent-roi = "agent_roi.cli.sentinel:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_roi"]
+
+[tool.hatch.build]
+include = [
+  "src/agent_roi/**/*.py",
+  "src/agent_roi/policies/*.yaml",
+]
+

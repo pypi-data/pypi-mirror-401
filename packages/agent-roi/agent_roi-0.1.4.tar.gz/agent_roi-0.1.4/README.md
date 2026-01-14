@@ -1,0 +1,291 @@
+# Agent-ROI
+
+**Agent-ROI** is a lightweight Python library for adding **guardrails, decision governance, auditability, and ROI reporting** to agentic workflows.
+
+It is designed for real environments where:
+- agents cost money (LLM/tool usage),
+- actions carry risk,
+- decisions need to be explainable,
+- and leadership needs ROI in plain language.
+
+---
+
+## Why Agent-ROI exists
+
+Agents are easy to demo. They are much harder to operate responsibly at scale.
+
+
+Once an agent “works,” the real questions begin:
+
+- When should it act automatically vs pause for human review?
+- How do we enforce execution limits (steps/tool calls/cost)?
+- How do we audit what happened — and why?
+- How do we quantify value in dollars?
+
+Agent-ROI focuses on those problems.
+
+It does **not** replace an agent framework.  
+It wraps your existing agent logic with controls, decisioning, and reporting.
+
+---
+
+## 90-second Quickstart
+
+### Install
+
+```bash
+pip install agent-roi
+````
+
+### Minimal runnable example
+
+This example shows the **golden path**:
+
+* **All external actions go through `ctx.call_tool(...)`**
+* The agent returns `(output, ConfidenceInputs)` so routing is meaningful
+* Guardrails enforce tool allowlists + limits automatically
+
+```python
+from agent_roi import SentinelRunner, Guardrails, DecisionPolicy, ConfidenceInputs
+
+def agent(ctx, payload):
+    # Always use ctx.call_tool for anything that could cost money or mutate state.
+    # It enforces tool allowlists, counts tool calls, tracks cost, and checks limits.
+    def add_one(x: int) -> int:
+        return x + 1
+
+    result = ctx.call_tool("add_one", add_one, payload["x"], cost_usd=0.001)
+
+    output = {"result": result}
+
+    # Provide confidence signals (from model outputs, heuristics, etc.)
+    confidence = ConfidenceInputs(prob=0.95, margin=0.40, entropy=0.10, llm_self_score=0.85)
+
+    return output, confidence
+
+runner = SentinelRunner(
+    name="quickstart",
+    guardrails=Guardrails(
+        max_steps=10,
+        max_tool_calls=10,
+        max_cost_usd=1.00,
+        allowed_tools={"add_one"},
+        deterministic=True,
+    ),
+    decision_policy=DecisionPolicy(min_confidence=0.75),
+)
+
+res = runner.run(agent, {"x": 1})
+
+print("Outcome:", res.outcome.value)
+print("Confidence:", round(res.confidence, 3))
+print("Tool calls:", res.ctx_snapshot["state"]["tool_calls"])
+print("Cost (USD):", res.ctx_snapshot["state"]["cost_usd"])
+```
+
+**Expected output**
+
+* `Outcome: accept` (if confidence ≥ min_confidence)
+* Otherwise you’ll see `human_review` (safe default)
+
+---
+
+## When to use Agent-ROI
+
+Use Agent-ROI when you need **operational controls** around an agent, especially if any of the following are true:
+
+* The agent calls **LLMs**, external APIs, databases, file systems, or tools that incur cost
+* The agent can recommend or take actions that need **human oversight**
+* You need **audit logs** and traceability (e.g., regulated environments)
+* You need to produce **ROI artifacts** (reports, executive briefs, CSV outputs)
+* You want to standardize “safe agent execution” across teams
+
+---
+
+## When NOT to use Agent-ROI
+
+Skip Agent-ROI if:
+
+* You’re doing quick experimentation / notebooks with no governance needs
+* The workflow is deterministic and low-risk with no external side-effects
+* You don’t need auditability, decision routing, or cost controls
+
+---
+
+## Core concepts
+
+### 1) Guardrails
+
+Guardrails define execution limits and allowlists, such as:
+
+* `max_steps`: maximum agent steps
+* `max_tool_calls`: maximum tool calls
+* `max_cost_usd`: maximum total cost
+* `allowed_tools`: explicit tool allowlist
+* `deterministic`: optional flag for deterministic runs
+
+If a limit is exceeded, Agent-ROI raises a `GuardrailViolation`.
+
+### 2) Tools (and why `ctx.call_tool(...)` matters)
+
+In Agent-ROI, a **tool** is any operation that could be:
+
+* expensive (LLM calls, paid APIs)
+* risky (writes, deletions, changes)
+* slow or failure-prone (network, storage)
+* important to audit
+
+**Golden rule:**
+**Always call external actions through `ctx.call_tool(tool_name, fn, ..., cost_usd=...)`.**
+
+This makes it hard to mess up because it automatically:
+
+* enforces tool allowlists,
+* increments tool call counts,
+* tracks cost,
+* validates guardrails continuously.
+
+### 3) Confidence inputs and decision routing
+
+Agent-ROI routes outcomes based on a confidence score:
+
+* `accept`: allow output to proceed
+* `human_review`: pause for review
+* `retry`: try again (optional)
+* `abstain`: do not act (optional)
+
+Confidence comes from `ConfidenceInputs`, which can include:
+
+* `prob`: model probability/confidence
+* `margin`: top-1 vs top-2 margin
+* `z_score`: standardized score
+* `entropy`: uncertainty (penalized)
+* `llm_self_score`: LLM self-assessment (optional)
+
+Best practice: return `(output, ConfidenceInputs)` from the agent.
+
+If no confidence is provided, the score defaults to 0.0 and routing will typically fall back to `human_review` (safe default).
+
+### 4) Audit logs (immutable-ish trail)
+
+Every run emits audit events with:
+
+* correlation_id
+* run_id
+* event_type
+* payload
+* optional hash chain
+
+Default backend is JSONL (`sentinel_audit.jsonl`), but you can provide your own `AuditStore`.
+
+### 5) Artifacts and ROI reporting
+
+Agent-ROI can generate:
+
+* ROI reports (Markdown)
+* executive briefs (Markdown)
+* recommendation CSV exports
+* run manifests (JSON)
+
+This is designed to make agent value reviewable by non-technical stakeholders.
+
+---
+
+## Demos
+
+### FinOps demo (cloud cost governance)
+
+Run:
+
+```bash
+python examples/demo_finops_cost_governance.py
+```
+
+Expected:
+
+* the terminal prints a run summary
+* artifacts are written to `artifacts/finops/<timestamp>/`
+
+Outputs:
+
+* `roi_report.md`
+* `executive_brief.md`
+* `recommendations.csv`
+* `manifest.json`
+
+---
+
+## Policy files (recommended way to configure behavior)
+
+Policies are YAML files that configure guardrails + decision thresholds.
+
+Load bundled policy:
+
+```python
+from agent_roi.policies import load_policy
+policy = load_policy("finops_policy.yaml")
+```
+
+Override with an enterprise-managed file:
+
+```python
+policy = load_policy("finops_policy.yaml", override_path="/path/to/policy.yaml")
+```
+
+Policies are validated at load time. Invalid policies raise `PolicyValidationError` with readable messages.
+
+---
+
+## Best practices (hard to mess up)
+
+* **Use `ctx.call_tool(...)` for all external actions**
+* Keep `allowed_tools` restrictive and explicit
+* Return `(output, ConfidenceInputs)` from agents
+* Start with conservative `min_confidence` thresholds in production
+* Store audit logs in a durable location (S3, blob, DB) for real deployments
+* Use the ROI artifacts to communicate value and governance to leadership
+
+---
+
+## FAQ
+
+### How do I make my agent “safe by default”?
+
+* Deny-by-default tool allowlisting (`allowed_tools`)
+* Low max_cost_usd, max_tool_calls
+* Default decision outcome to `human_review` unless confidence is high
+
+### How do I track LLM cost?
+
+Use:
+
+```python
+output = ctx.call_tool("llm_call", llm_fn, prompt, cost_usd=0.03)
+```
+
+### What if my agent can’t produce probabilities?
+
+Use `llm_self_score` or heuristics (entropy-like measures) and keep routing conservative.
+
+### Can I use my own audit backend?
+
+Yes. Implement the `AuditStore` protocol:
+
+* `append(event)`
+* `last_hash(correlation_id)`
+
+---
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest -q
+```
+
+---
+
+## License
+
+Check the License file
+
