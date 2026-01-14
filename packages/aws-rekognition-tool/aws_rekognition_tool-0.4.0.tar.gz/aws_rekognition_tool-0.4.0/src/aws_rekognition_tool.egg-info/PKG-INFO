@@ -1,0 +1,53 @@
+Metadata-Version: 2.4
+Name: aws_rekognition_tool
+Version: 0.4.0
+Summary: Easy-to-use Python wrapper for AWS Rekognition - Image label detection, face detection, and text detection
+Author-email: Bala_Bm_06_01 <devteam477@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/aws-rekognition-tool
+Project-URL: Documentation, https://github.com/yourusername/aws-rekognition-tool#readme
+Project-URL: Repository, https://github.com/yourusername/aws-rekognition-tool.git
+Project-URL: Bug Tracker, https://github.com/yourusername/aws-rekognition-tool/issues
+Keywords: aws,rekognition,image-recognition,machine-learning,computer-vision,face-detection,label-detection,s3,boto3
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Image Recognition
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: boto3>=1.26.0
+Requires-Dist: botocore>=1.29.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: moto>=4.0.0; extra == "dev"
+Dynamic: license-file
+
+# AWS Rekognition Tool 🔍
+
+Easy-to-use Python package for AWS Rekognition - Detect labels, faces, and text in images!
+
+## Installation
+
+```bash
+pip install aws-rekognition-tool
+
+
+
+from aws_rekognition_tool import detect_labels
+LOCAL_IMAGE_PATH = "/home/devel-balamurugan/adv3.png" 
+ 
+ 
+result = detect_labels(LOCAL_IMAGE_PATH)
+print(f"==>> result: {result}")
