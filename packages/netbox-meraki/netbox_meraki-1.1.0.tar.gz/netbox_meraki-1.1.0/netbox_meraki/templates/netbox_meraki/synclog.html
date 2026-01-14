@@ -1,0 +1,590 @@
+{% extends 'netbox_meraki/base.html' %}
+
+{% block page_content %}
+<style>
+    /* Enhanced status badge styling */
+    .status-badge {
+        padding: 6px 14px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 5px;
+        display: inline-block;
+    }
+    .status-badge.success {
+        background-color: #28a745;
+        color: #ffffff;
+    }
+    .status-badge.warning {
+        background-color: #ffc107;
+        color: #000000;
+    }
+    .status-badge.danger {
+        background-color: #dc3545;
+        color: #ffffff;
+    }
+    .status-badge.info {
+        background-color: #17a2b8;
+        color: #ffffff;
+    }
+    .status-badge.running {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+    
+    /* Cancel badge */
+    .cancel-badge {
+        background-color: #ffc107;
+        color: #000000;
+        padding: 6px 12px;
+        font-weight: 600;
+        border-radius: 5px;
+    }
+    
+    /* Progress bar text visibility */
+    .progress {
+        background-color: var(--bs-gray-300);
+        height: 30px;
+    }
+    .progress-bar {
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .progress-text {
+        color: #000000;
+        text-shadow: 0 0 5px rgba(255,255,255,0.9);
+        font-weight: 700;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h1>Sync Log Details</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Synchronization Information</strong>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>Timestamp:</th>
+                            <td>{{ sync_log.timestamp }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if sync_log.status == 'success' %}
+                                    <span class="status-badge success">{{ sync_log.status|upper }}</span>
+                                {% elif sync_log.status == 'partial' %}
+                                    <span class="status-badge warning">{{ sync_log.status|upper }}</span>
+                                {% elif sync_log.status == 'failed' %}
+                                    <span class="status-badge danger">{{ sync_log.status|upper }}</span>
+                                {% elif sync_log.status == 'running' %}
+                                    <span class="status-badge running">{{ sync_log.status|upper }}</span>
+                                {% else %}
+                                    <span class="status-badge info">{{ sync_log.status|upper }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if sync_log.status == 'running' %}
+                        <tr>
+                            <th>Current Operation:</th>
+                            <td id="current-operation">{{ sync_log.current_operation }}</td>
+                        </tr>
+                        <tr>
+                            <th>Progress:</th>
+                            <td>
+                                <div class="progress">
+                                    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                         role="progressbar" 
+                                         style="width: {{ sync_log.progress_percent }}%;"
+                                         aria-valuenow="{{ sync_log.progress_percent }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        <span id="progress-text" class="progress-text">{{ sync_log.progress_percent }}%</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Duration:</th>
+                            <td>
+                                {% if sync_log.duration_seconds %}
+                                    {{ sync_log.duration_seconds|floatformat:2 }} seconds
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Message:</th>
+                            <td>{{ sync_log.message }}</td>
+                        </tr>
+                        {% if sync_log.cancel_requested %}
+                        <tr>
+                            <th>Cancellation:</th>
+                            <td>
+                                <span class="cancel-badge">
+                                    {% if sync_log.cancelled_at %}
+                                        Cancellation Requested at {{ sync_log.cancelled_at|date:"Y-m-d H:i:s" }}
+                                    {% else %}
+                                        Cancellation Requested
+                                    {% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Synchronization Statistics</strong>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h3 id="orgs-stat">{{ sync_log.organizations_synced }}</h3>
+                            <p class="text-muted">Organizations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h3 id="networks-stat">{{ sync_log.networks_synced }}</h3>
+                            <p class="text-muted">Networks</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h3 id="devices-stat">{{ sync_log.devices_synced }}</h3>
+                            <p class="text-muted">Devices</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 id="vlans-stat">{{ sync_log.vlans_synced }}</h3>
+                            <p class="text-muted">VLANs</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h3 id="prefixes-stat">{{ sync_log.prefixes_synced }}</h3>
+                            <p class="text-muted">Prefixes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h3>{{ sync_log.ssids_synced }}</h3>
+                            <p class="text-muted">SSIDs</p>
+                        </div>
+                    </div>
+                </div>
+                {% if sync_log.deleted_sites or sync_log.deleted_devices or sync_log.deleted_vlans or sync_log.deleted_prefixes or sync_log.updated_prefixes %}
+                <hr>
+                <h5>Cleanup & Updates</h5>
+                <div class="row mt-3">
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h4 class="text-warning">{{ sync_log.deleted_sites }}</h4>
+                            <p class="text-muted">Sites Deleted</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h4 class="text-warning">{{ sync_log.deleted_devices }}</h4>
+                            <p class="text-muted">Devices Deleted</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-warning">{{ sync_log.deleted_vlans }}</h4>
+                            <p class="text-muted">VLANs Deleted</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center">
+                            <h4 class="text-warning">{{ sync_log.deleted_prefixes }}</h4>
+                            <p class="text-muted">Prefixes Deleted</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-info">{{ sync_log.updated_prefixes }}</h4>
+                            <p class="text-muted">Prefix Sites Changed</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if sync_log.errors %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <strong>Errors</strong>
+            </div>
+            <div class="card-body">
+                <ul>
+                    {% for error in sync_log.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if sync_log.progress_logs %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Live Progress Logs</strong>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="auto-scroll-toggle" 
+                               {% if sync_log.status == 'running' %}checked{% endif %}
+                               onchange="toggleAutoScroll()">
+                        <label class="form-check-label" for="auto-scroll-toggle">
+                            Enable Live Scrolling (2s)
+                        </label>
+                    </div>
+                    {% if sync_log.status == 'running' %}
+                    <button id="auto-refresh-toggle" class="btn btn-sm btn-primary" onclick="toggleAutoRefresh()">
+                        <i class="mdi mdi-pause"></i> Pause Auto-Refresh
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="progress-logs" class="bg-body-secondary" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.9em; padding: 15px; border-radius: 4px; color: var(--bs-body-color);">
+                    {% for log in sync_log.progress_logs %}
+                    <div class="log-entry" style="margin-bottom: 4px; color: var(--bs-body-color);">
+                        <span class="text-muted" style="opacity: 0.7;">[{{ log.timestamp|slice:"11:19" }}]</span>
+                        {% if log.level == 'error' %}
+                            <span class="badge bg-danger" style="color: #fff;">ERROR</span>
+                        {% elif log.level == 'warning' %}
+                            <span class="badge bg-warning" style="color: #000;">WARN</span>
+                        {% else %}
+                            <span class="badge" style="background-color: #0d6efd; color: #fff; font-weight: 600;">INFO</span>
+                        {% endif %}
+                        <span style="color: var(--bs-body-color);">{{ log.message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <a href="{% url 'plugins:netbox_meraki:dashboard' %}" class="btn btn-secondary">
+            Back to Dashboard
+        </a>
+        {% if sync_log.status == 'running' and not sync_log.cancel_requested %}
+        <button id="cancel-sync-btn" class="btn btn-warning" onclick="cancelSync()">
+            <i class="mdi mdi-cancel"></i> Cancel Sync
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+{% if sync_log.status == 'running' %}
+<script>
+let autoRefresh = true;
+let autoScroll = true;
+let refreshInterval;
+
+function toggleAutoScroll() {
+    const checkbox = document.getElementById('auto-scroll-toggle');
+    autoScroll = checkbox.checked;
+    
+    if (autoScroll) {
+        if (!refreshInterval) {
+            startAutoRefresh();
+        }
+    } else {
+        if (refreshInterval && !autoRefresh) {
+            stopAutoRefresh();
+        }
+    }
+}
+
+function toggleAutoRefresh() {
+    autoRefresh = !autoRefresh;
+    const btn = document.getElementById('auto-refresh-toggle');
+    if (autoRefresh) {
+        btn.innerHTML = '<i class="mdi mdi-pause"></i> Pause Auto-Refresh';
+        startAutoRefresh();
+    } else {
+        btn.innerHTML = '<i class="mdi mdi-play"></i> Resume Auto-Refresh';
+        if (!autoScroll) {
+            stopAutoRefresh();
+        }
+    }
+}
+
+function startAutoRefresh() {
+    if (!refreshInterval) {
+        refreshInterval = setInterval(fetchProgress, 2000);  // Refresh every 2 seconds
+    }
+}
+
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+}
+
+function fetchProgress() {
+    // Use the new simplified API endpoint
+    fetch(`{% url 'plugins:netbox_meraki:sync_status_api' pk=sync_log.id %}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error fetching progress:', data.error);
+                return;
+            }
+            
+            // Update progress bar
+            if (data.progress_percent !== undefined) {
+                const progressBar = document.getElementById('progress-bar');
+                const progressText = document.getElementById('progress-text');
+                if (progressBar && progressText) {
+                    progressBar.style.width = data.progress_percent + '%';
+                    progressBar.setAttribute('aria-valuenow', data.progress_percent);
+                    progressText.textContent = data.progress_percent + '%';
+                }
+            }
+            
+            // Update current operation
+            if (data.current_operation) {
+                const opElement = document.getElementById('current-operation');
+                if (opElement) {
+                    opElement.textContent = data.current_operation;
+                }
+            }
+            
+            // Update sync statistics in real-time
+            if (data.devices_synced !== undefined) {
+                updateStatIfExists('devices-stat', data.devices_synced);
+            }
+            if (data.vlans_synced !== undefined) {
+                updateStatIfExists('vlans-stat', data.vlans_synced);
+            }
+            if (data.prefixes_synced !== undefined) {
+                updateStatIfExists('prefixes-stat', data.prefixes_synced);
+            }
+            if (data.networks_synced !== undefined) {
+                updateStatIfExists('networks-stat', data.networks_synced);
+            }
+            if (data.organizations_synced !== undefined) {
+                updateStatIfExists('orgs-stat', data.organizations_synced);
+            }
+            
+            // Update progress logs
+            if (data.recent_logs && data.recent_logs.length > 0) {
+                const logsContainer = document.getElementById('progress-logs');
+                if (logsContainer) {
+                    // Append only new logs
+                    data.recent_logs.slice(-5).forEach(log => {
+                        const logId = `log-${log.timestamp}`;
+                        if (!document.getElementById(logId)) {
+                            const logEntry = document.createElement('div');
+                            logEntry.id = logId;
+                            logEntry.className = 'log-entry';
+                            logEntry.style.marginBottom = '4px';
+                            logEntry.style.color = 'var(--bs-body-color)';
+                            
+                            const timestamp = log.timestamp.substring(11, 19);  // HH:MM:SS
+                            const levelBadge = log.level === 'error' ? 
+                                '<span class="badge bg-danger">ERROR</span>' :
+                                log.level === 'warning' ?
+                                '<span class="badge bg-warning" style="color: #000;">WARN</span>' :
+                                '<span class="badge" style="background-color: #0d6efd; color: #fff; font-weight: 600;">INFO</span>';
+                        
+                            logEntry.innerHTML = `<span class="text-muted" style="opacity: 0.7;">[${timestamp}]</span> ${levelBadge} <span style="color: var(--bs-body-color);">${log.message}</span>`;
+                            logsContainer.appendChild(logEntry);
+                            
+                            if (autoScroll) {
+                                logEntry.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // If sync completed, reload page
+            if (!data.is_running) {
+                stopAutoRefresh();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching progress:', error);
+        });
+}
+
+function updateStatIfExists(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+function cancelSync() {
+    console.log('cancelSync() called');
+    
+    if (confirm('Are you sure you want to cancel this sync operation?')) {
+        console.log('User confirmed cancellation');
+        
+        const url = '{% url "plugins:netbox_meraki:sync_cancel_api" sync_log.id %}';
+        console.log('Fetching URL:', url);
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            alert('Cancellation requested. The sync will stop after the current operation.');
+            const cancelBtn = document.getElementById('cancel-sync-btn');
+            if (cancelBtn) {
+                cancelBtn.disabled = true;
+                cancelBtn.innerHTML = '<i class="mdi mdi-check"></i> Cancellation Requested';
+            }
+        })
+        .catch(error => {
+            console.error('Error canceling sync:', error);
+            alert('Failed to cancel sync: ' + error);
+        });
+    } else {
+        console.log('User cancelled the cancellation');
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Start auto-refresh on page load if checkbox is checked
+const checkbox = document.getElementById('auto-scroll-toggle');
+if (checkbox && checkbox.checked) {
+    startAutoRefresh();
+}
+</script>
+{% else %}
+<script>
+// For completed syncs, add live scrolling option
+let autoScroll = false;
+let refreshInterval = null;
+
+function toggleAutoScroll() {
+    const checkbox = document.getElementById('auto-scroll-toggle');
+    autoScroll = checkbox.checked;
+    
+    if (autoScroll) {
+        startAutoRefresh();
+    } else {
+        stopAutoRefresh();
+    }
+}
+
+function startAutoRefresh() {
+    if (!refreshInterval) {
+        refreshInterval = setInterval(fetchProgress, 2000);  // Refresh every 2 seconds
+    }
+}
+
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+}
+
+function fetchProgress() {
+    fetch('{% url "plugins:netbox_meraki:sync_progress_api" sync_log.id %}')
+        .then(response => response.json())
+        .then(data => {
+            // Update progress logs
+            if (data.progress_logs && data.progress_logs.length > 0) {
+                const logsContainer = document.getElementById('progress-logs');
+                if (logsContainer) {
+                    const currentScrollPos = logsContainer.scrollTop;
+                    const isScrolledToBottom = logsContainer.scrollHeight - logsContainer.clientHeight <= currentScrollPos + 1;
+                    
+                    logsContainer.innerHTML = '';
+                    data.progress_logs.forEach(log => {
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'log-entry';
+                        
+                        const timestamp = log.timestamp.substring(11, 19);  // Extract only HH:MM:SS
+                        const levelBadge = log.level === 'error' ? 
+                            '<span class="badge bg-danger">ERROR</span>' :
+                            log.level === 'warning' ?
+                            '<span class="badge bg-warning">WARN</span>' :
+                            '<span class="badge" style="background-color: #0d6efd; color: #fff; font-weight: 600;">INFO</span>';
+                        
+                        logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> ${levelBadge} <span>${log.message}</span>`;
+                        logsContainer.appendChild(logEntry);
+                    });
+                    
+                    // Auto-scroll to bottom if user was already at bottom or if auto-scroll is enabled
+                    if (isScrolledToBottom || autoScroll) {
+                        logsContainer.scrollTop = logsContainer.scrollHeight;
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching progress:', error);
+        });
+}
+</script>
+{% endif %}
+{% endblock %}
