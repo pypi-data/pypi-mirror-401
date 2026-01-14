@@ -1,0 +1,66 @@
+Metadata-Version: 2.4
+Name: popsummary
+Version: 0.1.0
+Summary: A Python API for interfacing with standardized LIGO-Virgo-KAGRA Rates and Populations results
+Home-page: https://git.ligo.org/RatesAndPopulations/popsummary
+Author: Christian Adamcewicz, Zoheyr Doctor
+Author-email: christian.adamcewicz@ligo.org
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: h5py
+Requires-Dist: numpy
+Provides-Extra: test
+Requires-Dist: scipy; extra == "test"
+Requires-Dist: astropy; extra == "test"
+Requires-Dist: nbconvert; extra == "test"
+Requires-Dist: nbstrip; extra == "test"
+Requires-Dist: ipykernel; extra == "test"
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# popsummary
+A Python API for interfacing with standardized LIGO-Virgo-KAGRA Rates and Populations results. 
+
+## Description
+Hierarchical population inference of gravitational wave sources results in a number of standard data products. `popsummary` defines a standardized hdf5-based format for these results. The Python API enables reading and writing to this format and depends primarily on `h5py` and `numpy`. 
+
+## Installation
+### Via pip (recommended):
+```
+pip install popsummary
+```
+### Via conda-forge (coming soon):
+```
+conda install -c conda-forge popsummary
+```
+### From Source:
+```
+git clone https://git.ligo.org/RatesAndPopulations/popsummary.git
+cd popsummary
+pip install .
+```
+
+## Usage
+See the examples folder for a tutorial notebook and other basic examples in python.
+
+## Support
+Feel free to leave a [git issue](https://git.ligo.org/RatesAndPopulations/popsummary/-/issues/new) if you encounter any problems or have any feature requests. Also see our [wiki page](https://git.ligo.org/RatesAndPopulations/popsummary/-/wikis/home) for more information.
+
+## Authors and acknowledgment
+### Primary Authors
+* Christian Adamcewicz
+* Storm Colloms (Reviewer)
+* Zoheyr Doctor 
+
+### Contributors
+* Colm Talbot
+* Tom Callister
