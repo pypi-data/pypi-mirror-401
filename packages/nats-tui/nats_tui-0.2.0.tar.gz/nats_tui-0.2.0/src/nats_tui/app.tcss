@@ -1,0 +1,369 @@
+/* App-specific styles for NATS TUI */
+
+/* Status bar at top */
+StatusBar {
+    dock: top;
+}
+
+/* Main content area */
+#main_content {
+    width: 100%;
+    height: 1fr;
+    align: center middle;
+}
+
+#status_message {
+    width: auto;
+    height: auto;
+    padding: 2 4;
+    border: round $primary;
+    background: $surface;
+    text-align: center;
+}
+
+/* Legacy welcome screen (kept for compatibility) */
+#welcome {
+    width: 100%;
+    height: 100%;
+    align: center middle;
+}
+
+#welcome-message {
+    width: auto;
+    height: auto;
+    padding: 2 4;
+    border: round $primary;
+    background: $surface;
+    text-align: center;
+}
+
+/* Subject browser layout */
+#subject_browser {
+    width: 100%;
+    height: 1fr;
+    layout: horizontal;
+}
+
+#subject_tree_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 1 0 0;
+}
+
+#subject_details_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 0 0 1;
+}
+
+/* Tree styling */
+SubjectTree > .tree--guides {
+    color: $primary;
+}
+
+SubjectTree > .tree--guides-hover {
+    color: $secondary;
+}
+
+/* Publish dialog */
+#publish_dialog {
+    width: 80;
+    height: auto;
+    max-height: 30;
+    border: round $primary;
+    background: $surface;
+    padding: 1 2;
+}
+
+#publish_title {
+    text-align: center;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#publish_dialog Input {
+    width: 100%;
+    margin-bottom: 1;
+}
+
+#publish_dialog TextArea {
+    width: 100%;
+    height: 6;
+    margin-bottom: 1;
+}
+
+#publish_dialog .headers_area {
+    height: 3;
+}
+
+#publish_dialog #button_row {
+    height: auto;
+    align: center middle;
+    margin-top: 1;
+}
+
+#publish_dialog Button {
+    margin: 0 2;
+}
+
+/* Message viewer layout */
+#message_viewer {
+    width: 100%;
+    height: 1fr;
+    layout: horizontal;
+    display: none;
+}
+
+#message_viewer.active {
+    display: block;
+}
+
+#message_list_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 1 0 0;
+}
+
+#message_detail_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 0 0 1;
+}
+
+/* Message list item styling */
+.message_item {
+    padding: 0 1;
+}
+
+/* Hidden class for view switching */
+.hidden {
+    display: none;
+}
+
+/* Subscribe dialog */
+#subscribe_dialog {
+    width: 60;
+    height: auto;
+    border: round $primary;
+    background: $surface;
+    padding: 1 2;
+}
+
+#subscribe_title {
+    text-align: center;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#subscribe_dialog Input {
+    width: 100%;
+    margin-bottom: 1;
+}
+
+#wildcard_hint {
+    color: $text-muted;
+    text-style: italic;
+    margin-bottom: 1;
+}
+
+#subscribe_dialog #button_row {
+    height: auto;
+    align: center middle;
+    margin-top: 1;
+}
+
+#subscribe_dialog Button {
+    margin: 0 2;
+}
+
+/* JetStream view layout */
+#jetstream_view {
+    width: 100%;
+    height: 1fr;
+    layout: horizontal;
+    display: none;
+}
+
+#jetstream_view.active {
+    display: block;
+}
+
+#stream_list_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 1 0 0;
+}
+
+#stream_detail_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 0 0 1;
+}
+
+/* Stream list styling */
+StreamList {
+    border: round $primary;
+    background: $surface;
+}
+
+/* Stream detail styling */
+StreamDetail {
+    border: round $primary;
+    background: $surface;
+    padding: 1;
+}
+
+/* Create stream dialog */
+#create_stream_dialog {
+    width: 70;
+    height: auto;
+    border: round $primary;
+    background: $surface;
+    padding: 1 2;
+}
+
+#create_stream_title {
+    text-align: center;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#create_stream_dialog .field_label {
+    margin-top: 1;
+    color: $text-muted;
+}
+
+#create_stream_dialog Input {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+#create_stream_dialog Select {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+#create_stream_dialog #button_row {
+    height: auto;
+    align: center middle;
+    margin-top: 2;
+}
+
+#create_stream_dialog Button {
+    margin: 0 2;
+}
+
+/* Consumer view layout */
+#consumer_view {
+    width: 100%;
+    height: 1fr;
+    layout: horizontal;
+    display: none;
+}
+
+#consumer_view.active {
+    display: block;
+}
+
+#consumer_list_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 1 0 0;
+}
+
+#consumer_detail_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 0 0 1;
+}
+
+/* Consumer list styling */
+ConsumerList {
+    border: round $primary;
+    background: $surface;
+}
+
+/* Consumer detail styling */
+ConsumerDetail {
+    border: round $primary;
+    background: $surface;
+    padding: 1;
+}
+
+/* Create consumer dialog */
+#create_consumer_dialog {
+    width: 70;
+    height: auto;
+    border: round $primary;
+    background: $surface;
+    padding: 1 2;
+}
+
+#create_consumer_title {
+    text-align: center;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#create_consumer_dialog .field_label {
+    margin-top: 1;
+    color: $text-muted;
+}
+
+#create_consumer_dialog Input {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+#create_consumer_dialog Select {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+#create_consumer_dialog #button_row {
+    height: auto;
+    align: center middle;
+    margin-top: 2;
+}
+
+#create_consumer_dialog Button {
+    margin: 0 2;
+}
+
+/* Stream messages view layout */
+#stream_messages_view {
+    width: 100%;
+    height: 1fr;
+    layout: horizontal;
+    display: none;
+}
+
+#stream_messages_view.active {
+    display: block;
+}
+
+#stream_message_list_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 1 0 0;
+}
+
+#stream_message_detail_container {
+    width: 1fr;
+    height: 100%;
+    padding: 0 0 0 1;
+}
+
+/* Stream message list styling */
+StreamMessageList {
+    border: round $primary;
+    background: $surface;
+}
+
+/* Stream message detail styling */
+StreamMessageDetail {
+    border: round $primary;
+    background: $surface;
+    padding: 1;
+}
+
