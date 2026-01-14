@@ -1,0 +1,14 @@
+query GetDatasetBySlug($owner: String!, $localSlug: String!) {
+  datasetBySlug(owner: $owner, localSlug: $localSlug) {
+    id
+    localSlug
+    owner {
+      __typename
+      username
+    }
+    viewerCanCreateVersion: viewerCan(action: CREATE_DATASET_VERSION)
+    viewerCanReadDatasetVersionFile: viewerCan(
+      action: READ_DATASET_VERSION_FILE
+    )
+  }
+}
