@@ -1,0 +1,38 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = ">=2.32.4"
+pandas = "*"
+click = ">=8.0.3"
+keyring = ">=23.2.1"
+pyjwt = "*"
+urllib3 = ">=2.6.3,<3"
+sqlalchemy = ">=1.4.36"
+tqdm = ">=4.64.0"
+aiohttp = ">=3.13.2"
+pydantic = ">2"
+awswrangler = {extras = ["all"], version = ">=3.4.2"}
+comotion-sdk = {file = ".", editable = true}
+
+[dev-packages]
+comotion-sdk = {file = ".", editable = true}
+toml = "*"
+pytest = "*"
+setuptools = "*"
+sphinx = "*"
+setuptools-scm = "*"
+sphinx-material = "*"
+"keyrings.cryptfile" = "*"
+build = "*"
+mock = "*"
+exceptiongroup = "*"
+tomli = "*"
+
+[requires]
+python_version = "3.9"
+
+[scripts]
+test = "pytest"
