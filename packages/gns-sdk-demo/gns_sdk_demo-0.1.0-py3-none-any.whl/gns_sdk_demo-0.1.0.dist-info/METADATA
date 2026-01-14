@@ -1,0 +1,47 @@
+Metadata-Version: 2.1
+Name: gns-sdk-demo
+Version: 0.1.0
+Summary: General Notification System Client SDK
+Home-page: https://github.com/yourusername/gns
+Author: Your Name
+Author-email: your.email@example.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: requests >=2.25.0
+
+# GNS Python SDK
+
+Official Python client for the General Notification System (GNS).
+
+## Installation
+
+```bash
+pip install gns-sdk
+```
+
+## Usage
+
+```python
+from gns_sdk import GNSClient
+
+# Initialize client
+client = GNSClient(
+    base_url="http://your-gns-server:8080", 
+    token="YOUR_API_TOKEN"
+)
+
+# Send a notification
+response = client.send_notification(
+    task_id="your-task-uuid",
+    data={
+        "name": "User",
+        "order_id": "123456"
+    },
+    priority="High"
+)
+
+print(response)
+```
