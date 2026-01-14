@@ -1,0 +1,601 @@
+# pytest-mark-integration
+
+[![PyPI version](https://badge.fury.io/py/pytest-mark-integration.svg)](https://pypi.org/project/pytest-mark-integration/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pytest-mark-integration.svg)](https://pypi.org/project/pytest-mark-integration/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+A pytest plugin for automatic integration test marking and management.
+
+## Features
+
+- 🎯 **Automatic Test Marking**: Automatically marks tests as integration tests based on file path patterns
+- 🎛️ **Flexible Configuration**: Configure default behavior via `pytest.ini` or `pyproject.toml`
+- ⚡ **Smart Test Ordering**: Runs unit tests before integration tests for faster feedback
+- 🚦 **Fail-Fast Support**: Optionally skip integration tests when unit tests fail
+- 🔌 **Plugin Integration**: Seamlessly integrates with `pytest-cov` and `pytest-timeout`
+- 🎚️ **Command-Line Control**: Override default behavior with `--with-integration` and `--without-integration` flags
+
+## Installation
+
+Install using pip:
+
+```bash
+pip install pytest-mark-integration
+```
+
+Or using uv:
+
+```bash
+uv add pytest-mark-integration --dev
+```
+
+## Quick Start
+
+Once installed, the plugin automatically activates. By default:
+
+1. **Tests are automatically marked** if their file path contains `integration`
+2. **Integration tests run by default** (configurable)
+3. **Unit tests run before integration tests** (for faster feedback)
+
+### Example Test Structure
+
+```
+your_project/
+├── tests/
+│   ├── unit/
+│   │   └── test_utils.py           # Not marked (runs first)
+│   ├── integration/
+│   │   └── test_api.py              # Auto-marked as integration
+│   └── test_db_integration.py       # Auto-marked (path contains "integration")
+```
+
+### Running Tests
+
+```bash
+# Run all tests (including integration tests)
+pytest
+
+# Skip integration tests
+pytest --without-integration
+
+# Run only integration tests
+pytest --with-integration -m integration
+
+# Run tests with coverage (integration tests excluded from coverage by default)
+pytest --cov
+```
+
+## Configuration
+
+### Configuration Options
+
+Configure via `pytest.ini`:
+
+```ini
+[pytest]
+# Run integration tests by default (default: true)
+run_integration_by_default = true
+
+# Skip integration tests if unit tests fail (default: true)
+fail_fast_on_unit_test_failure = true
+```
+
+Or via `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+run_integration_by_default = true
+fail_fast_on_unit_test_failure = true
+```
+
+### Command-Line Options
+
+| Option                                | Description                                                      |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| `--with-integration`                  | Run integration tests (overrides config)                         |
+| `--without-integration`               | Skip integration tests (overrides config)                        |
+| `--integration-cover`                 | Include integration tests in coverage reports                    |
+| `--integration-timeout SECONDS`       | Set timeout for integration tests (requires `pytest-timeout`)    |
+| `--integration-timeout-method METHOD` | Timeout method: `thread` or `signal` (requires `pytest-timeout`) |
+
+## How It Works
+
+### Automatic Marking
+
+The plugin automatically adds the `@pytest.mark.integration` marker to tests when:
+
+1. The test file path contains the word `integration` (case-insensitive)
+2. The test is manually decorated with `@pytest.mark.integration`
+
+**Note**: The plugin uses paths relative to the pytest root directory to avoid false positives from parent directory names containing "integration".
+
+**Examples of auto-marked tests:**
+
+```python
+# tests/integration/test_api.py - ✅ Auto-marked
+def test_api_endpoint():
+    pass
+
+# tests/test_database_integration.py - ✅ Auto-marked
+def test_db_connection():
+    pass
+
+# integration_tests/test_system.py - ✅ Auto-marked
+def test_full_system():
+    pass
+
+# tests/unit/test_helpers.py - ❌ Not marked
+def test_helper_function():
+    pass
+```
+
+### Test Execution Priority
+
+The plugin ensures integration tests run **after** unit tests:
+
+```
+Execution Order:
+1. Unit tests (no integration marker) ⚡ Fast
+2. Integration tests (@pytest.mark.integration) 🐢 Slower
+```
+
+This provides:
+
+- **Faster feedback** during development
+- **Efficient CI/CD** pipelines (fail fast on basic issues)
+
+### Fail-Fast Behavior
+
+When `fail_fast_on_unit_test_failure = true` (default):
+
+```
+Unit Test → FAIL ❌
+  ↓
+Integration Tests → SKIPPED ⏭️
+  ↓
+Reason: "Skipping integration tests due to unit test failure"
+```
+
+This saves time by not running expensive integration tests when basic functionality is broken.
+
+## Manual Marking
+
+You can still manually mark tests:
+
+```python
+import pytest
+
+@pytest.mark.integration
+def test_external_api():
+    """This test will be treated as an integration test"""
+    pass
+```
+
+## Integration with Other Plugins
+
+### pytest-cov (Coverage)
+
+By default, integration tests **do not contribute** to coverage reports (since unit tests should cover all code).
+
+```bash
+# Integration tests excluded from coverage
+pytest --cov
+
+# Include integration tests in coverage
+pytest --cov --integration-cover
+```
+
+### pytest-timeout
+
+Set timeouts specifically for integration tests:
+
+```bash
+# Set 60-second timeout for integration tests
+pytest --integration-timeout 60
+
+# Use signal-based timeout method
+pytest --integration-timeout 60 --integration-timeout-method signal
+```
+
+### pytest-xdist (Parallel Execution)
+
+The plugin is compatible with pytest-xdist for parallel test execution:
+
+```bash
+# Run tests in parallel across 4 workers
+pytest -n 4
+```
+
+**Note**: In parallel mode, fail-fast behavior may not work perfectly since tests are distributed across multiple processes.
+
+## Configuration Priority
+
+The plugin respects the following priority order:
+
+1. **Command-line flags** (highest priority)
+
+   - `--with-integration` → Always run integration tests
+   - `--without-integration` → Always skip integration tests
+
+2. **Configuration file** (medium priority)
+
+   - `run_integration_by_default = true/false`
+
+3. **Default behavior** (lowest priority)
+   - Run integration tests (`run_integration_by_default` defaults to `true`)
+
+## Use Cases
+
+### Local Development
+
+Fast feedback loop - skip slow integration tests:
+
+```bash
+# In pytest.ini
+run_integration_by_default = false
+```
+
+```bash
+pytest  # Only unit tests run
+```
+
+### CI/CD Pipeline
+
+Run all tests in CI:
+
+```bash
+# In pyproject.toml
+run_integration_by_default = true
+fail_fast_on_unit_test_failure = true
+```
+
+```bash
+pytest  # All tests run, fail fast if unit tests fail
+```
+
+### Pre-commit Hook
+
+Quick validation before committing:
+
+```bash
+pytest --without-integration
+```
+
+### Integration Test Suite
+
+Run only integration tests:
+
+```bash
+pytest --with-integration -m integration
+```
+
+## Examples
+
+### Example 1: Mixed Test Suite
+
+```python
+# tests/unit/test_calculator.py
+def test_add():
+    assert 1 + 1 == 2  # Runs first
+
+# tests/integration/test_api.py
+def test_api_health():
+    response = requests.get("http://api.example.com/health")
+    assert response.status_code == 200  # Runs second
+
+# tests/test_database_integration.py
+def test_database_connection():
+    db = Database()
+    assert db.connect()  # Runs third (auto-marked due to filename)
+```
+
+```bash
+$ pytest -v
+tests/unit/test_calculator.py::test_add PASSED             [ 33%]
+tests/integration/test_api.py::test_api_health PASSED      [ 66%]
+tests/test_database_integration.py::test_database_connection PASSED [100%]
+```
+
+### Example 2: Skip Integration Tests
+
+```bash
+$ pytest --without-integration -v
+tests/unit/test_calculator.py::test_add PASSED             [100%]
+tests/integration/test_api.py::test_api_health SKIPPED     (Integration tests skipped)
+tests/test_database_integration.py::test_database_connection SKIPPED (Integration tests skipped)
+```
+
+### Example 3: Fail-Fast Behavior
+
+```python
+# tests/unit/test_calculator.py
+def test_add():
+    assert 1 + 1 == 3  # ❌ FAILS
+
+# tests/integration/test_api.py
+def test_api_health():
+    # This test is skipped because unit test failed
+    pass
+```
+
+```bash
+$ pytest -v
+tests/unit/test_calculator.py::test_add FAILED             [50%]
+tests/integration/test_api.py::test_api_health SKIPPED     [100%]
+(Skipping integration tests due to unit test failure)
+```
+
+## Troubleshooting
+
+### Integration Tests Not Being Marked
+
+**Problem**: Tests in integration paths aren't being marked.
+
+**Solution**: Ensure the file path (not just the directory name) contains `integration`:
+
+```bash
+# ✅ Correct
+tests/integration/test_api.py
+tests/test_integration_api.py
+
+# ❌ Won't work
+int/test_api.py  # "integration" not in path
+```
+
+**Note**: The plugin uses paths relative to the pytest root directory. If you're running tests from a subdirectory, ensure the relative path from the project root contains "integration".
+
+### Integration Tests Still Running After Unit Test Failure
+
+**Problem**: Integration tests run even when unit tests fail.
+
+**Solution**: Enable fail-fast in configuration:
+
+```ini
+[pytest]
+fail_fast_on_unit_test_failure = true
+```
+
+### Coverage Reports Include Integration Tests
+
+**Problem**: Integration tests are included in coverage reports.
+
+**Solution**: Remove `--integration-cover` flag (it's disabled by default):
+
+```bash
+pytest --cov  # Integration tests excluded
+```
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/pytest-mark-integration.git
+cd pytest-mark-integration
+
+# Install dependencies with uv
+uv sync --all-extras
+
+# Or with pip
+pip install -e ".[dev]"
+```
+
+### Run Tests
+
+```bash
+make test
+```
+
+### Code Quality
+
+```bash
+# Format code
+make format
+
+# Lint code
+make lint
+
+# Type check
+make typecheck
+```
+
+### Build and Publish
+
+```bash
+# Build distribution
+make build
+
+# Publish to TestPyPI
+make publish-test
+
+# Publish to PyPI
+make publish
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Comparison with Similar Projects
+
+This plugin combines and improves upon features from two existing projects:
+
+### Feature Comparison
+
+| Feature                          | **pytest-mark-integration** (This Project) | pytest-integration                 | pytest-integration-mark             |
+| -------------------------------- | ------------------------------------------ | ---------------------------------- | ----------------------------------- |
+| **Auto-marking by path**         | ✅ `integration` in path                   | ❌ Manual only                     | ✅ `tests/integration/` folder only |
+| **Configurable folder**          | ✅ Any path with "integration"             | ❌ N/A                             | ✅ Via `--integration-tests-folder` |
+| **Default behavior**             | ✅ Run by default (configurable)           | ✅ Run by default                  | ❌ Skip by default                  |
+| **Smart test ordering**          | ✅ Unit → Integration                      | ✅ Unit → Integration → Slow       | ❌ No ordering                      |
+| **Fail-fast on unit failure**    | ✅ Yes (configurable)                      | ✅ Yes                             | ❌ No                               |
+| **Multi-tier integration tests** | ❌ Single tier                             | ✅ Two tiers (quick/slow)          | ❌ Single tier                      |
+| **Coverage integration**         | ✅ Exclude by default                      | ✅ Exclude by default              | ❌ Not handled                      |
+| **Timeout support**              | ✅ Via `--integration-timeout`             | ✅ Via `--integration-timeout`     | ❌ No                               |
+| **Configuration file**           | ✅ `pytest.ini` / `pyproject.toml`         | ❌ Command-line only               | ❌ Command-line only                |
+| **CLI override**                 | ✅ `--with/without-integration`            | ✅ `--with/without-integration`    | ✅ `--with-integration` only        |
+| **pytest-xdist compatible**      | ✅ Yes                                     | ⚠️ Partial (documented limitation) | ✅ Yes                              |
+| **Marker name**                  | `@pytest.mark.integration`                 | `@pytest.mark.integration_test`    | `@pytest.mark.integration`          |
+| **Python version**               | 3.10+                                      | Any                                | 3.7+                                |
+| **Active maintenance**           | ✅ 2025                                    | ⚠️ Last updated 2020               | ⚠️ Last updated 2021                |
+
+### Detailed Comparison
+
+#### vs. pytest-integration
+
+**pytest-integration** is the original project that pioneered integration test management in pytest. Our project builds upon its foundation with modern improvements:
+
+**Advantages of pytest-mark-integration:**
+
+- ✅ **Automatic path-based marking**: No need to manually add `@pytest.mark.integration_test` to every test
+- ✅ **Flexible configuration**: Configure behavior via `pytest.ini` or `pyproject.toml`, not just command-line
+- ✅ **Better defaults**: Integration tests run by default (matches CI/CD workflows)
+- ✅ **Simpler marker name**: `integration` vs. `integration_test`
+- ✅ **Modern codebase**: Type hints, Python 3.10+, uses current pytest APIs
+- ✅ **Better path detection**: Uses relative paths from project root to avoid false positives
+
+**Advantages of pytest-integration:**
+
+- ✅ **Multi-tier tests**: Supports both quick and slow integration tests (two-tier hierarchy)
+- ✅ **Cascading fail-fast**: Stops slow integration tests if quick integration tests fail
+
+**Best for:**
+
+- **pytest-mark-integration**: Projects wanting automatic marking, modern Python, and simpler configuration
+- **pytest-integration**: Projects needing multi-tier integration test hierarchies
+
+#### vs. pytest-integration-mark
+
+**pytest-integration-mark** focuses on automatically marking tests in a specific folder. Our project extends this concept significantly:
+
+**Advantages of pytest-mark-integration:**
+
+- ✅ **Flexible path matching**: Any path containing "integration", not just `tests/integration/`
+- ✅ **Run by default**: Better for CI/CD (skip integration tests locally, run in CI)
+- ✅ **Smart ordering**: Unit tests always run before integration tests
+- ✅ **Fail-fast support**: Skip integration tests when unit tests fail (saves time)
+- ✅ **Coverage integration**: Automatically excludes integration tests from coverage
+- ✅ **Timeout support**: Set timeouts specifically for integration tests
+- ✅ **Configuration file**: Persistent settings via `pytest.ini` or `pyproject.toml`
+- ✅ **Both CLI options**: `--with-integration` and `--without-integration`
+
+**Advantages of pytest-integration-mark:**
+
+- ✅ **Simpler**: Fewer features, easier to understand
+- ✅ **Skip by default**: Integration tests won't run unless explicitly requested
+
+**Best for:**
+
+- **pytest-mark-integration**: Production projects needing comprehensive integration test management
+- **pytest-integration-mark**: Simple projects wanting basic auto-marking with minimal configuration
+
+### Migration Guide
+
+#### From pytest-integration
+
+```python
+# Old (pytest-integration)
+@pytest.mark.integration_test
+def test_api():
+    pass
+
+@pytest.mark.slow_integration_test
+def test_slow_api():
+    pass
+```
+
+```python
+# New (pytest-mark-integration)
+# Automatic marking - no decorator needed if in integration path!
+def test_api():  # Auto-marked if in tests/integration/test_api.py
+    pass
+
+# Or manual marking with simpler name
+@pytest.mark.integration
+def test_api():
+    pass
+
+# Note: No slow_integration_test tier (use timeout instead)
+```
+
+**Configuration:**
+
+```ini
+# pytest-integration (command-line only)
+pytest --without-integration
+
+# pytest-mark-integration (persistent config)
+[pytest]
+run_integration_by_default = false
+```
+
+#### From pytest-integration-mark
+
+```python
+# Old (pytest-integration-mark)
+# File: tests/integration/test_api.py
+def test_api():  # Auto-marked only in tests/integration/
+    pass
+```
+
+```python
+# New (pytest-mark-integration)
+# File: tests/integration/test_api.py
+def test_api():  # Auto-marked (same behavior)
+    pass
+
+# File: tests/test_db_integration.py
+def test_db():  # ALSO auto-marked (path contains "integration")
+    pass
+```
+
+**Command-line:**
+
+```bash
+# pytest-integration-mark
+pytest --with-integration  # Run integration tests
+
+# pytest-mark-integration
+pytest --with-integration   # Run integration tests
+pytest --without-integration # Skip integration tests (new option!)
+pytest                       # Run by default (configurable)
+```
+
+### Why Choose pytest-mark-integration?
+
+Choose this plugin if you want:
+
+1. **🎯 Zero-configuration auto-marking**: Just name your files/folders with "integration"
+2. **⚙️ Flexible configuration**: Persistent settings in config files, not just CLI
+3. **⚡ Smart execution**: Unit tests first, fail-fast on failures
+4. **🔌 Ecosystem integration**: Works seamlessly with pytest-cov, pytest-timeout, pytest-xdist
+5. **📊 Better defaults**: Designed for modern CI/CD workflows
+6. **🛠️ Active maintenance**: Modern codebase with ongoing updates
+
+## Acknowledgments
+
+Inspired by:
+
+- [pytest-integration](https://github.com/jbwdevries/pytest-integration)
+- [pytest-integration-mark](https://github.com/Barbora-Data-Science/pytest-integration-mark)
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
+## Support
+
+- 📖 [Documentation](https://github.com/yourusername/pytest-mark-integration#readme)
+- 🐛 [Issue Tracker](https://github.com/yourusername/pytest-mark-integration/issues)
+- 💬 [Discussions](https://github.com/yourusername/pytest-mark-integration/discussions)
