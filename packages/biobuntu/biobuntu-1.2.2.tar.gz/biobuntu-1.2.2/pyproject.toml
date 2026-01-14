@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biobuntu"
+version = "1.2.2"
+description = "A comprehensive platform for running genomic analysis pipelines with CLI, GUI, and web interfaces. Perfect for researchers, labs, and bioinformatics teams."
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    {name = "BioBuntu", email = "info@biobuntu.com"},
+]
+dependencies = [
+    "click",
+    "pyyaml",
+    "flask",
+]
+requires-python = ">=3.8"
+keywords = ["bioinformatics", "genomics", "pipelines", "workflow", "cli", "gui", "web"]
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://biobuntu.github.io/"
+Source = "https://github.com/biobuntu/biobuntu"
+Tracker = "https://github.com/biobuntu/biobuntu/issues"
+Documentation = "https://biobuntu.github.io/docs"
+
+[project.scripts]
+biobuntu = "cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "core",
+    "core.*",
+    "cli",
+    "cli.*",
+    "gui",
+    "gui.*",
+    "web",
+    "web.*",
+    "tools",
+    "configs",
+    "configs.*",
+]
