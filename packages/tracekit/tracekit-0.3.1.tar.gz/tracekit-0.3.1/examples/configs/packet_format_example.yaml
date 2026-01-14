@@ -1,0 +1,149 @@
+# =============================================================================
+# Example: Binary Packet Format Configuration
+# =============================================================================
+#
+# This example demonstrates how to configure a binary packet format for
+# loading data from custom data acquisition systems, packet captures, or
+# logic analyzer exports.
+#
+# Usage:
+#   from tracekit.loaders import load_binary_packets
+#   traces = load_binary_packets("capture.bin", format_config="packet_format.yaml")
+#
+# =============================================================================
+
+# Format identification
+name: "custom_daq_v1"
+version: "1.0"
+description: "Example DAQ packet format with 64-bit samples"
+
+# Packet structure
+packet:
+  size: 1024 # Total packet size in bytes (or "variable" for variable-length)
+  byte_order: "big" # Default endianness: "big", "little", or "native"
+
+# Header definition
+header:
+  size: 16 # Header size in bytes
+  fields:
+    # Sequence counter - for detecting packet loss
+    - name: "sequence"
+      offset: 0
+      size: 4
+      type: "uint32"
+      endian: "big"
+      description: "Packet sequence number (increments by 1 per packet)"
+
+    # Status/flags field with bitfield extraction
+    - name: "status"
+      offset: 4
+      size: 2
+      type: "bitfield"
+      endian: "big"
+      fields:
+        overflow: { bit: 15, description: "FIFO overflow flag" }
+        error: { bit: 14, description: "Hardware error flag" }
+        reserved: { bits: [10, 13], description: "Reserved bits" }
+        count_high: { bits: [8, 9], description: "Sample count high bits" }
+        channel: { bits: [0, 7], description: "Channel/lane identifier" }
+
+    # Sync/frame marker for packet validation
+    - name: "sync_marker"
+      offset: 6
+      size: 1
+      type: "uint8"
+      value: 0xFA # Expected constant value
+      description: "Frame synchronization marker (must be 0xFA)"
+
+    # Device identifier
+    - name: "device_id"
+      offset: 7
+      size: 1
+      type: "uint8"
+      description: "Source device identifier"
+
+    # Channel/lane identifier
+    - name: "channel_id"
+      offset: 8
+      size: 1
+      type: "uint8"
+      description: "Data channel/lane number (1-4 typical)"
+
+    # Timestamp field (variable size example - 5 bytes / 40 bits)
+    - name: "timestamp"
+      offset: 9
+      size: 5
+      type: "uint40" # Non-standard size - will be zero-padded to uint64
+      endian: "little"
+      description: "Sample timestamp (40-bit, 10ns resolution)"
+
+    # Reserved/padding bytes
+    - name: "reserved"
+      offset: 14
+      size: 2
+      type: "bytes"
+      description: "Reserved for future use"
+
+# Sample data definition
+samples:
+  offset: 16 # Samples start after header
+  count: 126 # Number of samples per packet ((1024-16)/8 = 126)
+
+  format:
+    size: 8 # Bytes per sample
+    type: "uint64"
+    endian: "little"
+    description: "64-bit sample value (digital signal states)"
+
+  # Optional: Define how to extract individual bits/channels from samples
+  channel_extraction:
+    enabled: true
+    mode: "bitwise" # "bitwise" or "byte"
+    channels:
+      - { name: "ch0", bits: [0, 7], description: "Channel 0 (8 bits)" }
+      - { name: "ch1", bits: [8, 15], description: "Channel 1 (8 bits)" }
+      - { name: "ch2", bits: [16, 23], description: "Channel 2 (8 bits)" }
+      - { name: "ch3", bits: [24, 31], description: "Channel 3 (8 bits)" }
+      - { name: "ch4", bits: [32, 39], description: "Channel 4 (8 bits)" }
+      - { name: "ch5", bits: [40, 47], description: "Channel 5 (8 bits)" }
+      - { name: "ch6", bits: [48, 55], description: "Channel 6 (8 bits)" }
+      - { name: "ch7", bits: [56, 63], description: "Channel 7 (8 bits)" }
+
+# Timing information
+timing:
+  sample_rate: 100e6 # 100 MHz
+  timestamp_resolution: 10e-9 # 10 ns per timestamp tick
+  samples_per_packet: 126
+
+# Validation rules
+validation:
+  sync_check:
+    enabled: true
+    field: "sync_marker"
+    expected: 0xFA
+    on_failure: "warn" # "error", "warn", "skip"
+
+  sequence_check:
+    enabled: true
+    field: "sequence"
+    expect_increment: 1
+    on_gap: "warn"
+    on_duplicate: "warn"
+
+  checksum:
+    enabled: false # Enable if format has checksum
+    # algorithm: "crc16"
+    # field: "checksum"
+    # scope: "header"  # "header", "samples", "all"
+
+# Preprocessing options
+preprocessing:
+  trim_idle:
+    enabled: true
+    pattern: "auto" # "auto", "zeros", "ones", or specific byte value
+    min_duration: 100 # Minimum samples to consider as idle
+
+  deinterleave:
+    enabled: false
+    # channels: 4
+    # order: "channel_first"  # "channel_first" or "sample_first"

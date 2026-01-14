@@ -1,0 +1,145 @@
+# Pre-commit configuration for TraceKit
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+# https://pre-commit.com
+
+repos:
+  # ==========================================================================
+  # General file checks
+  # ==========================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        args: [--unsafe] # Allow custom YAML tags
+      - id: check-json
+        # Exclude JSONC files (VS Code uses JSON with comments)
+        # Our jsonc.sh handles these with proper comment stripping
+        # Also exclude intentionally corrupt test fixtures
+        exclude: ^(\.vscode/|tsconfig\.json|jsconfig\.json|tests/stress/fixtures/corrupt_registry\.json)
+      - id: check-toml
+      - id: end-of-file-fixer
+        exclude: ^(test_data/comprehensive_validation/binary/empty\.bin)$
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md] # Preserve markdown line breaks
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+        exclude: ^(docs/images/architecture/.*\.svg|test_data/.*)$
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-case-conflict
+      - id: check-symlinks
+      - id: detect-private-key
+
+  # ==========================================================================
+  # Python: Ruff (linting + formatting)
+  # ==========================================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.11
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        types_or: [python, pyi]
+
+  # ==========================================================================
+  # Python: Documentation quality (interrogate)
+  # ==========================================================================
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [--fail-under=98, --verbose, --quiet, --color]
+        exclude: ^(tests|examples|scripts)/
+        pass_filenames: false
+
+  # ==========================================================================
+  # Python: Docstring validation (darglint)
+  # ==========================================================================
+  - repo: https://github.com/terrencepreilly/darglint
+    rev: v1.8.1
+    hooks:
+      - id: darglint
+        args: [--docstring-style=google, --strictness=short]
+        exclude: ^(tests|examples|scripts|\.claude)/
+
+  # ==========================================================================
+  # Shell scripts: ShellCheck
+  # ==========================================================================
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        args: [--severity=warning]
+
+  # ==========================================================================
+  # YAML: yamllint
+  # ==========================================================================
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: [-c, .yamllint.yaml]
+        exclude: ^(\.pre-commit-config\.yaml|uv\.lock)$
+
+  # ==========================================================================
+  # Markdown: markdownlint
+  # ==========================================================================
+  # Note: markdownlint v0.47.0 requires Node.js >= 20
+  # Using v0.41.0 for compatibility with Node.js 18
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.41.0
+    hooks:
+      - id: markdownlint
+        args: [--config, .markdownlint.yaml, --fix]
+        exclude: ^(\.vscode/|\.claude/|test_data/)
+
+  # ==========================================================================
+  # Local hooks: Test quality gates
+  # ==========================================================================
+  # Note: JSONC validation hook was removed due to CI timeout issues.
+  # The jsonc.sh script can still be run manually: ./scripts/tools/jsonc.sh --check
+  - repo: local
+    hooks:
+      - id: validate-test-markers
+        name: Validate pytest markers
+        entry: python scripts/validate_test_markers.py
+        language: python
+        additional_dependencies: ["pytest>=8.0"]
+        files: '^tests/.*test_.*\.py$'
+        pass_filenames: false
+
+      - id: mkdocs-strict-build
+        name: MkDocs strict link validation
+        entry: uv run mkdocs build --strict --clean
+        language: system
+        pass_filenames: false
+        files: '^(docs/.*\.md|mkdocs\.yml)$'
+
+      - id: pytest-smoke-test
+        name: Quick pytest smoke test
+        entry: uv run pytest tests/unit/core/test_types.py -x --strict-markers --strict-config -q
+        language: system
+        pass_filenames: false
+        files: '^(src/.*\.py|tests/.*\.py|pyproject\.toml)$'
+
+      - id: check-test-isolation
+        name: Check test isolation (sample)
+        entry: uv run python scripts/check_test_isolation.py --sample 5
+        language: system
+        files: '^tests/.*test_.*\.py$'
+        pass_filenames: false
+
+# ==========================================================================
+# CI configuration
+# ==========================================================================
+ci:
+  autofix_commit_msg: "style: auto-fix from pre-commit hooks"
+  autofix_prs: true
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  autoupdate_schedule: monthly
+  skip: [] # Skip hooks that need additional deps in CI
+  submodules: false

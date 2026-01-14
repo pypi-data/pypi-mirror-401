@@ -1,0 +1,301 @@
+# Security scanning workflow
+# Runs vulnerability scanning on all dependencies and code
+# Schedule: Weekly on Monday at 9 AM UTC
+# Manual trigger: workflow_dispatch
+
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+      - "src/**"
+      - ".github/workflows/security.yml"
+      - ".gitleaks.toml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+      - "src/**"
+      - ".gitleaks.toml"
+  schedule:
+    # Run weekly on Monday at 9 AM UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+# Auto-cancel outdated runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  # ============================================================================
+  # Dependency vulnerability scanning
+  # ============================================================================
+
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-security-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            pip-${{ runner.os }}-security-
+
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety pip-audit
+
+      - name: Run Safety check
+        id: safety
+        continue-on-error: true
+        run: |
+          echo "::group::Safety Vulnerability Check"
+          safety check --json --output safety-report.json 2>&1 || true
+          safety check 2>&1 || echo "Safety check completed with findings"
+          echo "::endgroup::"
+
+      - name: Run pip-audit
+        id: pip-audit
+        continue-on-error: true
+        run: |
+          echo "::group::pip-audit Vulnerability Check"
+          pip-audit --format json --output pip-audit-report.json 2>&1 || true
+          pip-audit 2>&1 || echo "pip-audit completed with findings"
+          echo "::endgroup::"
+
+      - name: Upload Safety report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: safety-report
+          path: safety-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Upload pip-audit report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: pip-audit-report
+          path: pip-audit-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+  # ============================================================================
+  # Static code security analysis
+  # ============================================================================
+
+  code-scan:
+    name: Static Code Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Bandit
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit[toml]
+
+      - name: Run Bandit security scan
+        id: bandit
+        continue-on-error: true
+        run: |
+          echo "::group::Bandit Security Scan"
+          # Run with JSON output for artifact
+          bandit -r src/ -f json -o bandit-report.json -c pyproject.toml 2>&1 || true
+          # Run with screen output for logs
+          bandit -r src/ -f screen -c pyproject.toml
+          echo "::endgroup::"
+
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+  # ============================================================================
+  # Secret scanning
+  # ============================================================================
+
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Full history for comprehensive secret scanning
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_SUMMARY: true
+          # The action automatically uses .gitleaks.toml from the repository root
+          # See .gitleaks.toml for allowlisted patterns (example keys, test data, etc.)
+
+  # ============================================================================
+  # CodeQL analysis (GitHub's semantic code analysis)
+  # ============================================================================
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          queries: security-and-quality
+          # Customize analysis with config file if needed
+          # config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:python"
+
+  # ============================================================================
+  # License compliance check
+  # ============================================================================
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install pip-licenses
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-licenses
+
+      - name: Check licenses
+        run: |
+          echo "::group::Dependency Licenses"
+          pip-licenses --format=markdown --order=license
+          echo "::endgroup::"
+
+      - name: Generate license report
+        run: |
+          pip-licenses --format=json --output-file=licenses.json
+          pip-licenses --format=csv --output-file=licenses.csv
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v6
+        with:
+          name: license-report
+          path: |
+            licenses.json
+            licenses.csv
+          retention-days: 90
+
+  # ============================================================================
+  # Security summary
+  # ============================================================================
+
+  summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [dependency-scan, code-scan, secret-scan, codeql, license-check]
+    if: always()
+    steps:
+      - name: Download all reports
+        uses: actions/download-artifact@v7
+        with:
+          path: security-reports
+        continue-on-error: true
+
+      - name: Generate summary
+        run: |
+          echo "# Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Scan (Bandit) | ${{ needs.code-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scan (Gitleaks) | ${{ needs.secret-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL Analysis | ${{ needs.codeql.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Secret scanning uses \`.gitleaks.toml\` for allowlisted patterns." >> $GITHUB_STEP_SUMMARY
+          echo "See the configuration file for documented exceptions (example keys, test data)." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Review detailed reports in workflow artifacts for any findings." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifacts available:**" >> $GITHUB_STEP_SUMMARY
+          echo "- safety-report (dependency vulnerabilities)" >> $GITHUB_STEP_SUMMARY
+          echo "- pip-audit-report (dependency vulnerabilities)" >> $GITHUB_STEP_SUMMARY
+          echo "- bandit-report (code security issues)" >> $GITHUB_STEP_SUMMARY
+          echo "- license-report (dependency licenses)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for critical failures
+        run: |
+          # Secret scan failures are critical
+          if [[ "${{ needs.secret-scan.result }}" == "failure" ]]; then
+            echo "::error::Secret scan detected potential secrets in the repository!"
+            echo "::error::Check .gitleaks.toml if this is a false positive for example/test keys."
+            exit 1
+          fi
+          echo "No critical security issues detected"

@@ -1,0 +1,29 @@
+format_version: '1.0'
+vehicle:
+  make: Unknown
+  model: Test Vehicle
+messages:
+- id: '0x280'
+  name: Engine_Status
+  length: 8
+  transmitter: null
+  cycle_time_ms: 10.0
+  confidence: 0.95
+  evidence:
+  - Periodic at 100 Hz
+  - RPM signal validated
+  signals:
+  - name: engine_rpm
+    start_bit: 16
+    length: 16
+    byte_order: big_endian
+    value_type: unsigned
+    scale: 0.25
+    offset: 0.0
+    unit: rpm
+    confidence: 0.95
+    evidence:
+    - Statistical analysis
+    - Value range matches expectations
+    comment: ''
+  comment: null

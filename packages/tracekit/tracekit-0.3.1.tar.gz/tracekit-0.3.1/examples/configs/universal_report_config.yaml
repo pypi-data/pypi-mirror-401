@@ -1,0 +1,245 @@
+# TraceKit Universal Report Generator Configuration
+# This configuration file specifies input data, analysis options, and output format
+# for generating comprehensive data-driven analysis reports.
+#
+# NOTE: This file uses multi-document YAML format (separated by ---).
+# The first document contains the main configuration, while subsequent
+# documents contain commented example configurations for different use cases.
+
+# Input Specification
+# Defines the source data to analyze
+input:
+  # Path to input file (required)
+  # NOTE: This is an example path - replace with your actual data file
+  path: "examples/data/sample_capture.wfm"
+
+  # Input type (waveform, digital, binary, pcap, iq, packets)
+  # If not specified, auto-detected from file extension
+  type: waveform
+
+  # Explicit format override (optional)
+  # Options: tektronix, rigol, csv, hdf5, numpy, sigrok, vcd, pcap, wav, tdms
+  format: null
+
+  # Channel name or index for multi-channel files (optional)
+  channel: null
+
+  # Sample rate in Hz (required for raw binary data)
+  sample_rate: null
+
+  # Additional loader parameters (optional)
+  parameters: {}
+
+# Analysis Configuration
+# Specifies which analyses to run and their parameters
+analysis:
+  # Run all applicable analyses (default: true)
+  run_all: true
+
+  # Auto-detect applicable analyses based on input type (default: true)
+  auto_detect: true
+
+  # Per-domain configuration (optional - overrides run_all for specific domains)
+  domains:
+    # Waveform measurements (amplitude, timing, duty cycle)
+    waveform:
+      enabled: true
+      parameters: {}
+      thresholds: {}
+
+    # Digital signal analysis (edges, thresholds, quality)
+    digital:
+      enabled: true
+      parameters:
+        # Logic family for threshold detection
+        logic_family: "cmos_3v3"
+      thresholds: {}
+
+    # Timing measurements (setup, hold, propagation delay)
+    timing:
+      enabled: true
+      parameters: {}
+      thresholds: {}
+
+    # Spectral analysis (FFT, PSD, THD, SNR)
+    spectral:
+      enabled: true
+      parameters:
+        # FFT window function
+        window: "hann"
+        # Number of FFT points (0 = auto)
+        nfft: 0
+      thresholds: {}
+
+    # Statistical analysis (outliers, trends, correlation)
+    statistics:
+      enabled: true
+      parameters:
+        # Z-score threshold for outlier detection
+        zscore_threshold: 3.0
+      thresholds: {}
+
+    # Pattern detection (periodic, motifs, signatures)
+    patterns:
+      enabled: true
+      parameters:
+        # Minimum pattern length
+        min_length: 4
+        # Minimum repeat count
+        min_count: 2
+      thresholds: {}
+
+    # Jitter analysis (RJ, DJ, PJ, DDJ, bathtub)
+    jitter:
+      enabled: true
+      parameters:
+        # Target BER for TJ calculation
+        target_ber: 1e-12
+      thresholds: {}
+
+    # Eye diagram analysis
+    eye:
+      enabled: true
+      parameters:
+        # Unit interval in seconds (0 = auto-detect)
+        unit_interval: 0
+      thresholds: {}
+
+    # Power analysis (efficiency, switching, ripple)
+    power:
+      enabled: true
+      parameters: {}
+      thresholds: {}
+
+    # Protocol decoding (UART, SPI, I2C, CAN, etc.)
+    protocols:
+      enabled: true
+      parameters:
+        # Auto-detect protocol parameters
+        auto_detect: true
+      thresholds: {}
+
+    # Signal integrity (S-parameters, equalization)
+    signal_integrity:
+      enabled: true
+      parameters: {}
+      thresholds: {}
+
+    # Auto-inference (signal type, protocol detection)
+    inference:
+      enabled: true
+      parameters: {}
+      thresholds: {}
+
+    # Packet metrics (throughput, latency, loss)
+    packet:
+      enabled: true
+      parameters: {}
+      thresholds: {}
+
+    # Entropy analysis (Shannon entropy, data classification)
+    entropy:
+      enabled: true
+      parameters:
+        # Window size for sliding entropy
+        window_size: 256
+      thresholds: {}
+
+# Output Configuration
+# Specifies output formats and options
+output:
+  # Output formats to generate
+  # Options: json, yaml, pdf, html, markdown
+  formats:
+    - json
+    - yaml
+    - pdf
+
+  # Output directory (default: current directory)
+  output_dir: "."
+
+  # Base name for output files (without extension)
+  base_name: "analysis_report"
+
+  # Include raw numeric data in structured output
+  include_raw_data: true
+
+  # Include visualizations/plots
+  include_plots: true
+
+  # Output verbosity level
+  # Options: minimal, standard, detailed, full
+  verbosity: full
+
+  # JSON indentation (null for compact, 2 for readable)
+  json_indent: 2
+
+# Report Metadata
+# Information included in the report header
+metadata:
+  title: "TraceKit Universal Analysis Report"
+  author: ""
+  project: ""
+  version: "1.0"
+  custom:
+    # Add custom key-value pairs here
+    environment: "lab"
+    equipment: "Tektronix MSO64"
+
+---
+# Example configurations for different use cases
+# These are commented examples that can be copied and modified as needed.
+
+# Example 1: Waveform analysis only
+# input:
+#   path: "oscilloscope_capture.wfm"
+#   type: waveform
+# analysis:
+#   run_all: false
+#   domains:
+#     waveform:
+#       enabled: true
+#     spectral:
+#       enabled: true
+#     timing:
+#       enabled: true
+
+# Example 2: Protocol analysis
+# input:
+#   path: "i2c_capture.vcd"
+#   type: digital
+# analysis:
+#   run_all: false
+#   domains:
+#     digital:
+#       enabled: true
+#     protocols:
+#       enabled: true
+#       parameters:
+#         protocol: i2c
+
+# Example 3: Binary packet analysis
+# input:
+#   path: "packets.bin"
+#   type: binary
+# analysis:
+#   run_all: false
+#   domains:
+#     patterns:
+#       enabled: true
+#     entropy:
+#       enabled: true
+#     statistics:
+#       enabled: true
+
+# Example 4: Network capture analysis
+# input:
+#   path: "network.pcap"
+#   type: pcap
+# analysis:
+#   run_all: false
+#   domains:
+#     packet:
+#       enabled: true
+#     patterns:
+#       enabled: true
