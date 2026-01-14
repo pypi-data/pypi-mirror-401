@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kida-templates"
+version = "0.1.2"
+description = "Modern template engine for Python 3.14t — AST-native, free-threading ready"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+keywords = ["template-engine", "jinja2", "free-threading", "async", "templates"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [] # Pure Python, zero runtime dependencies
+
+[project.optional-dependencies]
+docs = ["bengal>=0.1.8"]
+
+[project.urls]
+Homepage = "https://github.com/lbliii/kida"
+Documentation = "https://github.com/lbliii/kida"
+Repository = "https://github.com/lbliii/kida"
+Changelog = "https://github.com/lbliii/kida/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+
+[tool.mypy]
+python_version = "3.14"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+strict_optional = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+
+# =============================================================================
+# Mypy per-module overrides for gradual type adoption
+# =============================================================================
+# These modules use mixin patterns and complex AST types that require
+# gradual type annotation improvements. Errors are suppressed per-module
+# to allow CI to pass while maintaining type checking for other modules.
+#
+# TODO: Incrementally fix these issues and remove overrides
+# See: TYPE_CHECKING_GUIDE.md for strategies
+# =============================================================================
+
+# Parser & Compiler: mixin patterns access attrs from host classes
+# NOTE: attr-defined errors eliminated via RFC rfc-mixin-protocol-typing.md
+[[tool.mypy.overrides]]
+module = ["kida.parser.*", "kida.compiler.*"]
+disable_error_code = [
+    # attr-defined: RESOLVED via hybrid protocol + inline declarations
+    "no-any-return",      # Dynamic dispatch returns Any
+    "arg-type",           # AST node type variance (list[Assign] vs list[stmt])
+    "return-value",       # List invariance issues
+    "assignment",         # AST node reassignment
+    "operator",           # List concatenation type issues
+    "no-untyped-def",     # Gradual typing
+    "no-redef",           # Overloaded method patterns
+    "call-arg",           # Constructor signature changes
+    "func-returns-value", # Optional return handling
+    "override",           # Property vs attribute in mixins
+    "type-arg",           # Callable generic params
+]
+
+# =============================================================================
+# Phase 1 & 2 complete: Only parser/compiler overrides remain (mixin patterns)
+# See: plan/rfc-type-suppression-reduction.md
+# =============================================================================
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+# Enable Python upgrade rules and other quality checks
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "UP",  # pyupgrade - Python modernization
+    "B",   # flake8-bugbear - common bugs
+    "SIM", # flake8-simplify - simplify code
+    "I",   # isort - import sorting
+    "N",   # pep8-naming
+]
+ignore = ["E501"] # Line length handled by formatter
+
+# Per-file ignore rules
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]   # Allow unused imports in __init__ files
+"tests/**/*.py" = ["S101"] # Allow assert in tests
+
+[dependency-groups]
+dev = [
+    # Testing
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-xdist>=3.3.0",
+    "pytest-timeout>=2.3.0", # Prevent hung tests
+    "hypothesis>=6.100.0",   # Property-based testing
+    "jinja2>=3.1.6,<3.2",
+    # Linting & Type Checking
+    "mypy>=1.10",
+    "ruff>=0.14.0",
+    # Pre-commit (optional, for local dev)
+    "pre-commit>=4.0.0",
+]
+docs = ["bengal>=0.1.8"]
