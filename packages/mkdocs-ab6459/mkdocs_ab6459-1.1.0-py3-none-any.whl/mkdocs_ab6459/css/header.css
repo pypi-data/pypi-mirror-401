@@ -1,0 +1,62 @@
+header {
+    background: var(--bg-gradient);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 0.25rem 0.5rem var(--box-shadow-1), 0 0.125rem 0.25rem var(--box-shadow-2);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    gap: var(--padding-lg);
+    padding: var(--padding-md);
+}
+
+header > .row {
+    align-items: center;
+}
+
+header > #module-details > h1 {
+    font-size: x-large;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+header > #module-details {
+    flex-grow: 1;
+}
+
+header > .row > select {
+    background-color: var(--bg-container);
+    border: var(--border-width-sm) solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-color);
+    padding: var(--padding-xs) var(--padding-sm);
+
+    /* Enhanced styling */
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    /* Dropdown arrow styling */
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--padding-xs) center;
+    background-size: 12px;
+    padding-right: calc(var(--padding-sm) + 20px);
+}
+
+header > .row > select:hover {
+    background-color: color-mix(in srgb, var(--bg-container) 90%, white 10%);
+    border-color: color-mix(in srgb, var(--border-color) 70%, white 30%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header > .row > select:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+header > .row > select:active {
+    transform: translateY(1px);
+}

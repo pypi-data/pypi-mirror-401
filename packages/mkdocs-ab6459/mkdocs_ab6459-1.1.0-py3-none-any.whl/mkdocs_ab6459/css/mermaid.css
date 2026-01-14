@@ -1,0 +1,88 @@
+[class='mermaid'] {
+    text-align: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+text.classTitleText {
+    font-weight: bold;
+}
+
+[id*='mermaid-'] .divider {
+    stroke: var(--mermaid-divider) !important;
+}
+
+[id*='mermaid-'] g.node > rect,
+[id*='mermaid-'] g.node > circle {
+    fill: var(--mermaid-node-bg) !important;
+    stroke: var(--mermaid-node-stroke) !important;
+    rx: var(--border-radius-md) !important;
+    ry: var(--border-radius-md) !important;
+}
+
+[id*='mermaid-'] g.node > circle {
+    r: 1.25rem !important;
+}
+
+[id*='mermaid-'] .edge-pattern-solid, path,
+[id*='mermaid-'] .flowchart-link {
+    stroke: var(--mermaid-edge) !important;
+}
+
+/* General rule for all markers - comes first */
+[id*='mermaid-'] marker path {
+    fill: var(--mermaid-edge) !important;
+    stroke: var(--mermaid-edge) !important;
+}
+
+/* Specific rule for aggregation - comes last to override */
+[id*='mermaid-'] marker[class*='relation'] path {
+    fill: none !important;
+    stroke: var(--mermaid-edge) !important;
+}
+
+[id*='mermaid-'] .label0,
+[id*='mermaid-'] .commit0 {
+    fill: var(--mermaid-commit-0) !important;
+    stroke: var(--mermaid-commit-0) !important;
+}
+
+[id*='mermaid-'] .label1,
+[id*='mermaid-'] .commit1 {
+    fill: var(--mermaid-commit-1) !important;
+    stroke: var(--mermaid-commit-1) !important;
+}
+
+[id*='mermaid-'] .label2,
+[id*='mermaid-'] .commit2 {
+    fill: var(--mermaid-commit-2) !important;
+    stroke: var(--mermaid-commit-2) !important;
+}
+
+[id*='mermaid-'] g.branchLabel > g > text {
+    fill: var(--mermaid-branch-text) !important;
+}
+
+[id*='mermaid-'] polygon.tag-label-bkg {
+    fill: var(--mermaid-tag-bg) !important;
+    stroke: var(--mermaid-tag-stroke) !important;
+}
+
+[id*='mermaid-'] text {
+    fill: var(--text-color) !important;
+}
+
+[id*='mermaid-'] .nodeLabel,
+[id*='mermaid-'] .edgeLabel {
+    color: var(--text-color) !important;
+}
+
+[id*='mermaid-'] .label {
+    color: var(--text-color) !important;
+}
+
+/* For class diagrams specifically */
+[id*='mermaid-'] .classLabel .nodeLabel,
+[id*='mermaid-'] .classLabel text {
+    fill: var(--text-color) !important;
+}
