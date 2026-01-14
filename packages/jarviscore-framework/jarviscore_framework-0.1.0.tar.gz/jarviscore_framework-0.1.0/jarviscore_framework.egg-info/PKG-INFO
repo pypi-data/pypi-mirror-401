@@ -1,0 +1,136 @@
+Metadata-Version: 2.4
+Name: jarviscore-framework
+Version: 0.1.0
+Summary: P2P distributed agent framework with LLM code generation and event-sourced state management
+Author-email: Ruth Mutua <mutuandinda82@gmail.com>, Muyukani Kizito <muyukani@prescottdata.io>
+Maintainer-email: Prescott Data <info@prescottdata.io>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/jarviscore
+Project-URL: Documentation, https://jarviscore.readthedocs.io
+Project-URL: Repository, https://github.com/yourusername/jarviscore
+Project-URL: Issues, https://github.com/yourusername/jarviscore/issues
+Keywords: agents,p2p,llm,distributed,workflow,orchestration
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: swim-p2p
+Requires-Dist: pyzmq
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: aiohttp>=3.9.0
+Requires-Dist: beautifulsoup4>=4.12.0
+Requires-Dist: anthropic>=0.18.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: google-generativeai>=0.3.0
+Requires-Dist: httpx>=0.25.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Provides-Extra: all
+Requires-Dist: jarviscore[dev]; extra == "all"
+Dynamic: license-file
+
+# JarvisCore Framework
+
+**P2P distributed agent framework with LLM code generation and production-grade state management**
+
+## Features
+
+- ✅ **Simple Agent Definition** - Write just 3 attributes, framework handles everything
+- ✅ **P2P Mesh Architecture** - Automatic agent discovery and task routing via SWIM protocol
+- ✅ **Event-Sourced State** - Complete audit trail with crash recovery
+- ✅ **Autonomous Execution** - LLM code generation with automatic repair
+
+## Installation
+
+```bash
+pip install jarviscore
+```
+
+## Setup & Validation
+
+### 1. Configure LLM Provider
+
+Copy the example config and add your API key:
+
+```bash
+cp .env.example .env
+# Edit .env and add one of: CLAUDE_API_KEY, AZURE_API_KEY, GEMINI_API_KEY, or LLM_ENDPOINT
+```
+
+### 2. Validate Installation
+
+```bash
+# Check setup
+python -m jarviscore.cli.check
+
+# Test LLM connectivity
+python -m jarviscore.cli.check --validate-llm
+
+# Run smoke test (end-to-end validation)
+python -m jarviscore.cli.smoketest
+```
+
+✅ **All checks pass?** You're ready to build agents!
+
+## Quick Start
+
+```python
+from jarviscore import Mesh
+from jarviscore.profiles import PromptDevAgent
+
+# Define agent (3 lines)
+class ScraperAgent(PromptDevAgent):
+    role = "scraper"
+    capabilities = ["web_scraping"]
+    system_prompt = "You are an expert web scraper..."
+
+# Create mesh and run workflow
+mesh = Mesh(mode="autonomous")
+mesh.add(ScraperAgent)
+await mesh.start()
+
+results = await mesh.workflow(
+    workflow_id="wf-123",
+    steps=[
+        {"id": "scrape", "task": "Scrape example.com", "role": "scraper"}
+    ]
+)
+```
+
+## Architecture
+
+JarvisCore is built on three layers:
+
+1. **Execution Layer (20%)** - Profile-specific execution (Prompt-Dev, MCP)
+2. **Orchestration Layer (60%)** - Workflow engine, dependencies, state management
+3. **P2P Layer (20%)** - Agent discovery, task routing, mesh coordination
+
+## Documentation
+
+- [User Guide](jarviscore/docs/USER_GUIDE.md) - Complete guide for AutoAgent users
+- [API Reference](jarviscore/docs/API_REFERENCE.md) - Detailed API documentation
+- [Configuration Guide](jarviscore/docs/CONFIGURATION.md) - Settings and environment variables
+- [Troubleshooting](jarviscore/docs/TROUBLESHOOTING.md) - Common issues and solutions
+- [Examples](examples/) - Working code examples
+
+## Development Status
+
+**Version:** 0.1.0 (Alpha)
+**Day 1:** Core framework foundation ✅
+
+## License
+
+MIT License - see LICENSE file for details
