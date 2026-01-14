@@ -1,0 +1,99 @@
+[build-system]
+requires = ["maturin>=1.5"]
+build-backend = "maturin"
+
+[project]
+name = "netsmith"
+version = "0.1.1"
+description = "Fast network analysis library with Rust acceleration"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Kyle T. Jones", email = "kyle@kyletjones.com"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Intended Audience :: Science/Research",
+]
+
+# Main dependencies
+dependencies = [
+    "numpy>=1.23,<3.0.0",
+]
+
+# Optional dependencies
+[project.optional-dependencies]
+rust = []  # Rust backend (installed automatically if available)
+scipy = ["scipy>=1.9,<2.0.0"]  # For sparse matrices and advanced stats
+pandas = ["pandas>=1.5,<3.0.0"]
+polars = ["polars>=0.20,<1.0.0"]
+networkx = ["networkx>=3.0,<4.0.0"]  # For community detection, null models, k-core
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+    "isort>=5.12",
+]
+
+[project.scripts]
+netsmith = "netsmith.apps.cli:main"
+
+# Maturin configuration for Rust extension
+[tool.maturin]
+# Path to the Cargo.toml of the Rust project (relative to the project root)
+manifest-path = "./rust/crates/netsmith-py/Cargo.toml"
+# Build in release mode for better performance
+release = true
+# Strip the binary to reduce size
+strip = true
+# Include LICENSE file in source distribution
+sdist-include = ["LICENSE", "README.md", "CHANGELOG.md"]
+
+# Setuptools configuration for src/ layout
+[tool.setuptools]
+package-dir = {"" = "src"}
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = [
+    "netsmith_rs.*",
+    "netsmith_rs",
+]
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
