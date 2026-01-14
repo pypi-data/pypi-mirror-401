@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lr-modbus"
+version = "0.2.1"
+description = "Modbus RTU helpers for FT231XS-based RS-485 HIL setups"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "Jonas Estberger", email = "jonas.estberger@lumenradio.com" }
+]
+dependencies = [
+  "pyserial>=3.5"
+]
+
+[project.optional-dependencies]
+dev = [
+  "black>=25.9.0",
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "twine>=5.1.1",
+  "build>=1.2.1"
+]
+
+[project.scripts]
+"lr-modbus" = "lr_modbus.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["lr_modbus"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "README.md",
+  "lr_modbus",
+]
