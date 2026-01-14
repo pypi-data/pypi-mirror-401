@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "extractly"
+version = "0.2.1"
+description = "Darkmatter AI internal library for document data extraction"
+readme = "README.md"
+authors = [{ name = "Francisco Macedo", email = "franciscovcbm@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "mistralai>=1.9.11",
+    "pydantic-ai>=1.0.17",
+    "python-dotenv>=1.1.1",
+    "tenacity>=9.1.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "basedpyright>=1.31.7",
+    "build>=1.2.1",
+    "pre-commit>=3.7.1",
+    "pytest>=8.4.2",
+    "pytest-env>=1.1.5",
+    "ruff>=0.14.2",
+    "twine>=5.1.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["extractly", "extractly.*"]
+
+[tool.basedpyright]
+include = ["extractly", "tests"]
+exclude = [
+    "**/__pycache__",
+]
+defineConstant = { DEBUG = true }
+
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+
+pythonVersion = "3.13"
+pythonPlatform = "Linux"
+
+venvPath = "."
+venv = ".venv"
+
+executionEnvironments = [
+  { root = "tests", reportPrivateUsage = false, reportMissingImports = "warning", extraPaths = ["."] },
+  { root = "extractly" }
+]
+
+
+[tool.pytest.ini_options]
+env = [
+    "MISTRAL_API_KEY=test", 
+    "GOOGLE_API_KEY=test"
+]
