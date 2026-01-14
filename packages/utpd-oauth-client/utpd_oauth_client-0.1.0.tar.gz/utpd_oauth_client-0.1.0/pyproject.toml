@@ -1,0 +1,45 @@
+[project]
+authors = [{ name = "Wardy", email = "wardy3@gmail.com" }]
+description = "Client library for utpd-oauth service with framework integrations"
+license = "MIT"
+name = "utpd-oauth-client"
+readme = "README.md"
+requires-python = ">=3.14"
+version = "0.1.0"
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = ["httpx>=0.28.1"]
+
+[dependency-groups]
+dev = ["common-tools[dev]>=0.1.0"]
+test = ["common-tools[test]>=0.3.0", "fastapi>=0.115.0", "nicegui>=2.0.0"]
+
+[tool.uv.sources]
+common-tools = { path = "../common-tools" }
+
+[build-system]
+build-backend = "uv_build"
+requires = ["uv_build>=0.9.23,<0.10.0"]
+
+[tool.pytest.ini_options]
+addopts = "-v --capture=tee-sys --durations=3 -p no:pastebin -p no:nose -p no:doctest"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+log_level = "DEBUG"
+pythonpath = [".", "src", "tests"]
+xfail_strict = true
+
+[tool.coverage.report]
+exclude_lines = ["@.*overload", "pragma: no cover", 'class \w+\((typing.|tp.)?Protocol\)']
