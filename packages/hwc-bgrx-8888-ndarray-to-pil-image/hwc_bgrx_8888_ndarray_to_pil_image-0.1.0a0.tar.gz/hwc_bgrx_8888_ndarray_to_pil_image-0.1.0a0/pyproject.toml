@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hwc-bgrx-8888-ndarray-to-pil-image"
+version = "0.1.0a0"
+description = "Convert an HWC BGR 888 or BGRX 8888 NumPy ndarray to an HWC RGB 888 PIL.Image, with the alpha/unused channel discarded."
+readme = "README.md"
+requires-python = ">=2"
+license = "MIT"
+authors = [
+  { name="Jifeng Wu", email="jifengwu2k@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "pillow"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jifengwu2k/hwc-bgrx-8888-ndarray-to-pil-image"
+"Bug Tracker" = "https://github.com/jifengwu2k/hwc-bgrx-8888-ndarray-to-pil-image/issues"
