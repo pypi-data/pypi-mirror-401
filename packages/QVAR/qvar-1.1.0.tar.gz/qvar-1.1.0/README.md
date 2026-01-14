@@ -1,0 +1,24 @@
+
+# QVAR
+
+Quantum subroutine for VARiance estimation. 
+
+The QVAR quantum subroutine employs a gate-based circuit logarithmic in depth to compute the classical variance of a set of values stored in superposition. This subroutine uses the Amplitude Estimation algorithm to estimate the variance of the indexed values. 
+
+## Installation
+
+```bash
+pip install qvar
+```
+
+## Features
+
+- Quantum subroutine for variance estimation with logarithmic depth and width
+- Easy integration within quantum and hybrid-quantum algorithms
+- Several simulation methods available (Amplitude Estimation, Faster Amplitude Estimation, Shots, Statevector simulation)
+
+
+## Documentation
+
+For detailed documentation, visit the [project repository](https://github.com/AlessandroPoggiali/QVAR).
+
