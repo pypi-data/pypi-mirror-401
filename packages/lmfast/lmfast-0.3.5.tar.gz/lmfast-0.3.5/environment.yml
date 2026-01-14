@@ -1,0 +1,25 @@
+name: lmfast
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip>=23.0
+  
+  # PyTorch with CUDA support
+  - pytorch>=2.1.0
+  - pytorch-cuda=12.1
+  - torchvision
+  - torchaudio
+  
+  # Development tools
+  - jupyter
+  - jupyterlab
+  - ipywidgets
+  
+  # Install remaining from pip
+  - pip:
+    - -e ".[all]"
