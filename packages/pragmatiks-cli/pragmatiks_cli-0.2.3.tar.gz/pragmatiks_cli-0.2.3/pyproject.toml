@@ -1,0 +1,62 @@
+[project]
+name = "pragmatiks-cli"
+version = "0.2.3"
+description = "Command-line interface for Pragmatiks"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "typer>=0.15.3",
+    "pragmatiks-sdk>=0.3.1",
+    "pyyaml>=6.0.3",
+    "copier>=9.0.0",
+    "rich>=13.9.0",
+]
+
+[project.scripts]
+pragma = "pragma_cli.main:app"
+
+[tool.uv.sources]
+pragmatiks-sdk = { git = "https://github.com/pragmatiks/sdk.git", tag = "v0.3.1" }
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "W", "F", "I", "UP", "D", "DOC", "PT"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+known-first-party = ["pragma_cli"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**/*.py" = ["D100", "D101", "D102", "D103", "D104", "D107", "DOC"]
+
+[tool.ruff.format]
+preview = true
+
+[tool.pytest.ini_options]
+addopts = ["-v"]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.2.3"
+version_files = ["pyproject.toml:^version"]
+tag_format = "v$version"
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+
+[dependency-groups]
+test = ["pytest>=8.4.1", "pytest-cov>=7.0.0", "pytest-mock>=3.14.0"]
+dev = ["commitizen>=4.11.0", "pre-commit>=4.0.0", "ruff>=0.11.0"]
+
+[tool.uv.build-backend]
+module-name = "pragma_cli"
+
+[build-system]
+requires = ["uv_build>=0.9.8"]
+build-backend = "uv_build"
