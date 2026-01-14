@@ -1,0 +1,17 @@
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+include setup.py
+
+recursive-include desktop_bridge *.py
+
+global-exclude __pycache__
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
+global-exclude .venv
+global-exclude venv
+global-exclude */venv/*
+global-exclude .env
+global-exclude *.egg-info
