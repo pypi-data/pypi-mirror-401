@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://niwrap.dev/argdump/schema-v1.json",
+  "title": "ParserInfo",
+  "description": "Serialized argparse.ArgumentParser",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string", "format": "uri" },
+    "$env": { "$ref": "#/$defs/EnvironmentInfo" },
+    "prog": { "type": ["string", "null"] },
+    "description": { "type": ["string", "null"] },
+    "epilog": { "type": ["string", "null"] },
+    "usage": { "type": ["string", "null"] },
+    "add_help": { "type": "boolean", "default": true },
+    "allow_abbrev": { "type": "boolean", "default": true },
+    "formatter_class": { "type": ["string", "null"] },
+    "prefix_chars": { "type": "string", "default": "-" },
+    "fromfile_prefix_chars": { "type": ["string", "null"] },
+    "argument_default": {},
+    "conflict_handler": { "type": "string", "default": "error" },
+    "exit_on_error": { "type": "boolean", "default": true },
+    "suggest_on_error": { "type": "boolean", "default": false },
+    "color": { "type": "boolean", "default": true },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ActionInfo" }
+    },
+    "argument_groups": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ArgumentGroup" }
+    },
+    "mutually_exclusive_groups": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/MutualExclusionGroup" }
+    }
+  },
+  "required": ["actions", "argument_groups", "mutually_exclusive_groups"],
+
+  "$defs": {
+    "EnvironmentInfo": {
+      "type": "object",
+      "description": "Information about the environment where serialization occurred",
+      "properties": {
+        "python_version": { "type": "string" },
+        "python_implementation": { "type": "string" },
+        "platform_system": { "type": "string" },
+        "platform_release": { "type": "string" },
+        "platform_machine": { "type": "string" },
+        "argdump_version": { "type": "string" }
+      },
+      "required": [
+        "python_version",
+        "python_implementation", 
+        "platform_system",
+        "platform_release",
+        "platform_machine",
+        "argdump_version"
+      ]
+    },
+
+    "ActionType": {
+      "type": "string",
+      "enum": [
+        "store", "store_const", "store_true", "store_false",
+        "append", "append_const", "count", "help", "version",
+        "parsers", "extend", "boolean_optional", "unknown"
+      ]
+    },
+
+    "TypeInfo": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "module": { "type": ["string", "null"] },
+        "builtin": { "type": "boolean", "default": false },
+        "serializable": { "type": "boolean", "default": true }
+      },
+      "required": ["name"]
+    },
+
+    "FileTypeInfo": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "string", "default": "r" },
+        "bufsize": { "type": "integer", "default": -1 },
+        "encoding": { "type": ["string", "null"] },
+        "errors": { "type": ["string", "null"] }
+      }
+    },
+
+    "ActionInfo": {
+      "type": "object",
+      "properties": {
+        "option_strings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "dest": { "type": "string" },
+        "action_type": { "$ref": "#/$defs/ActionType" },
+        "nargs": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "string" },
+            { "type": "null" },
+            { "$ref": "#/$defs/ArgparseMarker" }
+          ]
+        },
+        "const": {},
+        "default": {},
+        "type_info": {
+          "oneOf": [
+            { "$ref": "#/$defs/TypeInfo" },
+            { "type": "null" }
+          ]
+        },
+        "file_type_info": {
+          "oneOf": [
+            { "$ref": "#/$defs/FileTypeInfo" },
+            { "type": "null" }
+          ]
+        },
+        "choices": {
+          "oneOf": [
+            { "type": "array" },
+            { "type": "null" }
+          ]
+        },
+        "required": { "type": "boolean", "default": false },
+        "help": { "type": ["string", "null"] },
+        "metavar": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "null" }
+          ]
+        },
+        "deprecated": { "type": "boolean", "default": false },
+        "version": { "type": ["string", "null"] },
+        "subparsers": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": { "$ref": "#" }
+            },
+            { "type": "null" }
+          ]
+        },
+        "subparsers_title": { "type": ["string", "null"] },
+        "subparsers_description": { "type": ["string", "null"] },
+        "subparsers_dest": { "type": ["string", "null"] },
+        "subparsers_required": { "type": "boolean", "default": false },
+        "subparsers_aliases": {
+          "oneOf": [
+            {
+              "type": "object",
+              "description": "Mapping of subparser name to list of aliases",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "custom_action_class": { "type": ["string", "null"] }
+      },
+      "required": ["option_strings", "dest", "action_type"]
+    },
+
+    "ArgumentGroup": {
+      "type": "object",
+      "properties": {
+        "title": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "actions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["actions"]
+    },
+
+    "MutualExclusionGroup": {
+      "type": "object",
+      "properties": {
+        "required": { "type": "boolean" },
+        "actions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["required", "actions"]
+    },
+
+    "ArgparseMarker": {
+      "type": "object",
+      "properties": {
+        "__argparse__": {
+          "type": "string",
+          "enum": ["SUPPRESS", "REMAINDER"]
+        }
+      },
+      "required": ["__argparse__"]
+    }
+  }
+}
