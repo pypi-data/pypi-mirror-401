@@ -1,0 +1,78 @@
+Metadata-Version: 2.4
+Name: barie-slack-mcp
+Version: 0.1.0
+Summary: Slack MCP Server for interacting with Slack workspaces via the Model Context Protocol
+Author-email: Barie <support@barie.ai>
+License: MIT
+Keywords: mcp,model-context-protocol,slack,slack-api
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: mcp>=0.9.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Barie Slack MCP
+
+A Model Context Protocol (MCP) server for interacting with Slack workspaces. This package provides a comprehensive set of tools for managing Slack channels, messages, users, and files.
+
+## Installation
+
+Install via `uvx`:
+
+```bash
+uvx barie-slack-mcp
+```
+
+Or install via pip:
+
+```bash
+pip install barie-slack-mcp
+```
+
+## Usage
+
+Run the MCP server:
+
+```bash
+barie-slack-mcp --api-token <your-slack-token> --file-storage-path <path-to-files>
+```
+
+### Required Arguments
+
+- `--api-token`: Your Slack API token (xoxb-...)
+- `--file-storage-path`: Path to directory where files are stored for uploads
+
+### Optional Arguments
+
+- `--workspace-id`: Optional workspace ID
+
+## Features
+
+The server provides the following tools:
+
+- **Channel Management**: List, create, archive, and manage channels
+- **Message Operations**: Send, update, delete, and search messages
+- **User Management**: List and get user information
+- **File Uploads**: Upload files to channels
+- **Block Kit Support**: Send rich formatted messages using Slack Block Kit
+- **Team Information**: Get workspace/team details
+
+## Requirements
+
+- Python 3.9+
+- Slack API token with appropriate scopes
+
+## License
+
+MIT
