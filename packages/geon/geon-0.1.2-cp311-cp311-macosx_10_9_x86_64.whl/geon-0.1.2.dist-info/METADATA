@@ -1,0 +1,92 @@
+Metadata-Version: 2.4
+Name: geon
+Version: 0.1.2
+Summary: Interactive point cloud inspection and annotation tool.
+Keywords: point-cloud,visualization,annotation,vtk,pyqt
+Author: geon contributors
+License-Expression: GPL-3.0-only
+License-File: LICENSE
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Python: >=3.10
+Requires-Dist: numpy>=1.23
+Requires-Dist: h5py>=3.8
+Requires-Dist: PyQt6>=6.6
+Requires-Dist: vtk>=9.2
+Requires-Dist: plyfile>=0.8.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Provides-Extra: test
+Requires-Dist: pytest>=7.4; extra == "test"
+Description-Content-Type: text/markdown
+
+
+<p align="center">
+  <img src="resources/logo/geometric-red.png" alt="geon logo" width="350">
+</p>
+
+<p align="center">
+  <a href="https://github.com/biophase/geon/actions/workflows/ci.yml">
+    <img src="https://github.com/biophase/geon/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI">
+  </a>
+  <a href="https://pypi.org/project/geon/">
+    <img src="https://img.shields.io/pypi/v/geon" alt="PyPI version">
+  </a>
+  <a href="https://pypi.org/project/geon/">
+    <img src="https://img.shields.io/pypi/pyversions/geon" alt="Python versions">
+  </a>
+  <a href="https://pypi.org/project/geon/">
+    <img src="https://img.shields.io/pypi/l/geon" alt="License">
+  </a>
+</p>
+
+
+## Introduction
+*geon* is a research tool for managing and annotating large point cloud datasets stored in HDF5 file containers. 
+
+
+## Install guide
+The tool is tested with Python 3.10 to 3.12 and under *Windows*, *Linux (Ubuntu)* and *MacOS*.
+
+It requires `vtk` and `PyQt6`.
+
+
+To install run:
+```
+pip install geon
+```
+
+## Development build
+Native extensions are built with CMake via scikit-build-core. You will need a C++17 compiler and CMake. Make sure to clone with `--recursive` to pull submodules.
+
+```
+git clone --recursive https://github.com/biophase/geon.git
+pip install -e .
+```
+
+Building native modules:
+- Linux/MacOS:
+  ```
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY="$PWD/src/geon/_native"
+  cmake --build build -j
+  ```
+- On Windows (MSVC), use:
+  ```
+  cmake -S . -B build -G "Visual Studio 17 2022" -A x64 ^
+    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE="%CD%\\src\\geon\\_native"
+  cmake --build build --config Release
+  ```
+- OpenMP is used for some kernels when available.
+
+## Running Geon
+```
+python -m geon.app
+```
+
