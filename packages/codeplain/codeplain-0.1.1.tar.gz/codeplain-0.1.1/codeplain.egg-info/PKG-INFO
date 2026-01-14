@@ -1,0 +1,141 @@
+Metadata-Version: 2.4
+Name: codeplain
+Version: 0.1.1
+Summary: Transform plain language specifications into working code
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Software Development :: Code Generators
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: python-liquid2==0.3.0
+Requires-Dist: mistletoe==1.3.0
+Requires-Dist: langchain==1.0.8
+Requires-Dist: langchain-core==1.2.3
+Requires-Dist: langchain-openai==1.0.3
+Requires-Dist: langchain-anthropic==1.1.0
+Requires-Dist: langchain-aws==1.0.0
+Requires-Dist: langchain-cerebras==0.8.0
+Requires-Dist: langchain-google-genai==4.1.2
+Requires-Dist: langchain-ollama==1.0.0
+Requires-Dist: requests==2.32.3
+Requires-Dist: langsmith==0.4.4
+Requires-Dist: rich==14.2.0
+Requires-Dist: tiktoken==0.12.0
+Requires-Dist: PyYAML==6.0.2
+Requires-Dist: gitpython==3.1.42
+Requires-Dist: lizard==1.18.0
+Requires-Dist: textual==1.0.0
+Requires-Dist: SQLAlchemy==2.0.36
+Requires-Dist: psycopg2==2.9.10
+Requires-Dist: python-dotenv==1.1.0
+Requires-Dist: transitions==0.9.3
+Requires-Dist: cryptography==46.0.1
+Provides-Extra: dev
+Requires-Dist: pytest==8.3.5; extra == "dev"
+Requires-Dist: flake8==7.0.0; extra == "dev"
+Requires-Dist: black==24.2.0; extra == "dev"
+Requires-Dist: isort==5.13.2; extra == "dev"
+Requires-Dist: flake8-bugbear==24.12.12; extra == "dev"
+Requires-Dist: flake8-unused-arguments==0.0.13; extra == "dev"
+Requires-Dist: flake8-eradicate==1.5.0; extra == "dev"
+Requires-Dist: pep8-naming==0.15.1; extra == "dev"
+Requires-Dist: mypy==1.11.2; extra == "dev"
+Dynamic: license-file
+
+# Codeplain plain2code renderer
+
+Render ***plain source to software code using the Codeplain API.
+
+## Codeplain.ai - Code Generation as a Service
+
+Codeplain is a platform that generates software code using large language models based on requirements you specify in ***plain specification language.
+
+Schematic overview of the Codeplain's code generation service
+
+<img src="https://raw.githubusercontent.com/Codeplain-ai/plain2code_client/main/resources/codeplain_overview.png">
+
+### Abstracting Away Code Generation Complexity with ***plain
+
+
+***plain is a novel specification language that helps abstracting away complexity of using large language models for code generation.
+
+An example application in ***plain
+
+<img src="https://raw.githubusercontent.com/Codeplain-ai/plain2code_client/main/resources/plain_example.png" width="70%" height="70%">
+
+
+## Getting started
+
+### Prerequisites
+
+
+#### System requirements
+
+To run the plain2code client, you need Python 3.11 or a later version.
+
+**Windows users:** Please install WSL (Windows Subsystem for Linux) as this is currently the supported environment for running plain code on Windows.
+
+#### Authorization - Codeplain API Key
+
+We are using Codeplain API Key to authorize requests to the Codeplain API. To get your Codeplain API Key, please contact Codeplain.ai support at support@codeplain.ai.
+
+In order to generate code, you need to export the following environment variable:
+
+```bash
+export CODEPLAIN_API_KEY="your_actual_api_key_here"
+```
+
+### Installation Steps
+
+1. Clone this repository
+2. Set your Codeplain API key as an environment variable:
+   ```
+   export CODEPLAIN_API_KEY=your_api_key_here
+   ```
+3. (Recommended) Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
+4. Install required libraries
+   ```
+   pip install -r requirements.txt
+   ```
+
+### Quick Start
+
+After completing the installation steps above, you can immediately test the system with a simple "Hello World" example:
+
+- Change to the example folder and run the example:
+   ```
+   cd examples/example_hello_world_python
+   python ../../plain2code.py hello_world_python.plain
+   ```
+
+   *Note: Rendering will take a few minutes to complete.*
+
+- The system will generate a Python application in the `build` directory. You can run it with:
+   ```
+   cd build
+   python hello_world.py
+   ```
+
+## Additional Resources
+
+### Examples and Sample Projects
+
+- See the [examples](examples) folder for sample projects in Golang, Python, and React.
+- For example application how to implement task manager in ***plain see [example-task-manager](https://github.com/Codeplain-ai/example-task-manager) repository.
+- For example application how to implement SaaS connectors in ***plain see [example-saas-connectors](https://github.com/Codeplain-ai/example-saas-connectors) repository.
+
+### Documentation
+
+- For more details on the ***plain format, see the [***plain language specification](docs/plain_language_specification.md).
+- For step-by-step instructions for creating your first ***plain project see the [Kickstart your ***plain project](docs/starting_a_plain_project_from_scratch.md).
+- For complete CLI documentation and usage examples, see [plain2code CLI documentation](docs/plain2code_cli.md).
+
+
