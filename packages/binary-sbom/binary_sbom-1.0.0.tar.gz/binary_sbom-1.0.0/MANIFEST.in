@@ -1,0 +1,20 @@
+include README.md
+include LICENSE
+include pyproject.toml
+
+# Recursive include any data files in the package
+# recursive-include src/binary_sbom *.json *.yaml *.yml *.txt
+
+# Exclude development and testing artifacts
+global-exclude .gitignore
+global-exclude .pypirc.template
+global-exclude .pypirc
+global-exclude *.sh
+global-exclude *_verification.md
+global-exclude .claude_settings.json
+global-exclude .auto-claude-status
+global-exclude .auto-claude-security.json
+recursive-exclude .auto-claude *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * *.egg-info
