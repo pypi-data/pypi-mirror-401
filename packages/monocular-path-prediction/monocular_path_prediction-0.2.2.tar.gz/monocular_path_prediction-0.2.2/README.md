@@ -1,0 +1,121 @@
+# Monocular Camera Path Prediction for Exosuits
+The Python modules use a monocular camera to predict the user's movements to better inform the control algorithm.
+
+<img src="docs/exosuit_anticipation.png" alt="Description" width="600"/>
+
+## Install
+To install the library run: `pip install monocular-path-prediction`
+
+Download the pre-trained models from [Depth-Anything-V2](https://github.com/DepthAnything/Depth-Anything-V2?tab=readme-ov-file#pre-trained-models).
+
+## Development
+0. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) from Astral.
+1. Setup your computer to run Makefiles (not CMake).
+2. `make init` to create the virtual environment and install dependencies
+3. `make format` to format the code and check for errors
+4. `make test` to run the test suite
+5. `make clean` to delete the temporary files and directories
+6. `make deploy` to build and publish to https://pypi.org/project/monocular-path-prediction
+7. `make imu` to test the IMU device
+8. `make camera` to test the camera
+9. `make app` to run the application in a loop
+10. `make serial` to test a serial device
+11. `make calibration` to run the camera calibration
+
+## Usage
+```
+# example usage of the module
+ python src/monocular_path_prediction/__main__.py --help
+```
+
+## Microcontrollers
+The microcontroller code can be found inside src/microcontroller/.
+
+# Repo Structure
+<!-- TREE-START -->
+```
+├── docs
+│   ├── camera-calibration-checker-board_9x7.pdf
+│   └── exosuit_anticipation.png
+├── src
+│   ├── microcontroller
+│   │   └── adafruit_main.py
+│   └── monocular_path_prediction
+│       ├── config
+│       │   ├── __init__.py
+│       │   ├── definitions.py
+│       │   └── setup_logger.py
+│       ├── sensors
+│       │   ├── camera
+│       │   │   ├── calibration
+│       │   │   │   ├── __init__.py
+│       │   │   │   ├── __main__.py
+│       │   │   │   ├── calibration.py
+│       │   │   │   ├── detector.py
+│       │   │   │   └── results.py
+│       │   │   ├── images
+│       │   │   │   ├── __init__.py
+│       │   │   │   └── images.py
+│       │   │   ├── __init__.py
+│       │   │   ├── __main__.py
+│       │   │   ├── camera.py
+│       │   │   ├── camera_intrinsics.py
+│       │   │   ├── display.py
+│       │   │   └── utils.py
+│       │   ├── device
+│       │   │   ├── __init__.py
+│       │   │   ├── __main__.py
+│       │   │   ├── arduino.py
+│       │   │   ├── device_info.py
+│       │   │   ├── device_selector.py
+│       │   │   └── serial_device.py
+│       │   ├── imu
+│       │   │   ├── __init__.py
+│       │   │   ├── __main__.py
+│       │   │   ├── calibration.py
+│       │   │   ├── data_classes.py
+│       │   │   ├── filter.py
+│       │   │   ├── imu_device.py
+│       │   │   ├── plotter.py
+│       │   │   ├── reader.py
+│       │   │   └── writer.py
+│       │   ├── __init__.py
+│       │   └── setup.py
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── depth_estimator.py
+│       ├── path_planner.py
+│       ├── pipeline.py
+│       └── utils.py
+├── tests
+│   ├── core_test
+│   │   └── timer_test.py
+│   ├── sensors
+│   │   ├── camera
+│   │   │   └── calibration
+│   │   │       └── calibration_test.py
+│   │   ├── device
+│   │   │   └── serial_device_test.py
+│   │   └── imu
+│   │       ├── gyro_calibration_test.py
+│   │       ├── imu_test.py
+│   │       └── reader_test.py
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── estimators_test.py
+│   ├── main_test.py
+│   └── pipeline_test.py
+├── .coverage
+├── .gitignore
+├── .pre-commit-config.yaml
+├── .python-version
+├── CONTRIBUTING.md
+├── LICENSE
+├── Makefile
+├── README.md
+├── poetry.lock
+├── pyproject.toml
+├── repo_tree.py
+└── uv.lock
+```
+<!-- TREE-END -->
