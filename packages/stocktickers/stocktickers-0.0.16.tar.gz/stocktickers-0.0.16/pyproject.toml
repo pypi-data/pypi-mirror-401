@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stocktickers"
+version = "0.0.16"
+authors = [
+  { name="Taha Shieenavaz", email="tahashieenavaz@gmail.com" },
+]
+description = "List of stock tickers of specific countries gathered in one simple package."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = ["numpy", "pandas"]
+keywords = ["finance", "python finance"]
+license = { file = "LICENSE" }
+urls = { Homepage="https://github.com/tahashieenavaz/stocktickers", Repository="https://github.com/tahashieenavaz/stocktickers", Documentation="https://github.com/tahashieenavaz/stocktickers#readme" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+stocktickers = ["*.md", "*.txt"]
