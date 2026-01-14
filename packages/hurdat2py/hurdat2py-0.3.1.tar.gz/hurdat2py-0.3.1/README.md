@@ -1,0 +1,28 @@
+# hurdat2py
+
+A clean, researcher-focused Python interface for the NOAA HURDAT2 Hurricane Database.
+
+**Disclaimer:** This package is maintained primarily for personal research.
+
+## Installation
+
+```bash
+pip install hurdat2py
+```
+
+## Quick Start
+
+```python
+import hurdat2py
+
+# Initialize (Download/Cache latest data)
+atl = hurdat2py.Hurdat2()
+
+# Get a storm and plot it
+katrina = atl['Katrina', 2005]
+katrina.plot()
+```
+
+## Attribution & Acknowledgements
+* **Data:** National Hurricane Center (HURDAT2).
+* **Inspiration:** The plotting aesthetic in this package was inspired by the excellent [tropycal](https://tropycal.github.io/tropycal/index.html) library. While `hurdat2py` is a standalone implementation, we aimed to match their publication-quality visual style.
