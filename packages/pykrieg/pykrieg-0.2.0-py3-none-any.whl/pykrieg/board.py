@@ -1,0 +1,1692 @@
+"""
+Board class for Pykrieg - representing 20x25 game board.
+
+This module implements Board class with territory divisions,
+coordinate validation, piece management, and Lines of Communication (LOC) network system.
+"""
+
+import warnings
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple
+
+from . import constants
+
+if TYPE_CHECKING:
+    pass
+
+
+class Board:
+    """
+    Represents 20x25 game board with territory divisions.
+
+    The board has:
+    - 20 rows (0-19)
+    - 25 columns (0-24)
+    - Total 500 squares
+    - Territory division at row 10 (North: 0-9, South: 10-19)
+    """
+
+    TERRITORY_BOUNDARY = constants.TERRITORY_BOUNDARY  # Row 10 is the boundary
+
+    def __init__(self) -> None:
+        """Initialize empty board with territory boundaries."""
+        self._rows = constants.BOARD_ROWS
+        self._cols = constants.BOARD_COLS
+        # Use Any to handle both None and Unit objects due to circular imports
+        self._board: List[List[Any]] = [[None for _ in range(self._cols)]
+                                        for _ in range(self._rows)]
+        self._turn = constants.PLAYER_NORTH  # Starting player
+        self._turn_number = 1  # Track turn number
+        self._current_phase = constants.PHASE_MOVEMENT  # Track current phase
+        # Track pending retreats (persisted in FEN)
+        self._pending_retreats: List[Tuple[int, int]] = []
+
+        # New for 0.1.5: Retreat enforcement
+        self._units_must_retreat: Set[Tuple[int, int]] = set()  # Units forced to retreat this turn
+
+        # New for 0.1.4: Per-turn tracking
+        self._moved_units: Set[Tuple[int, int]] = set()  # Positions units moved FROM this turn
+        self._moved_unit_ids: Set[int] = set()  # IDs of units that moved this turn
+        self._attacks_this_turn: int = 0  # Attacks made this turn
+
+        # New for 0.2.0: Lines of Communication (LOC) network tracking
+        self._terrain: List[List[Optional[str]]] = [[None for _ in range(self._cols)]
+                                                     for _ in range(self._rows)]
+        self._active_north: Set[Tuple[int, int]] = set()  # Active units for North
+        self._active_south: Set[Tuple[int, int]] = set()  # Active units for South
+        self._relay_online_status: Dict[Tuple[int, int], bool] = {}  # Track relay online status
+        self._proximity_checked: Set[
+            Tuple[int, int]
+        ] = set()  # Track squares proximity-checked this cycle
+        self._network_coverage_north: Set[
+            Tuple[int, int]
+        ] = set()  # All squares covered by North's network
+        self._network_coverage_south: Set[
+            Tuple[int, int]
+        ] = set()  # All squares covered by South's network
+        self._network_calculated: bool = False  # Flag if calculate_network() was called
+        self._network_dirty: bool = True  # Flag for lazy recalculation - network needs update
+
+    @property
+    def rows(self) -> int:
+        """Return number of rows."""
+        return self._rows
+
+    @property
+    def cols(self) -> int:
+        """Return number of columns."""
+        return self._cols
+
+    @property
+    def turn(self) -> str:
+        """Return current player."""
+        return self._turn
+
+    def turn_side(self) -> str:
+        """Return current turn side (NORTH/SOUTH)."""
+        return self._turn
+
+    @property
+    def territory_boundary(self) -> int:
+        """Return row number that separates territories."""
+        return self.TERRITORY_BOUNDARY
+
+    def is_valid_square(self, row: int, col: int) -> bool:
+        """Check if coordinates are within board bounds."""
+        return (0 <= row < self._rows) and (0 <= col < self._cols)
+
+    def get_piece(self, row: int, col: int) -> Optional[object]:
+        """Get piece at given coordinates.
+
+        .. deprecated:: 0.1.2
+            Use :meth:`get_unit` instead. Will be removed in version 0.3.0.
+        """
+        warnings.warn(
+            "get_piece() is deprecated and will be removed in version 0.3.0. "
+            "Use get_unit() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+        return self._board[row][col]  # type: ignore[no-any-return]
+
+    def set_piece(self, row: int, col: int, piece: object) -> None:
+        """Set piece at given coordinates.
+
+        .. deprecated:: 0.1.2
+            Use :meth:`place_unit` instead. Will be removed in version 0.3.0.
+        """
+        warnings.warn(
+            "set_piece() is deprecated and will be removed in version 0.3.0. "
+            "Use place_unit() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+        self._board[row][col] = piece
+
+    def clear_square(self, row: int, col: int) -> None:
+        """Remove piece from square."""
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+        self._board[row][col] = None
+        self._network_dirty = True  # Mark network as needing recalculation
+
+    # Unit placement methods
+
+    def place_unit(self, row: int, col: int, unit: object) -> None:
+        """Place a Unit object on the board.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            unit: Unit object to place
+
+        Raises:
+            ValueError: If coordinates are invalid
+        """
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+        self._board[row][col] = unit
+        self._network_dirty = True  # Mark network as needing recalculation
+
+    def create_and_place_unit(self, row: int, col: int,
+                             unit_type: str, owner: str) -> object:
+        """Create and place a unit on board in one step.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            unit_type: Unit type string
+            owner: 'NORTH' or 'SOUTH'
+
+        Returns:
+            The created Unit object
+
+        Raises:
+            ValueError: If coordinates, unit_type, or owner are invalid
+        """
+        from .pieces import create_piece
+        unit = create_piece(unit_type, owner)
+        self.place_unit(row, col, unit)
+        return unit
+
+    # Unit query methods
+
+    def get_unit(self, row: int, col: int) -> Optional[object]:
+        """Get Unit object at given coordinates.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+
+        Returns:
+            Unit object or None if square is empty
+
+        Raises:
+            ValueError: If coordinates are invalid
+        """
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+        return self._board[row][col]  # type: ignore[no-any-return]
+
+    def get_unit_type(self, row: int, col: int) -> Optional[str]:
+        """Get unit type string at given coordinates.
+
+        Returns unit type string or None if square is empty.
+        """
+        unit = self.get_unit(row, col)
+        if unit is None:
+            return None
+        # Use getattr to avoid circular imports with Unit type
+        return getattr(unit, 'unit_type', None)
+
+    def get_unit_owner(self, row: int, col: int) -> Optional[str]:
+        """Get unit owner at given coordinates.
+
+        Returns 'NORTH', 'SOUTH', or None if square is empty.
+        """
+        unit = self.get_unit(row, col)
+        if unit is None:
+            return None
+        # Use getattr to avoid circular imports with Unit type
+        return getattr(unit, 'owner', None)
+
+    def count_units(self, unit_type: Optional[str] = None,
+                   owner: Optional[str] = None) -> int:
+        """Count units on the board with optional filters.
+
+        Args:
+            unit_type: Unit type to count, or None for all types
+            owner: Owner to count, or None for all owners
+
+        Returns:
+            Number of matching units
+        """
+        count = 0
+        for row in range(self._rows):
+            for col in range(self._cols):
+                unit = self._board[row][col]
+                if unit:
+                    if unit_type is None or unit.unit_type == unit_type:
+                        if owner is None or unit.owner == owner:
+                            count += 1
+        return count
+
+    def get_units_by_type(self, unit_type: str) -> List[Tuple[int, int]]:
+        """Get all coordinates containing a specific unit type.
+
+        Args:
+            unit_type: Unit type string
+
+        Returns:
+            List of (row, col) tuples containing unit type
+        """
+        units: List[Tuple[int, int]] = []
+        for row in range(self._rows):
+            for col in range(self._cols):
+                unit = self._board[row][col]
+                if unit and unit.unit_type == unit_type:
+                    units.append((row, col))
+        return units
+
+    def get_units_by_owner(self, owner: str) -> List[Tuple[int, int]]:
+        """Get all coordinates containing units owned by a player.
+
+        Args:
+            owner: 'NORTH' or 'SOUTH'
+
+        Returns:
+            List of (row, col) tuples containing player's units
+        """
+        units: List[Tuple[int, int]] = []
+        for row in range(self._rows):
+            for col in range(self._cols):
+                unit = self._board[row][col]
+                if unit and unit.owner == owner:
+                    units.append((row, col))
+        return units
+
+    def get_all_units(self) -> Dict[Tuple[int, int], object]:
+        """Get all units on the board.
+
+        Returns:
+            Dictionary mapping (row, col) tuples to Unit objects
+        """
+        units: Dict[Tuple[int, int], object] = {}
+        for row in range(self._rows):
+            for col in range(self._cols):
+                unit = self._board[row][col]
+                if unit:
+                    units[(row, col)] = unit
+        return units
+
+    # Validation methods
+
+    def is_valid_unit_type(self, unit_type: str) -> bool:
+        """Check if unit type is valid.
+
+        Returns True if unit_type is in ALL_UNIT_TYPES.
+        """
+        return unit_type in constants.ALL_UNIT_TYPES
+
+    def is_valid_owner(self, owner: str) -> bool:
+        """Check if owner is valid.
+
+        Returns True if owner is NORTH or SOUTH.
+        """
+        return owner in (constants.PLAYER_NORTH, constants.PLAYER_SOUTH)
+
+    def get_territory(self, row: int, col: int) -> str:
+        """
+        Determine which territory a square belongs to.
+
+        Returns:
+            'NORTH' if row < TERRITORY_BOUNDARY
+            'SOUTH' if row >= TERRITORY_BOUNDARY
+        """
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+
+        return constants.PLAYER_NORTH if row < self.TERRITORY_BOUNDARY else constants.PLAYER_SOUTH
+
+    def is_north_territory(self, row: int, col: int) -> bool:
+        """Check if square is in North territory."""
+        return self.get_territory(row, col) == constants.PLAYER_NORTH
+
+    def is_south_territory(self, row: int, col: int) -> bool:
+        """Check if square is in South territory."""
+        return self.get_territory(row, col) == constants.PLAYER_SOUTH
+
+    def get_territory_squares(self, territory: str) -> List[Tuple[int, int]]:
+        """
+        Get all squares belonging to a territory.
+
+        Args:
+            territory: 'NORTH' or 'SOUTH'
+
+        Returns:
+            List of (row, col) tuples
+        """
+        if territory not in [constants.PLAYER_NORTH, constants.PLAYER_SOUTH]:
+            raise ValueError(f"Invalid territory: {territory}")
+
+        squares = []
+        for row in range(self._rows):
+            for col in range(self._cols):
+                if self.get_territory(row, col) == territory:
+                    squares.append((row, col))
+        return squares
+
+    @staticmethod
+    def spreadsheet_to_tuple(coord: str) -> Tuple[int, int]:
+        """
+        Convert spreadsheet-style coordinate to internal (row, col) tuple.
+
+        Args:
+            coord: String in spreadsheet format (e.g., "A1", "AA10", "Y25")
+
+        Returns:
+            Tuple (row, col) where:
+            - row: 0-based from top
+            - col: 0-based from left
+
+        Note: Coordinate origin is top-left (A1 = top-left corner)
+              No flipping needed - direct mapping with 1-based to 0-based conversion
+
+        Example:
+            "A1" -> (0, 0)      (top-left corner)
+            "Y25" -> (24, 24)   (bottom-right on 25-col board)
+            "AA10" -> (9, 26)   (10th row, 27th column)
+            "AB1" -> (0, 27)     (top row, 28th column)
+        """
+        if not isinstance(coord, str):
+            raise TypeError(f"Coord must be string, got {type(coord)}")
+
+        # Check for empty or whitespace-only string
+        if not coord or coord.isspace():
+            raise ValueError(f"Invalid coord format: {coord}")
+
+        # Check for spaces in string
+        if ' ' in coord:
+            raise ValueError(f"Invalid coord format: {coord}")
+
+        # Separate letters (column) and numbers (row)
+        i = 0
+        while i < len(coord) and coord[i].isalpha():
+            i += 1
+
+        col_letters = coord[:i]
+        row_number = coord[i:]
+
+        if not col_letters or not row_number:
+            raise ValueError(f"Invalid coord format: {coord}")
+
+        # Parse row (direct conversion, no flip needed)
+        row_index = int(row_number) - 1  # Convert 1-based to 0-based
+
+        # Validate row index (must be >= 0 after conversion)
+        if row_index < 0:
+            raise ValueError(f"Invalid coord format: {coord} (row must be >= 1)")
+
+        # Parse column (A=0, Z=25, AA=26, AZ=51, BA=52, etc.)
+        col_index = 0
+        for char in col_letters:
+            col_index = col_index * 26 + (ord(char.upper()) - ord('A') + 1)
+        col_index -= 1  # Convert to 0-based
+
+        return (row_index, col_index)
+
+    @staticmethod
+    def tuple_to_spreadsheet(row: int, col: int) -> str:
+        """
+        Convert internal (row, col) tuple to spreadsheet-style coordinate.
+
+        Args:
+            row: Row number (0-19, 0-based from top)
+            col: Column number (0-24, 0-based from left)
+
+        Returns:
+            String in spreadsheet format (e.g., "A1", "AA10", "Y25")
+
+        Note: Coordinate origin is top-left (A1 = top-left corner)
+              No flipping needed - direct mapping with 0-based to 1-based conversion
+
+        Example:
+            (0, 0) -> "A1"      (top-left corner)
+            (24, 24) -> "Y25"   (bottom-right on 25-col board)
+            (9, 26) -> "AA10"   (10th row, 27th column)
+            (0, 27) -> "AB1"     (top row, 28th column)
+        """
+        if not isinstance(row, int) or not isinstance(col, int):
+            raise TypeError("Row and col must be integers")
+
+        # Format column (0=A, 1=B, 25=Z, 26=AA, etc.)
+        col_index = col + 1  # Convert to 1-based
+        col_letters: List[str] = []
+        while col_index > 0:
+            col_index -= 1
+            col_letters.insert(0, chr(ord('A') + col_index % 26))
+            col_index //= 26
+
+        # Format row (direct conversion, no flip needed)
+        row_number = row + 1  # Convert to 1-based
+
+        return f"{''.join(col_letters)}{row_number}"
+
+    @staticmethod
+    def tuple_to_index(row: int, col: int, board_cols: int = 25) -> int:
+        """
+        Convert row, col to square index (row-major order).
+
+        Args:
+            row: Row number (0-19)
+            col: Column number (0-24)
+            board_cols: Number of columns (default 25)
+
+        Returns:
+            Integer index (0-499)
+
+        Example:
+            (0, 0) -> 0
+            (0, 1) -> 1
+            (1, 0) -> 25
+        """
+        if row < 0 or col < 0:
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+
+        return row * board_cols + col
+
+    @staticmethod
+    def index_to_tuple(index: int, board_cols: int = 25, board_rows: int = 20) -> Tuple[int, int]:
+        """
+        Convert square index to row, col tuple.
+
+        Args:
+            index: Integer index (0-499)
+            board_cols: Number of columns (default 25)
+            board_rows: Number of rows (default 20)
+
+        Returns:
+            Tuple (row, col)
+
+        Example:
+            0 -> (0, 0)
+            1 -> (0, 1)
+            25 -> (1, 0)
+        """
+        if not isinstance(index, int):
+            raise TypeError(f"Index must be integer, got {type(index)}")
+
+        max_index = board_cols * board_rows - 1
+        if not (0 <= index <= max_index):
+            raise ValueError(f"Invalid index: {index} (max: {max_index})")
+
+        row = index // board_cols
+        col = index % board_cols
+        return (row, col)
+
+    # Movement convenience methods
+
+    def get_legal_moves(self, row: int, col: int) -> List[Tuple[int, int]]:
+        """Get all legal moves for unit at given position.
+
+        Convenience method that wraps movement.generate_moves.
+
+        Args:
+            row: Row of unit (0-19)
+            col: Column of unit (0-24)
+
+        Returns:
+            List of (to_row, to_col) tuples
+
+        Raises:
+            ValueError: If no unit at position
+        """
+        from .movement import generate_moves
+        return generate_moves(self, row, col)
+
+    def is_legal_move(self, from_row: int, from_col: int,
+                      to_row: int, to_col: int) -> bool:
+        """Check if a move is legal.
+
+        Convenience method that wraps movement.is_valid_move.
+
+        Args:
+            from_row: Source row (0-19)
+            from_col: Source column (0-24)
+            to_row: Target row (0-19)
+            to_col: Target column (0-24)
+
+        Returns:
+            True if move is legal, False otherwise
+        """
+        from .movement import is_valid_move
+        return is_valid_move(self, from_row, from_col, to_row, to_col)
+
+    def make_move(self, from_row: int, from_col: int,
+                  to_row: int, to_col: int) -> object:
+        """Make a move on the board.
+
+        Convenience method that wraps movement.execute_move.
+
+        Args:
+            from_row: Source row (0-19)
+            from_col: Source column (0-24)
+            to_row: Target row (0-19)
+            to_col: Target column (0-24)
+
+        Returns:
+            The Unit object that was moved
+
+        Raises:
+            ValueError: If move is invalid
+        """
+        from .movement import execute_move
+        return execute_move(self, from_row, from_col, to_row, to_col)
+
+    # Combat convenience methods
+
+    def calculate_combat(self, target_row: int, target_col: int,
+                        attacker: str, defender: str) -> Dict[str, object]:
+        """Calculate complete combat scenario.
+
+        Convenience method that wraps combat.calculate_combat.
+
+        Args:
+            target_row: Target row (0-19)
+            target_col: Target column (0-24)
+            attacker: 'NORTH' or 'SOUTH'
+            defender: 'NORTH' or 'SOUTH'
+
+        Returns:
+            Dictionary with combat results
+        """
+        from .combat import calculate_combat
+        return calculate_combat(self, target_row, target_col, attacker, defender)
+
+    def execute_capture(self, target_row: int, target_col: int) -> object:
+        """Execute a capture (remove target unit from board).
+
+        Convenience method that wraps combat.execute_capture.
+
+        Args:
+            target_row: Target row (0-19)
+            target_col: Target column (0-24)
+
+        Returns:
+            The captured Unit object
+        """
+        from .combat import execute_capture
+        return execute_capture(self, target_row, target_col)
+
+    # Retreat tracking methods
+
+    def add_pending_retreat(self, row: int, col: int) -> None:
+        """Add unit to pending retreats.
+
+        This is called when combat resolves to RETREAT outcome.
+        The actual retreat execution happens at the start of the defender's
+        next turn (enforced by turn management in 0.1.4).
+
+        Note: Retreats are tracked in-memory and not persisted in KFEN format.
+        They are resolved each turn by turn management system.
+
+        Args:
+            row: Row of unit that must retreat
+            col: Column of unit that must retreat
+
+        Raises:
+            ValueError: If no unit at position
+        """
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+
+        unit = self.get_unit(row, col)
+        if unit is None:
+            raise ValueError(f"No unit at ({row}, {col}) to mark for retreat")
+
+        # Check if already in retreat list to avoid duplicates
+        if (row, col) not in self._pending_retreats:
+            self._pending_retreats.append((row, col))
+
+    def get_pending_retreats(self) -> List[Tuple[int, int]]:
+        """Get all pending retreats.
+
+        Returns:
+            List of (row, col) tuples for units that must retreat
+        """
+        return list(self._pending_retreats)
+
+    def clear_pending_retreats(self) -> None:
+        """Clear all pending retreats after resolution.
+
+        This should be called after all retreats have been processed
+        at the start of a turn.
+        """
+        self._pending_retreats.clear()
+
+    def has_pending_retreat(self, row: int, col: int) -> bool:
+        """Check if unit at position must retreat.
+
+        Args:
+            row: Row of unit to check
+            col: Column of unit to check
+
+        Returns:
+            True if unit at (row, col) must retreat, False otherwise
+        """
+        return (row, col) in self._pending_retreats
+
+    # Retreat enforcement methods for 0.1.5
+
+    def get_units_must_retreat(self) -> List[Tuple[int, int]]:
+        """Get all units that must retreat this turn.
+
+        Returns:
+            List of (row, col) tuples for units that must retreat
+            before making other moves
+        """
+        return list(self._units_must_retreat)
+
+    def is_unit_in_retreat(self, row: int, col: int) -> bool:
+        """Check if unit is currently in retreat mode.
+
+        Args:
+            row: Row of unit to check
+            col: Column of unit to check
+
+        Returns:
+            True if unit at (row, col) is in retreat mode, False otherwise
+        """
+        return (row, col) in self._units_must_retreat
+
+    def get_valid_retreat_positions(self, row: int, col: int) -> List[Tuple[int, int]]:
+        """Get valid retreat positions for a unit.
+
+        Args:
+            row: Row of unit to check
+            col: Column of unit to check
+
+        Returns:
+            List of (to_row, to_col) tuples representing valid retreat destinations
+
+        Note:
+            This uses same movement rules as normal moves (terrain-independent in 0.1.4)
+        """
+        from .movement import generate_moves
+        return generate_moves(self, row, col)
+
+    # Turn management methods for 0.1.4
+
+    def has_moved_this_turn(self, row: int, col: int) -> bool:
+        """Check if a move originated from this position this turn.
+
+        Args:
+            row: Row of position to check
+            col: Column of position to check
+
+        Returns:
+            True if a unit moved FROM this position this turn, False otherwise
+        """
+        return (row, col) in self._moved_units
+
+    def get_moves_this_turn(self) -> int:
+        """Get number of units moved this turn.
+
+        Returns:
+            Number of units moved (0-5)
+        """
+        return len(self._moved_units)
+
+    def can_move_more(self) -> bool:
+        """Check if player can move more units this turn.
+
+        Returns:
+            True if fewer than 5 units have been moved, False otherwise
+        """
+        return len(self._moved_units) < constants.MAX_MOVES_PER_TURN
+
+    def get_attacks_this_turn(self) -> int:
+        """Get number of attacks made this turn.
+
+        Returns:
+            Number of attacks made (0 or 1)
+        """
+        return self._attacks_this_turn
+
+    def can_attack_more(self) -> bool:
+        """Check if player can attack more this turn.
+
+        Returns:
+            True if 0 attacks have been made, False otherwise
+        """
+        return self._attacks_this_turn < constants.MAX_ATTACKS_PER_TURN
+
+    def validate_move(self, from_row: int, from_col: int,
+                     to_row: int, to_col: int) -> bool:
+        """Validate a move according to turn rules.
+
+        Checks:
+        1. It's the movement phase
+        2. The unit belongs to the current player
+        3. The unit hasn't moved yet this turn
+        4. The player hasn't moved 5 units yet
+        5. If retreats are pending, only allow retreat moves
+        6. The move is legally valid (pseudo-legal check)
+
+        Args:
+            from_row: Source row (0-19)
+            from_col: Source column (0-24)
+            to_row: Target row (0-19)
+            to_col: Target column (0-24)
+
+        Returns:
+            True if move is valid according to turn rules, False otherwise
+        """
+        # Ensure network is up-to-date before checking movement
+        self._ensure_network_calculated()
+
+        # Check phase
+        if self._current_phase != constants.PHASE_MOVEMENT:
+            return False
+
+        # Check unit ownership
+        unit = self.get_unit(from_row, from_col)
+        if unit is None:
+            return False
+        if unit and unit.owner != self._turn:  # type: ignore[attr-defined]
+            return False
+
+        # Check if unit already moved (by checking unit ID)
+        unit_id = id(unit)
+        if unit_id in self._moved_unit_ids:
+            return False
+
+        # NEW: If units must retreat, only allow those to move
+        if self._units_must_retreat:
+            if (from_row, from_col) not in self._units_must_retreat:
+                return False
+
+        # Check move limit
+        if len(self._moved_units) >= constants.MAX_MOVES_PER_TURN:
+            return False
+
+        # Check move legality
+        from .movement import is_valid_move
+        return is_valid_move(self, from_row, from_col, to_row, to_col)
+
+    def make_turn_move(self, from_row: int, from_col: int,
+                       to_row: int, to_col: int) -> object:
+        """Make a move with turn validation and tracking.
+
+        This method:
+        1. Validates the move according to turn rules
+        2. Executes the move
+        3. Tracks that the unit has moved this turn
+        4. Clears the retreat flag if this was a retreat move
+
+        Args:
+            from_row: Source row (0-19)
+            from_col: Source column (0-24)
+            to_row: Target row (0-19)
+            to_col: Target column (0-24)
+
+        Returns:
+            The Unit object that was moved
+
+        Raises:
+            ValueError: If move is invalid according to turn rules
+        """
+        # Validate move
+        if not self.validate_move(from_row, from_col, to_row, to_col):
+            raise ValueError(
+                f"Invalid turn move from ({from_row}, {from_col}) to ({to_row}, {to_col})"
+            )
+
+        # Get unit before move to track its ID
+        unit = self.get_unit(from_row, from_col)
+        unit_id = id(unit)
+
+        # Execute move
+        from .movement import execute_move
+        moved_unit = execute_move(self, from_row, from_col, to_row, to_col)
+
+        # Track move - both position and unit ID
+        self._moved_units.add((from_row, from_col))
+        self._moved_unit_ids.add(unit_id)
+
+        # Clear retreat flag if this was a retreat move
+        if (from_row, from_col) in self._units_must_retreat:
+            self._units_must_retreat.remove((from_row, from_col))
+
+        return moved_unit
+
+    def validate_attack(self, target_row: int, target_col: int) -> bool:
+        """Validate an attack according to turn rules.
+
+        Checks:
+        1. It's the battle phase
+        2. The current player hasn't attacked yet
+        3. There's at least one attacking unit
+
+        Args:
+            target_row: Target row (0-19)
+            target_col: Target column (0-24)
+
+        Returns:
+            True if attack is valid according to turn rules, False otherwise
+        """
+        # Ensure network is up-to-date before checking attack
+        self._ensure_network_calculated()
+
+        # Check phase
+        if self._current_phase != constants.PHASE_BATTLE:
+            return False
+
+        # Check attack limit
+        if self._attacks_this_turn >= constants.MAX_ATTACKS_PER_TURN:
+            return False
+
+        # Check if attacker has units (can_attack will check this)
+        from .combat import can_attack
+        return can_attack(self, target_row, target_col, self._turn)
+
+    def make_turn_attack(self, target_row: int, target_col: int) -> Dict[str, object]:
+        """Make an attack with turn validation and tracking.
+
+        This method:
+        1. Validates the attack according to turn rules
+        2. Calculates the combat result
+        3. Executes capture if applicable
+        4. Marks defender for retreat if applicable
+        5. Tracks that an attack has been made
+
+        Args:
+            target_row: Target row (0-19)
+            target_col: Target column (0-24)
+
+        Returns:
+            Dictionary with combat results
+
+        Raises:
+            ValueError: If attack is invalid according to turn rules
+        """
+        # Validate attack
+        if not self.validate_attack(target_row, target_col):
+            raise ValueError(
+                f"Invalid turn attack at ({target_row}, {target_col})"
+            )
+
+        # Calculate combat
+        defender = (
+            constants.PLAYER_SOUTH
+            if self._turn == constants.PLAYER_NORTH
+            else constants.PLAYER_NORTH
+        )
+        result = self.calculate_combat(target_row, target_col, self._turn, defender)
+
+        # Handle outcome
+        from .combat import CombatOutcome
+        outcome = result['outcome']
+        if outcome == CombatOutcome.CAPTURE:
+            # Execute capture
+            self.execute_capture(target_row, target_col)
+        elif outcome == CombatOutcome.RETREAT:
+            # Mark defender for retreat
+            self.add_pending_retreat(target_row, target_col)
+
+        # Track attack
+        self._attacks_this_turn += 1
+
+        return result
+
+    def pass_attack(self) -> None:
+        """Pass the attack phase.
+
+        This method:
+        1. Validates it's the battle phase
+        2. Marks that an attack has been made (pass counts)
+
+        Raises:
+            ValueError: If not in battle phase or already attacked
+        """
+        if self._current_phase != constants.PHASE_BATTLE:
+            raise ValueError("Cannot pass attack: not in battle phase")
+
+        if self._attacks_this_turn >= constants.MAX_ATTACKS_PER_TURN:
+            raise ValueError("Cannot pass attack: already attacked")
+
+        self._attacks_this_turn += 1
+
+    def switch_to_battle_phase(self) -> None:
+        """Switch from movement phase to battle phase.
+
+        Raises:
+            ValueError: If not in movement phase
+        """
+        if self._current_phase != constants.PHASE_MOVEMENT:
+            raise ValueError("Cannot switch to battle phase: not in movement phase")
+
+        self._current_phase = constants.PHASE_BATTLE
+
+    def resolve_retreats(self) -> None:
+        """Resolve pending retreats at the start of a turn.
+
+        This method checks for pending retreats and enforces retreat rules:
+        1. For each unit that must retreat, find valid retreat squares
+        2. If valid retreat exists, mark unit as "must retreat" (player must choose destination)
+        3. If no valid retreat exists, capture (destroy) the unit
+        4. Clear pending retreats after resolution
+
+        Note:
+            - This is called at the start of the defender's turn
+            - Retreating units must move before other units can move
+            - Units in retreat are tracked in _units_must_retreat
+
+        TODO:
+            - In 0.2.0, add terrain validation to retreat moves
+            - In 0.2.0, check online/offline status for retreat
+        """
+        # Only resolve retreats for current player's units
+        retreat_positions = list(self._pending_retreats)
+
+        for row, col in retreat_positions:
+            unit = self.get_unit(row, col)
+            if unit is None:
+                # Unit already captured, skip
+                continue
+
+            # Only resolve retreats for current player
+            if unit and getattr(unit, 'owner', None) != self._turn:
+                continue
+
+            # Find valid retreat squares
+            # In 0.1.4, we use basic movement rules (terrain-independent)
+            from .movement import generate_moves
+            valid_moves = generate_moves(self, row, col)
+
+            if valid_moves:
+                # Mark unit as must retreat (player must choose destination)
+                self._units_must_retreat.add((row, col))
+            else:
+                # No valid retreat: capture the unit
+                self.execute_capture(row, col)
+
+        # Clear pending retreats for current player
+        self._pending_retreats = [
+            pos for pos in self._pending_retreats
+            if pos not in retreat_positions
+        ]
+
+    def end_turn(self) -> None:
+        """End current turn and switch to next player.
+
+        This method:
+        1. Clears moved unit tracking
+        2. Clears attack counter
+        3. Switches to other player
+        4. Resets phase to movement
+        5. Increments turn number
+        6. Resolves any pending retreats for new player
+
+        Note:
+            - Retreat resolution happens at the start of the new player's turn
+            - Turn number increments on each player switch
+            - Retreat state (_units_must_retreat) is NOT cleared automatically
+            - It persists until the NEXT end_turn() call
+            - This allows retreat state to persist during a player's turn
+        """
+        # Switch player and increment turn
+        self.increment_turn()
+
+        # Clear per-turn state for new player
+        self._moved_units.clear()
+        self._moved_unit_ids.clear()
+        self._attacks_this_turn = 0
+
+        # Resolve retreats for new player
+        self.resolve_retreats()
+
+    def reset_turn_state(self) -> None:
+        """Reset turn state without changing turn number or player.
+
+        This method is useful for:
+        - Undo functionality
+        - Testing scenarios
+        - Loading from FEN
+
+        Resets:
+        - Moved units tracking
+        - Attack counter
+        - Current phase (to movement)
+
+        Does NOT reset:
+        - Turn number
+        - Current player
+        - Pending retreats
+        - Board position
+        """
+        self._moved_units.clear()
+        self._moved_unit_ids.clear()
+        self._attacks_this_turn = 0
+        self._current_phase = constants.PHASE_MOVEMENT
+
+    # Turn tracking methods
+
+    @property
+    def turn_number(self) -> int:
+        """Return current turn number."""
+        return self._turn_number
+
+    @turn_number.setter
+    def turn_number(self, value: int) -> None:
+        """Set turn number."""
+        self._turn_number = value
+
+    @property
+    def current_phase(self) -> str:
+        """Return current turn phase."""
+        return self._current_phase
+
+    @current_phase.setter
+    def current_phase(self, value: str) -> None:
+        """Set current turn phase."""
+        self._current_phase = value
+
+    def increment_turn(self) -> None:
+        """Increment turn number and switch player."""
+        self._turn_number += 1
+        self._turn = (
+            constants.PLAYER_SOUTH
+            if self._turn == constants.PLAYER_NORTH
+            else constants.PLAYER_NORTH
+        )
+        self._current_phase = constants.PHASE_MOVEMENT  # Reset to movement phase
+
+    # =====================================================================
+    # 0.2.0: Lines of Communication (LOC) Network System
+    # =====================================================================
+
+    # Terrain management methods
+
+    def set_terrain(self, row: int, col: int, terrain: Optional[str]) -> None:
+        """Set terrain type for a square.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            terrain: Terrain type (None, 'MOUNTAIN', 'MOUNTAIN_PASS', 'FORTRESS')
+
+        Raises:
+            ValueError: If coordinates are invalid or terrain type is invalid
+        """
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+
+        if terrain is not None and terrain not in constants.ALL_TERRAIN_TYPES:
+            raise ValueError(f"Invalid terrain type: {terrain}")
+
+        self._terrain[row][col] = terrain
+
+    def get_terrain(self, row: int, col: int) -> Optional[str]:
+        """Get terrain type for a square.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+
+        Returns:
+            Terrain type or None if no terrain
+
+        Raises:
+            ValueError: If coordinates are invalid
+        """
+        if not self.is_valid_square(row, col):
+            raise ValueError(f"Invalid coordinates: ({row}, {col})")
+
+        return self._terrain[row][col]
+
+    # Network state helper methods
+
+    def _mark_square_covered(self, row: int, col: int, player: str) -> None:
+        """Mark a square as covered by a player's network.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            player: 'NORTH' or 'SOUTH'
+        """
+        if player == constants.PLAYER_NORTH:
+            self._network_coverage_north.add((row, col))
+        else:
+            self._network_coverage_south.add((row, col))
+
+    def _mark_unit_active(self, row: int, col: int, player: str) -> None:
+        """Mark a unit as active in the network.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            player: 'NORTH' or 'SOUTH'
+        """
+        if player == constants.PLAYER_NORTH:
+            self._active_north.add((row, col))
+        else:
+            self._active_south.add((row, col))
+
+        # Also mark the square as covered by the network
+        self._mark_square_covered(row, col, player)
+
+        # For relays/swift relays, also track online status
+        unit = self.get_unit(row, col)
+        if unit:
+            unit_type = getattr(unit, 'unit_type', None)
+            if unit_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                if (row, col) not in self._relay_online_status:
+                    self._relay_online_status[(row, col)] = True
+            else:
+                # For combat units, also track in relay_online_status for consistency
+                # This ensures is_unit_online works correctly for all units
+                if (row, col) not in self._relay_online_status:
+                    self._relay_online_status[(row, col)] = True
+
+    def _is_unit_active(self, row: int, col: int, player: str) -> bool:
+        """Check if a unit is active in the network.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            True if unit is active, False otherwise
+        """
+        if player == constants.PLAYER_NORTH:
+            return (row, col) in self._active_north
+        else:
+            return (row, col) in self._active_south
+
+    def _is_relay_online(self, row: int, col: int) -> bool:
+        """Check if a relay/swift relay is online.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+
+        Returns:
+            True if relay is online, False otherwise
+        """
+        return self._relay_online_status.get((row, col), False)
+
+    def _set_relay_online(self, row: int, col: int, online: bool) -> None:
+        """Set a relay/swift relay's online status.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            online: True if online, False otherwise
+        """
+        self._relay_online_status[(row, col)] = online
+
+    def _get_active_units(self, player: str) -> Set[Tuple[int, int]]:
+        """Get all active units for a player.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            Set of (row, col) tuples
+        """
+        if player == constants.PLAYER_NORTH:
+            return self._active_north.copy()
+        else:
+            return self._active_south.copy()
+
+    def _get_arsenals(self, player: str) -> List[Tuple[int, int]]:
+        """Get all arsenal squares for a player.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            List of (row, col) tuples
+        """
+        arsenals = []
+        for row in range(self._rows):
+            for col in range(self._cols):
+                unit = self._board[row][col]
+                if unit:
+                    unit_type = getattr(unit, 'unit_type', None)
+                    owner = getattr(unit, 'owner', None)
+                    if unit_type == constants.UNIT_ARSENAL and owner == player:
+                        arsenals.append((row, col))
+        return arsenals
+
+    def _get_unpropagated_relays(self, player: str) -> List[Tuple[int, int]]:
+        """Get all online relays/swift relays that haven't propagated yet.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            List of (row, col) tuples
+        """
+        relays = []
+        active_units = self._get_active_units(player)
+
+        for row, col in active_units:
+            unit = self.get_unit(row, col)
+            if unit:
+                unit_type = getattr(unit, 'unit_type', None)
+                if unit_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                    # Only return relays that are online AND haven't propagated yet
+                    if (
+                        self._is_relay_online(row, col)
+                        and (row, col) not in self._proximity_checked
+                    ):
+                        relays.append((row, col))
+
+        return relays
+
+    def _get_newly_activated_relays(self, player: str) -> List[Tuple[int, int]]:
+        """Get relays/swift relays activated in the most recent proximity check.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            List of (row, col) tuples
+        """
+        relays = []
+        active_units = self._get_active_units(player)
+
+        for row, col in active_units:
+            # If it's a relay/swift relay that's online but hasn't propagated yet
+            unit = self.get_unit(row, col)
+            if unit:
+                unit_type = getattr(unit, 'unit_type', None)
+                if unit_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                    if (
+                        self._is_relay_online(row, col)
+                        and (row, col) not in self._proximity_checked
+                    ):
+                        relays.append((row, col))
+
+        return relays
+
+    def _reset_network_state(self, player: str) -> None:
+        """Reset tracking state for a new network calculation.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+        """
+        if player == constants.PLAYER_NORTH:
+            self._active_north.clear()
+            self._network_coverage_north.clear()
+        else:
+            self._active_south.clear()
+            self._network_coverage_south.clear()
+
+        # Only clear relay_online_status when recalculating for both players
+        # This is handled in _ensure_network_calculated()
+        # Don't clear it here to preserve the other player's relay status
+        self._proximity_checked.clear()
+
+    # Ray-casting algorithm
+
+    def _cast_ray(self, origin_row: int, origin_col: int, dx: int, dy: int,
+                  player: str, source_is_arsenal: bool) -> bool:
+        """Cast a ray from origin in direction (dx, dy) until hitting a blocking obstacle.
+
+        Args:
+            origin_row: Starting row (0-19)
+            origin_col: Starting column (0-24)
+            dx, dy: Direction vector
+            player: The player whose network we're calculating
+            source_is_arsenal: True if ray originates from an arsenal, False if from relay
+
+        Returns:
+            True if any relay/swift relay was activated along this ray
+        """
+        x, y = origin_col, origin_row
+        relay_activated = False
+
+        # Extend ray to board edge
+        while True:
+            x += dx
+            y += dy
+
+            # Check board bounds
+            if not self.is_valid_square(y, x):
+                break
+
+            current_unit = self.get_unit(y, x)
+            current_terrain = self._terrain[y][x]
+
+            # Case 1: Empty square - continue ray
+            if current_unit is None:
+                # Check terrain at empty square
+                if current_terrain == constants.TERRAIN_MOUNTAIN:
+                    break  # Mountains block the ray
+                # Mountain passes and fortresses don't block
+                # Mark empty square as covered by network
+                self._mark_square_covered(y, x, player)
+                continue
+
+            # Case 2: Friendly unit - activate and continue (except relays may stop)
+            current_owner = getattr(current_unit, 'owner', None)
+            current_type = getattr(current_unit, 'unit_type', None)
+
+            if current_owner == player:
+                self._mark_unit_active(y, x, player)
+
+                # If it's a relay/swift relay, activate it and continue
+                if current_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                    if not self._is_relay_online(y, x):
+                        self._set_relay_online(y, x, True)
+                        relay_activated = True
+
+                # Friendly non-relay units don't block the ray (they're transparent)
+                continue
+
+            # Case 3: Enemy unit
+            # Enemy relays/swift relays do NOT block the ray
+            # Mark the square as covered (ray passes through) but don't activate enemy unit
+            if current_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                self._mark_square_covered(y, x, player)
+                continue
+
+            # All other enemy units block the ray
+            break
+
+        return relay_activated
+
+    # Network calculation steps
+
+    def _step1_arsenal_propagation(self, player: str) -> None:
+        """Step 1: Ray-based propagation from arsenals.
+
+        Arsenals radiate lines of communication in all 8 directions to the board edge.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+        """
+        arsenals = self._get_arsenals(player)
+
+        for arsenal_row, arsenal_col in arsenals:
+            # Mark arsenal as active
+            self._mark_unit_active(arsenal_row, arsenal_col, player)
+
+            # Ray-cast in all 8 directions
+            for dx, dy in constants.DIRECTIONS:
+                self._cast_ray(arsenal_row, arsenal_col, dx, dy, player, source_is_arsenal=True)
+
+    def _step2_relay_propagation(self, player: str) -> None:
+        """Step 2: Ray-based propagation from activated relays/swift relays.
+
+        This step repeats until no more valid relays are activated.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+        """
+        while True:
+            new_relays_activated = False
+
+            # Get all online relays/swift relays that haven't propagated yet
+            active_relays = self._get_unpropagated_relays(player)
+
+            for relay_row, relay_col in active_relays:
+                # Ray-cast in all 8 directions
+                for dx, dy in constants.DIRECTIONS:
+                    did_activate = self._cast_ray(
+                        relay_row, relay_col, dx, dy, player, source_is_arsenal=False
+                    )
+                    if did_activate:
+                        new_relays_activated = True
+
+                # Mark this relay as propagated
+                self._proximity_checked.add((relay_row, relay_col))
+
+            # If no new relays were activated AND all relays have propagated, we're done
+            if not new_relays_activated and not self._get_unpropagated_relays(player):
+                break
+
+    def _step3_proximity_propagation(self, player: str) -> bool:
+        """Step 3: Proximity-based propagation from active units.
+
+        This step repeats until all active units have been proximity-checked.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            True if new units were activated, False otherwise
+        """
+        new_units_activated = False
+        units_to_check = list(
+            self._get_active_units(player)
+        )  # Copy to avoid modification during iteration
+
+        for unit_row, unit_col in units_to_check:
+            if (unit_row, unit_col) in self._proximity_checked:
+                continue
+
+            # Mark this unit as proximity-checked
+            self._proximity_checked.add((unit_row, unit_col))
+
+            # Check all 8 adjacent squares
+            for dx, dy in constants.DIRECTIONS:
+                adj_row = unit_row + dy
+                adj_col = unit_col + dx
+
+                if not self.is_valid_square(adj_row, adj_col):
+                    continue
+
+                adj_unit = self.get_unit(adj_row, adj_col)
+
+                # Skip if no piece, wrong player, or already active
+                if adj_unit is None:
+                    continue
+                adj_owner = getattr(adj_unit, 'owner', None)
+                if adj_owner != player:
+                    continue
+                if self._is_unit_active(adj_row, adj_col, player):
+                    continue
+
+                # Activate adjacent unit
+                self._mark_unit_active(adj_row, adj_col, player)
+                new_units_activated = True
+
+        return new_units_activated
+
+    def _step4_relay_propagation_from_proximity(self, player: str) -> None:
+        """Step 4: Ray-based propagation from relays/swift relays activated by proximity.
+
+        This step is optional and defaults to True.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+        """
+        # Get relays that were just activated by proximity but haven't propagated yet
+        newly_activated_relays = self._get_newly_activated_relays(player)
+
+        for relay_row, relay_col in newly_activated_relays:
+            # Mark as propagated
+            if (relay_row, relay_col) not in self._proximity_checked:
+                self._proximity_checked.add((relay_row, relay_col))
+
+                # Ray-cast in all 8 directions
+                for dx, dy in constants.DIRECTIONS:
+                    self._cast_ray(relay_row, relay_col, dx, dy, player, source_is_arsenal=False)
+
+    # Main network calculation method
+
+    def calculate_network(self, player: str, enable_step4: bool = True) -> None:
+        """Calculate lines of communication network for specified player.
+
+        This must be called after any board state change.
+
+        Args:
+            player: The player to calculate network for ('NORTH' or 'SOUTH')
+            enable_step4: Whether to enable step 4 (ray propagation from proximity-activated relays)
+        """
+        # Note: _network_calculated is NOT set here. It is set by enable_networks()
+        # to maintain backward compatibility - networks are disabled by default.
+
+        # Reset state for this calculation cycle
+        self._reset_network_state(player)
+
+        # Step 1: Initial ray-based propagation from arsenals
+        self._step1_arsenal_propagation(player)
+
+        # Step 2: Ray-based propagation from activated relays/swift relays
+        # Repeat until no more relays are activated
+        self._step2_relay_propagation(player)
+
+        # Step 3: Proximity-based propagation from all active units
+        # Repeat until all active units have been proximity-checked
+        self._step3_proximity_propagation(player)
+
+        # Step 4: Optional ray-based propagation from proximity-activated relays
+        if enable_step4:
+            self._step4_relay_propagation_from_proximity(player)
+
+            # Step 5: Return to step 3 if any units were activated in step 4
+            # This loop continues until no new units are activated
+            while True:
+                new_units_activated = self._step3_proximity_propagation(player)
+                if not new_units_activated:
+                    break
+                self._step4_relay_propagation_from_proximity(player)
+
+    # Helper for lazy network calculation
+
+    def _ensure_network_calculated(self) -> None:
+        """Ensure network is up-to-date before querying network state.
+
+        This lazy calculation approach recalculates networks only when needed,
+        avoiding unnecessary recalculations during batch operations like
+        test setup or FEN loading.
+        """
+        # Only recalculate if network has been calculated before and is now dirty
+        # This ensures backward compatibility: if network has never been calculated,
+        # we don't force calculation (optimistic default applies)
+        if self._network_calculated and self._network_dirty:
+            # Clear relay status before recalculating both players
+            self._relay_online_status.clear()
+
+            # Recalculate when dirty (ensures online/offline status is correct)
+            from .constants import PLAYER_NORTH, PLAYER_SOUTH
+            self.calculate_network(PLAYER_NORTH)
+            self.calculate_network(PLAYER_SOUTH)
+            self._network_dirty = False
+
+    # Public API for network queries
+
+    def enable_networks(self) -> None:
+        """Enable network rules for both players.
+
+        This method activates the Lines of Communication system, after which
+        units must be connected to arsenals through the network to function.
+
+        Once enabled, the network system enforces:
+        - Units not connected to the network have 0 attack/defense/range (except relays)
+        - Units not connected to the network have 0 movement (except relays/swift relays)
+
+        Note: This should be called explicitly when network rules are desired.
+        The default behavior is that networks are disabled (all units online).
+
+        Example:
+            >>> board = Board()
+            >>> board.create_and_place_unit(5, 10, 'ARSENAL', 'NORTH')
+            >>> board.create_and_place_unit(5, 12, 'INFANTRY', 'NORTH')
+            >>> # Enable network rules
+            >>> board.enable_networks()
+        """
+        self._network_calculated = True
+        self.calculate_network(constants.PLAYER_NORTH)
+        self.calculate_network(constants.PLAYER_SOUTH)
+
+    def is_unit_online(self, row: int, col: int, player: str) -> bool:
+        """Check if a square is covered by network for a player.
+
+        This checks if the square is within network coverage,
+        which includes both units and empty squares covered by rays.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            True if square is covered by network, False otherwise
+
+        Note:
+            If network has never been calculated (_network_calculated == False),
+            returns True for all squares (optimistic default). This ensures backward
+            compatibility and allows normal movement before network system is invoked.
+        """
+        # Optimistic default: assume online if network hasn't been calculated
+        if not self._network_calculated:
+            return True
+
+        self._ensure_network_calculated()  # Lazy recalculation if needed
+        if player == constants.PLAYER_NORTH:
+            return (row, col) in self._network_coverage_north
+        else:
+            return (row, col) in self._network_coverage_south
+
+    def is_relay_online(self, row: int, col: int) -> bool:
+        """Check if a relay/swift relay is online.
+
+        Args:
+            row: Row coordinate (0-19)
+            col: Column coordinate (0-24)
+
+        Returns:
+            True if relay is online, False otherwise
+
+        Note:
+            If network has never been calculated (_network_calculated == False),
+            returns True for all relays (optimistic default). This ensures backward
+            compatibility and allows normal movement before network system is invoked.
+        """
+        # Optimistic default: assume online if network hasn't been calculated
+        if not self._network_calculated:
+            return True
+
+        self._ensure_network_calculated()  # Lazy recalculation if needed
+        unit = self.get_unit(row, col)
+        if unit:
+            unit_type = getattr(unit, 'unit_type', None)
+            if unit_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                return self._is_relay_online(row, col)
+        return False
+
+    def get_online_units(self, player: str) -> Set[Tuple[int, int]]:
+        """Get all online units for a player.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            Set of (row, col) tuples
+
+        Note:
+            If network has never been calculated (_network_calculated == False),
+            returns all units for the player (optimistic default). This ensures
+            backward compatibility and allows normal movement before network system is invoked.
+        """
+        # Optimistic default: return all units if network hasn't been calculated
+        if not self._network_calculated:
+            return set(self.get_units_by_owner(player))
+
+        self._ensure_network_calculated()  # Lazy recalculation if needed
+        return self._get_active_units(player)
+
+    def get_offline_units(self, player: str) -> Set[Tuple[int, int]]:
+        """Get all offline units for a player.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            Set of (row, col) tuples
+
+        Note:
+            If network has never been calculated (_network_calculated == False),
+            returns empty set (optimistic default - no units are offline).
+        """
+        # Optimistic default: no offline units if network hasn't been calculated
+        if not self._network_calculated:
+            return set()
+
+        self._ensure_network_calculated()  # Lazy recalculation if needed
+        all_units = set(self.get_units_by_owner(player))
+        online_units = self.get_online_units(player)
+        return all_units - online_units
+
+    def get_network_active_relays(self, player: str) -> Set[Tuple[int, int]]:
+        """Get all relays/swift relays that are online and can propagate.
+
+        Args:
+            player: 'NORTH' or 'SOUTH'
+
+        Returns:
+            Set of (row, col) tuples
+        """
+        self._ensure_network_calculated()  # Lazy recalculation if needed
+        online_units = self.get_online_units(player)
+        active_relays = set()
+
+        for row, col in online_units:
+            unit = self.get_unit(row, col)
+            if unit:
+                unit_type = getattr(unit, 'unit_type', None)
+                if unit_type in (constants.UNIT_RELAY, constants.UNIT_SWIFT_RELAY):
+                    if self._is_relay_online(row, col):
+                        active_relays.add((row, col))
+
+        return active_relays
