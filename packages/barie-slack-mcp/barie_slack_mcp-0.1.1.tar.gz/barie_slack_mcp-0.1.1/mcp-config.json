@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "barie-slack-mcp": {
+      "command": "uvx",
+      "args": [
+        "barie-slack-mcp",
+        "--api-token",
+        "${SLACK_API_TOKEN}",
+        "--file-storage-path",
+        "${SLACK_FILE_STORAGE_PATH}"
+      ],
+      "env": {
+        "SLACK_API_TOKEN": "xoxb-your-token-here",
+        "SLACK_FILE_STORAGE_PATH": "/path/to/file/storage"
+      }
+    }
+  }
+}
