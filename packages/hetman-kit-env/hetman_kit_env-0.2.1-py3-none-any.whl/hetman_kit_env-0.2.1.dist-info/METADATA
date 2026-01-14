@@ -1,0 +1,112 @@
+Metadata-Version: 2.4
+Name: hetman-kit-env
+Version: 0.2.1
+Summary: Hetman Kit Environment is a developer-centric environment variable manager. It leverages the Hetman Pipeline engine to treat environment variables not just as strings, but as strictly validated and transformed data structures.
+Author-email: Hetman <degadupeko@my-relay.app>
+Project-URL: Homepage, https://github.com/hetman-app/hetman-kit-env
+Project-URL: Documentation, https://github.com/hetman-app/hetman-kit-env
+Project-URL: Repository, https://github.com/hetman-app/hetman-kit-env
+Project-URL: Issues, https://github.com/hetman-app/hetman-kit-env/issues
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: hetman-pipeline
+Requires-Dist: python-dotenv
+Dynamic: license-file
+
+<img src="https://raw.githubusercontent.com/hetman-app/hetman-pipeline/main/docs/assets/full-white-text.webp" alt="Hetman Logo" width="200" height="38" />
+
+**Hetman Kit Environment** is a developer-centric environment variable manager. It leverages the **Hetman Pipeline** engine to treat environment variables not just as strings, but as strictly validated and transformed data structures.
+
+## Installation
+
+```bash
+pip install hetman-kit-env
+```
+
+## Why use this?
+
+Standard `os.environ.get` returns strings and provides no validation. **Hetman Kit Environment** allows you to:
+
+1. **Validate** length, patterns, and types immediately.
+2. **Transform** values (lowercase, strip, cast) during retrieval.
+3. **Parse** JSON structures stored in environment strings automatically.
+4. **Enforce** existence for missing variables.
+
+## Usage Example
+
+```python
+from hetman_kit_env import EnvironmentVariable
+from pipeline import Condition, Match, Transform
+
+# Set the path for your .env file
+EnvironmentVariable.dotenv_path = ".env"
+
+# Define a validated environment variable
+# This will raise an exception if the key is missing or validation fails
+SECRET_KEY = EnvironmentVariable[str](
+    name="SECRET_KEY",
+    type=str,
+    conditions={
+        Condition.ExactLength: 32
+    },
+    matches={
+        Match.Text.Letters: None
+    },
+    transform={
+        Transform.Lowercase: None
+    }
+)
+
+# Access the processed value
+print(SECRET_KEY.get)
+
+# You can call to get the raw value (Clean variable)
+API_PORT: int = EnvironmentVariable[int](name="API_PORT", type=int)()
+```
+
+## Pythonic Access Patterns
+
+You don't have to manually call `.get` every time. The `EnvironmentVariable` instance implements magic methods to make your code cleaner:
+
+-   **Direct Comparison**: Use `==` to compare the variable directly with a value.
+
+    ```python
+    if SECRET_KEY == "expected_hash_value":
+        ...
+    ```
+
+-   **Boolean Logic**: Use it directly in `if` statements to check if the value is truthy.
+
+    ```python
+    DEBUG_MODE = EnvironmentVariable[bool](name="DEBUG", optional=True)
+
+    if DEBUG_MODE:
+        print("Debug is enabled")
+    ```
+
+-   **String Conversion**: Use it directly in f-strings or `print()`.
+
+    ```python
+    print(f"API_URL: {API_URL}")
+    ```
+
+-   **Callable shorthand**: Call the object like a function to get the value.
+
+    ```python
+    current_key = SECRET_KEY()
+    ```
+
+## Core Features
+
+-   **Strict Typing**: Use Python generics `EnvironmentVariable[T]` for better IDE support and type safety.
+-   **JSON Ready**: Built-in `json.loads` support for complex environment configurations.
+-   **Pipeline Integration**: Full access to the Pipeline execution flow (Type Check -> Setup -> Conditions -> Matches -> Transformations).
+-   **Singleton .env Loading**: The `.env` file is loaded once and shared across all instances.
+
+## Documentation
+
+This package uses the **Hetman Pipeline** logic for its core processing. To learn more about available conditions, matches, and transformations, visit [Official Documentation](https://pipeline.hetman.app)
