@@ -1,0 +1,50 @@
+[package]
+name = "libertem-dectris"
+authors = ["Alexander Clausen <a.clausen@fz-juelich.de>"]
+license = "MIT"
+version = "0.3.0"
+edition = "2021"
+readme = "README.md"
+rust-version.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "libertem_dectris"
+crate-type = ["cdylib"]
+
+[[bin]]
+name = "libertem-dectris-tool"
+path = "src/main.rs"
+
+[dependencies]
+thiserror = { workspace = true }
+bs_sys = { path = "../bs-sys" }
+clap = { version = "3.2.16", features = ["derive"] }
+env_logger = { workspace = true }
+log = { workspace = true }
+memmap2 = "0.5.6"
+pyo3 = { workspace = true }
+numpy = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+spin_sleep = "1.1.1"
+uuid = { version = "1.1.2", features = ["v4", "fast-rng"] }
+zmq = { version = "0.10.0", features = [] }
+ipc-test = { path = "../ipc_test" }
+stats = { path = "../stats" }
+common = { path = "../common" }
+nix = "0.29.0"
+lz4 = "1.24.0"
+zerocopy = { workspace = true }
+md5 = "0.7.0"
+num = "0.4.3"
+opentelemetry = { workspace = true }
+
+[features]
+extension-module = ["pyo3/extension-module"]
+
+[dev-dependencies]
+tempfile = "3.3.0"
+
+[lints]
+workspace = true
