@@ -1,0 +1,144 @@
+# Lousy AI
+
+A library for AI Agents to make controlled code changes with documentation, error checking, and rollback support.
+
+## Why?
+
+Instead of agents making changes with no documentation, error checking, or hallucination prevention, this library forces a multi-step workflow that:
+
+- **Prevents hallucinations** by showing all code references before changes
+- **Enables rollback** with versioned snapshots of every change
+- **Documents everything** with required parameters and changelogs
+- **Forces verification** by requiring tokens between preview and execution
+
+## Installation
+
+```bash
+pip install lousy-ai
+```
+
+## User Setup
+
+### 1. Create config file
+
+```python
+# config_lousy.py
+from lousy_ai import Config
+import os
+
+config = Config(
+    base_path="./.lousy_ai/",           # Where to store lib data
+    base_dir=os.getcwd(),               # Project root
+    exclude_files=["config_lousy.py"],  # Files to ignore
+    exclude_dirs=[".git", "node_modules", "__pycache__"],
+    allowed_files_regex=".*\.(py|pypx|js|css|txt|html)"
+)
+```
+
+### 2. Set up rules
+
+```python
+# setup_lousy.py - Run once: python setup_lousy.py
+from config_lousy import config
+from lousy_ai import Ruler, Rule
+
+ruler = Ruler(config)
+ruler.clear()
+
+# REQUIRE rules - AI must provide these params
+ruler.add(Rule("functions_changed", "Names of functions affected", "require"))
+ruler.add(Rule("reason", "Why making this change", "require"))
+
+# FOLLOW rules - Guidelines for AI
+ruler.add(Rule("style", "Follow existing code style", "follow"))
+
+# AVOID rules - Things AI should not do
+ruler.add(Rule("secrets", "Never hardcode API keys", "avoid"))
+
+ruler.list_rules()
+```
+
+### 3. Include AGENT.md in AI prompt
+
+Copy the [AGENT.md](./AGENT.md) file content into your AI agent's system prompt or context. This tells the AI how to use the library.
+
+## How It Works
+
+```
+AI defines change → pre_execute() → shows references + token
+                                          ↓
+AI verifies → finds issues? → fix and re-run (new token)
+                                          ↓
+                         AI confirms with token
+                                          ↓
+                    Change recorded + applied
+```
+
+## API Reference
+
+### Orchestrator (Main Interface)
+
+```python
+from lousy_ai import Orchestrator, Config
+
+config = Config(base_dir="/path/to/project")
+orc = Orchestrator(config)
+
+# Task management
+orc.start_task(description, goal)
+orc.end_task(summary)
+
+# Actions (all require tokens for confirmation)
+orc.create_file(path, content, reason, required_params={...})
+orc.append_to_file(path, content, reason, required_params={...})
+orc.delete_file(path, reason, required_params={...})
+orc.replace_lines(path, start, end, new_content, reason, required_params={...})
+orc.replace_regex(path, pattern, replacement, reason, required_params={...})
+orc.move(source, dest, reason, required_params={...})
+orc.copy(source, dest, reason, required_params={...})
+orc.rename(path, new_name, reason, required_params={...})
+orc.remove_dir(path, reason, required_params={...})
+
+# Read-only (no confirmation needed)
+orc.read_file(path, start_line, end_line)
+orc.list_dir(path, max_depth)
+orc.search(pattern, path, is_regex)
+
+# Confirm pending action
+orc.confirm_action(token)
+
+# Rollback
+orc.show_history(count)
+orc.rollback(action_id)
+
+# Rules
+orc.add_rule(name, description, "require"|"follow"|"avoid")
+orc.show_rules()
+```
+
+### Rule Types
+
+Agent is reminded to follow these rules after queueing each action.
+
+| Type | Description |
+|------|-------------|
+| `require` | AI **must** provide this in `required_params` dict |
+| `follow` | AI **should** follow this guideline |
+| `avoid` | AI **should not** do this |
+
+## File Structure
+
+```
+.lousy_ai/
+├── rules.json      # User-defined rules
+├── history.json    # Changelog of all actions
+├── task.json       # Current task tracking
+├── future.json     # Pending actions
+└── versioning/     # File snapshots for rollback
+    ├── act_123..._abc123_before.snap
+    └── act_123..._abc123_after.snap
+```
+
+## License
+
+MIT
