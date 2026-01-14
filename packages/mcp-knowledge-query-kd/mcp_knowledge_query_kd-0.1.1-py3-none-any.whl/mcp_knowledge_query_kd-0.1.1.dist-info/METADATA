@@ -1,0 +1,80 @@
+Metadata-Version: 2.4
+Name: mcp-knowledge-query-kd
+Version: 0.1.1
+Summary: MCP server for querying internal knowledge base
+Author-email: Your Name <your.email@example.com>
+Requires-Python: >=3.10
+Requires-Dist: build>=1.4.0
+Requires-Dist: mcp[cli]>=1.25.0
+Requires-Dist: requests>=2.32.5
+Requires-Dist: twine>=6.2.0
+Requires-Dist: volcengine>=1.0.213
+Description-Content-Type: text/markdown
+
+# MCP Knowledge Query
+
+这是一个 MCP (Model Context Protocol) 服务器，提供知识库检索工具。它允许 LLM 或者是其他 MCP 客户端查询配置的知识库。
+
+## 功能
+
+- **query_knowledge**: 根据关键词检索知识库，支持配置 Top-K、分数阈值和查询扩展（Expand）。
+- **add**: 简单的加法工具（示例）。
+
+## 安装
+
+确保已安装 Python 3.10+ 和 `uv` (推荐) 或 `pip`。
+
+```bash
+# 使用 uv 运行
+uv run mcp-knowledge-query-kd
+```
+
+或者本地安装：
+
+```bash
+pip install -e .
+mcp-knowledge-query-kd
+```
+
+## 配置
+
+为了安全起见，本工具使用环境变量来管理敏感信息（AK/SK）。在使用前，请确保在运行环境中设置了以下环境变量：
+
+### 必需的环境变量
+
+- `HIAGENT_AK`: 您的 Access Key
+- `HIAGENT_SK`: 您的 Secret Key
+- `HIAGENT_WORKSPACE_ID`: 您的工作空间 ID
+- `HIAGENT_DATASET_IDS`: 默认查询的知识库 ID 列表，用逗号分隔。如果不设置，将使用代码内置的默认 ID。
+
+### 可选的环境变量
+
+- `HIAGENT_HOST`: API 服务地址，默认为 `https://hiagent-api.x-peng.com`
+
+### 示例配置 (.env)
+
+您可以参考 `.env.example` 文件配置您的环境。
+
+如果您是通过 Claude Desktop 使用此 MCP Server，请在 Claude 的配置文件 (`claude_desktop_config.json`) 中添加环境变量：
+
+```json
+{
+  "mcpServers": {
+    "knowledge-query": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/path/to/mcp-knowledge-query-kd",
+        "run",
+        "mcp-knowledge-query-kd"
+      ],
+      "env": {
+        "HIAGENT_AK": "your_actual_ak",
+        "HIAGENT_SK": "your_actual_sk",
+        "HIAGENT_WORKSPACE_ID": "your_workspace_id"
+      }
+    }
+  }
+}
+```
+
