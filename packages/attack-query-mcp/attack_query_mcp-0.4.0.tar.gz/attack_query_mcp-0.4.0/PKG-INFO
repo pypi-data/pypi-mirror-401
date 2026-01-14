@@ -1,0 +1,161 @@
+Metadata-Version: 2.4
+Name: attack-query-mcp
+Version: 0.4.0
+Summary: MCP server for ATT&CK queries via AI assistants
+Project-URL: Homepage, https://github.com/swoodeng/attack-query
+Project-URL: Repository, https://github.com/swoodeng/attack-query
+Project-URL: Documentation, https://github.com/swoodeng/attack-query#readme
+Project-URL: Issues, https://github.com/swoodeng/attack-query/issues
+Author: Stephen Wood
+License: MIT
+License-File: LICENSE
+Keywords: ai,attack,claude,llm,mcp,mitre,threat-intelligence
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Security
+Requires-Python: >=3.10
+Requires-Dist: attack-query>=0.6.0
+Requires-Dist: mcp<2,>=1.2.5
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.23.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.4.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# attack-query-mcp
+
+[![PyPI version](https://img.shields.io/pypi/v/attack-query-mcp.svg)](https://pypi.org/project/attack-query-mcp/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/attack-query-mcp.svg)](https://pypi.org/project/attack-query-mcp/)
+[![Python 3.10+](https://img.shields.io/pypi/pyversions/attack-query-mcp.svg)](https://pypi.org/project/attack-query-mcp/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+MCP server for ATT&CK queries via AI assistants.
+
+## Overview
+
+This package provides a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that enables AI assistants like Claude to query MITRE ATT&CK data using natural language.
+
+## Installation
+
+```bash
+pip install attack-query-mcp
+```
+
+## Usage
+
+### With Claude Desktop
+
+Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "attack-query": {
+      "command": "attack-query-mcp"
+    }
+  }
+}
+```
+
+### Standalone
+
+```bash
+attack-query-mcp
+```
+
+## Tools
+
+The MCP server provides 8 tools for querying ATT&CK data:
+
+| Tool | Description |
+|------|-------------|
+| `query_attack` | Natural language queries (e.g., "techniques used by APT28") |
+| `get_technique` | Get technique details by ID (e.g., T1566) |
+| `get_group` | Get group info by name, ID, or alias |
+| `compare_groups` | Compare techniques between two groups with similarity metrics |
+| `find_similar_groups` | Find groups with similar technique profiles |
+| `get_mitigations` | Get mitigations for a technique |
+| `export_navigator_layer` | Export techniques as Navigator layer JSON |
+| `get_group_techniques_temporal` | Get techniques used by a group during a specific time period |
+
+### Example Tool Usage
+
+```
+User: What techniques does APT28 use for initial access?
+AI: [calls query_attack with "techniques used by APT28 for initial access"]
+
+User: Compare APT28 and APT29
+AI: [calls compare_groups with group1="APT28", group2="APT29"]
+
+User: What mitigations address phishing?
+AI: [calls get_mitigations with technique_id="T1566"]
+
+User: What techniques did APT28 use in 2023?
+AI: [calls get_group_techniques_temporal with group="APT28", year=2023]
+
+User: What techniques did APT29 use between 2020 and 2023?
+AI: [calls get_group_techniques_temporal with group="APT29", start_year=2020, end_year=2023]
+```
+
+> **Note:** Temporal queries approximate group activity by cross-referencing campaign data. Results only include techniques documented in campaigns, not all techniques attributed to the group.
+
+## Resources
+
+The MCP server exposes 6 resources for browsing ATT&CK data:
+
+| URI | Description |
+|-----|-------------|
+| `attack://groups` | List all threat groups with IDs, names, and aliases |
+| `attack://techniques` | List all techniques with IDs, names, and tactics |
+| `attack://tactics` | List all tactics in kill chain order |
+| `attack://software` | List all software (malware and tools) |
+| `attack://mitigations` | List all mitigations with technique counts |
+| `attack://campaigns` | List all campaigns with dates and attribution |
+
+### Example Resource Usage
+
+```
+User: Show me all APT groups in ATT&CK
+AI: [reads attack://groups resource]
+
+User: What tactics are in the kill chain?
+AI: [reads attack://tactics resource]
+```
+
+## Resource Templates
+
+The MCP server also provides resource templates for detailed lookups:
+
+| URI Template | Description |
+|--------------|-------------|
+| `attack://groups/{id}` | Get details for a specific group (by ID, name, or alias) |
+| `attack://techniques/{id}` | Get details for a specific technique (by ID like T1566) |
+
+### Example Resource Template Usage
+
+```
+User: Tell me about APT28
+AI: [reads attack://groups/APT28 resource]
+
+User: What is technique T1566?
+AI: [reads attack://techniques/T1566 resource]
+
+User: Who is Fancy Bear?
+AI: [reads attack://groups/Fancy%20Bear resource]
+```
+
+## Requirements
+
+- Python 3.10+
+- [attack-query](../attack-query/) library
+
+## License
+
+MIT
