@@ -1,0 +1,157 @@
+# Predict Future Sales (Kaggle) — end-to-end ML pipeline
+
+This repository is a pet-project for [Kaggle “Predict Future Sales”](https://www.kaggle.com/c/competitive-data-science-predict-future-sales) with a **reproducible** ML workflow:
+- **DVC**: dataset versioning + reproducible ETL
+- **Feature engineering**: monthly aggregates + lags / rolling means (leakage-safe)
+- **Models**: LightGBM / XGBoost (+ configs / tuning)
+- **MLflow**: experiment tracking + artifacts (SHAP / error analysis)
+- **Airflow**: orchestration demo via `DockerOperator`
+
+## Project structure
+
+- **`data/raw/`**: raw CSVs (tracked via DVC `.dvc` files)
+- **`data/processed/`**: processed parquet produced by ETL/FE
+- **`notebooks/`**: EDA/DQC/ETL notebooks (+ exported `.py`)
+- **`scripts/`**: training / validation / models / utilities
+- **`submissions/`**: Kaggle submission CSVs
+- **`mlflow/`**: local MLflow store + artifacts
+- **`airflow/dags/`**: DAG `predict_sales_pipeline` (orchestration demo)
+
+## Quickstart (local)
+
+### Requirements
+
+- Python **3.11**
+- Docker (Docker Desktop)
+- `uv` (recommended) or `pip`
+- `dvc` (only if you need to pull raw data from a DVC remote)
+
+### Option A: install from PyPI
+
+If you only want the **Python package** (code), install it from PyPI:
+
+- Package page: [predict-sales-ml on PyPI](https://pypi.org/project/predict-sales-ml/)
+
+```bash
+pip install predict-sales-ml
+```
+
+Notes:
+- This installs the library, but does **not** include project files like `compose.yaml`, `airflow/`, or the DVC-tracked datasets.
+- For Airflow / DVC / end-to-end runs, use **Option B** (install from source).
+
+### Option B: install from source (recommended for the full project)
+
+#### 1) Environment variables
+
+Copy examples and adjust values:
+
+```bash
+cp .env.example .env
+cp airflow.env.example airflow.env
+```
+
+- `MLFLOW_TRACKING_URI` / `MLFLOW_EXPERIMENT_NAME` are used by `scripts/` and by the Airflow DAG.
+- `HOST_PROJECT_ROOT` must be an **absolute host path** to this repo root (required for Airflow `DockerOperator` bind-mounts).
+
+#### 2) Install dependencies
+
+Using `uv`:
+
+```bash
+uv sync --frozen
+```
+
+Or using `pip`:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+#### 3) Data (DVC)
+
+If raw data is missing, pull it:
+
+```bash
+dvc pull
+```
+
+Reproduce ETL/feature engineering:
+
+```bash
+dvc repro
+```
+
+> `dvc.yaml` contains stage `process_data`, which produces parquet files in `data/processed/`.
+
+## MLflow (local tracking server)
+
+Start MLflow UI via Docker Compose:
+
+```bash
+docker compose up -d mlflow
+```
+
+MLflow UI will be available at `http://localhost:5050` (see `compose.yaml`).
+
+## Model training (CLI)
+
+The main entrypoint for training a single model is `scripts/train_single.py`.
+
+Train LightGBM and create a submission:
+
+```bash
+python scripts/train_single.py --model lightgbm
+```
+
+For quick / low-RAM demo runs (e.g., in Airflow), you can point to a smaller parquet and override time splits:
+
+```bash
+python scripts/train_single.py \
+  --model lightgbm \
+  --run-name demo_lightgbm \
+  --train-encoded tmp/train_small.parquet \
+  --test-encoded data/processed/test_enriched_encoded.parquet \
+  --train-start 31 --train-end 31 \
+  --val-start 32 --val-end 32 \
+  --test-month 33 --production-month 34 \
+  --submission-filename demo_submission.csv \
+  --no-timestamp --no-score
+```
+
+Outputs:
+- **MLflow**: metrics + model + explainability artifacts (if `shap` is installed)
+- **`submissions/`**: a submission CSV file
+
+## Airflow (orchestration demo)
+
+Airflow is started via `docker compose` with the `airflow` profile.
+
+1) Start services:
+
+```bash
+docker compose --profile airflow up -d airflow-postgres airflow-init airflow-webserver airflow-scheduler
+```
+
+2) Open UI: `http://localhost:8080`
+
+3) DAG: `predict_sales_pipeline`
+
+Important:
+- The DAG uses `DockerOperator` and needs Docker socket access (see volume `/var/run/docker.sock`).
+- For bind-mounts to work, set `HOST_PROJECT_ROOT` in `airflow.env`.
+
+## What the pipeline does
+
+- **ETL/FE**: `dvc repro` → `notebooks/03_ETL.py` produces `sales_monthly_with_features(_encoded).parquet`
+- **Validation**: `TimeSeriesValidator` + `BaselineFeatureExtractor` (uses the \(N \leftarrow N-1\) pattern to avoid leakage)
+- **Training**: `scripts/train_single.py` → `TrainingPipeline`
+- **Explainability**: SHAP + error analysis (see `scripts/explainability.py`, artifacts in `mlflow/artifacts/`)
+
+## Troubleshooting
+
+- If training inside Docker cannot reach MLflow:
+  - containers typically need `MLFLOW_TRACKING_URI=http://host.docker.internal:5050`
+  - local host runs typically use `MLFLOW_TRACKING_URI=http://localhost:5050`

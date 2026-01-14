@@ -1,0 +1,40 @@
+## Python / IDE
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.ipynb_checkpoints/
+**/.DS_Store
+
+## Git / env
+**/.git/
+**/.env
+**/.env.*
+
+## Heavy project artifacts (do NOT bake into the image)
+data/
+mlflow/
+submissions/
+tmp/
+airflow/logs/
+
+## DVC local caches
+.dvc/cache/
+.dvc/tmp/
+
+## Python packaging outputs
+build/
+dist/
+**/*.egg-info/
+
+## Other common noise
+**/node_modules/
+**/npm-debug.log
+**/obj/
+**/bin/
+
+## Secrets/config variants (keep out of images)
+**/secrets*.yaml
+**/values*.yaml

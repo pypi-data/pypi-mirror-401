@@ -1,0 +1,126 @@
+services:
+  innowisemlinternshiptemp:
+    image: innowisemlinternshiptemp
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./scripts:/app/scripts
+      - ./data:/app/data
+      - ./submissions:/app/submissions
+
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    command: >
+      mlflow server
+      --backend-store-uri file:///mlruns
+      --serve-artifacts
+      --artifacts-destination /mlruns
+      --default-artifact-root mlflow-artifacts:/
+      --host 0.0.0.0
+      --port 5000
+    volumes:
+      - ./mlflow/mlruns:/mlruns
+    ports:
+      - "5050:5000"
+
+
+  airflow-postgres:
+    profiles: ["airflow"]
+    image: postgres:15
+    env_file:
+      - airflow.env
+    volumes:
+      - airflow_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+
+  airflow-init:
+    profiles: ["airflow"]
+    image: apache/airflow:2.9.3
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+    env_file:
+      - airflow.env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+    user: "${AIRFLOW_UID:-50000}:0"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username "$$_AIRFLOW_WWW_USER_USERNAME" \
+          --password "$$_AIRFLOW_WWW_USER_PASSWORD" \
+          --firstname "$$_AIRFLOW_WWW_USER_FIRSTNAME" \
+          --lastname "$$_AIRFLOW_WWW_USER_LASTNAME" \
+          --role Admin \
+          --email "$$_AIRFLOW_WWW_USER_EMAIL" || true
+
+
+  airflow-webserver:
+    profiles: ["airflow"]
+    image: apache/airflow:2.9.3
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+    env_file:
+      - airflow.env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+    user: "${AIRFLOW_UID:-50000}:0"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+
+  airflow-scheduler:
+    profiles: ["airflow"]
+    image: apache/airflow:2.9.3
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+    env_file:
+      - airflow.env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+    user: "${AIRFLOW_UID:-50000}:0"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -E '[a]irflow scheduler' >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    
+volumes:
+  airflow_pg_data:

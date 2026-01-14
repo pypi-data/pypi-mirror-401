@@ -1,0 +1,20 @@
+stages:
+  process_data:
+    cmd: python notebooks/03_ETL.py
+    deps:
+      - notebooks/03_ETL.py
+      - scripts/utils_etl.py
+      - data/raw/sales_train.csv
+      - data/raw/test.csv
+      - data/raw/items.csv
+      - data/raw/shops.csv
+      - data/raw/item_categories.csv
+    outs:
+      - data/processed/sales_monthly_clean.parquet
+      - data/processed/sales_monthly_with_features.parquet
+      - data/processed/sales_monthly_with_features_encoded.parquet
+      - data/processed/test_enriched.parquet
+      - data/processed/test_enriched_encoded.parquet
+      - data/processed/items_enriched.parquet
+      - data/processed/shops_enriched.parquet
+      - data/processed/item_categories_enriched.parquet

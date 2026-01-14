@@ -1,0 +1,67 @@
+schema: '2.0'
+stages:
+  process_data:
+    cmd: python notebooks/03_ETL.py
+    deps:
+    - path: data/raw/item_categories.csv
+      hash: md5
+      md5: 05c62f1bed0c0655924fc62fe921fb56
+      size: 3573
+    - path: data/raw/items.csv
+      hash: md5
+      md5: effd92430acdb03efca8542f7270e334
+      size: 1568417
+    - path: data/raw/sales_train.csv
+      hash: md5
+      md5: bc7e53cc48549aba37d690093256facf
+      size: 94603866
+    - path: data/raw/shops.csv
+      hash: md5
+      md5: beb40ce29c3db609a93b19ebbd1667b1
+      size: 2977
+    - path: data/raw/test.csv
+      hash: md5
+      md5: aabf81b3af9a427e897aa77f77e8b971
+      size: 3182735
+    - path: notebooks/03_ETL.py
+      hash: md5
+      md5: 88e17907bcfe6d1cc7ef5c070c872488
+      size: 12840
+      isexec: true
+    - path: scripts/utils_etl.py
+      hash: md5
+      md5: 43147f8c64273b400c313d7b3d6699c8
+      size: 55711
+    outs:
+    - path: data/processed/item_categories_enriched.parquet
+      hash: md5
+      md5: 48e8b3f046ac9d5573d91d89b55c1e67
+      size: 5386
+    - path: data/processed/items_enriched.parquet
+      hash: md5
+      md5: f36e36694bad0c86eb551eab27492610
+      size: 711633
+    - path: data/processed/sales_monthly_clean.parquet
+      hash: md5
+      md5: 85611752d590b77896bdc300509a0769
+      size: 21086396
+    - path: data/processed/sales_monthly_with_features.parquet
+      hash: md5
+      md5: 54b0056a36b72a14ea123935c165d98b
+      size: 519458292
+    - path: data/processed/sales_monthly_with_features_encoded.parquet
+      hash: md5
+      md5: 06e66434ecadb7fcb3587bbaab8db362
+      size: 470493724
+    - path: data/processed/shops_enriched.parquet
+      hash: md5
+      md5: 54cfbed7f7084d1eac8fdb073c0de284
+      size: 4146
+    - path: data/processed/test_enriched.parquet
+      hash: md5
+      md5: b3efbecec8d5e921c93130caa5a487b5
+      size: 17663376
+    - path: data/processed/test_enriched_encoded.parquet
+      hash: md5
+      md5: 41248d74ac5fb0e511800b5e682ae93f
+      size: 10308129

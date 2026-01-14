@@ -1,0 +1,60 @@
+[project]
+name = "predict-sales-ml"
+dynamic = ["version"]
+description = "ML toolkit for time-series sales prediction with feature engineering, validation, and hyperparameter optimization"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+authors = [
+    {name = "Eugene Malyukevich"} 
+]
+keywords = ["machine-learning", "time-series", "sales-prediction", "feature-engineering", "hyperparameter-optimization"]
+
+dependencies = [
+    "lightgbm>=4.0.0",
+    "matplotlib>=3.10.7",
+    "mlflow>=2.0.0",
+    "numpy>=2.3.5",
+    "optuna>=4.6.0",
+    "pandas>=2.3.3",
+    "pyarrow>=15.0.0,<21.0.0",
+    "pyyaml>=6.0.0",
+    "python-dotenv>=1.0.0",
+    "scikit-learn>=1.7.2",
+    "shap>=0.50.0",
+    "scipy>=1.11.0",
+    "tqdm>=4.66.0",
+    "xgboost>=3.1.2",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm>=8.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["scripts"]
+
+[tool.setuptools_scm]
+write_to = "scripts/_version.py"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.0",
+    "ruff>=0.14.6",
+]
+
+# Tools used for working with notebooks / exporting notebooks to .py
+notebooks = [
+    "ipykernel>=7.1.0",
+    "nbconvert>=7.16.6",
+]
+
+# Dataset versioning / pulling data from DVC remotes (optional, not required for training code itself)
+data = [
+    "dvc[gdrive]>=3.66.0",
+]
+
+# If you want to run Airflow locally (the repo mainly uses dockerized Airflow)
+airflow = [
+    "apache-airflow==2.9.3",
+    "apache-airflow-providers-docker>=3.10.0",
+]

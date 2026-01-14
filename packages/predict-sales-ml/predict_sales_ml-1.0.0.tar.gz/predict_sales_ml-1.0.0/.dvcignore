@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+airflow.env
+
+# Local runtime artifacts (should not be tracked by DVC)
+tmp/
+airflow/logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MLflow
+.mlruns/
+mlflow/mlruns/
+mlflow/artifacts/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+pip-log.txt
+
+# Data directories that shouldn't be tracked
+submissions/
+tuned_configs/
+
+# DVC internal (не нужно версионировать)
+.dvc/cache/
+.dvc/tmp/
+
+# Environment files
+.env
+.env.local
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Plans (документация)
+plans/
+
+# Version file (генерируется автоматически)
+scripts/_version.py
