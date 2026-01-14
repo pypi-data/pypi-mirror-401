@@ -1,0 +1,53 @@
+scopyon
+=======
+
+[![PyPI version](https://badge.fury.io/py/scopyon.svg)](https://badge.fury.io/py/scopyon)
+[![Readthedocs](https://readthedocs.org/projects/scopyon/badge/)](http://scopyon.readthedocs.io/)
+[![unittest](https://github.com/ecell/scopyon/actions/workflows/unittest.yml/badge.svg)](https://github.com/ecell/scopyon/actions/workflows/unittest.yml)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ecell/scopyon/master)
+
+:microscope: Monte Carlo simulation toolkit for bioimaging systems
+
+Documentation
+--------------
+
+See [https://scopyon.readthedocs.io/](https://scopyon.readthedocs.io/) for details.
+
+Requirements
+------------
+
+For `scopyon`, Python 3 and its libraries, `numpy`, `scipy`, `matplotlib`, `pyyaml` and `pint`, are required. Installation of `scikit-image`, `pillow` and `plotly` is also recommended.
+
+Installation
+------------
+
+```shell-session
+$ pip install scopyon
+```
+
+or
+
+```shell-session
+$ python setup.py test install
+```
+
+Quick start
+-----------
+
+```shell-session
+$ python examples/twocolor.py
+```
+
+![TIRF Image](https://github.com/ecell/scopyon/raw/master/examples/twocolor_000.png)
+
+License
+-------
+
+`scopyon` is licensed under the terms of BSD-3-Clause (see [LICENSE](/LICENSE)).
+
+Citation
+--------
+
+If this package contributes to your work, please cite the followings.
+
+[https://doi.org/10.1371/journal.pone.0130089](https://doi.org/10.1371/journal.pone.0130089)
