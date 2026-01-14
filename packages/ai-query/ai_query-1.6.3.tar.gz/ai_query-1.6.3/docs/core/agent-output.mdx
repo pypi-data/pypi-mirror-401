@@ -1,0 +1,129 @@
+---
+title: "Agent Output"
+description: "Protocol-agnostic feedback for agents"
+---
+
+Agents often need to provide feedback to the user *during* execution—like "Thinking...", "Running tool...", or intermediate results.
+
+The `AgentOutput` abstraction allows you to write this logic once and have it work across WebSockets, SSE, HTTP, or any other transport.
+
+## The Concept
+
+Instead of coupling your agent to a specific transport (like `Connection`), you use the abstract `self.output` interface.
+
+```python
+class ResearchBot(ChatAgent, InMemoryAgent):
+    async def on_step_start(self, event):
+        # Works on WebSocket, SSE, or Console!
+        await self.output.send_status(
+            f"Thinking (Step {event.step_number})...",
+            details={"tools": list(event.tools.keys())}
+        )
+```
+
+## Built-in Outputs
+
+ai-query provides adapters for common protocols:
+
+| Class | Transport | Format |
+|-------|-----------|--------|
+| `BroadcastOutput` | All connected clients | JSON (WS) / SSE |
+| `WebSocketOutput` | Single WebSocket connection | JSON frames |
+| `SSEOutput` | Single SSE stream | Server-Sent Events |
+| `NullOutput` | None | No-op |
+
+## Usage
+
+### 1. In Your Agent (The Logic)
+
+Use `self.output` in your hooks or tools.
+
+**By default, this uses `BroadcastOutput`**, which sends updates to **ALL** connected WebSocket and SSE clients.
+
+```python
+from ai_query.agents import ChatAgent, InMemoryAgent
+
+class MyBot(ChatAgent, InMemoryAgent):
+    async def on_step_finish(self, event):
+        if event.step.tool_calls:
+            for tc in event.step.tool_calls:
+                # Broadcasts to everyone connected to this agent
+                await self.output.send_status(f"🛠️ Executing: {tc.name}")
+```
+
+### 2. Targeted Output (Optional)
+
+If you want to send output to a *specific* connection (e.g., only the user who sent the message), pass a specific adapter.
+
+**WebSocket Example:**
+
+```python
+from ai_query.agents.output import WebSocketOutput
+
+class MyBot(ChatAgent, InMemoryAgent):
+    async def on_message(self, conn, message):
+        # 1. Create adapter for THIS connection only
+        output = WebSocketOutput(conn)
+
+        # 2. Pass it to chat()
+        # The agent will use this output instead of broadcasting
+        await self.chat(message, output=output)
+```
+
+**SSE Example:**
+
+```python
+from ai_query.agents.output import SSEOutput
+
+# Inside an aiohttp handler
+async def handle_sse(request):
+    response = web.StreamResponse(...)
+    await response.prepare(request)
+
+    output = SSEOutput(response)
+
+    # Stream only to this HTTP response
+    await agent.stream_chat(message, output=output)
+```
+
+## Custom Output Adapters
+
+Implement the `AgentOutput` protocol to support custom transports (e.g., Slack, Discord, Terminal).
+
+```python
+from typing import Any
+from ai_query.agents.output import AgentOutput
+
+class TerminalOutput(AgentOutput):
+    async def send_message(self, content: str) -> None:
+        print(f"🤖 {content}")
+
+    async def send_status(self, status: str, details: dict | None = None) -> None:
+        print(f"🔄 {status}")
+        if details:
+            print(f"   {details}")
+
+    async def send_error(self, error: str) -> None:
+        print(f"❌ {error}")
+```
+
+## API Reference
+
+### AgentOutput Protocol
+
+```python
+class AgentOutput(Protocol):
+    async def send_message(self, content: str) -> None: ...
+    async def send_status(self, status: str, details: dict | None = None) -> None: ...
+    async def send_error(self, error: str) -> None: ...
+    async def send_event(self, event: str, data: dict[str, Any]) -> None: ...
+```
+
+### ChatAgent.output
+
+```python
+@property
+def output(self) -> AgentOutput
+```
+
+Returns the current output adapter. If none is set, returns `NullOutput` so calls are safe.
