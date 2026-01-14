@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dssamble"
+version = "0.1.2"
+description = "⚡ CLI инструмент для генерации структуры проектов"
+authors = [{ name = "Dan", email = "dandasakami@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["cli", "project-generator", "fastapi", "scaffold"]
+dependencies = ["click>=8.1.0"]
+
+[project.urls]
+Homepage = "https://github.com/Dasakami/dssamble"
+Repository = "https://github.com/Dasakami/dssamble"
+"Bug Tracker" = "https://github.com/Dasakami/dssamble/issues"
+
+[project.scripts]
+dssamble = "dssamble.cli:cli"
+
+[tool.setuptools]
+packages = ["dssamble", "dssamble.commands", "dssamble.security"]
