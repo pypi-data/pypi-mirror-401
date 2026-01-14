@@ -1,0 +1,113 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weni-tools-utils"
+version = "1.1.0a1"
+description = "Shared utilities and tools library for AI agents on the Weni platform"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Weni AI", email = "dev@weni.ai"}
+]
+maintainers = [
+    {name = "Weni AI", email = "dev@weni.ai"}
+]
+keywords = [
+    "weni",
+    "vtex",
+    "concierge",
+    "ecommerce",
+    "ai-agent",
+    "chatbot",
+    "whatsapp",
+    "product-search",
+    "intelligent-search"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Communications :: Chat",
+    "Typing :: Typed"
+]
+
+dependencies = [
+    "requests>=2.28.0,<3.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "responses>=0.23.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "types-requests>=2.28.0",
+    "ruff>=0.1.0"
+]
+docs = [
+    "sphinx>=6.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+    "myst-parser>=1.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/weni-ai/tools-utils"
+Documentation = "https://github.com/weni-ai/tools-utils#readme"
+Repository = "https://github.com/weni-ai/tools-utils.git"
+Issues = "https://github.com/weni-ai/tools-utils/issues"
+Changelog = "https://github.com/weni-ai/tools-utils/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["weni_vtex*"]
+
+[tool.setuptools.package-data]
+weni_vtex = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["weni_vtex"]
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --cov=weni_vtex --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/weni_vtex"]
+branch = true
