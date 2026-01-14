@@ -1,0 +1,333 @@
+Metadata-Version: 2.4
+Name: chess-schema
+Version: 0.1.0
+Summary: Pydantic models for structured chess game data, optimized for LLM integration and analysis pipelines
+Project-URL: Homepage, https://github.com/danieljames-dj/chess-schema
+Project-URL: Documentation, https://github.com/danieljames-dj/chess-schema#readme
+Project-URL: Repository, https://github.com/danieljames-dj/chess-schema
+Project-URL: Issues, https://github.com/danieljames-dj/chess-schema/issues
+Project-URL: Changelog, https://github.com/danieljames-dj/chess-schema/releases
+Author-email: Daniel James <djdany444@gmail.com>
+License: MIT
+License-File: LICENSE
+Keywords: analysis,chess,llm,pgn,pydantic,san,schema,uci,validation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Games/Entertainment :: Board Games
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Typing :: Typed
+Requires-Python: >=3.9
+Requires-Dist: pydantic>=2.0.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: python-chess>=1.999; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Provides-Extra: pgn
+Requires-Dist: python-chess>=1.999; extra == 'pgn'
+Description-Content-Type: text/markdown
+
+# chess-schema
+
+**Pydantic models for structured chess game data.**
+
+A Python library for parsing, validating, and serializing chess game data with strict type safety. Designed for LLM integration and analysis pipelines where PGN is too messy and you need reliable, validated structured data.
+
+## Features
+
+✅ **LLM-Optimized**: Field descriptions guide LLM outputs, strict validation catches hallucinations  
+✅ **Dual Notation**: Both UCI (machine-readable) and SAN (human-readable) for every move  
+✅ **Rich Metadata**: Players, ratings, events, dates, comments, variations  
+✅ **Type-Safe**: Full Pydantic v2 validation with helpful error messages  
+✅ **Flexible Casing**: Python uses `snake_case`, JSON/LLMs use `camelCase`  
+✅ **Analysis Trees**: Recursive variations for full game analysis support
+
+## Installation
+
+```bash
+# Basic installation
+pip install chess-schema
+
+# With PGN parsing support
+pip install chess-schema python-chess
+```
+
+## Quick Start
+
+### Option 1: Parse from PGN
+
+```python
+from chess_schema import Game
+
+# Parse a PGN string directly
+pgn = """
+[Event "World Championship"]
+[Site "https://lichess.org/abc123"]
+[Date "2024.01.13"]
+[Round "1"]
+[White "Carlsen, Magnus"]
+[Black "Nepomniachtchi, Ian"]
+[Result "1-0"]
+[WhiteElo "2830"]
+[BlackElo "2795"]
+[Termination "Normal"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O 1-0
+"""
+
+game = Game.from_pgn(pgn)
+print(f"White: {game.white.name} ({game.white.rating})")
+print(f"First move: {game.moves[0].san} (UCI: {game.moves[0].uci})")
+```
+
+**Note:** `from_pgn()` requires the `python-chess` library:
+
+```bash
+pip install python-chess
+```
+
+### Option 2: Build Manually
+
+```python
+from chess_schema import Game, Player, Move, GameResult, Termination, GameMetadata
+from datetime import date
+
+# Create a game from scratch
+game = Game(
+    id="lichess_abc123",
+    white=Player(name="Alice", rating=1800, title="NM"),
+    black=Player(name="Bob", rating=1750),
+    moves=[
+        Move(uci="e2e4", san="e4", ply=1),
+        Move(uci="e7e5", san="e5", ply=2),
+        Move(uci="g1f3", san="Nf3", ply=3),
+    ],
+    result=GameResult.WHITE_WIN,
+    termination=Termination.NORMAL,
+    metadata=GameMetadata(
+        event="Club Championship 2024",
+        site="New York, USA",
+        date=date(2024, 1, 13),
+        round="3"
+    )
+)
+
+# Serialize to JSON (camelCase for LLMs)
+json_output = game.model_dump_json(indent=2, by_alias=True)
+print(json_output)
+```
+
+**Output:**
+
+```json
+{
+  "id": "lichess_abc123",
+  "metadata": {
+    "event": "Club Championship 2024",
+    "site": "New York, USA",
+    "date": "2024-01-13",
+    "round": "3"
+  },
+  "initialFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "white": {
+    "name": "Alice",
+    "rating": 1800,
+    "title": "NM"
+  },
+  "black": {
+    "name": "Bob",
+    "rating": 1750
+  },
+  "moves": [
+    { "uci": "e2e4", "san": "e4", "ply": 1 },
+    { "uci": "e7e5", "san": "e5", "ply": 2 },
+    { "uci": "g1f3", "san": "Nf3", "ply": 3 }
+  ],
+  "result": "1-0",
+  "termination": "normal"
+}
+```
+
+## LLM Integration Example
+
+```python
+from chess_schema import Game
+import anthropic
+
+# Generate schema for LLM prompt
+schema = Game.model_json_schema()
+
+client = anthropic.Anthropic(api_key="your-api-key")
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=2000,
+    messages=[{
+        "role": "user",
+        "content": f"""Analyze this PGN game and return structured JSON matching this schema:
+
+{schema}
+
+PGN:
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 1-0
+
+Return ONLY valid JSON, no markdown."""
+    }]
+)
+
+# Parse LLM output
+game = Game.model_validate_json(response.content[0].text)
+print(f"Game ID: {game.id}")
+print(f"Winner: {game.result}")
+```
+
+**Or use the built-in parser:**
+
+```python
+# If you already have PGN, just parse it directly
+pgn = "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 1-0"
+game = Game.from_pgn(pgn)
+
+# Then use LLM for analysis/annotation
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1000,
+    messages=[{
+        "role": "user",
+        "content": f"Analyze this chess game and identify key moments: {game.model_dump_json()}"
+    }]
+)
+```
+
+## Adding Comments and Variations
+
+```python
+from chess_schema import Move, Comment
+
+# Move with engine analysis
+move = Move(
+    uci="e2e4",
+    san="e4",
+    ply=1,
+    comments=[
+        Comment(text="Best by test", source="Stockfish 16"),
+        Comment(text="King's Pawn Opening", source="ECO"),
+    ]
+)
+
+# Add a variation
+alt_move = Move(uci="d2d4", san="d4", ply=1)
+move.variations.append([alt_move])  # 1.d4 as alternative to 1.e4
+
+# Or parse from PGN with comments/variations
+pgn_with_analysis = """
+1. e4 { Best by test } e5 (1... c5 { Sicilian Defense }) 2. Nf3
+"""
+game = Game.from_pgn(pgn_with_analysis)
+print(game.moves[0].comments[0].text)  # "Best by test"
+print(game.moves[0].variations[0][0].san)  # "c5"
+```
+
+## Validation Features
+
+chess-schema validates:
+
+- ✅ UCI format (4-5 chars, valid squares, promotion pieces)
+- ✅ FEN structure (6 fields, 8 ranks)
+- ✅ Sequential ply numbers
+- ✅ Rating ranges (0-4000)
+- ✅ No extra fields (catches LLM hallucinations)
+- ✅ URL formats for source links
+
+```python
+from pydantic import ValidationError
+
+try:
+    # Invalid UCI (wrong format)
+    Move(uci="e2-e4", san="e4")  # ❌ Raises ValidationError
+except ValidationError as e:
+    print(e)
+
+try:
+    # Extra fields rejected
+    Game(
+        id="test",
+        secret_field="hack",  # ❌ Raises ValidationError
+        # ... other required fields
+    )
+except ValidationError as e:
+    print("Extra field rejected:", e)
+```
+
+## API Reference
+
+### Core Models
+
+- **`Game`**: Complete game with metadata, players, moves, and result
+- **`Move`**: Single move with UCI, SAN, comments, and variations
+- **`Player`**: Player info (name, rating, title)
+- **`GameMetadata`**: Event, site, date, round, tags
+- **`Comment`**: Move annotation with source attribution
+
+### Enums
+
+- **`GameResult`**: `WHITE_WIN` ("1-0"), `BLACK_WIN` ("0-1"), `DRAW` ("1/2-1/2"), `UNTERMINATED` ("\*")
+- **`Termination`**: `NORMAL`, `TIME_FORFEIT`, `RULES_INFRACTION`, `ABANDONED`, etc.
+- **`Color`**: `WHITE`, `BLACK`
+
+### Base Class
+
+- **`ChessBaseModel`**: Inherit for custom models with same validation behavior
+
+## Why chess-schema?
+
+**Problem**: PGN is great for humans but messy for code. It's ambiguous, inconsistent, and hard to parse reliably—especially when dealing with LLM outputs.
+
+**Solution**: chess-schema provides:
+
+1. **Strict validation** that catches errors early
+2. **Clear structure** that LLMs can reliably produce
+3. **Type safety** for confident pipeline development
+4. **Rich metadata** for analysis and filtering
+
+## Project Structure
+
+```
+chess-schema/
+├── chess_schema/
+│   ├── __init__.py      # Public API exports
+│   ├── base.py          # ChessBaseModel configuration
+│   ├── enums.py         # GameResult, Termination, Color
+│   ├── move.py          # Move and Comment models
+│   └── game.py          # Game, Player, GameMetadata models
+├── tests/               # Unit tests
+├── README.md
+└── pyproject.toml
+```
+
+## Contributing
+
+Contributions welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Credits
+
+Built with [Pydantic](https://docs.pydantic.dev/) v2.
+
+---
+
+**Questions?** Open an issue on GitHub or check the [documentation](https://github.com/yourusername/chess-schema).
