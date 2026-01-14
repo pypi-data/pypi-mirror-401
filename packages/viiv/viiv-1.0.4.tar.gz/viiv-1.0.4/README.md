@@ -1,0 +1,652 @@
+# ViiV - Advanced VSCode Theme Generator
+
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.3.22-orange.svg)](pyproject.toml)
+
+A sophisticated Python library for generating beautiful, accessible VSCode themes with automatic contrast ratio optimization and multi-editor support.
+
+## ✨ Key Features
+
+- **🎨 Intelligent Color Generation**: Algorithmic color palette creation with scientific color theory
+- **♿ WCAG Accessibility Compliance**: Automatic contrast ratio optimization meeting [WCAG guidelines](https://www.w3.org/TR/WCAG20-TECHS/G17.html)
+- **🌓 Dual Theme Support**: Single configuration generates both dark and light themes
+- **🎯 Multi-Editor Support**: Generate themes for VSCode and Neovim from the same configuration
+- **⚡ Countless Variations**: Generate unlimited theme variations with randomization
+- **🔧 Highly Configurable**: Extensive customization options via JSON configuration
+- **🎪 Built-in Theme Collection**: 30+ pre-configured professional themes
+
+## 🖼️ Theme Previews
+
+### Dark Theme
+![Dark Theme Preview](images/dark_theme_demo.png)
+
+### Light Theme
+![Light Theme Preview](images/light_theme_demo.png)
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Using Poetry (recommended)
+poetry install
+
+# Using pip
+pip install -r requirements.txt
+```
+
+### Generate Your First Theme
+
+```bash
+# Generate a random theme
+python viiv.py -r
+
+# Generate specific built-in theme
+python viiv.py -g -t "ViiV-Tokyo-Night"
+
+# Generate all built-in themes
+python viiv.py -g
+
+# Generate Neovim themes
+python viiv.py -N --nvim-repo /path/to/viiv.nvim
+```
+
+## ⚙️ Configuration
+
+All theme configurations are managed through the `viiv/conf/config.json` file, which provides granular control over:
+
+### Core Configuration Areas
+
+- **Token Colors**: Syntax highlighting for code elements
+- **Workbench Colors**: UI elements (backgrounds, borders, foregrounds)
+- **Decoration Colors**: Special highlighting and accent colors
+- **Theme Variants**: Pre-configured theme collections
+- **Contrast Ratios**: Accessibility compliance settings
+
+### Custom Token Colors
+
+```json
+{
+  "token": [
+    {
+      "color": {
+        "hex": "#9a449a",
+        "alpha_range": ["0xde", "0xdf"]
+      },
+      "groups": [".*support.type.*"]
+    }
+  ]
+}
+```
+
+### Custom Editor Background
+
+```json
+{
+  "options": {
+    "workbench_editor_background_color": "#231f32"
+  }
+}
+```
+
+### Dynamic Color Ranges
+
+```json
+{
+  "color": {
+    "basic_range": [1, 11],
+    "light_range": [10, 35],
+    "alpha_range": ["0x95", "0xa5"]
+  }
+}
+```
+
+## 🎨 Built-in Theme Collection
+
+ViiV includes 30+ professionally crafted themes:
+
+### Popular Themes
+- **ViiV-Tokyo-Night**: Deep purple-blue dark theme
+- **ViiV-Night-Owl**: Sarah Drasner's Night Owl inspired
+- **ViiV-Nord-Dark**: Arctic, north-bluish color palette
+- **ViiV-Atom-Dark**: GitHub Atom's classic dark theme
+- **ViiV-Github-Dark-Dimmed**: GitHub's modern dark theme
+
+### Elite Color Series
+- **Elite-Blue**: Professional blue variants (Light/Dark/Deep)
+- **Elite-Green**: Nature-inspired green themes
+- **Elite-Violet**: Elegant purple themes
+- **Elite-Cyan**: Modern cyan themes
+- **Elite-Red**: Bold red themes
+
+### Corporate Themes
+- **ViiV-MS-Office-Dark**: Microsoft Office inspired
+- **ViiV-Ericsson-Dark**: Corporate dark theme
+
+## 🔧 Advanced Configuration
+
+### Contrast Ratio Optimization
+
+Optimal values based on extensive testing:
+
+```json
+{
+  "options": {
+    "token_foreground_color_min_contrast_ratio": 7,
+    "token_foreground_color_max_contrast_ratio": 10,
+    "dark_mode_workbench_foreground_color_min_contrast_ratio": 9,
+    "dark_mode_workbench_foreground_color_max_contrast_ratio": 15,
+    "is_auto_adjust_contrast_radio_enabled": true
+  }
+}
+```
+
+### Property Classification System
+
+ViiV uses intelligent property classification to handle VSCode's inconsistent naming:
+
+```json
+{
+  "workbench_foreground_properties": [
+    "(?!.*(badge|statusBarItem\\.remote).*).*foreground$",
+    ".*badge.*background$",
+    ".*gutter.{2,}background$",
+    ".*IndentGuide.*active.*background[0-9]*$"
+  ],
+  "workbench_background_properties": [
+    "(?!.*(badge|select|match|focus|highlight).*).*background[0-9]*$",
+    ".*badge.*foreground$",
+    ".*border.*"
+  ]
+}
+```
+
+> **Note**: Some VSCode properties are named inversely to their actual function. ViiV automatically handles these inconsistencies with regex-based classification.
+
+### Color Matching System
+
+ViiV uses a priority-based matching system:
+
+1. **EXACT** (Priority 1): Exact property name match
+2. **ENDSWITH** (Priority 2): Property ends with pattern
+3. **STARTSWITH** (Priority 3): Property starts with pattern
+4. **CONTAINS** (Priority 4): Property contains pattern
+5. **FUZZY** (Priority 5): Regex pattern matching
+
+```json
+{
+  "groups": [
+    "editor.foreground",           // EXACT match
+    ".*foreground$",               // ENDSWITH match
+    "editor.*",                    // STARTSWITH match
+    ".*error.*"                    // FUZZY regex match
+  ]
+}
+```
+
+### Configuration Areas
+
+ViiV organizes colors into logical areas with inheritance hierarchy:
+
+1. **`default`** - Highest priority, overrides all other areas
+2. **`token`** - Syntax highlighting colors
+3. **`background`** - UI background elements
+4. **`foreground`** - Text and icon colors
+5. **`border`** - Borders and separators
+6. **`decoration`** - Special highlights and accents
+7. **`highlight_background`** - Selection and focus backgrounds
+
+Each area supports:
+- **Static colors**: Fixed hex values
+- **Dynamic ranges**: Algorithmic color generation
+- **Group patterns**: Regex-based property matching
+- **Component replacement**: Selective color component updates
+
+### Component Replacement System
+
+Control which color components get replaced:
+
+```json
+{
+  "replace_color_component": ["ALPHA"],  // Only replace transparency
+  "replace_color_component": ["BASIC"],  // Only replace base color
+  "replace_color_component": ["LIGHT"],  // Only replace lightness
+  "replace_color_component": ["ALL"]     // Replace entire color
+}
+```
+
+### ANSI Color Support
+
+Built-in terminal color definitions:
+
+```json
+{
+  "groups": [
+    "ansiRed", "ansiBrightRed",
+    "ansiGreen", "ansiBrightGreen",
+    "ansiBlue", "ansiBrightBlue",
+    "ansiYellow", "ansiBrightYellow",
+    "ansiCyan", "ansiBrightCyan",
+    "ansiMagenta", "ansiBrightMagenta",
+    "ansiWhite", "ansiBrightWhite",
+    "ansiBlack", "ansiBrightBlack"
+  ]
+}
+```
+
+## 🎯 Multi-Editor Support
+
+### VSCode Themes
+Generate standard VSCode color themes:
+
+```bash
+python viiv.py -g -t "ViiV-Tokyo-Night"
+```
+
+### Neovim Themes
+Generate Neovim colorschemes from the same configuration:
+
+```bash
+python viiv.py -N --nvim-repo /path/to/viiv.nvim
+```
+
+Neovim themes are configured in `viiv/conf/nvim-themes.json`:
+
+```json
+{
+  "themes": {
+    "viiv_tokyo_night": "#231f32",
+    "viiv_nord": "#2E3440",
+    "viiv_atom_dark": "#282C34"
+  }
+}
+```
+
+## 🎨 Color Generation System
+
+### Algorithmic Palette Generation
+
+ViiV uses the `peelee` library for scientific color generation:
+
+```python
+palette = P.Palette(
+    colors_total=7,                    # Base colors count
+    colors_gradations_total=60,        # Gradation steps
+    colors_min=120, colors_max=180,    # Hue range
+    colors_saturation=0.35,            # Saturation level
+    colors_lightness=0.15,             # Lightness level
+    palette_mode="DARK"                # Theme mode
+).generate_palette()
+```
+
+### Color Placeholder System
+
+Colors are referenced using placeholders:
+- `C_01_30` - Color 1, lightness 30
+- `C_05_45aa` - Color 5, lightness 45, alpha AA
+- `#ff0000` - Direct hex colors
+
+### Decoration Color System
+
+Special highlighting system with automatic color selection:
+
+```json
+{
+  "decoration": [
+    {
+      "color": {
+        "basic_range": [1, 7],        // Auto-selected range
+        "light_range": [45, 55],
+        "alpha_range": ["0xfe", "0xff"]
+      },
+      "groups": ["default"]
+    }
+  ]
+}
+```
+
+## 🔬 Advanced Options
+
+### Automatic Color Optimization
+
+```json
+{
+  "options": {
+    "is_auto_adjust_contrast_radio_enabled": true,
+    "force_to_use_workbench_editor_background_color": false,
+    "workbench_base_background_color_lightness_rate": 0.6
+  }
+}
+```
+
+### Debug and Development
+
+```json
+{
+  "options": {
+    "debug_properties": ["editor.background", "editor.foreground"],
+    "debug_groups": ["decoration"],
+    "log_level": "DEBUG"
+  }
+}
+```
+
+> **Recommendation**: Keep `is_auto_adjust_contrast_radio_enabled: true` for optimal accessibility. The auto-tuned colors follow WCAG scientific standards for maximum visual comfort.
+
+## 🛠️ Development Guide
+
+### Project Structure
+
+```
+viiv/
+├── viiv/                    # Core package
+│   ├── viiv.py             # Main theme generator
+│   ├── utils.py            # Utility functions
+│   ├── builtin_themes.py   # Pre-configured themes
+│   ├── conf/               # Configuration files
+│   │   ├── config.json     # Main configuration
+│   │   └── nvim-themes.json # Neovim themes
+│   └── generators/         # Multi-editor support
+│       ├── vscode.py       # VSCode generator
+│       └── nvim.py         # Neovim generator
+├── templates/              # Theme templates
+├── themes/                 # Generated themes
+├── output/                 # Generation artifacts
+└── tests/                  # Test suite
+```
+
+### Workbench Color Tuning
+
+**Darker backgrounds** (recommended: 5-20):
+```json
+{
+  "workbench_colors_min": 5,
+  "workbench_colors_max": 10
+}
+```
+
+**Lighter backgrounds** (max recommended: 60):
+```json
+{
+  "workbench_colors_min": 30,
+  "workbench_colors_max": 60
+}
+```
+
+**Saturation and lightness control**:
+```json
+{
+  "workbench_colors_saturation": 0.2,
+  "workbench_colors_lightness": 0.09
+}
+```
+
+### Creating Custom Themes
+
+**Method 1: Specific background color**
+```json
+{
+  "name": "My-Custom-Theme",
+  "theme_mode": "DARK",
+  "workbench_editor_background_color": "#1a1a2e",
+  "workbench_base_background_color_lightness_rate": 0.7
+}
+```
+
+**Method 2: Color name selection**
+```json
+{
+  "name": "Elite-Ocean",
+  "theme_mode": "DARK",
+  "workbench_base_background_color_name": "BLUE",
+  "workbench_colors_saturation": 0.8,
+  "workbench_colors_lightness": 0.06
+}
+```
+
+**Available color names**: `RED`, `GREEN`, `BLUE`, `YELLOW`, `CYAN`, `VIOLET`, `OBSIDIAN`, `RANDOM`
+
+### Token Color Customization
+
+**Fixed colors for specific tokens**:
+```json
+{
+  "token": [
+    {
+      "color": {
+        "hex": "#9a449afe"
+      },
+      "groups": [".*support.type.*"]
+    }
+  ]
+}
+```
+
+**Dynamic token colors**:
+```json
+{
+  "token": [
+    {
+      "color": {
+        "basic_range": [1, 8],
+        "light_range": [40, 55],
+        "alpha_range": ["0xde", "0xdf"]
+      },
+      "groups": ["default"]
+    }
+  ]
+}
+```
+
+## 📋 Command Reference
+
+### Theme Generation
+
+```bash
+# Generate random theme
+python viiv.py -r
+
+# Generate specific theme
+python viiv.py -g -t "ViiV-Tokyo-Night"
+
+# Generate all built-in themes
+python viiv.py -g
+
+# Generate with custom output directory
+python viiv.py -r -o ./my-themes/
+
+# Generate Neovim themes
+python viiv.py -N --nvim-repo /path/to/viiv.nvim
+```
+
+### Debugging and Analysis
+
+```bash
+# List all built-in themes
+python viiv.py -T
+
+# Print theme colors with filter
+python viiv.py -p "editor" -t "viiv-tokyo-night"
+
+# Print theme colors with custom themes directory
+python -m viiv -t "viiv-random-5" -p 'list' -D $themes_dir
+
+# Print color palette
+python viiv.py -P "background"
+
+# Print palette with custom directory and theme
+python viiv.py -P "background" -d /path/to/palette -t "my-theme"
+```
+
+#### Example Output
+
+```bash
+❯ python -m viiv -t "viiv-random-5" -p 'list' -D $themes_dir
+2026-01-10 20:51:32.727 | INFO     | viiv.viiv:show_theme_colors:1149 - dropdown.listBackground: #F3FAF8fe (C_14_58fe)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.activeSelectionBackground: #C370A688 (C_13_378e)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.activeSelectionForeground: #0F1F0Cca (C_09_09ca)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.activeSelectionIconForeground: #160C1Fca (C_08_05ca)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.deemphasizedForeground: #000000ce (C_14_00ce)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.dropBackground: #E1F2EEfe (C_14_53fe)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.errorForeground: #b400b4ce (#b400b4ce)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.filterMatchBackground: #E1F2EEfe (C_14_53fe)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.filterMatchBorder: #F3FAF8fe (C_14_58fe)
+2026-01-10 20:51:32.728 | INFO     | viiv.viiv:show_theme_colors:1149 - list.focusAndSelectionOutline: #F9F6FB00 (C_09_5900)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.focusBackground: #C3E4DD96 (C_14_4896)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.focusForeground: #B325A5fe (C_05_36fe)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.focusHighlightForeground: #1F3E19fe (C_08_08fe)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.focusOutline: #FBF6FA00 (C_11_5900)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.highlightForeground: #25140Fca (C_12_09ca)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.hoverBackground: #9ED4C8fe (C_14_39fe)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.hoverForeground: #B325A5fe (C_05_33fe)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.inactiveFocusBackground: #BCE2D99a (C_14_469c)
+2026-01-10 20:51:32.729 | INFO     | viiv.viiv:show_theme_colors:1149 - list.inactiveFocusOutline: #F7FBF600 (C_11_5900)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - list.inactiveSelectionBackground: #EFF8F6ae (C_14_57ae)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - list.inactiveSelectionForeground: #285C5065 (C_14_1665)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - list.inactiveSelectionIconForeground: #306E6065 (C_14_1765)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - list.invalidItemForeground: #000000ce (C_14_00ce)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - list.warningForeground: #ffd611ce (#ffd611ce)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - listFilterWidget.background: #E1F2EEfe (C_14_53fe)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - listFilterWidget.noMatchesOutline: #FBFBF600 (C_11_5900)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - listFilterWidget.outline: #F7FBF600 (C_10_5900)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - listFilterWidget.shadow: #F9F6FB00 (C_11_5900)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - quickInputList.focusBackground: #9E76C6a5 (C_10_37ab)
+2026-01-10 20:51:32.730 | INFO     | viiv.viiv:show_theme_colors:1149 - quickInputList.focusForeground: #832179fe (C_05_39fe)
+2026-01-10 20:51:32.731 | INFO     | viiv.viiv:show_theme_colors:1149 - quickInputList.focusIconForeground: #B325A5fe (C_05_30fe)
+2026-01-10 20:51:32.731 | INFO     | viiv.viiv:show_theme_colors:1149 - settings.dropdownListBorder: #F3FAF8fe (C_14_58fe)
+```
+
+### Python API
+
+```python
+from viiv.viiv import generate_random_theme, generate_themes
+
+# Generate random theme
+generate_random_theme(
+    theme_name="My-Custom-Theme",
+    output_dir="./themes",
+    workbench_editor_background_color="#1a1a2e"
+)
+
+# Generate built-in themes
+generate_themes("ViiV-Tokyo-Night", output_dir="./themes")
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Theme Files Not Found
+```bash
+# Error: Theme file not found
+# Solution: Specify custom themes directory
+python viiv.py -p "editor" -t "my-theme" -D /path/to/themes/
+```
+
+#### Palette Files Not Found
+```bash
+# Error: Palette files not found
+# Solution: Specify custom palette directory
+python viiv.py -P "background" -d /path/to/palette/ -t "my-theme"
+```
+
+#### Permission Errors
+```bash
+# Error: Permission denied when writing files
+# Solution: Check output directory permissions
+chmod 755 ./themes/
+chmod 755 ./output/
+```
+
+#### Configuration Issues
+```bash
+# Error: Invalid configuration
+# Solution: Validate JSON syntax
+python -m json.tool viiv/conf/config.json
+```
+
+#### Missing Dependencies
+```bash
+# Error: Module not found
+# Solution: Install dependencies
+poetry install
+# or
+pip install -r requirements.txt
+```
+
+### Debug Mode
+
+Enable debug logging for detailed information:
+
+```json
+{
+  "options": {
+    "log_level": "DEBUG",
+    "debug_properties": ["editor.background", "editor.foreground"],
+    "debug_groups": ["decoration"]
+  }
+}
+```
+
+### Command Line Arguments
+
+| Argument | Short | Description |
+|----------|-------|-------------|
+| `--random_theme` | `-r` | Generate random theme |
+| `--generate` | `-g` | Generate built-in themes |
+| `--print_colors` | `-p` | Print theme colors with filter |
+| `--print_palette` | `-P` | Print palette colors with filter |
+| `--theme` | `-t` | Specify target theme |
+| `--themes-dir` | `-D` | Directory path for theme files |
+| `--palette-root-dir` | `-d` | Directory path for palette files |
+| `--output_dir` | `-o` | Output directory for generated themes |
+| `--get_themes` | `-T` | List all built-in themes |
+| `--nvim` | `-N` | Generate Neovim themes |
+
+## 🧪 Testing
+
+```bash
+# Run test suite
+poetry run pytest
+
+# Run with coverage
+poetry run pytest --cov=viiv
+
+# Run specific test
+poetry run pytest tests/viiv_package_test.py
+```
+
+## 📦 Dependencies
+
+- **Python 3.11+**: Core runtime
+- **peelee**: Color generation and manipulation
+- **loguru**: Advanced logging
+- **pillow**: Image processing
+- **numpy**: Numerical computations
+- **extcolors**: Color extraction
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and add tests
+4. Run the test suite: `poetry run pytest`
+5. Commit your changes: `git commit -m 'Add amazing feature'`
+6. Push to the branch: `git push origin feature/amazing-feature`
+7. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **WCAG Guidelines**: For accessibility standards
+- **VSCode Team**: For the excellent theming system
+- **Color Theory**: Scientific color harmony principles
+- **Community**: For feedback and contributions
+
+---
+
+**Made with ❤️ for developers who appreciate beautiful, accessible code themes.**
