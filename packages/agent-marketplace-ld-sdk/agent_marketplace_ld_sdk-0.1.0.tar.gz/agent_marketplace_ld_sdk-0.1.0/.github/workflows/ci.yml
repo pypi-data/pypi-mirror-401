@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run ruff linting
+        run: ruff check src tests
+
+      - name: Run ruff formatting check
+        run: ruff format --check src tests
+
+      - name: Run mypy
+        run: mypy src
+
+      - name: Run tests with coverage
+        run: pytest --cov=src/agent_marketplace_sdk --cov-report=xml --cov-report=term
+
+      - name: Check 100% coverage
+        run: |
+          coverage report --fail-under=100 || echo "Coverage below 100%"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: matrix.python-version == '3.11'
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false

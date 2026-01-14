@@ -1,0 +1,138 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-marketplace-ld-sdk"
+version = "0.1.0"
+description = "Official Python SDK for Agent Marketplace. Discover, install, and publish AI agents programmatically."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "Kevin McAllorum", email = "kmcallorum@example.com" },
+]
+keywords = [
+    "python",
+    "sdk",
+    "client",
+    "api-client",
+    "agent-marketplace",
+    "pytest-agents",
+    "async",
+    "httpx",
+    "pydantic",
+    "type-safe",
+    "agent-discovery",
+    "agent-installation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.26.0",
+    "pydantic>=2.0.0",
+    "typing-extensions>=4.9.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-mock>=3.12.0",
+    "respx>=0.20.0",
+    "ruff>=0.1.0",
+    "mypy>=1.8.0",
+    "faker>=22.0.0",
+    "types-python-dateutil>=2.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kmcallorum/agent-marketplace-ld-sdk"
+Documentation = "https://github.com/kmcallorum/agent-marketplace-ld-sdk#readme"
+Repository = "https://github.com/kmcallorum/agent-marketplace-ld-sdk"
+Issues = "https://github.com/kmcallorum/agent-marketplace-ld-sdk/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_marketplace_sdk"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ARG002",  # Unused method argument (pytest fixtures)
+    "SIM117",  # Use single with statement (pytest.raises pattern)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agent_marketplace_sdk"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_configs = true
+show_error_codes = true
+files = ["src/agent_marketplace_sdk"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+markers = [
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["src/agent_marketplace_sdk"]
+branch = true
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+fail_under = 100
+show_missing = true
