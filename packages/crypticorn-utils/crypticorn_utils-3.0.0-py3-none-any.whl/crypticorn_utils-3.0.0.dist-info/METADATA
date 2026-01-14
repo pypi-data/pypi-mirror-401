@@ -1,0 +1,45 @@
+Metadata-Version: 2.4
+Name: crypticorn_utils
+Version: 3.0.0
+Summary: Shared utilities for the Crypticorn APIs
+Author: Crypticorn
+Author-email: Crypticorn <timon@crypticorn.com>
+License-Expression: MIT
+License-File: LICENSE
+Classifier: Topic :: Scientific/Engineering
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Typing :: Typed
+Requires-Dist: fastapi>=0.124.0,<0.125.0
+Requires-Dist: prometheus-client>=0.22.0,<1.0.0
+Requires-Dist: crypticorn>=4.0.0,<5.0.0
+Requires-Dist: uv==0.9.17 ; extra == 'build'
+Requires-Python: >=3.11
+Project-URL: Changelog, https://github.com/crypticorn-ai/python-utils/releases
+Provides-Extra: build
+Description-Content-Type: text/markdown
+
+This module serves as a central place for providing utilities for our Python backends.
+
+To install the package, run:
+```bash
+pip install crypticorn-utils
+```
+or for development:
+```bash
+pip install -e .[dev]
+```
+
+- **Auth**: Authentication and authorization for APIs with API key, JWT bearer token, and basic auth support
+- **Exceptions**: Comprehensive error handling system with HTTP/WebSocket exceptions and standardized error responses
+- **Logging**: Logging configuration and utilities for consistent formatting across services
+- **Middleware**: API middleware components for request/response processing
+- **Pagination**: Utilities for paginated API responses with cursor-based pagination, filtering, and sorting
+- **Metrics**: Prometheus metrics collection for HTTP requests, response times, and sizes
+- **Types**: Environment definitions (prod/dev/local/docker) and base URL management
+- **Utils**: General utility functions including random ID generation, datetime conversion, and optional imports
