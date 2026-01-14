@@ -1,0 +1,115 @@
+######################################################################################################
+#                                 Auto-generated Metaflow stub file                                  #
+# MF version: 2.19.15.3+obcheckpoint(0.2.10);ob(v1)                                                  #
+# Generated on 2026-01-13T14:42:16.989326                                                            #
+######################################################################################################
+
+from __future__ import annotations
+
+import typing
+import metaflow
+if typing.TYPE_CHECKING:
+    import metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastructures
+    import metaflow.datastore.datastore_storage
+    import metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastore.core
+
+from ..datastore.core import ObjectStorage as ObjectStorage
+from ..datastore.core import DatastoreInterface as DatastoreInterface
+from ..datastore.core import STORAGE_FORMATS as STORAGE_FORMATS
+from ..datastore.core import warning_message as warning_message
+from .exceptions import ModelException as ModelException
+from ..exceptions import KeyNotFoundError as KeyNotFoundError
+from ..datastructures import ModelArtifact as ModelArtifact
+from ..exceptions import KeyNotCompatibleWithObjectException as KeyNotCompatibleWithObjectException
+
+MODELS_PEFFIX: str
+
+ARTIFACT_STORE_NAME: str
+
+METADATA_STORE_NAME: str
+
+ARTIFACT_METADATA_STORE_NAME: str
+
+class ModelPathComponents(tuple, metaclass=type):
+    """
+    ModelPathComponents(model_uuid, root_prefix)
+    """
+    @staticmethod
+    def __new__(_cls, model_uuid, root_prefix):
+        """
+        Create new instance of ModelPathComponents(model_uuid, root_prefix)
+        """
+        ...
+    def __repr__(self):
+        """
+        Return a nicely formatted representation string
+        """
+        ...
+    def __getnewargs__(self):
+        """
+        Return self as a plain tuple.  Used by copy and pickle.
+        """
+        ...
+    ...
+
+def decompose_model_artifact_key(key):
+    ...
+
+class ModelDatastore(metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastore.core.DatastoreInterface, metaclass=type):
+    def save(self, artifact: metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastructures.ModelArtifact, file_path, storage_format = 'tar'):
+        ...
+    def load_metadata(self, model_id):
+        ...
+    def save_metadata(self, attempt, model_id, metadata):
+        ...
+    def load(self, model_id, path):
+        ...
+    def list(self, *args, **kwargs):
+        ...
+    def delete(self, model_artifact: metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastructures.ModelArtifact) -> bool:
+        """
+        Delete a model from all stores.
+        
+        Deletion order:
+        1. Delete artifact data (files/tarball)
+        2. Delete artifact metadata
+        3. Delete task metadata
+        
+        Parameters
+        ----------
+        model_artifact : ModelArtifact
+            The model artifact to delete.
+        
+        Returns
+        -------
+        bool
+            True if all deletions were successful.
+        
+        Raises
+        ------
+        ValueError
+            If required datastores are not initialized.
+        """
+        ...
+    @classmethod
+    def init_delete_store(cls, storage_backend: metaflow.datastore.datastore_storage.DataStoreStorage, model_artifact: metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastructures.ModelArtifact):
+        """
+        Initialize datastore for delete operations from a model artifact.
+        
+        This creates a datastore instance with access to all three stores
+        needed for complete model deletion.
+        """
+        ...
+    @classmethod
+    def init_read_store(cls, storage_backend: metaflow.datastore.datastore_storage.DataStoreStorage, pathspec: typing.Optional[str] = None, attempt: typing.Optional[str] = None, model_key = None, *args, **kwargs):
+        ...
+    @classmethod
+    def decompose_key(cls, key):
+        ...
+    @classmethod
+    def init_write_store(cls, storage_backend: metaflow.datastore.datastore_storage.DataStoreStorage, pathspec: str, attempt, *args, **kwargs):
+        ...
+    def __init__(self, artifact_store: metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastore.core.ObjectStorage, metadata_store: metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastore.core.ObjectStorage, artifact_metadatastore: metaflow.mf_extensions.obcheckpoint.plugins.machine_learning_utilities.datastore.core.ObjectStorage):
+        ...
+    ...
+
