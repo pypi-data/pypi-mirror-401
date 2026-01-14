@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+[tool.hatch.build.targets.wheel]
+packages = ["src/open_hh_models"]
+[project]
+name = "ohh-pydantic"
+version = "0.1.0"
+readme = "README.md"
+dependencies = [
+    "pydantic>=2.12.5",
+]
+authors = [
+    { name="Allan Sattelberg Rivera", email="allansattriv@gmail.com"}
+]
+description = "Implementation of the Open Hand History Spec in Pydantic"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+[project.urls]
+Homepage = "https://github.com/allansatt/ohh_pydantic"
+Issues = "https://github.com/allansatt/ohh_pydantic/issues"
