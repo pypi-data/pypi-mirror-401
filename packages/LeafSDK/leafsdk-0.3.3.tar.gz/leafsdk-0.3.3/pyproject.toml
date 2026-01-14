@@ -1,0 +1,40 @@
+[project]
+name = "LeafSDK"
+version = "0.3.3"
+description = "SDK for mission planning"
+authors = [
+    { name = "Suleyman Yildirim", email = "suleyman.yildirim@droneleaf.io" },
+    { name = "Khalil Al Handawi", email = "khalil.alhandawi@droneleaf.io" },
+    { name = "Yaser Othman", email = "yaser.othman@droneleaf.io" },
+]
+dependencies = [
+    "networkx>=3.4.2",
+    "numpy>=2.2.6",
+    "scipy>=1.15.3",
+    "pydot>=4.0.1",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+
+[project.license]
+text = "MIT"
+
+[build-system]
+requires = [
+    "pdm-backend",
+]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "-e file:///${PROJECT_ROOT}/../petal-leafsdk#egg=petal-leafsdk",
+]
+
+[dependency-groups]
+prod = []
+dev = [
+    "pytest-cov>=6.2.1",
+]
