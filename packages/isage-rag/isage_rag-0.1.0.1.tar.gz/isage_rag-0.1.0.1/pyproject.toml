@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isage-rag"
+version = "0.1.0.1"
+description = "SAGE RAG Framework - Document loaders, chunkers, retrievers for RAG pipelines"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "IntelliStream Team", email = "shuhao_zhang@hust.edu.cn" }
+]
+keywords = [
+    "RAG",
+    "retrieval",
+    "document-loader",
+    "chunker",
+    "retriever",
+    "LLM",
+    "AI",
+]
+
+dependencies = [
+    "pydantic>=2.0.0",
+    "typing-extensions>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.4.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/intellistream/sage-rag"
+"Repository" = "https://github.com/intellistream/sage-rag"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["sage_libs*"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
