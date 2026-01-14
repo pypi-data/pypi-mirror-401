@@ -1,0 +1,2922 @@
+Metadata-Version: 2.4
+Name: bores-framework
+Version: 0.0.1a0
+Summary: 3D 3-Phase Black-Oil Reservoir Modelling and Simulation Framework (BORES).
+Author-email: ti-oluwa <tioluwa.dev@gmail.com>
+License:                     GNU AFFERO GENERAL PUBLIC LICENSE
+                               Version 3, 19 November 2007
+        
+         Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+         Everyone is permitted to copy and distribute verbatim copies
+         of this license document, but changing it is not allowed.
+        
+                                    Preamble
+        
+          The GNU Affero General Public License is a free, copyleft license for
+        software and other kinds of works, specifically designed to ensure
+        cooperation with the community in the case of network server software.
+        
+          The licenses for most software and other practical works are designed
+        to take away your freedom to share and change the works.  By contrast,
+        our General Public Licenses are intended to guarantee your freedom to
+        share and change all versions of a program--to make sure it remains free
+        software for all its users.
+        
+          When we speak of free software, we are referring to freedom, not
+        price.  Our General Public Licenses are designed to make sure that you
+        have the freedom to distribute copies of free software (and charge for
+        them if you wish), that you receive source code or can get it if you
+        want it, that you can change the software or use pieces of it in new
+        free programs, and that you know you can do these things.
+        
+          Developers that use our General Public Licenses protect your rights
+        with two steps: (1) assert copyright on the software, and (2) offer
+        you this License which gives you legal permission to copy, distribute
+        and/or modify the software.
+        
+          A secondary benefit of defending all users' freedom is that
+        improvements made in alternate versions of the program, if they
+        receive widespread use, become available for other developers to
+        incorporate.  Many developers of free software are heartened and
+        encouraged by the resulting cooperation.  However, in the case of
+        software used on network servers, this result may fail to come about.
+        The GNU General Public License permits making a modified version and
+        letting the public access it on a server without ever releasing its
+        source code to the public.
+        
+          The GNU Affero General Public License is designed specifically to
+        ensure that, in such cases, the modified source code becomes available
+        to the community.  It requires the operator of a network server to
+        provide the source code of the modified version running there to the
+        users of that server.  Therefore, public use of a modified version, on
+        a publicly accessible server, gives the public access to the source
+        code of the modified version.
+        
+          An older license, called the Affero General Public License and
+        published by Affero, was designed to accomplish similar goals.  This is
+        a different license, not a version of the Affero GPL, but Affero has
+        released a new version of the Affero GPL which permits relicensing under
+        this license.
+        
+          The precise terms and conditions for copying, distribution and
+        modification follow.
+        
+                               TERMS AND CONDITIONS
+        
+          0. Definitions.
+        
+          "This License" refers to version 3 of the GNU Affero General Public License.
+        
+          "Copyright" also means copyright-like laws that apply to other kinds of
+        works, such as semiconductor masks.
+        
+          "The Program" refers to any copyrightable work licensed under this
+        License.  Each licensee is addressed as "you".  "Licensees" and
+        "recipients" may be individuals or organizations.
+        
+          To "modify" a work means to copy from or adapt all or part of the work
+        in a fashion requiring copyright permission, other than the making of an
+        exact copy.  The resulting work is called a "modified version" of the
+        earlier work or a work "based on" the earlier work.
+        
+          A "covered work" means either the unmodified Program or a work based
+        on the Program.
+        
+          To "propagate" a work means to do anything with it that, without
+        permission, would make you directly or secondarily liable for
+        infringement under applicable copyright law, except executing it on a
+        computer or modifying a private copy.  Propagation includes copying,
+        distribution (with or without modification), making available to the
+        public, and in some countries other activities as well.
+        
+          To "convey" a work means any kind of propagation that enables other
+        parties to make or receive copies.  Mere interaction with a user through
+        a computer network, with no transfer of a copy, is not conveying.
+        
+          An interactive user interface displays "Appropriate Legal Notices"
+        to the extent that it includes a convenient and prominently visible
+        feature that (1) displays an appropriate copyright notice, and (2)
+        tells the user that there is no warranty for the work (except to the
+        extent that warranties are provided), that licensees may convey the
+        work under this License, and how to view a copy of this License.  If
+        the interface presents a list of user commands or options, such as a
+        menu, a prominent item in the list meets this criterion.
+        
+          1. Source Code.
+        
+          The "source code" for a work means the preferred form of the work
+        for making modifications to it.  "Object code" means any non-source
+        form of a work.
+        
+          A "Standard Interface" means an interface that either is an official
+        standard defined by a recognized standards body, or, in the case of
+        interfaces specified for a particular programming language, one that
+        is widely used among developers working in that language.
+        
+          The "System Libraries" of an executable work include anything, other
+        than the work as a whole, that (a) is included in the normal form of
+        packaging a Major Component, but which is not part of that Major
+        Component, and (b) serves only to enable use of the work with that
+        Major Component, or to implement a Standard Interface for which an
+        implementation is available to the public in source code form.  A
+        "Major Component", in this context, means a major essential component
+        (kernel, window system, and so on) of the specific operating system
+        (if any) on which the executable work runs, or a compiler used to
+        produce the work, or an object code interpreter used to run it.
+        
+          The "Corresponding Source" for a work in object code form means all
+        the source code needed to generate, install, and (for an executable
+        work) run the object code and to modify the work, including scripts to
+        control those activities.  However, it does not include the work's
+        System Libraries, or general-purpose tools or generally available free
+        programs which are used unmodified in performing those activities but
+        which are not part of the work.  For example, Corresponding Source
+        includes interface definition files associated with source files for
+        the work, and the source code for shared libraries and dynamically
+        linked subprograms that the work is specifically designed to require,
+        such as by intimate data communication or control flow between those
+        subprograms and other parts of the work.
+        
+          The Corresponding Source need not include anything that users
+        can regenerate automatically from other parts of the Corresponding
+        Source.
+        
+          The Corresponding Source for a work in source code form is that
+        same work.
+        
+          2. Basic Permissions.
+        
+          All rights granted under this License are granted for the term of
+        copyright on the Program, and are irrevocable provided the stated
+        conditions are met.  This License explicitly affirms your unlimited
+        permission to run the unmodified Program.  The output from running a
+        covered work is covered by this License only if the output, given its
+        content, constitutes a covered work.  This License acknowledges your
+        rights of fair use or other equivalent, as provided by copyright law.
+        
+          You may make, run and propagate covered works that you do not
+        convey, without conditions so long as your license otherwise remains
+        in force.  You may convey covered works to others for the sole purpose
+        of having them make modifications exclusively for you, or provide you
+        with facilities for running those works, provided that you comply with
+        the terms of this License in conveying all material for which you do
+        not control copyright.  Those thus making or running the covered works
+        for you must do so exclusively on your behalf, under your direction
+        and control, on terms that prohibit them from making any copies of
+        your copyrighted material outside their relationship with you.
+        
+          Conveying under any other circumstances is permitted solely under
+        the conditions stated below.  Sublicensing is not allowed; section 10
+        makes it unnecessary.
+        
+          3. Protecting Users' Legal Rights From Anti-Circumvention Law.
+        
+          No covered work shall be deemed part of an effective technological
+        measure under any applicable law fulfilling obligations under article
+        11 of the WIPO copyright treaty adopted on 20 December 1996, or
+        similar laws prohibiting or restricting circumvention of such
+        measures.
+        
+          When you convey a covered work, you waive any legal power to forbid
+        circumvention of technological measures to the extent such circumvention
+        is effected by exercising rights under this License with respect to
+        the covered work, and you disclaim any intention to limit operation or
+        modification of the work as a means of enforcing, against the work's
+        users, your or third parties' legal rights to forbid circumvention of
+        technological measures.
+        
+          4. Conveying Verbatim Copies.
+        
+          You may convey verbatim copies of the Program's source code as you
+        receive it, in any medium, provided that you conspicuously and
+        appropriately publish on each copy an appropriate copyright notice;
+        keep intact all notices stating that this License and any
+        non-permissive terms added in accord with section 7 apply to the code;
+        keep intact all notices of the absence of any warranty; and give all
+        recipients a copy of this License along with the Program.
+        
+          You may charge any price or no price for each copy that you convey,
+        and you may offer support or warranty protection for a fee.
+        
+          5. Conveying Modified Source Versions.
+        
+          You may convey a work based on the Program, or the modifications to
+        produce it from the Program, in the form of source code under the
+        terms of section 4, provided that you also meet all of these conditions:
+        
+            a) The work must carry prominent notices stating that you modified
+            it, and giving a relevant date.
+        
+            b) The work must carry prominent notices stating that it is
+            released under this License and any conditions added under section
+            7.  This requirement modifies the requirement in section 4 to
+            "keep intact all notices".
+        
+            c) You must license the entire work, as a whole, under this
+            License to anyone who comes into possession of a copy.  This
+            License will therefore apply, along with any applicable section 7
+            additional terms, to the whole of the work, and all its parts,
+            regardless of how they are packaged.  This License gives no
+            permission to license the work in any other way, but it does not
+            invalidate such permission if you have separately received it.
+        
+            d) If the work has interactive user interfaces, each must display
+            Appropriate Legal Notices; however, if the Program has interactive
+            interfaces that do not display Appropriate Legal Notices, your
+            work need not make them do so.
+        
+          A compilation of a covered work with other separate and independent
+        works, which are not by their nature extensions of the covered work,
+        and which are not combined with it such as to form a larger program,
+        in or on a volume of a storage or distribution medium, is called an
+        "aggregate" if the compilation and its resulting copyright are not
+        used to limit the access or legal rights of the compilation's users
+        beyond what the individual works permit.  Inclusion of a covered work
+        in an aggregate does not cause this License to apply to the other
+        parts of the aggregate.
+        
+          6. Conveying Non-Source Forms.
+        
+          You may convey a covered work in object code form under the terms
+        of sections 4 and 5, provided that you also convey the
+        machine-readable Corresponding Source under the terms of this License,
+        in one of these ways:
+        
+            a) Convey the object code in, or embodied in, a physical product
+            (including a physical distribution medium), accompanied by the
+            Corresponding Source fixed on a durable physical medium
+            customarily used for software interchange.
+        
+            b) Convey the object code in, or embodied in, a physical product
+            (including a physical distribution medium), accompanied by a
+            written offer, valid for at least three years and valid for as
+            long as you offer spare parts or customer support for that product
+            model, to give anyone who possesses the object code either (1) a
+            copy of the Corresponding Source for all the software in the
+            product that is covered by this License, on a durable physical
+            medium customarily used for software interchange, for a price no
+            more than your reasonable cost of physically performing this
+            conveying of source, or (2) access to copy the
+            Corresponding Source from a network server at no charge.
+        
+            c) Convey individual copies of the object code with a copy of the
+            written offer to provide the Corresponding Source.  This
+            alternative is allowed only occasionally and noncommercially, and
+            only if you received the object code with such an offer, in accord
+            with subsection 6b.
+        
+            d) Convey the object code by offering access from a designated
+            place (gratis or for a charge), and offer equivalent access to the
+            Corresponding Source in the same way through the same place at no
+            further charge.  You need not require recipients to copy the
+            Corresponding Source along with the object code.  If the place to
+            copy the object code is a network server, the Corresponding Source
+            may be on a different server (operated by you or a third party)
+            that supports equivalent copying facilities, provided you maintain
+            clear directions next to the object code saying where to find the
+            Corresponding Source.  Regardless of what server hosts the
+            Corresponding Source, you remain obligated to ensure that it is
+            available for as long as needed to satisfy these requirements.
+        
+            e) Convey the object code using peer-to-peer transmission, provided
+            you inform other peers where the object code and Corresponding
+            Source of the work are being offered to the general public at no
+            charge under subsection 6d.
+        
+          A separable portion of the object code, whose source code is excluded
+        from the Corresponding Source as a System Library, need not be
+        included in conveying the object code work.
+        
+          A "User Product" is either (1) a "consumer product", which means any
+        tangible personal property which is normally used for personal, family,
+        or household purposes, or (2) anything designed or sold for incorporation
+        into a dwelling.  In determining whether a product is a consumer product,
+        doubtful cases shall be resolved in favor of coverage.  For a particular
+        product received by a particular user, "normally used" refers to a
+        typical or common use of that class of product, regardless of the status
+        of the particular user or of the way in which the particular user
+        actually uses, or expects or is expected to use, the product.  A product
+        is a consumer product regardless of whether the product has substantial
+        commercial, industrial or non-consumer uses, unless such uses represent
+        the only significant mode of use of the product.
+        
+          "Installation Information" for a User Product means any methods,
+        procedures, authorization keys, or other information required to install
+        and execute modified versions of a covered work in that User Product from
+        a modified version of its Corresponding Source.  The information must
+        suffice to ensure that the continued functioning of the modified object
+        code is in no case prevented or interfered with solely because
+        modification has been made.
+        
+          If you convey an object code work under this section in, or with, or
+        specifically for use in, a User Product, and the conveying occurs as
+        part of a transaction in which the right of possession and use of the
+        User Product is transferred to the recipient in perpetuity or for a
+        fixed term (regardless of how the transaction is characterized), the
+        Corresponding Source conveyed under this section must be accompanied
+        by the Installation Information.  But this requirement does not apply
+        if neither you nor any third party retains the ability to install
+        modified object code on the User Product (for example, the work has
+        been installed in ROM).
+        
+          The requirement to provide Installation Information does not include a
+        requirement to continue to provide support service, warranty, or updates
+        for a work that has been modified or installed by the recipient, or for
+        the User Product in which it has been modified or installed.  Access to a
+        network may be denied when the modification itself materially and
+        adversely affects the operation of the network or violates the rules and
+        protocols for communication across the network.
+        
+          Corresponding Source conveyed, and Installation Information provided,
+        in accord with this section must be in a format that is publicly
+        documented (and with an implementation available to the public in
+        source code form), and must require no special password or key for
+        unpacking, reading or copying.
+        
+          7. Additional Terms.
+        
+          "Additional permissions" are terms that supplement the terms of this
+        License by making exceptions from one or more of its conditions.
+        Additional permissions that are applicable to the entire Program shall
+        be treated as though they were included in this License, to the extent
+        that they are valid under applicable law.  If additional permissions
+        apply only to part of the Program, that part may be used separately
+        under those permissions, but the entire Program remains governed by
+        this License without regard to the additional permissions.
+        
+          When you convey a copy of a covered work, you may at your option
+        remove any additional permissions from that copy, or from any part of
+        it.  (Additional permissions may be written to require their own
+        removal in certain cases when you modify the work.)  You may place
+        additional permissions on material, added by you to a covered work,
+        for which you have or can give appropriate copyright permission.
+        
+          Notwithstanding any other provision of this License, for material you
+        add to a covered work, you may (if authorized by the copyright holders of
+        that material) supplement the terms of this License with terms:
+        
+            a) Disclaiming warranty or limiting liability differently from the
+            terms of sections 15 and 16 of this License; or
+        
+            b) Requiring preservation of specified reasonable legal notices or
+            author attributions in that material or in the Appropriate Legal
+            Notices displayed by works containing it; or
+        
+            c) Prohibiting misrepresentation of the origin of that material, or
+            requiring that modified versions of such material be marked in
+            reasonable ways as different from the original version; or
+        
+            d) Limiting the use for publicity purposes of names of licensors or
+            authors of the material; or
+        
+            e) Declining to grant rights under trademark law for use of some
+            trade names, trademarks, or service marks; or
+        
+            f) Requiring indemnification of licensors and authors of that
+            material by anyone who conveys the material (or modified versions of
+            it) with contractual assumptions of liability to the recipient, for
+            any liability that these contractual assumptions directly impose on
+            those licensors and authors.
+        
+          All other non-permissive additional terms are considered "further
+        restrictions" within the meaning of section 10.  If the Program as you
+        received it, or any part of it, contains a notice stating that it is
+        governed by this License along with a term that is a further
+        restriction, you may remove that term.  If a license document contains
+        a further restriction but permits relicensing or conveying under this
+        License, you may add to a covered work material governed by the terms
+        of that license document, provided that the further restriction does
+        not survive such relicensing or conveying.
+        
+          If you add terms to a covered work in accord with this section, you
+        must place, in the relevant source files, a statement of the
+        additional terms that apply to those files, or a notice indicating
+        where to find the applicable terms.
+        
+          Additional terms, permissive or non-permissive, may be stated in the
+        form of a separately written license, or stated as exceptions;
+        the above requirements apply either way.
+        
+          8. Termination.
+        
+          You may not propagate or modify a covered work except as expressly
+        provided under this License.  Any attempt otherwise to propagate or
+        modify it is void, and will automatically terminate your rights under
+        this License (including any patent licenses granted under the third
+        paragraph of section 11).
+        
+          However, if you cease all violation of this License, then your
+        license from a particular copyright holder is reinstated (a)
+        provisionally, unless and until the copyright holder explicitly and
+        finally terminates your license, and (b) permanently, if the copyright
+        holder fails to notify you of the violation by some reasonable means
+        prior to 60 days after the cessation.
+        
+          Moreover, your license from a particular copyright holder is
+        reinstated permanently if the copyright holder notifies you of the
+        violation by some reasonable means, this is the first time you have
+        received notice of violation of this License (for any work) from that
+        copyright holder, and you cure the violation prior to 30 days after
+        your receipt of the notice.
+        
+          Termination of your rights under this section does not terminate the
+        licenses of parties who have received copies or rights from you under
+        this License.  If your rights have been terminated and not permanently
+        reinstated, you do not qualify to receive new licenses for the same
+        material under section 10.
+        
+          9. Acceptance Not Required for Having Copies.
+        
+          You are not required to accept this License in order to receive or
+        run a copy of the Program.  Ancillary propagation of a covered work
+        occurring solely as a consequence of using peer-to-peer transmission
+        to receive a copy likewise does not require acceptance.  However,
+        nothing other than this License grants you permission to propagate or
+        modify any covered work.  These actions infringe copyright if you do
+        not accept this License.  Therefore, by modifying or propagating a
+        covered work, you indicate your acceptance of this License to do so.
+        
+          10. Automatic Licensing of Downstream Recipients.
+        
+          Each time you convey a covered work, the recipient automatically
+        receives a license from the original licensors, to run, modify and
+        propagate that work, subject to this License.  You are not responsible
+        for enforcing compliance by third parties with this License.
+        
+          An "entity transaction" is a transaction transferring control of an
+        organization, or substantially all assets of one, or subdividing an
+        organization, or merging organizations.  If propagation of a covered
+        work results from an entity transaction, each party to that
+        transaction who receives a copy of the work also receives whatever
+        licenses to the work the party's predecessor in interest had or could
+        give under the previous paragraph, plus a right to possession of the
+        Corresponding Source of the work from the predecessor in interest, if
+        the predecessor has it or can get it with reasonable efforts.
+        
+          You may not impose any further restrictions on the exercise of the
+        rights granted or affirmed under this License.  For example, you may
+        not impose a license fee, royalty, or other charge for exercise of
+        rights granted under this License, and you may not initiate litigation
+        (including a cross-claim or counterclaim in a lawsuit) alleging that
+        any patent claim is infringed by making, using, selling, offering for
+        sale, or importing the Program or any portion of it.
+        
+          11. Patents.
+        
+          A "contributor" is a copyright holder who authorizes use under this
+        License of the Program or a work on which the Program is based.  The
+        work thus licensed is called the contributor's "contributor version".
+        
+          A contributor's "essential patent claims" are all patent claims
+        owned or controlled by the contributor, whether already acquired or
+        hereafter acquired, that would be infringed by some manner, permitted
+        by this License, of making, using, or selling its contributor version,
+        but do not include claims that would be infringed only as a
+        consequence of further modification of the contributor version.  For
+        purposes of this definition, "control" includes the right to grant
+        patent sublicenses in a manner consistent with the requirements of
+        this License.
+        
+          Each contributor grants you a non-exclusive, worldwide, royalty-free
+        patent license under the contributor's essential patent claims, to
+        make, use, sell, offer for sale, import and otherwise run, modify and
+        propagate the contents of its contributor version.
+        
+          In the following three paragraphs, a "patent license" is any express
+        agreement or commitment, however denominated, not to enforce a patent
+        (such as an express permission to practice a patent or covenant not to
+        sue for patent infringement).  To "grant" such a patent license to a
+        party means to make such an agreement or commitment not to enforce a
+        patent against the party.
+        
+          If you convey a covered work, knowingly relying on a patent license,
+        and the Corresponding Source of the work is not available for anyone
+        to copy, free of charge and under the terms of this License, through a
+        publicly available network server or other readily accessible means,
+        then you must either (1) cause the Corresponding Source to be so
+        available, or (2) arrange to deprive yourself of the benefit of the
+        patent license for this particular work, or (3) arrange, in a manner
+        consistent with the requirements of this License, to extend the patent
+        license to downstream recipients.  "Knowingly relying" means you have
+        actual knowledge that, but for the patent license, your conveying the
+        covered work in a country, or your recipient's use of the covered work
+        in a country, would infringe one or more identifiable patents in that
+        country that you have reason to believe are valid.
+        
+          If, pursuant to or in connection with a single transaction or
+        arrangement, you convey, or propagate by procuring conveyance of, a
+        covered work, and grant a patent license to some of the parties
+        receiving the covered work authorizing them to use, propagate, modify
+        or convey a specific copy of the covered work, then the patent license
+        you grant is automatically extended to all recipients of the covered
+        work and works based on it.
+        
+          A patent license is "discriminatory" if it does not include within
+        the scope of its coverage, prohibits the exercise of, or is
+        conditioned on the non-exercise of one or more of the rights that are
+        specifically granted under this License.  You may not convey a covered
+        work if you are a party to an arrangement with a third party that is
+        in the business of distributing software, under which you make payment
+        to the third party based on the extent of your activity of conveying
+        the work, and under which the third party grants, to any of the
+        parties who would receive the covered work from you, a discriminatory
+        patent license (a) in connection with copies of the covered work
+        conveyed by you (or copies made from those copies), or (b) primarily
+        for and in connection with specific products or compilations that
+        contain the covered work, unless you entered into that arrangement,
+        or that patent license was granted, prior to 28 March 2007.
+        
+          Nothing in this License shall be construed as excluding or limiting
+        any implied license or other defenses to infringement that may
+        otherwise be available to you under applicable patent law.
+        
+          12. No Surrender of Others' Freedom.
+        
+          If conditions are imposed on you (whether by court order, agreement or
+        otherwise) that contradict the conditions of this License, they do not
+        excuse you from the conditions of this License.  If you cannot convey a
+        covered work so as to satisfy simultaneously your obligations under this
+        License and any other pertinent obligations, then as a consequence you may
+        not convey it at all.  For example, if you agree to terms that obligate you
+        to collect a royalty for further conveying from those to whom you convey
+        the Program, the only way you could satisfy both those terms and this
+        License would be to refrain entirely from conveying the Program.
+        
+          13. Remote Network Interaction; Use with the GNU General Public License.
+        
+          Notwithstanding any other provision of this License, if you modify the
+        Program, your modified version must prominently offer all users
+        interacting with it remotely through a computer network (if your version
+        supports such interaction) an opportunity to receive the Corresponding
+        Source of your version by providing access to the Corresponding Source
+        from a network server at no charge, through some standard or customary
+        means of facilitating copying of software.  This Corresponding Source
+        shall include the Corresponding Source for any work covered by version 3
+        of the GNU General Public License that is incorporated pursuant to the
+        following paragraph.
+        
+          Notwithstanding any other provision of this License, you have
+        permission to link or combine any covered work with a work licensed
+        under version 3 of the GNU General Public License into a single
+        combined work, and to convey the resulting work.  The terms of this
+        License will continue to apply to the part which is the covered work,
+        but the work with which it is combined will remain governed by version
+        3 of the GNU General Public License.
+        
+          14. Revised Versions of this License.
+        
+          The Free Software Foundation may publish revised and/or new versions of
+        the GNU Affero General Public License from time to time.  Such new versions
+        will be similar in spirit to the present version, but may differ in detail to
+        address new problems or concerns.
+        
+          Each version is given a distinguishing version number.  If the
+        Program specifies that a certain numbered version of the GNU Affero General
+        Public License "or any later version" applies to it, you have the
+        option of following the terms and conditions either of that numbered
+        version or of any later version published by the Free Software
+        Foundation.  If the Program does not specify a version number of the
+        GNU Affero General Public License, you may choose any version ever published
+        by the Free Software Foundation.
+        
+          If the Program specifies that a proxy can decide which future
+        versions of the GNU Affero General Public License can be used, that proxy's
+        public statement of acceptance of a version permanently authorizes you
+        to choose that version for the Program.
+        
+          Later license versions may give you additional or different
+        permissions.  However, no additional obligations are imposed on any
+        author or copyright holder as a result of your choosing to follow a
+        later version.
+        
+          15. Disclaimer of Warranty.
+        
+          THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+        APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+        HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
+        OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+        THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+        PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+        IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+        ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+        
+          16. Limitation of Liability.
+        
+          IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+        WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS
+        THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+        GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+        USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+        DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+        PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+        EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+        SUCH DAMAGES.
+        
+          17. Interpretation of Sections 15 and 16.
+        
+          If the disclaimer of warranty and limitation of liability provided
+        above cannot be given local legal effect according to their terms,
+        reviewing courts shall apply local law that most closely approximates
+        an absolute waiver of all civil liability in connection with the
+        Program, unless a warranty or assumption of liability accompanies a
+        copy of the Program in return for a fee.
+        
+                             END OF TERMS AND CONDITIONS
+        
+                    How to Apply These Terms to Your New Programs
+        
+          If you develop a new program, and you want it to be of the greatest
+        possible use to the public, the best way to achieve this is to make it
+        free software which everyone can redistribute and change under these terms.
+        
+          To do so, attach the following notices to the program.  It is safest
+        to attach them to the start of each source file to most effectively
+        state the exclusion of warranty; and each file should have at least
+        the "copyright" line and a pointer to where the full notice is found.
+        
+            <one line to give the program's name and a brief idea of what it does.>
+            Copyright (C) <year>  <name of author>
+        
+            This program is free software: you can redistribute it and/or modify
+            it under the terms of the GNU Affero General Public License as published
+            by the Free Software Foundation, either version 3 of the License, or
+            (at your option) any later version.
+        
+            This program is distributed in the hope that it will be useful,
+            but WITHOUT ANY WARRANTY; without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+            GNU Affero General Public License for more details.
+        
+            You should have received a copy of the GNU Affero General Public License
+            along with this program.  If not, see <https://www.gnu.org/licenses/>.
+        
+        Also add information on how to contact you by electronic and paper mail.
+        
+          If your software can interact with users remotely through a computer
+        network, you should also make sure that it provides a way for users to
+        get its source.  For example, if your program is a web application, its
+        interface could display a "Source" link that leads users to an archive
+        of the code.  There are many ways you could offer source, and different
+        solutions will be better for different programs; see section 13 for the
+        specific requirements.
+        
+          You should also get your employer (if you work as a programmer) or school,
+        if any, to sign a "copyright disclaimer" for the program, if necessary.
+        For more information on this, and how to apply and follow the GNU AGPL, see
+        <https://www.gnu.org/licenses/>.
+        
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: attrs>=25.3.0
+Requires-Dist: coolprop>=6.8.0
+Requires-Dist: imageio>=2.37.0
+Requires-Dist: intel-cmplr-lib-rt>=2025.3.1; sys_platform != "darwin"
+Requires-Dist: ipython>=8.37.0
+Requires-Dist: kaleido>=1.0.0
+Requires-Dist: numba>=0.63.0
+Requires-Dist: plotly>=6.2.0
+Requires-Dist: pyamg>=5.3.0
+Requires-Dist: scikit-image>=0.25.2
+Requires-Dist: thermo>=0.4.2
+Requires-Dist: trame>=3.12.0
+Requires-Dist: typing-extensions>=4.15.0
+Requires-Dist: numpy>=2.0.0; sys_platform != "darwin" and platform_machine == "x86_64"
+Requires-Dist: scipy>=1.13.0; sys_platform != "darwin" and platform_machine == "x86_64"
+Requires-Dist: numpy>=2.0.0; sys_platform == "darwin" or platform_machine != "x86_64"
+Requires-Dist: scipy>=1.13.0; sys_platform == "darwin" or platform_machine != "x86_64"
+Requires-Dist: cachetools>=6.2.4
+Requires-Dist: h5py>=3.15.1
+Requires-Dist: zarr>=2.18.3
+Provides-Extra: dev
+Requires-Dist: auto-mix-prep>=0.2.0; extra == "dev"
+Requires-Dist: marimo>=0.18.4; extra == "dev"
+Requires-Dist: mypy>=1.16.1; extra == "dev"
+Requires-Dist: rich>=14.0.0; extra == "dev"
+Requires-Dist: ruff>=0.12.1; extra == "dev"
+Requires-Dist: ty>=0.0.1a26; extra == "dev"
+Requires-Dist: watchdog>=6.0.0; extra == "dev"
+Dynamic: license-file
+
+# BORES
+
+**3D 3-Phase Black-Oil Reservoir Modelling and Simulation Framework**
+
+> ⚠️ **Important Disclaimer**: BORES is designed for **educational, research, and prototyping purposes**. It is **not production-grade software** and should not be used for making critical business decisions, regulatory compliance, or field development planning. Results should be validated against established commercial simulators before any real-world application. Use at your own discretion.
+
+> 📚 **Documentation Notice**: Full API documentation is coming soon. In the meantime, this README provides an intuitive introduction through practical examples. For detailed API information, refer to the source code and docstrings.
+
+BORES is a reservoir engineering framework designed for 3D black-oil modelling and simulation of three-phase (oil, water, gas) flow in porous media built with Python. It provides a clean and modular API for building reservoir models, defining wells, defining fractures and faults, running simulations, and analyzing results. BORES APIs are also easily extensible for custom models and workflows, if you know what you are doing.
+
+BORES started as a final year project for my Bachelor's degree in Petroleum Engineering at the Federal University of Petroleum Resources, Effurun, Nigeria. Why write this when there are other commercial and open-source reservoir simulators like Eclipse, CMG, MRST, OpenPorousMedia, etc.? Well, Existing libraries are either closed-source, written in low-level languages (C/C++, Fortran), or have complex APIs with poor documentation that make prototyping and experimentation difficult. BORES aims to fill this gap by providing a simple, Pythonic interface for reservoir simulation that is easy to understand and extend. Simply put, this make thing more accessible to petroleum engineers and researchers who may not be expert programmers as Python is such a simple language to learn and use, and is widely adopted in the scientific computing community.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Static Grid/Model Building](#static-gridmodel-building)
+- [PVT Correlations vs Tables](#pvt-correlations-vs-tables)
+- [Simulation Configs & Timers](#simulation-configs--timers)
+- [Precision Control](#precision-control)
+- [Model States, Streams & Stores](#model-states-streams--stores)
+- [Wells](#wells)
+- [Fractures](#fractures)
+- [Capillary Pressure & Relative Permeability](#capillary-pressure--relative-permeability)
+- [Constants](#constants)
+- [Boundary Conditions](#boundary-conditions)
+- [Errors](#errors)
+- [Solvers](#solvers)
+- [Visualization](#visualization)
+- [Performance & Optimization](#performance--optimization)
+- [Troubleshooting & FAQ](#troubleshooting--faq)
+- [Contributing & Support](#contributing--support)
+
+---
+
+## Installation
+
+```bash
+uv add bores-framework
+
+pip install bores-framework
+
+# or for development
+pip install -e .
+```
+
+**Dependencies**:
+
+- NumPy
+- SciPy
+- CoolProp
+- Numba
+- attrs
+- h5py
+- zarr
+- plotly
+
+---
+
+## Quick Start
+
+See the [Complete Example](#example-complete-simulation-workflow-on-a-heterogeneous-reservoir-model) at the end of this README for a full working example. The `reservoir_model` factory requires many parameters including thickness grids, saturation endpoint grids, rock compressibility, and relative permeability/capillary pressure models. The complete example shows all the steps involved in building a sample heterogeneous reservoir model from scratch.
+
+---
+
+## Static Grid/Model Building
+
+BORES provides several utilities for building 3D grids with varying properties.
+
+### Basic Grid Construction
+
+```python
+import bores
+import numpy as np
+
+# Define grid dimensions
+grid_shape = (30, 20, 6)  # nx, ny, nz
+cell_dimension = (100.0, 100.0)  # dx, dy in feet (dz comes from thickness_grid)
+```
+
+### Layered Grids
+
+Use `layered_grid` to define properties that vary by layer. **Note**: Requires `orientation` parameter:
+
+```python
+# Porosity varying by layer (z-direction)
+porosity_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=[0.22, 0.20, 0.18, 0.15, 0.12, 0.10],  # One per layer
+    orientation=bores.Orientation.Z,  # Layer along z-axis
+)  # Shape: (30, 20, 6)
+
+# Permeability varying by layer
+permeability_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=[150.0, 120.0, 100.0, 80.0, 50.0, 30.0],  # mD
+    orientation=bores.Orientation.Z,
+)
+
+# Layer thickness (required for depth calculations)
+thickness_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=[30.0, 25.0, 20.0, 25.0, 30.0, 20.0],  # ft per layer
+    orientation=bores.Orientation.Z,
+)
+```
+
+### Uniform Grids
+
+For constant properties across the entire grid:
+
+```python
+temperature_grid = bores.uniform_grid(
+    grid_shape=grid_shape, value=180.0  # °F
+)
+```
+
+### Depth Grids
+
+Generate grids representing cell-center depths from a thickness grid:
+
+```python
+# Calculate depth at cell centers from thickness
+depth_grid = bores.depth_grid(thickness_grid)  # Takes `thickness_grid` only
+```
+
+### Structural Dip
+
+Apply structural dip to your depth grid using azimuth convention:
+
+```python
+# Apply 3° dip toward East (azimuth 90°)
+dipped_depth_grid = bores.apply_structural_dip(
+    elevation_grid=depth_grid,
+    cell_dimension=cell_dimension,  # (dx, dy) tuple
+    elevation_direction="downward",  # or "upward" for elevation convention
+    dip_angle=3.0,  # degrees (0-90)
+    dip_azimuth=90.0,  # degrees (0-360, clockwise from North)
+)
+```
+
+**Azimuth Convention:**
+
+- 0° = North (+y direction)
+- 90° = East (+x direction)  
+- 180° = South (-y direction)
+- 270° = West (-x direction)
+
+### Saturation Distribution with Fluid Contacts
+
+Build realistic saturation distributions with oil-water and gas-oil contacts. **Note**: Requires residual saturation grids, not scalars:
+
+```python
+# First create residual saturation grids
+connate_water_saturation_grid = bores.uniform_grid(grid_shape, value=0.15)
+residual_oil_saturation_water_grid = bores.uniform_grid(grid_shape, value=0.25)
+residual_oil_saturation_gas_grid = bores.uniform_grid(grid_shape, value=0.15)
+residual_gas_saturation_grid = bores.uniform_grid(grid_shape, value=0.05)
+
+# Build saturation grids with transition zones
+water_saturation, oil_saturation, gas_saturation = bores.build_saturation_grids(
+    depth_grid=dipped_depth_grid,
+    gas_oil_contact=60.0,  # Depth below top of reservoir (ft)
+    oil_water_contact=150.0,  # Depth below top of reservoir (ft)
+    connate_water_saturation_grid=connate_water_saturation_grid,
+    residual_oil_saturation_water_grid=residual_oil_saturation_water_grid,
+    residual_oil_saturation_gas_grid=residual_oil_saturation_gas_grid,
+    residual_gas_saturation_grid=residual_gas_saturation_grid,
+    porosity_grid=porosity_grid,
+    use_transition_zones=True,  # Enable smooth transitions
+    gas_oil_transition_thickness=8.0,  # ft
+    oil_water_transition_thickness=12.0,  # ft
+    transition_curvature_exponent=1.2,
+)
+```
+
+### Building the Reservoir Model
+
+The `reservoir_model` factory requires many parameters. Here's the structure (see [Complete Example](#example-complete-simulation-workflow-on-a-heterogeneous-reservoir-model) for a full working example):
+
+```python
+# First, create permeability structure for anisotropic permeability
+absolute_permeability = bores.RockPermeability(
+    x=x_permeability_grid,  # mD
+    y=y_permeability_grid,  # typically 0.8x of x-direction
+    z=z_permeability_grid,  # typically 0.1x of x-direction (vertical)
+)
+
+# Create relative permeability and capillary pressure models
+relative_permeability_table = bores.BrooksCoreyThreePhaseRelPermModel(
+    irreducible_water_saturation=0.15,
+    residual_oil_saturation_water=0.25,
+    residual_oil_saturation_gas=0.15,
+    residual_gas_saturation=0.045,
+    wettability=bores.WettabilityType.WATER_WET,
+    water_exponent=2.0,
+    oil_exponent=2.0,
+    gas_exponent=2.0,
+    mixing_rule=bores.eclipse_rule,
+)
+
+capillary_pressure_table = bores.BrooksCoreyCapillaryPressureModel(
+    oil_water_entry_pressure_water_wet=2.0,  # psi
+    oil_water_pore_size_distribution_index_water_wet=2.0,
+    gas_oil_entry_pressure=2.8,  # psi
+    gas_oil_pore_size_distribution_index=2.0,
+    wettability=bores.WettabilityType.WATER_WET,
+)
+
+# Build the reservoir model
+model = bores.reservoir_model(
+    grid_shape=grid_shape,
+    cell_dimension=cell_dimension,  # (dx, dy) tuple
+    thickness_grid=thickness_grid,
+    pressure_grid=pressure_grid,
+    rock_compressibility=4.5e-6,  # 1/psi
+    absolute_permeability=absolute_permeability,
+    porosity_grid=porosity_grid,
+    temperature_grid=temperature_grid,
+    oil_saturation_grid=oil_saturation,
+    water_saturation_grid=water_saturation,
+    gas_saturation_grid=gas_saturation,
+    oil_viscosity_grid=oil_viscosity_grid,  # cP
+    oil_compressibility_grid=oil_compressibility_grid,  # 1/psi
+    oil_bubble_point_pressure_grid=oil_bubble_point_pressure_grid,  # psia
+    residual_oil_saturation_water_grid=residual_oil_saturation_water_grid,
+    residual_oil_saturation_gas_grid=residual_oil_saturation_gas_grid,
+    residual_gas_saturation_grid=residual_gas_saturation_grid,
+    irreducible_water_saturation_grid=irreducible_water_saturation_grid,
+    connate_water_saturation_grid=connate_water_saturation_grid,
+    relative_permeability_table=relative_permeability_table,
+    capillary_pressure_table=capillary_pressure_table,
+    # Optional parameters:
+    oil_specific_gravity_grid=oil_specific_gravity_grid,
+    gas_gravity_grid=gas_gravity_grid,
+    net_to_gross_ratio_grid=net_to_gross_grid,
+    boundary_conditions=boundary_conditions,
+    dip_angle=dip_angle,
+    dip_azimuth=dip_azimuth,
+    reservoir_gas="methane", # Assumed that reservoir gas is methane. Can be any gas supported by CoolProp
+    pvt_tables=pvt_tables,
+)
+```
+
+---
+
+## PVT Correlations vs Tables
+
+BORES supports two approaches for PVT (Pressure-Volume-Temperature) property calculations:
+
+1. **Correlations**: Direct calculation using empirical correlations (e.g., Standing, Beggs & Robinson)
+2. **Tables**: Pre-computed lookup tables for faster interpolation during simulation
+
+### Why Use PVT Tables?
+
+PVT tables offer several advantages:
+
+- **Performance**: Interpolation is faster than evaluating complex correlations at each cell/timestep
+- **Flexibility**: Can incorporate lab PVT data directly
+- **Consistency**: Ensures thermodynamic consistency through pre-computation
+- **Pseudo-pressure support**: Used in pre-computed gas pseudo-pressure tables for efficient gas well calculations
+
+### Building PVT Tables
+
+```python
+import bores
+
+# Define the pressure, temperature, and salinity ranges
+pvt_table_data = bores.build_pvt_table_data(
+    pressures=bores.array([500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]),  # psia
+    temperatures=bores.array([120, 140, 160, 180, 200, 220]),  # °F
+    salinities=bores.array([30000, 32000, 33500, 35000]),  # ppm
+    oil_specific_gravity=0.845,  # API ~36
+    gas_gravity=0.65,  # relative to air
+    reservoir_gas="methane",  # or "co2", "n2", etc. (Gas names supported by CoolProp)
+)
+```
+
+This builds tables for:
+
+- **Oil**: Bubble point pressure, formation volume factor (Bo), viscosity (μo), compressibility (co), solution gas-oil ratio (Rs)
+- **Water**: Formation volume factor (Bw), viscosity (μw), compressibility (cw)
+- **Gas**: Z-factor, formation volume factor (Bg), viscosity (μg), compressibility (cg), density
+
+### Creating the `PVTTables` Object
+
+```python
+pvt_tables = bores.PVTTables(
+    table_data=pvt_table_data,
+    interpolation_method="linear",  # or "cubic" for smoother but slower interpolation
+)
+```
+
+### Using PVT Tables in Config
+
+```python
+config = bores.Config(
+    scheme="impes",
+    pvt_tables=pvt_tables,
+    use_pseudo_pressure=True,  # Enable gas pseudo-pressure for gas wells (Enabled by default)
+)
+```
+
+### Querying PVT Properties
+
+The `PVTTables` object provides methods for querying properties:
+
+```python
+# Single point query
+bo = pvt_tables.oil_formation_volume_factor(
+    pressure=2500.0,  # psia
+    temperature=180.0,  # °F
+    solution_gor=500.0,  # scf/STB
+)
+
+# Grid-based query (for simulation)
+viscosity_grid = pvt_tables.oil_viscosity(
+    pressure=pressure_grid,
+    temperature=temperature_grid,
+    solution_gor=rs_grid,
+)
+```
+
+---
+
+## Simulation Configs & Timers
+
+### `Timer` Configuration
+
+The `Timer` manages adaptive time-stepping with CFL-based control:
+
+```python
+timer = bores.Timer(
+    # Step size bounds
+    initial_step_size=bores.Time(hours=4.5),
+    max_step_size=bores.Time(days=5),
+    min_step_size=bores.Time(minutes=10),
+    
+    # Simulation duration
+    simulation_time=bores.Time(days=bores.c.DAYS_PER_YEAR * 5),  # 5 years
+    
+    # CFL control
+    max_cfl_number=0.9,  # Maximum CFL for stability
+    
+    # Adaptive stepping
+    ramp_up_factor=1.2,      # Grow step by 20% on success
+    backoff_factor=0.5,       # Halve step on failure
+    aggressive_backoff_factor=0.25,  # Quarter step on repeated failure
+    max_rejects=20,           # Max rejections before error
+)
+```
+
+### The `Time` Helper
+
+`bores.Time()` converts human-readable time to seconds:
+
+```python
+bores.Time(hours=4.5)                    # 16200.0 seconds
+bores.Time(days=30)                      # 2592000.0 seconds
+bores.Time(days=365, hours=12)           # 31579200.0 seconds
+bores.Time(weeks=2, days=3, hours=6)     # Mix units freely
+```
+
+### Simulation Config
+
+The `Config` object controls simulation behavior:
+
+```python
+config = bores.Config(
+    # Evolution scheme
+    scheme="impes",  # IMPES (Implicit Pressure, Explicit Saturation)
+    # or "explicit" for fully explicit scheme
+    
+    # Output control
+    output_frequency=1,  # Yield state every N steps
+    log_interval=5,      # Log progress every N steps
+    
+    # Physics options
+    miscibility_model="immiscible",  # or "todd_longstaff" for miscible flooding
+    use_pseudo_pressure=True,        # Use pseudo-pressure for gas
+    disable_capillary_effects=False, # Include capillary pressure
+    
+    # Numerical options
+    capillary_strength_factor=1.0,   # Scale capillary effects (0-1)
+    convergence_tolerance=1e-6,      # Solver tolerance
+    max_iterations=250,              # Max solver iterations
+    
+    # Solver selection
+    iterative_solver="bicgstab",     # BiCGSTAB, LGMRES, etc.
+    preconditioner="ilu",            # ILU preconditioning, can be AMG, Diagonal, CPR, or None
+    
+    # PVT tables (if using)
+    pvt_tables=pvt_tables,
+)
+```
+
+### Supported Schemes
+
+| Scheme       | Description                               | Stability         | Speed            |
+| ------------ | ----------------------------------------- | ----------------- | ---------------- |
+| `"impes"`    | Implicit Pressure, Explicit Saturation    | Moderate          | Fast             |
+| `"explicit"` | Fully explicit in pressure and saturation | Requires small Δt | Fastest per step |
+
+> **Note**: Fully implicit scheme (`"implicit"`) is planned but not yet implemented. The option may be added in future releases. I'll gladly accept contributions toward this feature too.
+
+---
+
+## Precision Control
+
+BORES supports both 32-bit and 64-bit floating-point precision (mainly for memory and speed optimization). By default, BORES uses 32-bit (`np.float32`):
+
+```python
+import bores
+
+# Enable 32-bit precision (default is already 32-bit)
+bores.use_32bit_precision()
+
+# Arrays created via `bores.array()` will use the configured precision
+pressure = bores.array([1000, 2000, 3000])  # float32 array
+```
+
+### Why Use 32-bit Precision?
+
+- **Memory**: Half the memory footprint for large grids
+- **Speed**: Faster computation, especially with NumPy/Numba
+- **GPU-ready**: Better compatibility with GPU acceleration
+
+### When to Use 64-bit (Default)
+
+- **Accuracy**: For simulations requiring high numerical precision
+- **Stability**: When dealing with very large pressure differentials or long simulation times
+
+```python
+# Check current precision
+dtype = bores.get_dtype()  # Returns np.float32 or np.float64
+```
+
+---
+
+## Model States, Streams & Stores
+
+### Model States
+
+Each time step produces a `ModelState` containing:
+
+```python
+state = states[100]  # Get state at step 100
+
+state.step          # Time step index
+state.time          # Simulation time (seconds)
+state.step_size     # Time step size (seconds)
+state.model         # ReservoirModel with updated properties
+state.wells         # Wells configuration at this state
+state.injection     # Injection rate grids
+state.production    # Production rate grids
+state.relative_permeabilities  # krw, kro, krg grids
+state.relative_mobilities      # Phase mobility grids
+state.capillary_pressures      # Pcow, Pcgo grids
+state.timer_state            # Dumped `Timer` state at this step
+```
+
+### Accessing Model Properties
+
+```python
+model = state.model
+fluid_props = model.fluid_properties
+
+# Pressure and saturations
+pressure = fluid_props.pressure_grid
+oil_saturation = fluid_props.oil_saturation_grid
+water_saturation = fluid_props.water_saturation_grid
+gas_saturation = fluid_props.gas_saturation_grid
+
+# Derived properties
+viscosity = fluid_props.oil_effective_viscosity_grid
+density = fluid_props.oil_effective_density_grid
+```
+
+### State Streams
+
+For long simulations, use `StateStream` to process states incrementally and persist to storage. It provides substantial performance improvements by reducing memory usage and I/O overhead. It supports checkpointing and batch persistence.
+
+A checkpoint is a saved state of the simulation that allows resuming from that point in case of interruptions from errors or system failures.
+
+```python
+from pathlib import Path
+
+# Create a store
+store = bores.ZarrStore(
+    store=Path("./results/simulation.zarr"),
+    metadata_dir=Path("./results/metadata/"),
+)
+
+# Run with streaming
+stream = bores.StateStream(
+    bores.run(model=model, timer=timer, wells=wells, config=config),
+    store=store,
+    async_io=True, # Prevent state persistence I/O operations from block stream
+    batch_size=50,  # Persist every 50 states
+    checkpoint_interval=200,  # Checkpoint every 200 steps
+    checkpoint_dir=Path("./results/checkpoints/"),
+)
+
+# Process states as they come
+with stream:
+    for state in stream:
+        # Process each state (optional)
+        print(f"Step {state.step}: P_avg = {state.model.fluid_properties.pressure_grid.mean():.1f}")
+    
+    # Or consume all at once
+    # stream.consume()
+
+    # Or collect states from specific steps
+    # selected_states = stream.collect(1, 5, 10, 20)
+
+    # Or collect states with a predicate. Can be computationally expensive.
+    # high_pressure_states = stream.collect(key=lambda s: s.model.fluid_properties.pressure_grid.mean() > 3000)
+```
+
+### State Stores
+
+BORES provides multiple storage backends:
+
+```python
+# Zarr (recommended for large simulations)
+zarr_store = bores.ZarrStore(
+    store=Path("./results/simulation.zarr"),
+    metadata_dir=Path("./results/metadata/"),
+    compression_level=3,  # Zlib compression level (0-9)
+)
+
+# HDF5
+hdf5_store = bores.HDF5Store(
+    filepath=Path("./results/simulation.h5"),
+    metadata_dir=Path("./results/metadata/"),
+)
+
+# Pickle (for small simulations or debugging)
+pickle_store = bores.PickleStore(
+    filepath=Path("./results/pickle/")
+)
+
+# NPZ (NumPy compressed)
+npz_store = bores.NPZStore(
+    filepath=Path("./results/npz/"),
+    metadata_dir=Path("./results/metadata/"),
+)
+```
+
+### Loading States
+
+```python
+# Load all states
+states = store.load(validate=False, lazy=False)
+
+# Lazy loading (loads metadata only, grids on access)
+states = store.load(validate=False, lazy=True)
+
+# Get the last state for continuation
+# Note that `load` returns a generator and we do not use list(states)
+# to avoid loading all states into memory.
+last_state = None
+while True:
+    try:
+        last_state = next(states)
+    except StopIteration:
+        break
+model = last_state.model
+```
+
+---
+
+## Wells
+
+### Production Wells
+
+```python
+# Define production clamp (limits). Prevents positive rates as production rates are taken as negative.
+# Hence production clamp prevents production wells from injecting fluids.
+clamp = bores.ProductionClamp()
+
+# Multi-phase rate control
+control = bores.MultiPhaseRateControl(
+    oil_control=bores.AdaptiveBHPRateControl(
+        target_rate=-100,      # STB/day (negative = production)
+        target_phase="oil",
+        bhp_limit=1200,        # Minimum BHP (psia)
+        clamp=clamp,
+    ),
+    gas_control=bores.AdaptiveBHPRateControl(
+        target_rate=-500,      # Mscf/day
+        target_phase="gas",
+        bhp_limit=1200,
+        clamp=clamp,
+    ),
+    water_control=bores.AdaptiveBHPRateControl(
+        target_rate=-10,       # STB/day
+        target_phase="water",
+        bhp_limit=1200,
+        clamp=clamp,
+    ),
+)
+
+# Create producer
+producer = bores.production_well(
+    well_name="P-1",
+    perforating_intervals=[((14, 10, 3), (14, 10, 4))],  # Grid cells (i, j, k)
+    radius=0.3542,  # ft (8.5" wellbore)
+    control=control,
+    # We produce oil, gas, and water
+    produced_fluids=(
+        bores.ProducedFluid(
+            name="Oil",
+            phase=bores.FluidPhase.OIL,
+            specific_gravity=0.845,
+            molecular_weight=180.0,
+        ),
+        bores.ProducedFluid(
+            name="Gas",
+            phase=bores.FluidPhase.GAS,
+            specific_gravity=0.65,
+            molecular_weight=16.04,
+        ),
+        bores.ProducedFluid(
+            name="Water",
+            phase=bores.FluidPhase.WATER,
+            specific_gravity=1.05,
+            molecular_weight=18.015,
+        ),
+    ),
+    skin_factor=2.5,
+    is_active=True,
+)
+```
+
+### Injection Wells
+
+```python
+# Injection clamp. Prevents negative rates as injection rates are positive.
+# Hence injection clamp prevents injection wells from producing fluids.
+injection_clamp = bores.InjectionClamp()
+
+# Rate control for injector
+control = bores.AdaptiveBHPRateControl(
+    target_rate=1_000_000,  # SCF/day (positive = injection)
+    target_phase="gas",
+    bhp_limit=3500,         # Maximum BHP (psia)
+    clamp=injection_clamp,
+)
+
+# Create CO2 injector
+gas_injector = bores.injection_well(
+    well_name="GI-1",
+    perforating_intervals=[((16, 3, 1), (16, 3, 3))],
+    radius=0.3542,
+    control=control,
+    injected_fluid=bores.InjectedFluid(
+        name="CO2",
+        phase=bores.FluidPhase.GAS,
+        specific_gravity=0.65,
+        molecular_weight=44.0,
+        minimum_miscibility_pressure=3250.0,  # For miscible flooding
+        todd_longstaff_omega=0.67,
+        is_miscible=True,
+    ),
+    skin_factor=2.0,
+    is_active=True,
+)
+
+# Duplicate wells with different locations
+gas_injector_2 = gas_injector.duplicate(
+    name="GI-2",
+    perforating_intervals=[((16, 16, 1), (16, 16, 3))],
+)
+```
+
+### Well Events & Scheduling
+
+Schedule changes to wells during simulation:
+
+```python
+# Start producer inactive, activate after 100 days
+producer = bores.production_well(
+    well_name="P-1",
+    ...,
+    is_active=False,  # Initially shut-in
+)
+
+# Schedule activation
+producer.schedule_event(
+    bores.WellEvent(
+        hook=bores.well_time_hook(time=bores.Time(days=100)),
+        action=bores.well_update_action(is_active=True),
+    )
+)
+```
+
+### Combining Wells
+
+```python
+# Create wells collection
+wells = bores.wells_(
+    injectors=[gas_injector, gas_injector_2],
+    producers=[producer],
+)
+
+# Run simulation with wells
+states = bores.run(model=model, timer=timer, wells=wells, config=config)
+```
+
+---
+
+## Fractures
+
+BORES supports various fracture types for modeling faults and fracture networks:
+
+### Vertical Sealing Fault
+
+```python
+# Simple vertical fault through entire grid
+fault = bores.vertical_sealing_fault(
+    fault_id="F-1",
+    orientation="x",  # Perpendicular to x-axis
+    index=10,         # Cell index where fault is located
+    permeability_multiplier=1e-4,  # 99.99% sealing
+)
+
+# Fault with limited extent
+fault_limited = bores.vertical_sealing_fault(
+    fault_id="F-2",
+    orientation="y",
+    index=15,
+    y_range=(5, 25),   # Lateral extent
+    z_range=(0, 8),    # Vertical extent (shallow fault)
+)
+
+model = bores.apply_fracture(model, fault)
+```
+
+### Normal Fault with Throw
+
+```python
+# Normal fault (hanging wall moves down)
+fault = bores.normal_fault_with_throw(
+    fault_id="NF-1",
+    orientation="x",
+    index=20,
+    throw_cells=2,      # Number of cells of displacement
+    permeability_multiplier=1e-4,  # Sealing factor
+    preserve_data=True,  # Preserve displaced grid data
+)
+```
+
+### Reverse Fault with Throw
+
+```python
+# Reverse fault (hanging wall moves up)
+fault = bores.reverse_fault_with_throw(
+    fault_id="RF-1",
+    orientation="y",
+    index=25,
+    throw_cells=3,
+    permeability_multiplier=1e-4,
+)
+```
+
+### Inclined Sealing Fault
+
+```python
+fault = bores.inclined_sealing_fault(
+    fault_id="IF-1",
+    orientation="x",
+    index=15,
+    slope=1.0,  # Rise over run
+    permeability_multiplier=1e-4,
+)
+```
+
+### Damage Zone Fault
+
+```python
+# Fault with damage zone (enhanced permeability around fault)
+fault = bores.damage_zone_fault(
+    fault_id="DZ-1",
+    orientation="x",
+    cell_range=(15, 18),
+    permeability_multiplier=1e-4,   # Fault core (sealing)
+)
+```
+
+### Conductive Fracture Network
+
+```python
+# High-permeability fracture corridor
+fracture_network = bores.conductive_fracture_network(
+    network_id="CFN-1",
+    orientation="x",
+    cell_range=(10, 12),  # Multiple fracture planes
+    permeability_multiplier=15.0,  # High conductivity
+)
+```
+
+### Applying Fractures
+
+```python
+# Apply single fracture
+model = bores.apply_fracture(model, fault)
+
+# Apply multiple fractures (using *args)
+model = bores.apply_fractures(model, fault1, fault2, fracture_network)
+```
+
+---
+
+## Capillary Pressure & Relative Permeability
+
+BORES provides both **analytical models** and **tables** for relative permeability and capillary pressure. For three-phase flow, two-phase data must be combined into three-phase tables using appropriate mixing rules.
+
+### Key Concepts
+
+**Two-Phase vs Three-Phase**: Laboratory data typically measures two-phase systems (oil-water or gas-oil). For three-phase simulation, these must be combined using mixing rules that account for phase interactions.
+
+**Wetting Phase**: The phase that preferentially adheres to rock surfaces:
+
+- **Water-wet**: Water preferentially wets rock (most sandstones)
+- **Oil-wet**: Oil preferentially wets rock (some carbonates)
+- **Mixed-wet**: Both water-wet and oil-wet regions exist
+
+**Saturation Endpoints**:
+
+- `Swc` (irreducible water saturation): Minimum water saturation
+- `Sorw` (residual oil to water): Oil remaining after water flood
+- `Sorg` (residual oil to gas): Oil remaining after gas flood  
+- `Sgr` (residual gas): Minimum gas saturation
+
+---
+
+### Relative Permeability Models
+
+#### Brooks-Corey Three-Phase Model
+
+The most common model using Corey-type power-law functions:
+
+```python
+relperm_model = bores.BrooksCoreyThreePhaseRelPermModel(
+    # Saturation endpoints
+    irreducible_water_saturation=0.15,   # Swc
+    residual_oil_saturation_water=0.25,  # Sor to water flood
+    residual_oil_saturation_gas=0.15,    # Sor to gas flood
+    residual_gas_saturation=0.045,       # Sgr
+    
+    # Corey exponents (typically 1.5-4.0)
+    water_exponent=2.0,  # Higher = more convex curve
+    oil_exponent=2.0,
+    gas_exponent=2.0,
+    
+    # Wettability
+    wettability=bores.WettabilityType.WATER_WET,  # WATER_WET, OIL_WET
+    
+    # Three-phase oil mixing rule
+    mixing_rule=bores.stone_II_rule,
+)
+
+# Use in reservoir model
+model = bores.reservoir_model(
+    # ... other params ...
+    relative_permeability_table=relperm_model,
+)
+```
+
+---
+
+### Three-Phase Oil Relative Permeability Mixing Rules
+
+The challenge in three-phase flow is computing oil relative permeability when both water and gas are present. BORES provides multiple mixing rules:
+
+```python
+# Conservative rules (lower kro estimates)
+bores.min_rule              # kro = min(kro_w, kro_g) - most conservative
+bores.harmonic_mean_rule    # 2/(1/kro_w + 1/kro_g) - series flow
+bores.geometric_mean_rule   # sqrt(kro_w × kro_g)
+bores.hustad_hansen_rule    # (kro_w × kro_g) / max(kro_w, kro_g)
+bores.blunt_rule            # For strongly water-wet systems
+
+# Industry standard rules
+bores.stone_I_rule          # Stone I (1970) - water-wet systems
+bores.stone_II_rule         # Stone II (1973) - most widely used (default)
+bores.eclipse_rule          # ECLIPSE simulator default
+
+# Other rules
+bores.arithmetic_mean_rule  # (kro_w + kro_g) / 2 - optimistic
+bores.baker_linear_rule     # Baker's linear interpolation (1988)
+bores.saturation_weighted_interpolation_rule  # Weighted by Sw, Sg
+bores.linear_interpolation_rule  # Simple linear interpolation
+bores.max_rule              # max(kro_w, kro_g) - most optimistic
+
+# Parameterized rule
+bores.aziz_settari_rule(a=0.5, b=0.5)  # kro = kro_w^a × kro_g^b
+```
+
+**Comparison Table**:
+
+| Rule | Conservativeness | Best For |
+|------|------------------|----------|
+| `min_rule` | Very conservative | Lower bound, safety analysis |
+| `harmonic_mean_rule` | Very conservative | Tight rocks, series flow |
+| `geometric_mean_rule` | Conservative | General purpose |
+| `stone_I_rule` | Moderate | Water-wet sandstones |
+| `stone_II_rule` | Moderate | Industry standard |
+| `eclipse_rule` | Moderate | Matching commercial simulators |
+| `arithmetic_mean_rule` | Optimistic | Upper bound estimate |
+| `max_rule` | Very optimistic | Sensitivity analysis |
+
+---
+
+### Relative Permeability Tables
+
+For lab-measured or history-matched data, use tabular input. **Two-phase tables must be combined into a three-phase table.**
+
+#### Two-Phase Tables
+
+```python
+# Oil-Water system (water = wetting phase in water-wet rock)
+oil_water_relperm = bores.TwoPhaseRelPermTable(
+    wetting_phase=bores.FluidPhase.WATER,
+    non_wetting_phase=bores.FluidPhase.OIL,
+    wetting_phase_saturation=bores.array([0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75]),
+    wetting_phase_relative_permeability=bores.array([0.0, 0.02, 0.06, 0.12, 0.22, 0.35, 0.45]),  # krw
+    non_wetting_phase_relative_permeability=bores.array([1.0, 0.7, 0.45, 0.25, 0.10, 0.02, 0.0]),  # kro
+)
+
+# Gas-Oil system (oil = wetting phase)
+gas_oil_relperm = bores.TwoPhaseRelPermTable(
+    wetting_phase=bores.FluidPhase.OIL,
+    non_wetting_phase=bores.FluidPhase.GAS,
+    wetting_phase_saturation=bores.array([0.15, 0.25, 0.40, 0.55, 0.70, 0.85, 0.95]),  # Oil saturation
+    wetting_phase_relative_permeability=bores.array([0.0, 0.05, 0.15, 0.35, 0.55, 0.80, 1.0]),  # kro
+    non_wetting_phase_relative_permeability=bores.array([0.9, 0.65, 0.40, 0.20, 0.08, 0.01, 0.0]),  # krg
+)
+```
+
+#### Constructing Three-Phase Table from Two-Phase Data
+
+**Two-phase tables cannot be used directly** — they must be combined with a mixing rule:
+
+```python
+# Construct three-phase table from two-phase data
+three_phase_relperm = bores.ThreePhaseRelPermTable(
+    oil_water_table=oil_water_relperm,  # Water-oil relative permeabilities
+    gas_oil_table=gas_oil_relperm,      # Gas-oil relative permeabilities
+    mixing_rule=bores.stone_II_rule,    # How to compute kro in 3-phase
+)
+
+# Use in reservoir model
+model = bores.reservoir_model(
+    # ... other params ...
+    relative_permeability_table=three_phase_relperm,
+)
+```
+
+#### Querying Relative Permeabilities
+
+```python
+# Query at specific saturations
+result = three_phase_relperm.get_relative_permeabilities(
+    water_saturation=0.3,
+    oil_saturation=0.5,
+    gas_saturation=0.2,
+)
+
+print(result["water"])  # krw
+print(result["oil"])    # kro (computed via mixing rule)
+print(result["gas"])    # krg
+```
+
+---
+
+### Capillary Pressure Models
+
+#### Brooks-Corey Capillary Pressure Model
+
+The standard model for petroleum applications:
+
+```python
+capillary_model = bores.BrooksCoreyCapillaryPressureModel(
+    # Saturation endpoints
+    irreducible_water_saturation=0.15,
+    residual_oil_saturation_water=0.25,
+    residual_oil_saturation_gas=0.15,
+    residual_gas_saturation=0.045,
+    
+    # Oil-water system parameters (water-wet)
+    oil_water_entry_pressure_water_wet=5.0,  # Entry/threshold pressure (psi)
+    oil_water_pore_size_distribution_index_water_wet=2.0,  # λ (higher = narrower pore size dist)
+    
+    # Oil-water system parameters (oil-wet, used for mixed-wet)
+    oil_water_entry_pressure_oil_wet=8.0,
+    oil_water_pore_size_distribution_index_oil_wet=1.5,
+    
+    # Gas-oil system parameters
+    gas_oil_entry_pressure=2.0,
+    gas_oil_pore_size_distribution_index=2.5,
+    
+    # Wettability
+    wettability=bores.WettabilityType.WATER_WET,  # WATER_WET, OIL_WET, MIXED_WET
+    mixed_wet_water_fraction=0.6,  # Fraction water-wet (for MIXED_WET only)
+)
+```
+
+**Wettability effects:**
+
+- **WATER_WET**: Pcow > 0 (oil pressure > water pressure)
+- **OIL_WET**: Pcow < 0 (water pressure > oil pressure)
+- **MIXED_WET**: Pcow varies with saturation (weighted combination)
+
+#### Van Genuchten Capillary Pressure Model
+
+Alternative model with smoother transitions near endpoints:
+
+```python
+capillary_model = bores.VanGenuchtenCapillaryPressureModel(
+    # Saturation endpoints
+    irreducible_water_saturation=0.15,
+    residual_oil_saturation_water=0.25,
+    residual_oil_saturation_gas=0.15,
+    residual_gas_saturation=0.045,
+    
+    # Oil-water parameters (α in 1/psi, n > 1)
+    oil_water_alpha_water_wet=0.1,   # Higher α = lower entry pressure
+    oil_water_n_water_wet=2.5,       # Higher n = sharper transition
+    oil_water_alpha_oil_wet=0.08,
+    oil_water_n_oil_wet=2.0,
+    
+    # Gas-oil parameters
+    gas_oil_alpha=0.15,
+    gas_oil_n=2.2,
+    
+    # Wettability
+    wettability=bores.WettabilityType.WATER_WET,
+    mixed_wet_water_fraction=0.5,
+)
+```
+
+#### Leverett J-Function Model
+
+For scaling capillary pressure across rock types using the dimensionless J-function:
+
+```python
+capillary_model = bores.LeverettJCapillaryPressureModel(
+    # Saturation endpoints
+    irreducible_water_saturation=0.15,
+    residual_oil_saturation_water=0.25,
+    residual_oil_saturation_gas=0.15,
+    residual_gas_saturation=0.045,
+    
+    # Rock properties
+    permeability=100.0,  # mD
+    porosity=0.2,
+    
+    # Interfacial tensions (dynes/cm)
+    oil_water_interfacial_tension=30.0,
+    gas_oil_interfacial_tension=20.0,
+    
+    # Contact angles (degrees)
+    contact_angle_oil_water=0.0,   # 0° = water-wet, 180° = oil-wet
+    contact_angle_gas_oil=0.0,
+    
+    wettability=bores.WettabilityType.WATER_WET,
+)
+```
+
+---
+
+### Capillary Pressure Tables
+
+Similar to relative permeability, two-phase tables must be combined.
+
+#### Two-Phase Capillary Pressure Tables
+
+```python
+# Oil-water capillary pressure (Pcow = Po - Pw)
+oil_water_pc = bores.TwoPhaseCapillaryPressureTable(
+    wetting_phase=bores.FluidPhase.WATER,
+    non_wetting_phase=bores.FluidPhase.OIL,
+    wetting_phase_saturation=np.array([0.15, 0.25, 0.35, 0.50, 0.65, 0.75]),
+    capillary_pressure=np.array([50.0, 15.0, 6.0, 2.0, 0.5, 0.0]),  # psi
+)
+
+# Gas-oil capillary pressure (Pcgo = Pg - Po)
+gas_oil_pc = bores.TwoPhaseCapillaryPressureTable(
+    wetting_phase=bores.FluidPhase.OIL,
+    non_wetting_phase=bores.FluidPhase.GAS,
+    wetting_phase_saturation=np.array([0.15, 0.30, 0.50, 0.70, 0.85, 0.95]),  # Oil saturation
+    capillary_pressure=np.array([30.0, 12.0, 5.0, 1.5, 0.3, 0.0]),  # psi
+)
+```
+
+#### Constructing Three-Phase Capillary Pressure Table
+
+```python
+# Combine into three-phase table
+three_phase_pc = bores.ThreePhaseCapillaryPressureTable(
+    oil_water_table=oil_water_pc,
+    gas_oil_table=gas_oil_pc,
+)
+
+# Use in reservoir model
+model = bores.reservoir_model(
+    # ... other params ...
+    capillary_pressure_table=three_phase_pc,
+)
+```
+
+#### Querying Capillary Pressures
+
+```python
+result = three_phase_pc.get_capillary_pressures(
+    water_saturation=0.3,
+    oil_saturation=0.5,
+    gas_saturation=0.2,
+)
+
+print(result["oil_water"])  # Pcow = Po - Pw (psi)
+print(result["gas_oil"])    # Pcgo = Pg - Po (psi)
+```
+
+---
+
+### Wettability Types
+
+```python
+# Using WettabilityType enum
+bores.WettabilityType.WATER_WET   # Water preferentially wets rock
+bores.WettabilityType.OIL_WET     # Oil preferentially wets rock
+bores.WettabilityType.MIXED_WET   # Both water-wet and oil-wet regions
+
+# Alias for convenience
+bores.Wettability.WATER_WET  # Same as WettabilityType.WATER_WET
+```
+
+---
+
+### Complete Example: Lab Data to Simulation
+
+```python
+import numpy as np
+import bores
+
+# 1. Define two-phase relative permeability from lab SCAL data
+oil_water_kr = bores.TwoPhaseRelPermTable(
+    wetting_phase=bores.FluidPhase.WATER,
+    non_wetting_phase=bores.FluidPhase.OIL,
+    wetting_phase_saturation=bores.array([0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.75]),
+    wetting_phase_relative_permeability=bores.array([0.0, 0.01, 0.04, 0.10, 0.20, 0.32, 0.38]),
+    non_wetting_phase_relative_permeability=bores.array([1.0, 0.65, 0.40, 0.20, 0.08, 0.01, 0.0]),
+)
+gas_oil_kr = bores.TwoPhaseRelPermTable(
+    wetting_phase=bores.FluidPhase.OIL,
+    non_wetting_phase=bores.FluidPhase.GAS,
+    wetting_phase_saturation=bores.array([0.25, 0.35, 0.50, 0.65, 0.80, 0.95]),
+    wetting_phase_relative_permeability=bores.array([0.0, 0.08, 0.25, 0.50, 0.78, 1.0]),
+    non_wetting_phase_relative_permeability=bores.array([0.85, 0.55, 0.28, 0.10, 0.02, 0.0]),
+)
+
+# 2. Combine into three-phase table with Stone II mixing
+three_phase_kr = bores.ThreePhaseRelPermTable(
+    oil_water_table=oil_water_kr,
+    gas_oil_table=gas_oil_kr,
+    mixing_rule=bores.stone_II_rule,
+)
+
+# 3. Define capillary pressure from lab data
+oil_water_pc = bores.TwoPhaseCapillaryPressureTable(
+    wetting_phase=bores.FluidPhase.WATER,
+    non_wetting_phase=bores.FluidPhase.OIL,
+    wetting_phase_saturation=bores.array([0.20, 0.30, 0.45, 0.60, 0.75]),
+    capillary_pressure=bores.array([35.0, 12.0, 4.0, 1.0, 0.0]),
+)
+gas_oil_pc = bores.TwoPhaseCapillaryPressureTable(
+    wetting_phase=bores.FluidPhase.OIL,
+    non_wetting_phase=bores.FluidPhase.GAS,
+    wetting_phase_saturation=bores.array([0.25, 0.40, 0.60, 0.80, 0.95]),
+    capillary_pressure=bores.array([20.0, 8.0, 3.0, 0.8, 0.0]),
+)
+three_phase_pc = bores.ThreePhaseCapillaryPressureTable(
+    oil_water_table=oil_water_pc,
+    gas_oil_table=gas_oil_pc,
+)
+
+# 4. Use in reservoir model
+model = bores.reservoir_model(
+    # ... grid, properties, etc. ...
+    relative_permeability_table=three_phase_kr,
+    capillary_pressure_table=three_phase_pc,
+)
+```
+
+---
+
+## Constants
+
+BORES also provides and uses physical constants and conversion factors with the context of a simulation run.
+
+```python
+import bores
+
+# Access via the constants object
+c = bores.c  # or bores.Constants()
+
+# Time conversions
+c.DAYS_PER_YEAR        # 365.25
+c.SECONDS_PER_DAY      # 86400.0
+
+# Standard conditions
+c.STANDARD_PRESSURE_IMPERIAL    # 14.696 psia
+c.STANDARD_TEMPERATURE_IMPERIAL # 60.0 °F
+
+# Fluid properties
+c.STANDARD_WATER_DENSITY_IMPERIAL  # 62.37 lb/ft³
+c.IDEAL_GAS_CONSTANT_IMPERIAL            # 10.73 (psia·ft³)/(lbmol·°R)
+
+# Conversion factors
+c.PSI_TO_PA            # 6894.76
+c.BBL_TO_FT3     # 5.6146
+
+# And many others...
+```
+
+### Customizing Constants
+
+```python
+# Create custom constants context
+my_constants = bores.Constants()
+my_constants["STANDARD_TEMPERATURE_IMPERIAL"] = bores.Constant(
+    70.0,  # Different standard temperature
+    unit="°F",
+    description="Custom standard temperature",
+)
+# Or just set constant directly
+my_constants.STANDARD_PRESSURE_IMPERIAL = 70.0  # Different standard pressure
+
+# Use in specific calculations
+with bores.ConstantsContext(my_constants):
+    # Calculations here use custom constants
+    pass
+
+# Or use constant object directly
+with my_constants():
+    # Calculations here use custom constants
+    pass
+```
+
+---
+
+## Boundary Conditions
+
+### Boundary Directions
+
+```python
+from bores.boundary_conditions import BoundaryDirection
+
+BoundaryDirection.X_MINUS  # Left face
+BoundaryDirection.X_PLUS   # Right face
+BoundaryDirection.Y_MINUS  # Front face
+BoundaryDirection.Y_PLUS   # Back face
+BoundaryDirection.Z_MINUS  # Bottom face
+BoundaryDirection.Z_PLUS   # Top face
+```
+
+### Boundary Types
+
+```python
+# No-flow (default for reservoir boundaries)
+no_flow = bores.NoFlowBoundary()
+
+# Constant pressure/saturation (aquifer support)
+constant = bores.ConstantBoundary(value=3000.0)  # psia
+
+# Dirichlet (fixed value)
+dirichlet = bores.DirichletBoundary(value=2800.0)
+
+# Neumann (fixed flux)
+neumann = bores.NeumannBoundary(flux=100.0)  # e.g bbl/day/ft²
+
+# Linear gradient
+gradient = bores.LinearGradientBoundary(
+    gradient=0.433,      # psi/ft
+    reference_value=3000.0,
+    reference_position=0,
+)
+```
+
+### Applying Boundaries
+
+Boundary conditions are organized by property (pressure, saturation, etc.) using a conditions dictionary:
+
+```python
+# Create boundary conditions using `GridBoundaryCondition` for each property
+boundary_conditions = bores.BoundaryConditions(
+    conditions={
+        # Pressure boundary conditions
+        "pressure": bores.GridBoundaryCondition(
+            left=bores.NoFlowBoundary(),
+            right=bores.NoFlowBoundary(),
+            front=bores.NoFlowBoundary(),
+            back=bores.NoFlowBoundary(),
+            bottom=bores.ConstantBoundary(constant=4600),  # Aquifer pressure
+            top=bores.NoFlowBoundary(),
+        ),
+        # Oil saturation boundary conditions
+        "oil_saturation": bores.GridBoundaryCondition(),  # Default: NoFlow all sides
+        # Gas saturation boundary conditions
+        "gas_saturation": bores.GridBoundaryCondition(),
+        # Water saturation boundary conditions
+        "water_saturation": bores.GridBoundaryCondition(),
+    }
+)
+
+# Apply to model
+model = bores.reservoir_model(
+    ...,
+    boundary_conditions=boundary_conditions,
+)
+```
+
+### GridBoundaryCondition Parameters
+
+The `GridBoundaryCondition` accepts boundary conditions for each face:
+
+- `left` / `right`: X-direction faces
+- `front` / `back`: Y-direction faces  
+- `bottom` / `top`: Z-direction faces
+
+---
+
+## Errors
+
+BORES defines specific exceptions for different error types:
+
+```python
+from bores.errors import (
+    BORESError,           # Base class for all BORES errors
+    ValidationError,      # Invalid input data
+    SolverError,          # Solver convergence failure
+    ComputationError,     # Numerical computation errors
+    SimulationError,      # General simulation errors
+    TimingError,          # Time stepping issues
+    StorageError,         # State persistence errors
+    StreamError,          # Streaming operation errors
+    PreconditionerError,  # Preconditioner setup/application errors
+    StopSimulation,       # Graceful simulation termination signal
+)
+```
+
+### Error Handling
+
+Below is an example of handling solver errors during simulation:
+
+```python
+import bores
+from bores.errors import SolverError, StopSimulation
+
+config = bores.Config(
+    scheme="impes",
+    convergence_tolerance=1e-6,
+    max_iterations=250,
+)
+
+for _ in range(3):  # Retry up to 3 times
+    try:
+        for state in bores.run(model=model, timer=timer, wells=wells, config=config):
+            ... # Process each state
+        
+    except SolverError as e:
+        print(f"Solver failed to converge: {e}")
+        # Try with relaxed settings
+        config = bores.Config(
+            scheme="impes",
+            convergence_tolerance=1e-4,  # Relax tolerance
+            max_iterations=500,
+        )
+    except StopSimulation:
+        print("Simulation terminated gracefully")
+        break
+```
+
+---
+
+## Solvers
+
+### Supported Solvers
+
+BORES currently supports **IMPES** and **Explicit** schemes:
+
+| Solver   | Pressure | Saturation | Use Case                         |
+| -------- | -------- | ---------- | -------------------------------- |
+| IMPES    | Implicit | Explicit   | General purpose, good stability  |
+| Explicit | Explicit | Explicit   | Fast per step, requires small Δt |
+
+### IMPES Configuration
+
+```python
+config = bores.Config(
+    scheme="impes",
+    
+    # Iterative solver options
+    iterative_solver="bicgstab",  # BiCGSTAB (recommended)
+    # or: "lgmres", "gmres", "tfqmr"
+    
+    preconditioner="ilu",  # ILU (recommended)
+    # or: "diagonal", "ilu", "amg", "cpr", None
+    
+    # Convergence settings
+    convergence_tolerance=1e-6,
+    max_iterations=250,
+    
+    # CFL control (internal)
+    impes_cfl_threshold=0.9,
+)
+```
+
+### Explicit Configuration
+
+```python
+config = bores.Config(
+    scheme="explicit",
+    
+    # Separate CFL limits for pressure and saturation
+    explicit_pressure_cfl_threshold=0.9,
+    explicit_saturation_cfl_threshold=0.6,
+)
+```
+
+> **Note**: Fully implicit scheme with Newton-Raphson iteration is planned for a future release.
+
+---
+
+## Visualization
+
+BORES provides visualization utilities for time-series data and 3D reservoir visualization.
+
+### Configure Image Output
+
+```python
+bores.image_config(scale=3)  # Higher DPI for publication-quality
+```
+
+### Time-Series Plots
+
+```python
+import numpy as np
+
+# Prepare data: list of (time_step, value) tuples
+pressure_history = [
+    (state.step, state.model.fluid_properties.pressure_grid.mean()) 
+    for state in states
+]
+
+# Create series plot
+fig = bores.make_series_plot(
+    data={"Avg. Reservoir Pressure": np.array(pressure_history)},
+    title="Pressure Decline",
+    x_label="Time Step",
+    y_label="Pressure (psia)",
+    marker_sizes=6,
+    show_markers=True,
+    width=720,
+    height=460,
+)
+fig.show()
+```
+
+### Multi-Series Plots
+
+```python
+# Multiple data series
+saturation_data = {
+    "Oil Saturation": np.array(oil_sat_history),
+    "Water Saturation": np.array(water_sat_history),
+    "Gas Saturation": np.array(gas_sat_history),
+}
+
+fig = bores.make_series_plot(
+    data=saturation_data,
+    title="Saturation History",
+    x_label="Time Step",
+    y_label="Saturation (fraction)",
+    line_colors=["brown", "blue", "red"],  # Custom colors
+)
+fig.show()
+```
+
+### Merging Plots
+
+```python
+# Create individual plots
+oil_plot = bores.make_series_plot(data={"Oil": oil_data}, title="Oil Production")
+gas_plot = bores.make_series_plot(data={"Gas": gas_data}, title="Gas Production")
+
+# Merge into subplot grid
+combined = bores.merge_plots(
+    oil_plot,
+    gas_plot,
+    cols=2,
+    title="Production Analysis",
+)
+combined.show()
+```
+
+### 3D Visualization
+
+```python
+from bores.visualization import plotly3d
+
+# Create a DataVisualizer
+viz = plotly3d.DataVisualizer()
+
+# Volume rendering of pressure
+fig = viz.make_plot(
+    source=states[-1],  # ModelState from simulation
+    property="pressure",  # Property name from registry
+    plot_type="volume",  # "volume", "isosurface", "scatter_3d", "cell_blocks"
+    title="Pressure Distribution",
+    width=720,
+    height=460,
+    opacity=0.67,
+    z_scale=3,  # Exaggerate vertical scale
+)
+fig.show()
+
+# With wells overlay and labels
+labels = plotly3d.Labels()
+wells = states[0].wells
+injector_locations, producer_locations = wells.locations
+injector_names, producer_names = wells.names
+labels.add_well_labels(
+    [*injector_locations, *producer_locations],
+    [*injector_names, *producer_names]
+)
+
+fig = viz.make_plot(
+    source=states[-1],
+    property="oil-saturation",
+    plot_type="scatter_3d",
+    show_wells=True,
+    show_surface_marker=True,
+    show_perforations=True,
+    labels=labels,
+    aspect_mode="data",
+    marker_size=4,
+)
+fig.show()
+
+# Slice visualization (view specific layers)
+fig = viz.make_plot(
+    source=states[-1],
+    property="temperature",
+    x_slice=(0, 25),  # First 25 cells in X
+    y_slice=(0, 25),  # First 25 cells in Y
+    z_slice=5,        # Single layer at Z=5
+)
+fig.show()
+```
+
+### Model Analysis
+
+Use `ModelAnalyst` for common analysis operations:
+
+> Check the `bores.analyses` module for more details or check `scenerios/*_analysis.py` for real usage examples.
+
+```python
+store = bores.ZarrStore(
+    store=Path("/results/simulation.zarr"), 
+    metadata_dir=Path("/results/metadata")
+)
+# Create stream in store replay mode (no need for lazy loading since grid will mostly be used immediately)
+stream = bores.StateStream(
+    store=store, 
+    lazy_load=False, 
+    auto_replay=True
+)
+# Collect only the initial state and states at every 10th step
+states = stream.collect(key=lambda s: s.step == 0 or s.step % 10 == 0) # this returns a generator
+analyst = bores.ModelAnalyst(states)
+
+# Sweep efficiency over time
+sweep_history = analyst.sweep_efficiency_history(
+    interval=1,
+    from_step=1,
+    displacing_phase="water",
+)
+
+# Production rates
+oil_production = analyst.oil_production_history(
+    interval=1,
+    cumulative=False,
+    from_step=1,
+)
+
+# Cumulative production
+cumulative_oil = analyst.oil_production_history(
+    interval=1,
+    cumulative=True,
+    from_step=1,
+)
+
+# Injection history
+gas_injection = analyst.gas_injection_history(
+    interval=1,
+    cumulative=True,
+    from_step=1,
+)
+
+# Instantaneous rates with water cut and GOR
+rates = analyst.instantaneous_rates_history(
+    interval=1,
+    from_step=1,
+    rate_type="production",
+)
+for step, result in rates:
+    print(f"Step {step}: WOR = {result.water_cut:.3f}, GOR = {result.gas_oil_ratio:.1f}")
+```
+
+---
+
+## Performance & Optimization
+
+BORES has been optimized for reasonable performance within Python's constraints, but users should understand the computational trade-offs involved in reservoir simulation.
+
+### Computational Complexity
+
+Reservoir simulation is inherently computationally intensive. Several factors affect simulation time:
+
+| Factor                 | Impact on Performance                                                      |
+| ---------------------- | -------------------------------------------------------------------------- |
+| **Grid Size**          | Scales roughly as O(n³) for 3D grids. A 100×100×50 grid has 500,000 cells. |
+| **Number of Wells**    | Each well adds coupling terms and flow calculations per time step.         |
+| **Fractures & Faults** | Increase matrix complexity and may reduce sparsity.                        |
+| **Time Step Size**     | Smaller steps = more iterations; larger steps may hit CFL limits.          |
+| **Solver Iterations**  | Complex pressure/saturation distributions require more iterations.         |
+| **PVT Table Lookups**  | 3D interpolation (P-T-S) is slower than 2D (P-T).                          |
+
+### CFL Condition & Time Stepping
+
+The Courant-Friedrichs-Lewy (CFL) condition limits the maximum stable time step for explicit schemes:
+
+```math
+CFL = (velocity × Δt) / Δx ≤ CFL_max
+```
+
+**Implications:**
+
+- High flow velocities (near wells, fractures) force smaller time steps
+- Finer grids require smaller time steps for the same CFL number
+- The adaptive timer will automatically reduce step size when CFL limits are exceeded
+
+**If stability is not critical** (e.g., for quick prototyping):
+
+```python
+# Relax CFL constraints (use with caution!)
+config = bores.Config(
+    impes_cfl_threshold=1.2,           # Default is 0.9
+    explicit_saturation_cfl_threshold=0.8,  # Default is 0.6
+    explicit_pressure_cfl_threshold=1.0,    # Default is 0.9
+)
+```
+
+> ⚠️ **Warning**: Relaxing CFL limits may cause numerical instability, oscillations, or non-physical results. Always validate results when using relaxed settings.
+
+### Memory Considerations
+
+Large grids consume significant memory especially when running analysis with multiple property grids (pressure, saturations, mobilities, etc.):
+
+| Grid Size   | Cells | ~Memory per Property Grid |
+| ----------- | ----- | ------------------------- |
+| 50×50×20    | 50K   | ~400 KB (float64)         |
+| 100×100×50  | 500K  | ~4 MB (float64)           |
+| 200×200×100 | 4M    | ~32 MB (float64)          |
+
+With 20+ property grids, state history storage, and solver matrices, memory can grow quickly.
+
+**Tips for reducing memory:**
+
+- Use 32-bit precision: `bores.use_32bit_precision()` (halves grid memory usage)
+- Use `StateStream` with a `StateStore` to persist states to disk instead of holding in memory. Most stores also support lazy loading, so use that when analyzing results.
+- Increase `output_frequency` in `Config` to store fewer states
+- Use coarser grids during prototyping, then refine
+
+### Performance Tips
+
+1. **Use 32-bit precision** for large grids (significant speedup with NumPy/Numba)
+2. **Start with coarse grids** and refine after validating the model setup
+3. **Use `bicgstab` solver** with `ilu` preconditioner for most cases. Although using a `diagonal` or no preconditioner may be faster, it may require more iterations.
+4. **Batch state storage** with `StateStream` to avoid memory buildup
+5. **Avoid keeping states in memory** unless necessary for analysis. When using `bores.run`, iterate through states directly or use a store. Never do list(bores.run(...)) for large simulations.
+6. **Use `StateStream` for post-simulation analysis** — Model analysis with `ModelAnalyst` can be memory-intensive since all collected states need to be loaded into memory. Use `StateStream.collect()` with a predicate to filter only the timesteps you need for analysis (e.g., every 10th step, specific time intervals, or final state only). This prevents loading hundreds of states when only a subset is needed.
+7. **Profile your simulation** to identify bottlenecks:
+
+   ```python
+   import cProfile
+   cProfile.run('list(bores.run(model, timer, wells, config))')
+   ```
+
+   ```python
+   import memory_profiler
+
+   @memory_profiler.profile
+   def run_simulation():
+       # Setup model, timer, wells, config and run simulation
+       ...
+    
+   run_simulation()
+   ```
+
+### Language & Hardware Limitations
+
+BORES is written in Python with NumPy, SciPy, and Numba for numerical operations. While optimizations have been made:
+
+- **Python's GIL** limits true parallelism for CPU-bound operations
+- **Numba JIT compilation** helps but has startup overhead (only on first run)
+- **Memory bandwidth** often limits performance more than CPU speed
+- **Single-threaded by design** — commercial simulators use MPI/GPU parallelism
+
+For large-scale production simulations requiring maximum performance, consider commercial simulators (ECLIPSE, CMG, tNavigator) or compiled frameworks (OPM Flow, MRST).
+
+---
+
+## Troubleshooting & FAQ
+
+### Frequently Asked Questions
+
+**Q: My simulation is running very slowly. What can I do?**
+
+A: Several factors affect speed:
+
+1. Reduce grid resolution during prototyping
+2. Enable 32-bit precision: `bores.use_32bit_precision()`
+3. Increase `min_step_size` in Timer if stability permits
+4. Use `output_frequency > 1` to reduce state storage overhead
+5. Check if wells have very high rates causing CFL violations
+
+**Q: The solver is not converging. What should I check?**
+
+A: Non-convergence usually indicates numerical issues:
+
+1. Check for extreme property values (very high/low permeability, porosity near 0 or 1)
+2. Ensure saturation endpoints are physical (Swc + Sor < 1)
+3. Try a stronger preconditioner (`"amg"` instead of `"ilu"`)
+4. Reduce initial time step size
+5. Check well BHP/control limits aren't causing numerical instability
+
+**Q: I'm getting negative saturations or saturations > 1.**
+
+A: This indicates numerical instability, although BORES enforces saturation bounds:
+
+1. Reduce time step size (lower `max_step_size`, `initial_step_size`)
+2. Tighten CFL thresholds in `Config`
+3. Check relative permeability endpoints for consistency
+4. Ensure capillary pressure curves are monotonic
+
+**Q: How do I handle a gas cap or aquifer?**
+
+A: Use boundary conditions:
+
+```python
+# Bottom aquifer support
+boundary_conditions = bores.BoundaryConditions(
+    conditions={
+        "pressure": bores.GridBoundaryCondition(
+            bottom=bores.ConstantBoundary(constant=4500),  # Aquifer pressure
+        ),
+    }
+)
+```
+
+For gas caps, set appropriate initial saturations using `build_saturation_grids` with `gas_oil_contact`.
+
+**Q: Can BORES handle compositional simulation?**
+
+A: No, BORES is specifically designed for black-oil (3-phase) simulation. Compositional simulation with equation-of-state (EOS) calculations is not supported.
+
+**Q: How do I restart a simulation from a saved state?**
+
+A: Load the final state from storage and use it to rebuild the model:
+
+```python
+# Load states
+store = bores.HDF5Store(filepath=Path("results/simulation.h5"), metadata_dir=Path("results/metadata"))
+stream = bores.StateStream(store=store, validate=False, auto_replay=True, lazy_load=False)
+last_state = stream.last()
+
+# Continue simulation with last recorded timer state
+timer = bores.Timer.load_state(last_state.timer_state)
+```
+
+**Q: Why are my well rates different from what I specified?**
+
+A: Wells operate under constraints:
+
+1. BHP limits may cap achievable rates
+2. Reservoir deliverability may be insufficient
+3. Skin factor reduces productivity
+4. Check `warn_well_anomalies=True` in Config for warnings
+
+**Q: The simulation crashes with "out of memory" error.**
+
+A: Large simulations can exhaust RAM (especially with many stored states). Solutions:
+
+1. Use `StateStream` with disk storage instead of holding all states in memory
+2. Enable 32-bit precision
+3. Reduce grid resolution
+4. Increase `output_frequency` to store fewer states
+
+---
+
+## Contributing & Support
+
+### Getting Help
+
+- **Questions & Discussions**: Open a [GitHub Discussion](https://github.com/ti-oluwa/bores/discussions) for questions, ideas, or general conversation
+- **Bug Reports**: File an [Issue](https://github.com/ti-oluwa/bores/issues) with a minimal reproducible example
+- **Feature Requests**: Open an Issue describing the use case and proposed feature
+
+### Contributing
+
+Contributions are welcome! To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes with tests
+4. Ensure all tests pass (`pytest`)
+5. Submit a Pull Request
+
+**Areas where contributions are especially welcome:**
+
+- Additions, corrections or improvements to PVT correlations, relperm models, capillary pressure models
+- New well models/controls or enhancements to existing well controls
+- Improvements to grid construction utilities
+- Enhancements to visualization utilities
+- Performance optimizations
+- Documentation improvements
+- Bug fixes and test coverage
+
+### API Reference
+
+For detailed API information beyond this README:
+
+1. **Source Code**: The source code contains comprehensive docstrings for all public APIs. Browse the `src/bores/` directory for detailed documentation on each module.
+
+2. **Module Structure**:
+   - `bores/factories.py` — Main factory functions (`reservoir_model`, `production_well`, etc.)
+   - `bores/grids/` — Grid construction utilities
+   - `bores/wells/` — Well models and controls
+   - `bores/pvt/` — PVT correlations and tables
+   - `bores/relperm.py` — Relative permeability models
+   - `bores/capillary_pressures.py` — Capillary pressure models
+   - `bores/fractures.py` — Fracture and fault models
+   - `bores/states.py` — State management and storage
+   - `bores/visualization/` — Plotting utilities
+   - `bores/analyses.py` — Post-simulation analysis tools
+
+3. **Examples**: The `scenarios/` directory contains complete working examples demonstrating various simulation workflows (primary depletion, CO₂ injection, CH₄ injection, etc.)
+
+> 📚 **Coming Soon**: Full API documentation with detailed usage guides, tutorials, and best practices.
+
+---
+
+## Example: Complete Simulation Workflow on a Heterogeneous Reservoir Model
+
+This complete example demonstrates building a heterogeneous reservoir model with wells and running a simulation. It follows the actual API patterns used in the scenario files.
+
+```python
+import typing
+import logging
+from pathlib import Path
+import numpy as np
+import bores
+
+logging.basicConfig(level=logging.INFO)
+
+# 1. Enable 32-bit precision for better performance
+bores.use_32bit_precision()
+
+# 2. Define grid dimensions
+cell_dimension = (100.0, 100.0)  # 100ft x 100ft cells (dx, dy)
+grid_shape = typing.cast(
+    bores.ThreeDimensions,
+    (20, 20, 10),  # 20x20 cells, 10 layers
+)
+dip_angle = 2.0
+dip_azimuth = 90.0  # Dipping toward East
+
+# 3. Build thickness grid (variable layer thickness)
+thickness_values = bores.array([30.0, 20.0, 25.0, 30.0, 25.0, 30.0, 20.0, 25.0, 30.0, 25.0])  # ft
+thickness_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=thickness_values,
+    orientation=bores.Orientation.Z,
+)
+
+# 4. Build pressure grid (hydrostatic gradient)
+reservoir_top_depth = 8000.0  # ft
+pressure_gradient = 0.38  # psi/ft
+layer_depths = reservoir_top_depth + np.cumsum(np.concatenate([[0], thickness_values[:-1]]))
+layer_pressures = 14.7 + (layer_depths * pressure_gradient)
+
+pressure_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=layer_pressures,
+    orientation=bores.Orientation.Z,
+)
+
+# Bubble point pressure (undersaturated oil)
+oil_bubble_point_pressure_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=layer_pressures - 400.0,  # 400 psi below formation pressure
+    orientation=bores.Orientation.Z,
+)
+
+# 5. Build saturation endpoint grids
+residual_oil_saturation_water_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.25)
+residual_oil_saturation_gas_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.15)
+irreducible_water_saturation_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.15)
+connate_water_saturation_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.12)
+residual_gas_saturation_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.045)
+
+# 6. Build porosity grid (compaction trend)
+porosity_values = bores.array([0.04, 0.07, 0.09, 0.1, 0.08, 0.12, 0.14, 0.16, 0.11, 0.08])
+porosity_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=porosity_values,
+    orientation=bores.Orientation.Z,
+)
+
+# 7. Build depth grid with structural dip
+goc_depth = 8060.0  # Gas-oil contact
+owc_depth = 8220.0  # Oil-water contact
+
+depth_grid = bores.depth_grid(thickness_grid)
+depth_grid = bores.apply_structural_dip(
+    elevation_grid=depth_grid,
+    elevation_direction="downward",
+    cell_dimension=cell_dimension,
+    dip_angle=dip_angle,
+    dip_azimuth=dip_azimuth,
+)
+
+# 8. Build saturation grids with fluid contacts
+water_saturation_grid, oil_saturation_grid, gas_saturation_grid = bores.build_saturation_grids(
+    depth_grid=depth_grid,
+    gas_oil_contact=goc_depth - reservoir_top_depth,
+    oil_water_contact=owc_depth - reservoir_top_depth,
+    connate_water_saturation_grid=connate_water_saturation_grid,
+    residual_oil_saturation_water_grid=residual_oil_saturation_water_grid,
+    residual_oil_saturation_gas_grid=residual_oil_saturation_gas_grid,
+    residual_gas_saturation_grid=residual_gas_saturation_grid,
+    porosity_grid=porosity_grid,
+    use_transition_zones=True,
+    oil_water_transition_thickness=12.0,
+    gas_oil_transition_thickness=8.0,
+    transition_curvature_exponent=1.2,
+)
+
+# 9. Build oil viscosity grid (increases with depth)
+oil_viscosity_values = np.linspace(1.2, 2.5, grid_shape[2])  # cP
+oil_viscosity_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=oil_viscosity_values,
+    orientation=bores.Orientation.Z,
+)
+
+# Oil compressibility and specific gravity
+oil_compressibility_grid = bores.uniform_grid(grid_shape=grid_shape, value=1.2e-5)  # 1/psi
+oil_specific_gravity_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.845)  # ~36 API
+
+# 10. Build permeability structure (anisotropic)
+x_perm_values = bores.array([12, 25, 40, 18, 55, 70, 90, 35, 48, 22])  # mD
+x_permeability_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=x_perm_values,
+    orientation=bores.Orientation.Z,
+)
+y_permeability_grid = typing.cast(bores.ThreeDimensionalGrid, x_permeability_grid * 0.8)
+z_permeability_grid = typing.cast(bores.ThreeDimensionalGrid, x_permeability_grid * 0.1)
+
+absolute_permeability = bores.RockPermeability(
+    x=x_permeability_grid,
+    y=y_permeability_grid,
+    z=z_permeability_grid,
+)
+
+# 11. Create relative permeability model
+relative_permeability_table = bores.BrooksCoreyThreePhaseRelPermModel(
+    irreducible_water_saturation=0.15,
+    residual_oil_saturation_gas=0.15,
+    residual_oil_saturation_water=0.25,
+    residual_gas_saturation=0.045,
+    wettability=bores.WettabilityType.WATER_WET,
+    water_exponent=2.0,
+    oil_exponent=2.0,
+    gas_exponent=2.0,
+    mixing_rule=bores.eclipse_rule,
+)
+
+# 12. Create capillary pressure model
+capillary_pressure_table = bores.BrooksCoreyCapillaryPressureModel(
+    oil_water_entry_pressure_water_wet=2.0,
+    oil_water_pore_size_distribution_index_water_wet=2.0,
+    gas_oil_entry_pressure=2.8,
+    gas_oil_pore_size_distribution_index=2.0,
+    wettability=bores.WettabilityType.WATER_WET,
+)
+
+# 13. Build temperature grid (geothermal gradient)
+surface_temp = 60.0  # °F
+temp_gradient = 0.015  # °F/ft
+layer_temps = surface_temp + (layer_depths * temp_gradient)
+temperature_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=layer_temps,
+    orientation=bores.Orientation.Z,
+)
+
+# Rock compressibility
+rock_compressibility = 4.5e-6  # 1/psi
+
+# Net-to-gross ratio
+net_to_gross_grid = bores.layered_grid(
+    grid_shape=grid_shape,
+    layer_values=[0.42, 0.55, 0.68, 0.35, 0.60, 0.72, 0.80, 0.50, 0.63, 0.47],
+    orientation=bores.Orientation.Z,
+)
+
+# Gas gravity
+gas_gravity_grid = bores.uniform_grid(grid_shape=grid_shape, value=0.65)
+
+# 14. Create boundary conditions
+boundary_conditions = bores.BoundaryConditions(
+    conditions={
+        "pressure": bores.GridBoundaryCondition(
+            bottom=bores.ConstantBoundary(constant=4600),  # Aquifer support
+        ),
+    }
+)
+
+# 15. Build PVT tables
+pvt_table_data = bores.build_pvt_table_data(
+    pressures=bores.array([500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]),
+    temperatures=bores.array([120, 140, 160, 180, 200, 220]),
+    salinities=bores.array([30000, 32000, 36000, 40000]),
+    oil_specific_gravity=0.845,
+    gas_gravity=0.65,
+    reservoir_gas="methane",
+)
+pvt_tables = bores.PVTTables(table_data=pvt_table_data, interpolation_method="linear")
+
+# 16. Build the reservoir model
+model = bores.reservoir_model(
+    grid_shape=grid_shape,
+    cell_dimension=cell_dimension,
+    thickness_grid=thickness_grid,
+    pressure_grid=pressure_grid,
+    oil_bubble_point_pressure_grid=oil_bubble_point_pressure_grid,
+    absolute_permeability=absolute_permeability,
+    porosity_grid=porosity_grid,
+    temperature_grid=temperature_grid,
+    rock_compressibility=rock_compressibility,
+    oil_saturation_grid=oil_saturation_grid,
+    water_saturation_grid=water_saturation_grid,
+    gas_saturation_grid=gas_saturation_grid,
+    oil_viscosity_grid=oil_viscosity_grid,
+    oil_specific_gravity_grid=oil_specific_gravity_grid,
+    oil_compressibility_grid=oil_compressibility_grid,
+    gas_gravity_grid=gas_gravity_grid,
+    residual_oil_saturation_water_grid=residual_oil_saturation_water_grid,
+    residual_oil_saturation_gas_grid=residual_oil_saturation_gas_grid,
+    irreducible_water_saturation_grid=irreducible_water_saturation_grid,
+    connate_water_saturation_grid=connate_water_saturation_grid,
+    residual_gas_saturation_grid=residual_gas_saturation_grid,
+    net_to_gross_ratio_grid=net_to_gross_grid,
+    boundary_conditions=boundary_conditions,
+    relative_permeability_table=relative_permeability_table,
+    capillary_pressure_table=capillary_pressure_table,
+    reservoir_gas="methane",
+    dip_angle=dip_angle,
+    dip_azimuth=dip_azimuth,
+    pvt_tables=pvt_tables,
+)
+
+# 17. (Optional) Add a sealing fault
+fault = bores.vertical_sealing_fault(
+    fault_id="F-1",
+    orientation="x",
+    index=10,
+    permeability_multiplier=1e-4,
+    z_range=(0, 8),  # Shallow fault
+)
+model = bores.apply_fracture(model, fault)
+
+# 18. Create production well
+production_clamp = bores.ProductionClamp()
+control = bores.MultiPhaseRateControl(
+    oil_control=bores.AdaptiveBHPRateControl(
+        target_rate=-150,
+        target_phase="oil",
+        bhp_limit=1200,
+        clamp=production_clamp,
+    ),
+    gas_control=bores.AdaptiveBHPRateControl(
+        target_rate=-500,
+        target_phase="gas",
+        bhp_limit=1200,
+        clamp=production_clamp,
+    ),
+    water_control=bores.AdaptiveBHPRateControl(
+        target_rate=-10,
+        target_phase="water",
+        bhp_limit=1200,
+        clamp=production_clamp,
+    ),
+)
+
+producer = bores.production_well(
+    well_name="P-1",
+    perforating_intervals=[((10, 10, 4), (10, 10, 6))],
+    radius=0.3542,  # 8.5" wellbore
+    control=control,
+    produced_fluids=(
+        bores.ProducedFluid(
+            name="Oil",
+            phase=bores.FluidPhase.OIL,
+            specific_gravity=0.845,
+            molecular_weight=180.0,
+        ),
+        bores.ProducedFluid(
+            name="Gas",
+            phase=bores.FluidPhase.GAS,
+            specific_gravity=0.65,
+            molecular_weight=16.04,
+        ),
+        bores.ProducedFluid(
+            name="Water",
+            phase=bores.FluidPhase.WATER,
+            specific_gravity=1.05,
+            molecular_weight=18.015,
+        ),
+    ),
+    skin_factor=2.5,
+    is_active=True,
+)
+
+wells = bores.wells_(injectors=None, producers=[producer])
+
+# 19. Configure timer and simulation
+timer = bores.Timer(
+    initial_step_size=bores.Time(hours=4.5),
+    max_step_size=bores.Time(days=5.0),
+    min_step_size=bores.Time(hours=1.0),
+    simulation_time=bores.Time(days=365),  # 1 year
+    max_cfl_number=0.9,
+    ramp_up_factor=1.2,
+    backoff_factor=0.5,
+    aggressive_backoff_factor=0.25,
+)
+
+config = bores.Config(
+    scheme="impes",
+    output_frequency=1,
+    miscibility_model="immiscible",
+    use_pseudo_pressure=True,
+    max_iterations=500,
+    iterative_solver="bicgstab",
+    preconditioner="ilu",
+    pvt_tables=pvt_tables,
+)
+
+# 20. Run simulation with storage
+store = bores.ZarrStore(
+    store=Path.cwd() / "results/simulation.zarr",
+    metadata_dir=Path.cwd() / "results/metadata",
+)
+
+stream = bores.StateStream(
+    bores.run(model=model, timer=timer, wells=wells, config=config),
+    store=store,
+    batch_size=50,
+)
+with stream: # Use context manager to ensure proper stream setup and teardown
+    for state in stream.collect(key=lambda s: s.step % 10 == 0):
+        avg_pressure = state.model.fluid_properties.pressure_grid.mean()
+        print(f"Step {state.step}: Avg pressure = {avg_pressure:.1f} psia")
+
+# 21. Analyze results (reuse stream with `auto_replay` for memory-efficient analysis)
+stream = bores.StateStream(store=store, lazy_load=False, auto_replay=True)
+# Collect only states at every 5th step to reduce memory footprint
+states = list(stream.collect(key=lambda s: s.step == 0 or s.step % 5 == 0))
+analyst = bores.ModelAnalyst(states)
+
+# Cumulative oil production
+oil_cum = list(analyst.oil_production_history(interval=1, cumulative=True, from_step=1))
+print(f"Total oil produced: {oil_cum[-1][1]:.0f} STB")
+
+# Plot production history (collect states again for a separate analysis)
+pressure_history = [(s.step, s.model.fluid_properties.pressure_grid.mean()) for s in states]
+fig = bores.make_series_plot(
+    data={"Avg. Reservoir Pressure": np.array(pressure_history)},
+    title="Pressure Decline",
+    x_label="Time Step",
+    y_label="Pressure (psia)",
+)
+fig.show()
+```
+
+---
+
+## License
+
+See [LICENSE](LICENSE) for details.
+
+---
+
+*Built for students, researchers, reservoir engineers and simulation enthusiasts.*

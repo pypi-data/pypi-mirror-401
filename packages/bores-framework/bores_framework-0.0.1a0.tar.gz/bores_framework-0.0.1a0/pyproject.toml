@@ -1,0 +1,73 @@
+[project]
+name = "bores-framework"
+version = "0.0.1a0"
+description = "3D 3-Phase Black-Oil Reservoir Modelling and Simulation Framework (BORES)."
+authors = [
+    { name = "ti-oluwa", email = "tioluwa.dev@gmail.com" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "attrs>=25.3.0",
+    "coolprop>=6.8.0",
+    "imageio>=2.37.0",
+    "intel-cmplr-lib-rt>=2025.3.1; sys_platform != 'darwin'",
+    "ipython>=8.37.0",
+    "kaleido>=1.0.0",
+    "numba>=0.63.0",
+    "plotly>=6.2.0",
+    "pyamg>=5.3.0",
+    "scikit-image>=0.25.2",
+    "thermo>=0.4.2",
+    "trame>=3.12.0",
+    "typing-extensions>=4.15.0",
+    # Install MKL versions only on x86_64 Windows/Linux
+    "numpy>=2.0.0; sys_platform != 'darwin' and platform_machine == 'x86_64'",
+    "scipy>=1.13.0; sys_platform != 'darwin' and platform_machine == 'x86_64'",
+    # Fallback to standard PyPI for macOS or non-x86 architectures
+    "numpy>=2.0.0; sys_platform == 'darwin' or platform_machine != 'x86_64'",
+    "scipy>=1.13.0; sys_platform == 'darwin' or platform_machine != 'x86_64'",
+    "cachetools>=6.2.4",
+    "h5py>=3.15.1",
+    "zarr>=2.18.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "auto-mix-prep>=0.2.0",
+    "marimo>=0.18.4",
+    "mypy>=1.16.1",
+    "rich>=14.0.0",
+    "ruff>=0.12.1",
+    "ty>=0.0.1a26",
+    "watchdog>=6.0.0",
+]
+
+[tool.marimo.runtime]
+pythonpath=["src"]
+output_max_bytes = 10_000_000
+
+[[tool.uv.index]]
+name = "numpy-mkl"
+url = "https://urob.github.io/numpy-mkl"
+explicit = true
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+[tool.uv.sources]
+numpy = [
+  { index = "numpy-mkl", marker = "sys_platform != 'darwin' and platform_machine == 'x86_64'" },
+]
+scipy = [
+  { index = "numpy-mkl", marker = "sys_platform != 'darwin' and platform_machine == 'x86_64'" },
+]
+
+[dependency-groups]
+dev = [
+    "marimo>=0.18.4",
+]
