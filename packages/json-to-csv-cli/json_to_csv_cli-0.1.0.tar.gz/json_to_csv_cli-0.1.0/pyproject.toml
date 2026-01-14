@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "json-to-csv-cli"
+version = "0.1.0"
+description = "CLI tool to convert JSON files into CSV format."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "jsonviewertool" }]
+license = { text = "MIT" }
+keywords = ["json", "cli", "converter"]
+
+[project.urls]
+Homepage = "https://jsonviewertool.com/json-to-csv"
+Repository = "https://github.com/coderaviverma/json-viewer-tools"
+
+[project.scripts]
+json = "json_to_csv_cli.cli:main"
