@@ -1,0 +1,121 @@
+Metadata-Version: 2.4
+Name: complexity-tokenizer
+Version: 0.1.6
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Rust
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Text Processing :: Linguistic
+Requires-Dist: pytest>=7.0 ; extra == 'dev'
+Requires-Dist: maturin>=1.4 ; extra == 'dev'
+Provides-Extra: dev
+Summary: Fast BPE tokenizer in Rust with HuggingFace compatibility
+Keywords: tokenizer,bpe,nlp,huggingface,rust,fast
+Author-email: Complexity-ML <contact@complexity-ml.org>
+License: Apache-2.0
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Documentation, https://github.com/Complexity-ML/complexity-tokenizer#readme
+Project-URL: Homepage, https://github.com/Complexity-ML/complexity-tokenizer
+Project-URL: Repository, https://github.com/Complexity-ML/complexity-tokenizer
+
+# Complexity Tokenizer
+
+**Fast BPE tokenizer in Rust with HuggingFace compatibility.**
+
+## Features
+
+- **Fast**: Written in Rust, 10-20x faster than pure Python
+- **Parallel**: Batch encoding/decoding uses all CPU cores (rayon)
+- **HuggingFace Compatible**: Loads `tokenizer.json` directly
+- **Hub Support**: `from_pretrained("repo/model")` works out of the box
+
+## Installation
+
+```bash
+pip install complexity-tokenizer
+```
+
+## Usage
+
+### Load from file
+
+```python
+from complexity_tokenizer import Tokenizer
+
+tok = Tokenizer.from_file("tokenizer.json")
+
+# Encode
+ids = tok.encode("Hello, world!")
+print(ids)  # [123, 456, 789, ...]
+
+# Decode
+text = tok.decode(ids)
+print(text)  # "Hello, world!"
+```
+
+### Load from HuggingFace Hub
+
+```python
+from complexity_tokenizer import Tokenizer
+
+tok = Tokenizer.from_pretrained("Pacific-Prime/pacific-prime")
+ids = tok.encode("Bonjour le monde!")
+```
+
+### Batch processing (parallel)
+
+```python
+texts = ["Hello", "World", "Foo", "Bar"] * 1000
+
+# Uses all CPU cores
+ids_batch = tok.encode_batch(texts)
+texts_back = tok.decode_batch(ids_batch)
+```
+
+### Special tokens
+
+```python
+print(tok.vocab_size)        # 100000
+print(tok.special_tokens)    # {'eos': 0, 'bos': 2, 'pad': 1, ...}
+
+# Token <-> ID conversion
+tok.token_to_id("<s>")       # 2
+tok.id_to_token(2)           # "<s>"
+```
+
+## Performance
+
+| Operation | complexity-tokenizer (Rust) | tokenizers (HF) | Python |
+|-----------|---------------------|-----------------|--------|
+| Encode 1K texts | ~5ms | ~8ms | ~100ms |
+| Decode 1K texts | ~3ms | ~5ms | ~80ms |
+| Batch encode 10K | ~20ms | ~40ms | ~1s |
+
+## Build from source
+
+Requires Rust 1.70+ and maturin:
+
+```bash
+# Install maturin
+pip install maturin
+
+# Build and install
+maturin develop --release
+
+# Or build wheel
+maturin build --release
+```
+
+## License
+
+Apache-2.0
+
