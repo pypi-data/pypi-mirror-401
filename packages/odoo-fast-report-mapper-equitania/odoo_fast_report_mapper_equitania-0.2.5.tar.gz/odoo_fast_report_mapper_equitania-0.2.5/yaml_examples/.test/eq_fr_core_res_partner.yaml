@@ -1,0 +1,49 @@
+# Version 1.0.0
+name:
+  ger: Kontaktauszug
+  eng: Contact Excerpt
+report_name: eq_fr_core_res_partner
+report_model: res.partner
+attachment: ('Kontaktauszug.pdf')
+print_report_name: ('Kontaktauszug')
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: false
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+report_fields:
+  res.partner:
+    - id
+    - company_type
+    - eq_firstname
+    - name
+    - street
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - zip
+    - city
+    - country_id
+    - child_ids
+    - phone
+    - email
+    - mobile
+    - title
+    - street2
+    - type
+    - eq_citypart
+    - eq_name2
+    - eq_name3
+  res.country:
+    - id
+    - name
+  res.partner.title:
+    - name
+    - id
+calculated_fields: { }

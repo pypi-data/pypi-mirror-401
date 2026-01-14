@@ -1,0 +1,130 @@
+# Version 1.0.1
+name:
+  ger: Mahnbericht
+  eng: Follow-up Report
+report_name: eq_fr_ee_invoice_follow_up
+report_model: res.partner
+attachment: 
+print_report_name: ('Mahnung - ' + (object.name or '').replace('/',''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: true
+multi: false
+eq_multiprint: create_zip
+attachment_use: false
+dependencies:
+  - eq_fr_core
+  - account
+  - account_followup
+report_fields:
+  res.partner:
+    - id
+    - city
+    - eq_citypart
+    - company_type
+    - lang
+    - name
+    - eq_name2
+    - eq_name3
+    - eq_firstname
+    - parent_id
+    - street
+    - street2
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+    - state_id
+    - unpaid_invoice_ids
+    - total_due
+    - total_overdue
+    - customer_number
+    - followup_line_id
+    - followup_status
+  account.move:
+    - id
+    - invoice_date
+    - ref
+    - name
+    - state
+    - invoice_payment_term_id
+    - invoice_incoterm_id
+    - currency_id
+    - amount_total
+    - amount_tax
+    - amount_untaxed
+    - amount_residual
+    - user_id
+    - company_id
+    - invoice_origin
+    - invoice_date_due
+    - amount_residual
+    - move_type
+    - payment_reference
+    - fiscal_position_id
+    - narration
+    - line_ids
+  account.fiscal.position:
+    - id
+    - name
+    - note
+    #- preference_favored_string
+  res.currency:
+    - id
+    - symbol
+    - name
+  res.partner.title:
+    - name
+    - id
+  res.company:
+    - id
+    - bank_ids
+    - city
+    - company_registry
+    - country_id
+    - email
+    - name
+    - phone
+    - state_id
+    - street
+    - vat
+    - website
+    - zip
+  res.partner.bank:
+    - id
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  res.users:
+    - id
+    - email
+    - lang
+    - mobile
+    - name
+    - phone
+    - display_name
+  account.payment.term:
+    - id
+    - note
+    - name
+  account.tax:
+    - id
+    - description
+    - amount
+  account.incoterms:
+    - id
+    - name
+  account_followup.followup.line:
+    - id
+    - display_name
+    - name
+calculated_fields: { }

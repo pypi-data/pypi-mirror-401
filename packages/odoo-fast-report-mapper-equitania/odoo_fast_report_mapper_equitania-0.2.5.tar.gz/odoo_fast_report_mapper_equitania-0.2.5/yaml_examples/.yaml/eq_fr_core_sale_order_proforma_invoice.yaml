@@ -1,0 +1,169 @@
+# Version 1.0.1
+# 08.05.2023
+name:
+  ger: Proformarechnung
+  eng: Proforma invoice
+report_name: eq_fr_core_sale_order_proforma_invoice
+report_model: sale.order
+attachment: ('Proformarechnung-' + (object.name or '') +'.pdf')
+print_report_name: ('Proformarechnung-' + (object.name or ''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: false
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+  - eq_sale_stock
+  - eq_layout_category
+  - sale_management
+  - eq_sale
+report_fields:
+  sale.order:
+    - id
+    - name
+    - date_order
+    - origin
+    - state
+    - eq_head_text
+    - note
+    - partner_id
+    - partner_shipping_id
+    - payment_term_id
+    - incoterm
+    - currency_id
+    - amount_total
+    - amount_tax
+    - amount_untaxed
+    - user_id
+    - company_id
+    - order_line
+    - client_order_ref
+  sale.order.line:
+    - id
+    - sequence
+    - product_id
+    - eq_delivery_date
+    - discount
+    - price_subtotal
+    - tax_id
+    - name
+    - layout_category_id
+    - product_uom
+    - product_uom_qty
+    - price_unit
+    - price_total
+    - display_type
+    - eq_pos
+  res.currency:
+    - id
+    - symbol
+  res.partner:
+    - id
+    - city
+    - company_type
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - customer_number
+    - eq_citypart
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - eq_name2
+    - eq_name3
+    - lang
+    - name
+    - parent_id
+    - street
+    - street2
+    - supplier_number
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+    - state_id
+  res.partner.title:
+    - name
+    - id
+  res.company:
+    - id
+    - bank_ids
+    - city
+    - company_registry
+    - country_id
+    - email
+    - eq_ceo_01
+    - eq_ceo_02
+    - eq_ceo_03
+    - eq_ceo_title
+    - eq_fax
+    - name
+    - phone
+    - state_id
+    - street
+    - vat
+    - website
+    - zip
+  res.partner.bank:
+    - id
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  res.users:
+    - id
+    - email
+    - eq_firstname
+    - eq_fax
+    - lang
+    - mobile
+    - name
+    - phone
+    - display_name
+  product.product:
+    - id
+    - default_code
+    - name
+    - qty_available
+    - lst_price
+  uom.uom:
+    - id
+    - name
+  account.incoterms:
+    - id
+    - name
+  account.payment.term:
+    - id
+    - note
+  account.tax:
+    - id
+    - description
+    - amount
+    - name
+    - tax_group_id
+  account.tax.group:
+    - id
+    - name
+  sale.layout_category:
+    - id
+    - name
+    - sequence
+  stock.move:
+    - id
+    - picking_id
+  stock.picking:
+    - id
+    - name
+    - date_done
+calculated_fields: { }

@@ -1,0 +1,109 @@
+# Version 1.0.0
+name:
+  ger: Interessenten
+  eng: Lead
+report_name: eq_fr_core_crm_lead
+report_model: crm.lead
+attachment: ('Interessent_' + (object.name or '') +'.pdf')
+print_report_name: ('Interessent_' + (object.name or ''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: false
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+  - eq_crm
+report_fields:
+  crm.lead:
+    - id
+    - title
+    - firstname
+    - lastname
+    - birthdate
+    - email_from
+    - function
+    - phone
+    - website
+    - mobile
+    - priority
+    - partner_id
+    - description
+    - message_bounce
+    - date_open
+    - date_closed
+    - referred
+    - campaign_id
+    - active
+    - probability
+    - medium_id
+    - source_id
+    - team_id
+    - user_id
+    - tag_ids
+    - name
+  res.partner:
+    - id
+    - city
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - company_type
+    - customer_number
+    - eq_citypart
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - eq_name2
+    - eq_name3
+    - lang
+    - name
+    - parent_id
+    - street
+    - street2
+    - supplier_number
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+    - state_id
+  res.partner.title:
+    - id
+    - name
+  res.partner.bank:
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  res.users:
+    - id
+    - email
+    - eq_firstname
+    - eq_fax
+    - lang
+    - mobile
+    - name
+    - phone
+  utm.campaign:
+    - id
+    - name
+  utm.medium:
+    - id
+    - name
+  utm.source:
+    - id
+    - name
+  crm.team:
+    - id
+    - name
+calculated_fields: { }

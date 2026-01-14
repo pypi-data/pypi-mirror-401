@@ -1,0 +1,74 @@
+# Version 1.0.1
+# 8.05.2023
+name:
+  ger: Demo-Modell-res-company
+  eng: Demo-Model-res-company
+report_name: eq_fr_core_res_company
+report_model: res.company
+attachment: ('demo_res_company.pdf')
+print_report_name: ('demo_res_company')
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: false
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+report_fields:
+  res.partner:
+    - id
+    - company_type
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - name
+    - parent_id
+    - street
+    - zip
+    - city
+    - country_id
+    - child_ids
+    - phone
+    - email
+    - mobile
+    - title
+    - street2
+    - type
+    - eq_citypart
+    - eq_name2
+    - eq_name3
+  res.company:
+    - id
+    - name
+    - street
+    - street2
+    - city
+    - state_id
+    - zip
+    - country_id
+    - eq_ceo_title
+    - eq_ceo_01
+    - eq_ceo_02
+    - eq_ceo_03
+    - website
+    - phone
+    - email
+    - vat
+    - company_registry
+    - currency_id
+    - partner_id
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  res.partner.title:
+    - name
+    - id
+calculated_fields: { }

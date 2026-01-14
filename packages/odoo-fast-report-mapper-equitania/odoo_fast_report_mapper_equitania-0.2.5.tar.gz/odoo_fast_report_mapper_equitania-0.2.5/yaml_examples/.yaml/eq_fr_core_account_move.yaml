@@ -1,0 +1,190 @@
+# Version 2.1.0
+# 14.11.2024
+name:
+  ger: Rechnungen
+  eng: Invoices
+report_name: eq_fr_core_account_move
+report_model: account.move
+attachment: (object.move_type in ('out_refund')) and ('Gutschrift-' + (object.name or '').replace('/','')+'.pdf') or (object.move_type in ('in_refund')) and ('Lieferantengutschrift-' + (object.name or '').replace('/','')+'.pdf') or (object.move_type in ('in_invoice')) and ('Rechnung-' + (object.name or '').replace('/','')+'.pdf') or (object.move_type in ('out_invoice')) and ('Rechnung-' + (object.name or '').replace('/','')+'.pdf')
+print_report_name: (object.move_type in ('out_refund')) and ('Gutschrift-' + (object.name or '').replace('/','')) or (object.move_type in ('in_refund')) and ('Lieferantengutschrift-' + (object.name or '').replace('/','')) or (object.move_type in ('in_invoice')) and ('Rechnung-' + (object.name or '').replace('/','')) or (object.move_type in ('out_invoice')) and ('Rechnung-' + (object.name or '').replace('/',''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: true
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+  - eq_account
+  - eq_layout_category
+report_fields:
+  account.move:
+    - id
+    - invoice_date
+    - ref
+    - name
+    - state
+    - eq_head_text
+    - partner_id
+    - partner_shipping_id
+    - invoice_payment_term_id
+    - invoice_incoterm_id
+    - currency_id
+    - invoice_line_ids
+    - comment
+    - amount_total
+    - amount_tax
+    - amount_untaxed
+    - amount_residual
+    - user_id
+    - company_id
+    - invoice_origin
+    - amount_residual
+    - move_type
+    - eq_invoice_payments_widget
+    - line_ids
+    - payment_reference
+    - payment_state
+  account.move.line:
+    - id
+    - sequence
+    - product_id
+    - discount
+    - price_subtotal
+    - tax_ids
+    - name
+    - layout_category_id
+    - product_uom_id
+    - quantity
+    - price_unit
+    - price_total
+    - sale_line_ids
+    - display_type
+    - eq_pos
+    - credit
+    - debit
+    - tax_group_id
+  sale.order.line:
+    - id
+    - order_id
+  sale.order:
+    - id
+    - picking_ids
+  res.currency:
+    - id
+    - symbol
+    - name
+  res.partner:
+    - id
+    - city
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - company_type
+    - customer_number
+    - eq_citypart
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - eq_name2
+    - eq_name3
+    - lang
+    - name
+    - parent_id
+    - street
+    - street2
+    - supplier_number
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+    - state_id
+  res.partner.title:
+    - name
+    - id
+  res.company:
+    - id
+    - bank_ids
+    - city
+    - company_registry
+    - country_id
+    - email
+    - eq_ceo_01
+    - eq_ceo_02
+    - eq_ceo_03
+    - eq_ceo_title
+    - eq_fax
+    - name
+    - phone
+    - state_id
+    - street
+    - vat
+    - website
+    - zip
+  res.partner.bank:
+    - id
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.country:
+    - id
+    - name
+    - code
+  res.country.state:
+    - id
+    - name
+  res.users:
+    - id
+    - email
+    - eq_firstname
+    - eq_fax
+    - lang
+    - mobile
+    - name
+    - phone
+    - display_name
+  product.product:
+    - id
+    - default_code
+    - name
+    - qty_available
+    - lst_price
+  uom.uom:
+    - id
+    - name
+  account.incoterms:
+    - id
+    - name
+  account.payment.term:
+    - id
+    - note
+  account.tax:
+    - id
+    - description
+    - amount
+    - name
+    - tax_group_id
+  account.tax.group:
+    - id
+    - name
+  sale.layout_category:
+    - id
+    - name
+    - sequence
+  stock.move:
+    - id
+    - picking_id
+  stock.picking:
+    - id
+    - name
+    - date_done
+    - state
+calculated_fields:
+  payment_text:
+    eq_get_payment_terms:
+      - partner_id.lang
+      - currency_id

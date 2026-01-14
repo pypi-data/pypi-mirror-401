@@ -1,0 +1,167 @@
+# Version 2.1.0
+# 14.11.2024
+name:
+  ger: Packvorgänge
+  eng: Picking Operations
+report_name: eq_fr_core_stock_picking_packaging
+report_model: stock.picking
+attachment: ('Packliste-' + (object.name or '').replace('/','')+'.pdf')
+print_report_name: ('Packliste-' + (object.name or '').replace('/',''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: false
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+  - eq_stock
+  - eq_sale_stock
+  - product_expiry
+report_fields:
+  stock.picking:
+    - id
+    - name
+    - origin
+    - eq_footer_text
+    - eq_header_text
+    - date
+    - scheduled_date
+    - date_done
+    - carrier_id
+    - weight
+    - state
+    - move_ids
+    - partner_id
+    - sale_id
+    - company_id
+  stock.move:
+    - id
+    - sequence
+    - product_id
+    - product_uom
+    - picking_type_id
+    - location_id
+    - location_dest_id
+    - product_uom_qty
+    - move_line_ids
+    - name
+    - quantity
+    - description_picking
+    - eq_picking_product_default_code
+  stock.move.line:
+    - id
+    - quantity
+    - lot_id
+  stock.lot:
+    - id
+    - name
+    - use_date
+  stock.quant:
+    - id
+    - location_id
+  stock.picking.type:
+    - id
+    - use_existing_lots
+  stock.location:
+    - id
+    - location_id
+    - scrap_location
+    - usage
+    - posx
+    - posy
+    - posz
+    - barcode
+    - name
+    - display_name
+  res.partner:
+    - id
+    - city
+    - company_type
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - customer_number
+    - eq_citypart
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - eq_name2
+    - eq_name3
+    - lang
+    - name
+    - parent_id
+    - street
+    - street2
+    - supplier_number
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+    - state_id
+  res.partner.title:
+    - name
+    - id
+  res.company:
+    - id
+    - bank_ids
+    - city
+    - company_registry
+    - country_id
+    - email
+    - eq_ceo_01
+    - eq_ceo_02
+    - eq_ceo_03
+    - eq_ceo_title
+    - name
+    - phone
+    - state_id
+    - street
+    - vat
+    - website
+    - zip
+  res.partner.bank:
+    - id
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  delivery.carrier:
+    - id
+    - name
+  res.users:
+    - id
+    - email
+    - eq_firstname
+    - eq_fax
+    - lang
+    - mobile
+    - name
+    - phone
+  product.product:
+    - id
+    - default_code
+    - name
+    - qty_available
+    - tracking
+    - hs_code
+    - country_of_origin
+  product.attribute.value:
+    - id
+    - name
+  uom.uom:
+    - id
+    - name
+  sale.order:
+    - id
+    - partner_invoice_id
+calculated_fields: { }

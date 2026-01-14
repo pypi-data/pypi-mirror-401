@@ -1,0 +1,155 @@
+# Version 2.1.0
+# 14.11.2024
+name:
+  ger: Beschaffungsauftrag
+  eng: Purchase Order
+report_name: eq_fr_core_purchase_order
+report_model: purchase.order
+attachment: ('Beschaffungsauftrag-' + (object.name or '').replace('/','')+'.pdf')
+print_report_name: ('Beschaffungsauftrag-' + (object.name or '').replace('/',''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: true
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+  - eq_purchase
+report_fields:
+  purchase.order:
+    - id
+    - name
+    - origin
+    - state
+    - eq_head_text
+    - date_order
+    - order_line
+    - currency_id
+    - amount_untaxed
+    - amount_tax
+    - amount_total
+    - notes
+    - payment_term_id
+    - incoterm_id
+    - partner_id
+    - user_id
+    - company_id
+    - partner_ref
+    - date_planned
+    - picking_type_id
+    - dest_address_id
+  purchase.order.line:
+    - id
+    - sequence
+    - product_id
+    - product_uom
+    - name
+    - price_subtotal
+    - taxes_id
+    - product_qty
+    - price_unit
+  res.currency:
+    - id
+    - symbol
+  res.partner:
+    - id
+    - city
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - company_type
+    - customer_number
+    - eq_citypart
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - eq_name2
+    - eq_name3
+    - lang
+    - name
+    - parent_id
+    - street
+    - street2
+    - supplier_number
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+    - state_id
+  res.partner.title:
+    - name
+    - id
+  res.company:
+    - id
+    - bank_ids
+    - city
+    - company_registry
+    - country_id
+    - email
+    - eq_ceo_01
+    - eq_ceo_02
+    - eq_ceo_03
+    - eq_ceo_title
+    - eq_fax
+    - name
+    - phone
+    - state_id
+    - street
+    - vat
+    - website
+    - zip
+  res.partner.bank:
+    - id
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  res.users:
+    - id
+    - email
+    - eq_firstname
+    - eq_fax
+    - lang
+    - mobile
+    - name
+    - phone
+    - display_name
+  product.product:
+    - id
+    - default_code
+    - name
+    - qty_available
+    - lst_price
+  uom.uom:
+    - id
+    - name
+  account.tax:
+    - id
+    - description
+    - amount
+    - name
+    - tax_group_id
+  account.tax.group:
+    - id
+    - name
+  account.incoterms:
+    - id
+    - name
+  account.payment.term:
+    - id
+    - note
+  stock.picking.type:
+    - id
+    - code
+    - sequence_code
+calculated_fields: { }

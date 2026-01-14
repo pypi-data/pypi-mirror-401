@@ -1,0 +1,197 @@
+# Version 2.1.0
+# 14.11.2024
+name:
+  ger: Angebot / Auftrag
+  eng: Quotation / Order
+report_name: eq_fr_core_sale_order
+report_model: sale.order
+attachment: (object.state in ('draft','sent')) and ('Angebot-' + (object.name or '').replace('/','')+'.pdf')
+  or (object.state in ('sale','done')) and ('Auftrag-' + (object.name or '').replace('/','')+'.pdf')
+  or (object.state in ('cancel')) and ('Abgebrochen-' + (object.name or '').replace('/','')+'.pdf')
+print_report_name: (object.state in ('draft','sent')) and ('Angebot-' + (object.name
+  or '').replace('/','')) or (object.state in ('sale','done')) and ('Auftrag-' + (object.name
+  or '').replace('/','')) or (object.state in ('cancel')) and ('Abgebrochen-' + (object.name
+  or '').replace('/',''))
+report_type: fast_report
+eq_export_type: pdf
+eq_ignore_images: true
+eq_handling_html_fields: standard
+eq_print_button: false
+multi: false
+eq_multiprint: create_zip
+attachment_use: true
+dependencies:
+  - account
+  - eq_base
+  - eq_fr_core
+  - eq_res_partner
+  - eq_sale_stock
+  - eq_layout_category
+  - sale_management
+  - eq_sale
+report_fields:
+  sale.order:
+    - id
+    - amount_tax
+    - amount_total
+    - amount_untaxed
+    - carrier_id
+    - client_order_ref
+    - commitment_date
+    - company_id
+    - date_order
+    - eq_delivery_address
+    - eq_delivery_condition_id
+    - eq_head_text
+    - eq_incoterm_location
+    - eq_invoice_address
+    - incoterm
+    - name
+    - note
+    - order_line
+    - origin
+    - partner_id
+    - partner_invoice_id
+    - partner_shipping_id
+    - payment_term_id
+    - pricelist_id
+    - state
+    - user_id
+    - validity_date
+    - sale_order_option_ids
+    - eq_use_calendar_week
+    - eq_show_delivery_date
+  sale.order.line:
+    - id
+    - customer_lead
+    - discount
+    - eq_delivery_date
+    - tax_id
+    - layout_category_id
+    - product_id
+    - product_uom
+    - price_total
+    - sequence
+    - price_subtotal
+    - name
+    - price_unit
+    - product_uom_qty
+    - display_type
+    - eq_pos
+  sale.order.option:
+    - id
+    - product_id
+    - quantity
+    - uom_id
+    - price_unit
+    - name
+  res.partner:
+    - id
+    - city
+    - company_type
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - customer_number
+    - eq_citypart
+    - eq_firstname
+    - eq_foreign_ref
+    - eq_foreign_ref_purchase
+    - eq_name2
+    - eq_name3
+    - lang
+    - name
+    - parent_id
+    - street
+    - street2
+    - supplier_number
+    - title
+    - type
+    - vat
+    - zip
+    - country_id
+  delivery.carrier:
+    - id
+    - name
+  account.payment.term:
+    - id
+    - note
+    - name
+  product.pricelist:
+    - id
+    - currency_id
+  res.currency:
+    - id
+    - symbol
+  res.users:
+    - id
+    - email
+    - eq_firstname
+    - eq_fax
+    - lang
+    - mobile
+    - name
+    - phone
+    - display_name
+  account.incoterms:
+    - id
+    - name
+  eq.delivery.conditions:
+    - id
+    - eq_name
+  res.company:
+    - id
+    - bank_ids
+    - city
+    - company_registry
+    - country_id
+    - email
+    - eq_ceo_01
+    - eq_ceo_02
+    - eq_ceo_03
+    - eq_ceo_title
+    - eq_fax
+    - name
+    - phone
+    - state_id
+    - street
+    - vat
+    - website
+    - zip
+  res.partner.bank:
+    - id
+    - acc_number
+    - bank_bic
+    - bank_name
+  res.partner.title:
+    - name
+    - id
+  res.country:
+    - id
+    - name
+  res.country.state:
+    - id
+    - name
+  sale.layout_category:
+    - id
+    - name
+    - sequence
+  product.product:
+    - id
+    - default_code
+    - lst_price
+    - name
+    - qty_available
+    - hs_code
+  uom.uom:
+    - name
+    - id
+  account.tax:
+    - id
+    - description
+    - amount
+    - name
+    - tax_group_id
+  account.tax.group:
+    - id
+    - name
+calculated_fields: { }
