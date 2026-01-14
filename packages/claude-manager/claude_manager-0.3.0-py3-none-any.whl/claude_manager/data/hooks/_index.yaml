@@ -1,0 +1,63 @@
+version: "1.0.0"
+
+# Hooks globaux - configuration à ajouter dans ~/.claude/settings.json
+# Les hooks sont en Python pour la compatibilité cross-platform (Windows/Linux/macOS)
+global:
+  - name: add-date
+    file: global/add-date.py
+    version: "1.0.0"
+    description: "Ajoute la date actuelle au contexte de chaque prompt"
+    event: UserPromptSubmit
+    matcher: null
+
+  - name: security-check
+    file: global/security-check.py
+    version: "1.0.0"
+    description: "Bloque l'écriture de secrets (GitHub tokens, etc.)"
+    event: PreToolUse
+    matcher: "Edit|Write"
+
+  - name: auto-format
+    file: global/auto-format.py
+    version: "1.0.0"
+    description: "Formate automatiquement les fichiers frontend avec Prettier"
+    event: PostToolUse
+    matcher: "Edit|Write"
+
+  - name: tdd-reminder
+    file: global/tdd-reminder.py
+    version: "1.0.0"
+    description: "Rappel TDD après modification de fichiers non-test"
+    event: PostToolUse
+    matcher: "Edit|Write"
+
+# Hooks optionnels - disponibles mais non installés par défaut
+optional:
+  - name: log-event
+    file: global/log-event.py
+    version: "1.0.0"
+    description: "Log les événements Task, Bash, Edit, Write (debug)"
+    event: PreToolUse
+    matcher: "Task|Bash|Edit|Write"
+    tags: [debug, logging]
+
+# Configuration settings.json générée (sans hooks optionnels)
+# Note: Les chemins utilisent {hooks_dir} comme placeholder, remplacé à l'installation
+settings_template:
+  hooks:
+    UserPromptSubmit:
+      - hooks:
+          - type: command
+            command: "python {hooks_dir}/add-date.py"
+    PreToolUse:
+      - matcher: "Edit|Write"
+        hooks:
+          - type: command
+            command: "python {hooks_dir}/security-check.py"
+    PostToolUse:
+      - matcher: "Edit|Write"
+        hooks:
+          - type: command
+            command: "python {hooks_dir}/auto-format.py"
+          - type: command
+            command: "python {hooks_dir}/tdd-reminder.py"
