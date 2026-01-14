@@ -1,0 +1,80 @@
+---
+title: Development
+jupyter: python3
+---
+
+Thank you for your interest in the development of `pxwebpy`!  
+This page explains how you can contribute. All improvements to code, documentation, and tests are welcome.
+
+## Setting up `uv` and the virtual environment
+
+This project is set up to use [`uv`](https://docs.astral.sh/uv/) to manage Python and
+dependencies. First, be sure you
+[have `uv` installed](https://docs.astral.sh/uv/getting-started/installation/).
+
+```bash
+# Install dependencies and set up the virtual environment
+uv sync
+```
+
+For more details on how to use `uv`, head over to the [`uv` docs](https://docs.astral.sh/uv/).
+
+## Formatting
+
+### Code
+`ruff` is used for linting and formatting, automatically executed in a `pre-commit` hook.  
+
+```bash
+# Install the pre-commit hooks
+uv run pre-commit install
+```
+  
+To run `ruff` manually from the command line or editor, see the [`ruff` documentation](https://docs.astral.sh/ruff/).
+
+### Docstrings
+Follow the [`NumPy`](https://numpydoc.readthedocs.io/en/latest/format.html#overview) style guide when writing docstrings. This is important for being able to [build the documentation](#building-the-documentation).
+
+## Running tests
+For fast iteration on specific tests, use `uv run pytest`:
+
+```bash
+uv run pytest -s tests/test_client.py # one test file
+uv run pytest -s tests/test_client.py::test_call_raises_http_error # one specific test
+```
+
+To run the complete test suite across all supported Python versions, use `nox`:
+```bash
+uv run nox # for the entire suite
+uv run nox -s tests # same thing, just being explicit about the session
+```
+
+To check test coverage:
+```bash
+uv run pytest --cov=pxweb # for terminal output
+uv run pytest --cov=pxweb --cov-report=html # to get a report 
+```
+
+Some tests utilize [`syrupy`](https://github.com/syrupy-project/syrupy) for snapshot testing to ensure consistency. If snapshots need to be updated:
+```bash
+uv run pytest --snapshot-update
+```
+
+## Building the documentation
+Documentation is built using [`quartodoc`](https://github.com/machow/quartodoc), thus you also need [`quarto`](https://quarto.org/docs/get-started/) installed on your machine if you wish to build the documentation locally. This is usually a good idea to check that the output looks as expected. The documentation is automatically built and published upon each release.
+
+With `quarto` installed the documentation can be rendered:
+
+```bash
+cd docs
+uv run quartodoc build
+uv run quarto render
+```
+
+The rendered output is found in the folder called `_site`.
+
+## Submitting changes
+When you’re ready to contribute:  
+
+1. Clone the repository and create a new branch for your changes.  
+2. Ensure tests pass and code is properly formatted.
+3. Open a pull request to the `main` branch.  
