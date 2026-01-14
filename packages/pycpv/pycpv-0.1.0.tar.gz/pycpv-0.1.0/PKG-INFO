@@ -1,0 +1,62 @@
+Metadata-Version: 2.4
+Name: pycpv
+Version: 0.1.0
+Summary: Checkpoint Versioning - Model and Data versioning for Automated Machine Learning, Training and Finetuning using Git, DVC, and AWS S3
+Project-URL: Homepage, https://github.com/yourusername/cpv
+Project-URL: Documentation, https://github.com/yourusername/cpv#readme
+Project-URL: Repository, https://github.com/yourusername/cpv.git
+Project-URL: Issues, https://github.com/yourusername/cpv/issues
+Project-URL: Changelog, https://github.com/yourusername/cpv/blob/main/CHANGELOG.md
+Author-email: An Nguyen <an.nguyen@cs.ox.ac.uk>
+License: MIT
+License-File: LICENSE
+Keywords: ai,aws,checkpoints,dvc,git,ml,s3,versioning
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Version Control
+Requires-Python: >=3.8
+Requires-Dist: boto3>=1.26.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: dvc-s3>=3.2.2
+Requires-Dist: dvc>=3.66.1
+Requires-Dist: gitpython>=3.1.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: tqdm>=4.60.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: flake8>=6.0.0; extra == 'dev'
+Requires-Dist: isort>=5.12.0; extra == 'dev'
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0.0; extra == 'dev'
+Requires-Dist: pytest-mock>=3.10.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Model Training Guide
+
+## Setup
+1. Install dependencies: `pip install -r requirements.txt`
+2. Configure AWS and Bitbucket: `cpv aws-config && cpv bitbucket-config`
+
+## Training
+1. Prepare training data in `data/` directory
+2. Update metrics logging in `train.py`
+3. Run: `python train.py`
+
+## Versioning
+1. Upload checkpoint: `cpv model upload --message "Training v1"`
+2. List checkpoints: `cpv model list-tags`
+3. Revert to version: `cpv model revert --tag v1.0`
+
+## Metrics
+- Training metrics logged in `metrics.log`
+- Model weights stored in `model.bin`

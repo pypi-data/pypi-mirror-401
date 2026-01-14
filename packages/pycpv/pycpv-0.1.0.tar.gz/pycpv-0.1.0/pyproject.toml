@@ -1,0 +1,78 @@
+[project]
+name = "pycpv"
+version = "0.1.0"
+description = "Checkpoint Versioning - Model and Data versioning for Automated Machine Learning, Training and Finetuning using Git, DVC, and AWS S3"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "An Nguyen", email = "an.nguyen@cs.ox.ac.uk"}
+]
+keywords = ["versioning", "checkpoints", "dvc", "aws", "s3", "git", "ml", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Version Control",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "GitPython>=3.1.0",
+    "boto3>=1.26.0",
+    "dvc>=3.66.1",
+    "dvc-s3>=3.2.2",
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "PyYAML>=6.0.0",
+    "tqdm>=4.60.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "isort>=5.12.0",
+]
+
+[project.scripts]
+cpv = "cp_manage.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/cpv"
+Documentation = "https://github.com/yourusername/cpv#readme"
+Repository = "https://github.com/yourusername/cpv.git"
+Issues = "https://github.com/yourusername/cpv/issues"
+Changelog = "https://github.com/yourusername/cpv/blob/main/CHANGELOG.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.hatch.build.targets.wheel]
+packages = ["cp_manage"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
