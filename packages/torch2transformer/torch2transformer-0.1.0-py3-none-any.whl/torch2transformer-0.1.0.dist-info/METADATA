@@ -1,0 +1,43 @@
+Metadata-Version: 2.4
+Name: torch2transformer
+Version: 0.1.0
+Summary: Wrap plain PyTorch models for the Hugging Face Transformers ecosystem
+Author: Louis MAI
+Project-URL: Homepage, https://github.com/longmaisg/torch2transformer
+Project-URL: Repository, https://github.com/longmaisg/torch2transformer
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch
+Requires-Dist: transformers>=4.30
+Dynamic: license-file
+
+# torch2transformer
+
+**torch2transformer** lets you wrap plain PyTorch models so they work
+seamlessly with the Hugging Face Transformers ecosystem. Important note: The original PyTorch model class must be available at run time and load time.
+
+## Features
+- Use `Trainer` with any PyTorch model
+- Save / load via `save_pretrained`
+- Minimal adapter interface
+- No custom training loops
+
+## Example
+
+```python
+from torch2transformer import TorchAdapter, wrap_model, load_model
+
+# wrap Pytorch model as a Transformer model
+model = wrap_model(
+    torch_model_cls=TinyCharModel,
+    torch_model_kwargs={"vocab_size": 100, "hidden_size": 32},
+    task_type="causal_lm"
+)
+# then can be used with Trainer()
+
+# save model
+model.save_pretrained("./tiny_ckpt")
+
+# load model
+model = load_model("./tiny_ckpt", torch_model_cls=TinyCharModel)
