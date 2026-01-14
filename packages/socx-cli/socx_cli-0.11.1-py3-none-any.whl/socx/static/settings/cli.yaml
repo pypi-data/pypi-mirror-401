@@ -1,0 +1,53 @@
+cli:
+  params:
+    cwd: "@jinja {{'.' | realpath}}"
+    color: true
+    debug: false
+    configure: true
+    verbosity: WARNING
+    config_files: []
+
+  command:
+    options_metavar: "[options]"
+    context_settings:
+      help_option_names:
+        - -h
+        - --help
+      allow_interspersed_args: true
+
+  group:
+    options_metavar: "[options]"
+    subcommand_metavar: "<subcommand> [args]..."
+    context_settings:
+      auto_envvar_prefix: "SOCX_"
+      help_option_names:
+        - -h
+        - --help
+      allow_extra_args: true
+      ignore_unknown_options: true
+      allow_interspersed_args: false
+
+  command_panels:
+    - name: Commands
+      commands:
+        - git
+        - init
+        - plugin
+        - config
+        - version
+        - regression
+    - name: Plugins
+
+  option_panels:
+    - name: General Options
+      options:
+        - --help
+        - --debug
+        - --verbosity
+        - --color
+
+    - name: Project Options
+      options:
+        - --cwd
+        - --config-file
+        - --configure
