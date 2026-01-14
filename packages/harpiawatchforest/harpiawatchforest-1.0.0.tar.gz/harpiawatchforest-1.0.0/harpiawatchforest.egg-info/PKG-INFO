@@ -1,0 +1,273 @@
+Metadata-Version: 2.1
+Name: harpiawatchforest
+Version: 1.0.0
+Summary: Sistema de detección de pérdida de cobertura vegetal mediante Google Earth Engine
+Home-page: 
+Author: Elvis Garcia, Yubrany Gonzalez
+Author-email: 
+Maintainer: Ministerio de Ambiente de Panamá
+License: MIT
+Project-URL: Homepage, https://github.com/elvisgarcia/HarpiaWatchForest
+Project-URL: Repository, https://github.com/elvisgarcia/HarpiaWatchForest
+Project-URL: Issues, https://github.com/elvisgarcia/HarpiaWatchForest/issues
+Keywords: google-earth-engine,remote-sensing,deforestation,forest-monitoring,vegetation-loss
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: GIS
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+
+# HarpiaWatchForest 🦅🌳
+
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Sistema de detección automática de pérdida de cobertura vegetal mediante análisis de imágenes satelitales Sentinel-2 y Google Earth Engine.
+
+**Desarrollado por:** Elvis Garcia y Yubrany Gonzalez  
+**Organización:** Ministerio de Ambiente de Panamá
+
+## 📋 Descripción
+
+HarpiaWatchForest es un sistema avanzado de monitoreo forestal que utiliza análisis de series temporales de NDVI (Índice de Vegetación de Diferencia Normalizada) y el algoritmo CCDC (Continuous Change Detection and Classification) para identificar cambios en la cobertura vegetal a nivel de corregimientos en Panamá.
+
+### Características principales
+
+- ✅ Detección automática de pérdidas de cobertura vegetal
+- ✅ Análisis temporal basado en NDVI semanal
+- ✅ Integración con Google Earth Engine
+- ✅ Filtrado automático de nubes mediante Cloud Score+
+- ✅ Enriquecimiento con capas de capacidad agrológica y áreas protegidas (SINAP)
+- ✅ Exportación automática a Google Drive en formato Shapefile
+- ✅ Procesamiento por hexágonos para optimización
+- ✅ Configuración flexible de parámetros
+
+## 🚀 Instalación
+
+```bash
+pip install HarpiaWatchForest
+```
+
+## 📦 Requisitos
+
+- Python 3.7+
+- Cuenta de Google Earth Engine (https://earthengine.google.com/)
+- Credenciales autenticadas de GEE
+
+## 🔧 Configuración inicial
+
+### 1. Autenticación en Google Earth Engine
+
+```python
+import ee
+ee.Authenticate()  # Solo la primera vez
+```
+
+### 2. Uso básico
+
+```python
+from harpiawatch import HarpiaAnalyzer, HarpiaConfig
+
+# Crear configuración
+config = HarpiaConfig()
+
+# Configurar parámetros
+config.set_corregimientos(['Buena Vista', 'Chepigana'])
+config.set_periodo(year=2026, month=1)
+config.set_parametros_deteccion(min_area_ha=0.15, threshold_ndvi=-0.15)
+
+# Inicializar analizador
+analyzer = HarpiaAnalyzer(config)
+analyzer.initialize(authenticate=False)  # True solo la primera vez
+
+# Procesar
+resultados = analyzer.procesar()
+```
+
+### 3. Uso avanzado - Configuración de assets personalizados
+
+```python
+from harpiawatch import HarpiaConfig
+
+config = HarpiaConfig()
+
+# Cambiar proyecto de Earth Engine
+config.set_ee_project('mi-proyecto-gee')
+
+# Configurar assets personalizados
+config.set_assets(
+    distrito="projects/mi-proyecto/assets/distritos",
+    corregimientos="projects/mi-proyecto/assets/corregimientos",
+    sinap="projects/mi-proyecto/assets/areas_protegidas",
+    hexagonos="projects/mi-proyecto/assets/grilla_hexagonal",
+    capacidad_agrologica="projects/mi-proyecto/assets/capacidad_suelos"
+)
+```
+
+## 📖 Ejemplos de uso
+
+### Ejemplo 1: Análisis de un solo corregimiento
+
+```python
+from harpiawatch import HarpiaAnalyzer, HarpiaConfig
+
+config = HarpiaConfig()
+config.lista_corregimientos = ['Buena Vista']
+config.year_analisis = 2026
+config.month_analisis = 1
+
+analyzer = HarpiaAnalyzer(config)
+analyzer.initialize()
+analyzer.procesar()
+```
+
+### Ejemplo 2: Listar corregimientos disponibles
+
+```python
+from harpiawatch import HarpiaAnalyzer
+
+analyzer = HarpiaAnalyzer()
+analyzer.initialize()
+corregimientos = analyzer.listar_corregimientos()
+```
+
+### Ejemplo 3: Obtener hexágonos de un corregimiento
+
+```python
+analyzer = HarpiaAnalyzer()
+analyzer.initialize()
+hexagonos = analyzer.obtener_hexagonos('Chepigana')
+print(f"Total de hexágonos: {len(hexagonos)}")
+```
+
+### Ejemplo 4: Configuración completa personalizada
+
+```python
+from harpiawatch import HarpiaConfig, HarpiaAnalyzer
+
+# Crear configuración personalizada
+config = HarpiaConfig()
+
+# Corregimientos a analizar
+config.set_corregimientos([
+    'Buena Vista',
+    'Chepigana',
+    'Las Palmas'
+])
+
+# Período de análisis
+config.set_periodo(year=2025, month=12)
+
+# Parámetros de detección
+config.set_parametros_deteccion(
+    min_area_ha=0.20,        # Área mínima de 0.2 hectáreas
+    threshold_ndvi=-0.18     # Umbral más estricto
+)
+
+# Rango de fechas para datos Sentinel-2
+config.set_rango_fechas(
+    date_start='2024-01-01',
+    date_end='2025-12-31'
+)
+
+# Ejecutar análisis
+analyzer = HarpiaAnalyzer(config)
+analyzer.initialize()
+resultados = analyzer.procesar()
+
+# Ver resumen
+for r in resultados:
+    print(f"{r['corregimiento']}: {r['estado']}")
+```
+
+## 📊 Parámetros configurables
+
+### Parámetros de análisis
+
+| Parámetro | Descripción | Valor por defecto |
+|-----------|-------------|-------------------|
+| `lista_corregimientos` | Lista de corregimientos a procesar | `['Buena Vista', 'Chepigana']` |
+| `year_analisis` | Año del análisis | `2026` |
+| `month_analisis` | Mes del análisis (1-12) | `1` |
+| `min_area_ha` | Área mínima de polígonos (ha) | `0.15` |
+| `threshold_ndvi_low` | Umbral de pérdida de NDVI | `-0.15` |
+| `date_start` | Fecha inicio datos Sentinel-2 | `'2023-01-01'` |
+| `date_end` | Fecha fin datos Sentinel-2 | `'2029-12-31'` |
+
+### Assets de capas base
+
+| Asset | Descripción | Ruta por defecto |
+|-------|-------------|------------------|
+| `asset_distrito` | Límites de distritos | `projects/proyecto-cobertura-boscosa/assets/Mapas_Panama/Lim_Distrito` |
+| `asset_corregimientos` | Límites de corregimientos | `projects/proyecto-cobertura-boscosa/assets/Mapas_Panama/Lim_Corregimiento` |
+| `asset_sinap` | Sistema Nacional de Áreas Protegidas | `projects/proyecto-cobertura-boscosa/assets/Mapas_Panama/SINAP` |
+| `asset_hexagonos` | Grilla hexagonal | `projects/proyecto-cobertura-boscosa/assets/Mapas_Panama/hexagonos_2025` |
+| `asset_capacidad_agrologica` | Capacidad agrológica del suelo | `projects/proyecto-cobertura-boscosa/assets/Mapas_Panama/Capacidad_Agrologica` |
+
+## 📁 Estructura de salida
+
+Los resultados se exportan automáticamente a Google Drive con la siguiente estructura:
+
+```
+Google Drive/
+└── SHP-PERDIDAS-CORREGIMIENTO-{NOMBRE}-{MES}-{AÑO}/
+    ├── Perdidas_NDVI_GRID_ID_1_0_15ha_January2026_W1-W5.shp
+    ├── Perdidas_NDVI_GRID_ID_2_0_15ha_January2026_W1-W5.shp
+    └── ...
+```
+
+Cada shapefile contiene:
+- Geometría de los polígonos detectados
+- Fecha de detección
+- Semana y año
+- ID de hexágono
+- Nombre del corregimiento
+- Capacidad agrológica
+- Información de áreas protegidas (SINAP)
+- Área en hectáreas
+
+## 🔬 Metodología
+
+1. **Filtrado de nubes:** Cloud Score+ de Google Earth Engine
+2. **Cálculo de NDVI:** Índice normalizado semanal usando bandas B8 y B4
+3. **Detección de cambios:** Análisis temporal mediante CCDC
+4. **Umbralización:** Identificación de pérdidas significativas
+5. **Vectorización:** Conversión a polígonos
+6. **Enriquecimiento:** Adición de atributos contextuales
+7. **Exportación:** Generación de shapefiles por hexágono
+
+## 🤝 Contribuciones
+
+Este proyecto fue desarrollado por el Ministerio de Ambiente de Panamá para el monitoreo y conservación de los recursos forestales del país.
+
+## 📄 Licencia
+
+MIT License - Ver archivo LICENSE para más detalles
+
+## 👥 Autores
+
+- **Elvis Garcia** - Desarrollo y diseño del algoritmo
+- **Yubrany Gonzalez** - Desarrollo y diseño del algoritmo
+
+**Organización:** Ministerio de Ambiente de Panamá
+
+## 📧 Contacto
+
+Para preguntas, sugerencias o reportes de problemas, por favor contactar a:
+- eggarcia@miambiente.gob.pa
+- ydgonzalez@miambiente.gob.pa
+
+## 🙏 Agradecimientos
+
+- Google Earth Engine 
+- Programa Copernicus
+- Ministerio de Ambiente de Panamá
+
+---
+
+**Versión:** 1.0.0  
+**Fecha:** Enero 2026  
+**Ministerio de Ambiente de Panamá** 🇵🇦
