@@ -1,0 +1,1892 @@
+from typing import TypedDict, Literal, NotRequired, Any, Coroutine, Union, overload, Generator, final
+from hfortix_fortios.models import FortiObject
+from hfortix_core.types import MutationResponse, RawAPIResponse
+
+# Payload TypedDict for IDE autocomplete (for POST/PUT - fields are optional via total=False)
+# NOTE: We intentionally DON'T use NotRequired wrapper because:
+# 1. total=False already makes all fields optional
+# 2. NotRequired[Literal[...]] prevents Pylance from validating Literal values in dict literals
+class UserPayload(TypedDict, total=False):
+    """
+    Type hints for system/snmp/user payload fields.
+    
+    SNMP user configuration.
+    
+    **Related Resources:**
+
+    Dependencies (resources this endpoint references):
+        - :class:`~.system.interface.InterfaceEndpoint` (via: interface)
+        - :class:`~.system.snmp.mib-view.MibViewEndpoint` (via: mib-view)
+
+    **Usage:**
+        payload: UserPayload = {
+            "field": "value",  # <- autocomplete shows all fields
+        }
+    """
+    name: str  # SNMP user name. | MaxLen: 32
+    status: Literal["enable", "disable"]  # Enable/disable this SNMP user. | Default: enable
+    trap_status: Literal["enable", "disable"]  # Enable/disable traps for this SNMP user. | Default: enable
+    trap_lport: int  # SNMPv3 local trap port (default = 162). | Default: 162 | Min: 1 | Max: 65535
+    trap_rport: int  # SNMPv3 trap remote port (default = 162). | Default: 162 | Min: 1 | Max: 65535
+    queries: Literal["enable", "disable"]  # Enable/disable SNMP queries for this user. | Default: enable
+    query_port: int  # SNMPv3 query port (default = 161). | Default: 161 | Min: 1 | Max: 65535
+    notify_hosts: list[dict[str, Any]]  # SNMP managers to send notifications (traps) to.
+    notify_hosts6: list[dict[str, Any]]  # IPv6 SNMP managers to send notifications (traps) t
+    source_ip: str  # Source IP for SNMP trap. | Default: 0.0.0.0
+    source_ipv6: str  # Source IPv6 for SNMP trap. | Default: ::
+    ha_direct: Literal["enable", "disable"]  # Enable/disable direct management of HA cluster mem | Default: disable
+    events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"]  # SNMP notifications (traps) to send. | Default: cpu-high mem-low log-full intf-ip vpn-tun-up vpn-tun-down ha-switch ha-hb-failure ips-signature ips-anomaly av-virus av-oversize av-pattern av-fragmented fm-if-change bgp-established bgp-backward-transition ha-member-up ha-member-down ent-conf-change av-conserve av-bypass av-oversize-passed av-oversize-blocked ips-pkg-update ips-fail-open faz-disconnect faz wc-ap-up wc-ap-down fswctl-session-up fswctl-session-down load-balance-real-server-down per-cpu-high dhcp pool-usage ippool interface ospf-nbr-state-change ospf-virtnbr-state-change bfd
+    mib_view: str  # SNMP access control MIB view. | MaxLen: 32
+    vdoms: list[dict[str, Any]]  # SNMP access control VDOMs.
+    security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"]  # Security level for message authentication and encr | Default: no-auth-no-priv
+    auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"]  # Authentication protocol. | Default: sha
+    auth_pwd: str  # Password for authentication protocol. | MaxLen: 128
+    priv_proto: Literal["aes", "des", "aes256", "aes256cisco"]  # Privacy (encryption) protocol. | Default: aes
+    priv_pwd: str  # Password for privacy (encryption) protocol. | MaxLen: 128
+    interface_select_method: Literal["auto", "sdwan", "specify"]  # Specify how to select outgoing interface to reach | Default: auto
+    interface: str  # Specify outgoing interface to reach server. | MaxLen: 15
+    vrf_select: int  # VRF ID used for connection to server. | Default: 0 | Min: 0 | Max: 511
+
+# Nested TypedDicts for table field children (dict mode)
+
+class UserVdomsItem(TypedDict):
+    """Type hints for vdoms table item fields (dict mode).
+    
+    Provides IDE autocomplete for nested table field items.
+    All fields are present in API responses.
+    """
+    
+    name: str  # VDOM name. | MaxLen: 79
+
+
+# Nested classes for table field children (object mode)
+
+@final
+class UserVdomsObject:
+    """Typed object for vdoms table items.
+    
+    Provides IDE autocomplete for nested table field attributes.
+    At runtime, this is a FortiObject instance.
+    """
+    
+    # VDOM name. | MaxLen: 79
+    name: str
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> dict[str, Any]: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+
+# Response TypedDict for GET returns (all fields present in API response)
+class UserResponse(TypedDict):
+    """
+    Type hints for system/snmp/user API response fields.
+    
+    All fields are present in the response from the FortiGate API.
+    """
+    name: str  # SNMP user name. | MaxLen: 32
+    status: Literal["enable", "disable"]  # Enable/disable this SNMP user. | Default: enable
+    trap_status: Literal["enable", "disable"]  # Enable/disable traps for this SNMP user. | Default: enable
+    trap_lport: int  # SNMPv3 local trap port (default = 162). | Default: 162 | Min: 1 | Max: 65535
+    trap_rport: int  # SNMPv3 trap remote port (default = 162). | Default: 162 | Min: 1 | Max: 65535
+    queries: Literal["enable", "disable"]  # Enable/disable SNMP queries for this user. | Default: enable
+    query_port: int  # SNMPv3 query port (default = 161). | Default: 161 | Min: 1 | Max: 65535
+    notify_hosts: list[dict[str, Any]]  # SNMP managers to send notifications (traps) to.
+    notify_hosts6: list[dict[str, Any]]  # IPv6 SNMP managers to send notifications (traps) t
+    source_ip: str  # Source IP for SNMP trap. | Default: 0.0.0.0
+    source_ipv6: str  # Source IPv6 for SNMP trap. | Default: ::
+    ha_direct: Literal["enable", "disable"]  # Enable/disable direct management of HA cluster mem | Default: disable
+    events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"]  # SNMP notifications (traps) to send. | Default: cpu-high mem-low log-full intf-ip vpn-tun-up vpn-tun-down ha-switch ha-hb-failure ips-signature ips-anomaly av-virus av-oversize av-pattern av-fragmented fm-if-change bgp-established bgp-backward-transition ha-member-up ha-member-down ent-conf-change av-conserve av-bypass av-oversize-passed av-oversize-blocked ips-pkg-update ips-fail-open faz-disconnect faz wc-ap-up wc-ap-down fswctl-session-up fswctl-session-down load-balance-real-server-down per-cpu-high dhcp pool-usage ippool interface ospf-nbr-state-change ospf-virtnbr-state-change bfd
+    mib_view: str  # SNMP access control MIB view. | MaxLen: 32
+    vdoms: list[UserVdomsItem]  # SNMP access control VDOMs.
+    security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"]  # Security level for message authentication and encr | Default: no-auth-no-priv
+    auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"]  # Authentication protocol. | Default: sha
+    auth_pwd: str  # Password for authentication protocol. | MaxLen: 128
+    priv_proto: Literal["aes", "des", "aes256", "aes256cisco"]  # Privacy (encryption) protocol. | Default: aes
+    priv_pwd: str  # Password for privacy (encryption) protocol. | MaxLen: 128
+    interface_select_method: Literal["auto", "sdwan", "specify"]  # Specify how to select outgoing interface to reach | Default: auto
+    interface: str  # Specify outgoing interface to reach server. | MaxLen: 15
+    vrf_select: int  # VRF ID used for connection to server. | Default: 0 | Min: 0 | Max: 511
+
+
+@final
+class UserObject:
+    """Typed FortiObject for system/snmp/user with IDE autocomplete support.
+    
+    This is a typed wrapper that provides IDE autocomplete for API response fields.
+    At runtime, this is actually a FortiObject instance.
+    """
+    
+    # SNMP user name. | MaxLen: 32
+    name: str
+    # Enable/disable this SNMP user. | Default: enable
+    status: Literal["enable", "disable"]
+    # Enable/disable traps for this SNMP user. | Default: enable
+    trap_status: Literal["enable", "disable"]
+    # SNMPv3 local trap port (default = 162). | Default: 162 | Min: 1 | Max: 65535
+    trap_lport: int
+    # SNMPv3 trap remote port (default = 162). | Default: 162 | Min: 1 | Max: 65535
+    trap_rport: int
+    # Enable/disable SNMP queries for this user. | Default: enable
+    queries: Literal["enable", "disable"]
+    # SNMPv3 query port (default = 161). | Default: 161 | Min: 1 | Max: 65535
+    query_port: int
+    # SNMP managers to send notifications (traps) to.
+    notify_hosts: list[dict[str, Any]]
+    # IPv6 SNMP managers to send notifications (traps) to.
+    notify_hosts6: list[dict[str, Any]]
+    # Source IP for SNMP trap. | Default: 0.0.0.0
+    source_ip: str
+    # Source IPv6 for SNMP trap. | Default: ::
+    source_ipv6: str
+    # Enable/disable direct management of HA cluster members. | Default: disable
+    ha_direct: Literal["enable", "disable"]
+    # SNMP notifications (traps) to send. | Default: cpu-high mem-low log-full intf-ip vpn-tun-up vpn-tun-down ha-switch ha-hb-failure ips-signature ips-anomaly av-virus av-oversize av-pattern av-fragmented fm-if-change bgp-established bgp-backward-transition ha-member-up ha-member-down ent-conf-change av-conserve av-bypass av-oversize-passed av-oversize-blocked ips-pkg-update ips-fail-open faz-disconnect faz wc-ap-up wc-ap-down fswctl-session-up fswctl-session-down load-balance-real-server-down per-cpu-high dhcp pool-usage ippool interface ospf-nbr-state-change ospf-virtnbr-state-change bfd
+    events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"]
+    # SNMP access control MIB view. | MaxLen: 32
+    mib_view: str
+    # SNMP access control VDOMs.
+    vdoms: list[UserVdomsObject]
+    # Security level for message authentication and encryption. | Default: no-auth-no-priv
+    security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"]
+    # Authentication protocol. | Default: sha
+    auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"]
+    # Password for authentication protocol. | MaxLen: 128
+    auth_pwd: str
+    # Privacy (encryption) protocol. | Default: aes
+    priv_proto: Literal["aes", "des", "aes256", "aes256cisco"]
+    # Password for privacy (encryption) protocol. | MaxLen: 128
+    priv_pwd: str
+    # Specify how to select outgoing interface to reach server. | Default: auto
+    interface_select_method: Literal["auto", "sdwan", "specify"]
+    # Specify outgoing interface to reach server. | MaxLen: 15
+    interface: str
+    # VRF ID used for connection to server. | Default: 0 | Min: 0 | Max: 511
+    vrf_select: int
+    
+    # Common API response fields
+    status: str
+    http_status: int | None
+    vdom: str | None
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> UserPayload: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+class User:
+    """
+    SNMP user configuration.
+    
+    Path: system/snmp/user
+    Category: cmdb
+    Primary Key: name
+    """
+    
+    # ================================================================
+    # DEFAULT MODE OVERLOADS (no response_mode) - MUST BE FIRST
+    # These match when response_mode is NOT passed (client default is "dict")
+    # Pylance matches overloads top-to-bottom, so these must come first!
+    # ================================================================
+    
+    # Default mode: mkey as positional arg -> returns typed dict
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> UserResponse: ...
+    
+    # Default mode: mkey as keyword arg -> returns typed dict
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> UserResponse: ...
+    
+    # Default mode: no mkey -> returns list of typed dicts
+    @overload
+    def get(
+        self,
+        name: None = None,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> list[UserResponse]: ...
+    
+    # ================================================================
+    # EXPLICIT response_mode="object" OVERLOADS
+    # ================================================================
+    
+    # Object mode: mkey as positional arg -> returns single object
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # Object mode: mkey as keyword arg -> returns single object
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # Object mode: no mkey -> returns list of objects
+    @overload
+    def get(
+        self,
+        *,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> list[UserObject]: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        response_mode: Literal["object"] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Dict mode with mkey provided as positional arg (single dict)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> UserResponse: ...
+    
+    # Dict mode with mkey provided as keyword arg (single dict)
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> UserResponse: ...
+    
+    # Dict mode - list of dicts (no mkey/name provided) - keyword-only signature
+    @overload
+    def get(
+        self,
+        *,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> list[UserResponse]: ...
+    
+    # Fallback overload for all other cases
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> Union[dict[str, Any], list[dict[str, Any]], FortiObject, list[FortiObject]]: ...
+    
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: str | None = ...,
+        **kwargs: Any,
+    ) -> UserObject | list[UserObject] | dict[str, Any] | list[dict[str, Any]]: ...
+    
+    def get_schema(
+        self,
+        vdom: str | None = ...,
+        format: str = ...,
+    ) -> dict[str, Any]: ...
+    
+    # POST overloads
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # PUT overloads
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # DELETE overloads
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def delete(
+        self,
+        name: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # Helper methods
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+# ================================================================
+# MODE-SPECIFIC CLASSES FOR CLIENT-LEVEL response_mode SUPPORT
+# ================================================================
+
+class UserDictMode:
+    """User endpoint for dict response mode (default for this client).
+    
+    By default returns UserResponse (TypedDict).
+    Can be overridden per-call with response_mode="object" to return UserObject.
+    """
+    
+    # raw_json=True returns RawAPIResponse regardless of response_mode
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Object mode override with mkey (single item)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # Object mode override without mkey (list)
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> list[UserObject]: ...
+    
+    # Dict mode with mkey (single item) - default
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> UserResponse: ...
+    
+    # Dict mode without mkey (list) - default
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> list[UserResponse]: ...
+
+    # raw_json=True returns RawAPIResponse for POST
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # POST - Object mode override
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # POST - Default overload (returns MutationResponse)
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # POST - Dict mode (default for DictMode class)
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # raw_json=True returns RawAPIResponse for PUT
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # PUT - Object mode override
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # PUT - Default overload (returns MutationResponse)
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # PUT - Dict mode (default for DictMode class)
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # raw_json=True returns RawAPIResponse for DELETE
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # DELETE - Object mode override
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # DELETE - Default overload (returns MutationResponse)
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # DELETE - Dict mode (default for DictMode class)
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # Helper methods (inherited from base class)
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+class UserObjectMode:
+    """User endpoint for object response mode (default for this client).
+    
+    By default returns UserObject (FortiObject).
+    Can be overridden per-call with response_mode="dict" to return UserResponse (TypedDict).
+    """
+    
+    # raw_json=True returns RawAPIResponse for GET
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Dict mode override with mkey (single item)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> UserResponse: ...
+    
+    # Dict mode override without mkey (list)
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> list[UserResponse]: ...
+    
+    # Object mode with mkey (single item) - default
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["object"] | None = ...,
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # Object mode without mkey (list) - default
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["object"] | None = ...,
+        **kwargs: Any,
+    ) -> list[UserObject]: ...
+
+    # raw_json=True returns RawAPIResponse for POST
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # POST - Dict mode override
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # POST - Object mode override (requires explicit response_mode="object")
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # POST - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # POST - Default for ObjectMode (returns MutationResponse like DictMode)
+    def post(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # PUT - Dict mode override
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns RawAPIResponse for PUT
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # PUT - Object mode override (requires explicit response_mode="object")
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # PUT - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # PUT - Default for ObjectMode (returns MutationResponse like DictMode)
+    def put(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # raw_json=True returns RawAPIResponse for DELETE
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # DELETE - Dict mode override
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # DELETE - Object mode override (requires explicit response_mode="object")
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # DELETE - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> UserObject: ...
+    
+    # DELETE - Default for ObjectMode (returns MutationResponse like DictMode)
+    def delete(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+    # Helper methods (inherited from base class)
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: UserPayload | None = ...,
+        name: str | None = ...,
+        status: Literal["enable", "disable"] | None = ...,
+        trap_status: Literal["enable", "disable"] | None = ...,
+        trap_lport: int | None = ...,
+        trap_rport: int | None = ...,
+        queries: Literal["enable", "disable"] | None = ...,
+        query_port: int | None = ...,
+        notify_hosts: str | list[str] | None = ...,
+        notify_hosts6: str | list[str] | None = ...,
+        source_ip: str | None = ...,
+        source_ipv6: str | None = ...,
+        ha_direct: Literal["enable", "disable"] | None = ...,
+        events: Literal["cpu-high", "mem-low", "log-full", "intf-ip", "vpn-tun-up", "vpn-tun-down", "ha-switch", "ha-hb-failure", "ips-signature", "ips-anomaly", "av-virus", "av-oversize", "av-pattern", "av-fragmented", "fm-if-change", "fm-conf-change", "bgp-established", "bgp-backward-transition", "ha-member-up", "ha-member-down", "ent-conf-change", "av-conserve", "av-bypass", "av-oversize-passed", "av-oversize-blocked", "ips-pkg-update", "ips-fail-open", "faz-disconnect", "faz", "wc-ap-up", "wc-ap-down", "fswctl-session-up", "fswctl-session-down", "load-balance-real-server-down", "device-new", "per-cpu-high", "dhcp", "pool-usage", "ippool", "interface", "ospf-nbr-state-change", "ospf-virtnbr-state-change", "bfd"] | list[str] | None = ...,
+        mib_view: str | None = ...,
+        vdoms: str | list[str] | list[dict[str, Any]] | None = ...,
+        security_level: Literal["no-auth-no-priv", "auth-no-priv", "auth-priv"] | None = ...,
+        auth_proto: Literal["md5", "sha", "sha224", "sha256", "sha384", "sha512"] | None = ...,
+        auth_pwd: str | None = ...,
+        priv_proto: Literal["aes", "des", "aes256", "aes256cisco"] | None = ...,
+        priv_pwd: str | None = ...,
+        interface_select_method: Literal["auto", "sdwan", "specify"] | None = ...,
+        interface: str | None = ...,
+        vrf_select: int | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+__all__ = [
+    "User",
+    "UserDictMode",
+    "UserObjectMode",
+    "UserPayload",
+    "UserObject",
+]

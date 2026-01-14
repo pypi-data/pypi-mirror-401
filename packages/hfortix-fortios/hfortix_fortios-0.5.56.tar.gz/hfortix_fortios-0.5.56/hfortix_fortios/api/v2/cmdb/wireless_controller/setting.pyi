@@ -1,0 +1,1161 @@
+from typing import TypedDict, Literal, NotRequired, Any, Coroutine, Union, overload, Generator, final
+from hfortix_fortios.models import FortiObject
+from hfortix_core.types import MutationResponse, RawAPIResponse
+
+# Payload TypedDict for IDE autocomplete (for POST/PUT - fields are optional via total=False)
+# NOTE: We intentionally DON'T use NotRequired wrapper because:
+# 1. total=False already makes all fields optional
+# 2. NotRequired[Literal[...]] prevents Pylance from validating Literal values in dict literals
+class SettingPayload(TypedDict, total=False):
+    """
+    Type hints for wireless_controller/setting payload fields.
+    
+    VDOM wireless controller configuration.
+    
+    **Usage:**
+        payload: SettingPayload = {
+            "field": "value",  # <- autocomplete shows all fields
+        }
+    """
+    account_id: str  # FortiCloud customer account ID. | MaxLen: 63
+    country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"]  # Country or region in which the FortiGate is locate | Default: US
+    duplicate_ssid: Literal["enable", "disable"]  # Enable/disable allowing Virtual Access Points | Default: disable
+    fapc_compatibility: Literal["enable", "disable"]  # Enable/disable FAP-C series compatibility. | Default: disable
+    wfa_compatibility: Literal["enable", "disable"]  # Enable/disable WFA compatibility. | Default: disable
+    phishing_ssid_detect: Literal["enable", "disable"]  # Enable/disable phishing SSID detection. | Default: enable
+    fake_ssid_action: Literal["log", "suppress"]  # Actions taken for detected fake SSID. | Default: log
+    offending_ssid: list[dict[str, Any]]  # Configure offending SSID.
+    device_weight: int  # Upper limit of confidence of device for identifica | Default: 1 | Min: 0 | Max: 255
+    device_holdoff: int  # Lower limit of creation time of device for identif | Default: 5 | Min: 0 | Max: 60
+    device_idle: int  # Upper limit of idle time of device for identificat | Default: 1440 | Min: 0 | Max: 14400
+    firmware_provision_on_authorization: Literal["enable", "disable"]  # Enable/disable automatic provisioning of latest fi | Default: disable
+    rolling_wtp_upgrade: Literal["enable", "disable"]  # Enable/disable rolling WTP upgrade | Default: disable
+    darrp_optimize: int  # Time for running Distributed Automatic Radio Resou | Default: 86400 | Min: 0 | Max: 86400
+    darrp_optimize_schedules: list[dict[str, Any]]  # Firewall schedules for DARRP running time. DARRP w
+
+# Nested TypedDicts for table field children (dict mode)
+
+class SettingOffendingssidItem(TypedDict):
+    """Type hints for offending-ssid table item fields (dict mode).
+    
+    Provides IDE autocomplete for nested table field items.
+    All fields are present in API responses.
+    """
+    
+    id: int  # ID. | Default: 0 | Min: 0 | Max: 65535
+    ssid_pattern: str  # Define offending SSID pattern (case insensitive). | MaxLen: 33
+    action: Literal["log", "suppress"]  # Actions taken for detected offending SSID. | Default: log
+
+
+class SettingDarrpoptimizeschedulesItem(TypedDict):
+    """Type hints for darrp-optimize-schedules table item fields (dict mode).
+    
+    Provides IDE autocomplete for nested table field items.
+    All fields are present in API responses.
+    """
+    
+    name: str  # Schedule name. | MaxLen: 35
+
+
+# Nested classes for table field children (object mode)
+
+@final
+class SettingOffendingssidObject:
+    """Typed object for offending-ssid table items.
+    
+    Provides IDE autocomplete for nested table field attributes.
+    At runtime, this is a FortiObject instance.
+    """
+    
+    # ID. | Default: 0 | Min: 0 | Max: 65535
+    id: int
+    # Define offending SSID pattern (case insensitive). For exampl | MaxLen: 33
+    ssid_pattern: str
+    # Actions taken for detected offending SSID. | Default: log
+    action: Literal["log", "suppress"]
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> dict[str, Any]: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+@final
+class SettingDarrpoptimizeschedulesObject:
+    """Typed object for darrp-optimize-schedules table items.
+    
+    Provides IDE autocomplete for nested table field attributes.
+    At runtime, this is a FortiObject instance.
+    """
+    
+    # Schedule name. | MaxLen: 35
+    name: str
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> dict[str, Any]: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+
+# Response TypedDict for GET returns (all fields present in API response)
+class SettingResponse(TypedDict):
+    """
+    Type hints for wireless_controller/setting API response fields.
+    
+    All fields are present in the response from the FortiGate API.
+    """
+    account_id: str  # FortiCloud customer account ID. | MaxLen: 63
+    country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"]  # Country or region in which the FortiGate is locate | Default: US
+    duplicate_ssid: Literal["enable", "disable"]  # Enable/disable allowing Virtual Access Points | Default: disable
+    fapc_compatibility: Literal["enable", "disable"]  # Enable/disable FAP-C series compatibility. | Default: disable
+    wfa_compatibility: Literal["enable", "disable"]  # Enable/disable WFA compatibility. | Default: disable
+    phishing_ssid_detect: Literal["enable", "disable"]  # Enable/disable phishing SSID detection. | Default: enable
+    fake_ssid_action: Literal["log", "suppress"]  # Actions taken for detected fake SSID. | Default: log
+    offending_ssid: list[SettingOffendingssidItem]  # Configure offending SSID.
+    device_weight: int  # Upper limit of confidence of device for identifica | Default: 1 | Min: 0 | Max: 255
+    device_holdoff: int  # Lower limit of creation time of device for identif | Default: 5 | Min: 0 | Max: 60
+    device_idle: int  # Upper limit of idle time of device for identificat | Default: 1440 | Min: 0 | Max: 14400
+    firmware_provision_on_authorization: Literal["enable", "disable"]  # Enable/disable automatic provisioning of latest fi | Default: disable
+    rolling_wtp_upgrade: Literal["enable", "disable"]  # Enable/disable rolling WTP upgrade | Default: disable
+    darrp_optimize: int  # Time for running Distributed Automatic Radio Resou | Default: 86400 | Min: 0 | Max: 86400
+    darrp_optimize_schedules: list[SettingDarrpoptimizeschedulesItem]  # Firewall schedules for DARRP running time. DARRP w
+
+
+@final
+class SettingObject:
+    """Typed FortiObject for wireless_controller/setting with IDE autocomplete support.
+    
+    This is a typed wrapper that provides IDE autocomplete for API response fields.
+    At runtime, this is actually a FortiObject instance.
+    """
+    
+    # FortiCloud customer account ID. | MaxLen: 63
+    account_id: str
+    # Country or region in which the FortiGate is located. The cou | Default: US
+    country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"]
+    # Enable/disable allowing Virtual Access Points (VAPs) to use | Default: disable
+    duplicate_ssid: Literal["enable", "disable"]
+    # Enable/disable FAP-C series compatibility. | Default: disable
+    fapc_compatibility: Literal["enable", "disable"]
+    # Enable/disable WFA compatibility. | Default: disable
+    wfa_compatibility: Literal["enable", "disable"]
+    # Enable/disable phishing SSID detection. | Default: enable
+    phishing_ssid_detect: Literal["enable", "disable"]
+    # Actions taken for detected fake SSID. | Default: log
+    fake_ssid_action: Literal["log", "suppress"]
+    # Configure offending SSID.
+    offending_ssid: list[SettingOffendingssidObject]
+    # Upper limit of confidence of device for identification | Default: 1 | Min: 0 | Max: 255
+    device_weight: int
+    # Lower limit of creation time of device for identification in | Default: 5 | Min: 0 | Max: 60
+    device_holdoff: int
+    # Upper limit of idle time of device for identification in min | Default: 1440 | Min: 0 | Max: 14400
+    device_idle: int
+    # Enable/disable automatic provisioning of latest firmware on | Default: disable
+    firmware_provision_on_authorization: Literal["enable", "disable"]
+    # Enable/disable rolling WTP upgrade (default = disable). | Default: disable
+    rolling_wtp_upgrade: Literal["enable", "disable"]
+    # Time for running Distributed Automatic Radio Resource Provis | Default: 86400 | Min: 0 | Max: 86400
+    darrp_optimize: int
+    # Firewall schedules for DARRP running time. DARRP will run pe
+    darrp_optimize_schedules: list[SettingDarrpoptimizeschedulesObject]
+    
+    # Common API response fields
+    status: str
+    http_status: int | None
+    vdom: str | None
+    
+    # Methods from FortiObject
+    def get_full(self, name: str) -> Any: ...
+    def to_dict(self) -> SettingPayload: ...
+    def keys(self) -> Any: ...
+    def values(self) -> Generator[Any, None, None]: ...
+    def items(self) -> Generator[tuple[str, Any], None, None]: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def __getitem__(self, key: str) -> Any: ...
+
+
+class Setting:
+    """
+    VDOM wireless controller configuration.
+    
+    Path: wireless_controller/setting
+    Category: cmdb
+    """
+    
+    # ================================================================
+    # DEFAULT MODE OVERLOADS (no response_mode) - MUST BE FIRST
+    # These match when response_mode is NOT passed (client default is "dict")
+    # Pylance matches overloads top-to-bottom, so these must come first!
+    # ================================================================
+    
+    # Default mode: mkey as positional arg -> returns typed dict
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> SettingResponse: ...
+    
+    # Default mode: mkey as keyword arg -> returns typed dict
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> SettingResponse: ...
+    
+    # Default mode: no mkey -> returns list of typed dicts
+    @overload
+    def get(
+        self,
+        name: None = None,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+    ) -> SettingResponse: ...
+    
+    # ================================================================
+    # EXPLICIT response_mode="object" OVERLOADS
+    # ================================================================
+    
+    # Object mode: mkey as positional arg -> returns single object
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # Object mode: mkey as keyword arg -> returns single object
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # Object mode: no mkey -> returns list of objects
+    @overload
+    def get(
+        self,
+        *,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        response_mode: Literal["object"] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Dict mode with mkey provided as positional arg (single dict)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+    
+    # Dict mode with mkey provided as keyword arg (single dict)
+    @overload
+    def get(
+        self,
+        *,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+    
+    # Dict mode - list of dicts (no mkey/name provided) - keyword-only signature
+    @overload
+    def get(
+        self,
+        *,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] = ...,
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+    
+    # Fallback overload for all other cases
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> dict[str, Any] | FortiObject: ...
+    
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: str | None = ...,
+        **kwargs: Any,
+    ) -> SettingObject | dict[str, Any]: ...
+    
+    def get_schema(
+        self,
+        vdom: str | None = ...,
+        format: str = ...,
+    ) -> dict[str, Any]: ...
+    
+    # PUT overloads
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[False] = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns the full API envelope
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: Literal[True] = ...,
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Default overload (no response_mode or raw_json specified)
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # Helper methods
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+# ================================================================
+# MODE-SPECIFIC CLASSES FOR CLIENT-LEVEL response_mode SUPPORT
+# ================================================================
+
+class SettingDictMode:
+    """Setting endpoint for dict response mode (default for this client).
+    
+    By default returns SettingResponse (TypedDict).
+    Can be overridden per-call with response_mode="object" to return SettingObject.
+    """
+    
+    # raw_json=True returns RawAPIResponse regardless of response_mode
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Object mode override with mkey (single item)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # Object mode override without mkey (list)
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # Dict mode with mkey (single item) - default
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+    
+    # Dict mode without mkey (list) - default
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict"] | None = ...,
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+
+
+    # raw_json=True returns RawAPIResponse for PUT
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # PUT - Object mode override
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # PUT - Default overload (returns MutationResponse)
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # PUT - Dict mode (default for DictMode class)
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+
+    # Helper methods (inherited from base class)
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+class SettingObjectMode:
+    """Setting endpoint for object response mode (default for this client).
+    
+    By default returns SettingObject (FortiObject).
+    Can be overridden per-call with response_mode="dict" to return SettingResponse (TypedDict).
+    """
+    
+    # raw_json=True returns RawAPIResponse for GET
+    @overload
+    def get(
+        self,
+        name: str | None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # Dict mode override with mkey (single item)
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+    
+    # Dict mode override without mkey (list)
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> SettingResponse: ...
+    
+    # Object mode with mkey (single item) - default
+    @overload
+    def get(
+        self,
+        name: str,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["object"] | None = ...,
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # Object mode without mkey (list) - default
+    @overload
+    def get(
+        self,
+        name: None = ...,
+        filter: str | list[str] | None = ...,
+        count: int | None = ...,
+        start: int | None = ...,
+        payload_dict: dict[str, Any] | None = ...,
+        range: list[int] | None = ...,
+        sort: str | None = ...,
+        format: str | None = ...,
+        action: str | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["object"] | None = ...,
+        **kwargs: Any,
+    ) -> SettingObject: ...
+
+
+    # PUT - Dict mode override
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["dict"],
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    # raw_json=True returns RawAPIResponse for PUT
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        raw_json: Literal[True],
+        **kwargs: Any,
+    ) -> RawAPIResponse: ...
+    
+    # PUT - Object mode override (requires explicit response_mode="object")
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        *,
+        response_mode: Literal["object"],
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # PUT - Default overload (no response_mode specified, returns Object for ObjectMode)
+    @overload
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> SettingObject: ...
+    
+    # PUT - Default for ObjectMode (returns MutationResponse like DictMode)
+    def put(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+
+
+    # Helper methods (inherited from base class)
+    def exists(
+        self,
+        name: str,
+        vdom: str | bool | None = ...,
+    ) -> bool: ...
+    
+    def set(
+        self,
+        payload_dict: SettingPayload | None = ...,
+        account_id: str | None = ...,
+        country: Literal["--", "AF", "AL", "DZ", "AS", "AO", "AR", "AM", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "BN", "BG", "BF", "KH", "CM", "KY", "CF", "TD", "CL", "CN", "CX", "CO", "CG", "CD", "CR", "HR", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "ET", "EE", "GF", "PF", "FO", "FJ", "FI", "FR", "GA", "GE", "GM", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GY", "HT", "HN", "HK", "HU", "IS", "IN", "ID", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JO", "KZ", "KE", "KR", "KW", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "MA", "MZ", "MM", "NA", "NP", "NL", "AN", "AW", "NZ", "NI", "NE", "NG", "NO", "MP", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "KN", "LC", "MF", "PM", "VC", "SA", "SN", "RS", "ME", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SR", "SZ", "SE", "CH", "TW", "TZ", "TH", "TL", "TG", "TT", "TN", "TR", "TM", "AE", "TC", "UG", "UA", "GB", "US", "PS", "UY", "UZ", "VU", "VE", "VN", "VI", "WF", "YE", "ZM", "ZW", "JP", "CA"] | None = ...,
+        duplicate_ssid: Literal["enable", "disable"] | None = ...,
+        fapc_compatibility: Literal["enable", "disable"] | None = ...,
+        wfa_compatibility: Literal["enable", "disable"] | None = ...,
+        phishing_ssid_detect: Literal["enable", "disable"] | None = ...,
+        fake_ssid_action: Literal["log", "suppress"] | list[str] | None = ...,
+        offending_ssid: str | list[str] | list[dict[str, Any]] | None = ...,
+        device_weight: int | None = ...,
+        device_holdoff: int | None = ...,
+        device_idle: int | None = ...,
+        firmware_provision_on_authorization: Literal["enable", "disable"] | None = ...,
+        rolling_wtp_upgrade: Literal["enable", "disable"] | None = ...,
+        darrp_optimize: int | None = ...,
+        darrp_optimize_schedules: str | list[str] | list[dict[str, Any]] | None = ...,
+        vdom: str | bool | None = ...,
+        raw_json: bool = ...,
+        response_mode: Literal["dict", "object"] | None = ...,
+        **kwargs: Any,
+    ) -> MutationResponse: ...
+    
+    @staticmethod
+    def help(field_name: str | None = ...) -> str: ...
+    
+    @staticmethod
+    def fields(detailed: bool = ...) -> Union[list[str], list[dict[str, Any]]]: ...
+    
+    @staticmethod
+    def field_info(field_name: str) -> dict[str, Any]: ...
+    
+    @staticmethod
+    def validate_field(name: str, value: Any) -> bool: ...
+    
+    @staticmethod
+    def required_fields() -> list[str]: ...
+    
+    @staticmethod
+    def defaults() -> dict[str, Any]: ...
+    
+    @staticmethod
+    def schema() -> dict[str, Any]: ...
+
+
+__all__ = [
+    "Setting",
+    "SettingDictMode",
+    "SettingObjectMode",
+    "SettingPayload",
+    "SettingObject",
+]
