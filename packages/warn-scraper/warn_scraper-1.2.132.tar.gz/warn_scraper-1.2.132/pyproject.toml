@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warn-scraper"
+description = "Command-line interface for downloading WARN Act notices of qualified plant closings and mass layoffs from state government websites"
+authors = [
+  { name = "Big Local News", email = "biglocalnews@stanford.edu" }
+]
+readme = "README.md"
+# requires-python = ">=3.10"
+keywords = ["WARN Act", "scrapers", "WARN Act data", "WARN Act scrapers"]
+license = "Apache-2.0"
+classifiers = [
+  "Programming Language :: Python :: 3"
+]
+dependencies = [
+  "click",
+  "beautifulsoup4",
+  "html5lib",
+  "pdfplumber",
+  "requests",
+  "openpyxl",
+  "pyopenssl",
+  "retry2",
+  "selenium",
+  "stealthenium",
+  "tenacity",
+  "xlrd",
+  "xvfbwrapper",
+  "webdriver-manager"
+]
+dynamic = ["version"]
+
+[project.scripts]
+warn-scraper = "warn.cli:main"
+
+[project.urls]
+"Documentation" = "https://warn-scraper.readthedocs.io"
+"Maintainer" = "https://github.com/biglocalnews"
+"Source" = "https://github.com/biglocalnews/warn-scraper"
+"Tracker" = "https://github.com/biglocalnews/warn-scraper/issues"
+
+[tool.setuptools_scm]
+
+# ... other project metadata fields as listed in:
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
