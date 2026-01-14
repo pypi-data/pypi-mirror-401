@@ -1,0 +1,37 @@
+[project]
+name = "use-the-force"
+version = "0.2.0"
+description = "Code for practicum Use the Force at Vrije Universteit Amsterdam."
+readme = "README.md"
+authors = [
+    { name = "Pieter van Toorenenburg", email = "p.h.van.toorenenburg@vu.nl" },
+]
+classifiers = [
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+]
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.10.1",
+    "pyqtgraph>=0.14.0",
+    "pyserial>=3.5",
+    "pyside6-essentials>=6.10.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/NatuurkundePracticumAmsterdam/Use-the-Force"
+Repository = "https://github.com/NatuurkundePracticumAmsterdam/Use-the-Force"
+Issues = "https://github.com/NatuurkundePracticumAmsterdam/Use-the-Force/issues"
+Changelog = "https://github.com/NatuurkundePracticumAmsterdam/Use-the-Force/blob/main/CHANGELOG.md"
+
+[project.scripts]
+use-the-force = "use_the_force.main:main"
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
