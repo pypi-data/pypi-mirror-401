@@ -1,0 +1,84 @@
+[project]
+name = "crystflux"
+version = "0.23.10"
+description = "A type-safe immutable JSON toolkit with chainable method access."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "T.K", email = "the.usefulness.of.the.useless@gmail.com" }]
+# Core dependencies: minimal (stdlib only)
+dependencies = []
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Repository = "https://github.com/void-latent/crystflux"
+
+[project.optional-dependencies]
+# Optional adapter dependencies
+numpy = ["numpy>=2.3"]
+pydantic = ["pydantic"]
+# Development dependencies
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "basedpyright",
+    "mypy",
+]
+# Bundle all adapters
+all = ["crystflux[numpy]", "crystflux[pydantic]"]
+
+# PEP 735 dependency groups (for development)
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+lint = [
+    "ruff",
+]
+typecheck = [
+    "basedpyright",
+    "mypy",
+]
+# Unified development group
+dev = [
+    {include-group = "test"},
+    {include-group = "lint"},
+    {include-group = "typecheck"},
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["crystflux*"]
+exclude = ["*.tests*", "*.test*", "tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.11"
+
+[tool.basedpyright]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+
+[tool.ruff]
+line-length = 100
