@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pygulp"
+version = "0.1.1"
+authors = [
+    { name = "AIDE Lab", email = "info.aidelab@gmail.com" },
+    { name = "Kshitij Vaidya", email = "22b1829@iitb.ac.in" },
+    { name = "Ishan Pandit", email = "22b2141@iitb.ac.in" },
+    { name = "Roomani Srivastava", email = "roomani@iitb.ac.in" }
+]
+description = "Python Package for Goal Linear Programming"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pulp", # Core dependency for Solver Backend
+]
+
+[project.urls]
+"Homepage" = "https://github.com/aidelab-iitbombay/GLP"
+
+[project.optional-dependencies]
+# For visualisation and data handling
+viz = ["pandas", "matplotlib"]
+# Dependencies for development
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "ruff",
+    "mypy",
+    "pre-commit",
+    "twine",
+    "build",
+    "sphinx",
+]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+miniversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+
+[tool.mypy]
+packages = ["glp"]
+strict = true
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["glp", "glp.*"]
