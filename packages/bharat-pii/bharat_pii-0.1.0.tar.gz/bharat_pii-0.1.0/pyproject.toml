@@ -1,0 +1,17 @@
+[project]
+name = "bharat-pii"
+version = "0.1.0"
+description = "India-first PII detection & redaction for GenAI pipelines"
+authors = [{ name = "Rahul Sharma" }]
+requires-python = ">=3.10"
+dependencies = ["regex"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
