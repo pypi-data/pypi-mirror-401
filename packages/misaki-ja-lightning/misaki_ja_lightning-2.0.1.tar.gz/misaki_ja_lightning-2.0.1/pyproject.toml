@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "misaki-ja-lightning"
+version = "2.0.1"
+description = "Lightweight Japanese text-to-IPA phoneme converter extracted from misaki"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["japanese", "nlp", "tts", "phoneme", "ipa", "g2p", "text-to-speech"]
+authors = [
+  {name = "Your Name", email = "your.email@example.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Text Processing :: Linguistic",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "fugashi==1.4.0",
+    "mecab-python3",
+    "jaconv==0.4.0",
+    "mojimoji==0.0.13",
+    "pyopenjtalk-somniumism>=0.1.dev0",
+]
+
+[project.optional-dependencies]
+unidic = [
+    "unidic-lite",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/misaki-ja-lightning"
+Repository = "https://github.com/yourusername/misaki-ja-lightning"
+"Bug Tracker" = "https://github.com/yourusername/misaki-ja-lightning/issues"
+
+[tool.setuptools.packages.find]
+include = ["misaki_ja_lightning*"]
+
+[tool.setuptools.package-data]
+misaki_ja_lightning = ["data/*.txt"]

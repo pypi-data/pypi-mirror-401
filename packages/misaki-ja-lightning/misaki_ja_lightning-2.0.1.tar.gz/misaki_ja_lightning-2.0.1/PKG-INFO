@@ -1,0 +1,181 @@
+Metadata-Version: 2.4
+Name: misaki-ja-lightning
+Version: 2.0.1
+Summary: Lightweight Japanese text-to-IPA phoneme converter extracted from misaki
+Home-page: https://github.com/yourusername/misaki-ja-lightning
+Author: Your Name
+Author-email: Your Name <your.email@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/misaki-ja-lightning
+Project-URL: Repository, https://github.com/yourusername/misaki-ja-lightning
+Project-URL: Bug Tracker, https://github.com/yourusername/misaki-ja-lightning/issues
+Keywords: japanese,nlp,tts,phoneme,ipa,g2p,text-to-speech
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Text Processing :: Linguistic
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fugashi==1.4.0
+Requires-Dist: mecab-python3
+Requires-Dist: jaconv==0.4.0
+Requires-Dist: mojimoji==0.0.13
+Requires-Dist: pyopenjtalk-somniumism>=0.1.dev0
+Provides-Extra: unidic
+Requires-Dist: unidic-lite; extra == "unidic"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# misaki-ja-lightning ⚡
+
+Lightweight Japanese text-to-IPA phoneme converter extracted from the [misaki](https://github.com/hexgrad/misaki) library. This package contains only the Japanese G2P (grapheme-to-phoneme) functionality with minimal dependencies.
+
+## Features
+
+- 🇯🇵 Convert Japanese text (hiragana, katakana, kanji) to IPA phonemes
+- 🔢 Convert numbers to Japanese kana
+- ⚡ Lightning-fast with minimal dependencies
+- 🎯 Focused on Japanese language only
+- 🔧 Supports both `cutlet` (default) and `pyopenjtalk` backends
+- ☁️ Serverless-friendly: UniDic dictionary auto-downloads to `/tmp` when needed
+
+## Installation
+
+```bash
+# Basic installation (cutlet backend, no bundled dictionary)
+pip install misaki-ja-lightning
+
+# With bundled dictionary (for local development)
+pip install misaki-ja-lightning[unidic]
+```
+
+**Note for Vercel/Serverless**: Use basic installation. The UniDic dictionary will automatically download to `/tmp` on first use, keeping your deployment under size limits.
+
+## Usage
+
+### Basic G2P Conversion
+
+```python
+from misaki_ja_lightning import JAG2P
+
+# Initialize with cutlet backend (default, recommended)
+g2p = JAG2P(version='cutlet')
+
+# Or use pyopenjtalk backend
+# g2p = JAG2P(version='pyopenjtalk')
+
+# Convert Japanese text to IPA phonemes
+text = "こんにちは、世界"
+phonemes, tokens = g2p(text)
+
+print(phonemes)  # IPA phoneme string with pitch information
+```
+
+### Number to Kana Conversion
+
+```python
+from misaki_ja_lightning import Convert, ConvertKanji
+
+# Convert Arabic numbers to Japanese
+result = Convert(12345, 'hiragana')
+print(result)  # いちまんにせんさんびゃくよんじゅうご
+
+# Convert to kanji
+result = Convert(12345, 'kanji')
+print(result)  # 一万二千三百四十五
+
+# Convert to romaji
+result = Convert(12345, 'romaji')
+print(result)  # ichi man ni sen san byaku yon juu go
+
+# Supported formats: 'hiragana', 'kanji', 'romaji'
+# Note: 'katakana' is not supported in num2kana module
+
+# Convert kanji numbers back to Arabic
+number = ConvertKanji("一万二千三百四十五")
+print(number)  # 12345
+```
+
+### Token-level Processing
+
+```python
+from misaki_ja_lightning import JAG2P
+
+g2p = JAG2P()
+phonemes, tokens = g2p("今日は良い天気ですね")
+
+for token in tokens:
+    print(f"Text: {token.text}")
+    print(f"Phonemes: {token.phonemes}")
+    print(f"Tag: {token.tag}")
+    print(f"Pitch: {token._.pitch}")
+    print("---")
+```
+
+## What's Included
+
+This lightweight package includes:
+
+- `ja.py` - Japanese G2P converter supporting both cutlet and pyopenjtalk
+- `cutlet.py` - Cutlet backend for IPA conversion
+- `num2kana.py` - Number to Japanese kana converter
+- `token.py` - Token data structure
+- `unidic_downloader.py` - Runtime dictionary downloader for serverless
+
+## Differences from Original Misaki
+
+- ✅ Japanese-only (removed other languages)
+- ✅ Removed `addict` dependency
+- ✅ Simplified token structure
+- ✅ Smart dictionary loading: uses bundled unidic-lite if available, downloads to `/tmp` otherwise
+- ✅ Serverless-optimized
+
+## Requirements
+
+- Python >= 3.8
+- fugashi, mecab-python3, jaconv, mojimoji (for cutlet backend)
+- pyopenjtalk-somniumism (forked version with /tmp support)
+- unidic-lite (optional, auto-downloads if not present)
+
+**Note**: This package intelligently handles dictionaries:
+- **Local**: Uses bundled unidic-lite if installed
+- **Serverless**: Auto-downloads dictionary to `/tmp` on first use
+- **Both**: pyopenjtalk dictionary also auto-downloads to `/tmp`
+
+This allows the package to work in serverless environments like Vercel while keeping deployment size under limits.
+
+## License
+
+MIT License (inherited from original misaki library)
+
+## Credits
+
+This package is extracted from [misaki](https://github.com/hexgrad/misaki) by hexgrad. All credit for the original implementation goes to the misaki authors.
+
+The num2kana module is based on [Convert-Numbers-to-Japanese](https://github.com/Greatdane/Convert-Numbers-to-Japanese) by Greatdane (MIT License).
+
+## Related Projects
+
+- [misaki](https://github.com/hexgrad/misaki) - Full multilingual G2P library
+- [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) - Text-to-speech model
+- [pyopenjtalk](https://github.com/r9y9/pyopenjtalk) - Japanese text processing
+
+## Use Cases
+
+Perfect for:
+- Text-to-speech applications
+- Japanese language learning tools
+- Phoneme-based synthesis
+- Lightweight Japanese text processing
+
+## Support
+
+For issues and questions, please visit the [GitHub Issues](https://github.com/yourusername/misaki-ja-lightning/issues) page.
