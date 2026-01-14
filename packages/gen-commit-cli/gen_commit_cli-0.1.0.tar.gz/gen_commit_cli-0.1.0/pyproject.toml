@@ -1,0 +1,17 @@
+[project]
+name = "gen-commit-cli"   # 👈 NEW UNIQUE NAME
+version = "0.1.0"
+description = "Generate git commit messages using Groq LLMs"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "Pankaj Shrivastava" }
+]
+dependencies = [
+  "requests",
+  "typer"
+]
+
+[project.scripts]
+gen-commit = "gen_commit.cli:main"
