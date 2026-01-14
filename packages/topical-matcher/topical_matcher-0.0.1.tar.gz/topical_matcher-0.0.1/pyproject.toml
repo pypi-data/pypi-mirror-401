@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "topical-matcher"
+version = "0.0.1"
+description = "UDC/IAB document classification toolkit (coming soon)"
+readme = "README.md"
+license = "LicenseRef-Dual-License"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    {name = "Turov Team"}
+]
+keywords = ["classification", "udc", "iab", "taxonomy", "nlp"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/turov/topical-matcher"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["topical_matcher*"]
