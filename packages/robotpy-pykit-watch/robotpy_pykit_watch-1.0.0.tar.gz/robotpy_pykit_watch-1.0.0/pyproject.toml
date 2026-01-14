@@ -1,0 +1,21 @@
+[project]
+name = "robotpy-pykit-watch"
+version = "1.0.0"
+description = "Replay watch functionality to PyKit"
+readme = "README.md"
+authors = [{ name = "Luke Maxwell", email = "luke@whsrobotics.org" }]
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+keywords = ["pykit", "frc", "robotics", "logging", "telemetry", "replay"]
+requires-python = ">=3.10"
+dependencies = [
+    "pyfrc>=2026.0.1",
+    "watchdog>=6.0.0",
+    "wpilib>=2026.1.1",
+]
+
+[project.entry-points."robotpy_cli.2026"]
+watch = "pykit_watch.watch.cli_replaywatch:PyKitReplayWatch"
+
+[project.urls]
+Homepage = "https://github.com/1757WestwoodRobotics/PyKitWatch"
