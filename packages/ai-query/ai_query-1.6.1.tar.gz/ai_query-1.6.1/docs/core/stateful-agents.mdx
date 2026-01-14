@@ -1,0 +1,133 @@
+---
+title: "Stateful Agents"
+description: "Build persistent, stateful AI agents with built-in WebSocket, HTTP, and storage support"
+---
+
+ai-query provides a powerful `Agent` class for building stateful AI applications. Unlike standard LLM calls, **Agents** maintain memory, state, and identity over time.
+
+They can be deployed in two main ways:
+1. **Long-running Servers** (WebSocket/SSE) - ideal for real-time chat, collaboration
+2. **Serverless Functions** (HTTP) - ideal for REST APIs, webhooks, and scale-to-zero
+
+## Quick Start
+
+Here's a simple chat agent that remembers conversation history in memory:
+
+```python
+from ai_query.agents import ChatAgent, InMemoryAgent
+
+class MyBot(ChatAgent, InMemoryAgent):
+    initial_state = {"message_count": 0}
+    system = "You are a helpful assistant."
+
+    async def on_message(self, conn, message):
+        # Handle WebSocket message
+        response = await self.chat(message)
+        await conn.send(response)
+
+# Run as a local server
+MyBot.serve_many(port=8080)
+```
+
+## Core Concepts
+
+### 1. State & Persistence
+
+Every agent has a `state` dictionary and a `messages` list that are automatically persisted to your chosen backend.
+
+```python
+async with MyBot("agent-1") as bot:
+    # State is automatically saved when set
+    await bot.set_state({"status": "active"})
+
+    # Access current state
+    print(bot.state["status"])
+```
+
+### 2. Storage Backends
+
+Choose where your data lives. Switch backends by changing the base class:
+
+| Backend | Description | Best For |
+|---------|-------------|----------|
+| `InMemoryAgent` | RAM-only storage | Testing, local dev |
+| `SQLiteAgent` | Local file or `:memory:` | Single-server apps, prototypes |
+| `DurableObjectAgent` | Cloudflare Storage | Edge deployment |
+| **Custom** | Redis, Postgres, DynamoDB | Production, Serverless |
+
+### 3. The Actor Model
+
+Agents run as **Actors**. This means:
+- **Sequential Processing**: Messages are processed one at a time (no race conditions).
+- **Mailbox**: Requests (HTTP, WebSocket, internal calls) go into a queue.
+- **Identity**: Each agent has a unique ID (e.g., `user-123`, `room-abc`).
+
+## Deployment Patterns
+
+### Real-time Server (WebSocket/SSE)
+
+Ideal for chatbots and collaborative apps. The agent stays alive in memory while clients are connected.
+
+```python
+# Start a server for this agent class
+MyBot.serve_many(port=8080)
+```
+
+Clients connect to:
+- `ws://localhost:8080/agent/{id}/ws` (Bidirectional)
+- `http://localhost:8080/agent/{id}/events` (Server-Sent Events)
+
+### Serverless (HTTP / REST)
+
+Ideal for AWS Lambda, Vercel, or Google Cloud Run. The agent loads state, processes one request, saves state, and shuts down.
+
+Use the `handle_request()` lifecycle method:
+
+```python
+# AWS Lambda Handler
+def handler(event, context):
+    agent_id = event["pathParameters"]["id"]
+    agent = MyBot(agent_id)
+
+    return asyncio.run(agent.handle_request({
+        "action": "chat",
+        "message": event["body"]
+    }))
+```
+
+<Card title="Serverless Cookbook" icon="cloud" href="/cookbook/serverless-agents">
+  See full examples for AWS Lambda, Vercel, and FastAPI
+</Card>
+
+## Agent Communication
+
+Agents can call other agents using `invoke()`. This works regardless of whether they are in the same process or distributed.
+
+```python
+class ManagerAgent(ChatAgent, InMemoryAgent):
+    async def on_message(self, conn, msg):
+        # Delegate work to a researcher agent
+        result = await self.invoke("researcher-1", {
+            "task": "search",
+            "query": msg
+        })
+        await conn.send(f"Research found: {result['summary']}")
+```
+
+<Card title="Agent Communication Patterns" icon="messages" href="/cookbook/agent-communication">
+  Learn about pipelines, fan-out, and event-driven architectures
+</Card>
+
+## API Reference
+
+<CardGroup cols={2}>
+  <Card title="Agent API" icon="book" href="/api-reference/agent">
+    Full methods and hooks documentation
+  </Card>
+  <Card title="Storage Backends" icon="database" href="/api-reference/agent-backends">
+    InMemory, SQLite, and Durable Objects
+  </Card>
+  <Card title="Multi-Agent Server" icon="server" href="/api-reference/agent-server">
+    Routing and server configuration
+  </Card>
+</CardGroup>

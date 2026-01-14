@@ -1,0 +1,191 @@
+---
+title: "Real-time Agent"
+description: "Build an agent with WebSocket support for real-time interactions"
+---
+
+Create an agent that handles WebSocket connections for real-time, bidirectional communication.
+
+## Quick Start
+
+With the built-in `serve()` method, you can run a WebSocket server in one line:
+
+```python
+from ai_query.agents import ChatAgent, InMemoryAgent
+
+class TaskAssistant(ChatAgent, InMemoryAgent):
+    system = "You are a helpful task assistant. Help users complete their work."
+    
+    async def on_connect(self, connection, ctx):
+        await super().on_connect(connection, ctx)
+        connection.user_id = ctx.metadata.get("user_id", "anonymous")
+        await connection.send("Connected! How can I help you today?")
+    
+    async def on_message(self, connection, message):
+        # Respond to all messages with AI assistance
+        response = await self.chat(message)
+        await connection.send(response)
+    
+    async def on_close(self, connection, code, reason):
+        await super().on_close(connection, code, reason)
+        print(f"User {connection.user_id} disconnected")
+
+# One line to start the server!
+TaskAssistant("assistant-1").serve(port=8080)
+```
+
+Connect with: `wscat -c 'ws://localhost:8080/ws?user_id=alice'`
+
+## Full Example with State and Tools
+
+A research assistant that tracks findings and provides streaming responses:
+
+```python
+import json
+from ai_query.agents import ChatAgent, InMemoryAgent
+from ai_query import tool, Field
+
+class ResearchAssistant(ChatAgent, InMemoryAgent):
+    initial_state = {"findings": [], "queries": 0}
+    system = """You are a research assistant. Help users research topics 
+    and save important findings for later reference."""
+    
+    @property
+    def tools(self):
+        @tool(description="Save an important finding for later")
+        async def save_finding(finding: str = Field(description="Finding to save")) -> str:
+            findings = self.state["findings"] + [finding]
+            await self.set_state({**self.state, "findings": findings})
+            return f"Saved finding #{len(findings)}"
+        
+        @tool(description="List all saved findings")
+        async def list_findings() -> str:
+            if not self.state["findings"]:
+                return "No findings saved yet."
+            return "\n".join([f"{i+1}. {f}" for i, f in enumerate(self.state["findings"])])
+        
+        return {"save_finding": save_finding, "list_findings": list_findings}
+    
+    async def on_connect(self, connection, ctx):
+        await super().on_connect(connection, ctx)
+        connection.user_id = ctx.metadata.get("user_id", "anonymous")
+        
+        findings_count = len(self.state["findings"])
+        if findings_count > 0:
+            await connection.send(json.dumps({
+                "type": "system",
+                "message": f"Welcome back! You have {findings_count} saved findings."
+            }))
+        else:
+            await connection.send(json.dumps({
+                "type": "system",
+                "message": "Hello! I can help you research topics."
+            }))
+    
+    async def on_message(self, connection, message):
+        await self.set_state({**self.state, "queries": self.state["queries"] + 1})
+        
+        # Stream AI response
+        await self._stream_response(message)
+    
+    async def _stream_response(self, message):
+        await self.broadcast(json.dumps({"type": "ai_start"}))
+        full_response = ""
+        async for chunk in self.stream_chat(message):
+            full_response += chunk
+            await self.broadcast(json.dumps({"type": "ai_chunk", "chunk": chunk}))
+        await self.broadcast(json.dumps({"type": "ai_end", "message": full_response}))
+
+ResearchAssistant("research-1").serve(port=8080)
+```
+
+## Custom WebSocket Integration
+
+To use with your own framework, implement the [`Connection`](/api-reference/agent#connection-protocol) interface:
+
+```python
+from fastapi import FastAPI, WebSocket
+from ai_query.agents import ChatAgent, InMemoryAgent, Connection, ConnectionContext
+
+class FastAPIConnection(Connection):
+    def __init__(self, ws: WebSocket):
+        self._ws = ws
+    
+    async def send(self, message: str | bytes) -> None:
+        await self._ws.send_text(message)
+    
+    async def close(self, code: int = 1000, reason: str = "") -> None:
+        await self._ws.close(code)
+
+
+class MyAgent(ChatAgent, InMemoryAgent):
+    system = "You are a helpful assistant."
+
+
+app = FastAPI()
+agent = MyAgent("my-agent")
+
+@app.on_event("startup")
+async def startup():
+    await agent.start()
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    conn = FastAPIConnection(websocket)
+    ctx = ConnectionContext(request=websocket, metadata={})
+    
+    await agent.on_connect(conn, ctx)
+    try:
+        while True:
+            message = await websocket.receive_text()
+            await agent.on_message(conn, message)
+    except:
+        pass
+    finally:
+        await agent.on_close(conn, 1000, "Disconnected")
+```
+
+## Client Example (JavaScript)
+
+```javascript
+const ws = new WebSocket('ws://localhost:8080/ws?user_id=alice');
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    switch(data.type) {
+        case 'system': console.log(`System: ${data.message}`); break;
+        case 'ai_chunk': process.stdout.write(data.chunk); break;
+        case 'ai_end': console.log(); break;
+    }
+};
+
+// Ask the assistant to research something
+ws.send("Research the latest developments in quantum computing");
+```
+
+## Cloudflare Durable Objects
+
+For production, use [`DurableObjectAgent`](/api-reference/agent-backends#durableobjectagent):
+
+```python
+from ai_query.agents import ChatAgent, DurableObjectAgent
+
+class CloudflareAssistant(ChatAgent, DurableObjectAgent):
+    initial_state = {"queries": 0}
+    
+    async def on_message(self, conn, message):
+        await self.set_state({**self.state, "queries": self.state["queries"] + 1})
+        response = await self.chat(message)
+        await conn.send(response)
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Multi-Agent Server" href="/core/agent-server">
+    Route multiple users to independent agents
+  </Card>
+  <Card title="Agent API" href="/api-reference/agent">
+    Complete Agent API reference
+  </Card>
+</CardGroup>
