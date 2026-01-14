@@ -1,0 +1,36 @@
+Metadata-Version: 2.4
+Name: spark-json-flatten
+Version: 0.1.0
+Summary: Recursively flatten complex PySpark DataFrames with nested structs and arrays
+Author: Your Name
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Database
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pyspark>=3.0.0
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Dynamic: license-file
+
+# spark-json-flatten
+
+A lightweight utility to **recursively flatten complex PySpark DataFrames**
+containing deeply nested structs and arrays.
+
+## Features
+- Recursive schema flattening
+- Handles arbitrary nesting depth
+- Uses `explode_outer` for safe array expansion
+- No UDFs, fully Spark-native
+
+## Installation
+```bash
+pip install spark-json-flatten
+
+from spark_json_flatten import flatten_recursive
+
+flattened_df = flatten_recursive(complex_df)
