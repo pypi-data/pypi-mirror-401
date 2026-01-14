@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling>=1.18", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aicage"
+description = "Runs agentic coding assistants in docker containers"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Stefan Kuhn" }]
+dependencies = [
+  "docker",
+  "portalocker",
+  "PyYAML"
+]
+dynamic = ["version"]
+
+[project.scripts]
+aicage = "aicage.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aicage"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"config/images-metadata.yaml" = "config/images-metadata.yaml"
+"config/agent-build" = "config/agent-build"
+"config/extension-build" = "config/extension-build"
+"config/validation/agent.schema.json" = "config/validation/agent.schema.json"
+"config/validation/base.schema.json" = "config/validation/base.schema.json"
+"config/validation/extension.schema.json" = "config/validation/extension.schema.json"
+
+[tool.hatch.build]
+include = [
+  "config/images-metadata.yaml",
+  "config/agent-build/**",
+  "config/extension-build/**",
+  "config/validation/agent.schema.json",
+  "config/validation/base.schema.json",
+  "config/validation/extension.schema.json",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/aicage/**",
+  "config/images-metadata.yaml",
+  "config/agent-build/**",
+  "config/extension-build/**",
+  "config/validation/agent.schema.json",
+  "config/validation/base.schema.json",
+  "config/validation/extension.schema.json",
+  "LICENSE",
+  "README.md",
+  "pyproject.toml",
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/aicage/_version.py"
+
+[tool.ruff]
+line-length = 120
+[tool.ruff.lint]
+select = [
+  "E", "F",        # correctness
+  "I",             # imports
+  "UP",            # pyupgrade
+  "B",             # bugbear
+  "PL",            # pylint rules (incl. protected access)
+  "SLF",           # flake8-self (private member access)
+]
+per-file-ignores = { "tests/**" = ["SLF001"] }
