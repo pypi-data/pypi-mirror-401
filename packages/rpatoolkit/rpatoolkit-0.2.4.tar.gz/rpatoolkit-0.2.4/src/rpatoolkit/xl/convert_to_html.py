@@ -1,0 +1,20 @@
+from xlsx2html import xlsx2html
+from typing import Any
+import re
+
+
+def convert_to_html(source: Any):
+    if hasattr(source, "seek"):
+        source.seek(0)
+
+    out_stream = xlsx2html(source)
+    out_stream.seek(0)
+    html_content = out_stream.read()
+
+    # Extract only the table part of the HTML
+    pattern = r"(<table.*?</table>)"
+    match = re.search(pattern, html_content, re.DOTALL | re.MULTILINE)
+    if match:
+        return match.group(1) + "<br><br>"
+
+    return None
