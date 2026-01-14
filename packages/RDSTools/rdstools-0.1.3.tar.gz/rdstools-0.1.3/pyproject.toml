@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RDSTools"
+version = "0.1.3"
+description = "Python tools for Respondent-Driven Sampling (RDS) analysis"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Jay Kim", email = "jayhk@umich.edu"},
+    {name = "Jay Kim", email = "aquilanima96@gmail.com"}
+]
+keywords = ["RDS", "respondent-driven sampling", "sampling", "statistics", "survey", "epidemiology"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "pandas>=1.3.0",
+    "numpy>=1.20.0",
+    "statsmodels>=0.12.0",
+    "scipy>=1.7.0",
+    "patsy>=0.5.0",
+    "folium>=0.12.0",
+    "matplotlib>=3.3.0",
+    "networkx>=2.5",
+    "python-igraph>=0.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=3.0",
+    "black>=22.0",
+    "flake8>=4.0",
+]
+viz = [
+    "pygraphviz>=1.7",  # Optional for enhanced visualizations
+]
+
+[project.urls]
+Repository = "https://github.com/RDSTools/RDSTools-Python-Package"
+Documentation = "https://rdstools-python-package.readthedocs.io/en/latest/"
+
+[tool.setuptools]
+packages = ["RDSTools"]
+
+[tool.setuptools.package-data]
+RDSTools = ["*.csv", "data/*.csv"]
