@@ -1,0 +1,131 @@
+# pale-signal
+
+[![PyPI version](https://img.shields.io/pypi/v/pale-signal.svg)](https://pypi.org/project/pale-signal/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![View on PyPI](https://img.shields.io/badge/View%20on-PyPI-blue.svg)](https://pypi.org/project/pale-signal/)
+
+A CLI tool for tracking daily life signals. All data stays locally on your machine.
+
+```
+╔═══════════════════════════════════════════════════════════╗
+║   ██████╗  █████╗ ██╗     ███████╗    ███████╗██╗ ██████╗ ║
+║   ██╔══██╗██╔══██╗██║     ██╔════╝    ██╔════╝██║██╔════╝ ║
+║   ██████╔╝███████║██║     █████╗█████╗███████╗██║██║  ███╗║
+║   ██╔═══╝ ██╔══██║██║     ██╔══╝╚════╝╚════██║██║██║   ██║║
+║   ██║     ██║  ██║███████╗███████╗    ███████║██║╚██████╔╝║
+║   ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝    ╚══════╝╚═╝ ╚═════╝ ║
+╠═══════════════════════════════════════════════════════════╣
+║          Track daily signals. Build awareness.            ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
+## Install
+
+```bash
+pip install pale-signal
+```
+
+That's it. Works globally from anywhere.
+
+## Commands
+
+<details>
+<summary><code>pale-signal add</code> - Log today's data</summary>
+
+```
+Adding data for 2026-01-14
+============================================================
+Sleep hours (0-24): 7.5
+Focus (1-10): 8
+Mood (1-10): 7
+Work hours (0-24): 9
+Social interaction type:
+  none       - No social interaction
+  online     - Online/digital only (chat, video call)
+  casual     - Brief in-person (small talk, errands)
+  meaningful - Quality time with friends/family
+  deep       - Deep conversation or bonding
+Choose (none/online/casual/meaningful/deep): meaningful
+
+SUCCESS: Data saved for 2026-01-14
+```
+
+</details>
+
+<details>
+<summary><code>pale-signal summary</code> - View your stats</summary>
+
+```
+Summary for last 30 days (30 entries)
+============================================================
+
+AVERAGES:
+  Sleep:     7.1 hours
+  Focus:     6.3 / 10
+  Mood:      6.6 / 10
+  Work:      7.9 hours
+  Social:
+    casual       - 8/30 days (26.7%)
+    meaningful   - 12/30 days (40.0%)
+    deep         - 10/30 days (33.3%)
+
+7-DAY ROLLING AVERAGES:
+  Sleep:     7.4 hours
+  Focus:     6.8 / 10
+  Mood:      7.1 / 10
+  Work:      7.2 hours
+
+TOP CORRELATIONS:
+  sleep_hours <-> mood: +0.72 (strong positive)
+  focus <-> mood: +0.58 (moderate positive)
+  sleep_hours <-> work_hours: -0.45 (moderate negative)
+
+FLAGS:
+  WARNING: Low sleep (<6h): 4/30 days (13.3%)
+```
+
+</details>
+
+<details>
+<summary><code>pale-signal plot mood</code> - Generate a plot</summary>
+
+```
+Mood (1-10) (Last 30 days)
+┌────────────────────────────────────────────────────────────┐
+│                    ●                                       │
+│          ●        / \       ●                              │
+│         / \      /   \     / \             ●      ●        │
+│      ●-●   \    /     \   /   \           / \    /         │
+│     /       ●--●       \ /     ●         /   \  /          │
+│    /                    ●       \       /     ●-           │
+│   ●                              \     /                   │
+│                                   ●---●                    │
+└────────────────────────────────────────────────────────────┘
+  Min: 4.0  Max: 9.0  Avg: 6.6
+
+High-resolution plot saved to: ~/.pale-signal/output/mood_plot.png
+Opening plot...
+```
+
+</details>
+
+## What You Track
+
+| Signal | Range | Description |
+|--------|-------|-------------|
+| sleep_hours | 0-24 | Hours of sleep |
+| focus | 1-10 | Mental clarity |
+| mood | 1-10 | Emotional state |
+| work_hours | 0-24 | Hours worked |
+| social | 5 types | none, online, casual, meaningful, deep |
+
+## Data Storage
+
+Everything stays local in `~/.pale-signal/`:
+- `data.json` - Your entries
+- `output/` - Generated plots
+
+## License
+
+[MIT](LICENSE)
