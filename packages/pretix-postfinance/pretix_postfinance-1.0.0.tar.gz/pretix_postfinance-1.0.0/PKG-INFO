@@ -1,0 +1,129 @@
+Metadata-Version: 2.3
+Name: pretix-postfinance
+Version: 1.0.0
+Summary: PostFinance Checkout payment plugin for pretix
+Keywords: pretix,payment,postfinance,checkout
+Author: Sweenu
+Author-email: Sweenu <contact@sweenu.xyz>
+License: AGPLv3
+Classifier: Development Status :: 4 - Beta
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Dist: pretix>=2024.1.0
+Requires-Dist: postfinancecheckout>=6.0.0
+Requires-Dist: pytest>=7.0 ; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0 ; extra == 'dev'
+Requires-Dist: django>=4.0 ; extra == 'dev'
+Requires-Dist: mypy>=1.0 ; extra == 'dev'
+Requires-Dist: django-stubs>=4.0 ; extra == 'dev'
+Requires-Dist: ruff>=0.1 ; extra == 'dev'
+Requires-Dist: commitizen>=4.9.1 ; extra == 'dev'
+Requires-Python: >=3.9
+Project-URL: Homepage, https://github.com/sweenu/pretix-postfinance
+Project-URL: Repository, https://github.com/sweenu/pretix-postfinance
+Provides-Extra: dev
+Description-Content-Type: text/markdown
+
+# pretix-postfinance
+
+PostFinance Checkout payment plugin for pretix.
+
+## Installation
+
+### PyPI
+
+```bash
+pip install pretix-postfinance
+```
+
+### NixOS
+
+For NixOS users, the plugin can be installed using the flake:
+
+```nix
+{
+  inputs.pretix-postfinance.url = "github:sweenu/pretix-postfinance";
+
+  outputs = { self, nixpkgs, pretix-postfinance }: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        {
+          services.pretix = {
+            enable = true;
+            plugins = [
+              pretix-postfinance.packages.x86_64-linux.default
+            ];
+          };
+        }
+      ];
+    };
+  };
+}
+```
+
+## Development
+
+### Setup with uv
+
+```bash
+# Create virtual environment
+uv venv
+
+# Install with development dependencies
+uv pip install -e ".[dev]"
+```
+
+### Setup with Nix
+
+```bash
+# Enter development shell
+nix develop
+
+# Or use direnv (if you have a .envrc configured)
+direnv allow
+```
+
+### Running checks
+
+```bash
+# Run linting
+uv run ruff check .
+
+# Run type checking
+uv run mypy pretix_postfinance/
+
+# Run tests with coverage
+uv run pytest tests/ --cov=pretix_postfinance --cov-report=term-missing -v
+```
+
+### Configuration
+
+Configure the plugin in your pretix settings with:
+
+- **Space ID**: Your PostFinance Checkout space ID
+- **User ID**: API user ID
+- **API Secret**: API authentication secret
+- **Environment**: `production` or `sandbox`
+
+## Features
+
+- Payment processing via PostFinance Checkout
+- Full and partial refund support
+- Webhook handling for payment and refund notifications
+- Payment capture support
+- Comprehensive error handling and logging
+- Admin interface integration
+
+## License
+
+GNU Affero General Public License v3.0 (AGPLv3)
