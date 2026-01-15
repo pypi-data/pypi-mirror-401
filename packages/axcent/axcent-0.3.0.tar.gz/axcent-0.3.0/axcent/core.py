@@ -1,0 +1,129 @@
+import json
+from typing import Callable, Dict, List, Any, Optional
+from .tools import function_to_schema
+from .llm import LLMBackend, OpenAIBackend
+from .history import ConversationHistory
+
+class Agent:
+    """
+    An AI agent that can interact with the user and perform tasks using tools.
+
+    Attributes:
+
+        system_prompt (str): The system prompt to guide the agent's behavior.
+        backend (LLMBackend): The backend to use for generating responses.
+        history (List[Dict[str, Any]]): The conversation history.
+        tools (Dict[str, Callable]): The tools available to the agent.
+        tool_schemas (List[Dict[str, Any]]): The schemas of the tools.
+        usage_history (List[Dict[str, int]]): The usage history of the agent.
+
+    Methods:
+    
+        get_total_usage(): Returns the total token usage across all requests.
+        tool(func: Callable): Decorator to register a tool.
+        ask(query: str): Sends a query to the agent and returns the response.
+    """
+    def __init__(self, system_prompt: str = "You are a helpful assistant.", backend: Optional[LLMBackend] = None, model: str = "gpt-4o", persist_history: bool = False, history_file: str = "conv.json", max_history: Optional[int] = None):
+        self.system_prompt = system_prompt
+        self.backend = backend or OpenAIBackend(model=model)
+        self.history: ConversationHistory = ConversationHistory(persist=persist_history, filepath=history_file, max_messages=max_history)
+        self.tools: Dict[str, Callable] = {}
+        self.tool_schemas: List[Dict[str, Any]] = []
+        self.usage_history: List[Dict[str, int]] = []
+
+        # Ensure system prompt is present
+        if not self.history or self.history[0].get("role") != "system":
+            self.history.insert(0, {"role": "system", "content": self.system_prompt})
+
+
+
+
+    def get_total_usage(self) -> Dict[str, int]:
+        """Returns the total token usage across all requests."""
+        total = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "cached_tokens": 0}
+        for usage in self.usage_history:
+            total["prompt_tokens"] += usage.get("prompt_tokens", 0)
+            total["completion_tokens"] += usage.get("completion_tokens", 0)
+            total["total_tokens"] += usage.get("total_tokens", 0)
+            total["cached_tokens"] += usage.get("cached_tokens", 0)
+        return total
+
+    def tool(self, func: Callable):
+        """Decorator to register a tool."""
+        schema = function_to_schema(func)
+        self.tools[func.__name__] = func
+        self.tool_schemas.append(schema)
+        return func
+
+    def ask(self, query: str) -> str:
+        """
+        Sends a query to the agent and returns the response.
+        Handles tool calls automatically.
+        """
+        self.history.append({"role": "user", "content": query})
+        
+        while True:
+            # Sort tools by name to ensure consistent order for OpenAI prompt caching
+            current_tools = sorted(self.tool_schemas, key=lambda x: x['function']['name']) if self.tool_schemas else None
+            response = self.backend.chat(self.history.data, tools=current_tools)
+            message = response.choices[0].message
+            
+            # Track Usage
+            if hasattr(response, 'usage') and response.usage:
+                usage_data = {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "total_tokens": response.usage.total_tokens,
+                    "cached_tokens": 0
+                }
+                # Check for cached tokens (OpenAI specific structure)
+                if hasattr(response.usage, 'prompt_tokens_details') and response.usage.prompt_tokens_details:
+                     if hasattr(response.usage.prompt_tokens_details, 'cached_tokens'):
+                         usage_data["cached_tokens"] = response.usage.prompt_tokens_details.cached_tokens
+                
+                self.usage_history.append(usage_data)
+            
+            # Convert message to dict to ensure compatibility with next API call and persistence
+            message_dict = {
+                "role": message.role,
+                "content": message.content,
+            }
+            if message.tool_calls:
+                 # OpenAI tool_calls are objects, need to be converted for JSON serialization
+                 message_dict["tool_calls"] = [
+                     {
+                         "id": tc.id,
+                         "type": tc.type,
+                         "function": {
+                             "name": tc.function.name,
+                             "arguments": tc.function.arguments
+                         }
+                     } for tc in message.tool_calls
+                 ]
+            
+            self.history.append(message_dict)
+
+            if hasattr(message, 'tool_calls') and message.tool_calls:
+                for tool_call in message.tool_calls:
+                    function_name = tool_call.function.name
+                    arguments = json.loads(tool_call.function.arguments)
+                    
+                    if function_name in self.tools:
+                        func = self.tools[function_name]
+                        try:
+                            result = func(**arguments)
+                            content = str(result)
+                        except Exception as e:
+                            content = f"Error executing tool: {e}"
+                    else:
+                        content = f"Error: Tool {function_name} not found."
+                        
+                    self.history.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": content
+                    })
+                # Continue loop to let LLM process tool outputs
+            else:
+                # No tool calls, return content
+                return message.content
