@@ -1,0 +1,15 @@
+PERMANENT_WORK_AREA_NAME_STRING = "bWa"
+
+TEMPORARY_WORKSPACE_NAME_STRING = (
+    "wfs_bi"
+)
+
+PERMANENT_B_TEMP_PREFIX_NAME_STRING = (
+    "wfs_bi_temp"
+)
+
+IN_SCOPE_ZIPPED_FILE_EXTENSIONS = [
+    ".7z",
+    ".zip",
+    ".gz",
+]

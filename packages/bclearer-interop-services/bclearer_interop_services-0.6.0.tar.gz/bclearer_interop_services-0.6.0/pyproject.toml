@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bclearer-interop-services"
+version = "0.6.0"
+description = "\"A set of interop services to integrate and transfer data between different applications, model and storage technologies for the bclearer framework.\""
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Mesbah Khan", email = "khanm@ontoledgy.io" }]
+dependencies = [
+  "bclearer-orchestration-services>=0.2.8,<0.3.0",
+  "pycozo==0.7.6",
+  "cozo-embedded==0.7.6",
+]
+
+[project.optional-dependencies]
+yxdb = ["yxdb>=1.1.1"]
+
+[tool.uv]
+dev-dependencies = [
+  "bclearer-core>=0.1.10,<0.2.0",
+  "bclearer-orchestration-services>=0.2.8,<0.3.0",
+  "yxdb>=1.1.1",
+]
