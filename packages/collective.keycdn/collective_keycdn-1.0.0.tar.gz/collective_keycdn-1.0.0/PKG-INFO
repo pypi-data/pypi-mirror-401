@@ -1,0 +1,165 @@
+Metadata-Version: 2.4
+Name: collective.keycdn
+Version: 1.0.0
+Summary: A Plone addon for purging a KeyCDN cache on content changes.
+Home-page: https://github.com/collective/collective.keycdn
+Author: Jon Pentland
+Author-email: jon.pentland@pretagov.co.uk
+License: GPL version 2
+Project-URL: PyPI, https://pypi.org/project/collective.keycdn/
+Project-URL: Source, https://github.com/collective/collective.keycdn
+Project-URL: Tracker, https://github.com/collective/collective.keycdn/issues
+Keywords: Python Plone CMS KeyCDN
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Plone
+Classifier: Framework :: Plone :: Addon
+Classifier: Framework :: Plone :: 5.2
+Classifier: Framework :: Plone :: 6.0
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: GNU General Public License v2 (GPLv2)
+Requires-Python: >=3.7
+License-File: LICENSE.GPL
+License-File: LICENSE.rst
+Requires-Dist: setuptools
+Requires-Dist: z3c.jbot
+Requires-Dist: z3c.unconfigure
+Requires-Dist: plone.api>=1.8.4
+Requires-Dist: plone.app.dexterity
+Requires-Dist: plone.cachepurging
+Requires-Dist: requests>=2.20.0
+Provides-Extra: test
+Requires-Dist: plone.app.testing; extra == "test"
+Requires-Dist: plone.testing>=5.0.0; extra == "test"
+Requires-Dist: plone.app.contenttypes; extra == "test"
+Requires-Dist: plone.restapi; extra == "test"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+.. This README is meant for consumption by humans and PyPI. PyPI can render rst files so please do not use Sphinx features.
+   If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide.html
+   This text does not appear on PyPI or github. It is a comment.
+
+.. image:: https://github.com/collective/collective.keycdn/actions/workflows/plone-package.yml/badge.svg
+    :target: https://github.com/collective/collective.keycdn/actions/workflows/plone-package.yml
+
+.. image:: https://codecov.io/gh/collective/collective.keycdn/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/collective/collective.keycdn
+
+.. image:: https://img.shields.io/pypi/v/collective.keycdn.svg
+    :target: https://pypi.python.org/pypi/collective.keycdn/
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/status/collective.keycdn.svg
+    :target: https://pypi.python.org/pypi/collective.keycdn
+    :alt: Egg Status
+
+.. image:: https://img.shields.io/pypi/pyversions/collective.keycdn.svg?style=plastic   :alt: Supported - Python Versions
+
+.. image:: https://img.shields.io/pypi/l/collective.keycdn.svg
+    :target: https://pypi.python.org/pypi/collective.keycdn/
+    :alt: License
+
+
+=================
+collective.keycdn
+=================
+
+A Plone addon for purging a KeyCDN cache on content changes.
+
+Features
+--------
+
+This package overrides the plone.cachepurging utility to send purge requests to KeyCDN, a commercial content delivery network.
+
+It works with the existing caching control panel and a separate add-on control panel for providing api keys and zone configuration information.
+
+Documentation
+-------------
+
+This package only works if you have a working plone caching setup. It does not automatically purge content on its own.
+
+Once your caching configuration is in place and you have activated the addon, go to the KeyCDN add on control panel and put in your KeyCDN api key and provide the list of zones and urls to purge.
+
+You can enter multiple zones/sites and each purge will be repeated for each zone.
+
+
+Installation
+------------
+
+Install collective.keycdn by adding it to your buildout::
+
+    [buildout]
+
+    ...
+
+    eggs =
+        collective.keycdn
+
+
+and then running ``bin/buildout``
+
+Once you have installed the package you can enable the addon via the 'Add-ons' control panel.
+
+
+Authors
+-------
+
+Jon Pentland [instification], PretaGov
+
+
+Contributors
+------------
+
+ - instification
+
+
+Contribute
+----------
+
+- Issue Tracker: https://github.com/collective/collective.keycdn/issues
+- Source Code: https://github.com/collective/collective.keycdn
+- Documentation: https://docs.plone.org/foo/bar
+
+
+Support
+-------
+
+If you are having issues, please create an issue at https://github.com/collective/collective.keycdn/issues
+
+
+License
+-------
+
+The project is licensed under the GPLv2.
+
+
+Contributors
+============
+
+- Jon Pentland, jon.pentland@pretagov.co.uk
+
+
+Changelog
+=========
+
+
+1.0.0 (2026-01-14)
+------------------
+
+- New: Initial release of KeyCDN purging package.
+  [instification]
