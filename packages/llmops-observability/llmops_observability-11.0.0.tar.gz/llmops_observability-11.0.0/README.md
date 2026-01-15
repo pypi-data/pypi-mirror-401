@@ -1,0 +1,659 @@
+# LLMOps Observability SDK
+
+A lightweight Python SDK for LLM observability with **direct Langfuse integration**. No SQS queues, no batching, no worker threads - just instant tracing to Langfuse.
+
+## Key Features
+
+- ⚡ **Instant Tracing**: Sends traces directly to Langfuse in real-time
+- 🎯 **Simple API**: (`@track_function`, `@track_llm_call`)
+- 🚫 **No Complexity**: No SQS queues, no batching, no background workers
+- 🔄 **Sync & Async**: Supports both synchronous and asynchronous functions
+- 🎨 **Provider Agnostic**: Works with any LLM provider (Bedrock, OpenAI, Anthropic, etc.)
+- 🪆 **Nested Spans**: Automatic parent-child relationship tracking
+- 🔍 **Locals Capture**: Capture function local variables for debugging
+- 🌐 **ASGI Middleware**: Auto-tracing for FastAPI/Starlette apps
+- 📊 **Smart Serialization**: Automatic data size limits (200KB) to prevent issues
+
+## Installation
+
+```bash
+# From source (development)
+cd llmops-observability_sdk
+pip install -e .
+
+# Or install from package (when published)
+pip install llmops-observability
+```
+
+## Quick Start
+
+### 1. Configure Langfuse Credentials
+
+**Option A: Environment Variables (Recommended)**
+
+Create a `.env` file in your application directory:
+
+```bash
+# Langfuse Configuration
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_BASE_URL=https://your-langfuse-instance.com
+LANGFUSE_VERIFY_SSL=false  # Optional, default is false
+
+# Project Configuration
+PROJECT_ID=my_project  # Your project identifier (used as trace name in Langfuse)
+ENV=production  # Environment: production, development, staging, etc.
+```
+
+**Important Notes:**
+- `PROJECT_ID`: Used as the trace name in Langfuse. Should be unique per project.
+- `ENV`: Automatically mapped to `LANGFUSE_TRACING_ENVIRONMENT` for proper environment tracking in Langfuse.
+- The SDK automatically reads these values from the `.env` file.
+
+**Option B: Programmatic Configuration**
+
+```python
+from llmops_observability import configure
+import os
+
+# Configure at application startup
+configure(
+    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+    base_url=os.getenv("LANGFUSE_BASE_URL"),
+    verify_ssl=False
+)
+
+# Note: You still need PROJECT_ID and ENV in your .env file
+# Or pass them explicitly in start_trace()
+```
+
+> **Important**: Each application should have its own Langfuse project/keys for proper isolation. Never hardcode credentials!
+
+### 2. Basic Usage
+
+**Method 1: Simple Start/End (with auto-loaded project and environment)**
+```python
+from llmops_observability import TraceManager, track_function, track_llm_call
+
+# Start a trace - PROJECT_ID and ENV are auto-loaded from .env
+TraceManager.start_trace(
+    name="chat_message",  # Operation name
+    metadata={"user_id": "123", "session_id": "456"},
+    tags=["production", "v1.0"]
+)
+# Trace name in Langfuse will be: PROJECT_ID (from .env)
+# Environment will be: ENV (from .env) - automatically tracked by Langfuse
+
+# Track regular functions
+@track_function()
+def process_data(input_data):
+    # Your code here
+    return {"processed": input_data}
+
+# Track LLM calls
+@track_llm_call()
+def call_bedrock(prompt):
+    # Call your LLM
+    response = bedrock_client.converse(
+        modelId="anthropic.claude-3-sonnet",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response
+
+# Use the functions
+result = process_data("some data")
+llm_response = call_bedrock("Hello, world!")
+
+# End the trace (flushes to Langfuse)
+TraceManager.end_trace()
+```
+
+**Method 2: Explicit Project and Environment Override**
+```python
+# Override PROJECT_ID and ENV from .env
+TraceManager.start_trace(
+    name="chat_message",  # Operation name
+    project_id="custom_project",  # Override PROJECT_ID
+    environment="staging",  # Override ENV
+    metadata={"user_id": "123"},
+)
+
+# Your code...
+
+TraceManager.end_trace()
+```
+
+**Method 3: Using `finalize_and_send()` (llmops-observability)**
+```python
+# Start trace
+TraceManager.start_trace(name="chat_session")
+
+# Your code
+user_input = "What is machine learning?"
+response = await llm.generate(user_input)
+
+# Finalize with input/output in one call
+TraceManager.finalize_and_send(
+    user_id="user_123",
+    session_id="session_456",
+    trace_name="chat_message",
+    trace_input={"user_msg": user_input},
+    trace_output={"bot_response": str(response)}
+)
+```
+
+### 3. Capture Local Variables (Debugging)
+
+```python
+@track_function(capture_locals=True)
+def complex_calculation(x, y, z):
+    intermediate = x + y
+    result = intermediate * z
+    final = result ** 2
+    # All local variables are captured in Langfuse
+    return final
+
+# Capture specific variables only
+@track_function(capture_locals=["important_var", "result"])
+def selective_capture(data):
+    important_var = process(data)
+    temp_var = "not captured"
+    result = transform(important_var)
+    return result
+```
+
+### 4. Nested Spans (Parent-Child Tracking)
+
+```python
+@track_function(name="parent_task")
+def parent_function():
+    data = fetch_data()
+    # Child spans are automatically nested
+    processed = child_function(data)
+    return processed
+
+@track_function(name="child_task")
+def child_function(data):
+    return data.upper()
+
+# Langfuse will show: parent_task → child_task
+```
+
+### 5. ASGI Middleware (FastAPI Auto-Tracing)
+
+```python
+from fastapi import FastAPI
+from llmops_observability import LLMOpsASGIMiddleware
+
+app = FastAPI()
+app.add_middleware(LLMOpsASGIMiddleware, service_name="my_api")
+
+@app.get("/")
+async def root():
+    # Request is automatically traced
+    return {"message": "Hello World"}
+
+@app.post("/generate")
+async def generate(prompt: str):
+    # All decorated functions within request are nested
+    result = await generate_text(prompt)
+    return result
+```
+
+### 6. Async Support
+
+```python
+@track_function()
+async def async_process(data):
+    return await some_async_operation(data)
+
+@track_llm_call(name="summarize")
+async def async_llm_call(text):
+    return await chain.ainvoke({"text": text})
+
+# Both sync and async work seamlessly
+``` Guide
+
+### Per-Application Configuration
+
+Each Gen AI application using this SDK should have **its own Langfuse project and credentials**. This ensures proper isolation and organization.
+
+#### Step 1: Create Langfuse Project
+1. Go to your Langfuse instance
+2. Create a new project for your application (e.g., "chatbot-api", "doc-analyzer")
+3. Copy the project's public key, secret key, and base URL
+
+#### Step 2: Configure in Your Application
+
+**Method 1: Environment Variables** (Recommended for production)
+
+```bash
+# .env file in your application root
+LANGFUSE_PUBLIC_KEY=pk-lf-abc123...
+LANGFUSE_SECRET_KEY=sk-lf-xyz789...
+LANGFUSE_BASE_URL=https://langfuse.company.com
+LANGFUSE_VERIFY_SSL=false
+```
+
+```python
+from llmops_observability import TraceManager
+from dotenv import load_dotenv
+
+load_dotenv()  # Loads .env from current directory
+# SDK auto-configures from environment variables
+```
+
+**Method 2: Explicit Configuration** (Recommended for testing)
+
+```python
+from llmops_observability import configure
+import os
+
+# At application startup (e.g., main.py)
+configure(
+    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+    base_url=os.getenv("LANGFUSE_BASE_URL"),
+    verify_ssl=False
+)
+```
+
+### Environment Variables Reference
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `LANGFUSE_PUBLIC_KEY` | Yes | None | Langfuse public key from your project |
+| `LANGFUSE_SECRET_KEY` | Yes | None | Langfuse secret key from your project |
+| `LANGFUSE_BASE_URL` | Yes | None | Langfuse instance URL |
+| `LANGFUSE_VERIFY_SSL` | No | `false` | Whether to verify SSL certificates |
+| `PROJECT_ID` | No | `unknown_project` | Project identifier (used as trace name in Langfuse) |
+| `ENV` | No | `development` | Environment name (production, staging, development, etc.) - automatically mapped to `LANGFUSE_TRACING_ENVIRONMENT` |
+
+**Environment Tracking:**
+- The `ENV` variable is automatically mapped to Langfuse's `LANGFUSE_TRACING_ENVIRONMENT`
+- This applies the environment as a top-level attribute to all traces and observations
+- Allows easy filtering by environment in Langfuse UI
+- Must follow regex: `^(?!langfuse)[a-z0-9-_]+$` with max 40 characters, capture_locals=False, capture_self=True)`
+Track regular function execution with optional local variable capture.
+
+```python
+@track_function()
+def my_function(x, y):
+    return x + y
+
+@track_function(name="custom_name", tags={"version": "1.0"})
+def another_function():
+    pass
+
+# Capture all local variables for debugging
+@track_function(capture_locals=True)
+def debug_function(data):
+    step1 = process(data)
+    step2 = transform(step1)
+    return step2  # All locals captured in Langfuse
+
+# Capture specific variables only
+@track_function(capture_locals=["result", "important_var"])
+def selective_function(input):
+    temp = input * 2  # Not captured
+    result = temp + 10  # Captured
+    important_var = compute(result)  # Captured
+    return important_var
+```
+
+**Parameters:**
+- `name`: Custom span name (default: function name)
+- `tags`: Dictionary of tags/metadata
+- `capture_locals`: Capture local variables - `True` (all), `False` (none), or list of variable names
+- `capture_self`: Whether to capture `self` in methods (default: `True`)
+
+## API Reference
+
+### TraceManager
+
+#### `start_trace(name, project_id=None, environment=None, metadata=None, user_id=None, session_id=None, tags=None)`
+Start a new trace with project and environment tracking.
+
+```python
+TraceManager.start_trace(
+    name="chat_message",  # Operation name (required)
+    project_id="my_project",  # Optional: defaults to PROJECT_ID env var
+    environment="production",  # Optional: defaults to ENV env var
+    metadata={"custom": "data"},
+    user_id="user_123",
+    session_id="session_456",
+    tags=["experiment"]
+)
+```
+
+**Parameters:**
+- `name` (required): Operation/trace name (e.g., "chat_message", "document_analysis")
+- `project_id` (optional): Project identifier. Defaults to `PROJECT_ID` from `.env`. Used as trace name in Langfuse.
+- `environment` (optional): Environment name (e.g., "production", "staging"). Defaults to `ENV` from `.env`. Automatically mapped to `LANGFUSE_TRACING_ENVIRONMENT`.
+- `metadata` (optional): Custom metadata dictionary
+- `user_id` (optional): User identifier
+- `session_id` (optional): Session identifier
+- `tags` (optional): List of tags
+
+**Returns:** Trace ID (string)
+
+**Example with .env auto-loading:**
+```bash
+# .env file
+PROJECT_ID=chatbot-api
+ENV=production
+```
+
+```python
+# Automatically uses PROJECT_ID and ENV from .env
+TraceManager.start_trace(
+    name="user_query",
+    metadata={"version": "2.0"}
+)
+# Trace name in Langfuse: "chatbot-api"
+# Environment in Langfuse: "production"
+```
+
+#### `end_trace()`
+End the current trace and flush to Langfuse.
+
+```python
+TraceManager.end_trace()
+```
+
+#### `finalize_and_send(user_id, session_id, trace_name, trace_input, trace_output)`
+Finalize and send the trace with input/output metadata .
+
+This is a convenience method that combines setting trace metadata and ending the trace in one call.
+
+```python
+TraceManager.start_trace(name="chat_message")
+
+# ... your code executes ...
+
+# Finalize with input/output details
+TraceManager.finalize_and_send(
+    user_id="user_123",
+    session_id="session_456",
+    trace_name="bedrock_chat_message",
+    trace_input={"user_msg": "What is Python?"},
+    trace_output={"bot_response": "Python is a programming language..."}
+)
+```
+
+**Parameters:**
+- `user_id`: User identifier
+- `session_id`: Session identifier
+- `trace_name`: Name for the trace (can override the initial name)
+- `trace_input`: Dictionary containing the input data
+- `trace_output`: Dictionary containing the output/response data
+
+### Decorators
+
+#### `@track_function(name=None, tags=None)`
+Track regular function execution.
+
+```python
+@track_function()
+def my_function(x, y):
+    return x + y
+
+@track_function(name="custom_name", tags={"version": "1.0"})
+def another_function():
+    pass
+```
+
+#### `@track_llm_call(name=None, tags=None)`
+Track LLM generation calls.
+
+```python
+@trAdvanced Features
+
+### Nested Spans & Parent-Child Relationships
+
+The SDK automatically handles nested function calls, creating parent-child relationships in Langfuse:
+
+```python
+@track_function(name="orchestrator")
+def main_workflow(user_query):
+    # This is the parent span
+    context = retrieve_documents(user_query)  # Child span 1
+    answer = generate_response(user_query, context)  # Child span 2
+    return answer
+
+@track_function(name="retrieval")
+def retrieve_documents(query):
+    # This becomes a child of main_workflow
+    return db.search(query)
+
+@track_function(name="generation")
+def generate_response(query, context):
+    # This also becomes a child of main_workflow
+    return llm.generate(query, context)
+```
+
+### Data Size Management
+
+The SDK automatically limits output size to **200KB** to prevent issues with large data:
+
+- Outputs larger than 200KB are truncated with metadata
+- Preview of first ~1KB is included
+- Prevents memory/network issues with large responses
+
+### ASGI Middleware for FastAPI
+
+Automatically trace all HTTP requests:
+
+```python
+from fastapi import FastAPI
+from llmops_observability import LLMOpsASGIMiddleware, track_function
+
+app = FastAPI()
+app.add_middleware(LLMOpsASGIMiddleware, service_name="chatbot_api")
+
+@app.post("/chat")
+async def chat_endpoint(message: str):
+    # Entire request is automatically traced
+    response = process_message(message)
+    return {"response": response}
+
+@track_function()
+def process_message(msg):
+    # This becomes a child span of the HTTP request trace
+    return "Response"
+```
+
+The middleware captures:
+- Request method, path, headers
+- Response status code
+- Request duration
+- User agent, client IP
+- Automatic trace naming: `{project}_{hostname}`
+
+## Project Structure
+
+```
+llmops-observability_sdk/
+├── src/
+│   └── llmops_observability/
+│       ├── __init__.py           # Public API
+│       ├── config.py             # Langfuse client configuration
+│       ├── trace_manager.py      # TraceManager & @track_function
+│       ├── llm.py                # @track_llm_call decorator
+│       ├── models.py             # SpanContext model
+│       ├── asgi_middleware.py    # FastAPI middleware
+│       └── pricing.py            # Token pricing calculations
+├──Best Practices
+
+### 1. Configuration Management
+- ✅ **Each application gets its own `.env` file** with unique Langfuse credentials
+- ✅ Use `.gitignore` to exclude `.env` files from version control
+- ✅ Call `configure()` at application startup before any tracing
+- ❌ Never hardcode credentials in the SDK or application code
+
+### 2. Trace Organization
+```python
+# Good: Descriptive trace names with context
+TraceManager.start_trace(
+    name="document_analysis_pipeline",
+    user_id=user_id,
+    session_id=session_id,
+    metadata={"doc_type": "pdf", "version": "2.0"},
+    tags=["production", "critical"]
+)
+
+# Bad: Generic names without context
+TraceManager.start_trace(name="process")
+```
+
+### 3. Local Variables Capture
+```python
+# Use for debugging only - has performance impact
+@track_function(capture_locals=True)  # Development
+def debug_complex_logic(data):
+    # All locals captured
+    pass
+
+# Production: Disable or be selective
+@track_function(capture_locals=False)  # Production
+@track_function(capture_locals=["final_result"])  # Selective
+```
+
+### 4. Always End Traces
+```python
+try:
+    TraceManager.start_trace(name="workflow")
+    result = process()
+    return result
+finally:
+    TraceManager.end_trace()  # Always flush
+```
+
+### 5. Trace Naming Convention
+- **Trace Name (in Langfuse)**: Uses `PROJECT_ID` for easy project identification
+- **Operation Name**: The `name` parameter describes what operation is being traced
+- **Environment**: Tracked automatically from `ENV` variable
+
+```python
+# Example:
+# .env: PROJECT_ID=payment-service, ENV=production
+
+TraceManager.start_trace(name="process_payment")
+# In Langfuse UI:
+#   - Trace Name: "payment-service"
+#   - Environment: "production"
+#   - Operation: "process_payment" (in metadata)
+```
+
+## When to Use This SDK
+
+✅ **Use llmops-observability when:**
+- Developing and testing LLM applications locally
+- You want instant trace visibility in Langfuse (no delays)
+- Simple, straightforward tracing without infrastructure setup
+- Running internal tools, demos, or proof-of-concepts
+- Need quick debugging with local variable capture
+- Small to medium-scale deployments
+
+
+## Troubleshooting
+
+### Configuration Errors
+
+**Error: "Langfuse not configured"**
+```python
+# Solution: Ensure env vars are set or call configure()
+from dotenv import load_dotenv
+load_dotenv()  # Load .env file
+
+# Or configure explicitly
+from llmops_observability import configure
+configure(public_key="...", secret_key="...", base_url="...")
+```
+
+### Trace Not Appearing in Langfuse
+
+1. Check that `TraceManager.end_trace()` is called
+2. Verify credentials are correct
+3. Check Langfuse URL is accessible
+4. Look for error messages in console output
+
+### SSL Certificate Issues
+
+```python
+# Disable SSL verification if using self-signed certs
+configure(
+    public_key="...",
+    secret_key="...",
+    base_url="...",
+    verify_ssl=False  # ← Disable SSL verification
+)
+```
+
+## Version History
+
+**v8.0.0** (Current)
+- Direct Langfuse integration (no SQS/batching)
+- Nested span support with automatic parent-child relationships
+- Local variable capture for debugging
+- ASGI middleware for FastAPI
+- Smart data serialization with size limits
+- Sync and async function support
+- Dynamic configuration per application
+
+## License
+
+Proprietary - Verisk Analytics
+
+## Contributing
+
+Internal SDK - For questions or contributions, contact the LLMOps team.# TraceManager & @track_function
+│       ├── llm.py                # @track_llm_call decorator
+│       └── models.py             # SpanContext model
+├── pyproject.toml
+└── README.md
+```
+
+## Example: Complete Workflow
+
+```python
+from llmops_observability import TraceManager, track_function, track_llm_call
+import boto3
+
+# Initialize Bedrock client
+bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+
+@track_function()
+def retrieve_context(query):
+    # Simulate RAG retrieval
+    return {"documents": ["Context doc 1", "Context doc 2"]}
+
+@track_llm_call()
+def generate_answer(prompt, context):
+    response = bedrock.converse(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        messages=[{
+            "role": "user",
+            "content": f"Context: {context}\n\nQuestion: {prompt}"
+        }]
+    )
+    return response
+
+# Start trace
+TraceManager.start_trace(
+    name="rag_pipeline",
+    user_id="user_123",
+    metadata={"pipeline": "v1"}
+)
+
+# Execute workflow
+context = retrieve_context("What is Python?")
+answer = generate_answer("What is Python?", context)
+
+# End trace
+TraceManager.end_trace()
+```
+
+## Thanks to
+Verisk LLMOps Team ❤️
