@@ -1,0 +1,38 @@
+[project]
+name = "jupyter-phoenix-proxy"
+version = "1.0.0"
+description = "Jupyter server proxy for Arize Phoenix"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+authors = [
+    {name = "LiZongfeng", email = "lzf940629@vip.qq.com"},
+]
+maintainers = [
+    {name = "LiZongfeng", email = "lzf940629@vip.qq.com"},
+]
+keywords = [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "jupyter-server-proxy",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+]
+requires-python = ">=3.10, <3.14"
+dependencies = [
+    "arize-phoenix>=12.28.1",
+    "jupyter-server-proxy>=4.4.0",
+]
+
+[project.urls]
+Repository = "https://cnb.cool/lzf.ai/jupyter-phoenix-proxy"
+
+[project.entry-points."jupyter_serverproxy_servers"]
+phoenix = "jupyter_phoenix_proxy:setup_phoenix"
