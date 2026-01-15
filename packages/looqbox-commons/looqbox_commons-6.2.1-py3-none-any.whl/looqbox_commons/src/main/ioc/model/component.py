@@ -1,0 +1,19 @@
+from typing import TypeVar, Type, Generic
+
+from looqbox_commons.src.main.ioc.model.base_bean import BaseBean
+
+T = TypeVar('T')
+
+
+class Component(BaseBean, Generic[T]):
+
+    def __init__(self, cls: Type[T]):
+        self._cls = cls
+        super().__init__(cls)
+
+    def __call__(self, *args, **kwargs) -> T:
+        return self._cls(*args, **kwargs)
+
+    def start(self, context, bean):
+        kwargs = context.get_injections(bean)
+        context.beans[self] = bean(**kwargs)

@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "simple": {
+      "()": "looqbox_commons.src.main.logger.formatters.stout_formatter.StdoutRecord",
+      "default_log_keys": {
+        "level": "levelname",
+        "message": "message",
+        "timestamp": "timestamp",
+        "logger": "name",
+        "module": "module",
+        "function": "funcName",
+        "thread_name": "thread"
+      }
+    },
+    "json": {
+      "()": "looqbox_commons.src.main.logger.formatters.json_formatter.LogJsonRecord",
+      "default_log_keys": {
+        "level": "levelname",
+        "message": "message",
+        "timestamp": "timestamp",
+        "logger": "name",
+        "module": "module",
+        "function": "funcName",
+        "thread_name": "thread"
+      }
+    }
+  },
+  "handlers": {
+    "stderr": {
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "formatter": "simple",
+      "stream": "ext://sys.stderr"
+    },
+    "file_json": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "DEBUG",
+      "formatter": "json",
+      "filename": "my_app.log.jsonl",
+      "maxBytes": 1000000,
+      "backupCount": 10
+    }
+  },
+  "loggers": {
+    "root": {
+      "level": "INFO",
+      "handlers": [
+        "stderr",
+        "file_json"
+      ]
+    }
+  }
+}
