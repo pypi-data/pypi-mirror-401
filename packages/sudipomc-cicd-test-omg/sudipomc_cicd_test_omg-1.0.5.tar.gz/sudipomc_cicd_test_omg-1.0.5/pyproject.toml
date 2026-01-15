@@ -1,0 +1,19 @@
+[project]
+name = "sudipomc-cicd-test-omg"
+version = "1.0.5"
+description = ""
+authors = [
+    {name = "Sudip Ranabhat",email = "sudip.ranabhat@omc.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[tool.poetry]
+packages = [{include = "cicdtest", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
