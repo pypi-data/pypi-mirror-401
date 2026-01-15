@@ -1,0 +1,302 @@
+from typing import Any
+
+import pandas as pd
+import numpy as np
+import copy
+
+from mirp._images.generic_image import GenericImage
+from mirp._imagefilters.generic import GenericFilter
+from mirp._imagefilters.utilities import SeparableFilterSet, pool_voxel_grids
+from mirp._images.transformed_image import TransformedImage
+from mirp.settings.generic import SettingsClass
+
+
+class LawsTransformedImage(TransformedImage):
+    def __init__(
+            self,
+            laws_kernel: None | str | list[str] = None,
+            delta_parameter: None | int = None,
+            energy_map: None | bool = None,
+            rotation_invariance: None | bool = None,
+            pooling_method: None | str = None,
+            boundary_condition: None | str = None,
+            riesz_order: None | int | list[int] = None,
+            riesz_steering: None | bool = None,
+            riesz_sigma_parameter: None | float = None,
+            template: None | GenericImage = None,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+
+        # Filter parameters
+        self.laws_kernel = laws_kernel
+        self.delta_parameter = delta_parameter
+        self.energy_map = energy_map
+        self.rotation_invariance = rotation_invariance
+        self.pooling_method = pooling_method
+        self.boundary_condition = boundary_condition
+        self.riesz_transformed = riesz_order is not None
+        self.riesz_order = copy.deepcopy(riesz_order)
+        self.riesz_steering = riesz_steering
+        self.riesz_sigma_parameter = riesz_sigma_parameter
+
+        # Update image parameters using the template.
+        if isinstance(template, GenericImage):
+            self.update_from_template(template=template)
+
+    def get_file_name_descriptor(self) -> list[str]:
+        descriptors = super().get_file_name_descriptor()
+
+        descriptors += ["laws", self.laws_kernel]
+        if self.energy_map:
+            descriptors += ["energy", "delta", str(self.delta_parameter)]
+        if self.rotation_invariance:
+            descriptors += ["invar"]
+
+        return descriptors
+
+    def get_export_attributes(self) -> dict[str, Any]:
+        parent_attributes = super().get_export_attributes()
+
+        attributes = [
+            ("filter_type", "laws"),
+            ("laws_kernel", self.laws_kernel),
+            ("energy_map", self.energy_map),
+            ("rotation_invariance", self.rotation_invariance),
+            ("boundary_condition", self.boundary_condition)
+        ]
+
+        if self.energy_map:
+            attributes += [("delta_parameter", self.delta_parameter)]
+
+        if self.pooling_method is not None:
+            attributes += [("pooling_method", self.pooling_method)]
+
+        if self.riesz_transformed:
+            attributes += [("riesz_order", self.riesz_order)]
+
+            if self.riesz_steering:
+                attributes += [("riesz_sigma_parameter", self.riesz_sigma_parameter)]
+
+        parent_attributes.update(dict(attributes))
+
+        return parent_attributes
+
+    def parse_feature_names(self, x: None | pd.DataFrame) -> pd.DataFrame:
+        x = super().parse_feature_names(x=x)
+
+        feature_name_prefix = ["laws", self.laws_kernel]
+        if self.energy_map:
+            feature_name_prefix += ["energy", "delta", str(self.delta_parameter)]
+        if self.rotation_invariance:
+            feature_name_prefix += ["invar"]
+
+        if len(feature_name_prefix) > 0:
+            feature_name_prefix = "_".join(feature_name_prefix)
+            feature_name_prefix += "_"
+            x.columns = feature_name_prefix + x.columns
+
+        return x
+
+
+class LawsFilter(GenericFilter):
+    def __init__(self, image: GenericImage, settings: SettingsClass, name: str):
+
+        super().__init__(image=image, settings=settings, name=name)
+
+        self.ibsi_compliant = True
+        self.ibsi_id = "JTXT"
+
+        # Normalise kernel and energy filters? This is true by default (see IBSI).
+        self.kernel_normalise = True
+        self.energy_normalise = True
+
+        # Set the filter name
+        self.laws_kernel: None | str | list[str] = settings.img_transform.laws_kernel
+
+        # Size of neighbourhood in chebyshev distance from center voxel
+        self.delta: None | int | list[int] = settings.img_transform.laws_delta
+
+        # Whether Laws texture energy should be calculated
+        self.calculate_energy = settings.img_transform.laws_calculate_energy
+
+        # Whether response maps or texture energy images should be made rotationally invariant
+        self.rotation_invariance = settings.img_transform.laws_rotation_invariance
+
+        # Which pooling method is used.
+        self.pooling_method = settings.img_transform.laws_pooling_method
+
+        # Set boundary condition
+        self.mode = settings.img_transform.laws_boundary_condition
+
+        if self.separate_slices and any(len(x) == 6 for x in self.laws_kernel):
+            mismatched_kernels = [x for x in self.laws_kernel if len(x) == 6]
+            raise ValueError(f"Cannot use 3D laws kernels for slice-by-slice filtering. Following kernels cannot be "
+                             f"used: {mismatched_kernels}")
+
+    def _not_isotropic_warning_message(self):
+        return f"Laws kernels require isotropic voxel spacing."
+
+    def generate_object(self):
+        # Generator for transformation objects.
+        laws_kernel = copy.deepcopy(self.laws_kernel)
+        if not isinstance(laws_kernel, list):
+            laws_kernel = [laws_kernel]
+
+        delta = copy.deepcopy(self.delta)
+        if not isinstance(delta, list):
+            delta = [delta]
+
+        if not self.calculate_energy:
+            delta = [None]
+
+        # Iterate over options to yield filter objects with specific settings. A copy of the parent object is made to
+        # avoid updating by reference.
+        for current_laws_kernel in laws_kernel:
+            for current_delta in delta:
+                filter_object = copy.deepcopy(self)
+                filter_object.laws_kernel = current_laws_kernel
+                filter_object.delta = current_delta
+
+                # Set 2D application.
+                filter_object.separate_slices = len(current_laws_kernel) == 4
+
+                yield filter_object
+
+    def transform(self, image: GenericImage) -> LawsTransformedImage:
+        # Create placeholder Laws kernel response map.
+        response_map = LawsTransformedImage(
+            image_data=None,
+            laws_kernel=self.laws_kernel,
+            delta_parameter=self.delta,
+            energy_map=self.calculate_energy,
+            rotation_invariance=self.rotation_invariance,
+            pooling_method=self.pooling_method,
+            boundary_condition=self.mode,
+            riesz_order=None,
+            riesz_steering=None,
+            riesz_sigma_parameter=None,
+            template=image
+        )
+        response_map.ibsi_compliant = self.ibsi_compliant and image.ibsi_compliant
+
+        if image.is_empty():
+            return response_map
+
+        self.check_isotropic_image(image=image)
+
+        # Initialise voxel grid.
+        response_voxel_grid = None
+
+        # Get filter list.
+        filter_set_list: list[SeparableFilterSet] = self.get_filter_set().permute_filters(
+            rotational_invariance=self.rotation_invariance)
+
+        for ii, filter_set in enumerate(filter_set_list):
+            # Convolve and compute response map.
+            pooled_voxel_grid = filter_set.convolve(
+                voxel_grid=image.get_voxel_grid(),
+                mode=self.mode
+            )
+
+            # Pool grids.
+            response_voxel_grid = pool_voxel_grids(
+                x1=response_voxel_grid,
+                x2=pooled_voxel_grid,
+                pooling_method=self.pooling_method
+            )
+
+            # Remove img_laws_grid to explicitly release memory when collecting garbage.
+            del pooled_voxel_grid
+
+        if self.pooling_method == "mean":
+            # Perform final pooling step for mean pooling.
+            response_voxel_grid = np.divide(response_voxel_grid, len(filter_set_list))
+
+        # Compute energy map from the response map.
+        if self.calculate_energy:
+            response_voxel_grid = self.response_to_energy(voxel_grid=response_voxel_grid)
+
+        # Set voxel grid.
+        response_map.set_voxel_grid(voxel_grid=response_voxel_grid)
+
+        return response_map
+
+    def response_to_energy(self, voxel_grid):
+
+        # Take absolute value of the voxel grid.
+        voxel_grid = np.abs(voxel_grid)
+
+        # Set the filter size.
+        filter_size = 2 * self.delta + 1
+
+        # Set up the filter kernel.
+        if self.energy_normalise:
+            filter_kernel = np.ones(filter_size, dtype=float) / filter_size
+        else:
+            filter_kernel = np.ones(filter_size, dtype=float)
+
+        # Create a filter set.
+        if self.separate_slices:
+            filter_set = SeparableFilterSet(
+                filter_x=filter_kernel,
+                filter_y=filter_kernel)
+        else:
+            filter_set = SeparableFilterSet(
+                filter_x=filter_kernel,
+                filter_y=filter_kernel,
+                filter_z=filter_kernel)
+
+        # Apply the filter.
+        voxel_grid = filter_set.convolve(voxel_grid=voxel_grid, mode=self.mode)
+
+        return voxel_grid
+
+    def get_filter_set(self):
+
+        # Get kernels
+        kernels: str = copy.deepcopy(self.laws_kernel)
+
+        # Deparse kernels to a list
+        kernel_list = [kernels[ii:ii + 2] for ii in range(0, len(kernels), 2)]
+
+        filter_x = None
+        filter_y = None
+        filter_z = None
+
+        for ii, kernel in enumerate(kernel_list):
+            if kernel.lower() == "l5":
+                laws_kernel = np.array([1.0, 4.0, 6.0, 4.0, 1.0])
+            elif kernel.lower() == "e5":
+                laws_kernel = np.array([-1.0, -2.0, 0.0, 2.0, 1.0])
+            elif kernel.lower() == "s5":
+                laws_kernel = np.array([-1.0, 0.0, 2.0, 0.0, -1.0])
+            elif kernel.lower() == "w5":
+                laws_kernel = np.array([-1.0, 2.0, 0.0, -2.0, 1.0])
+            elif kernel.lower() == "r5":
+                laws_kernel = np.array([1.0, -4.0, 6.0, -4.0, 1.0])
+            elif kernel.lower() == "l3":
+                laws_kernel = np.array([1.0, 2.0, 1.0])
+            elif kernel.lower() == "e3":
+                laws_kernel = np.array([-1.0, 0.0, 1.0])
+            elif kernel.lower() == "s3":
+                laws_kernel = np.array([-1.0, 2.0, -1.0])
+            else:
+                raise ValueError(f"{kernel} is not an implemented Laws kernel")
+
+            # Normalise kernel
+            if self.kernel_normalise:
+                laws_kernel /= np.sqrt(np.sum(np.power(laws_kernel, 2.0)))
+
+            # Assign filter to variable.
+            if ii == 0:
+                filter_x = laws_kernel
+            elif ii == 1:
+                filter_y = laws_kernel
+            elif ii == 2:
+                filter_z = laws_kernel
+
+        # Create FilterSet object
+        return SeparableFilterSet(filter_x=filter_x,
+                                  filter_y=filter_y,
+                                  filter_z=filter_z)
