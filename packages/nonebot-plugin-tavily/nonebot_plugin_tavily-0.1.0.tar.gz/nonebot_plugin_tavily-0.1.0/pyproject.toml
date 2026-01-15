@@ -1,0 +1,28 @@
+[project]
+name = "nonebot-plugin-tavily"
+version = "0.1.0"
+description = "Tavily Search API plugin for NoneBot2"
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "gsskk", email = "your.email@example.com" }
+]
+license = { file = "LICENSE" } 
+
+dependencies = [
+    "nonebot2>=2.3.0",
+    "nonebot-plugin-alconna>=0.50.2",
+    "tavily-python>=0.5.4",
+]
+
+[tool.nonebot]
+plugins = ["nonebot_plugin_tavily"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+ignore = ["E402"]
