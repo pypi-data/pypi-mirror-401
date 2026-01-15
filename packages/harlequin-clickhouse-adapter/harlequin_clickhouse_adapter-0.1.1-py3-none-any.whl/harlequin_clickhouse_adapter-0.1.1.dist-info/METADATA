@@ -1,0 +1,75 @@
+Metadata-Version: 2.4
+Name: harlequin-clickhouse-adapter
+Version: 0.1.1
+Summary: A Harlequin adapter for ClickHouse.
+Author: Artem Gromov
+License-File: LICENSE
+Requires-Python: <4.0,>=3.8.1
+Requires-Dist: clickhouse-driver>=0.2.6
+Requires-Dist: harlequin<3,>=1.7
+Description-Content-Type: text/markdown
+
+# harlequin-clickhouse-adapter
+
+A ClickHouse adapter for [Harlequin](https://harlequin.sh) built on `clickhouse-driver`.
+
+## Installation
+
+Using `uv`:
+
+```bash
+uv pip install harlequin-clickhouse-adapter
+```
+
+From source:
+
+```bash
+uv sync
+uv pip install -e .
+```
+
+## Usage
+
+Connect with a URL:
+
+```bash
+harlequin clickhouse clickhouse://user:password@localhost:9000/default
+```
+
+Connect with explicit options:
+
+```bash
+harlequin clickhouse \
+  --host localhost \
+  --port 9000 \
+  --user default \
+  --database default
+```
+
+Or via positional connection tokens (host, port, database, user, password):
+
+```bash
+harlequin clickhouse localhost 9000 default default secret
+```
+
+### TLS and compression
+
+```bash
+harlequin clickhouse \
+  --host ch.example.com \
+  --port 9440 \
+  --secure \
+  --ca-cert /path/to/ca.pem \
+  --compression
+```
+
+### ClickHouse settings
+
+Repeat `--setting` for query-level settings:
+
+```bash
+harlequin clickhouse \
+  --host localhost \
+  --setting max_threads=8 \
+  --setting max_memory_usage=10000000000
+```
