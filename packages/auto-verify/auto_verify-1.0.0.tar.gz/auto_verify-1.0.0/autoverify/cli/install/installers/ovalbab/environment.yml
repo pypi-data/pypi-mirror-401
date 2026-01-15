@@ -1,0 +1,108 @@
+name: __av__ovalbab
+
+channels:
+- pytorch
+- nvidia
+- conda-forge
+- nodefaults # Explicitly block Anaconda repos
+
+dependencies:
+  # Critical pinned packages
+  - python=3.8
+  - pytorch=2.0.0
+  - torchvision=0.15.0
+  - torchaudio=2.0.0
+  - numpy=1.24.3
+  - sympy=1.11.1
+
+  # Unpinned packages (let Conda resolve versions)
+  - _libgcc_mutex
+  - _openmp_mutex
+  - blas
+  - brotlipy
+  - bzip2
+  - ca-certificates
+  - certifi
+  - cffi
+  - charset-normalizer
+  - cryptography
+  - cuda-cudart
+  - cuda-cupti
+  - cuda-libraries
+  - cuda-nvrtc
+  - cuda-nvtx
+  - cuda-runtime
+  - ffmpeg
+  - filelock
+  - freetype
+  - giflib
+  - gmp
+  - gmpy2
+  - gnutls
+  - idna
+
+  - jinja2
+  - jpeg
+  - lame
+  - lcms2
+  - ld_impl_linux-64
+  - lerc
+  - libcublas
+  - libcufft
+  - libcufile
+  - libcurand
+  - libcusolver
+  - libcusparse
+  - libdeflate
+  - libffi
+  - libgcc-ng
+  - libgomp
+  - libiconv
+  - libidn2
+  - libnpp
+  - libnvjpeg
+  - libpng
+  - libstdcxx-ng
+  - libtasn1
+  - libtiff
+  - libunistring
+  - libwebp
+  - libwebp-base
+  - lz4-c
+  - markupsafe
+  - mkl
+  - mkl-service
+  - mkl_fft
+  - mkl_random
+  - mpc
+  - mpfr
+  - mpmath
+  - ncurses
+  - nettle
+  - networkx
+  - openh264
+  - openssl
+  - pillow
+  - pip
+  - pycparser
+  - pyopenssl
+  - pysocks
+  - pytorch-cuda
+  - pytorch-mutex
+  - readline
+  - requests
+  - setuptools
+  - six
+  - sqlite
+  - tk
+  - torchtriton
+  - typing_extensions
+  - urllib3
+  - wheel
+  - xz
+  - zlib
+  - zstd
+
+  # Pip dependencies
+  - pip:
+      - intel-openmp
