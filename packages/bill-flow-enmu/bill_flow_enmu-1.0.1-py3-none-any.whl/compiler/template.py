@@ -1,0 +1,6 @@
+normal_template = """
+    {{
+        
+    }}
+
+"""
