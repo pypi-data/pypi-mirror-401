@@ -1,0 +1,132 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pickomino-env"
+version = "1.0.7"
+description = "Pickomino (Heckmeck) Gymnasium environment"
+readme = ""
+requires-python = ">=3.8"
+authors = [{ name = "Jarl and Robin" }]
+dependencies = [
+    "gymnasium>=1.2.3",
+    "numpy>=2.3.5",
+    "pygame>=2.6.1",
+    # pygame uses deprecated pkg_resources (setuptools issue)
+    # See: https://setuptools.pypa.io/en/latest/pkg_resources.html
+    "setuptools<81"
+]
+
+[project.optional-dependencies]
+test = ["matplotlib", "pytest", "pytest-cov", "stable_baselines3"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pickomino_env*"]
+
+[tool.pydocstyle]
+convention = "google"
+
+[tool.black]
+line-length = 120
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+markers = [
+    "slow: marks tests as slow (skipped in pre-commit, run in CI",
+]
+
+[tool.coverage.run]
+omit = ["config*.py"]
+
+[tool.setuptools.package-data]
+"pickomino_env" = ["py.typed"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+exclude = [
+    "tests/",
+    "local/"
+]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint."messages control"]
+enable = [
+    "bad-inline-option",
+    "deprecated-pragma",
+    "file-ignored",
+    "use-symbolic-message-instead",
+    "useless-suppression",
+]
+disable = ["consider-using-assignment-expr"] # Assignments in a boolean expression is a bad idea
+include-naming-hints = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "EM101", # Gymnasium uses descriptive f-strings directly in exeptions. (raise ValueError(f"<message>"))
+    "EM102", # EM101. EM102, TRY003 conflict with this standard.
+    "TRY003",
+    "D203", # Conflicts with D211 (no blank line before class wins)
+    "D213", # Conflicts with D212 (first line summary wins)
+    "D413", # No blank line after docstring allowed (Google style).
+]
+
+[tool.pylint.master]
+fail-on = ["I"]
+load-plugins = [
+    "pylint.extensions.bad_builtin",
+    "pylint.extensions.broad_try_clause",
+    "pylint.extensions.check_elif",
+    "pylint.extensions.code_style",
+    "pylint.extensions.comparison_placement",
+    "pylint.extensions.confusing_elif",
+    "pylint.extensions.consider_refactoring_into_while_condition",
+    "pylint.extensions.consider_ternary_expression",
+    "pylint.extensions.dict_init_mutate",
+    "pylint.extensions.docparams",
+    "pylint.extensions.docstyle",
+    "pylint.extensions.dunder",
+    "pylint.extensions.eq_without_hash",
+    "pylint.extensions.empty_comment",
+    "pylint.extensions.for_any_all",
+    "pylint.extensions.magic_value",
+    "pylint.extensions.mccabe",
+    "pylint.extensions.no_self_use",
+    "pylint.extensions.overlapping_exceptions",
+    "pylint.extensions.private_import",
+    "pylint.extensions.redefined_loop_name",
+    "pylint.extensions.redefined_variable_type",
+    "pylint.extensions.set_membership",
+    "pylint.extensions.typing",
+    "pylint.extensions.while_used"
+]
+
+[tool.pylint.variables]
+generated-members = ["cv2", "pygame"]
+allow-global-unused-variables = false
+
+[tool.pylint.string]
+check-quote-consistency = true
+
+[tool.pyright]
+include = ["pickomino_env/**"]
+exclude = ["tests/**", "**/__pycache__"]
+strict = []
+
+typeCheckingMode = "strict"
+pythonVersion = "3.8"
+pythonPlatform = "All"
+
+# This is required as the CI pre-commit does not download the module (numpy, pygame, and more).
+#   Therefore, we have to ignore missing imports.
+reportMissingImports = "none"
+# Cannot infer types from unresolved imports in pre-commit environment
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUnnecessaryIsInstance = "none"
+reportUnknownArgumentType = "none"
