@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '**'
+  pull_request:
+
+jobs:
+
+  test-python:
+    name: test ${{ matrix.python-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - '3.11'
+          - '3.12'
+          - '3.13'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run python tests
+        run: uv run pytest tests
+      - name: Run rust tests
+        run: cargo test --all
+
+  docs:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+        with:
+          python-version: "3.11"
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+      - name: docs
+        run: |
+          make docs-strict
