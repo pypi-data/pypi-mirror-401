@@ -1,0 +1,288 @@
+Metadata-Version: 2.4
+Name: spark-cli
+Version: 0.4.1
+Summary: Your intelligent code snippet manager for developers
+Home-page: https://github.com/zeroequalsone/spark-cli
+Author: zeroequalsone
+Author-email: hi@sgoetze.de
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pyperclip>=1.8.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Spark CLI
+
+🔥 Your intelligent code snippet manager for developers
+
+Spark helps you save, organize, and quickly access your frequently used commands and code snippets. Never forget that perfect command again!
+
+[![PyPI version](https://badge.fury.io/py/spark-cli.svg)](https://badge.fury.io/py/spark-cli)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+
+**Available on PyPI:** `pip install spark-cli`
+
+## Features
+
+- 💾 **Save snippets** with optional tags for organization
+- 🔍 **Smart search** - Find snippets by command or tag content
+- 📋 **Quick copy** - Copy snippets to clipboard with one command
+- 🏷️ **Tag system** - Organize snippets with comma-separated tags
+- 🗑️ **Flexible deletion** - Delete by ID or by text content (with preview)
+- 🎨 **Beautiful output** - Colorful, table-based display using Rich
+- ⚠️ **Duplicate detection** - Warns if you try to save a duplicate command
+- 🔄 **Auto-migration** - Database schema updates automatically
+- 🤖 **Intelligent Auto-Tagging** - Automatically detects and adds relevant tags based on command content, tools, languages, and project context
+
+## Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install spark-cli
+```
+
+After installation, the `spark` command is available globally.
+
+**Note:** If `spark` doesn't work after installation (e.g., with editable installs), you can use `python -m spark` as an alternative.
+
+### From source
+
+```bash
+git clone https://github.com/zeroequalsone/spark-cli.git
+cd spark-cli
+pip install -e .
+```
+
+**Note:** With editable installs, if `spark` command doesn't work, use `python -m spark` instead.
+
+## Quick Start
+
+After installation, Spark is ready to use. No configuration needed! The database is automatically created in `~/.spark/snippets.db` on first use.
+
+```bash
+# Save your first snippet (auto-tags detected automatically!)
+spark save "docker-compose up -d"  # Auto-tags: compose,docker
+
+# Save with manual tags (auto-tags are merged)
+spark save "git log --oneline -10" --tags "git,log,history"
+
+# Save without auto-tagging
+spark save "echo hello" --no-auto-tags
+
+# Find snippets
+spark find docker
+
+# List all snippets
+spark list
+
+# List snippets by tag
+spark list --tag docker
+
+# Copy to clipboard
+spark copy 1
+
+# Delete a snippet
+spark delete 1
+
+# Delete by text content
+spark delete "docker"
+```
+
+## Commands
+
+### `spark save <command> [--tags] [--no-auto-tags]`
+
+Save a new code snippet with intelligent auto-tagging.
+
+```bash
+spark save "npm install" --tags "npm,node,install"
+spark save "docker-compose up -d"  # Auto-tags: compose,docker
+spark save "git log" --no-auto-tags  # Disable auto-tagging
+```
+
+**Features:**
+
+- **Intelligent Auto-Tagging**: Automatically detects tags based on:
+  - **Tools**: docker, git, npm, python, terraform, etc.
+  - **Languages**: Python, JavaScript, Rust, Go, Java, etc.
+  - **Project Context**: Detects language/technology from project files (package.json → JavaScript, requirements.txt → Python, Cargo.toml → Rust, etc.)
+  - **Directory Context**: Recognizes backend/frontend/mobile projects from directory structure
+- **Tag Merging**: Auto-tags are automatically combined with your manual tags
+- Duplicate detection: If a command already exists, Spark will warn you and ask for confirmation
+- Tags are optional: You can save snippets with or without tags
+- Tags are comma-separated: `--tags "tag1,tag2,tag3"`
+- Disable auto-tagging: Use `--no-auto-tags` flag
+
+### `spark find <search-term>`
+
+Search for snippets containing the search term in either the command or tags.
+
+```bash
+spark find docker
+spark find git
+```
+
+### `spark list [--tag <tag>]`
+
+List all snippets, optionally filtered by tag.
+
+```bash
+spark list
+spark list --tag docker
+```
+
+### `spark copy <id>`
+
+Copy a snippet to your clipboard by ID.
+
+```bash
+spark copy 1
+```
+
+### `spark delete <id|text>`
+
+Delete a snippet by ID or by text content. When deleting by text, Spark shows all matching snippets and asks for confirmation.
+
+```bash
+# Delete by ID (immediate)
+spark delete 1
+
+# Delete by text (shows preview table and asks for confirmation)
+spark delete "docker"
+```
+
+**Note:** When deleting by text, all snippets containing that text will be shown. You can confirm or cancel the deletion.
+
+### `spark clear`
+
+Delete all snippets and reset the database. This also resets the ID counter back to 1.
+
+```bash
+spark clear
+```
+
+**Warning:** This action cannot be undone!
+
+## Examples
+
+### Organizing Docker Commands
+
+```bash
+# Auto-tagging detects "docker" and "compose" automatically
+spark save "docker-compose up -d"  # Auto-tags: compose,docker
+
+# Add custom tags - auto-tags are merged
+spark save "docker ps -a" --tags "containers"  # Tags: containers,docker
+
+# Find all docker commands
+spark list --tag docker
+```
+
+### Git Workflow Snippets
+
+```bash
+spark save "git log --oneline -10" --tags "git,log,history"
+spark save "git checkout -b feature/new-feature" --tags "git,branch,workflow"
+spark save "git push origin HEAD" --tags "git,push,remote"
+
+# Search for git commands
+spark find git
+```
+
+### Python Development
+
+```bash
+# Auto-tagging detects Python tools and languages
+spark save "python -m pytest tests/"  # Auto-tags: pytest,python,test
+spark save "python -m black ."  # Auto-tags: python
+spark save "pip install -e ."  # Auto-tags: pip,python
+
+# Add custom tags - auto-tags are merged
+spark save "python manage.py migrate" --tags "django"  # Tags: django,python
+
+# List all Python-related snippets
+spark list --tag python
+```
+
+## Data Storage
+
+Spark stores all snippets in a local SQLite database located at:
+
+- **Linux/macOS**: `~/.spark/snippets.db`
+- **Windows**: `%USERPROFILE%\.spark\snippets.db`
+
+Your data stays local and private.
+
+## Requirements
+
+- Python 3.8+
+- typer
+- rich
+- pyperclip
+
+## Version
+
+Current version: **0.4.1**
+
+**What's new in v0.4.1:**
+- Fixed: Added support for `python -m spark` as fallback method
+- Improved installation compatibility
+
+**What's new in v0.4.0:**
+- 🎯 Intelligent Auto-Tagging - Automatically detects relevant tags from commands
+- Enhanced tag merging with manual tags
+- Improved project context detection
+
+Check for updates:
+
+```bash
+pip install --upgrade spark-cli
+```
+
+## Contributing
+
+Contributions are welcome! Feel free to open an issue or submit a pull request.
+
+**Ideas for contributions:**
+
+- Import from bash history
+- Export/backup functionality
+- Statistics and usage tracking
+- Shell completion scripts
+- VS Code extension
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+Inspired by tools like `pet` and `cheat.sh`, but designed to be more personal and intelligent.
+
+## Links
+
+- **PyPI Package:** https://pypi.org/project/spark-cli/
+- **GitHub Repository:** https://github.com/zeroequalsone/spark-cli
+- **Issues & Bug Reports:** https://github.com/zeroequalsone/spark-cli/issues
