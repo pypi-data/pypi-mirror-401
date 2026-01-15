@@ -1,0 +1,2 @@
+from .basic import NumPyWaypointsTrajectory as NumPyWaypointsTrajectory
+from .accelerated import JaxWaypointsTrajectory as JaxWaypointsTrajectory

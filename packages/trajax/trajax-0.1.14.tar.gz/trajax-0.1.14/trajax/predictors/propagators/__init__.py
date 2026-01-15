@@ -1,0 +1,2 @@
+from .basic import NumPyLinearCovariancePropagator as NumPyLinearCovariancePropagator
+from .accelerated import JaxLinearCovariancePropagator as JaxLinearCovariancePropagator
