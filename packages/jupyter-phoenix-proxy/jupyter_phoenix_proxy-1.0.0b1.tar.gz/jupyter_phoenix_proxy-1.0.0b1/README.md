@@ -1,0 +1,48 @@
+# jupyter-phoenix-proxy
+
+Running Arize Phoenix inside the Jupyter environment
+
+## Requirements
+
+- [Phoenix](https://github.com/Arize-ai/phoenix)
+- [Jupyter Server Proxy](https://github.com/jupyterhub/jupyter-server-proxy)
+
+## Installation
+
+```bash
+pip install jupyter-phoenix-proxy
+```
+
+## Configuration
+
+### Setting the working directory
+The environment variable PHOENIX_WORKING_DIR is prioritised and can be changed for the Arize Phoenix independently of the Jupyter working/notebook directory.
+
+The order/priority is as follows:
+
+1. PHOENIX_WORKING_DIR, if not set:
+2. JUPYTERHUB_ROOT_DIR, if not set:
+3. JUPYTER_SERVER_ROOT, if not set:
+4. HOME
+
+### Using pre-started phoenix
+> Note:  
+Because of the phoenix routing strategy, the pre-started instance must be accessible from `localhost` and must in the subdir `/phoenix` by setting the following environment variables: PHOENIX_HOST_ROOT_PATH=/phoenix
+
+In case phoenix server is already running (e.g. started in sidecar container with Jupyter running in Kubernetes) and serving via TCP port, it is possible to proxy this already running instance instead of starting a new one with jupyter-server-proxy. Variable JSP_PHOENIX_PORT set command to empty list which makes jupyter-server-proxy pass requests to specified port of socket.  
+If running phoenix server is listening to TCP port, environment variable JSP_PHOENIX_PORT may be set to port number.  
+If none of these environment variables are set, jupyter-phoenix-proxy starts new phoenix server process and proxies requests to its socket.
+
+### Enable/disable launcher
+By default phoenix launcher is enabled and visible in JupyterLab. Option JSP_PHOENIX_LAUNCHER_DISABLED may be set to any non-empty value to disable launcher. This is useful when e.g. certain users are not supposed to have phoenix available in Jupyterhub as there is no easy way to disable loading of entire jupyter-phoenix-proxy module for these users if module is for example built into Docker image.
+
+### Other Phoenix Configurations
+[server-configuration](https://arize.com/docs/phoenix/self-hosting/configuration#server-configuration)
+
+## Credits
+
+### Inspiration
+- [jupyter-code-server](https://github.com/pc2/jupyter-code-server)
+
+### Assets
+- [phoenix-logo](https://github.com/Arize-ai/phoenix-assets/blob/main/logos/Phoenix/phoenix.svg)
