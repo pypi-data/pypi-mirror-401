@@ -1,0 +1,10 @@
+pyserial
+tqdm
+
+[test]
+pytest
+pytest-mock
+mypy
+
+[test:sys_platform != "win32"]
+mock-serial
