@@ -1,0 +1,69 @@
+"""
+Parze Python SDK
+A simple client for interacting with the Parze API.
+"""
+
+import requests
+from typing import Union, BinaryIO
+
+class ParzeClient:
+    def __init__(self, api_key: str, base_url: str = "https://parze-561514618654.europe-west1.run.app"):
+        self.api_key = api_key
+        self.base_url = base_url
+        self.headers = {"Authorization": f"Bearer {self.api_key}"}
+
+    def parse(self, file: Union[str, BinaryIO], 
+              output_format: str = "structured",
+              preserve_tables: bool = True,
+              preserve_layout: bool = True,
+              extraction_mode: str = "auto") -> dict:
+        """Parse document into structured text."""
+        url = f"{self.base_url}/api/parse"
+        
+        if isinstance(file, str):
+            with open(file, 'rb') as f:
+                files = {'file': f}
+                data = {
+                    'output_format': output_format,
+                    'preserve_tables': str(preserve_tables).lower(),
+                    'preserve_layout': str(preserve_layout).lower(),
+                    'extraction_mode': extraction_mode
+                }
+                response = requests.post(url, files=files, data=data, headers=self.headers)
+        else:
+            files = {'file': file}
+            data = {
+                'output_format': output_format,
+                'preserve_tables': str(preserve_tables).lower(),
+                'preserve_layout': str(preserve_layout).lower(),
+                'extraction_mode': extraction_mode
+            }
+            response = requests.post(url, files=files, data=data, headers=self.headers)
+        
+        response.raise_for_status()
+        return response.json()
+
+    def extract(self, text: str, extraction_schema: dict) -> dict:
+        """Extract structured data from text using schema."""
+        url = f"{self.base_url}/api/extract"
+        headers = {**self.headers, "Content-Type": "application/json"}
+        payload = {"text": text, "extraction_schema": extraction_schema}
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return response.json()
+
+    def suggest_schema(self, text: str) -> dict:
+        """Get AI-suggested schema based on text."""
+        url = f"{self.base_url}/api/suggest-schema"
+        headers = {**self.headers, "Content-Type": "application/json"}
+        response = requests.post(url, json={"text": text}, headers=headers)
+        response.raise_for_status()
+        return response.json()
+
+    def text_to_schema(self, description: str) -> dict:
+        """Convert natural language to extraction schema."""
+        url = f"{self.base_url}/api/text-to-schema"
+        headers = {**self.headers, "Content-Type": "application/json"}
+        response = requests.post(url, json={"text": description}, headers=headers)
+        response.raise_for_status()
+        return response.json()
