@@ -1,0 +1,50 @@
+Metadata-Version: 2.4
+Name: agent-dist
+Version: 0.1.2
+Summary: A lightweight agentic mesh for orchestrating AI agents.
+Author-email: Shekar <shekar.shekar9036@gmail.com>
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: requests
+Requires-Dist: httpx
+Requires-Dist: pydantic
+Requires-Dist: langchain-groq
+Requires-Dist: langchain-ollama
+Requires-Dist: python-dotenv
+
+# AgentFlows
+
+A lightweight agentic mesh for orchestrating AI agents in a hospital environment.
+
+## ⚙️ Configuration
+
+Copy the example configuration file:
+```bash
+cp .env.example .env
+```
+Edit `.env` to set your LLM provider.
+
+### Supported LLM Providers
+- **Ollama** (Default): Run local models via `ollama serve`.
+- **Groq**: Fast inference. Set `LLM_PROVIDER=groq` and `GROQ_API_KEY`.
+- **OpenAI**: Set `LLM_PROVIDER=openai` and `LLM_API_KEY`.
+
+## Installation
+```bash
+pip install agentflows
+```
+
+## Running
+
+**Registry:**
+```bash
+python -m agentflows.registry.app
+```
+
+**Orchestrator:**
+```bash
+python -m agentflows.orchestrator.app
+```
+
