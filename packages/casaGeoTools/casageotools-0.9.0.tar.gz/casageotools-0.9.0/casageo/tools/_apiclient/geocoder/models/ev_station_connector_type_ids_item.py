@@ -1,0 +1,41 @@
+from enum import Enum
+
+
+class EvStationConnectorTypeIdsItem(str, Enum):
+    VALUE_0 = "10"
+    VALUE_1 = "11"
+    VALUE_10 = "24"
+    VALUE_11 = "25"
+    VALUE_12 = "29"
+    VALUE_13 = "30"
+    VALUE_14 = "31"
+    VALUE_15 = "32"
+    VALUE_16 = "33"
+    VALUE_17 = "34"
+    VALUE_18 = "35"
+    VALUE_19 = "36"
+    VALUE_2 = "12"
+    VALUE_20 = "37"
+    VALUE_21 = "42"
+    VALUE_22 = "43"
+    VALUE_23 = "46"
+    VALUE_24 = "48"
+    VALUE_25 = "49"
+    VALUE_26 = "5"
+    VALUE_27 = "50"
+    VALUE_28 = "52"
+    VALUE_29 = "53"
+    VALUE_3 = "13"
+    VALUE_30 = "6"
+    VALUE_31 = "7"
+    VALUE_32 = "8"
+    VALUE_33 = "9"
+    VALUE_4 = "14"
+    VALUE_5 = "15"
+    VALUE_6 = "20"
+    VALUE_7 = "21"
+    VALUE_8 = "22"
+    VALUE_9 = "23"
+
+    def __str__(self) -> str:
+        return str(self.value)
