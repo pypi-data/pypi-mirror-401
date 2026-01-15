@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ascript" # 建议改成你的项目名，避免与库名 ascript 冲突
+version = "1.0.2"
+description = "Ascript Devloper Library"
+readme = "README.md"
+# 兼容性建议：Python 3.9 是目前的主流，但如果需要支持旧机器，3.8 也可以
+requires-python = ">=3.9"
+license = {text = "MIT"}
+classifiers = [
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+# 核心业务依赖
+dependencies = [
+    "ascript",              # 核心库
+    "eel>=0.17.0",          # 核心：Python 与 HTML 通信框架
+    "gevent>=23.9.1",       # 核心依赖：Eel 的并发模型支持
+    "bottle>=0.12.25",      # 核心依赖：Eel 内部的 Web 服务器
+    "bottle-websocket>=0.2.9", # 核心依赖：支持实时通信
+    "uiautomation>=2.0.20", # 既然你用到了 WalkControl 和 UI 探测
+    "pywin32>=306",         # Windows API 支持
+    "psutil>=5.9.0",        # 进程管理，用于查找窗口和 PID
+    "pyautogui>=0.9.54",
+    "opencv-python>=4.9.0.0",
+    "pillow>=10.0.0",
+    "numpy>=1.26.0",
+]
+[project.optional-dependencies]
+# 这里的依赖只在开发和打包时使用，不会被打包进业务逻辑
+dev = [
+    "pyinstaller>=6.0.0",
+]
+
+[tool.setuptools]
+# 确保只打包你自己的业务代码文件夹（假设叫 src）
+packages = {find = {}}
+
+[tool.pyinstaller]
+# 可以在这里备注打包参数，虽然 PyInstaller 不直接读取它，但方便 Action 调用
+args = [
+    "--onefile",
+    "--noconsole",
+    "--clean",
+    "--exclude-module=tkinter",
+    "--exclude-module=unittest"
+]
