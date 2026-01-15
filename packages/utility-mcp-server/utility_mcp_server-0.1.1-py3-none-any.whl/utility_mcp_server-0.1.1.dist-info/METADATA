@@ -1,0 +1,536 @@
+Metadata-Version: 2.4
+Name: utility-mcp-server
+Version: 0.1.1
+Summary: A utility Model Context Protocol (MCP) server
+Project-URL: Homepage, https://github.com/redhat-data-and-ai/utility-mcp-server
+Project-URL: Repository, https://github.com/redhat-data-and-ai/utility-mcp-server
+Project-URL: Issues, https://github.com/redhat-data-and-ai/utility-mcp-server/issues
+Author-email: Jitendra Yejare <jyejare@redhat.com>
+License: Apache-2.0
+License-File: LICENSE
+Keywords: ai-tools,fastmcp,mcp,model-context-protocol,release-notes
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: <3.14,>=3.12
+Requires-Dist: asyncpg==0.30.0
+Requires-Dist: fastapi==0.116.0
+Requires-Dist: fastmcp==2.10.4
+Requires-Dist: httpx==0.28.1
+Requires-Dist: itsdangerous==2.2.0
+Requires-Dist: psycopg==3.2.3
+Requires-Dist: pydantic-settings==2.10.1
+Requires-Dist: pydantic==2.11.7
+Requires-Dist: python-dotenv==1.1.1
+Requires-Dist: requests-oauthlib==2.0.0
+Requires-Dist: structlog==25.4.0
+Requires-Dist: uvicorn==0.35.0
+Provides-Extra: dev
+Requires-Dist: bandit==1.8.6; extra == 'dev'
+Requires-Dist: httpx==0.28.1; extra == 'dev'
+Requires-Dist: langchain-google-genai==2.1.8; extra == 'dev'
+Requires-Dist: langchain-mcp-adapters==0.1.8; extra == 'dev'
+Requires-Dist: langgraph==0.5.4; extra == 'dev'
+Requires-Dist: mypy==1.16.1; extra == 'dev'
+Requires-Dist: pre-commit==4.2.0; extra == 'dev'
+Requires-Dist: pytest-asyncio==1.0.0; extra == 'dev'
+Requires-Dist: pytest-cov==6.2.1; extra == 'dev'
+Requires-Dist: pytest==8.4.1; extra == 'dev'
+Requires-Dist: ruff==0.12.2; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Utility MCP Server
+
+[![PyPI](https://img.shields.io/pypi/v/utility-mcp-server.svg)](https://pypi.org/project/utility-mcp-server/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12,3.13-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://github.com/redhat-data-and-ai/utility-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/redhat-data-and-ai/utility-mcp-server/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/redhat-data-and-ai/utility-mcp-server/branch/main/graph/badge.svg)](https://codecov.io/gh/redhat-data-and-ai/utility-mcp-server)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+## Description
+
+A Model Context Protocol (MCP) server providing utility tools for development workflows. Built with Python and FastMCP, this server offers tools like automated release notes generation from git commits.
+
+Features include structured logging, configuration management, multiple transport protocols (HTTP, SSE, streamable-HTTP), SSL support, and containerized deployment.
+
+## Code Structure
+
+```
+utility-mcp-server/
+├── utility_mcp_server/           # Main package directory
+│   ├── __init__.py
+│   ├── src/                       # Core source code
+│   │   ├── __init__.py
+│   │   ├── main.py               # Application entry point & startup logic
+│   │   ├── api.py                # FastAPI application & transport setup
+│   │   ├── mcp.py                # MCP server implementation & tool registration
+│   │   ├── settings.py           # Pydantic-based configuration management
+│   │   └── tools/                # MCP tool implementations
+│   │       ├── __init__.py
+│   │       ├── release_notes_tool.py  # Release notes generation tool
+│   │       └── assets/           # Static resource files
+│   └── utils/                    # Shared utilities
+│       ├── __init__.py
+│       └── pylogger.py          # Structured logging with structlog
+├── tests/                        # Comprehensive test suite
+│   ├── conftest.py              # Pytest fixtures and configuration
+│   ├── test_settings.py         # Unit tests for configuration
+│   ├── test_mcp.py              # Unit tests for MCP server
+│   ├── test_release_notes_tool.py # Unit tests for release notes tool
+│   ├── test_api.py              # Unit tests for API endpoints
+│   ├── test_main.py             # Unit tests for main module
+│   └── test_integration.py      # Integration tests
+├── pyproject.toml               # Project metadata & dependencies
+├── Containerfile               # Red Hat UBI-based container build
+├── compose.yaml                # Docker Compose orchestration
+├── .env.example                # Environment configuration template
+├── .gitignore                  # Version control exclusions
+├── .pre-commit-config.yaml     # Code quality automation
+└── README.md                   # Project documentation
+```
+
+### Key Components
+
+- **`main.py`**: Application entry point with configuration validation, error handling, and uvicorn server startup
+- **`api.py`**: FastAPI application setup with transport protocol selection (HTTP/SSE/streamable-HTTP) and health endpoints
+- **`mcp.py`**: Core MCP server class that registers tools using FastMCP decorators
+- **`settings.py`**: Environment-based configuration using Pydantic BaseSettings with validation
+- **`tools/`**: MCP tool implementations for utility operations
+- **`utils/pylogger.py`**: Structured JSON logging using structlog
+
+### Current MCP Tools
+
+1. **`generate_release_notes`**: Generates structured release notes from git commits and tags
+
+### Release Notes Tool
+
+The `generate_release_notes` tool automatically creates comprehensive release notes from git commits, categorizing changes into features, enhancements, bug fixes, and breaking changes. See [USE_CASES.md](USE_CASES.md) for detailed use cases and integration scenarios.
+
+## Installation
+
+### From PyPI (Recommended)
+
+Install the package directly from PyPI:
+
+```bash
+# Using pip
+pip install utility-mcp-server
+
+# Using uv (recommended)
+uv pip install utility-mcp-server
+```
+
+### From Source
+
+For development or to get the latest changes:
+
+```bash
+git clone https://github.com/redhat-data-and-ai/utility-mcp-server
+cd utility-mcp-server
+uv pip install -e .
+```
+
+## Using with Cursor IDE
+
+The MCP server integrates with Cursor IDE using the STDIO transport protocol.
+
+### Quick Setup
+
+1. **Install the package:**
+   ```bash
+   pip install utility-mcp-server
+   ```
+
+2. **Configure Cursor:**
+   - Open Cursor Settings (`Cmd+,` on Mac / `Ctrl+,` on Windows/Linux)
+   - Navigate to `Tools & Integrations` → `MCP Tools`
+   - Click `Add MCP Server` and add the following configuration:
+
+   ```json
+   {
+     "mcpServers": {
+       "utility-mcp-server": {
+         "command": "utility-mcp-server-stdio",
+         "args": []
+       }
+     }
+   }
+   ```
+
+3. **Restart Cursor** to load the MCP server
+
+### Alternative Configuration (if command not in PATH)
+
+If you encounter `spawn utility-mcp-server-stdio ENOENT` error:
+
+```json
+{
+  "mcpServers": {
+    "utility-mcp-server": {
+      "command": "python",
+      "args": ["-m", "utility_mcp_server.src.stdio_main"]
+    }
+  }
+}
+```
+
+Or with a virtual environment:
+
+```json
+{
+  "mcpServers": {
+    "utility-mcp-server": {
+      "command": "/path/to/your/venv/bin/python",
+      "args": ["-m", "utility_mcp_server.src.stdio_main"]
+    }
+  }
+}
+```
+
+For detailed setup instructions and troubleshooting, see [CURSOR_SETUP.md](CURSOR_SETUP.md).
+
+## Using with Claude Desktop
+
+The MCP server can also be used with Claude Desktop application.
+
+### Setup
+
+1. **Install the package:**
+   ```bash
+   pip install utility-mcp-server
+   ```
+
+2. **Locate the Claude Desktop config file:**
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+   - **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+3. **Add the MCP server configuration:**
+
+   ```json
+   {
+     "mcpServers": {
+       "utility-mcp-server": {
+         "command": "utility-mcp-server-stdio",
+         "args": []
+       }
+     }
+   }
+   ```
+
+   Or if the command is not in your PATH:
+
+   ```json
+   {
+     "mcpServers": {
+       "utility-mcp-server": {
+         "command": "python",
+         "args": ["-m", "utility_mcp_server.src.stdio_main"]
+       }
+     }
+   }
+   ```
+
+4. **Restart Claude Desktop** to load the MCP server
+
+### Using the Release Notes Tool
+
+Once configured, you can use the `generate_release_notes` tool in your conversations:
+
+> "Generate release notes for version v1.0.0 comparing with v0.9.0 for the repository at /path/to/repo"
+
+The tool will analyze git commits between the specified tags and generate structured release notes with categorized changes.
+
+## Running as HTTP Server
+
+For development, testing, or integration with other tools, you can run the MCP server as an HTTP service.
+
+### Prerequisites
+
+- Python 3.12 or higher
+- [uv](https://docs.astral.sh/uv/) (fast Python package installer and resolver)
+
+### Setup
+
+1. **Install uv (if not already installed):**
+   ```bash
+   # On macOS/Linux:
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # On MacOS using brew
+   brew install uv
+
+   # On Windows:
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+   # Or with pip:
+   pip install uv
+   ```
+
+2. **Clone the repository:**
+   ```bash
+   git clone https://github.com/redhat-data-and-ai/utility-mcp-server
+   cd utility-mcp-server
+   ```
+
+3. **Create and activate a virtual environment with uv:**
+   ```bash
+   uv venv
+
+   # Activate the virtual environment:
+   # On macOS/Linux:
+   source .venv/bin/activate
+
+   # On Windows:
+   .venv\Scripts\activate
+   ```
+
+4. **Install the package and dependencies:**
+   ```bash
+   # Install in editable mode with all dependencies
+   uv pip install -e .
+   ```
+
+5. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
+   # Edit .env file with your configuration
+   ```
+
+6. **Run the server:**
+   ```bash
+   # Using the installed console script
+   utility-mcp-server
+
+   # Or directly with Python module
+   python -m utility_mcp_server.src.main
+
+   # Or using uv to run directly
+   uv run python -m utility_mcp_server.src.main
+   ```
+
+### HTTP Server Configuration
+
+The HTTP server configuration is managed through environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MCP_HOST` | `0.0.0.0` | Server bind address |
+| `MCP_PORT` | `3000` | Server port (1024-65535) |
+| `MCP_TRANSPORT_PROTOCOL` | `streamable-http` | Transport protocol (`http`, `sse`, `streamable-http`) |
+| `MCP_SSL_KEYFILE` | `None` | SSL private key file path |
+| `MCP_SSL_CERTFILE` | `None` | SSL certificate file path |
+| `PYTHON_LOG_LEVEL` | `INFO` | Logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`) |
+
+### Using Podman
+
+1. **Build and run with Podman Compose:**
+   ```bash
+   podman-compose up --build
+   ```
+
+2. **Or build manually:**
+   ```bash
+   podman build -t utility-mcp-server .
+   podman run -p 3000:3000 --env-file .env utility-mcp-server
+   ```
+
+### Verify Installation
+
+1. **Health check:**
+   ```bash
+   curl http://localhost:3000/health
+   ```
+
+2. **Test MCP tools:**
+   ```bash
+   # List available tools via MCP endpoint
+   curl -X POST "http://localhost:3000/mcp" \
+        -H "Content-Type: application/json" \
+        -d '{"method": "tools/list"}'
+   ```
+
+## How to Test the Code Locally
+
+### Development Environment Setup
+
+1. **Install development dependencies:**
+   ```bash
+   uv pip install -e ".[dev]"
+   ```
+
+2. **Install pre-commit hooks:**
+   ```bash
+   pre-commit install
+   ```
+
+### Running Tests
+
+The project includes a comprehensive test suite covering unit tests, integration tests, and various edge cases.
+
+1. **Run all tests:**
+   ```bash
+   pytest
+   ```
+
+2. **Run tests with coverage reporting:**
+   ```bash
+   pytest --cov=utility_mcp_server --cov-report=html --cov-report=term
+   ```
+
+3. **Run tests by category:**
+   ```bash
+   # Unit tests only
+   pytest -m unit
+
+   # Integration tests only
+   pytest -m integration
+
+   # Slow running tests
+   pytest -m slow
+
+   # Tests requiring network access
+   pytest -m network
+   ```
+
+4. **Run specific test modules:**
+   ```bash
+   # Test individual components
+   pytest tests/test_settings.py -v
+   pytest tests/test_mcp.py -v
+   pytest tests/test_release_notes_tool.py -v
+
+   # Run integration tests
+   pytest tests/test_integration.py -v
+   ```
+
+5. **Run tests with different output formats:**
+   ```bash
+   # Verbose output with detailed test names
+   pytest -v
+
+   # Short traceback format
+   pytest --tb=short
+
+   # Quiet output (minimal)
+   pytest -q
+   ```
+
+### Code Quality Checks
+
+1. **Linting and formatting with Ruff:**
+   ```bash
+   # Check for issues
+   ruff check .
+
+   # Auto-fix issues
+   ruff check . --fix
+
+   # Format code
+   ruff format .
+   ```
+
+2. **Type checking with MyPy:**
+   ```bash
+   mypy utility_mcp_server/
+   ```
+
+3. **Docstring validation:**
+   ```bash
+   pydocstyle utility_mcp_server/ --convention=google
+   ```
+
+4. **Run all pre-commit checks:**
+   ```bash
+   pre-commit run --all-files
+   ```
+
+### Test Suite Overview
+
+| Test Category | Description |
+|---------------|-------------|
+| **Unit Tests** | Individual component testing with mocking |
+| **Integration Tests** | End-to-end workflow testing |
+
+**Test Files:**
+- `test_settings.py` - Configuration, environment variables, validation
+- `test_mcp.py` - Server initialization, tool registration, error handling
+- `test_release_notes_tool.py` - Release notes generation tool functionality
+- `test_api.py` - API endpoints and health checks
+- `test_main.py` - Main module and server startup
+- `test_integration.py` - Complete workflows and system integration
+
+### Manual Testing
+
+1. **Container testing:**
+   ```bash
+   docker-compose up -d
+   curl -f http://localhost:3000/health
+   docker-compose down
+   ```
+
+2. **SSL testing (if configured):**
+   ```bash
+   curl -k https://localhost:3000/health
+   ```
+
+## Continuous Integration
+
+GitHub Actions runs automated CI on push and PRs:
+
+- Multi-Python version testing (3.12, 3.13)
+- Test suite execution with coverage reporting
+- Ruff linting and MyPy type checking
+- Bandit security scanning
+
+### Running CI Checks Locally
+
+```bash
+# Run all pre-commit checks
+pre-commit run --all-files
+
+# Run tests with coverage
+pytest --cov=utility_mcp_server --cov-fail-under=80
+
+# Run security checks
+bandit -r utility_mcp_server/
+```
+
+## How to Contribute
+
+### Development Workflow
+
+1. Fork and clone the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Set up development environment:
+   ```bash
+   uv venv && source .venv/bin/activate
+   uv pip install -e ".[dev]"
+   pre-commit install
+   ```
+4. Make changes and run tests: `pytest --cov=utility_mcp_server`
+5. Run pre-commit checks: `pre-commit run --all-files`
+6. Commit and push, then create a Pull Request
+
+### Coding Standards
+
+- Follow PEP 8 (enforced by Ruff)
+- Type annotations for public functions
+- Google-style docstrings
+- Conventional commit format (`feat:`, `fix:`, `docs:`, etc.)
+
+### Adding New Tools
+
+1. Create a tool module in `utility_mcp_server/src/tools/`
+2. Register the tool in `utility_mcp_server/src/mcp.py` using `self.mcp.tool()(your_function)`
+3. Add tests in `tests/`
+4. Update documentation
+
+### Getting Help
+
+Open GitHub issues for bugs or feature requests.
