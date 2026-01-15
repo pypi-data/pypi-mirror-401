@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "she-codes-uv-example"
+version = "0.1.1"
+description = "Example package deployment"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Oliver Lavers", email = "hauteclere.code@gmail.com" }]
+dependencies = [
+    "cowsay>=6.1",
+]
+
+
+# This is the executable that will be created at install time.
+[project.scripts]
+she-codes-uv-example = "cli:main"
