@@ -1,0 +1,111 @@
+Metadata-Version: 2.3
+Name: macroverse
+Version: 0.6.1
+Summary: Jupyverse environment deployment
+Keywords: jupyter
+Author: David Brochart
+Author-email: David Brochart <david.brochart@gmail.com>
+License: The MIT License (MIT)
+         
+         Copyright (c) 2025 David Brochart
+         
+         Permission is hereby granted, free of charge, to any person obtaining a copy
+         of this software and associated documentation files (the "Software"), to deal
+         in the Software without restriction, including without limitation the rights
+         to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+         copies of the Software, and to permit persons to whom the Software is
+         furnished to do so, subject to the following conditions:
+         
+         The above copyright notice and this permission notice shall be included in all
+         copies or substantial portions of the Software.
+         
+         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+         IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+         FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+         AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+         SOFTWARE.
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Requires-Dist: fps[fastapi,anycorn]>=0.5.8,<0.6.0
+Requires-Dist: fps-auth
+Requires-Dist: fps-login
+Requires-Dist: fps-jupyterlab
+Requires-Dist: fps-contents
+Requires-Dist: fps-file-id
+Requires-Dist: fps-file-watcher
+Requires-Dist: fps-nbconvert
+Requires-Dist: fps-yjs
+Requires-Dist: fps-lab
+Requires-Dist: fps-frontend
+Requires-Dist: jupyverse-api
+Requires-Dist: jupyter-collaboration-ui
+Requires-Dist: jupyter-docprovider
+Requires-Dist: cyclopts>=4.4.3,<5.0.0
+Requires-Dist: holm>=0.8.1
+Requires-Dist: pyyaml>=6.0.3,<7.0.0
+Requires-Dist: httpx>=0.28.1,<1.0.0
+Requires-Dist: structlog
+Requires-Dist: psutil
+Requires-Dist: types-psutil
+Requires-Dist: types-pyyaml
+Requires-Python: >=3.10
+Project-URL: Homepage, https://github.com/davidbrochart/macroverse
+Description-Content-Type: text/markdown
+
+# Macroverse
+
+[![Build Status](https://github.com/davidbrochart/macroverse/workflows/test/badge.svg)](https://github.com/davidbrochart/macroverse/actions)
+
+[Jupyverse](https://github.com/jupyter-server/jupyverse) environment deployment.
+
+## Installation
+
+Install [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html),
+create an environment an install `macroverse` and `nginx`:
+
+```bash
+micromamba create -n macroverse
+micromamba activate macroverse
+micromamba install nginx pip
+pip install macroverse
+```
+
+## Usage
+
+### Process containers
+
+In this configuration, Jupyter servers run in processes on the same machine.
+
+Enter in the terminal:
+
+```bash
+macroverse --open-browser
+```
+
+This should open a browser window with a list of environments.
+Click on `New environment` and enter an `Environment YAML`.
+Click `Submit` and wait until the environment is created.
+Click on `New server` and then on `Add environment(s)`, and enter the name of the environment you just created.
+Then click on the link of the server. This should open JupyterLab in a new tab with the enabled environments.
+
+### Docker containers
+
+You must have Docker installed. In this configuration, Jupyter servers run in Docker containers.
+
+Enter in the terminal:
+
+```bash
+macroverse --open-browser --container docker
+```
+
+The UX is the same as for process containers.
