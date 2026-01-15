@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ascript"
+version = "1.0.3"
+description = "Ascript Developer Library"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+classifiers = [
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "ascript",
+    "eel>=0.17.0",
+    "gevent>=23.9.1",
+    "bottle>=0.12.25",
+    "bottle-websocket>=0.2.9",
+    "uiautomation>=2.0.20",
+    "pywin32>=306",
+    "psutil>=5.9.0",
+    "pyautogui>=0.9.54",
+    "opencv-python>=4.9.0.0",
+    "pillow>=10.0.0",
+    "numpy>=1.26.0",
+    "flet>=0.21.0",
+]
+
+[project.optional-dependencies]
+dev = ["pyinstaller>=6.0.0"]
+
+# --- 以下是核心修复部分 ---
+
+[tool.setuptools]
+# 自动查找包
+packages = {find = {}}
+# 关键 1：允许包含数据文件
+include-package-data = true
+
+[tool.setuptools.package-data]
+# 关键 2：显式包含所有子包下的 web 文件夹内容
+# "*" 代表匹配所有包名，确保只要文件夹叫 web 就会被打包
+"*" = ["web/*", "web/**/*"]
+
+[tool.pyinstaller]
+args = [
+    "--onefile",
+    "--noconsole",
+    "--clean",
+    "--exclude-module=tkinter",
+    "--exclude-module=unittest"
+]
