@@ -1,0 +1,38 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "zoopipe"
+dynamic = ["version"]
+description = "ZooPipe is a data processing framework that allows you to process data in a declarative way."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+
+authors = [
+    { name = "Alberto Daniel Badia", email = "alberto_badia@enlacepatagonia.com" },
+]
+
+urls = {"Homepage" = "https://github.com/albertobadia/zoopipe"}
+
+dependencies = [
+    "pydantic>=2.12.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "ruff>=0.14.10",
+    "faker>=40.1.0",
+    "maturin>=1.11.5",
+]
+
+[tool.maturin]
+python-source = "src"
+module-name = "zoopipe.zoopipe_rust_core"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
