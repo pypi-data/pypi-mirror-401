@@ -1,0 +1,1674 @@
+//! PDF content stream builder.
+//!
+//! Builds PDF content streams containing graphics and text operators
+//! according to PDF specification ISO 32000-1:2008 Section 8-9.
+
+use crate::elements::{
+    ContentElement, ImageContent, PathContent, PathOperation, StructureElement, TableCellAlign,
+    TableContent, TextContent,
+};
+use crate::error::Result;
+use crate::layout::Color;
+use std::io::Write;
+
+/// Operations that can be added to a content stream.
+#[derive(Debug, Clone)]
+pub enum ContentStreamOp {
+    /// Save graphics state (q)
+    SaveState,
+    /// Restore graphics state (Q)
+    RestoreState,
+    /// Set transformation matrix (cm)
+    Transform(f32, f32, f32, f32, f32, f32),
+    /// Begin text object (BT)
+    BeginText,
+    /// End text object (ET)
+    EndText,
+    /// Set font and size (Tf)
+    SetFont(String, f32),
+    /// Move text position (Td)
+    MoveText(f32, f32),
+    /// Set text matrix (Tm)
+    SetTextMatrix(f32, f32, f32, f32, f32, f32),
+    /// Show text (Tj) - literal string
+    ShowText(String),
+    /// Show hex-encoded text (Tj) - for CIDFonts/Unicode
+    ShowHexText(String),
+    /// Show text with positioning (TJ)
+    ShowTextArray(Vec<TextArrayItem>),
+    /// Set character spacing (Tc)
+    SetCharacterSpacing(f32),
+    /// Set word spacing (Tw)
+    SetWordSpacing(f32),
+    /// Set text leading (TL)
+    SetTextLeading(f32),
+    /// Move to next line (T*)
+    NextLine,
+    /// Set fill color RGB (rg)
+    SetFillColorRGB(f32, f32, f32),
+    /// Set stroke color RGB (RG)
+    SetStrokeColorRGB(f32, f32, f32),
+    /// Set fill color gray (g)
+    SetFillColorGray(f32),
+    /// Set stroke color gray (G)
+    SetStrokeColorGray(f32),
+    /// Set line width (w)
+    SetLineWidth(f32),
+    /// Move to (m)
+    MoveTo(f32, f32),
+    /// Line to (l)
+    LineTo(f32, f32),
+    /// Curve to (c)
+    CurveTo(f32, f32, f32, f32, f32, f32),
+    /// Rectangle (re)
+    Rectangle(f32, f32, f32, f32),
+    /// Close path (h)
+    ClosePath,
+    /// Stroke (S)
+    Stroke,
+    /// Fill (f)
+    Fill,
+    /// Fill and stroke (B)
+    FillStroke,
+    /// Close and stroke (s)
+    CloseStroke,
+    /// End path without filling/stroking (n)
+    EndPath,
+    /// Paint XObject (Do)
+    PaintXObject(String),
+
+    // === Marked Content Operations ===
+    /// Begin marked content with dictionary (BDC) - for tagged PDF structure
+    BeginMarkedContentDict {
+        /// The tag/structure type (e.g., "P" for paragraph, "H1" for heading)
+        tag: String,
+        /// Marked Content ID for linking to structure tree
+        mcid: u32,
+    },
+    /// End marked content (EMC)
+    EndMarkedContent,
+
+    // === Clipping Operations ===
+    /// Clip using non-zero winding rule (W)
+    Clip,
+    /// Clip using even-odd rule (W*)
+    ClipEvenOdd,
+
+    // === Extended Graphics State ===
+    /// Set graphics state from ExtGState dictionary (gs)
+    SetExtGState(String),
+
+    // === Color Space Operations ===
+    /// Set fill color space (cs)
+    SetFillColorSpace(String),
+    /// Set stroke color space (CS)
+    SetStrokeColorSpace(String),
+    /// Set fill color in current color space (sc/scn)
+    SetFillColorN(Vec<f32>),
+    /// Set stroke color in current color space (SC/SCN)
+    SetStrokeColorN(Vec<f32>),
+    /// Set fill color with pattern (scn with pattern name)
+    SetFillPattern(String, Vec<f32>),
+    /// Set stroke color with pattern (SCN with pattern name)
+    SetStrokePattern(String, Vec<f32>),
+
+    // === Shading Operations ===
+    /// Paint shading (sh)
+    PaintShading(String),
+
+    // === Additional Path Operations ===
+    /// Curve with first control point on current point (v)
+    CurveToV(f32, f32, f32, f32),
+    /// Curve with second control point on end point (y)
+    CurveToY(f32, f32, f32, f32),
+    /// Fill using even-odd rule (f*)
+    FillEvenOdd,
+    /// Fill and stroke using even-odd rule (B*)
+    FillStrokeEvenOdd,
+    /// Close, fill and stroke (b)
+    CloseFillStroke,
+    /// Close, fill and stroke using even-odd rule (b*)
+    CloseFillStrokeEvenOdd,
+
+    // === Line Style Operations ===
+    /// Set line cap style (J)
+    SetLineCap(LineCap),
+    /// Set line join style (j)
+    SetLineJoin(LineJoin),
+    /// Set miter limit (M)
+    SetMiterLimit(f32),
+    /// Set dash pattern (d)
+    SetDashPattern(Vec<f32>, f32),
+
+    // === CMYK Color Operations ===
+    /// Set fill color CMYK (k)
+    SetFillColorCMYK(f32, f32, f32, f32),
+    /// Set stroke color CMYK (K)
+    SetStrokeColorCMYK(f32, f32, f32, f32),
+
+    /// Raw operator (for extensibility)
+    Raw(String),
+}
+
+/// Line cap styles for path stroking.
+#[derive(Debug, Clone, Copy, Default)]
+pub enum LineCap {
+    /// Square butt cap (default)
+    #[default]
+    Butt = 0,
+    /// Round cap
+    Round = 1,
+    /// Projecting square cap
+    Square = 2,
+}
+
+/// Line join styles for path stroking.
+#[derive(Debug, Clone, Copy, Default)]
+pub enum LineJoin {
+    /// Miter join (default)
+    #[default]
+    Miter = 0,
+    /// Round join
+    Round = 1,
+    /// Bevel join
+    Bevel = 2,
+}
+
+/// Blend modes for transparency.
+#[derive(Debug, Clone, Copy, Default)]
+pub enum BlendMode {
+    /// Normal blend (default)
+    #[default]
+    Normal,
+    /// Multiply
+    Multiply,
+    /// Screen
+    Screen,
+    /// Overlay
+    Overlay,
+    /// Darken
+    Darken,
+    /// Lighten
+    Lighten,
+    /// Color dodge
+    ColorDodge,
+    /// Color burn
+    ColorBurn,
+    /// Hard light
+    HardLight,
+    /// Soft light
+    SoftLight,
+    /// Difference
+    Difference,
+    /// Exclusion
+    Exclusion,
+}
+
+impl BlendMode {
+    /// Get the PDF name for this blend mode.
+    pub fn as_pdf_name(&self) -> &'static str {
+        match self {
+            BlendMode::Normal => "Normal",
+            BlendMode::Multiply => "Multiply",
+            BlendMode::Screen => "Screen",
+            BlendMode::Overlay => "Overlay",
+            BlendMode::Darken => "Darken",
+            BlendMode::Lighten => "Lighten",
+            BlendMode::ColorDodge => "ColorDodge",
+            BlendMode::ColorBurn => "ColorBurn",
+            BlendMode::HardLight => "HardLight",
+            BlendMode::SoftLight => "SoftLight",
+            BlendMode::Difference => "Difference",
+            BlendMode::Exclusion => "Exclusion",
+        }
+    }
+}
+
+/// Item in a TJ array (text or positioning adjustment).
+#[derive(Debug, Clone)]
+pub enum TextArrayItem {
+    /// Text string (literal)
+    Text(String),
+    /// Hex-encoded text string (for CIDFonts/Unicode)
+    HexText(String),
+    /// Positioning adjustment (negative = move right, positive = move left)
+    Adjustment(f32),
+}
+
+/// An image that needs to be registered as an XObject.
+///
+/// When ContentStreamBuilder encounters an ImageContent, it generates
+/// the content stream operators but also tracks the image data so it
+/// can be registered as an XObject when the PDF is saved.
+#[derive(Debug, Clone)]
+pub struct PendingImage {
+    /// The image content
+    pub image: ImageContent,
+    /// The resource ID assigned to this image (e.g., "Im1")
+    pub resource_id: String,
+}
+
+/// Builder for PDF content streams.
+///
+/// Creates the byte sequence for a PDF content stream from operations
+/// or ContentElements.
+#[derive(Debug, Default)]
+pub struct ContentStreamBuilder {
+    /// Operations in the stream
+    operations: Vec<ContentStreamOp>,
+    /// Current font name
+    current_font: Option<String>,
+    /// Current font size
+    current_font_size: f32,
+    /// Whether we're in a text object
+    in_text_object: bool,
+    /// MCID (Marked Content ID) counter for tagged PDF structure
+    mcid_counter: u32,
+    /// Images that need to be registered as XObjects
+    pending_images: Vec<PendingImage>,
+    /// Next image resource ID counter
+    next_image_id: u32,
+}
+
+impl ContentStreamBuilder {
+    /// Create a new content stream builder.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Add an operation to the stream.
+    pub fn op(&mut self, op: ContentStreamOp) -> &mut Self {
+        self.operations.push(op);
+        self
+    }
+
+    /// Add multiple operations.
+    pub fn ops(&mut self, ops: impl IntoIterator<Item = ContentStreamOp>) -> &mut Self {
+        self.operations.extend(ops);
+        self
+    }
+
+    /// Begin a text object.
+    pub fn begin_text(&mut self) -> &mut Self {
+        if !self.in_text_object {
+            self.op(ContentStreamOp::BeginText);
+            self.in_text_object = true;
+        }
+        self
+    }
+
+    /// End a text object.
+    pub fn end_text(&mut self) -> &mut Self {
+        if self.in_text_object {
+            self.op(ContentStreamOp::EndText);
+            self.in_text_object = false;
+        }
+        self
+    }
+
+    /// Set font for text operations.
+    pub fn set_font(&mut self, font_name: &str, size: f32) -> &mut Self {
+        if self.current_font.as_deref() != Some(font_name) || self.current_font_size != size {
+            self.op(ContentStreamOp::SetFont(font_name.to_string(), size));
+            self.current_font = Some(font_name.to_string());
+            self.current_font_size = size;
+        }
+        self
+    }
+
+    /// Add text at a position (literal string for Base-14 fonts).
+    pub fn text(&mut self, text: &str, x: f32, y: f32) -> &mut Self {
+        self.begin_text();
+        self.op(ContentStreamOp::SetTextMatrix(1.0, 0.0, 0.0, 1.0, x, y));
+        self.op(ContentStreamOp::ShowText(text.to_string()));
+        self
+    }
+
+    /// Add hex-encoded text at a position (for CIDFonts/Unicode).
+    ///
+    /// The hex_string should already be formatted as "<XXXX...>" where each
+    /// 4-digit hex value is a glyph ID.
+    pub fn hex_text(&mut self, hex_string: &str, x: f32, y: f32) -> &mut Self {
+        self.begin_text();
+        self.op(ContentStreamOp::SetTextMatrix(1.0, 0.0, 0.0, 1.0, x, y));
+        self.op(ContentStreamOp::ShowHexText(hex_string.to_string()));
+        self
+    }
+
+    /// Add text using an embedded font with Unicode support.
+    ///
+    /// This is a convenience method that encodes the text and shows it.
+    /// The font should be registered and set before calling this.
+    pub fn unicode_text(
+        &mut self,
+        font: &mut crate::writer::font_manager::EmbeddedFont,
+        text: &str,
+        x: f32,
+        y: f32,
+    ) -> &mut Self {
+        let encoded = font.encode_string(text);
+        self.hex_text(&encoded, x, y)
+    }
+
+    /// Set fill color.
+    pub fn fill_color(&mut self, color: Color) -> &mut Self {
+        self.op(ContentStreamOp::SetFillColorRGB(color.r, color.g, color.b))
+    }
+
+    /// Draw an image XObject at the specified position and size.
+    ///
+    /// # Arguments
+    /// * `resource_id` - The XObject resource ID (e.g., "Im1")
+    /// * `x` - X position (left edge)
+    /// * `y` - Y position (bottom edge)
+    /// * `width` - Display width
+    /// * `height` - Display height
+    pub fn draw_image(
+        &mut self,
+        resource_id: &str,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> &mut Self {
+        // End any open text object
+        self.end_text();
+
+        // Save graphics state, apply transform, draw image, restore state
+        self.op(ContentStreamOp::SaveState);
+        self.op(ContentStreamOp::Transform(width, 0.0, 0.0, height, x, y));
+        self.op(ContentStreamOp::PaintXObject(resource_id.to_string()));
+        self.op(ContentStreamOp::RestoreState);
+        self
+    }
+
+    /// Draw an image using an ImagePlacement specification.
+    pub fn draw_image_at(
+        &mut self,
+        resource_id: &str,
+        placement: &super::image_handler::ImagePlacement,
+    ) -> &mut Self {
+        self.draw_image(resource_id, placement.x, placement.y, placement.width, placement.height)
+    }
+
+    /// Set stroke color.
+    pub fn stroke_color(&mut self, color: Color) -> &mut Self {
+        self.op(ContentStreamOp::SetStrokeColorRGB(color.r, color.g, color.b))
+    }
+
+    /// Set fill color with RGB values.
+    pub fn set_fill_color(&mut self, r: f32, g: f32, b: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetFillColorRGB(r, g, b))
+    }
+
+    /// Set stroke color with RGB values.
+    pub fn set_stroke_color(&mut self, r: f32, g: f32, b: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetStrokeColorRGB(r, g, b))
+    }
+
+    /// Set line width.
+    pub fn set_line_width(&mut self, width: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetLineWidth(width))
+    }
+
+    /// Move to a point (start a new subpath).
+    pub fn move_to(&mut self, x: f32, y: f32) -> &mut Self {
+        self.op(ContentStreamOp::MoveTo(x, y))
+    }
+
+    /// Draw a line to a point.
+    pub fn line_to(&mut self, x: f32, y: f32) -> &mut Self {
+        self.op(ContentStreamOp::LineTo(x, y))
+    }
+
+    /// Draw a rectangle.
+    pub fn rect(&mut self, x: f32, y: f32, width: f32, height: f32) -> &mut Self {
+        self.op(ContentStreamOp::Rectangle(x, y, width, height))
+    }
+
+    /// Stroke the current path.
+    pub fn stroke(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::Stroke)
+    }
+
+    /// Fill the current path.
+    pub fn fill(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::Fill)
+    }
+
+    /// Fill using even-odd rule.
+    pub fn fill_even_odd(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::FillEvenOdd)
+    }
+
+    /// Fill and stroke the current path.
+    pub fn fill_stroke(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::FillStroke)
+    }
+
+    /// Fill and stroke using even-odd rule.
+    pub fn fill_stroke_even_odd(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::FillStrokeEvenOdd)
+    }
+
+    /// Close, fill, and stroke the path.
+    pub fn close_fill_stroke(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::CloseFillStroke)
+    }
+
+    /// Close path.
+    pub fn close_path(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::ClosePath)
+    }
+
+    // === Clipping Path Methods ===
+
+    /// Clip to the current path using non-zero winding rule.
+    ///
+    /// After calling this, use `end_path()` to consume the path without painting,
+    /// or combine with stroke/fill operations.
+    pub fn clip(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::Clip)
+    }
+
+    /// Clip to the current path using even-odd rule.
+    pub fn clip_even_odd(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::ClipEvenOdd)
+    }
+
+    /// End path without painting (use after clip).
+    pub fn end_path(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::EndPath)
+    }
+
+    /// Create a rectangular clipping region.
+    ///
+    /// This is a convenience method that creates a rectangle path and clips to it.
+    pub fn clip_rect(&mut self, x: f32, y: f32, width: f32, height: f32) -> &mut Self {
+        self.rect(x, y, width, height).clip().end_path()
+    }
+
+    // === Graphics State Methods ===
+
+    /// Save the current graphics state.
+    pub fn save_state(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::SaveState)
+    }
+
+    /// Restore the previous graphics state.
+    pub fn restore_state(&mut self) -> &mut Self {
+        self.op(ContentStreamOp::RestoreState)
+    }
+
+    /// Set extended graphics state (for transparency, blend modes, etc.).
+    ///
+    /// The `gs_name` should reference an ExtGState resource defined in the page.
+    pub fn set_ext_gstate(&mut self, gs_name: &str) -> &mut Self {
+        self.op(ContentStreamOp::SetExtGState(gs_name.to_string()))
+    }
+
+    // === Transform Methods ===
+
+    /// Apply a transformation matrix.
+    ///
+    /// Matrix is specified as [a b c d e f] where:
+    /// - a, d: scaling
+    /// - b, c: rotation/skewing
+    /// - e, f: translation
+    pub fn transform(&mut self, a: f32, b: f32, c: f32, d: f32, e: f32, f: f32) -> &mut Self {
+        self.op(ContentStreamOp::Transform(a, b, c, d, e, f))
+    }
+
+    /// Translate (move) the coordinate system.
+    pub fn translate(&mut self, tx: f32, ty: f32) -> &mut Self {
+        self.transform(1.0, 0.0, 0.0, 1.0, tx, ty)
+    }
+
+    /// Scale the coordinate system.
+    pub fn scale(&mut self, sx: f32, sy: f32) -> &mut Self {
+        self.transform(sx, 0.0, 0.0, sy, 0.0, 0.0)
+    }
+
+    /// Rotate the coordinate system by angle in radians.
+    pub fn rotate(&mut self, angle: f32) -> &mut Self {
+        let cos = angle.cos();
+        let sin = angle.sin();
+        self.transform(cos, sin, -sin, cos, 0.0, 0.0)
+    }
+
+    /// Rotate the coordinate system by angle in degrees.
+    pub fn rotate_degrees(&mut self, degrees: f32) -> &mut Self {
+        self.rotate(degrees * std::f32::consts::PI / 180.0)
+    }
+
+    // === Line Style Methods ===
+
+    /// Set line cap style.
+    pub fn set_line_cap(&mut self, cap: LineCap) -> &mut Self {
+        self.op(ContentStreamOp::SetLineCap(cap))
+    }
+
+    /// Set line join style.
+    pub fn set_line_join(&mut self, join: LineJoin) -> &mut Self {
+        self.op(ContentStreamOp::SetLineJoin(join))
+    }
+
+    /// Set miter limit.
+    pub fn set_miter_limit(&mut self, limit: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetMiterLimit(limit))
+    }
+
+    /// Set dash pattern.
+    ///
+    /// # Arguments
+    /// * `pattern` - Array of dash lengths (e.g., [3.0, 2.0] for 3pt dash, 2pt gap)
+    /// * `phase` - Starting offset into the pattern
+    pub fn set_dash_pattern(&mut self, pattern: Vec<f32>, phase: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetDashPattern(pattern, phase))
+    }
+
+    /// Set solid line (no dashing).
+    pub fn set_solid_line(&mut self) -> &mut Self {
+        self.set_dash_pattern(vec![], 0.0)
+    }
+
+    // === Color Space Methods ===
+
+    /// Set fill color space.
+    pub fn set_fill_color_space(&mut self, name: &str) -> &mut Self {
+        self.op(ContentStreamOp::SetFillColorSpace(name.to_string()))
+    }
+
+    /// Set stroke color space.
+    pub fn set_stroke_color_space(&mut self, name: &str) -> &mut Self {
+        self.op(ContentStreamOp::SetStrokeColorSpace(name.to_string()))
+    }
+
+    /// Set fill color in current color space.
+    pub fn set_fill_color_n(&mut self, components: Vec<f32>) -> &mut Self {
+        self.op(ContentStreamOp::SetFillColorN(components))
+    }
+
+    /// Set stroke color in current color space.
+    pub fn set_stroke_color_n(&mut self, components: Vec<f32>) -> &mut Self {
+        self.op(ContentStreamOp::SetStrokeColorN(components))
+    }
+
+    /// Set fill color with CMYK values.
+    pub fn set_fill_color_cmyk(&mut self, c: f32, m: f32, y: f32, k: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetFillColorCMYK(c, m, y, k))
+    }
+
+    /// Set stroke color with CMYK values.
+    pub fn set_stroke_color_cmyk(&mut self, c: f32, m: f32, y: f32, k: f32) -> &mut Self {
+        self.op(ContentStreamOp::SetStrokeColorCMYK(c, m, y, k))
+    }
+
+    // === Pattern Methods ===
+
+    /// Set fill pattern.
+    ///
+    /// # Arguments
+    /// * `pattern_name` - Name of the pattern resource
+    /// * `components` - Additional color components (empty for colored patterns)
+    pub fn set_fill_pattern(&mut self, pattern_name: &str, components: Vec<f32>) -> &mut Self {
+        self.op(ContentStreamOp::SetFillPattern(pattern_name.to_string(), components))
+    }
+
+    /// Set stroke pattern.
+    pub fn set_stroke_pattern(&mut self, pattern_name: &str, components: Vec<f32>) -> &mut Self {
+        self.op(ContentStreamOp::SetStrokePattern(pattern_name.to_string(), components))
+    }
+
+    // === Shading Methods ===
+
+    /// Paint a shading (gradient).
+    ///
+    /// The shading fills the current clipping path. Use with `save_state()`,
+    /// `clip_rect()`, and `restore_state()` to control the painted area.
+    pub fn paint_shading(&mut self, shading_name: &str) -> &mut Self {
+        self.op(ContentStreamOp::PaintShading(shading_name.to_string()))
+    }
+
+    /// Draw a linear gradient within a rectangle.
+    ///
+    /// This is a convenience method that clips to the rectangle and paints the shading.
+    /// The shading resource must be defined separately.
+    pub fn draw_gradient_rect(
+        &mut self,
+        shading_name: &str,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> &mut Self {
+        self.save_state()
+            .rect(x, y, width, height)
+            .clip()
+            .end_path()
+            .paint_shading(shading_name)
+            .restore_state()
+    }
+
+    // === Additional Path Methods ===
+
+    /// Draw a Bézier curve (full control).
+    pub fn curve_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32) -> &mut Self {
+        self.op(ContentStreamOp::CurveTo(x1, y1, x2, y2, x3, y3))
+    }
+
+    /// Draw a Bézier curve with first control point at current position.
+    pub fn curve_to_v(&mut self, x2: f32, y2: f32, x3: f32, y3: f32) -> &mut Self {
+        self.op(ContentStreamOp::CurveToV(x2, y2, x3, y3))
+    }
+
+    /// Draw a Bézier curve with second control point at end point.
+    pub fn curve_to_y(&mut self, x1: f32, y1: f32, x3: f32, y3: f32) -> &mut Self {
+        self.op(ContentStreamOp::CurveToY(x1, y1, x3, y3))
+    }
+
+    /// Draw a circle.
+    ///
+    /// Uses Bézier curves to approximate a circle.
+    pub fn circle(&mut self, cx: f32, cy: f32, radius: f32) -> &mut Self {
+        // Bézier approximation constant for circles
+        let k = 0.552_284_8; // 4/3 * (sqrt(2) - 1)
+        let c = radius * k;
+
+        self.move_to(cx + radius, cy)
+            .curve_to(cx + radius, cy + c, cx + c, cy + radius, cx, cy + radius)
+            .curve_to(cx - c, cy + radius, cx - radius, cy + c, cx - radius, cy)
+            .curve_to(cx - radius, cy - c, cx - c, cy - radius, cx, cy - radius)
+            .curve_to(cx + c, cy - radius, cx + radius, cy - c, cx + radius, cy)
+            .close_path()
+    }
+
+    /// Draw an ellipse.
+    pub fn ellipse(&mut self, cx: f32, cy: f32, rx: f32, ry: f32) -> &mut Self {
+        let kx = rx * 0.552_284_8;
+        let ky = ry * 0.552_284_8;
+
+        self.move_to(cx + rx, cy)
+            .curve_to(cx + rx, cy + ky, cx + kx, cy + ry, cx, cy + ry)
+            .curve_to(cx - kx, cy + ry, cx - rx, cy + ky, cx - rx, cy)
+            .curve_to(cx - rx, cy - ky, cx - kx, cy - ry, cx, cy - ry)
+            .curve_to(cx + kx, cy - ry, cx + rx, cy - ky, cx + rx, cy)
+            .close_path()
+    }
+
+    /// Draw a rounded rectangle.
+    pub fn rounded_rect(
+        &mut self,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        radius: f32,
+    ) -> &mut Self {
+        let r = radius.min(width / 2.0).min(height / 2.0);
+        let k = r * 0.552_284_8;
+
+        // Start at top-left corner (after radius)
+        self.move_to(x + r, y)
+            // Top edge
+            .line_to(x + width - r, y)
+            // Top-right corner
+            .curve_to(x + width - r + k, y, x + width, y + k, x + width, y + r)
+            // Right edge
+            .line_to(x + width, y + height - r)
+            // Bottom-right corner
+            .curve_to(
+                x + width,
+                y + height - r + k,
+                x + width - k,
+                y + height,
+                x + width - r,
+                y + height,
+            )
+            // Bottom edge
+            .line_to(x + r, y + height)
+            // Bottom-left corner
+            .curve_to(x + r - k, y + height, x, y + height - k, x, y + height - r)
+            // Left edge
+            .line_to(x, y + r)
+            // Top-left corner
+            .curve_to(x, y + r - k, x + r - k, y, x + r, y)
+            .close_path()
+    }
+
+    /// Add a ContentElement to the stream.
+    pub fn add_element(&mut self, element: &ContentElement) -> &mut Self {
+        match element {
+            ContentElement::Text(text) => self.add_text_content(text),
+            ContentElement::Path(path) => self.add_path_content(path),
+            ContentElement::Image(image) => self.add_image_content(image),
+            ContentElement::Structure(_) => self, // Structure elements recurse via add_structure_element
+            ContentElement::Table(table) => self.add_table_content(table),
+        }
+    }
+
+    /// Add text content element.
+    fn add_text_content(&mut self, text: &TextContent) -> &mut Self {
+        self.begin_text();
+
+        // Set color if not black
+        if text.style.color.r != 0.0 || text.style.color.g != 0.0 || text.style.color.b != 0.0 {
+            self.fill_color(text.style.color);
+        }
+
+        // Set font
+        let font_name = self.map_font_name(&text.font.name, text.style.weight.is_bold());
+        self.set_font(&font_name, text.font.size);
+
+        // Position and show text
+        self.op(ContentStreamOp::SetTextMatrix(1.0, 0.0, 0.0, 1.0, text.bbox.x, text.bbox.y));
+        self.op(ContentStreamOp::ShowText(text.text.clone()));
+
+        self
+    }
+
+    /// Map a font name to a PDF base font name.
+    fn map_font_name(&self, name: &str, bold: bool) -> String {
+        let base = match name.to_lowercase().as_str() {
+            "helvetica" | "arial" | "sans-serif" => "Helvetica",
+            "times" | "times-roman" | "times new roman" | "serif" => "Times-Roman",
+            "courier" | "courier new" | "monospace" => "Courier",
+            _ => "Helvetica",
+        };
+
+        if bold {
+            format!("{}-Bold", base)
+        } else {
+            base.to_string()
+        }
+    }
+
+    /// Add path content element.
+    fn add_path_content(&mut self, path: &PathContent) -> &mut Self {
+        // End any text object first
+        self.end_text();
+
+        // Set stroke properties
+        if let Some(color) = path.stroke_color {
+            self.stroke_color(color);
+        }
+        if let Some(color) = path.fill_color {
+            self.fill_color(color);
+        }
+        self.op(ContentStreamOp::SetLineWidth(path.stroke_width));
+
+        // Add path operations
+        for op in &path.operations {
+            match op {
+                PathOperation::MoveTo(x, y) => {
+                    self.op(ContentStreamOp::MoveTo(*x, *y));
+                },
+                PathOperation::LineTo(x, y) => {
+                    self.op(ContentStreamOp::LineTo(*x, *y));
+                },
+                PathOperation::CurveTo(x1, y1, x2, y2, x3, y3) => {
+                    self.op(ContentStreamOp::CurveTo(*x1, *y1, *x2, *y2, *x3, *y3));
+                },
+                PathOperation::Rectangle(x, y, w, h) => {
+                    self.op(ContentStreamOp::Rectangle(*x, *y, *w, *h));
+                },
+                PathOperation::ClosePath => {
+                    self.op(ContentStreamOp::ClosePath);
+                },
+            }
+        }
+
+        // Apply stroke/fill
+        match (path.stroke_color.is_some(), path.fill_color.is_some()) {
+            (true, true) => self.op(ContentStreamOp::FillStroke),
+            (true, false) => self.op(ContentStreamOp::Stroke),
+            (false, true) => self.op(ContentStreamOp::Fill),
+            (false, false) => self.op(ContentStreamOp::EndPath),
+        };
+
+        self
+    }
+
+    /// Add table content element.
+    ///
+    /// Renders the table directly to the content stream using:
+    /// - Rectangle operations for cell backgrounds
+    /// - Line operations for borders
+    /// - Text operations for cell content
+    fn add_table_content(&mut self, table: &TableContent) -> &mut Self {
+        // End any text object first
+        self.end_text();
+
+        let style = &table.style;
+        let padding = style.cell_padding;
+
+        // Save graphics state for table rendering
+        self.op(ContentStreamOp::SaveState);
+
+        // Calculate row positions based on bounding boxes
+        let mut current_y = table.bbox.y + table.bbox.height;
+
+        for (row_idx, row) in table.rows.iter().enumerate() {
+            let row_height = row
+                .height
+                .unwrap_or_else(|| table.bbox.height / table.rows.len() as f32);
+            current_y -= row_height;
+
+            let mut current_x = table.bbox.x;
+
+            // Draw row background if specified
+            if let Some((r, g, b)) = row.background {
+                self.op(ContentStreamOp::SetFillColorRGB(r, g, b));
+                self.op(ContentStreamOp::Rectangle(
+                    table.bbox.x,
+                    current_y,
+                    table.bbox.width,
+                    row_height,
+                ));
+                self.op(ContentStreamOp::Fill);
+            }
+
+            // Draw stripe background for alternating rows
+            if row_idx % 2 == 1 {
+                if let Some((r, g, b)) = style.stripe_background {
+                    self.op(ContentStreamOp::SetFillColorRGB(r, g, b));
+                    self.op(ContentStreamOp::Rectangle(
+                        table.bbox.x,
+                        current_y,
+                        table.bbox.width,
+                        row_height,
+                    ));
+                    self.op(ContentStreamOp::Fill);
+                }
+            }
+
+            // Draw header background if this is a header row
+            if row.is_header {
+                if let Some((r, g, b)) = style.header_background {
+                    self.op(ContentStreamOp::SetFillColorRGB(r, g, b));
+                    self.op(ContentStreamOp::Rectangle(
+                        table.bbox.x,
+                        current_y,
+                        table.bbox.width,
+                        row_height,
+                    ));
+                    self.op(ContentStreamOp::Fill);
+                }
+            }
+
+            for (col_idx, cell) in row.cells.iter().enumerate() {
+                // Calculate cell width
+                let cell_width = if col_idx < table.column_widths.len() {
+                    table.column_widths[col_idx] * cell.colspan as f32
+                } else if !table.column_widths.is_empty() {
+                    table.column_widths[0]
+                } else {
+                    table.bbox.width / row.cells.len() as f32
+                };
+
+                // Draw cell background if specified
+                if let Some((r, g, b)) = cell.background {
+                    self.op(ContentStreamOp::SetFillColorRGB(r, g, b));
+                    self.op(ContentStreamOp::Rectangle(
+                        current_x, current_y, cell_width, row_height,
+                    ));
+                    self.op(ContentStreamOp::Fill);
+                }
+
+                // Draw cell text
+                if !cell.text.is_empty() {
+                    let font_size = cell.font_size.unwrap_or(10.0);
+                    let font_name = if cell.bold {
+                        "Helvetica-Bold"
+                    } else {
+                        "Helvetica"
+                    };
+
+                    // Calculate text position based on alignment
+                    let text_x = match cell.align {
+                        TableCellAlign::Left => current_x + padding,
+                        TableCellAlign::Center => current_x + cell_width / 2.0,
+                        TableCellAlign::Right => current_x + cell_width - padding,
+                    };
+
+                    // Position text at top of cell with padding
+                    let text_y = current_y + row_height - padding - font_size;
+
+                    self.begin_text();
+                    self.op(ContentStreamOp::SetFillColorRGB(0.0, 0.0, 0.0)); // Black text
+                    self.set_font(font_name, font_size);
+                    self.op(ContentStreamOp::SetTextMatrix(1.0, 0.0, 0.0, 1.0, text_x, text_y));
+                    self.op(ContentStreamOp::ShowText(cell.text.clone()));
+                    self.end_text();
+                }
+
+                current_x += cell_width;
+            }
+        }
+
+        // Draw borders
+        if style.border_width > 0.0 {
+            let (r, g, b) = style.border_color;
+            self.op(ContentStreamOp::SetStrokeColorRGB(r, g, b));
+            self.op(ContentStreamOp::SetLineWidth(style.border_width));
+
+            // Outer border
+            if style.outer_border {
+                self.op(ContentStreamOp::Rectangle(
+                    table.bbox.x,
+                    table.bbox.y,
+                    table.bbox.width,
+                    table.bbox.height,
+                ));
+                self.op(ContentStreamOp::Stroke);
+            }
+
+            // Horizontal borders
+            if style.horizontal_borders {
+                let mut y = table.bbox.y + table.bbox.height;
+                for row in &table.rows {
+                    let row_height = row
+                        .height
+                        .unwrap_or_else(|| table.bbox.height / table.rows.len() as f32);
+                    y -= row_height;
+                    if y > table.bbox.y {
+                        self.op(ContentStreamOp::MoveTo(table.bbox.x, y));
+                        self.op(ContentStreamOp::LineTo(table.bbox.x + table.bbox.width, y));
+                        self.op(ContentStreamOp::Stroke);
+                    }
+                }
+            }
+
+            // Vertical borders
+            if style.vertical_borders && !table.column_widths.is_empty() {
+                let mut x = table.bbox.x;
+                for (i, &width) in table.column_widths.iter().enumerate() {
+                    x += width;
+                    if i < table.column_widths.len() - 1 {
+                        self.op(ContentStreamOp::MoveTo(x, table.bbox.y));
+                        self.op(ContentStreamOp::LineTo(x, table.bbox.y + table.bbox.height));
+                        self.op(ContentStreamOp::Stroke);
+                    }
+                }
+            }
+        }
+
+        // Restore graphics state
+        self.op(ContentStreamOp::RestoreState);
+
+        self
+    }
+
+    /// Add image content element.
+    ///
+    /// Registers the image for XObject creation and emits a Do operator
+    /// to paint the image at its specified position.
+    ///
+    /// After calling `build()`, use `take_pending_images()` to retrieve
+    /// the images that need to be registered as XObjects.
+    fn add_image_content(&mut self, image: &ImageContent) -> &mut Self {
+        // End any text object first
+        self.end_text();
+
+        // Allocate resource ID for this image
+        self.next_image_id += 1;
+        let resource_id = format!("Im{}", self.next_image_id);
+
+        // Track the image for XObject registration
+        self.pending_images.push(PendingImage {
+            image: image.clone(),
+            resource_id: resource_id.clone(),
+        });
+
+        // Draw the image using the transformation matrix
+        self.draw_image(
+            &resource_id,
+            image.bbox.x,
+            image.bbox.y,
+            image.bbox.width,
+            image.bbox.height,
+        );
+
+        self
+    }
+
+    /// Take the pending images that need to be registered as XObjects.
+    ///
+    /// This should be called after `build()` to retrieve images that
+    /// need to be added to the page's Resources dictionary.
+    pub fn take_pending_images(&mut self) -> Vec<PendingImage> {
+        std::mem::take(&mut self.pending_images)
+    }
+
+    /// Get a reference to pending images without removing them.
+    pub fn pending_images(&self) -> &[PendingImage] {
+        &self.pending_images
+    }
+
+    /// Build multiple elements into the stream.
+    pub fn add_elements(&mut self, elements: &[ContentElement]) -> &mut Self {
+        for element in elements {
+            self.add_element(element);
+        }
+        // Make sure to end any open text object
+        self.end_text();
+        self
+    }
+
+    /// Get the next MCID value and increment the counter.
+    pub fn next_mcid(&mut self) -> u32 {
+        let mcid = self.mcid_counter;
+        self.mcid_counter += 1;
+        mcid
+    }
+
+    /// Add a StructureElement with marked content wrapping.
+    ///
+    /// This wraps the structure element's children in BDC/EMC (Begin/End Marked Content)
+    /// operators to enable tagged PDF support. Each content element gets a unique MCID.
+    ///
+    /// # Arguments
+    ///
+    /// * `elem` - The structure element to add, containing the hierarchy and content
+    ///
+    /// # PDF Spec Compliance
+    ///
+    /// - ISO 32000-1:2008, Section 14.7.4 - Marked Content Sequences
+    /// - BDC operator with tag and MCID property dictionary
+    /// - EMC operator for proper nesting
+    pub fn add_structure_element(&mut self, elem: &StructureElement) -> &mut Self {
+        self.add_structure_element_impl(elem)
+    }
+
+    /// Internal recursive implementation for adding structure elements.
+    fn add_structure_element_impl(&mut self, elem: &StructureElement) -> &mut Self {
+        // Allocate MCID for this structure element
+        let mcid = self.next_mcid();
+
+        // Begin marked content with structure type as tag and MCID property
+        self.op(ContentStreamOp::BeginMarkedContentDict {
+            tag: elem.structure_type.clone(),
+            mcid,
+        });
+
+        // Add children (recursively for nested structures)
+        for child in &elem.children {
+            match child {
+                ContentElement::Structure(nested_elem) => {
+                    // Recursively add nested structure element
+                    self.add_structure_element_impl(nested_elem);
+                },
+                _ => {
+                    // Add regular content element
+                    self.add_element(child);
+                },
+            }
+        }
+
+        // End marked content
+        self.op(ContentStreamOp::EndMarkedContent);
+
+        self
+    }
+
+    /// Build the content stream to bytes.
+    pub fn build(&self) -> Result<Vec<u8>> {
+        let mut buf = Vec::new();
+
+        for op in &self.operations {
+            self.write_op(&mut buf, op)?;
+            writeln!(buf)?;
+        }
+
+        Ok(buf)
+    }
+
+    /// Write a single operation to the buffer.
+    fn write_op<W: Write>(&self, w: &mut W, op: &ContentStreamOp) -> std::io::Result<()> {
+        match op {
+            ContentStreamOp::SaveState => write!(w, "q"),
+            ContentStreamOp::RestoreState => write!(w, "Q"),
+            ContentStreamOp::Transform(a, b, c, d, e, f) => {
+                write!(w, "{} {} {} {} {} {} cm", a, b, c, d, e, f)
+            },
+            ContentStreamOp::BeginText => write!(w, "BT"),
+            ContentStreamOp::EndText => write!(w, "ET"),
+            ContentStreamOp::SetFont(name, size) => write!(w, "/{} {} Tf", name, size),
+            ContentStreamOp::MoveText(tx, ty) => write!(w, "{} {} Td", tx, ty),
+            ContentStreamOp::SetTextMatrix(a, b, c, d, e, f) => {
+                write!(w, "{} {} {} {} {} {} Tm", a, b, c, d, e, f)
+            },
+            ContentStreamOp::ShowText(text) => {
+                write!(w, "(")?;
+                self.write_escaped_string(w, text)?;
+                write!(w, ") Tj")
+            },
+            ContentStreamOp::ShowHexText(hex) => {
+                // Hex string already formatted as <XXXX...>
+                write!(w, "{} Tj", hex)
+            },
+            ContentStreamOp::ShowTextArray(items) => {
+                write!(w, "[")?;
+                for item in items {
+                    match item {
+                        TextArrayItem::Text(t) => {
+                            write!(w, "(")?;
+                            self.write_escaped_string(w, t)?;
+                            write!(w, ")")?;
+                        },
+                        TextArrayItem::HexText(hex) => {
+                            // Hex string already formatted as <XXXX...>
+                            write!(w, "{}", hex)?;
+                        },
+                        TextArrayItem::Adjustment(adj) => {
+                            write!(w, "{}", adj)?;
+                        },
+                    }
+                    write!(w, " ")?;
+                }
+                write!(w, "] TJ")
+            },
+            ContentStreamOp::SetCharacterSpacing(spacing) => write!(w, "{} Tc", spacing),
+            ContentStreamOp::SetWordSpacing(spacing) => write!(w, "{} Tw", spacing),
+            ContentStreamOp::SetTextLeading(leading) => write!(w, "{} TL", leading),
+            ContentStreamOp::NextLine => write!(w, "T*"),
+            ContentStreamOp::SetFillColorRGB(r, g, b) => write!(w, "{} {} {} rg", r, g, b),
+            ContentStreamOp::SetStrokeColorRGB(r, g, b) => write!(w, "{} {} {} RG", r, g, b),
+            ContentStreamOp::SetFillColorGray(g) => write!(w, "{} g", g),
+            ContentStreamOp::SetStrokeColorGray(g) => write!(w, "{} G", g),
+            ContentStreamOp::SetLineWidth(width) => write!(w, "{} w", width),
+            ContentStreamOp::MoveTo(x, y) => write!(w, "{} {} m", x, y),
+            ContentStreamOp::LineTo(x, y) => write!(w, "{} {} l", x, y),
+            ContentStreamOp::CurveTo(x1, y1, x2, y2, x3, y3) => {
+                write!(w, "{} {} {} {} {} {} c", x1, y1, x2, y2, x3, y3)
+            },
+            ContentStreamOp::Rectangle(x, y, w_val, h) => {
+                write!(w, "{} {} {} {} re", x, y, w_val, h)
+            },
+            ContentStreamOp::ClosePath => write!(w, "h"),
+            ContentStreamOp::Stroke => write!(w, "S"),
+            ContentStreamOp::Fill => write!(w, "f"),
+            ContentStreamOp::FillStroke => write!(w, "B"),
+            ContentStreamOp::CloseStroke => write!(w, "s"),
+            ContentStreamOp::EndPath => write!(w, "n"),
+            ContentStreamOp::PaintXObject(name) => write!(w, "/{} Do", name),
+
+            // Marked content operations
+            ContentStreamOp::BeginMarkedContentDict { tag, mcid } => {
+                write!(w, "/{} <</MCID {}>> BDC", tag, mcid)
+            },
+            ContentStreamOp::EndMarkedContent => write!(w, "EMC"),
+
+            // Clipping operations
+            ContentStreamOp::Clip => write!(w, "W"),
+            ContentStreamOp::ClipEvenOdd => write!(w, "W*"),
+
+            // Extended graphics state
+            ContentStreamOp::SetExtGState(name) => write!(w, "/{} gs", name),
+
+            // Color space operations
+            ContentStreamOp::SetFillColorSpace(name) => write!(w, "/{} cs", name),
+            ContentStreamOp::SetStrokeColorSpace(name) => write!(w, "/{} CS", name),
+            ContentStreamOp::SetFillColorN(components) => {
+                for c in components {
+                    write!(w, "{} ", c)?;
+                }
+                write!(w, "scn")
+            },
+            ContentStreamOp::SetStrokeColorN(components) => {
+                for c in components {
+                    write!(w, "{} ", c)?;
+                }
+                write!(w, "SCN")
+            },
+            ContentStreamOp::SetFillPattern(name, components) => {
+                for c in components {
+                    write!(w, "{} ", c)?;
+                }
+                write!(w, "/{} scn", name)
+            },
+            ContentStreamOp::SetStrokePattern(name, components) => {
+                for c in components {
+                    write!(w, "{} ", c)?;
+                }
+                write!(w, "/{} SCN", name)
+            },
+
+            // Shading
+            ContentStreamOp::PaintShading(name) => write!(w, "/{} sh", name),
+
+            // Additional path operations
+            ContentStreamOp::CurveToV(x2, y2, x3, y3) => {
+                write!(w, "{} {} {} {} v", x2, y2, x3, y3)
+            },
+            ContentStreamOp::CurveToY(x1, y1, x3, y3) => {
+                write!(w, "{} {} {} {} y", x1, y1, x3, y3)
+            },
+            ContentStreamOp::FillEvenOdd => write!(w, "f*"),
+            ContentStreamOp::FillStrokeEvenOdd => write!(w, "B*"),
+            ContentStreamOp::CloseFillStroke => write!(w, "b"),
+            ContentStreamOp::CloseFillStrokeEvenOdd => write!(w, "b*"),
+
+            // Line style operations
+            ContentStreamOp::SetLineCap(cap) => write!(w, "{} J", *cap as u8),
+            ContentStreamOp::SetLineJoin(join) => write!(w, "{} j", *join as u8),
+            ContentStreamOp::SetMiterLimit(limit) => write!(w, "{} M", limit),
+            ContentStreamOp::SetDashPattern(pattern, phase) => {
+                write!(w, "[")?;
+                for (i, p) in pattern.iter().enumerate() {
+                    if i > 0 {
+                        write!(w, " ")?;
+                    }
+                    write!(w, "{}", p)?;
+                }
+                write!(w, "] {} d", phase)
+            },
+
+            // CMYK colors
+            ContentStreamOp::SetFillColorCMYK(c, m, y, k) => {
+                write!(w, "{} {} {} {} k", c, m, y, k)
+            },
+            ContentStreamOp::SetStrokeColorCMYK(c, m, y, k) => {
+                write!(w, "{} {} {} {} K", c, m, y, k)
+            },
+
+            ContentStreamOp::Raw(raw) => write!(w, "{}", raw),
+        }
+    }
+
+    /// Write an escaped PDF string.
+    fn write_escaped_string<W: Write>(&self, w: &mut W, text: &str) -> std::io::Result<()> {
+        for byte in text.bytes() {
+            match byte {
+                b'(' => write!(w, "\\(")?,
+                b')' => write!(w, "\\)")?,
+                b'\\' => write!(w, "\\\\")?,
+                b'\n' => write!(w, "\\n")?,
+                b'\r' => write!(w, "\\r")?,
+                b'\t' => write!(w, "\\t")?,
+                _ => w.write_all(&[byte])?,
+            }
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::elements::{FontSpec, TextStyle};
+    use crate::geometry::Rect;
+
+    #[test]
+    fn test_simple_text() {
+        let mut builder = ContentStreamBuilder::new();
+        builder
+            .begin_text()
+            .set_font("Helvetica", 12.0)
+            .text("Hello, World!", 72.0, 720.0)
+            .end_text();
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("BT"));
+        assert!(content.contains("/Helvetica 12 Tf"));
+        assert!(content.contains("(Hello, World!) Tj"));
+        assert!(content.contains("ET"));
+    }
+
+    #[test]
+    fn test_text_content_element() {
+        let text_content = TextContent {
+            text: "Test".to_string(),
+            bbox: Rect::new(100.0, 700.0, 50.0, 12.0),
+            font: FontSpec::new("Helvetica", 12.0),
+            style: TextStyle::default(),
+            reading_order: Some(0),
+            origin: None,
+            rotation_degrees: None,
+            matrix: None,
+        };
+
+        let mut builder = ContentStreamBuilder::new();
+        builder.add_element(&ContentElement::Text(text_content));
+        builder.end_text();
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("BT"));
+        assert!(content.contains("100 700"));
+        assert!(content.contains("(Test) Tj"));
+        assert!(content.contains("ET"));
+    }
+
+    #[test]
+    fn test_path_operations() {
+        let mut builder = ContentStreamBuilder::new();
+        builder
+            .stroke_color(Color::black())
+            .op(ContentStreamOp::SetLineWidth(1.0))
+            .op(ContentStreamOp::MoveTo(0.0, 0.0))
+            .op(ContentStreamOp::LineTo(100.0, 100.0))
+            .stroke();
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("0 0 0 RG"));
+        assert!(content.contains("1 w"));
+        assert!(content.contains("0 0 m"));
+        assert!(content.contains("100 100 l"));
+        assert!(content.contains("S"));
+    }
+
+    #[test]
+    fn test_marked_content_operators() {
+        let mut builder = ContentStreamBuilder::new();
+
+        builder
+            .op(ContentStreamOp::BeginMarkedContentDict {
+                tag: "P".to_string(),
+                mcid: 0,
+            })
+            .op(ContentStreamOp::EndMarkedContent);
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("/P <</MCID 0>> BDC"));
+        assert!(content.contains("EMC"));
+    }
+
+    #[test]
+    fn test_mcid_allocation() {
+        let mut builder = ContentStreamBuilder::new();
+        assert_eq!(builder.next_mcid(), 0);
+        assert_eq!(builder.next_mcid(), 1);
+        assert_eq!(builder.next_mcid(), 2);
+    }
+
+    #[test]
+    fn test_structure_element_with_text() {
+        use crate::elements::FontSpec;
+        use crate::geometry::Rect;
+
+        let text_content = TextContent {
+            text: "Hello".to_string(),
+            bbox: Rect::new(100.0, 700.0, 50.0, 12.0),
+            font: FontSpec::new("Helvetica", 12.0),
+            style: TextStyle::default(),
+            reading_order: Some(0),
+            origin: None,
+            rotation_degrees: None,
+            matrix: None,
+        };
+
+        let structure = StructureElement {
+            structure_type: "P".to_string(),
+            bbox: Rect::new(100.0, 700.0, 200.0, 50.0),
+            children: vec![ContentElement::Text(text_content)],
+            reading_order: Some(0),
+            alt_text: None,
+            language: None,
+        };
+
+        let mut builder = ContentStreamBuilder::new();
+        builder.add_structure_element(&structure);
+        builder.end_text();
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("/P <</MCID 0>> BDC"));
+        assert!(content.contains("EMC"));
+        assert!(content.contains("(Hello) Tj"));
+    }
+
+    #[test]
+    fn test_nested_structure_elements() {
+        use crate::geometry::Rect;
+
+        let inner_structure = StructureElement {
+            structure_type: "Span".to_string(),
+            bbox: Rect::new(100.0, 700.0, 50.0, 12.0),
+            children: vec![],
+            reading_order: None,
+            alt_text: None,
+            language: None,
+        };
+
+        let outer_structure = StructureElement {
+            structure_type: "P".to_string(),
+            bbox: Rect::new(100.0, 700.0, 200.0, 50.0),
+            children: vec![ContentElement::Structure(inner_structure)],
+            reading_order: Some(0),
+            alt_text: None,
+            language: None,
+        };
+
+        let mut builder = ContentStreamBuilder::new();
+        builder.add_structure_element(&outer_structure);
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        // Should have BDC/EMC pairs for both outer and inner structures
+        assert!(content.contains("/P <</MCID 0>> BDC"));
+        assert!(content.contains("/Span <</MCID 1>> BDC"));
+
+        // Count EMC to ensure proper nesting
+        let emc_count = content.matches("EMC").count();
+        assert_eq!(emc_count, 2);
+    }
+
+    #[test]
+    fn test_rectangle() {
+        let mut builder = ContentStreamBuilder::new();
+        builder.rect(72.0, 72.0, 468.0, 648.0).stroke();
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("72 72 468 648 re"));
+        assert!(content.contains("S"));
+    }
+
+    #[test]
+    fn test_escaped_text() {
+        let mut builder = ContentStreamBuilder::new();
+        builder
+            .begin_text()
+            .set_font("Helvetica", 12.0)
+            .text("Text with (parens) and \\backslash", 72.0, 720.0)
+            .end_text();
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        assert!(content.contains("\\(parens\\)"));
+        assert!(content.contains("\\\\backslash"));
+    }
+
+    #[test]
+    fn test_font_mapping() {
+        let builder = ContentStreamBuilder::new();
+
+        assert_eq!(builder.map_font_name("Arial", false), "Helvetica");
+        assert_eq!(builder.map_font_name("Arial", true), "Helvetica-Bold");
+        assert_eq!(builder.map_font_name("Times New Roman", false), "Times-Roman");
+        assert_eq!(builder.map_font_name("Courier", false), "Courier");
+    }
+
+    #[test]
+    fn test_table_content_rendering() {
+        use crate::elements::{TableCellContent, TableContent, TableContentStyle, TableRowContent};
+
+        // Create a simple 2x2 table
+        let mut table = TableContent::new(Rect::new(72.0, 600.0, 200.0, 100.0));
+        table.column_widths = vec![100.0, 100.0];
+        table.style = TableContentStyle::bordered();
+
+        // Header row
+        let header = TableRowContent::header(vec![
+            TableCellContent::header("Name"),
+            TableCellContent::header("Value"),
+        ]);
+        table.add_row(header);
+
+        // Data row
+        let row =
+            TableRowContent::new(vec![TableCellContent::new("Item"), TableCellContent::new("100")]);
+        table.add_row(row);
+
+        let mut builder = ContentStreamBuilder::new();
+        builder.add_element(&ContentElement::Table(table));
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        // Should contain graphics state operations
+        assert!(content.contains("q")); // Save state
+        assert!(content.contains("Q")); // Restore state
+
+        // Should contain text for cells
+        assert!(content.contains("(Name) Tj"));
+        assert!(content.contains("(Value) Tj"));
+        assert!(content.contains("(Item) Tj"));
+        assert!(content.contains("(100) Tj"));
+
+        // Should contain stroke operations for borders
+        assert!(content.contains("re")); // Rectangle
+        assert!(content.contains("S")); // Stroke
+
+        // No pending images
+        assert!(builder.pending_images().is_empty());
+    }
+
+    #[test]
+    fn test_image_content_rendering() {
+        use crate::elements::{ColorSpace, ImageContent, ImageFormat};
+
+        // Create a test image
+        let image = ImageContent {
+            bbox: Rect::new(100.0, 500.0, 200.0, 150.0),
+            format: ImageFormat::Jpeg,
+            data: vec![0xFF, 0xD8, 0xFF, 0xE0], // JPEG magic bytes
+            width: 800,
+            height: 600,
+            bits_per_component: 8,
+            color_space: ColorSpace::RGB,
+            reading_order: Some(0),
+            alt_text: Some("Test image".to_string()),
+            horizontal_dpi: None,
+            vertical_dpi: None,
+        };
+
+        let mut builder = ContentStreamBuilder::new();
+        builder.add_element(&ContentElement::Image(image));
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        // Should contain image drawing operations
+        assert!(content.contains("q")); // Save state
+        assert!(content.contains("Q")); // Restore state
+        assert!(content.contains("cm")); // Transform matrix
+        assert!(content.contains("Do")); // Paint XObject
+
+        // Should have one pending image
+        let pending = builder.pending_images();
+        assert_eq!(pending.len(), 1);
+        assert_eq!(pending[0].resource_id, "Im1");
+        assert_eq!(pending[0].image.width, 800);
+        assert_eq!(pending[0].image.height, 600);
+    }
+
+    #[test]
+    fn test_mixed_content_elements() {
+        use crate::elements::{
+            ColorSpace, ImageContent, ImageFormat, TableCellContent, TableContent,
+            TableContentStyle, TableRowContent,
+        };
+
+        let mut builder = ContentStreamBuilder::new();
+
+        // Add text
+        let text_content = TextContent {
+            text: "Header".to_string(),
+            bbox: Rect::new(72.0, 720.0, 100.0, 14.0),
+            font: FontSpec::new("Helvetica", 14.0),
+            style: TextStyle::default(),
+            reading_order: Some(0),
+            origin: None,
+            rotation_degrees: None,
+            matrix: None,
+        };
+        builder.add_element(&ContentElement::Text(text_content));
+
+        // Add table
+        let mut table = TableContent::new(Rect::new(72.0, 600.0, 200.0, 50.0));
+        table.column_widths = vec![200.0];
+        table.style = TableContentStyle::minimal();
+        table.add_row(TableRowContent::new(vec![TableCellContent::new("Row 1")]));
+        builder.add_element(&ContentElement::Table(table));
+
+        // Add image
+        let image = ImageContent {
+            bbox: Rect::new(72.0, 400.0, 100.0, 100.0),
+            format: ImageFormat::Png,
+            data: vec![0x89, 0x50, 0x4E, 0x47], // PNG magic bytes
+            width: 200,
+            height: 200,
+            bits_per_component: 8,
+            color_space: ColorSpace::RGB,
+            reading_order: Some(2),
+            alt_text: None,
+            horizontal_dpi: None,
+            vertical_dpi: None,
+        };
+        builder.add_element(&ContentElement::Image(image));
+
+        let bytes = builder.build().unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+
+        // Verify all content types are present
+        assert!(content.contains("(Header) Tj")); // Text
+        assert!(content.contains("(Row 1) Tj")); // Table cell text
+        assert!(content.contains("/Im1 Do")); // Image
+
+        // Should have one pending image
+        assert_eq!(builder.pending_images().len(), 1);
+    }
+
+    #[test]
+    fn test_take_pending_images() {
+        use crate::elements::{ColorSpace, ImageContent, ImageFormat};
+
+        let image = ImageContent {
+            bbox: Rect::new(0.0, 0.0, 100.0, 100.0),
+            format: ImageFormat::Jpeg,
+            data: vec![0xFF, 0xD8],
+            width: 100,
+            height: 100,
+            bits_per_component: 8,
+            color_space: ColorSpace::RGB,
+            reading_order: None,
+            alt_text: None,
+            horizontal_dpi: None,
+            vertical_dpi: None,
+        };
+
+        let mut builder = ContentStreamBuilder::new();
+        builder.add_element(&ContentElement::Image(image));
+
+        // Take pending images
+        let pending = builder.take_pending_images();
+        assert_eq!(pending.len(), 1);
+
+        // After taking, should be empty
+        assert!(builder.pending_images().is_empty());
+        assert!(builder.take_pending_images().is_empty());
+    }
+}
