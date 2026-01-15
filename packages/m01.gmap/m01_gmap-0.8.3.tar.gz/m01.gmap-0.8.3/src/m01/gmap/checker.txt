@@ -1,0 +1,19 @@
+======
+README
+======
+
+Let's test the source code with our custom checker:
+
+  >>> import p01.checker
+  >>> import m01.gmap
+
+  >>> skipFileNames = [
+  ... ]
+
+  >>> skipFolderNames = [
+  ...     'plugins',
+  ... ]
+
+  >>> checker = p01.checker.Checker()
+  >>> checker.check(m01.gmap, skipFileNames=skipFileNames,
+  ...     skipFolderNames=skipFolderNames)
