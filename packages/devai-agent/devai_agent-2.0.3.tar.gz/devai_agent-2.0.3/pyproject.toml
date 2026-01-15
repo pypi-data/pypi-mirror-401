@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devai-agent"
+version = "2.0.3"
+description = "A Claude Code-inspired agentic coding assistant"
+readme = "README.md"
+authors = [
+  { name = "Devendra", email = "your.email@example.com" },
+]
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "rich",
+    "google-generativeai",
+    "openai",
+    "anthropic",
+    "pydantic",
+    "python-dotenv",
+    "aiohttp",
+    "colorama",
+    "pyperclip"
+]
+requires-python = ">=3.9"
+
+[project.scripts]
+devai = "devai_runner:main"
+
+[tool.setuptools]
+py-modules = ["devai_runner", "devai"]
+packages = ["agent", "client", "config", "context", "hooks", "prompts", "safety", "tools", "ui", "utils"]
