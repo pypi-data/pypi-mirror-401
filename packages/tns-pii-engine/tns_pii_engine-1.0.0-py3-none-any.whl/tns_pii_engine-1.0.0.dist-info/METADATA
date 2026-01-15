@@ -1,0 +1,530 @@
+Metadata-Version: 2.4
+Name: tns-pii-engine
+Version: 1.0.0
+Summary: Enterprise PII Masking, Tokenization & Encryption Module
+Author: Naveenkumar Koppala
+Author-email: naveenkumar.k@tnsservices.com
+License: MIT
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: cryptography>=3.4.8
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: mysql-connector-python>=8.0.0
+Requires-Dist: python-dotenv>=0.19.0
+Provides-Extra: fastapi
+Requires-Dist: fastapi>=0.68.0; extra == "fastapi"
+Requires-Dist: uvicorn>=0.15.0; extra == "fastapi"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: black>=22.0.0; extra == "dev"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# PII Engine - Production Ready Pseudonymization & Tokenization
+
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Enterprise-grade PII (Personally Identifiable Information) processing engine with **field-level tokenization**, deterministic pseudonymization, and AES-256 encryption.
+
+## 🚀 Quick Start Guide
+
+### Step 1: Environment Setup
+
+**1.1 Copy Environment File**
+```bash
+cp .env.example .env
+```
+
+**1.2 Update `.env` with Your Database Credentials**
+```bash
+# Generate encryption key first
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# Edit .env file
+PII_ENC_KEY=your-generated-key-here
+
+# Your Database Configuration
+DB_HOST=your-database-host
+DB_PORT=3306
+DB_USER=your-username
+DB_PASSWORD=your-password
+DB_NAME=your-database-name
+```
+
+### Step 2: Configure Your Tables
+
+**2.1 Edit `pii_engine/config/fabricator.json`**
+
+```json
+{
+  "product_specific_config": {
+    "your_product_name": {
+      "fabricator_name": "YOUR_FABRICATOR",
+      "token_size": "8",
+      "prefix": "YOUR"
+    }
+  },
+  "schema": [
+    {
+      "table": "users",
+      "columns": [
+        {"name": "email", "type": "varchar(255)", "mask": true, "pseudo": true},
+        {"name": "mobile_number", "type": "varchar(20)", "mask": true, "pseudo": true},
+        {"name": "password", "type": "varchar(255)", "mask": true, "pseudo": true},
+        {"name": "username", "type": "varchar(255)", "mask": false, "pseudo": false}
+      ]
+    }
+  ]
+}
+```
+
+**Field Configuration:**
+- `"mask": true, "pseudo": true` = Field will be pseudonymized with individual token
+- `"mask": false, "pseudo": false` = Field remains unchanged
+
+### Step 3: Database Setup
+
+**3.1 Add JSON Column to Tables**
+```bash
+python add_pii_json_column.py
+```
+This adds `pii_data` JSON column to store field-level tokens and encrypted originals.
+
+### Step 4: Test Your Setup
+
+**4.1 Test Processing**
+```bash
+python main.py
+```
+This will:
+- Process sample records with field-level tokenization
+- Generate unique tokens per field (YOUR_XXXXXXXX format)
+- Store encrypted originals in same table JSON column
+- Update main table with pseudonymized data
+- Performance: ~0.9 seconds per field
+
+**4.2 View Results**
+```bash
+python view_tokens.py
+```
+
+## 📊 Production Usage
+
+### Field-Level Processing
+```python
+from pii_engine.core.clean_processor import PIIProcessor
+
+processor = PIIProcessor()
+
+# Process individual field
+pseudo_value, token = processor.process_field(
+    "users", "email", "john@example.com", user_id
+)
+
+# Retrieve original data
+original_email = processor.vault.retrieve_field_from_main_table(
+    "users", user_id, "email"
+)
+```
+**Important: Duplicate Protection**
+The masking service automatically detects and skips already processed fields, preventing data corruption during:
+- Multiple INSERT attempts on same record
+- Repeated UPDATE operations on same field
+- Mixed INSERT/UPDATE scenarios
+
+No additional code needed - protection is built-in.
+
+
+### Bulk Processing
+```bash
+python bulk_processor.py
+```
+- Processes thousands of existing records
+- Batch processing with progress tracking
+- Converts existing data to masked format
+
+## 🏗️ How It Works
+
+### Field-Level Data Flow
+```
+Original Data → Individual Tokens → Pseudonymization → Same Table Storage
+     ↓               ↓                    ↓              ↓
+"john@email.com" → YOUR_a1b2c3d4 → "fake@example.com" → Main Table
+"555-1234"       → YOUR_e5f6g7h8 → "555-9876"       → Main Table
+
+Original Data → AES-256 Encryption → JSON Storage
+     ↓                ↓                    ↓
+"john@email.com" → Encrypted Value → pii_data JSON column
+```
+
+### Token Format
+- **Prefix**: Configured in fabricator.json (e.g., "YOUR")
+- **Format**: YOUR_XXXXXXXX (8 character hash)
+- **Unique**: Each field gets individual token
+- **Deterministic**: Same field value = same pseudonym
+
+### Storage Architecture
+**Main Table** (users):
+- Contains pseudonymized data in original columns
+- `pii_data` JSON column stores tokens and encrypted originals
+- No separate vault table needed
+
+**JSON Structure Example:**
+```json
+{
+  "email": {
+    "token": "YOUR_a1b2c3d4",
+    "encrypted_value": "encrypted_original_email"
+  },
+  "mobile_number": {
+    "token": "YOUR_e5f6g7h8", 
+    "encrypted_value": "encrypted_original_mobile"
+  }
+}
+```
+
+## 🔧 Production Integration Guide
+
+### Phase 1: Service Integration
+
+**Step 1: Import Production-Ready Functions**
+```python
+# Import our production-ready wrapper functions
+from pii_engine.wrappers import process_pii_fields, retrieve_original_data
+```
+
+**Step 2: Replace Your Existing Functions**
+Delete your hardcoded `process_pii_fields()` and `retrieve_original_data()` functions and use ours.
+
+### Phase 2: Database Operations
+
+**A. INSERT Operations (User Registration)**
+
+*Current Pattern:*
+```python
+cursor.execute("INSERT INTO jobseekers (email, mobile_number, ...) VALUES (%s, %s, ...)", 
+               (email, mobile, ...))
+```
+
+*Modified Pattern:*
+```python
+# Process PII fields before insert
+user_data = {'email': email, 'mobile_number': mobile_number, 'first_name': first_name}
+processed_data = process_pii_fields("jobseekers", "pseudo", None, user_data)
+
+# Extract fields and tokenSet
+actor_details = processed_data['fields']
+actor_details["token_set"] = processed_data['TokenSet']
+
+# Insert with pseudonymized data
+cursor.execute("INSERT INTO jobseekers (email, mobile_number, first_name, token_set, ...) VALUES (%s, %s, %s, %s, ...)", 
+               (actor_details['email'], actor_details['mobile_number'], actor_details['first_name'], 
+                json.dumps(actor_details['token_set']), ...))
+```
+
+**B. UPDATE Operations**
+
+*Current Pattern:*
+```python
+cursor.execute("UPDATE jobseekers SET email = %s WHERE id = %s", (new_email, user_id))
+```
+
+*Modified Pattern:*
+```python
+# Process new PII value
+update_data = {'email': new_email}
+processed_data = process_pii_fields("jobseekers", "pseudo", user_id, update_data)
+
+cursor.execute("UPDATE jobseekers SET email = %s WHERE id = %s", 
+               (processed_data['fields']['email'], user_id))
+```
+
+**C. SELECT Operations (Data Retrieval)**
+
+*Current Pattern:*
+```python
+cursor.execute("SELECT email, mobile_number FROM jobseekers WHERE id = %s", (user_id,))
+result = cursor.fetchone()
+```
+
+*Modified Pattern:*
+```python
+cursor.execute("SELECT email, mobile_number, token_set FROM jobseekers WHERE id = %s", (user_id,))
+result = cursor.fetchone()
+
+# For admin access - retrieve original data
+if user_role == "admin":
+    original_email = retrieve_original_data("jobseekers", user_id, "email")
+    result['email'] = original_email
+```
+
+**D. Admin Data Retrieval Endpoint**
+```python
+@router.get("/admin/user/{user_id}/original")
+async def get_original_user_data(user_id: int, user_role: str = Depends(get_user_role)):
+    if user_role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Retrieve original PII data
+    original_email = retrieve_original_data("jobseekers", user_id, "email")
+    original_mobile = retrieve_original_data("jobseekers", user_id, "mobile_number")
+    
+    return {
+        "user_id": user_id,
+        "original_email": original_email,
+        "original_mobile": original_mobile
+    }
+```
+
+### Phase 3: Function Signatures
+
+**process_pii_fields()**
+```python
+process_pii_fields(table_name: str, process: str, record_id: Optional[int], field_data: dict) -> dict
+```
+- `table_name`: "jobseekers" or "employers"
+- `process`: "pseudo" or "mask"
+- `record_id`: User ID (None during signup)
+- `field_data`: Input JSON data
+- **Returns**: `{'TokenSet': token_data, 'fields': processed_data}`
+
+**retrieve_original_data()**
+```python
+retrieve_original_data(table_name: str, record_id: int, field_name: str) -> str
+```
+- **Returns**: Original field value for admin access
+
+### Phase 4: Database Setup
+
+**Add token_set column to your tables:**
+```sql
+ALTER TABLE jobseekers ADD COLUMN token_set JSON;
+ALTER TABLE employers ADD COLUMN token_set JSON;
+```
+
+## 🚀 Integration Steps Summary
+
+**For Your Team:**
+
+1. **Import Functions (1 line):**
+   ```python
+   from pii_engine.wrappers import process_pii_fields, retrieve_original_data
+   ```
+
+2. **Delete Your Functions (~20 lines):**
+   - Remove your hardcoded `process_pii_fields()` function
+   - Remove your hardcoded `retrieve_original_data()` function
+
+3. **Add Database Column:**
+   ```sql
+   ALTER TABLE jobseekers ADD COLUMN token_set JSON;
+   ALTER TABLE employers ADD COLUMN token_set JSON;
+   ```
+
+4. **That's It!** Your existing code works as-is.
+
+**Console Output:**
+```
+>>> PROCESSING TABLE: jobseekers (process: pseudo)
+```
+
+## 📊 What Happens During Processing
+
+**Why record_id is None during signup:**
+- **Signup Flow**: User doesn't exist yet → `record_id = None`
+- **Update Flow**: User exists → `record_id = actual_user_id`
+- **Our Service**: Handles both cases automatically
+
+**Input Data:**
+```json
+{
+  "first_name": "John",
+  "email": "john@example.com",
+  "uid": 633
+}
+```
+
+**Console Output:**
+```
+>>> PROCESSING TABLE: jobseekers (process: pseudo)
+```
+
+**Returned Data:**
+```json
+{
+  "TokenSet": {
+    "first_name": "EE_4bd1511e",
+    "last_name": "EE_b83eef5f",
+    "email": "EE_695caa3c",
+    "mobile_code": "EE_4151c52c",
+    "mobile_number": "EE_c12e9f85",
+    "gender": "EE_b1a66072",
+    "date_of_birth": "EE_123364e0",
+    "country": "EE_b8123438",
+    "state": "EE_8349e493",
+    "city": "EE_cf3f05e7",
+    "zip_code": "EE_2e7e659a",
+    "address_1": "EE_c9aafc13",
+    "address_2": "EE_29b0cb77",
+    "cv_file_path": "EE_2bc76800",
+    "agreed_to_terms": "Y",
+    "usertype": "JS",
+    "usersubtype": "JS",
+    "status": "A",
+    "uid": 633,
+    "username": "578cb6087149"
+  },
+  "fields": {
+    "first_name": "***",
+    "last_name": "***",
+    "email": "user123@fake.edu",
+    "mobile_code": "***",
+    "mobile_number": "***",
+    "gender": "***",
+    "date_of_birth": "1990-01-01",
+    "country": "***",
+    "state": "***",
+    "city": "***",
+    "zip_code": "***",
+    "address_1": "***",
+    "address_2": "***",
+    "cv_file_path": "***",
+    "agreed_to_terms": "Y",
+    "usertype": "JS",
+    "usersubtype": "JS",
+    "status": "A",
+    "uid": 633,
+    "username": "578cb6087149"
+  }
+}
+```
+
+**Database Result:**
+- Main table gets pseudonymized data
+- `token_set` column stores complete audit trail
+- Admin can retrieve original data anytime
+
+## 🛡️ Security Features
+
+- **Field-Level Tokenization**: Individual tokens per field per record
+- **Same Table Storage**: No separate vault table needed
+- **AES-256 Encryption**: Military-grade encryption for original data
+- **Deterministic Pseudonymization**: Same input = same fake output
+- **Complete Reversibility**: Admin can retrieve original data using tokens
+- **Configurable Processing**: Teams control which fields to mask via fabricator.json
+
+## 📋 Performance Metrics
+
+**Current Performance:**
+- **Field Processing**: ~0.9 seconds per field
+- **Record Processing**: ~5-6 seconds per record (multiple fields)
+- **Bulk Processing**: 1000+ records with progress tracking
+- **Database**: Optimized connection reuse
+
+**Test Results:**
+```
+Record 31: dchakras@gmail.com → sergiorivera@example.net (Token: EE_7b659ff3)
+Record 32: dchakras1@gmail.com → michaelcarter@example.net (Token: EE_dc06a015)
+Record 33: sonjoy.c@tnsservices.com → cynthia30@example.com (Token: EE_bac2065b)
+Record 34: naveenkumar.k@tnsservices.com → russell53@example.com (Token: EE_f24e8e6a)
+```
+
+## 📁 File Structure
+
+```
+masking-service/
+├── pii_engine/                 # Core PII processing package
+│   ├── config/
+│   │   ├── fabricator.json     # Table configuration
+│   │   └── config.py           # Config loader
+│   ├── core/
+│   │   ├── clean_processor.py  # Main processor
+│   │   ├── pseudonymizer.py    # Data pseudonymization
+│   │   └── token_generator.py  # Token generation
+│   ├── utils/
+│   │   └── vault.py            # JSON storage & encryption
+│   └── wrappers/
+│       ├── __init__.py         # Wrapper package
+│       └── integration_wrappers.py  # Production wrapper functions
+├── main.py                     # Test processing (field-level)
+├── bulk_processor.py           # Bulk processing (production)
+├── add_pii_json_column.py      # Database setup
+├── demo_reset.py               # Reset test data
+├── view_tokens.py              # Token inspection
+├── .env                        # Database credentials
+└── README.md                   # This guide
+```
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**1. Database Connection Error**
+- Check `.env` credentials
+- Verify database server is accessible
+
+**2. No Maskable Fields Found**
+- Update `fabricator.json` with your table schema
+- Ensure `"mask": true, "pseudo": true` for PII fields
+
+**3. JSON Column Missing**
+- Run `python add_pii_json_column.py` to add `pii_data` column
+- Check column exists: `SHOW COLUMNS FROM your_table LIKE 'pii_data';`
+
+**4. Performance Issues**
+- First field takes ~3s (connection setup), subsequent fields ~0.9s
+- Use connection reuse for better performance
+
+### Commands Reference
+```bash
+# Database setup
+python add_pii_json_column.py
+
+# Test processing
+python main.py
+
+# View results
+python view_tokens.py
+
+# Bulk processing
+python bulk_processor.py
+
+# Reset test data
+python demo_reset.py
+```
+
+## 🏆 Key Features
+
+- ✅ **Field-Level Tokenization** - Individual tokens per field
+- ✅ **Same Table Storage** - No separate vault table needed
+- ✅ **Configuration-Driven** - Teams control masking via fabricator.json
+- ✅ **Fast Performance** - ~0.9s per field processing
+- ✅ **AES-256 Encryption** - Military-grade security
+- ✅ **Complete Reversibility** - Admin data retrieval
+- ✅ **Production Ready** - Bulk processing support
+
+---
+
+**Ready to Integrate** 🎯
+
+1. Update `.env` → 2. Configure `fabricator.json` → 3. Run `python add_pii_json_column.py` → 4. Test with `python main.py` → Success!
