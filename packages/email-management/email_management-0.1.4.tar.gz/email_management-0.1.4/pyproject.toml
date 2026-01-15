@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "email_management"
+version = "0.1.4"
+description = "API for managing your email"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "pydantic",
+    "langchain",
+    "langchain-core",
+    "langchain-openai",
+    "langchain-google-genai",
+    "langchain-xai",
+    "langchain-groq",
+    "langchain-anthropic",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/email_management"]
+include = ["src/email_management/py.typed"]
+
+
