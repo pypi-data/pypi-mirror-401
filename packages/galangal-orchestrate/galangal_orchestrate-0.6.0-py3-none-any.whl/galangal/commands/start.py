@@ -1,0 +1,395 @@
+"""
+galangal start - Start a new task.
+"""
+
+import argparse
+import threading
+
+from galangal.core.state import (
+    TaskType,
+    WorkflowState,
+    get_task_dir,
+    load_state,
+    save_state,
+)
+from galangal.core.tasks import (
+    create_task_branch,
+    generate_task_name,
+    set_active_task,
+    task_name_exists,
+)
+from galangal.core.workflow import run_workflow
+from galangal.ui.tui import PromptType, WorkflowTUIApp
+
+
+def create_task(
+    task_name: str,
+    description: str,
+    task_type: TaskType,
+    github_issue: int | None = None,
+    github_repo: str | None = None,
+    screenshots: list[str] | None = None,
+) -> tuple[bool, str]:
+    """Create a new task with the given name, description, and type.
+
+    Args:
+        task_name: Name for the task (will be used for directory and branch)
+        description: Task description
+        task_type: Type of task (Feature, Bug Fix, etc.)
+        github_issue: Optional GitHub issue number this task is linked to
+        github_repo: Optional GitHub repo (owner/repo) for the issue
+        screenshots: Optional list of local screenshot paths from the issue
+
+    Returns:
+        Tuple of (success, message)
+    """
+    # Check if task already exists
+    if task_name_exists(task_name):
+        return False, f"Task '{task_name}' already exists"
+
+    task_dir = get_task_dir(task_name)
+
+    # Create git branch
+    success, msg = create_task_branch(task_name)
+    if not success and "already exists" not in msg.lower():
+        return False, msg
+
+    # Create task directory
+    task_dir.mkdir(parents=True, exist_ok=True)
+    (task_dir / "logs").mkdir(exist_ok=True)
+
+    # Initialize state with task type and optional GitHub info
+    state = WorkflowState.new(
+        description, task_name, task_type, github_issue, github_repo, screenshots
+    )
+    save_state(state)
+
+    # Set as active task
+    set_active_task(task_name)
+
+    return True, f"Created task: {task_name}"
+
+
+def cmd_start(args: argparse.Namespace) -> int:
+    """Start a new task."""
+    from galangal.config.loader import is_initialized
+    from galangal.ui.console import print_error, print_info
+
+    # Check if project is initialized
+    if not is_initialized():
+        print_error("Galangal has not been initialized in this project.")
+        print_info("Run 'galangal init' first to set up your project.")
+        return 1
+
+    description = " ".join(args.description) if args.description else ""
+    task_name = args.name or ""
+    from_issue = getattr(args, "issue", None)
+
+    # Create TUI app for task setup
+    app = WorkflowTUIApp("New Task", "SETUP", hidden_stages=frozenset())
+
+    task_info = {
+        "type": None,
+        "description": description,
+        "name": task_name,
+        "github_issue": from_issue,
+        "github_repo": None,
+        "screenshots": None,
+    }
+    result_code = {"value": 0}
+
+    def task_creation_thread():
+        try:
+            app.add_activity("[bold]Starting new task...[/bold]", "🆕")
+
+            # Step 0: Choose task source (manual or GitHub) if no description/issue provided
+            if not task_info["description"] and not task_info["github_issue"]:
+                app.set_status("setup", "select task source")
+
+                source_event = threading.Event()
+                source_result = {"value": None}
+
+                def handle_source(choice):
+                    source_result["value"] = choice
+                    source_event.set()
+
+                app.show_prompt(
+                    PromptType.TASK_SOURCE,
+                    "Create task from:",
+                    handle_source,
+                )
+                source_event.wait()
+
+                if source_result["value"] == "quit":
+                    app._workflow_result = "cancelled"
+                    result_code["value"] = 1
+                    app.call_from_thread(app.set_timer, 0.5, app.exit)
+                    return
+
+                if source_result["value"] == "github":
+                    # Handle GitHub issue selection
+                    app.set_status("setup", "checking GitHub")
+                    app.show_message("Checking GitHub setup...", "info")
+
+                    try:
+                        from galangal.github.client import GitHubClient
+                        from galangal.github.issues import list_issues
+
+                        client = GitHubClient()
+                        check = client.check_setup()
+
+                        if not check.is_ready:
+                            app.show_message(
+                                "GitHub not ready. Run 'galangal github check'",
+                                "error"
+                            )
+                            app._workflow_result = "error"
+                            result_code["value"] = 1
+                            app.call_from_thread(app.set_timer, 0.5, app.exit)
+                            return
+
+                        task_info["github_repo"] = check.repo_name
+
+                        # List issues with galangal label
+                        app.set_status("setup", "fetching issues")
+                        app.show_message("Fetching issues...", "info")
+
+                        issues = list_issues()
+                        if not issues:
+                            app.show_message("No issues with 'galangal' label found", "warning")
+                            app._workflow_result = "cancelled"
+                            result_code["value"] = 1
+                            app.call_from_thread(app.set_timer, 0.5, app.exit)
+                            return
+
+                        # Show issue selection
+                        app.set_status("setup", "select issue")
+                        issue_event = threading.Event()
+                        issue_result = {"value": None}
+
+                        def handle_issue(issue_num):
+                            issue_result["value"] = issue_num
+                            issue_event.set()
+
+                        issue_options = [(i.number, i.title) for i in issues]
+                        app.show_github_issue_select(issue_options, handle_issue)
+                        issue_event.wait()
+
+                        if issue_result["value"] is None:
+                            app._workflow_result = "cancelled"
+                            result_code["value"] = 1
+                            app.call_from_thread(app.set_timer, 0.5, app.exit)
+                            return
+
+                        # Get the selected issue details
+                        selected_issue = next(
+                            (i for i in issues if i.number == issue_result["value"]),
+                            None
+                        )
+                        if selected_issue:
+                            task_info["github_issue"] = selected_issue.number
+                            task_info["description"] = (
+                                f"{selected_issue.title}\n\n{selected_issue.body}"
+                            )
+                            app.show_message(
+                                f"Selected issue #{selected_issue.number}",
+                                "success"
+                            )
+
+                            # Download screenshots from issue body
+                            from galangal.github.images import extract_image_urls
+                            images = extract_image_urls(selected_issue.body)
+                            if images:
+                                app.set_status("setup", "downloading screenshots")
+                                app.show_message(
+                                    f"Found {len(images)} screenshot(s) in issue...",
+                                    "info"
+                                )
+                                # Note: Actual download happens after task_name is generated
+                                # Store the issue body for later processing
+                                task_info["_issue_body"] = selected_issue.body
+
+                            # Try to infer task type from labels
+                            type_hint = selected_issue.get_task_type_hint()
+                            if type_hint:
+                                type_map = {
+                                    "feature": TaskType.FEATURE,
+                                    "bug_fix": TaskType.BUG_FIX,
+                                    "refactor": TaskType.REFACTOR,
+                                    "chore": TaskType.CHORE,
+                                    "docs": TaskType.DOCS,
+                                    "hotfix": TaskType.HOTFIX,
+                                }
+                                task_info["type"] = type_map.get(type_hint)
+                                app.show_message(
+                                    f"Inferred type from labels: {task_info['type'].display_name()}",
+                                    "info"
+                                )
+
+                    except Exception as e:
+                        app.show_message(f"GitHub error: {e}", "error")
+                        app._workflow_result = "error"
+                        result_code["value"] = 1
+                        app.call_from_thread(app.set_timer, 0.5, app.exit)
+                        return
+
+            # Step 1: Get task type (if not already set from GitHub labels)
+            if task_info["type"] is None:
+                app.set_status("setup", "select task type")
+
+                type_event = threading.Event()
+                type_result = {"value": None}
+
+                def handle_type(choice):
+                    type_result["value"] = choice
+                    type_event.set()
+
+                app.show_prompt(
+                    PromptType.TASK_TYPE,
+                    "Select task type:",
+                    handle_type,
+                )
+                type_event.wait()
+
+                if type_result["value"] == "quit":
+                    app._workflow_result = "cancelled"
+                    result_code["value"] = 1
+                    app.call_from_thread(app.set_timer, 0.5, app.exit)
+                    return
+
+                # Map selection to TaskType
+                type_map = {
+                    "feature": TaskType.FEATURE,
+                    "bugfix": TaskType.BUG_FIX,
+                    "refactor": TaskType.REFACTOR,
+                    "chore": TaskType.CHORE,
+                    "docs": TaskType.DOCS,
+                    "hotfix": TaskType.HOTFIX,
+                }
+                task_info["type"] = type_map.get(type_result["value"], TaskType.FEATURE)
+
+            app.show_message(f"Task type: {task_info['type'].display_name()}", "success")
+
+            # Step 2: Get task description if not provided
+            if not task_info["description"]:
+                app.set_status("setup", "enter description")
+                desc_event = threading.Event()
+
+                def handle_description(desc):
+                    task_info["description"] = desc
+                    desc_event.set()
+
+                app.show_multiline_input("Enter task description (Ctrl+S to submit):", "", handle_description)
+                desc_event.wait()
+
+                if not task_info["description"]:
+                    app.show_message("Task description required", "error")
+                    app._workflow_result = "cancelled"
+                    result_code["value"] = 1
+                    app.call_from_thread(app.set_timer, 0.5, app.exit)
+                    return
+
+            # Step 3: Generate task name if not provided
+            if not task_info["name"]:
+                app.set_status("setup", "generating task name")
+                app.show_message("Generating task name...", "info")
+
+                base_name = generate_task_name(task_info["description"])
+
+                # Prefix with issue number if from GitHub
+                if task_info["github_issue"]:
+                    base_name = f"issue-{task_info['github_issue']}-{base_name}"
+
+                final_name = base_name
+
+                suffix = 2
+                while task_name_exists(final_name):
+                    final_name = f"{base_name}-{suffix}"
+                    suffix += 1
+
+                task_info["name"] = final_name
+            else:
+                # Validate provided name
+                if task_name_exists(task_info["name"]):
+                    app.show_message(f"Task '{task_info['name']}' already exists", "error")
+                    app._workflow_result = "cancelled"
+                    result_code["value"] = 1
+                    app.call_from_thread(app.set_timer, 0.5, app.exit)
+                    return
+
+            app.show_message(f"Task name: {task_info['name']}", "success")
+
+            # Step 3.5: Download screenshots if from GitHub issue
+            if task_info.get("_issue_body"):
+                app.set_status("setup", "downloading screenshots")
+                try:
+                    from galangal.github.images import download_issue_images
+
+                    task_dir = get_task_dir(task_info["name"])
+                    # Create task dir early for screenshots
+                    task_dir.mkdir(parents=True, exist_ok=True)
+
+                    screenshot_paths = download_issue_images(
+                        task_info["_issue_body"],
+                        task_dir,
+                    )
+                    if screenshot_paths:
+                        task_info["screenshots"] = screenshot_paths
+                        app.show_message(
+                            f"Downloaded {len(screenshot_paths)} screenshot(s)",
+                            "success"
+                        )
+                except Exception as e:
+                    app.show_message(f"Screenshot download failed: {e}", "warning")
+                    # Non-critical - continue without screenshots
+
+            # Step 4: Create the task
+            app.set_status("setup", "creating task")
+            success, message = create_task(
+                task_info["name"],
+                task_info["description"],
+                task_info["type"],
+                github_issue=task_info["github_issue"],
+                github_repo=task_info["github_repo"],
+                screenshots=task_info.get("screenshots"),
+            )
+
+            if success:
+                app.show_message(message, "success")
+                app._workflow_result = "task_created"
+
+                # Mark issue as in-progress if from GitHub
+                if task_info["github_issue"]:
+                    try:
+                        from galangal.github.issues import mark_issue_in_progress
+                        mark_issue_in_progress(task_info["github_issue"])
+                        app.show_message("Marked issue as in-progress", "info")
+                    except Exception:
+                        pass  # Non-critical
+            else:
+                app.show_message(f"Failed: {message}", "error")
+                app._workflow_result = "error"
+                result_code["value"] = 1
+
+        except Exception as e:
+            app.show_message(f"Error: {e}", "error")
+            app._workflow_result = "error"
+            result_code["value"] = 1
+        finally:
+            app.call_from_thread(app.set_timer, 0.5, app.exit)
+
+    # Start creation in background thread
+    thread = threading.Thread(target=task_creation_thread, daemon=True)
+    app.call_later(thread.start)
+    app.run()
+
+    # If task was created, start the workflow
+    if app._workflow_result == "task_created" and task_info["name"]:
+        state = load_state(task_info["name"])
+        if state:
+            # Pass skip_discovery flag via state attribute
+            if getattr(args, 'skip_discovery', False):
+                state._skip_discovery = True
+            run_workflow(state)
+
+    return result_code["value"]
