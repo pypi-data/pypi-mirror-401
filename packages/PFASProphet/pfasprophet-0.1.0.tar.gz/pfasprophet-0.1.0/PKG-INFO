@@ -1,0 +1,55 @@
+Metadata-Version: 2.4
+Name: PFASProphet
+Version: 0.1.0
+Summary: ML-based PFAS prediction from mass spectrometry data
+Author-email: Mathieu Feraud <Mathieu.Feraud@outlook.com>
+License: MIT
+License-File: LICENSE
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: <3.13,>=3.12
+Requires-Dist: joblib==1.5.3
+Requires-Dist: lightgbm==4.6.0
+Requires-Dist: numpy==2.4.1
+Requires-Dist: pandas==2.3.3
+Requires-Dist: pydantic==2.12.5
+Requires-Dist: scikit-learn==1.4.2
+Provides-Extra: test
+Requires-Dist: pytest>=8.0.0; extra == 'test'
+Description-Content-Type: text/markdown
+
+# PFASProphet
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+
+A tool for giving a score on the likelihood of PFAS (Per- and Polyfluoroalkyl Substances) from mass spectrometry data using machine learning.
+
+## Features
+- Obtain a PFAS scores from precursor masses and fragment ions.
+- Support for CSV files or direct list inputs.
+- can be run from python directly or Command-line interface (CLI).
+- Handles ionised vs. neutral masses (negative ESI mode).
+- See examples for usage.
+
+## Installation
+1. Clone the repository: `git clone https://github.com/yourusername/PFASProphet.git`
+2. Navigate to the directory: `cd PFASProphet`
+3. Create a virtual environment: `python -m venv .venv`
+4. Activate it: `.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux/Mac)
+5. Install: `pip install -e .`
+
+## Usage
+### CLI Examples
+- **Predict from lists**: `pfasprophet --mass "[248.9461]" --fragments "[[63.9624]]"`
+- **Predict from CSV**: `pfasprophet --file data.csv`
+- **Help**: `pfasprophet` or `pfasprophet --help`
+
+### Python API
+```python
+from PFASProphet import PFASProphet
+
+prophet = PFASProphet()
+result = prophet.predict(mass=[248.9461], fragments=[[63.9624]])
+print(result)
