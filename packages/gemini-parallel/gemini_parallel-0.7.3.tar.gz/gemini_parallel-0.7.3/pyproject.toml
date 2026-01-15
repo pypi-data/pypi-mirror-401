@@ -1,0 +1,14 @@
+[project]
+name = "gemini-parallel"
+version = "0.7.3"
+description = "Simplified Sequential Processor for Google Gemini API"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-api-core>=2.25.0",
+    "google-genai>=1.18.0",
+    "python-dotenv>=1.1.0",
+]
+
+[project.scripts]
+geminiparallel = "gemini_parallel.cli:main"
