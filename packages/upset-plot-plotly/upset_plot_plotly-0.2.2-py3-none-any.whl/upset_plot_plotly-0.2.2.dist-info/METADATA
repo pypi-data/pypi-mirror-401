@@ -1,0 +1,101 @@
+Metadata-Version: 2.4
+Name: upset_plot_plotly
+Version: 0.2.2
+Summary: A generic and colored Upset Plot generator using Plotly
+Author: Prabin Raj KP
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: plotly
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Upset Plot Package
+
+A generic Python package for generating Upset Plots using Plotly. This package allows you to visualize intersections of sets and categories, supporting both standard and colored variations.
+
+## Installation
+
+You can install this package locally:
+```bash
+pip install upset_plot_plotly
+```
+
+## Usage
+
+### Usage
+
+```python
+import pandas as pd
+from upset_plot import plot
+
+# 1. Prepare Data
+df = pd.DataFrame({
+    'Category A': [True, True, False, True],
+    'Category B': [True, False, True, True],
+    'Category C': [False, True, True, False]
+})
+
+categories_dict = {
+    'Category A': df['Category A'],
+    'Category B': df['Category B'],
+    'Category C': df['Category C']
+}
+
+# 2. Plot
+fig = plot(df, categories_dict, title="My Upset Plot")
+fig.show()
+```
+
+### Colored Usage
+
+For scenarios where you want to color-code specific elements (e.g., based on source or type):
+
+```python
+from upset_plot import ColoredUpsetPlotGenerator
+
+# Define colors for each category
+category_colors = {
+    'Category A': '#D32F2F',  # Red
+    'Category B': '#1976D2',  # Blue
+    'Category C': 'purple'
+}
+
+upset_gen = ColoredUpsetPlotGenerator(
+    df, 
+    categories_dict, 
+    category_colors=category_colors
+)
+upset_gen.compute_combinations()
+
+fig = upset_gen.plot(title="Colored Upset Plot")
+fig.show()
+```
+
+## Features
+- **Simple Functional API**: Generate complex Upset plots with a single function call `plot()`.
+- **Interactive Visualizations**: Built on top of Plotly, allowing for zoom, hover, and detailed data inspection.
+- **Automatic Set Size Calculation**: Automatically computes set sizes and intersection counts from your DataFrame.
+- **Customizable Appearance**:
+    - **Bar Colors**: Customize the color of the intersection bars.
+    - **Highlighting**: Use `active_color` and `inactive_color` to distinguish between included and excluded sets in the matrix.
+    - **Connection Lines**: Style the lines connecting the set matrix points.
+- **Flexible Filtering**:
+    - Filter combinations by a minimum number of intersecting sets (`min_sets`).
+    - Display specific ranges of combinations (`combinations_range`).
+- **Colored Upset Plots**: Support for advanced coloring logic (e.g., coloring matrix dots based on specific categories) using `category_colors`.
+- **Responsive Layout**: Auto-calculated heights with options to override for perfect integration into dashboards.
+- **Framework Agnostic**: Works seamlessly with any Python environment (Jupyter, Streamlit, etc.) that supports Plotly.
+
+## Dependencies
+
+- pandas
+- plotly
