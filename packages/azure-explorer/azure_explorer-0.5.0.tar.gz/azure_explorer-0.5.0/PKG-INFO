@@ -1,0 +1,81 @@
+Metadata-Version: 2.4
+Name: azure-explorer
+Version: 0.5.0
+Summary: 
+Author: uch
+Author-email: uch@energinet.dk
+Requires-Python: >=3.10.8,<4.0.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Dist: azure-data-tables (>=12.7.0,<13.0.0)
+Requires-Dist: azure-identity (>=1.25.1,<2.0.0)
+Requires-Dist: azure-mgmt-resource (>=24.0.0,<25.0.0)
+Requires-Dist: azure-mgmt-servicebus (>=9.0.0,<10.0.0)
+Requires-Dist: azure-mgmt-storage (>=24.0.0,<25.0.0)
+Requires-Dist: azure-mgmt-subscription (>=3.1.1,<4.0.0)
+Requires-Dist: azure-servicebus (>=7.14.3,<8.0.0)
+Requires-Dist: azure-storage-blob (>=12.27.1,<13.0.0)
+Requires-Dist: azure-storage-file-datalake (>=12.22.0,<13.0.0)
+Requires-Dist: pytz (>=2025.2,<2026.0)
+Requires-Dist: textual (>=7.0.0,<8.0.0)
+Description-Content-Type: text/markdown
+
+# 🔎 Azure Explorer
+
+The purpose of this package is to provide a simple interface for exploring resources in your Azure Cloud environment. The package consists of a CLI tool and a Python library.
+
+---
+
+## Setup
+
+Install the latest version of Azure Explorer with
+
+```console
+pip install azure-explorer
+```
+
+---
+
+## Usage
+
+### CLI tool
+
+The CLI tool provides a way of navigating your Azure Cloud resources in the command line. Run the CLI tool with
+
+```console
+ax
+```
+
+![cli-tool](docs/cli-tool.png)
+
+### Python library
+
+The Python library provides a way of interacting with our Azure Cloud resources in in Python code. Use the Python library with
+
+```python
+>>> import azure_explorer as ax
+>>> tenant = ax.get_tenant_manager()
+>>> tenant.list_subscription_names()
+[
+    'development-subscription',
+    'preproduction-subscription',
+    'production-subscription',
+    'test-subscription',
+]
+
+>>> container = ax.get_container_manager(
+    storage_account_name='sadataprod',
+    container_name='documents',
+)
+>>> container.list_dir()
+[
+    'dir1',
+    'dir2',
+    'file1.txt',
+    'file2.jpg',
+    'file3.pdf',
+]
+```
