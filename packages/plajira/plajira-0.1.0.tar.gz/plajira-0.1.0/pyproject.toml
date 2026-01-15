@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plajira"
+version = "0.1.0"
+description = "Sync your .plan file with Jira Cloud"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "plajira contributors"}
+]
+keywords = ["jira", "plan", "sync", "productivity", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Bug Tracking",
+    "Topic :: Utilities",
+]
+
+[project.scripts]
+plajira = "plajira.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/plajira"
+Repository = "https://github.com/yourusername/plajira"
+Issues = "https://github.com/yourusername/plajira/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["plajira*"]
