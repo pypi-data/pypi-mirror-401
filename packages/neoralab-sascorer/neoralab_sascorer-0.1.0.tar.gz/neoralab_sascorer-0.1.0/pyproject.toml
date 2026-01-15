@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "versioningit>=2.2.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neoralab-sascorer"
+description = "Synthetic accessibility scoring from RDKit Contrib SA_Score"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "BSD-3-Clause"}
+authors = [
+  {name = "RDKit contributors"},
+]
+dynamic = ["version"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "rdkit>=2025.9.3",
+]
+
+[dependency-groups]
+docs = [
+  "mkdocs>=1.6,<2.0",
+  "mkdocs-material>=9.5,<10.0",
+]
+
+[project.scripts]
+neoralab-sascorer = "neoralab_sascorer.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+neoralab_sascorer = ["fpscores.pkl.gz"]
+
+[tool.versioningit]
+vcs = "git"
+default-version = "0.1.0"
+
+[tool.versioningit.format]
+distance = "{base_version}.dev{distance}"
+dirty = "{base_version}+dirty"
+distance-dirty = "{base_version}.dev{distance}+dirty"
+
+[tool.versioningit.write]
+file = "src/neoralab_sascorer/version.py"
