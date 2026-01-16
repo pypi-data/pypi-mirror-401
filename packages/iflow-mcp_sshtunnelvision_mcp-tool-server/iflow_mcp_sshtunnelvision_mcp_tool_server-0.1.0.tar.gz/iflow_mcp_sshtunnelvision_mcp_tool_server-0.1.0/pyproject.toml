@@ -1,0 +1,26 @@
+[project]
+name = "iflow-mcp_sshtunnelvision_mcp-tool-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fal-client>=0.5.9",
+    "fastapi>=0.115.11",
+    "mcp[cli]>=1.3.0",
+    "python-dotenv>=1.0.1",
+    "sse-starlette>=2.2.1",
+    "uvicorn>=0.34.0",
+    "Pillow>=10.0.0",
+]
+
+[project.scripts]
+iflow-mcp-sshtunnelvision-mcp-tool-server = "run_server:main"
+
+[tool.setuptools.packages.find]
+include = ["*", "tools/*"]
+exclude = ["tests*", "docs*"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
