@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rasberrysoup"
+version = "1.0.0"
+description = "A Python library for simplifying complex mathematical formulas with simple keyword calls."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Rheehose (Rhee Creative)", email = "sea35652@gmail.com"}
+]
+keywords = ["math", "mathematics", "formula", "engineering", "science"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rasberrysoup*"]
