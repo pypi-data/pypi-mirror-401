@@ -1,0 +1,20 @@
+[project]
+name = "pypi-test-sh"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Soonwoo Hong", email = "swhong@princeton.edu" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=2.0.2",
+	"scipy",
+]
+
+[project.scripts]
+pypi-test-sh = "pypi_test_sh:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
