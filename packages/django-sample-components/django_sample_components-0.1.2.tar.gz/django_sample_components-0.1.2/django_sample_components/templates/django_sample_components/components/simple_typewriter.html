@@ -1,0 +1,22 @@
+{% load static %}
+<div class="wrapper-typewriter">
+
+{# Loading Static Files #}
+<link rel="stylesheet" href="{% static 'css/components/typewriter.css' %}">
+<script src="{% static 'js/components/typewriter.js' %}"></script>
+
+
+
+    <span id="typewriter"></span><span class="typewriter-cursor">|</span></span>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const words = {{ words|safe }};
+            const typewriterEl = document.getElementById('typewriter');
+
+            if (typewriterEl) {
+                initTypewriterWordsAnimation(typewriterEl, words);
+            }
+        });
+    </script>
+</div>
