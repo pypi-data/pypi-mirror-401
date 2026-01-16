@@ -1,0 +1,224 @@
+Metadata-Version: 2.4
+Name: deepsweep-ai
+Version: 0.2.1
+Summary: Security Gateway for AI Coding Assistants. Validate Cursor, Copilot, Claude Code, Windsurf, and MCP configurations.
+Project-URL: Homepage, https://deepsweep.ai
+Project-URL: Documentation, https://docs.deepsweep.ai
+Project-URL: Repository, https://github.com/deepsweep-ai/deepsweep
+Project-URL: Changelog, https://github.com/deepsweep-ai/deepsweep/blob/main/CHANGELOG.md
+Project-URL: Issues, https://github.com/deepsweep-ai/deepsweep/issues
+Author-email: DeepSweep <security@deepsweep.ai>
+Maintainer-email: DeepSweep <security@deepsweep.ai>
+License: MIT
+License-File: LICENSE
+Keywords: ai,claude,copilot,cursor,linting,mcp,security,validation,vibe-coding,windsurf
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Security
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Requires-Dist: click>=8.1.0
+Requires-Dist: posthog>=3.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pre-commit>=3.0.0; extra == 'dev'
+Requires-Dist: pytest-cov>=4.0.0; extra == 'dev'
+Requires-Dist: pytest-xdist>=3.0.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: mkdocs-material>=9.0.0; extra == 'docs'
+Requires-Dist: mkdocs>=1.5.0; extra == 'docs'
+Description-Content-Type: text/markdown
+
+# DeepSweep
+
+**Security validation for AI coding assistants**
+
+[![PyPI version](https://badge.fury.io/py/deepsweep-ai.svg)](https://pypi.org/project/deepsweep-ai/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+DeepSweep validates your AI assistant configurations (Cursor, Windsurf, GitHub Copilot, Claude Code) for security vulnerabilities before they can cause harm.
+
+## Quick Start
+```bash
+pip install deepsweep-ai
+deepsweep validate
+```
+
+DeepSweep automatically finds and validates:
+
+- `.cursorrules` / `.windsurfrules` / `AGENTS.md`
+- MCP configurations (`mcp.json`, `claude_desktop_config.json`)
+- 46 security patterns including prompt injection, MCP attacks, and data exfiltration
+
+## What's New in v0.2.0
+
+- **MCP Security Validation** - 7 new patterns for Model Context Protocol configs
+- **deepsweep mcp list** - Discover all MCP configurations on your system
+- **deepsweep mcp validate** - Dedicated MCP security scanning
+- **deepsweep init** - Create secure starter templates
+- **deepsweep doctor** - Check installation health
+- **deepsweep badge** - Generate repository security badges
+
+## Example Output
+DEEPSWEEP Security Report
+──────────────────────────────────────────────────────
+Score: ████████████████████████░░░░░░ 80/100
+Grade: B
+Found 2 issue(s):
+[HIGH] DS-MCP-001: Unverified MCP server: @random/untrusted
+> Use @modelcontextprotocol/* servers or verify source
+[MEDIUM] DS-MCP-003: Unpinned MCP server version
+> Pin version: @server@1.2.3
+──────────────────────────────────────────────────────
+Run with --fix to see remediation suggestions
+
+## Security Patterns
+
+### Rules File Patterns (39)
+
+| ID | Severity | Description |
+|----|----------|-------------|
+| DS-PI-001 | Critical | Prompt injection attempt |
+| DS-PI-002 | Critical | System prompt extraction |
+| DS-DATA-001 | High | Sensitive data exposure |
+| DS-EXEC-001 | Critical | Arbitrary code execution |
+
+See full list at https://deepsweep.ai/patterns
+
+### MCP Patterns (7)
+
+| ID | Severity | Description |
+|----|----------|-------------|
+| DS-MCP-001 | High | Unverified MCP server source |
+| DS-MCP-002 | Critical | Dangerous command arguments |
+| DS-MCP-003 | Medium | Unpinned server version |
+| DS-MCP-004 | High | Using @latest tag |
+| DS-MCP-005 | High | Auto-approve enabled |
+| DS-MCP-006 | Critical | Shell command execution |
+| DS-MCP-007 | Critical | Network exfiltration risk |
+
+## Commands
+
+### deepsweep validate [PATH]
+```bash
+deepsweep validate                    # Current directory
+deepsweep validate /path/to/project   # Specific path
+deepsweep validate --include-mcp      # Include MCP validation
+deepsweep validate --fix              # Show fix suggestions
+deepsweep validate --format json      # JSON output for CI/CD
+```
+
+### deepsweep mcp list
+```bash
+deepsweep mcp list
+```
+
+### deepsweep mcp validate
+```bash
+deepsweep mcp validate
+deepsweep mcp validate --fix
+deepsweep mcp validate --format json
+```
+
+### deepsweep init
+```bash
+deepsweep init                    # Create .cursorrules
+deepsweep init --type python      # Project type
+deepsweep init --include-mcp      # Include MCP template
+deepsweep init --force            # Overwrite existing
+```
+
+### deepsweep doctor
+```bash
+deepsweep doctor
+```
+
+### deepsweep badge
+```bash
+deepsweep badge
+deepsweep badge --format markdown
+deepsweep badge --format html
+```
+
+## Security Badges
+
+Add a DeepSweep badge to your README:
+```markdown
+[![DeepSweep Validated](https://img.shields.io/badge/DeepSweep-A%20100%2F100-brightgreen)](https://deepsweep.ai)
+```
+
+Generate yours:
+```bash
+deepsweep validate && deepsweep badge
+```
+
+## CI/CD Integration
+
+### GitHub Actions
+```yaml
+name: AI Security Check
+on: [push, pull_request]
+
+jobs:
+  deepsweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install deepsweep-ai
+      - run: deepsweep validate --include-mcp --format json
+```
+
+### Pre-commit Hook
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: deepsweep
+        name: DeepSweep Security Check
+        entry: deepsweep validate
+        language: system
+        pass_filenames: false
+```
+
+## Privacy
+
+- **Your code never leaves your machine** - Only pattern IDs and scores transmitted
+- **Anonymous by default** - No personal information collected
+- **Opt-out anytime** - Set `DO_NOT_TRACK=1`
+- **Offline mode** - Set `DEEPSWEEP_OFFLINE=1`
+
+Learn more: https://deepsweep.ai/privacy
+
+## Contributing
+
+See CONTRIBUTING.md for guidelines.
+
+- Report bugs: GitHub Issues
+- Request features: GitHub Discussions
+- Security issues: security@deepsweep.ai
+
+## License
+
+MIT License - see LICENSE for details.
+
+---
+
+**Made by DeepSweep** | https://deepsweep.ai
