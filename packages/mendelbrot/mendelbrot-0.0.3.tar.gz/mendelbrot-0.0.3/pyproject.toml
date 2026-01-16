@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name='mendelbrot'
+description='A really simple Pedigree Parser'
+readme = "README.md"
+version="0.0.3"
+requires-python = ">3.8"
+license = 'MIT'
+license-files = ["LICENSE"]
+classifiers=[
+    'Environment :: Console',
+    'Intended Audience :: Science/Research',
+    'Natural Language :: English',
+    'Operating System :: Unix',
+    'Programming Language :: Python',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
+]
+
+dependencies=[
+    'cloudpathlib[all]',
+    'loguru',
+]
+
+[project.optional-dependencies]
+# various requirements when running cpg-flow/analysis-runner
+dev = [
+    'bump-my-version',
+    'pre-commit',
+    'pytest',
+]
+
+[project.urls]
+Repository = "https://github.com/MattWellie/mendelbrot"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mendelbrot"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[options]
+include_package_data = true
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ['test']
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["venv", ".mypy_cache", ".venv", "build", "dist"]
+
+[tool.ruff.lint]
+# ignore pydocstyle, flake8-boolean-trap (FBT)
+select = ["A", "B", "C", "E", "F", "G", "I", "N", "Q", "S", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "ERA", "EXE", "ICN", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "UP", "YTT"]
+
+fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "ERA", "EXE", "FBT", "ICN", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "UP", "YTT"]
+
+ignore = [
+    "ANN204", # Missing type annotation for special method `__init__`
+    "G004", # Logging statement uses f-string
+    "Q000", # Single quotes found but double quotes preferred
+]
+
+[tool.ruff.format]
+indent-style = 'space'
+quote-style = "single"
+
+[tool.ruff.lint.isort]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.bumpversion]
+current_version = "0.0.3"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+commit_args = ""
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version="{current_version}"'
+replace = 'version="{new_version}"'

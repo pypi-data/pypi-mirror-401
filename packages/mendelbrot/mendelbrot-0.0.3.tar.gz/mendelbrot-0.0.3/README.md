@@ -1,0 +1,30 @@
+# mendelbrot
+
+This library contains utility modules, used in both [Talos](https://github.com/populationgenomics/talos) and [TalosAf](https://github.com/populationgenomics/talos_af) - analysis tools created at the Centre for Population Genomics.
+
+## pedigree_parser
+
+This is a simple pedigree parser, which provides a simple, minimal-dependency interface for parsing a Pedigree file.
+
+This was developed as part of the broader [Talos](https://github.com/populationgenomics/talos) project, and as such can
+support standard 6-column pedigree files, as well as 7-column pedigree files which pack HPO terms into the final column. 
+See the [Usage documentation](docs/Pedigree.md) for more details
+
+## bcftools_intepreter
+
+A wrapper to generate HGVS-compliant p. notation from BCFtools CSQ's `amino_acid_change` field.
+
+This wrapper contains individual method and RegEx patterns to decipher long-form AA change Strings. These can be 
+accessed directly (e.g. through `mendelbrot.bcftools_interpreter.process_stop_gained()`) or they can be accessed via 
+a distributor method:
+
+```python
+from mendelbrot.pedigree_parser import classify_change
+
+neat_aa = classify_change('812L>812*', 'stop_gained')
+
+neat_frameshift = classify_change('375VIGYECDCAAGFELIDRKTC..821>375V*', 'frameshift')
+```
+
+This wrapper only works for some consequence types (synonymous, missense, stop_gained, and frameshift). If it fails some
+corenr cases for any of these types, or new types are required, please raise an issue.
