@@ -1,0 +1,161 @@
+Metadata-Version: 2.4
+Name: da2-mcp-multi-db
+Version: 0.1.1
+Summary: A Multi-Database MCP Server - enables AI assistants to query and explore PostgreSQL and MySQL databases
+Project-URL: Homepage, https://da2.35g.tw
+Author-email: Danny <danny@35g.tw>, DA2 Studio <contact@35g.tw>
+License: MIT
+License-File: LICENSE
+Keywords: ai,database,llm,mariadb,mcp,mysql,postgresql
+Requires-Python: >=3.10
+Requires-Dist: mcp[cli]>=1.0.0
+Requires-Dist: mysql-connector-python>=8.0.0
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: python-dotenv>=1.0.0
+Description-Content-Type: text/markdown
+
+# Multi-Database MCP Server (PostgreSQL & MySQL)
+
+A powerful Model Context Protocol (MCP) Server designed for **AI-assisted development** (e.g., Cursor, Claude Desktop, Antigravity). It enables your AI assistant to safely interact directly with **PostgreSQL** and **MySQL/MariaDB** databases.
+
+## Key Features
+
+*   **Dual Database Support**: Supports both PostgreSQL and MySQL out of the box.
+*   **Ready to Use**: Simple `pip` installation with zero complex setup.
+*   **Flexible Configuration**: Configure via Client Config or Environment Variables (`.env`).
+*   **Secure & Controlled**: Built-in Read-Only mode, Max Row limits, and strict permission controls.
+*   **Dual Execution Modes**: Supports standard STDIO (Default for Cursor) and HTTP (for Antigravity/Docker).
+
+## Installation
+
+Ensure you have Python 3.10 or higher installed.
+
+```bash
+pip install da2-mcp-multi-db
+```
+
+*(Note: The package name is `da2-mcp-multi-db`)*
+
+## Quick Start
+
+Once installed, you can launch the servers directly using the following commands:
+
+### 1. PostgreSQL
+```bash
+# Start PostgreSQL Server
+da2-mcp-postgresql
+```
+
+### 2. MySQL / MariaDB
+```bash
+# Start MySQL Server
+da2-mcp-mysql
+```
+
+---
+
+## Configuration Guide
+
+This program relies on environment variables (like `DATABASE_URL`) to connect to your database. We provide two ways to configure this, please choose the one that fits your workflow:
+
+### Method 1: MCP Client Configuration (Recommended)
+If you are using **Cursor** or **Claude Desktop**, it is recommended to define variables directly in your Client's configuration file for a cleaner setup.
+
+**Cursor Example (`cursor_mcp_config.json`):**
+
+```json
+{
+  "mcpServers": {
+    "my-postgres": {
+      "command": "da2-mcp-postgresql", 
+      "args": [],
+      "env": {
+        "DATABASE_URL": "postgresql://user:password@localhost:5432/mydb",
+        "READ_ONLY": "false",
+        "MAX_ROWS": "1000"
+      }
+    },
+    "my-mysql": {
+      "command": "da2-mcp-mysql",
+      "args": [],
+      "env": {
+        "MYSQL_DATABASE_URL": "mysql://user:password@localhost:3306/mydb"
+      }
+    }
+  }
+}
+```
+
+### Method 2: Using .env File (For CLI)
+If you are running commands manually in a terminal, the program will automatically look for a `.env` file in the **current working directory**.
+
+1.  Create a file named `.env` in the directory where you run the command.
+2.  Add the following content:
+
+```env
+# PostgreSQL Connection String
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+
+# MySQL Connection String
+MYSQL_DATABASE_URL=mysql://user:password@localhost:3306/mydb
+
+# --- OR Use Individual Variables (Lowest Priority) ---
+
+# PostgreSQL Config
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=password
+PG_DATABASE=postgres
+
+# MySQL Config
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=password
+MYSQL_DATABASE=mysql
+
+# Security Settings (Optional)
+LOG_LEVEL=INFO
+READ_ONLY=false
+MAX_ROWS=1000
+QUERY_TIMEOUT=30
+ALLOW_CREATE_DB=false
+ALLOW_DROP_DB=false
+```
+
+---
+
+## Available Tools
+
+Once connected, your AI assistant will have access to the following capabilities:
+
+| Tool Name | Description |
+| :--- | :--- |
+| **list_databases** | List all available databases on the server |
+| **list_schemas** | (PostgreSQL Only) List schemas in a database |
+| **list_tables** | Show all tables in a specific database |
+| **describe_table** | Inspect table schema (columns, types, indexes) |
+| **execute_query** | Execute standard SQL queries (SELECT, INSERT, UPDATE...) |
+| **create_database** | Create a new database (requires permission) |
+| **drop_database** | Drop a database (requires permission and confirmation) |
+| **get_server_info** | Get current server version and configuration info |
+
+## HTTP Mode
+
+If you need to run in HTTP Server mode (e.g., for Docker containers or remote deployment):
+
+```bash
+# Start on Port 8000
+da2-mcp-postgresql --http --port 8000
+```
+You can debug this using the MCP Inspector:
+`npx @modelcontextprotocol/inspector http://localhost:8000/mcp`
+
+---
+
+## License
+
+MIT License
+
+Copyright (c) 2026 Danny, DA2 Studio (https://da2.35g.tw)
