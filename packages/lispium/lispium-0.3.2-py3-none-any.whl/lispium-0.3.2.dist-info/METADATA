@@ -1,0 +1,84 @@
+Metadata-Version: 2.4
+Name: lispium
+Version: 0.3.2
+Summary: A Symbolic Computer Algebra System
+Author-email: Tetraslam <tetraslam@users.noreply.github.com>
+License: MIT
+Project-URL: Homepage, https://github.com/Tetraslam/lispium
+Project-URL: Repository, https://github.com/Tetraslam/lispium
+Project-URL: Issues, https://github.com/Tetraslam/lispium/issues
+Keywords: cas,computer-algebra,symbolic-math,lisp,mathematics
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Other
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# Lispium
+
+A Symbolic Computer Algebra System written in Zig.
+
+## Installation
+
+```bash
+pip install lispium
+```
+
+Or with uv:
+
+```bash
+uv pip install lispium
+```
+
+## Usage
+
+After installation, the `lispium` command is available:
+
+```bash
+# Start the REPL
+lispium repl
+
+# Run a file
+lispium run script.lspm
+
+# Show version
+lispium --version
+
+# Show help
+lispium --help
+```
+
+## Features
+
+- **Symbolic Computation**: Work with symbolic expressions and variables
+- **Calculus**: Differentiation, integration, Taylor series, limits
+- **Linear Algebra**: Matrices, determinants, eigenvalues, linear systems
+- **Algebra**: Polynomial operations, equation solving, factoring
+- **Number Theory**: Prime testing, factorization, modular arithmetic
+- **And much more**: Complex numbers, vectors, statistics, plotting
+
+## Example
+
+```lisp
+; Differentiate x^3
+(diff (^ x 3) x)  ; => (* 3 (^ x 2))
+
+; Solve quadratic equation
+(solve (- (^ x 2) 4) x)  ; => {2, -2}
+
+; Matrix determinant
+(det (matrix (1 2) (3 4)))  ; => -2
+```
+
+## Documentation
+
+See the [GitHub repository](https://github.com/Tetraslam/lispium) for full documentation.
+
+## License
+
+MIT
