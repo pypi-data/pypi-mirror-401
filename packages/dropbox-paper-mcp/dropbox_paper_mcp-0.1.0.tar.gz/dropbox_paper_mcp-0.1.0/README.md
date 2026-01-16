@@ -1,0 +1,67 @@
+# Dropbox Paper MCP Server
+
+MCP server for Dropbox Paper built with [FastMCP](https://gofastmcp.com).
+
+## Features
+
+| Tool | Description |
+|------|-------------|
+| `paper_search` | Search Paper documents |
+| `paper_get_content` | Get Paper content (Markdown format) |
+| `paper_get_metadata` | Get Paper metadata |
+| `paper_create` | Create new Paper from Markdown |
+| `paper_list` | List all Paper documents |
+| `list_folder` | List files and folders in a directory |
+
+## Configuration
+
+1. Create a `.env` file:
+```bash
+DROPBOX_ACCESS_TOKEN=your_access_token_here
+```
+
+2. Install dependencies:
+```bash
+uv sync
+```
+
+## Running
+
+### Using uvx (after publishing)
+```bash
+uvx dropbox-paper-mcp
+```
+
+### Local development
+```bash
+uv run dropbox-paper-mcp
+```
+
+Or:
+```bash
+uv run python main.py
+```
+
+## MCP Client Configuration
+
+Add to Claude Desktop or other MCP clients:
+
+```json
+{
+  "mcpServers": {
+    "dropbox-paper": {
+      "command": "uvx",
+      "args": ["dropbox-paper-mcp"],
+      "env": {
+        "DROPBOX_ACCESS_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+## API Permissions Required
+
+- `files.metadata.read` - Search and metadata
+- `files.content.read` - Get document content
+- `files.content.write` - Create new documents (optional)
