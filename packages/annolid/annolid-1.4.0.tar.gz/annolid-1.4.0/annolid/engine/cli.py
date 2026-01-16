@@ -1,0 +1,500 @@
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from typing import Optional
+
+from annolid.engine.registry import get_load_failures, get_model, list_models, load_builtin_models
+
+
+def _cmd_list_models(_: argparse.Namespace) -> int:
+    failures = load_builtin_models()
+    if failures:
+        details = get_load_failures()
+        for name in failures:
+            print(
+                f"[annolid-run] Failed to import {name}: {details.get(name,'')}", file=sys.stderr)
+    rows = [
+        {
+            "name": m.name,
+            "train": m.supports_train,
+            "predict": m.supports_predict,
+            "description": m.description,
+        }
+        for m in list_models(load_builtins=False)
+    ]
+    print(json.dumps(rows, indent=2))
+    return 0
+
+
+def _cmd_collect_labels(args: argparse.Namespace) -> int:
+    from annolid.datasets.labelme_collection import (
+        DEFAULT_LABEL_INDEX_NAME,
+        DEFAULT_LABEL_INDEX_DIRNAME,
+        index_labelme_dataset,
+    )
+
+    dataset_root = Path(args.dataset_root).expanduser().resolve()
+    index_file_default = str(
+        Path(DEFAULT_LABEL_INDEX_DIRNAME) / DEFAULT_LABEL_INDEX_NAME)
+    index_file = Path(getattr(args, "index_file", index_file_default))
+    if not index_file.is_absolute():
+        index_file = dataset_root / index_file
+
+    summary = index_labelme_dataset(
+        sources=[Path(p) for p in args.source],
+        index_file=index_file,
+        recursive=bool(args.recursive),
+        include_empty=bool(args.include_empty),
+        dedupe=not bool(args.allow_duplicates),
+    )
+    print(json.dumps(summary, indent=2))
+    return 0
+
+
+def _cmd_index_to_yolo(args: argparse.Namespace) -> int:
+    from annolid.datasets.builders.label_index_yolo import build_yolo_from_label_index
+
+    summary = build_yolo_from_label_index(
+        index_file=Path(args.index_file),
+        output_dir=Path(args.output_dir),
+        dataset_name=str(args.dataset_name),
+        val_size=float(args.val_size),
+        test_size=float(args.test_size),
+        link_mode=str(args.link_mode),
+        task=str(args.task),
+        include_empty=bool(args.include_empty),
+        keep_staging=bool(args.keep_staging),
+    )
+    print(json.dumps(summary, indent=2))
+    return 0
+
+
+def _cmd_import_deeplabcut_training_data(args: argparse.Namespace) -> int:
+    from annolid.datasets.importers.deeplabcut_training_data import (
+        DeepLabCutTrainingImportConfig,
+        import_deeplabcut_training_data,
+    )
+    from annolid.datasets.labelme_collection import index_labelme_dataset
+
+    source_dir = Path(args.source_dir).expanduser().resolve()
+    labeled_data = Path(args.labeled_data)
+    labeled_data = labeled_data if labeled_data.is_absolute() else (source_dir /
+                                                                    labeled_data)
+
+    summary = import_deeplabcut_training_data(
+        DeepLabCutTrainingImportConfig(
+            source_dir=source_dir,
+            labeled_data_root=Path(args.labeled_data),
+            instance_label=str(args.instance_label),
+            overwrite=bool(args.overwrite),
+            recursive=not bool(args.no_recursive),
+        ),
+        write_pose_schema=bool(args.write_pose_schema),
+        pose_schema_out=Path(
+            args.pose_schema_out) if args.pose_schema_out else None,
+        pose_schema_preset=str(args.pose_schema_preset),
+        instance_separator=str(args.instance_separator or "_"),
+    )
+
+    if bool(args.write_index):
+        index_file = Path(args.index_file)
+        if not index_file.is_absolute():
+            index_file = source_dir / index_file
+        index_summary = index_labelme_dataset(
+            sources=[labeled_data],
+            index_file=index_file,
+            recursive=True,
+            include_empty=False,
+            dedupe=True,
+        )
+        summary["index_file"] = str(index_file)
+        summary["index_summary"] = index_summary
+
+    print(json.dumps(summary, indent=2))
+    return 0
+
+
+def _cmd_dino_kpseg_embeddings(args: argparse.Namespace) -> int:
+    from annolid.segmentation.dino_kpseg.tensorboard_embeddings import main as tb_main
+
+    argv: list[str] = []
+    argv.extend(["--data", str(args.data)])
+    argv.extend(["--split", str(args.split)])
+    if args.weights:
+        argv.extend(["--weights", str(args.weights)])
+    if args.model_name:
+        argv.extend(["--model-name", str(args.model_name)])
+    if args.short_side is not None:
+        argv.extend(["--short-side", str(int(args.short_side))])
+    if args.layers:
+        argv.extend(["--layers", str(args.layers)])
+    if args.device:
+        argv.extend(["--device", str(args.device)])
+    argv.extend(["--radius-px", str(float(args.radius_px))])
+    argv.extend(["--mask-type", str(args.mask_type)])
+    if args.heatmap_sigma is not None:
+        argv.extend(["--heatmap-sigma", str(float(args.heatmap_sigma))])
+    argv.extend(["--instance-mode", str(args.instance_mode)])
+    argv.extend(["--bbox-scale", str(float(args.bbox_scale))])
+    if bool(args.no_cache):
+        argv.append("--no-cache")
+    argv.extend(["--max-images", str(int(args.max_images))])
+    argv.extend(["--max-patches", str(int(args.max_patches))])
+    argv.extend(["--per-image-per-keypoint",
+                str(int(args.per_image_per_keypoint))])
+    argv.extend(["--pos-threshold", str(float(args.pos_threshold))])
+    if bool(args.add_negatives):
+        argv.append("--add-negatives")
+    argv.extend(["--neg-threshold", str(float(args.neg_threshold))])
+    argv.extend(["--negatives-per-image", str(int(args.negatives_per_image))])
+    argv.extend(["--crop-px", str(int(args.crop_px))])
+    argv.extend(["--sprite-border-px", str(int(args.sprite_border_px))])
+    argv.extend(["--seed", str(int(args.seed))])
+    if args.output:
+        argv.extend(["--output", str(args.output)])
+    if args.runs_root:
+        argv.extend(["--runs-root", str(args.runs_root)])
+    if args.run_name:
+        argv.extend(["--run-name", str(args.run_name)])
+    return int(tb_main(argv))
+
+
+def _cmd_dino_kpseg_audit(args: argparse.Namespace) -> int:
+    from annolid.segmentation.dino_kpseg.dataset_tools import audit_yolo_pose_dataset
+
+    report = audit_yolo_pose_dataset(
+        Path(args.data).expanduser().resolve(),
+        split=str(args.split),
+        max_images=(int(args.max_images)
+                    if args.max_images is not None else None),
+        seed=int(args.seed),
+        instance_mode=str(args.instance_mode),
+        bbox_scale=float(args.bbox_scale),
+    )
+    if args.out:
+        out_path = Path(args.out).expanduser().resolve()
+        out_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    else:
+        print(json.dumps(report, indent=2))
+    return 0
+
+
+def _cmd_dino_kpseg_split(args: argparse.Namespace) -> int:
+    from annolid.segmentation.dino_kpseg.dataset_tools import stratified_split
+
+    summary = stratified_split(
+        Path(args.data).expanduser().resolve(),
+        output_dir=Path(args.output),
+        val_size=float(args.val_size),
+        seed=int(args.seed),
+        group_by=str(args.group_by),
+        group_regex=str(args.group_regex) if args.group_regex else None,
+        include_val=bool(args.include_val),
+    )
+    print(json.dumps(summary, indent=2))
+    return 0
+
+
+def _cmd_dino_kpseg_precompute(args: argparse.Namespace) -> int:
+    from annolid.segmentation.dino_kpseg.dataset_tools import precompute_features
+    from annolid.segmentation.dino_kpseg.cli_utils import parse_layers
+
+    layers = parse_layers(str(args.layers))
+    summary = precompute_features(
+        data_yaml=Path(args.data).expanduser().resolve(),
+        model_name=str(args.model_name),
+        short_side=int(args.short_side),
+        layers=layers,
+        device=(str(args.device).strip() if args.device else None),
+        split=str(args.split),
+        instance_mode=str(args.instance_mode),
+        bbox_scale=float(args.bbox_scale),
+        cache_dir=(Path(args.cache_dir).expanduser().resolve()
+                   if args.cache_dir else None),
+        cache_dtype=str(args.cache_dtype),
+    )
+    print(json.dumps(summary, indent=2))
+    return 0
+
+
+def _build_root_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="annolid-run",
+        description="Unified training/inference CLI (plugin-based).",
+    )
+    sub = p.add_subparsers(dest="command", required=True)
+
+    list_p = sub.add_parser(
+        "list-models", help="List available model plugins.")
+    list_p.set_defaults(_handler=_cmd_list_models)
+
+    collect_p = sub.add_parser(
+        "collect-labels",
+        help="Index LabelMe PNG/JSON pairs by absolute path (no copying).",
+    )
+    collect_p.add_argument(
+        "--source",
+        action="append",
+        required=True,
+        help="Source folder (repeatable) containing per-frame JSON/PNG pairs.",
+    )
+    collect_p.add_argument(
+        "--dataset-root",
+        required=True,
+        help="Directory that will store the index file.",
+    )
+    collect_p.add_argument("--recursive", action="store_true", default=True)
+    collect_p.add_argument(
+        "--no-recursive",
+        dest="recursive",
+        action="store_false",
+        help="Only scan the top-level of each source directory.",
+    )
+    collect_p.add_argument(
+        "--include-empty",
+        action="store_true",
+        help="Collect JSON files even when they contain no shapes.",
+    )
+    collect_p.add_argument(
+        "--index-file",
+        default="annolid_logs/annolid_dataset.jsonl",
+        help="Index file path relative to --dataset-root (default: annolid_logs/annolid_dataset.jsonl).",
+    )
+    collect_p.add_argument(
+        "--allow-duplicates",
+        action="store_true",
+        help="Append even if the image path already exists in the index.",
+    )
+    collect_p.set_defaults(_handler=_cmd_collect_labels)
+
+    yolo_p = sub.add_parser(
+        "index-to-yolo",
+        help="Convert an Annolid dataset index JSONL into a YOLO dataset.",
+    )
+    yolo_p.add_argument("--index-file", required=True,
+                        help="Path to annolid_dataset.jsonl (JSONL index).")
+    yolo_p.add_argument("--output-dir", required=True,
+                        help="Directory to write the YOLO dataset.")
+    yolo_p.add_argument("--dataset-name", default="YOLO_dataset",
+                        help="Output dataset folder name.")
+    yolo_p.add_argument("--val-size", type=float, default=0.1)
+    yolo_p.add_argument("--test-size", type=float, default=0.1)
+    yolo_p.add_argument("--link-mode", choices=("hardlink",
+                        "copy", "symlink"), default="hardlink")
+    yolo_p.add_argument(
+        "--task",
+        choices=("auto", "segmentation", "pose"),
+        default="auto",
+        help="How to handle mixed polygon+point annotations (default: auto).",
+    )
+    yolo_p.add_argument("--include-empty", action="store_true",
+                        help="Include JSON records with no shapes.")
+    yolo_p.add_argument("--keep-staging", action="store_true",
+                        help="Keep temporary staging files.")
+    yolo_p.set_defaults(_handler=_cmd_index_to_yolo)
+
+    imp_p = sub.add_parser(
+        "import-deeplabcut-training-data",
+        help="Convert DeepLabCut labeled-data (CollectedData_*.csv) into LabelMe JSON next to images, then (optionally) index it.",
+    )
+    imp_p.add_argument("--source-dir", required=True,
+                       help="Dataset root, e.g. /Users/.../mouse_training_data")
+    imp_p.add_argument("--labeled-data", default="labeled-data",
+                       help="labeled-data root relative to --source-dir (default: labeled-data)")
+    imp_p.add_argument("--instance-label", default="mouse",
+                       help="Instance label prefix to use for point shapes (default: mouse)")
+    imp_p.add_argument("--overwrite", action="store_true",
+                       help="Overwrite existing per-image LabelMe JSON files.")
+    imp_p.add_argument("--no-recursive", action="store_true",
+                       help="Do not search for CollectedData_*.csv recursively under --labeled-data.")
+    imp_p.add_argument(
+        "--write-pose-schema",
+        action="store_true",
+        help="Write pose_schema.json derived from DeepLabCut bodyparts.",
+    )
+    imp_p.add_argument(
+        "--pose-schema-out",
+        default="labeled-data/pose_schema.json",
+        help="Path (relative to --source-dir) for the pose schema (default: labeled-data/pose_schema.json).",
+    )
+    imp_p.add_argument(
+        "--pose-schema-preset",
+        default="mouse",
+        help="Edge preset to use when building the schema (default: mouse).",
+    )
+    imp_p.add_argument(
+        "--instance-separator",
+        default="_",
+        help="Separator used for instance prefixes (default: _).",
+    )
+    imp_p.add_argument(
+        "--index-file",
+        default="annolid_logs/annolid_dataset.jsonl",
+        help="Index file path relative to --source-dir (default: annolid_logs/annolid_dataset.jsonl).",
+    )
+    imp_p.add_argument("--no-index", dest="write_index",
+                       action="store_false", help="Skip writing annolid_dataset.jsonl")
+    imp_p.set_defaults(
+        write_index=True, _handler=_cmd_import_deeplabcut_training_data)
+
+    tb_p = sub.add_parser(
+        "dino-kpseg-embeddings",
+        help="Write TensorBoard projector embeddings for DinoKPSEG (DINOv3 patch features).",
+    )
+    tb_p.add_argument("--data", required=True,
+                      help="Path to YOLO pose data.yaml")
+    tb_p.add_argument("--split", choices=("train", "val"), default="val")
+    tb_p.add_argument("--weights", default=None,
+                      help="Optional DinoKPSEG checkpoint (.pt); enables pred overlays and keypoint names.")
+    tb_p.add_argument(
+        "--model-name", default="facebook/dinov3-vits16-pretrain-lvd1689m")
+    tb_p.add_argument("--short-side", type=int, default=768)
+    tb_p.add_argument("--layers", type=str, default="-1")
+    tb_p.add_argument("--device", default=None)
+    tb_p.add_argument("--radius-px", type=float, default=6.0)
+    tb_p.add_argument("--mask-type", choices=("disk",
+                      "gaussian"), default="gaussian")
+    tb_p.add_argument("--heatmap-sigma", type=float, default=None)
+    tb_p.add_argument("--instance-mode", choices=("auto", "union",
+                      "per_instance"), default="auto")
+    tb_p.add_argument("--bbox-scale", type=float, default=1.25)
+    tb_p.add_argument("--no-cache", action="store_true")
+    tb_p.add_argument("--max-images", type=int, default=64)
+    tb_p.add_argument("--max-patches", type=int, default=4000)
+    tb_p.add_argument("--per-image-per-keypoint", type=int, default=3)
+    tb_p.add_argument("--pos-threshold", type=float, default=0.35)
+    tb_p.add_argument("--add-negatives", action="store_true")
+    tb_p.add_argument("--neg-threshold", type=float, default=0.02)
+    tb_p.add_argument("--negatives-per-image", type=int, default=6)
+    tb_p.add_argument("--crop-px", type=int, default=96)
+    tb_p.add_argument("--sprite-border-px", type=int, default=3)
+    tb_p.add_argument("--seed", type=int, default=0)
+    tb_p.add_argument("--output", default=None,
+                      help="Run output directory (optional)")
+    tb_p.add_argument("--runs-root", default=None,
+                      help="Runs root (optional)")
+    tb_p.add_argument("--run-name", default=None,
+                      help="Optional run name (default: timestamp)")
+    tb_p.set_defaults(_handler=_cmd_dino_kpseg_embeddings)
+
+    audit_p = sub.add_parser(
+        "dino-kpseg-audit",
+        help="Audit a YOLO pose dataset for DinoKPSEG and emit a report.",
+    )
+    audit_p.add_argument("--data", required=True,
+                         help="Path to YOLO pose data.yaml")
+    audit_p.add_argument(
+        "--split", choices=("train", "val", "both"), default="both")
+    audit_p.add_argument("--max-images", type=int, default=None)
+    audit_p.add_argument("--seed", type=int, default=0)
+    audit_p.add_argument("--instance-mode", choices=("auto", "union", "per_instance"),
+                         default="auto")
+    audit_p.add_argument("--bbox-scale", type=float, default=1.25)
+    audit_p.add_argument("--out", default=None,
+                         help="Optional output JSON path")
+    audit_p.set_defaults(_handler=_cmd_dino_kpseg_audit)
+
+    split_p = sub.add_parser(
+        "dino-kpseg-split",
+        help="Create a stratified train/val split for a YOLO pose dataset.",
+    )
+    split_p.add_argument("--data", required=True,
+                         help="Path to YOLO pose data.yaml")
+    split_p.add_argument("--output", required=True,
+                         help="Output directory for split lists")
+    split_p.add_argument("--val-size", type=float, default=0.1)
+    split_p.add_argument("--seed", type=int, default=0)
+    split_p.add_argument("--group-by", choices=("parent",
+                         "grandparent", "stem_prefix", "regex"), default="parent")
+    split_p.add_argument("--group-regex", default=None)
+    split_p.add_argument("--include-val", action="store_true")
+    split_p.set_defaults(_handler=_cmd_dino_kpseg_split)
+
+    pre_p = sub.add_parser(
+        "dino-kpseg-precompute",
+        help="Precompute and cache DINOv3 features for a DinoKPSEG dataset.",
+    )
+    pre_p.add_argument("--data", required=True,
+                       help="Path to YOLO pose data.yaml")
+    pre_p.add_argument("--model-name", required=True)
+    pre_p.add_argument("--short-side", type=int, default=768)
+    pre_p.add_argument("--layers", type=str, default="-1")
+    pre_p.add_argument("--device", default=None)
+    pre_p.add_argument("--split", choices=("train",
+                       "val", "both"), default="both")
+    pre_p.add_argument("--instance-mode", choices=("auto", "union",
+                       "per_instance"), default="auto")
+    pre_p.add_argument("--bbox-scale", type=float, default=1.25)
+    pre_p.add_argument("--cache-dir", default=None)
+    pre_p.add_argument("--cache-dtype", choices=("float16",
+                       "float32"), default="float16")
+    pre_p.set_defaults(_handler=_cmd_dino_kpseg_precompute)
+
+    train_p = sub.add_parser("train", help="Train a model.")
+    train_p.add_argument("model", help="Model plugin name (see list-models).")
+    train_p.add_argument("--help-model", action="store_true",
+                         help="Show model-specific help.")
+    train_p.set_defaults(_handler="train")
+
+    pred_p = sub.add_parser("predict", help="Run inference.")
+    pred_p.add_argument("model", help="Model plugin name (see list-models).")
+    pred_p.add_argument("--help-model", action="store_true",
+                        help="Show model-specific help.")
+    pred_p.set_defaults(_handler="predict")
+
+    return p
+
+
+def _dispatch_model_subcommand(
+    *,
+    base_args: argparse.Namespace,
+    argv: list[str],
+) -> int:
+    model_name = str(base_args.model)
+    plugin = get_model(model_name)
+
+    mode = base_args._handler
+    if mode == "train":
+        if not plugin.__class__.supports_train():
+            raise SystemExit(
+                f"Model {model_name!r} does not support training.")
+        p = argparse.ArgumentParser(prog=f"annolid-run train {model_name}")
+        plugin.add_train_args(p)
+        if base_args.help_model:
+            p.print_help()
+            return 0
+        args = p.parse_args(argv)
+        return int(plugin.train(args))
+
+    if mode == "predict":
+        if not plugin.__class__.supports_predict():
+            raise SystemExit(
+                f"Model {model_name!r} does not support inference.")
+        p = argparse.ArgumentParser(prog=f"annolid-run predict {model_name}")
+        plugin.add_predict_args(p)
+        if base_args.help_model:
+            p.print_help()
+            return 0
+        args = p.parse_args(argv)
+        return int(plugin.predict(args))
+
+    raise SystemExit(f"Unknown mode: {mode}")
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    p = _build_root_parser()
+    args, rest = p.parse_known_args(argv)
+
+    handler = getattr(args, "_handler", None)
+    if callable(handler):
+        return int(handler(args))
+
+    return _dispatch_model_subcommand(base_args=args, argv=rest)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
