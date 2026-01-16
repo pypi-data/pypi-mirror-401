@@ -1,0 +1,32 @@
+[project]
+name = "xaal.fauxmo"
+version = "0.2.3"
+description = "xAAL to Wemo fake emulations"
+readme = "README.rst"
+authors = [
+    { name = "Jerome Kerdreux", email = "Jerome.Kerdreux@imt-atlantique.fr" },
+]
+license = "GPL-3.0-or-later"
+classifiers = ["Programming Language :: Python", "Topic :: Home Automation"]
+keywords = ["xaal", "wemo", "alexa"]
+dependencies = ["xaal.lib", "fauxmo==0.6", "nest_asyncio"]
+
+[tool.setuptools.packages.find]
+include = ["xaal*"]
+namespaces = true
+
+[project.urls]
+Homepage = "https://recherche.imt-atlantique.fr/xaal/"
+Documentation = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/emulations/Fauxmo/README.rst"
+Source = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/emulations/Fauxmo"
+
+[tool.ruff]
+line-length = 122
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 122
+skip-string-normalization = true
+
