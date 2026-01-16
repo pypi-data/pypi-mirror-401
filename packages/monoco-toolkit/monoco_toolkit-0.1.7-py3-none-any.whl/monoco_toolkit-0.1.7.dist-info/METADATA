@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: monoco-toolkit
+Version: 0.1.7
+Summary: Agent Native Toolkit for Monoco - Task Management & Kanban for AI Agents
+Project-URL: Homepage, https://monoco.io
+Project-URL: Repository, https://github.com/IndenScale/Monoco
+Project-URL: Documentation, https://monoco.io/docs
+Project-URL: Issues, https://github.com/IndenScale/Monoco/issues
+Author-email: Monoco Team <dev@monoco.io>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: agent-native,ai-agents,cli,kanban,monoco,task-management,workflow
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Office/Business :: Groupware
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Quality Assurance
+Requires-Python: >=3.10
+Requires-Dist: fastapi>=0.100.0
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: prompt-toolkit>=3.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: sse-starlette>=1.6.0
+Requires-Dist: typer[all]>=0.9.0
+Requires-Dist: uvicorn[standard]>=0.20.0
+Requires-Dist: watchdog>=6.0.0
+Description-Content-Type: text/markdown
+
+# Monoco: Harnessing AI Agents
+
+> **The control interface between raw AI velocity and human information bandwidth.**
+
+Production in the LLM era is exploding along a vertical curve. A single AI agent can work 24/7, generating massive amounts of intermediate data that far exceeds the biological information bandwidth of a human supervisor. When one agent becomes a hundred, the bottleneck is no longer "intelligence"—it is "command and control."
+
+**Monoco is the Cockpit.**
+
+It doesn't just "run" agents; it "encapsulates" them. It provides a deterministic barrier between the chaotic, raw execution power of LLMs and the rigorous, finite decision bandwidth of human engineers. It ensures that every agentic action eventually collapses into the outcome you intended.
+
+## Workflow: Plan - Execute - Review - Archive
+
+Monoco channels agent execution into a clear cycle:
+
+1. **Plan**: Decompose complex missions through **Project → Epic → Feature** hierarchies into executable atomic units.
+2. **Execute**: Agents work autonomously based on acceptance criteria defined in Issues, with all intermediate states persisted as structured files.
+3. **Review**: Humans monitor progress through the Kanban dashboard, intervening only at critical decision points.
+4. **Archive**: Completed tasks automatically transition to archived states, forming a traceable project history.
+
+## The Control Matrix
+
+- **Task Anchors (Issues)**: Define missions via structured files, setting clear boundaries and acceptance criteria for agents.
+- **Deterministic Interface (CLI)**: Acts as a sensory extension for LLMs, providing them with structured perception of project state and eliminating hallucinated guesses.
+- **Mission Dashboard (Kanban)**: A high-fidelity visual console that allows humans to audit tasks and transition states with minimal cognitive load.
+
+## Quick Start
+
+### 1. Install the Control Suite
+
+```bash
+pip install monoco-toolkit
+```
+
+### 2. Initialize the Workflow
+
+```bash
+monoco init
+```
+
+### 3. Take Control
+
+Start the backend control hub:
+
+```bash
+monoco serve
+```
+
+Then, launch the visual mission dashboard from anywhere:
+
+```bash
+npx @monoco-io/kanban
+```
+
+Visit `http://localhost:3123` (or the URL displayed in your terminal) to enter your cockpit.
+
+---
+
+_"Cars are made to drive, not to fix."_
