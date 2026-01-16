@@ -1,0 +1,262 @@
+Metadata-Version: 2.4
+Name: odibi
+Version: 2.6.5
+Summary: A declarative data engineering framework - Explicit over implicit, Stories over magic
+Author-email: Henry Odibi <odibiengineering@gmail.com>
+License: Apache-2.0
+Project-URL: Homepage, https://github.com/henryodibi11/Odibi
+Project-URL: Documentation, https://github.com/henryodibi11/Odibi/tree/main/docs
+Project-URL: Repository, https://github.com/henryodibi11/Odibi
+Project-URL: Issues, https://github.com/henryodibi11/Odibi/issues
+Keywords: data-engineering,pipeline,etl,workflow,orchestration
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pydantic<3.0.0,>=2.0.0
+Requires-Dist: pyyaml<7.0,>=6.0
+Requires-Dist: pandas<2.2.0,>=2.0.0
+Requires-Dist: numpy<2.0.0,>=1.24.0
+Requires-Dist: bottleneck<2.0.0,>=1.3.6
+Requires-Dist: python-dotenv<2.0.0,>=1.0.0
+Requires-Dist: markdown2<3.0.0,>=2.4.0
+Requires-Dist: Jinja2<4.0.0,>=3.1.0
+Requires-Dist: portalocker<3.0.0,>=2.7.0
+Requires-Dist: pyarrow<17.0.0,>=14.0.0
+Requires-Dist: fastapi<1.0.0,>=0.100.0
+Requires-Dist: uvicorn<1.0.0,>=0.20.0
+Requires-Dist: deltalake<0.30.0,>=0.18.0
+Requires-Dist: rich<14.0.0,>=13.0.0
+Requires-Dist: requests<3.0.0,>=2.28.0
+Requires-Dist: importlib_metadata>=4.0.0
+Requires-Dist: duckdb<1.1.0,>=0.9.0
+Provides-Extra: cli
+Requires-Dist: rich>=13.0.0; extra == "cli"
+Provides-Extra: lineage
+Requires-Dist: openlineage-python>=1.0.0; extra == "lineage"
+Provides-Extra: telemetry
+Requires-Dist: opentelemetry-api>=1.20.0; extra == "telemetry"
+Requires-Dist: opentelemetry-sdk>=1.20.0; extra == "telemetry"
+Requires-Dist: opentelemetry-exporter-otlp>=1.20.0; extra == "telemetry"
+Provides-Extra: spark
+Requires-Dist: pyspark>=3.4.0; extra == "spark"
+Requires-Dist: delta-spark>=2.3.0; extra == "spark"
+Provides-Extra: pandas
+Requires-Dist: duckdb>=0.9.0; extra == "pandas"
+Requires-Dist: pandasql>=0.7.3; extra == "pandas"
+Requires-Dist: fastavro>=1.8.0; extra == "pandas"
+Provides-Extra: azure
+Requires-Dist: azure-storage-blob>=12.0.0; extra == "azure"
+Requires-Dist: azure-identity>=1.14.0; extra == "azure"
+Requires-Dist: azure-keyvault-secrets>=4.7.0; extra == "azure"
+Requires-Dist: adlfs>=2023.1.0; extra == "azure"
+Provides-Extra: sql
+Requires-Dist: pyodbc>=5.0.0; extra == "sql"
+Requires-Dist: sqlalchemy>=2.0.0; extra == "sql"
+Provides-Extra: polars
+Requires-Dist: polars>=0.20.0; extra == "polars"
+Provides-Extra: all
+Requires-Dist: pyspark>=3.4.0; extra == "all"
+Requires-Dist: delta-spark>=2.3.0; extra == "all"
+Requires-Dist: duckdb>=0.9.0; extra == "all"
+Requires-Dist: pandasql>=0.7.3; extra == "all"
+Requires-Dist: deltalake>=0.13.0; extra == "all"
+Requires-Dist: fastavro>=1.8.0; extra == "all"
+Requires-Dist: pyarrow>=10.0.0; extra == "all"
+Requires-Dist: azure-storage-blob>=12.0.0; extra == "all"
+Requires-Dist: azure-identity>=1.14.0; extra == "all"
+Requires-Dist: azure-keyvault-secrets>=4.7.0; extra == "all"
+Requires-Dist: adlfs>=2023.1.0; extra == "all"
+Requires-Dist: pyodbc>=5.0.0; extra == "all"
+Requires-Dist: sqlalchemy>=2.0.0; extra == "all"
+Requires-Dist: polars>=0.20.0; extra == "all"
+Requires-Dist: opentelemetry-api>=1.20.0; extra == "all"
+Requires-Dist: opentelemetry-sdk>=1.20.0; extra == "all"
+Requires-Dist: opentelemetry-exporter-otlp>=1.20.0; extra == "all"
+Requires-Dist: openlineage-python>=1.0.0; extra == "all"
+Requires-Dist: rich>=13.0.0; extra == "all"
+Requires-Dist: gradio>=4.0.0; extra == "all"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: pre-commit>=3.4.0; extra == "dev"
+Requires-Dist: pyspark>=3.4.0; extra == "dev"
+Requires-Dist: delta-spark>=2.3.0; extra == "dev"
+Requires-Dist: pyarrow>=10.0.0; extra == "dev"
+Requires-Dist: azure-identity>=1.14.0; extra == "dev"
+Requires-Dist: azure-keyvault-secrets>=4.7.0; extra == "dev"
+Requires-Dist: deltalake>=0.13.0; extra == "dev"
+Requires-Dist: duckdb>=0.9.0; extra == "dev"
+Requires-Dist: pandasql>=0.7.3; extra == "dev"
+Requires-Dist: mkdocs-material>=9.0.0; extra == "dev"
+Requires-Dist: mkdocstrings[python]>=0.20.0; extra == "dev"
+Requires-Dist: rich>=13.0.0; extra == "dev"
+Dynamic: license-file
+
+# Odibi
+
+**Declarative data pipelines. YAML in, star schemas out.**
+
+[![CI](https://github.com/henryodibi11/Odibi/workflows/CI/badge.svg)](https://github.com/henryodibi11/Odibi/actions)
+[![PyPI](https://img.shields.io/pypi/v/odibi.svg)](https://pypi.org/project/odibi/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://henryodibi11.github.io/Odibi/)
+
+Odibi is a framework for building data pipelines. You describe *what* you want in YAML; Odibi handles *how*. Every run generates a "Data Story" — an audit report showing exactly what happened to your data.
+
+---
+
+## ⚡ Quick Start
+
+```bash
+pip install odibi
+```
+
+**Option 1: Start from a template**
+```bash
+odibi init my_project --template star-schema
+cd my_project
+odibi run odibi.yaml
+odibi story last          # View the audit report
+```
+
+**Option 2: Clone the reference example**
+```bash
+git clone https://github.com/henryodibi11/Odibi.git
+cd Odibi/docs/examples/canonical/runnable
+odibi run 04_fact_table.yaml
+```
+
+This builds a complete **star schema** in seconds:
+- 3 dimension tables (customer, product, date)
+- 1 fact table with FK lookups and orphan handling
+- HTML audit report
+
+**[See the full breakdown →](docs/examples/canonical/THE_REFERENCE.md)**
+
+---
+
+## 📖 The Canonical Example
+
+```yaml
+pipelines:
+  - pipeline: build_dimensions
+    nodes:
+      - name: dim_customer
+        read:
+          connection: source
+          format: csv
+          path: customers.csv
+        pattern:
+          type: dimension
+          params:
+            natural_key: customer_id
+            surrogate_key: customer_sk
+            scd_type: 1
+        write:
+          connection: gold
+          format: parquet
+          path: dim_customer
+
+      - name: dim_date
+        pattern:
+          type: date_dimension
+          params:
+            start_date: "2025-01-01"
+            end_date: "2025-12-31"
+        write:
+          connection: gold
+          format: parquet
+          path: dim_date
+
+  - pipeline: build_facts
+    nodes:
+      - name: fact_sales
+        depends_on: [dim_customer, dim_date]
+        read:
+          connection: source
+          format: csv
+          path: orders.csv
+        pattern:
+          type: fact
+          params:
+            grain: [order_id, line_item_id]
+            dimensions:
+              - source_column: customer_id
+                dimension_table: dim_customer
+                dimension_key: customer_id
+                surrogate_key: customer_sk
+            orphan_handling: unknown
+        write:
+          connection: gold
+          format: parquet
+          path: fact_sales
+```
+
+**[Full runnable example →](docs/examples/canonical/runnable/04_fact_table.yaml)**
+
+---
+
+## 🚀 Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Data Stories** | Every run generates an HTML audit report |
+| **Dimensional Patterns** | SCD1/SCD2, date dimension, fact tables built-in |
+| **Validation & Contracts** | Fail-fast checks, quarantine bad rows |
+| **Dual Engine** | Pandas locally, Spark in production — same config |
+| **Production Ready** | Retry, alerting, secrets, Delta Lake support |
+
+---
+
+## 📚 Documentation
+
+| Goal | Link |
+|------|------|
+| **Get running in 10 minutes** | [Golden Path](docs/golden_path.md) |
+| **Copy THE working example** | [THE_REFERENCE.md](docs/examples/canonical/THE_REFERENCE.md) |
+| **Solve a specific problem** | [Playbook](docs/playbook/README.md) |
+| **Understand when to use what** | [Decision Guide](docs/guides/decision_guide.md) |
+| **See all config options** | [YAML Schema](docs/reference/yaml_schema.md) |
+
+---
+
+## 📦 Installation
+
+```bash
+# Standard (Pandas engine)
+pip install odibi
+
+# With Spark + Azure support
+pip install "odibi[spark,azure]"
+```
+
+---
+
+## 🎯 Who is this for?
+
+- **Solo data engineers** building pipelines without a team
+- **Analytics engineers** moving from dbt to Python-based pipelines
+- **Anyone** tired of writing the same boilerplate for every project
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+**Maintainer:** Henry Odibi ([@henryodibi11](https://github.com/henryodibi11))  
+**License:** Apache 2.0
