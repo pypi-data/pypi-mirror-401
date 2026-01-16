@@ -1,0 +1,37 @@
+# Automate releases using Release Please
+# Uses Conventional Commits to determine version bumps:
+#   - fix: patch (0.0.x)
+#   - feat: minor (0.x.0)
+#   - feat!: or BREAKING CHANGE: major (x.0.0)
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write  # Required for PyPI trusted publishing
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Run Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          manifest-file: .release-please-manifest.json
+          config-file: release-please-config.json
+          skip-labeling: true
+
+  publish:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit
