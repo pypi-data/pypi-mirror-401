@@ -1,0 +1,49 @@
+Metadata-Version: 2.2
+Name: photonforge
+Version: 1.3.0
+Summary: PhotonForge is a design tool that integrates with foundry PDKs to speed up the design, simulation, and verification cycle for optical components and systems.
+Author-Email: "Flexcompute Inc." <support@flexcompute.com>
+Project-URL: homepage, https://www.flexcompute.com/
+Project-URL: documentation, https://docs.flexcompute.com/projects/photonforge/
+Requires-Python: >=3.10
+Requires-Dist: numpy>=1.22
+Requires-Dist: scipy>=1.15
+Requires-Dist: tidy3d[trimesh]==2.10.*
+Requires-Dist: pydantic
+Requires-Dist: uvicorn>=0.34
+Requires-Dist: fastapi>=0.115
+Requires-Dist: jinja2>=3.1
+Provides-Extra: dev
+Requires-Dist: build>=1.3; extra == "dev"
+Requires-Dist: ipykernel>=6.10; extra == "dev"
+Requires-Dist: ipywidgets>=8.0; extra == "dev"
+Requires-Dist: jsonschema>=4.25; extra == "dev"
+Provides-Extra: test
+Requires-Dist: pytest>=7.2; extra == "test"
+Requires-Dist: gdstk>=0.9.60; extra == "test"
+Requires-Dist: scipy>=1.7; extra == "test"
+Requires-Dist: httpx>=0.28; extra == "test"
+Provides-Extra: xarray
+Requires-Dist: xarray; extra == "xarray"
+Provides-Extra: plotting
+Requires-Dist: matplotlib; extra == "plotting"
+Description-Content-Type: text/markdown
+
+# PhotonForge
+
+PhotonForge is a design tool that integrates with foundry PDKs to speed up the
+design, simulation, and verification cycle for optical components and systems. 
+
+
+## Documentation
+
+The online documentation can be found
+[here](https://docs.flexcompute.com/projects/photonforge/).
+
+Development docs:
+
+- (docs/development.md)[docs/development.md]: local development setup.
+- (docs/architecture.md)[docs/architecture.md]: general code structure and
+  architecture.
+- (docs/testing.md)[docs/testing.md]: testing infrastructure.
+- (docs/deployment.md)[docs/deployment.md]: how to release a new version.
