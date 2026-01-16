@@ -1,0 +1,42 @@
+[project]
+name = "signal-cli-jsonrpc"
+
+#[[[cog
+#  from gen.utils import SIGNAL_CLI_PATH, sh
+#  signal_cli_version = sh("git describe --exact-match --tags".split(), cwd=SIGNAL_CLI_PATH, text=True).strip()
+#  import tomllib
+#  gen_version = tomllib.loads(cog.previous)["version"].split(".")[-1].removeprefix("dev")
+#  full_version = f"{signal_cli_version}.dev{gen_version}"
+#  print(f'version = "{full_version}"')
+#]]]
+version = "v0.13.20.dev1"
+#[[[end]]]
+
+description = "Strongly typed Python dataclass interface to signal-cli's RPC commands"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "aiohttp>=3.12.13",
+    "aiohttp-sse-client>=0.2.1",
+    "caseutil>=0.7.2",
+    "dacite>=1.9.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.0",
+    "go-task-bin>=3.45.4",
+    "ast-grep-py>=0.39.6",
+    "ordered-set>=4.1.0",
+    "yamlfix>=1.19.0",
+    "lefthook>=2.0.3",
+    "pre-commit-hooks>=6.0.0",
+    "cogapp>=3.6.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.19,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
