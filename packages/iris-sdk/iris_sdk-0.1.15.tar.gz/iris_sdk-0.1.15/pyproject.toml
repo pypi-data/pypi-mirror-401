@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iris_sdk"
+version = "0.1.15"
+description = "SDK for Agentic AI workflow management with Iris"
+authors = [{name="Iris"}]
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+dependencies = [
+    "openai",
+    "anthropic",
+    "google-generativeai",
+    "langchain-core"
+]
