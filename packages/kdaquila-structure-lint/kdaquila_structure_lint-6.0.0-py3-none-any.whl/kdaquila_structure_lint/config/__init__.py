@@ -1,0 +1,21 @@
+"""Configuration module for structure-lint."""
+
+from kdaquila_structure_lint.config.functions.loader import load_config
+from kdaquila_structure_lint.config.functions.project_root import find_project_root
+from kdaquila_structure_lint.config.types import (
+    Config,
+    LineLimitsConfig,
+    OnePerFileConfig,
+    StructureConfig,
+    ValidatorToggles,
+)
+
+__all__ = [
+    "Config",
+    "LineLimitsConfig",
+    "OnePerFileConfig",
+    "StructureConfig",
+    "ValidatorToggles",
+    "find_project_root",
+    "load_config",
+]
