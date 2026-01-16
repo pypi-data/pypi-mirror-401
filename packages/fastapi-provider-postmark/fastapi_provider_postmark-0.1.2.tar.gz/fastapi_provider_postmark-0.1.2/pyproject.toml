@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-provider-postmark"
+version = "0.1.2"
+description = "Postmark email provider for FastAPI projects."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]==0.128",
+    "postmarker>=1.0.0",
+    "pytest>=9.0.1",
+    "pytest-asyncio>=0.25.3",
+]
+[project.optional-dependencies]
+dev = []
+
