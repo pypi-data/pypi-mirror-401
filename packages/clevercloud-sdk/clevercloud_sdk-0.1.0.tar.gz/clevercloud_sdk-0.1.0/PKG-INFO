@@ -1,0 +1,73 @@
+Metadata-Version: 2.4
+Name: clevercloud-sdk
+Version: 0.1.0
+Summary: Python SDK for the Clever Cloud API
+Project-URL: Homepage, https://github.com/CleverCloud/clevercloud-sdk-python
+Project-URL: Documentation, https://github.com/CleverCloud/clevercloud-sdk-python#readme
+Project-URL: Repository, https://github.com/CleverCloud/clevercloud-sdk-python
+Project-URL: Issues, https://github.com/CleverCloud/clevercloud-sdk-python/issues
+Author-email: Clever Cloud <support@clever-cloud.com>
+License-Expression: Apache-2.0
+License-File: LICENSE
+Keywords: api,clever-cloud,cloud,paas,sdk
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.25.0
+Description-Content-Type: text/markdown
+
+# Clever Cloud Python SDK
+
+A Python SDK for the [Clever Cloud](https://clever-cloud.com) API.
+
+## Installation
+
+```bash
+pip install clevercloud-sdk
+```
+
+## Usage
+
+### With API Token
+
+```python
+from clever_cloud import CleverCloudClient, ApiTokenCredentials
+
+async with CleverCloudClient(ApiTokenCredentials(token="...")) as client:
+    profile = await client.get_profile()
+    print(f"Hello, {profile.name}!")
+```
+
+### With OAuth
+
+```python
+from clever_cloud import CleverCloudClient, OAuthCredentials
+
+credentials = OAuthCredentials(
+    consumer_key="...",
+    consumer_secret="...",
+    token="...",
+    secret="...",
+)
+
+async with CleverCloudClient(credentials) as client:
+    app = await client.create_application(
+        owner_id="...",
+        name="my-app",
+        instance_slug="node"
+    )
+```
+
+## License
+
+Apache 2.0 - See [LICENSE](LICENSE) for details.
