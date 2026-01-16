@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fulfulde-stopwords"
+version = "1.0"
+description = "Stopwords for the Fulfulde language (Adamawa variant)"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [
+    {name = "Isaac Touza", email = "isaac.touza@univ-maroua.cm"}
+]
+maintainers = [
+    {name = "Isaac Touza", email = "isaac.touza@univ-maroua.cm"}
+]
+keywords = [
+    "nlp",
+    "natural-language-processing",
+    "stopwords",
+    "fulfulde",
+    "african-languages",
+    "low-resource-languages",
+    "text-processing",
+    "computational-linguistics"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.urls]
+Homepage = "https://github.com/2zalab/fulfulde-stopwords"
+Documentation = "https://github.com/2zalab/fulfulde-stopwords#readme"
+Repository = "https://github.com/2zalab/fulfulde-stopwords"
+"Bug Tracker" = "https://github.com/2zalab/fulfulde-stopwords/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+    "mypy>=0.990"
+]
+
+[tool.setuptools]
+packages = ["fulfulde_stopwords"]
+
+[tool.setuptools.package-data]
+fulfulde_stopwords = ["stopwords.txt"]
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=fulfulde_stopwords --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false

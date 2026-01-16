@@ -1,0 +1,277 @@
+# Fulfulde Stopwords
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://badge.fury.io/py/fulfulde-stopwords.svg)](https://badge.fury.io/py/fulfulde-stopwords)
+
+A curated list of **stopwords for the Fulfulde language** (Adamawa variant), designed for Natural Language Processing (NLP) applications.
+
+Fulfulde is a low-resource African language spoken by millions across West and Central Africa. This library provides the first comprehensive, linguistically grounded stopword list for NLP tasks such as:
+
+- Text classification
+- Information retrieval
+- Clustering and topic modeling
+- Text preprocessing and cleaning
+- Machine translation
+- Sentiment analysis
+
+## Features
+
+- **Linguistically grounded**: Compiled by linguists and NLP researchers
+- **Comprehensive**: 180+ stopwords covering all major grammatical categories
+- **Easy to use**: Simple Python API with no external dependencies
+- **Well documented**: Extensive documentation and examples
+- **Tested**: Comprehensive test suite
+- **Open source**: MIT licensed
+
+## Installation
+
+### From PyPI (recommended)
+
+```bash
+pip install fulfulde-stopwords
+```
+
+### From source
+
+```bash
+git clone https://github.com/2zalab/fulfulde-stopwords.git
+cd fulfulde-stopwords
+pip install -e .
+```
+
+## Quick Start
+
+### Basic Usage
+
+```python
+from fulfulde_stopwords import get_stopwords, remove_stopwords, is_stopword
+
+# Get all stopwords
+stopwords = get_stopwords()
+print(f"Total stopwords: {len(stopwords)}")
+
+# Check if a word is a stopword
+print(is_stopword('mi'))  # True
+print(is_stopword('wuro'))  # False
+
+# Remove stopwords from text
+tokens = ['mi', 'heɓi', 'wuro', 'e', 'nder', 'Kameruun']
+filtered = remove_stopwords(tokens)
+print(filtered)  # ['heɓi', 'wuro', 'Kameruun']
+```
+
+### Advanced Usage
+
+```python
+from fulfulde_stopwords import filter_text, get_stats
+
+# Filter an entire text
+text = "mi heɓi wuro e nder Kameruun"
+filtered_text = filter_text(text)
+print(filtered_text)  # "heɓi wuro Kameruun"
+
+# Get statistics
+tokens = ['mi', 'heɓi', 'wuro', 'e', 'nder']
+stats = get_stats(tokens)
+print(stats)
+# {
+#     'total_tokens': 5,
+#     'stopword_count': 3,
+#     'content_word_count': 2,
+#     'stopword_ratio': 0.6
+# }
+```
+
+### Integration with NLP Libraries
+
+#### NLTK
+
+```python
+from fulfulde_stopwords import get_stopwords
+from nltk.tokenize import word_tokenize
+
+stopwords = get_stopwords()
+text = "mi heɓi wuro e nder Kameruun"
+tokens = word_tokenize(text)
+filtered = [w for w in tokens if w.lower() not in stopwords]
+```
+
+#### spaCy
+
+```python
+import spacy
+from fulfulde_stopwords import get_stopwords
+
+nlp = spacy.blank("xx")  # Multi-language model
+stopwords = get_stopwords()
+
+# Add stopwords to spaCy
+for word in stopwords:
+    nlp.vocab[word].is_stop = True
+```
+
+#### scikit-learn
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from fulfulde_stopwords import get_stopwords
+
+stopwords = get_stopwords()
+vectorizer = TfidfVectorizer(stop_words=list(stopwords))
+```
+
+## API Reference
+
+### `get_stopwords(case_sensitive=False)`
+
+Get the set of Fulfulde stopwords.
+
+**Parameters:**
+- `case_sensitive` (bool): If False (default), returns lowercase stopwords
+
+**Returns:**
+- `Set[str]`: A set containing all Fulfulde stopwords
+
+### `is_stopword(word, case_sensitive=False)`
+
+Check if a word is a stopword.
+
+**Parameters:**
+- `word` (str): The word to check
+- `case_sensitive` (bool): If False (default), comparison is case-insensitive
+
+**Returns:**
+- `bool`: True if the word is a stopword, False otherwise
+
+### `remove_stopwords(tokens, case_sensitive=False, preserve_order=True)`
+
+Remove stopwords from a list of tokens.
+
+**Parameters:**
+- `tokens` (List[str]): List of tokens to filter
+- `case_sensitive` (bool): If False (default), comparison is case-insensitive
+- `preserve_order` (bool): If True (default), preserves original token order
+
+**Returns:**
+- `List[str]`: List of tokens with stopwords removed
+
+### `filter_text(text, tokenizer=None, case_sensitive=False)`
+
+Remove stopwords from a text string.
+
+**Parameters:**
+- `text` (str): The text to filter
+- `tokenizer` (callable): Optional tokenizer function
+- `case_sensitive` (bool): If False (default), comparison is case-insensitive
+
+**Returns:**
+- `str`: The filtered text with stopwords removed
+
+### `get_stopword_count(tokens, case_sensitive=False)`
+
+Count the number of stopwords in a list of tokens.
+
+**Parameters:**
+- `tokens` (List[str]): List of tokens to analyze
+- `case_sensitive` (bool): If False (default), comparison is case-insensitive
+
+**Returns:**
+- `int`: The number of stopwords found
+
+### `get_stopword_ratio(tokens, case_sensitive=False)`
+
+Calculate the ratio of stopwords to total tokens.
+
+**Parameters:**
+- `tokens` (List[str]): List of tokens to analyze
+- `case_sensitive` (bool): If False (default), comparison is case-insensitive
+
+**Returns:**
+- `float`: The ratio of stopwords (between 0 and 1)
+
+### `get_stats(tokens, case_sensitive=False)`
+
+Get comprehensive statistics about stopwords in a list of tokens.
+
+**Parameters:**
+- `tokens` (List[str]): List of tokens to analyze
+- `case_sensitive` (bool): If False (default), comparison is case-insensitive
+
+**Returns:**
+- `dict`: Statistics including total tokens, stopword count, content word count, and stopword ratio
+
+## Language Information
+
+### Variant and Orthography
+
+- **Language**: Fulfulde (Adamawa variant)
+- **Region**: Cameroon and Northern Nigeria
+- **Script**: Latin alphabet with special characters (ɓ, ɗ, ŋ, etc.)
+- **ISO 639-3**: `fub` (Adamawa Fulfulde)
+
+### Linguistic Features
+
+Fulfulde is characterized by:
+
+- **Nominal class system**: 20+ noun classes with corresponding pronouns
+- **Agglutinative morphology**: Extensive use of suffixes and prefixes
+- **VSO word order**: Verb-Subject-Object as default
+- **Grammatical particles**: Heavy reliance on particles rather than articles
+
+## Stopword Categories
+
+The stopword list includes:
+
+1. **Personal pronouns**: mi, a, o, ɓe, en, on
+2. **Demonstratives**: ɗo, ɗon, oo, ɓee
+3. **Prepositions**: haa, e, nder, dow, ley
+4. **Conjunctions**: bee, koo, ammaa, niai
+5. **Auxiliaries**: woni, ɗon, woodi, jogi
+6. **Discourse particles**: nden, ni, boo, tan
+7. **Negations**: ai, ataa, naa, fay
+8. **Interrogatives**: mo, ko, moy, ndeeye
+9. **Nominal class pronouns**: ɗum, ka, ki, nde, ndi, etc.
+10. **Temporal/spatial adverbs**: ɗoo, toon, hande
+
+
+### Areas for contribution:
+
+- Additional stopwords from other Fulfulde variants (Maasina, Pulaar, etc.)
+- Extended stopword lists with domain-specific terms
+- Integration examples with popular NLP frameworks
+- Benchmarks on NLP tasks
+- Translations and documentation
+
+## Citation
+
+If you use this library in your research, please cite:
+
+```bibtex
+@article{fulfulde_stopwords_2026,
+  title={Fulfulde Stopwords: A Linguistic Resource for NLP in a Low-Resource African Language},
+  author={Isaac Touza},
+  year={2026},
+}
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For questions, suggestions, or collaborations:
+
+- GitHub Issues: [https://github.com/2zalab/fulfulde-stopwords/issues](https://github.com/2zalab/fulfulde-stopwords/issues)
+- Email: isaac.touza@univ-maroua.cm
+
+## Changelog
+
+### Version 1.0 (2026-01-14)
+
+- Initial release
+- 180+ stopwords for Adamawa Fulfulde
+- Complete Python API
+- Comprehensive documentation
+- Test suite
