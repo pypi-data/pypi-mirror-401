@@ -1,0 +1,1 @@
+import{t as e}from"./use-api-BAbm8GVs.js";import{r as t}from"./user-service-Cq_o-JT5.js";function n(){let{data:n,isLoading:r,error:i,refetch:a}=e(t);return{allServiceAccounts:n,isLoading:r,error:i,refresh:a}}export{n as t};
