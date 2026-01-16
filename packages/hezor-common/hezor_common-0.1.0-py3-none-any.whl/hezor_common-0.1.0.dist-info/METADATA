@@ -1,0 +1,147 @@
+Metadata-Version: 2.4
+Name: hezor-common
+Version: 0.1.0
+Summary: Common utilities for Hezor projects
+Project-URL: Homepage, https://github.com/lennon/hezor_common
+Project-URL: Repository, https://github.com/lennon/hezor_common
+Project-URL: Issues, https://github.com/lennon/hezor_common/issues
+Author-email: Silo QIAN <qtisan@hotmail.com>
+License-File: LICENSE
+Keywords: common,hezor,utilities
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+
+# Hezor Common
+
+Common utilities for Hezor projects.
+
+## Installation
+
+```bash
+pip install hezor-common
+```
+
+## Usage
+
+```python
+from hezor_common import hello
+
+print(hello())
+```
+
+## Development
+
+### Setup
+
+```bash
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment and install dependencies
+uv sync
+```
+
+### Quick Commands (using Makefile)
+
+```bash
+# Show all available commands
+make help
+
+# Install dependencies
+make install
+
+# Build the package
+make build
+
+# Publish to TestPyPI (recommended for testing)
+make publish-test
+
+# Publish to PyPI (production)
+make publish
+
+# Clean build artifacts
+make clean
+```
+
+### Manual Build and Publish
+
+#### Building
+
+```bash
+# Build the package
+uv build
+
+# Or use the build script
+./scripts/build.sh
+```
+
+#### Publishing to PyPI
+
+Before publishing, you need to:
+
+1. **Register on PyPI/TestPyPI**:
+   - TestPyPI: https://test.pypi.org/account/register/
+   - PyPI: https://pypi.org/account/register/
+
+2. **Configure credentials** (recommended - using API tokens):
+   ```bash
+   # Create ~/.pypirc file
+   cat > ~/.pypirc << EOF
+   [distutils]
+   index-servers =
+       pypi
+       testpypi
+
+   [pypi]
+   username = __token__
+   password = pypi-your-api-token-here
+
+   [testpypi]
+   username = __token__
+   password = pypi-your-test-api-token-here
+   EOF
+   
+   chmod 600 ~/.pypirc
+   ```
+
+3. **Publish**:
+   ```bash
+   # Publish to TestPyPI first (recommended)
+   ./scripts/publish.sh --test
+   # Or: make publish-test
+
+   # After testing, publish to PyPI
+   ./scripts/publish.sh
+   # Or: make publish
+   ```
+
+### Project Structure
+
+```
+hezor_common/
+├── src/
+│   └── hezor_common/
+│       ├── __init__.py
+│       └── py.typed
+├── scripts/
+│   ├── build.sh
+│   ├── publish.sh
+│   └── build-and-publish.sh
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── MANIFEST.in
+├── Makefile
+└── .gitignore
+```
+
+## License
+
+MIT License - see LICENSE file for details.
+
