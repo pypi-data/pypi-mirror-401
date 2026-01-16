@@ -1,0 +1,109 @@
+{
+  "name": "monoco-vscode",
+  "displayName": "Monoco",
+  "description": "Monoco VS Code Cockpit Integration",
+  "version": "0.1.5",
+  "publisher": "indenscale",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IndenScale/Monoco.git",
+    "directory": "Toolkit/extensions/vscode"
+  },
+  "homepage": "https://github.com/IndenScale/Monoco/tree/main/Toolkit/extensions/vscode",
+  "bugs": {
+    "url": "https://github.com/IndenScale/Monoco/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "monoco-cockpit",
+          "title": "Monoco",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "monoco-cockpit": [
+        {
+          "id": "monoco-kanban",
+          "type": "webview",
+          "name": "Monoco",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "monoco.openKanban",
+        "title": "Monoco: Open Kanban"
+      },
+      {
+        "command": "monoco.refreshEntry",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "monoco.refreshEntry",
+          "when": "view == monoco-kanban",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Monoco",
+      "properties": {
+        "monoco.apiBaseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8642/api/v1",
+          "description": "Base URL for Monoco Daemon API"
+        },
+        "monoco.webUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8642",
+          "description": "URL for Monoco Web UI"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./ && mkdir -p out/webview && cp src/webview/* out/webview/",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "20.x",
+    "@types/sinon": "^10.0.0",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^2.22.0",
+    "eslint": "^8.57.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.4.0",
+    "ovsx": "^0.8.3",
+    "sinon": "^17.0.0",
+    "typescript": "^5.4.5"
+  }
+}
