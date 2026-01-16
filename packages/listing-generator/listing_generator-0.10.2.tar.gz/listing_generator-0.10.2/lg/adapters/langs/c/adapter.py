@@ -1,0 +1,86 @@
+"""
+C adapter core: configuration, document and adapter classes.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, List, Optional, ClassVar, Dict
+
+from tree_sitter import Language
+
+from ...code_base import CodeAdapter
+from ...code_model import CodeCfg
+from ...comment_style import CommentStyle, C_STYLE_COMMENTS
+from ...context import LightweightContext
+from ...optimizations import ImportClassifier, TreeSitterImportAnalyzer, LanguageLiteralDescriptor
+from ...shared import LanguageCodeDescriptor
+from ...tree_sitter_support import TreeSitterDocument
+
+
+@dataclass
+class CCfg(CodeCfg):
+    """Configuration for C adapter."""
+
+    @staticmethod
+    def from_dict(d: Optional[Dict[str, Any]]) -> CCfg:
+        """Load configuration from YAML dictionary."""
+        if not d:
+            return CCfg()
+
+        cfg = CCfg()
+        cfg.general_load(d)
+
+        # C-specific settings (currently none)
+
+        return cfg
+
+
+class CDocument(TreeSitterDocument):
+
+    def get_language(self) -> Language:
+        import tree_sitter_c as tsc
+        return Language(tsc.language())
+
+
+class CAdapter(CodeAdapter[CCfg]):
+
+    name = "c"
+    extensions = {".c", ".h"}
+
+    COMMENT_STYLE: ClassVar[CommentStyle] = C_STYLE_COMMENTS
+
+    def create_document(self, text: str, ext: str) -> TreeSitterDocument:
+        return CDocument(text, ext)
+
+    def create_import_classifier(self, external_patterns: List[str]) -> ImportClassifier:
+        """Create C-specific import classifier."""
+        from .imports import CImportClassifier
+        return CImportClassifier(external_patterns)
+
+    def create_import_analyzer(self, classifier: ImportClassifier) -> TreeSitterImportAnalyzer:
+        """Create C-specific import analyzer."""
+        from .imports import CImportAnalyzer
+        return CImportAnalyzer(classifier)
+
+    def get_code_descriptor(self) -> LanguageCodeDescriptor:
+        """Return C code descriptor."""
+        from .code_profiles import C_CODE_DESCRIPTOR
+        return C_CODE_DESCRIPTOR
+
+    def create_literal_descriptor(self) -> LanguageLiteralDescriptor:
+        """Create C literal descriptor."""
+        from .literals import create_c_descriptor
+        return create_c_descriptor()
+
+    def should_skip(self, lightweight_ctx: LightweightContext) -> bool:
+        """
+        C-specific file skip heuristics.
+        Detects trivial header files with only forward declarations.
+        """
+        if not self.cfg.skip_trivial_files:
+            return False
+
+        from .trivial import CTrivialAnalyzer
+        analyzer = CTrivialAnalyzer()
+        return analyzer.is_trivial(lightweight_ctx, self)

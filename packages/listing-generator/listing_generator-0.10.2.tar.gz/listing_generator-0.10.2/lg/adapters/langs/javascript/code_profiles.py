@@ -1,0 +1,279 @@
+"""
+JavaScript code profiles for declarative element collection.
+
+Describes all code element types in JavaScript:
+- Classes
+- Functions (top-level)
+- Methods (inside classes)
+- Variables (module-level)
+
+JavaScript uses the 'export' keyword for public API.
+Unlike TypeScript, there are no visibility modifiers (private/protected/public).
+Top-level declarations are public only if they have 'export' keyword.
+Class members are always considered public (no visibility modifiers in standard JS).
+"""
+
+from __future__ import annotations
+
+from typing import Optional
+
+from ...shared import ElementProfile, InheritMode, LanguageCodeDescriptor, is_inside_container, compute_element_range_with_trailing
+from ...tree_sitter_support import Node, TreeSitterDocument
+
+
+def _extract_name(node: Node, doc: TreeSitterDocument) -> Optional[str]:
+    """
+    Extract name of JavaScript element from node.
+    """
+    # Special handling for variable_declaration and lexical_declaration
+    if node.type in ("variable_declaration", "lexical_declaration"):
+        for child in node.children:
+            if child.type == "variable_declarator":
+                for grandchild in child.children:
+                    if grandchild.type == "identifier":
+                        return doc.get_node_text(grandchild)
+
+    # Search for child node with function/class/method name
+    for child in node.children:
+        if child.type in ("identifier", "property_identifier"):
+            return doc.get_node_text(child)
+
+    # For some node types, name may be in the name field
+    name_node = node.child_by_field_name("name")
+    if name_node:
+        return doc.get_node_text(name_node)
+
+    return None
+
+
+def _has_export_keyword(node: Node, doc: TreeSitterDocument) -> bool:
+    """
+    Check if node has 'export' keyword directly before it.
+
+    For top-level declarations.
+    """
+    node_text = doc.get_node_text(node).strip()
+
+    # Check if text starts with export keyword
+    if node_text.startswith("export "):
+        return True
+
+    # Check parent for export_statement
+    if node.parent and node.parent.type == "export_statement":
+        return True
+
+    return False
+
+
+def _is_exported_via_default(node: Node, doc: TreeSitterDocument) -> bool:
+    """
+    Check if element is exported via 'export default Name'.
+
+    For classes and functions that are declared separately and then exported.
+    """
+    # Extract element name
+    name = _extract_name(node, doc)
+    if not name:
+        return False
+
+    # Search for export default statements in the document
+    root = doc.root_node
+    for child in root.children:
+        if child.type == "export_statement":
+            # Check if this is 'export default Name'
+            export_text = doc.get_node_text(child).strip()
+            if f"export default {name}" in export_text:
+                return True
+
+    return False
+
+
+def _is_public_top_level(node: Node, doc: TreeSitterDocument) -> bool:
+    """
+    Determine if top-level JavaScript element is public.
+
+    Top-level elements are public if:
+    1. They have 'export' keyword in declaration
+    2. They are exported via 'export default Name'
+    """
+    # Check direct export
+    if _has_export_keyword(node, doc):
+        return True
+
+    # Check export via default
+    return _is_exported_via_default(node, doc)
+
+
+def _is_public_class_member(node: Node, doc: TreeSitterDocument) -> bool:
+    """
+    Determine if class member (method/field) is public.
+
+    In JavaScript, class members are public by default.
+    Private members are identified by:
+    1. # prefix (modern private fields/methods): #privateMethod, #privateField
+    2. _ prefix (convention-based protected/private): _protectedMethod
+    """
+    # Check for private_property_identifier in children (# prefix)
+    for child in node.children:
+        if child.type == "private_property_identifier":
+            return False
+
+        # Check for _ prefix in identifier names (convention-based private)
+        if child.type == "property_identifier":
+            name = doc.get_node_text(child)
+            if name.startswith("_"):
+                return False
+
+    return True
+
+
+def _find_javascript_docstring(body_node: Node, _doc: TreeSitterDocument) -> Optional[Node]:
+    """
+    Find docstring (JSDoc comment) at the start of function body.
+
+    In JavaScript, docstrings are typically handled via JSDoc comments
+    which appear before the function, not inside the body.
+    This searches for comment nodes at the start of the body.
+    """
+    # JavaScript docstrings are usually before the function, not in the body
+    # We check if there's a comment as first child
+    if not body_node or body_node.type != "statement_block":
+        return None
+
+    for child in body_node.children:
+        if child.type in ("comment", "line_comment", "block_comment"):
+            return child
+        # First statement/whitespace that's not a comment, stop
+        if child.type not in ("newline", "\n", " ", "\t"):
+            break
+
+    return None
+
+
+def _has_arrow_function_body(node: Node, _doc: TreeSitterDocument) -> bool:
+    """
+    Check if variable declaration contains arrow function with statement_block body.
+
+    Arrow functions can have:
+    - Expression body: const f = () => "value"  (no braces, single expression)
+    - Block body: const f = () => { return "value"; }  (with braces)
+
+    We only care about block bodies for function body optimization.
+    """
+    # Find variable_declarator child
+    for child in node.children:
+        if child.type == "variable_declarator":
+            # Find arrow_function child
+            for grandchild in child.children:
+                if grandchild.type == "arrow_function":
+                    # Check if arrow function has statement_block body
+                    for arrow_child in grandchild.children:
+                        if arrow_child.type == "statement_block":
+                            return True
+    return False
+
+
+def _find_arrow_function_body(node: Node) -> Optional[Node]:
+    """
+    Extract arrow function body node from variable declaration.
+    """
+    # Navigate: variable_declaration -> variable_declarator -> arrow_function -> statement_block
+    for child in node.children:
+        if child.type == "variable_declarator":
+            for grandchild in child.children:
+                if grandchild.type == "arrow_function":
+                    for arrow_child in grandchild.children:
+                        if arrow_child.type == "statement_block":
+                            return arrow_child
+    return None
+
+
+def _compute_element_range(node: Node, element_type: str, doc: TreeSitterDocument) -> Optional[tuple[int, int]]:
+    """Compute adjusted element range to include trailing semicolon."""
+    return compute_element_range_with_trailing(
+        node, element_type, doc,
+        element_types={"field", "variable"},
+        trailing_chars={";"},
+    )
+
+
+JAVASCRIPT_CODE_DESCRIPTOR = LanguageCodeDescriptor(
+    language="javascript",
+    profiles=[
+        ElementProfile(
+            name="class",
+            query="(class_declaration) @element",
+            is_public=_is_public_top_level,
+        ),
+
+        ElementProfile(
+            name="function",
+            query="(function_declaration) @element",
+            is_public=_is_public_top_level,
+            additional_check=lambda node, doc: not is_inside_container(
+                node, {"class_declaration", "class_body"}
+            ),
+            has_body=True,
+            body_query='(function_declaration body: (statement_block) @body)',
+            docstring_extractor=_find_javascript_docstring,
+        ),
+
+        # Need to handle both lexical_declaration (const/let) and variable_declaration (var)
+        ElementProfile(
+            name="arrow_function",
+            query="(lexical_declaration) @element",
+            is_public=_is_public_top_level,
+            additional_check=_has_arrow_function_body,  # Only arrow functions with block body
+            has_body=True,
+            body_resolver=_find_arrow_function_body,
+            docstring_extractor=_find_javascript_docstring,
+        ),
+
+        ElementProfile(
+            query="(variable_declaration) @element",
+            inherit_previous=InheritMode.INHERIT,
+        ),
+
+        ElementProfile(
+            name="method",
+            query="(method_definition) @element",
+            is_public=_is_public_class_member,
+            has_body=True,
+            body_query='(method_definition body: (statement_block) @body)',
+            docstring_extractor=_find_javascript_docstring,
+        ),
+
+        ElementProfile(
+            name="field",
+            query="(field_definition) @element",
+            is_public=_is_public_class_member,
+        ),
+
+        ElementProfile(
+            name="variable",
+            query="(variable_declaration) @element",
+            is_public=_is_public_top_level,
+            additional_check=lambda node, doc: (
+                not is_inside_container(node, {"class_declaration", "class_body"}) and
+                not is_inside_container(node, {
+                    "function_declaration", "method_definition", "arrow_function",
+                    "function_expression", "generator_function"
+                }) and
+                not _has_arrow_function_body(node, doc)
+            ),
+        ),
+
+        ElementProfile(
+            query="(lexical_declaration) @element",
+            inherit_previous=InheritMode.INHERIT,
+        ),
+    ],
+
+    decorator_types=set(),
+    comment_types={"comment", "line_comment", "block_comment"},
+    name_extractor=_extract_name,
+    compute_element_range=_compute_element_range,
+)
+
+
+__all__ = ["JAVASCRIPT_CODE_DESCRIPTOR"]
