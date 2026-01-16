@@ -1,0 +1,112 @@
+Metadata-Version: 2.4
+Name: orrin-cli
+Version: 0.1.6
+Summary: Orrin CLI
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typer
+Requires-Dist: requests
+Requires-Dist: platformdirs
+Dynamic: license-file
+
+# Orrin CLI
+
+The Orrin CLI enables users to perform the actions required to deploy a standalone app to Orrin Apps.
+
+It is the standard tool for packaging UI bundles (ZIP files), uploading them to the server for review, and checking the status of the review process for both the frontend and backend.
+
+## The CLI
+The CLI currently consists of two main commands:
+
+| Command | Purpose |
+| :--- | :--- |
+| `config` | Manages configuration, including setting or revoking your Developer API key. |
+| `ui` | Handles UI-related activities, including building and uploading the deployment ZIP file. |
+
+Each command has specific subcommands detailed below.
+
+## Subcommands for `config`
+
+| Command | Purpose |
+| :--- | :--- |
+| `configure-dev-api` | Configures your Developer API key within the Orrin CLI. |
+| `revoke-config` | Removes your currently configured Developer API key. |
+| `show-configuration` | Displays the Developer API key currently configured. |
+
+### Configuration of Developer API
+Configuring your developer API key is the recommended first step. While not strictly required to install the CLI, the key is required to perform any deployment actions.
+
+To configure your key, run:
+
+```bash
+orrin config configure-dev-api
+```
+
+### Revoking Configuration
+If you need to remove the currently configured Developer API key, run:
+
+```bash
+orrin config revoke-config
+```
+
+This effectively removes the stored key. You can reconfigure a new key at any time.
+
+### Showing the Configuration
+If you have forgotten your developer API key, run:
+
+```bash
+orrin config show-configuration
+```
+
+This will print the stored Developer API key. As the Orrin CLI matures, this command will likely display additional developer metadata.
+
+## Subcommands for `ui`
+
+| Command | Purpose |
+| :--- | :--- |
+| `generate-zip` | Runs at the root of the Next.js codebase. It builds the project, exports static contents, and zips them for upload. |
+| `upload` | Sends the generated ZIP file to the server, adding it to the "STAGING" queue to await review. |
+
+### Generating ZIP File
+To upload your UI for review and deployment, you must package the static contents of your codebase into a ZIP file.
+
+From the root of your Next.js codebase, run:
+
+```bash
+orrin ui generate-zip
+```
+
+This performs a build and generates the required ZIP file.
+
+**NOTE:** Ensure your `next.config.ts` contains the following configuration. Without this, the ZIP creation may fail:
+
+```tsx
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  basePath: '/<your_app_name>/current',
+  reactStrictMode: true,
+};
+
+export default nextConfig;
+```
+
+### Uploading the UI
+When you are ready, you can upload the UI to the server. This submits it to a "STAGING" queue, meaning it is awaiting review/approval.
+
+Run the following command to upload:
+
+```bash
+orrin ui upload --app <AppName>
+```
+
+**Important Requirements:**
+*   **Backend First:** `<AppName>` must match the app name found in your backend configuration. An app is only created after the backend is submitted. If you attempt to submit the frontend before the backend, this command will fail with a "no app found" error.
+*   **App Linking:** Inherently, the UI code is not "attached" to an app. Passing `--app` allows the server to link the uploaded UI to the specific app record.
+
+**The Review Process**
+*   **Overrides:** If you upload a new codebase using an existing app name, it will override the previous codebase and trigger a new review.
+*   **Updates:** A review is required for every upload before the UI can be hosted. If an app is already live and you submit an update, the old version persists until the new one is approved. Once approved, the new version takes over and the old version is cached.
