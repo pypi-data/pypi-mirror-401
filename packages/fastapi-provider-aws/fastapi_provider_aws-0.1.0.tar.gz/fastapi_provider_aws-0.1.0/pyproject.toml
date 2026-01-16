@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-provider-aws"
+version = "0.1.0"
+description = "AWS S3 provider for FastAPI projects."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]==0.128",
+    "boto3>=1.35.0",
+    "pytest>=9.0.1",
+    "pytest-asyncio>=0.25.3",
+    "moto[s3]>=5.0.0",
+]
+[project.optional-dependencies]
+dev = []

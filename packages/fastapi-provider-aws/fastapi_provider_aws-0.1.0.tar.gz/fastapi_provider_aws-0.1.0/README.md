@@ -1,0 +1,284 @@
+# FastAPI Provider AWS
+
+An AWS S3 provider package for FastAPI projects that provides a clean, class-based interface for interacting with Amazon S3.
+
+## Features
+
+- 📦 **File Upload**
+  - Upload bytes or files to S3
+  - Automatic content type handling
+  - Returns S3 URLs for uploaded objects
+
+- 🔗 **Presigned URLs**
+  - Generate presigned GET URLs for secure file access
+  - Configurable expiration times
+
+- 📥 **File Download**
+  - Download objects from S3 as bytes
+  - Parse S3 URLs (s3://, https:// formats)
+
+- 🛡️ **Error Handling**
+  - Comprehensive error handling
+  - Clear validation messages
+
+## Installation
+
+Using UV:
+
+```bash
+uv add fastapi-provider-aws
+```
+
+Or using pip:
+
+```bash
+pip install fastapi-provider-aws
+```
+
+## Quick Start
+
+### Basic Usage
+
+```python
+import os
+from fastapi import FastAPI
+from fastapi_provider_aws import S3Provider
+
+app = FastAPI()
+
+# Initialize AWS S3 provider (reused across routes/services)
+s3_provider = S3Provider(
+    bucket=os.getenv("S3_BUCKET_NAME", "my-bucket"),
+    region=os.getenv("AWS_REGION", "us-east-1"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+)
+
+@app.post("/upload")
+async def upload_file():
+    # Upload bytes
+    s3_url = s3_provider.upload_bytes(
+        key="path/to/file.txt",
+        content=b"Hello, World!",
+        content_type="text/plain"
+    )
+    return {"s3_url": s3_url}
+```
+
+### Direct Initialization
+
+```python
+from fastapi_provider_aws import S3Provider
+
+# Initialize with direct values
+s3_provider = S3Provider(
+    bucket="my-bucket-name",
+    region="us-west-2",
+    aws_access_key_id="your-access-key-id",
+    aws_secret_access_key="your-secret-access-key",
+)
+```
+
+### Uploading Files
+
+```python
+# Upload from file path
+s3_url = s3_provider.upload_file(
+    file_path="/path/to/local/file.pdf",
+    key="documents/file.pdf"
+)
+
+# Upload bytes
+s3_url = s3_provider.upload_bytes(
+    key="data/content.txt",
+    content=b"File content here",
+    content_type="text/plain"
+)
+```
+
+### Generating Presigned URLs
+
+```python
+# Generate a presigned URL (expires in 1 hour by default)
+presigned_url = s3_provider.presign_get_url_from_s3_url(
+    s3_url="s3://bucket-name/path/to/file.pdf",
+    expiration=3600  # seconds
+)
+
+# Or from an HTTPS S3 URL
+presigned_url = s3_provider.presign_get_url_from_s3_url(
+    s3_url="https://bucket-name.s3.amazonaws.com/path/to/file.pdf",
+    expiration=7200  # 2 hours
+)
+```
+
+### Downloading Files
+
+```python
+# Download object as bytes
+content = s3_provider.get_object_bytes(
+    s3_url="s3://bucket-name/path/to/file.pdf"
+)
+
+# Extract filename from S3 URL
+filename = s3_provider.get_filename_from_s3_url(
+    s3_url="s3://bucket-name/path/to/file.pdf",
+    default="document.pdf"
+)
+```
+
+### Using with Dependency Injection
+
+```python
+import os
+from fastapi import Depends
+from fastapi_provider_aws import S3Provider
+
+def get_s3_provider() -> S3Provider:
+    return S3Provider(
+        bucket=os.getenv("S3_BUCKET_NAME", "my-bucket"),
+        region=os.getenv("AWS_REGION", "us-east-1"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    )
+
+@app.post("/upload")
+async def upload_file(
+    s3: S3Provider = Depends(get_s3_provider)
+):
+    s3_url = s3.upload_bytes(
+        key="path/to/file.txt",
+        content=b"Hello, World!"
+    )
+    return {"s3_url": s3_url}
+```
+
+### Using in Application Config
+
+```python
+import os
+# In your api/config.py or similar
+from fastapi_provider_aws import S3Provider
+
+# Initialize AWS S3 provider (reused across routes/services)
+s3_provider = S3Provider(
+    bucket=os.getenv("S3_BUCKET_NAME", "my-bucket"),
+    region=os.getenv("AWS_REGION", "us-east-1"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+)
+
+# Then import and use in your routes
+from api.config import s3_provider
+
+@app.post("/upload")
+async def upload_file():
+    s3_url = s3_provider.upload_bytes(
+        key="path/to/file.txt",
+        content=b"Hello, World!"
+    )
+    return {"s3_url": s3_url}
+```
+
+## API Reference
+
+### S3Provider
+
+#### `__init__`
+
+Initialize the S3 provider.
+
+**Parameters:**
+- `bucket` (str, required): S3 bucket name
+- `region` (str, required): AWS region name
+- `aws_access_key_id` (str, required): AWS access key ID
+- `aws_secret_access_key` (str, required): AWS secret access key
+
+#### `upload_bytes`
+
+Upload bytes to S3 and return an s3:// URL.
+
+**Parameters:**
+- `key` (str, required): S3 object key (path)
+- `content` (bytes, required): Content to upload
+- `content_type` (str, optional): MIME type of the content
+
+**Returns:** str - S3 URL (s3://bucket/key)
+
+#### `upload_file`
+
+Upload a local file to S3 and return an s3:// URL.
+
+**Parameters:**
+- `file_path` (str, required): Path to local file
+- `key` (str, required): S3 object key (path)
+
+**Returns:** str - S3 URL (s3://bucket/key)
+
+#### `presign_get_url_from_s3_url`
+
+Generate a presigned GET URL for a stored S3 URL.
+
+**Parameters:**
+- `s3_url` (str, required): S3 URL (supports s3:// and https:// formats)
+- `expiration` (int, optional): URL expiration time in seconds (default: 3600)
+
+**Returns:** str - Presigned HTTPS URL
+
+#### `get_object_bytes`
+
+Download an object from S3 and return its content as bytes.
+
+**Parameters:**
+- `s3_url` (str, required): S3 URL to download
+
+**Returns:** bytes - File content
+
+#### `get_filename_from_s3_url`
+
+Extract the filename from an S3 URL.
+
+**Parameters:**
+- `s3_url` (str, required): S3 URL to extract filename from
+- `default` (str, optional): Default filename if extraction fails
+
+**Returns:** str - Filename
+
+## URL Format Support
+
+The provider supports multiple S3 URL formats:
+
+- `s3://bucket-name/path/to/file`
+- `https://bucket-name.s3.amazonaws.com/path/to/file`
+- `http://bucket-name.s3.amazonaws.com/path/to/file`
+
+## Error Handling
+
+The provider includes error handling for:
+
+- Missing AWS credentials
+- Invalid S3 URLs
+- Network errors
+- S3 API errors
+
+## Development
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies:
+```bash
+uv sync
+```
+
+3. Set up environment variables (optional, for use with `os.getenv()`):
+```bash
+export AWS_ACCESS_KEY_ID=your-access-key-id
+export AWS_SECRET_ACCESS_KEY=your-secret-access-key
+export S3_BUCKET_NAME=your-bucket-name
+export AWS_REGION=us-east-1
+```
+
+## License
+
+MIT License - see LICENSE file for details
