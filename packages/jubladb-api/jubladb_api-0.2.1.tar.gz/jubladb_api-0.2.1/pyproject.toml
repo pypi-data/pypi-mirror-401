@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jubladb_api"
+version = "0.2.1"
+dependencies = [
+  "requests>=2.32.2",
+]
+requires-python = ">=3.10"
+
+description = "Hitobito JSON:API"
+authors = [
+  {name = "Basil Bader", email="dev@basilbader.com"}
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+keywords = ["Hitobito JSON:API"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU Affero General Public License v3",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Repository = "https://github.com/Jungwacht-Herisau/jubladb_python_api"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
