@@ -1,0 +1,2756 @@
+"""Pipeline executor and orchestration."""
+
+import time
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+if TYPE_CHECKING:
+    import pandas as pd
+
+from odibi.config import AlertConfig, ErrorStrategy, PipelineConfig, ProjectConfig, RetryConfig
+from odibi.context import create_context
+from odibi.engine.registry import get_engine_class
+from odibi.exceptions import DependencyError
+from odibi.graph import DependencyGraph
+from odibi.lineage import OpenLineageAdapter
+from odibi.node import Node, NodeResult
+from odibi.plugins import get_connection_factory, load_plugins
+from odibi.registry import FunctionRegistry
+from odibi.state import StateManager, create_state_backend
+from odibi.story import StoryGenerator
+from odibi.story.lineage_utils import generate_lineage
+from odibi.transformers import register_standard_library
+from odibi.utils import load_yaml_with_env
+from odibi.utils.alerting import send_alert
+from odibi.utils.logging import configure_logging, logger
+from odibi.utils.logging_context import (
+    create_logging_context,
+    set_logging_context,
+)
+from odibi.utils.progress import NodeStatus, PipelineProgress
+
+
+@dataclass
+class PipelineResults:
+    """Results from pipeline execution."""
+
+    pipeline_name: str
+    completed: List[str] = field(default_factory=list)
+    failed: List[str] = field(default_factory=list)
+    skipped: List[str] = field(default_factory=list)
+    node_results: Dict[str, NodeResult] = field(default_factory=dict)
+    duration: float = 0.0
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    story_path: Optional[str] = None
+
+    def get_node_result(self, name: str) -> Optional[NodeResult]:
+        """Get result for specific node.
+
+        Args:
+            name: Node name
+
+        Returns:
+            NodeResult if available, None otherwise
+        """
+        return self.node_results.get(name)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary.
+
+        Returns:
+            Dictionary representation
+        """
+        return {
+            "pipeline_name": self.pipeline_name,
+            "completed": self.completed,
+            "failed": self.failed,
+            "skipped": self.skipped,
+            "duration": self.duration,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "node_count": len(self.node_results),
+        }
+
+    def debug_summary(self) -> str:
+        """Generate a debug summary with next steps for failed pipelines.
+
+        Returns:
+            Formatted string with failure details and suggested next steps.
+            Returns empty string if pipeline succeeded.
+        """
+        if not self.failed:
+            return ""
+
+        lines = []
+        lines.append(f"\n{'=' * 60}")
+        lines.append(f"❌ Pipeline '{self.pipeline_name}' failed")
+        lines.append(f"{'=' * 60}")
+
+        # List failed nodes with errors
+        lines.append("\nFailed nodes:")
+        for node_name in self.failed:
+            node_res = self.node_results.get(node_name)
+            if node_res and node_res.error:
+                error_msg = str(node_res.error)[:200]
+                lines.append(f"  • {node_name}: {error_msg}")
+            else:
+                lines.append(f"  • {node_name}")
+
+        # Story path if available
+        lines.append("\n📖 Next Steps:")
+        if self.story_path:
+            lines.append("  1. View the execution story:")
+            lines.append(f"     odibi story show {self.story_path}")
+            lines.append("")
+            lines.append("  2. Inspect a specific failed node:")
+            first_failed = self.failed[0] if self.failed else "<node_name>"
+            lines.append(f"     odibi story last --node {first_failed}")
+        else:
+            lines.append("  1. Check the logs for error details")
+
+        lines.append("")
+        lines.append("  3. If this is an environment issue:")
+        lines.append("     odibi doctor")
+        lines.append("")
+
+        return "\n".join(lines)
+
+
+class Pipeline:
+    """Pipeline executor and orchestrator."""
+
+    def __init__(
+        self,
+        pipeline_config: PipelineConfig,
+        engine: str = "pandas",
+        connections: Optional[Dict[str, Any]] = None,
+        generate_story: bool = True,
+        story_config: Optional[Dict[str, Any]] = None,
+        retry_config: Optional[RetryConfig] = None,
+        alerts: Optional[List[AlertConfig]] = None,
+        performance_config: Optional[Any] = None,
+        catalog_manager: Optional[Any] = None,
+        lineage_adapter: Optional[Any] = None,
+    ):
+        """Initialize pipeline.
+
+        Args:
+            pipeline_config: Pipeline configuration
+            engine: Engine type ('pandas' or 'spark')
+            connections: Available connections
+            generate_story: Whether to generate execution stories
+            story_config: Story generator configuration
+            retry_config: Retry configuration
+            alerts: Alert configurations
+            performance_config: Performance tuning configuration
+            catalog_manager: System Catalog Manager (Phase 1)
+            lineage_adapter: OpenLineage Adapter
+        """
+        self.config = pipeline_config
+        self.project_config = None  # Set by PipelineManager if available
+        self.engine_type = engine
+        self.connections = connections or {}
+        self.generate_story = generate_story
+        self.retry_config = retry_config
+        self.alerts = alerts or []
+        self.performance_config = performance_config
+        self.catalog_manager = catalog_manager
+        self.lineage = lineage_adapter
+
+        # Batch write buffers to collect catalog writes during execution
+        # These are flushed at pipeline end to eliminate concurrency conflicts
+        self._pending_lineage_records: List[Dict[str, Any]] = []
+        self._pending_asset_records: List[Dict[str, Any]] = []
+        self._pending_hwm_updates: List[Dict[str, Any]] = []
+        self._batch_mode_enabled: bool = True  # Enable batch mode by default
+
+        # Track async story futures for flush_stories()
+        self._story_future = None
+        self._story_executor = None
+
+        # Create logging context for this pipeline
+        self._ctx = create_logging_context(
+            pipeline_id=pipeline_config.pipeline,
+            engine=engine,
+        )
+
+        self._ctx.info(
+            f"Initializing pipeline: {pipeline_config.pipeline}",
+            engine=engine,
+            node_count=len(pipeline_config.nodes),
+            connections=list(self.connections.keys()) if self.connections else [],
+        )
+
+        # Initialize story generator
+        story_config = story_config or {}
+        self.story_config = story_config  # Store for async_generation check
+
+        self.story_generator = StoryGenerator(
+            pipeline_name=pipeline_config.pipeline,
+            max_sample_rows=story_config.get("max_sample_rows", 10),
+            output_path=story_config.get("output_path", "stories/"),
+            storage_options=story_config.get("storage_options", {}),
+            catalog_manager=catalog_manager,
+        )
+
+        # Initialize engine
+        engine_config = {}
+        if performance_config:
+            if hasattr(performance_config, "model_dump"):
+                engine_config["performance"] = performance_config.model_dump()
+            elif hasattr(performance_config, "dict"):
+                engine_config["performance"] = performance_config.model_dump()
+            else:
+                engine_config["performance"] = performance_config
+
+        try:
+            EngineClass = get_engine_class(engine)
+        except ValueError as e:
+            # Handle Spark special case message
+            if engine == "spark":
+                raise ImportError(
+                    "Spark engine not available. "
+                    "Install with 'pip install odibi[spark]' or ensure pyspark is installed."
+                )
+            raise e
+
+        if engine == "spark":
+            # SparkEngine can take existing session if needed, but here we let it create/get one
+            # We might need to pass connections to it for ADLS auth config
+            self.engine = EngineClass(connections=connections, config=engine_config)
+        else:
+            self.engine = EngineClass(config=engine_config)
+
+        self._ctx.debug(f"Engine initialized: {engine}")
+
+        # Initialize context
+        spark_session = getattr(self.engine, "spark", None)
+        self.context = create_context(engine, spark_session=spark_session)
+
+        # Build dependency graph
+        self.graph = DependencyGraph(pipeline_config.nodes)
+
+        # Log graph structure
+        layers = self.graph.get_execution_layers()
+        edge_count = sum(len(n.depends_on) for n in pipeline_config.nodes)
+        self._ctx.log_graph_operation(
+            operation="build",
+            node_count=len(pipeline_config.nodes),
+            edge_count=edge_count,
+            layer_count=len(layers),
+        )
+
+    def __enter__(self) -> "Pipeline":
+        """Context manager entry."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Context manager exit - cleanup connections."""
+        self._cleanup_connections()
+
+    def _cleanup_connections(self) -> None:
+        """Clean up all connection resources."""
+        if not self.connections:
+            return
+
+        for name, conn in self.connections.items():
+            if hasattr(conn, "close"):
+                try:
+                    conn.close()
+                    self._ctx.debug(f"Closed connection: {name}")
+                except Exception as e:
+                    self._ctx.warning(f"Failed to close connection {name}: {e}", exc_info=True)
+
+    @classmethod
+    def from_yaml(cls, yaml_path: str) -> "PipelineManager":
+        """Create PipelineManager from YAML file (recommended).
+
+        This method now returns a PipelineManager that can run all or specific pipelines.
+
+        Args:
+            yaml_path: Path to YAML configuration file
+
+        Returns:
+            PipelineManager instance (use .run() to execute)
+
+        Example:
+            >>> from odibi.pipeline import Pipeline
+            >>> manager = Pipeline.from_yaml("config.yaml")
+            >>> results = manager.run()  # Run all pipelines
+            >>> results = manager.run('bronze_to_silver')  # Run specific pipeline
+
+        Note:
+            For direct access to PipelineManager class:
+            >>> from odibi.pipeline import PipelineManager
+            >>> manager = PipelineManager.from_yaml("config.yaml")
+        """
+        # Delegate to PipelineManager
+        return PipelineManager.from_yaml(yaml_path)
+
+    def register_outputs(self) -> int:
+        """
+        Pre-register node outputs from pipeline config without running the pipeline.
+
+        Scans pipeline nodes for output locations (write blocks, merge/scd2 params)
+        and registers them to meta_outputs. This enables cross-pipeline references
+        without requiring the source pipeline to have run first.
+
+        Returns:
+            Number of outputs registered
+
+        Example:
+            >>> pipeline = Pipeline(config, engine="spark", catalog_manager=catalog)
+            >>> count = pipeline.register_outputs()
+            >>> print(f"Registered {count} outputs")
+        """
+        if not self.catalog_manager:
+            self._ctx.warning("No catalog_manager configured, cannot register outputs")
+            return 0
+
+        count = self.catalog_manager.register_outputs_from_config(self.config)
+        self._ctx.info(f"Pre-registered {count} outputs from pipeline config")
+        return count
+
+    def run(
+        self,
+        parallel: bool = False,
+        dry_run: bool = False,
+        resume_from_failure: bool = False,
+        max_workers: int = 4,
+        on_error: Optional[str] = None,
+        tag: Optional[str] = None,
+        node: Optional[Union[str, List[str]]] = None,
+        console: bool = False,
+    ) -> PipelineResults:
+        """Execute the pipeline.
+
+        Args:
+            parallel: Whether to use parallel execution
+            dry_run: Whether to simulate execution without running operations
+            resume_from_failure: Whether to skip successfully completed nodes from last run
+            max_workers: Maximum number of parallel threads (default: 4)
+            on_error: Override error handling strategy
+            tag: Filter nodes by tag (only nodes with this tag will run)
+            node: Run only specific node(s) by name - can be a string or list of strings
+            console: Whether to show rich console output with progress
+
+        Returns:
+            PipelineResults with execution details
+        """
+        start_time = time.time()
+        start_timestamp = datetime.now().isoformat()
+
+        # Generate run_id at start for observability (used by log_failure in nodes)
+        self._current_run_id = str(uuid.uuid4())
+
+        results = PipelineResults(pipeline_name=self.config.pipeline, start_time=start_timestamp)
+
+        # Set global logging context for this pipeline run
+        set_logging_context(self._ctx)
+
+        # Pre-register outputs so cross-pipeline references can resolve on first run
+        if self.catalog_manager:
+            try:
+                count = self.register_outputs()
+                if count > 0:
+                    self._ctx.debug(f"Pre-registered {count} outputs for reference resolution")
+            except Exception as e:
+                self._ctx.debug(f"Output pre-registration skipped: {e}")
+
+        # Get execution plan info for logging
+        layers = self.graph.get_execution_layers()
+        execution_order = self.graph.topological_sort()
+
+        # Apply node filters (--tag, --node)
+        filtered_nodes = set(execution_order)
+        if tag:
+            filtered_nodes = {name for name in filtered_nodes if tag in self.graph.nodes[name].tags}
+            self._ctx.info(f"Filtering by tag '{tag}': {len(filtered_nodes)} nodes match")
+        if node:
+            # Normalize to list
+            node_list = [node] if isinstance(node, str) else node
+            # Validate all nodes exist
+            missing = [n for n in node_list if n not in self.graph.nodes]
+            if missing:
+                available = ", ".join(self.graph.nodes.keys())
+                raise ValueError(f"Node(s) not found: {missing}. Available: {available}")
+            # Auto-include all upstream dependencies
+            filtered_nodes = set(node_list)
+            for n in node_list:
+                deps = self.graph.get_dependencies(n)
+                filtered_nodes.update(deps)
+            if len(filtered_nodes) > len(node_list):
+                dep_count = len(filtered_nodes) - len(node_list)
+                self._ctx.info(f"Running node(s): {node_list} (+ {dep_count} dependencies)")
+            else:
+                self._ctx.info(f"Running specific node(s): {node_list}")
+
+        # Update execution order to only include filtered nodes
+        execution_order = [n for n in execution_order if n in filtered_nodes]
+        layers = [[n for n in layer if n in filtered_nodes] for layer in layers]
+        layers = [layer for layer in layers if layer]  # Remove empty layers
+
+        self._ctx.info(
+            f"Starting pipeline: {self.config.pipeline}",
+            mode="parallel" if parallel else "serial",
+            dry_run=dry_run,
+            resume_from_failure=resume_from_failure,
+            node_count=len(self.graph.nodes),
+            layer_count=len(layers),
+            max_workers=max_workers if parallel else 1,
+        )
+
+        if parallel:
+            self._ctx.debug(
+                f"Parallel execution plan: {len(layers)} layers",
+                layers=[list(layer) for layer in layers],
+            )
+        else:
+            self._ctx.debug(
+                f"Serial execution order: {len(execution_order)} nodes",
+                order=execution_order,
+            )
+
+        # Initialize progress tracker for console output
+        progress: Optional[PipelineProgress] = None
+        if console:
+            progress = PipelineProgress(
+                pipeline_name=self.config.pipeline,
+                node_names=execution_order,
+                engine=self.engine_type,
+                layers=[list(layer) for layer in layers] if parallel else None,
+            )
+            progress.start()
+
+        # Alert: on_start
+        self._send_alerts("on_start", results)
+
+        # Lineage: Start
+        parent_run_id = None
+        if self.lineage:
+            parent_run_id = self.lineage.emit_pipeline_start(self.config)
+
+        # Drift Detection (Governance)
+        if self.catalog_manager:
+            try:
+                import hashlib
+                import json
+
+                # Calculate Local Hash
+                if hasattr(self.config, "model_dump"):
+                    dump = self.config.model_dump(mode="json")
+                else:
+                    dump = self.config.model_dump()
+                dump_str = json.dumps(dump, sort_keys=True)
+                local_hash = hashlib.md5(dump_str.encode("utf-8")).hexdigest()
+
+                # Get Remote Hash
+                remote_hash = self.catalog_manager.get_pipeline_hash(self.config.pipeline)
+
+                if remote_hash and remote_hash != local_hash:
+                    self._ctx.warning(
+                        "DRIFT DETECTED: Local pipeline differs from Catalog",
+                        local_hash=local_hash[:8],
+                        catalog_hash=remote_hash[:8],
+                        suggestion="Deploy changes using 'odibi deploy' before production",
+                    )
+                elif not remote_hash:
+                    self._ctx.info(
+                        "Pipeline not found in Catalog (Running un-deployed code)",
+                        catalog_status="not_deployed",
+                    )
+                else:
+                    self._ctx.debug(
+                        "Drift check passed",
+                        hash=local_hash[:8],
+                    )
+            except Exception as e:
+                self._ctx.debug(f"Drift detection check failed: {e}")
+
+        state_manager = None
+        if resume_from_failure:
+            self._ctx.info("Resume from failure enabled - checking previous run state")
+            if self.project_config:
+                try:
+                    backend = create_state_backend(
+                        config=self.project_config,
+                        project_root=".",
+                        spark_session=getattr(self.engine, "spark", None),
+                    )
+                    state_manager = StateManager(backend=backend)
+                    self._ctx.debug("StateManager initialized for resume capability")
+                except Exception as e:
+                    self._ctx.warning(
+                        f"Could not initialize StateManager: {e}",
+                        suggestion="Check state backend configuration",
+                    )
+            else:
+                self._ctx.warning(
+                    "Resume capability unavailable: Project configuration missing",
+                    suggestion="Ensure project config is set for resume support",
+                )
+
+        # Define node processing function (inner function to capture self/context)
+        def process_node(node_name: str) -> NodeResult:
+            node_ctx = self._ctx.with_context(node_id=node_name)
+
+            node_config = self.graph.nodes[node_name]
+            deps_failed_list = [dep for dep in node_config.depends_on if dep in results.failed]
+            deps_failed = len(deps_failed_list) > 0
+
+            if deps_failed:
+                node_ctx.warning(
+                    "Skipping node due to dependency failure",
+                    skipped=True,
+                    failed_dependencies=deps_failed_list,
+                    suggestion="Fix upstream node failures first",
+                )
+                return NodeResult(
+                    node_name=node_name,
+                    success=False,
+                    duration=0.0,
+                    metadata={"skipped": True, "reason": "dependency_failed"},
+                )
+
+            # Check for resume capability
+            if resume_from_failure and state_manager:
+                last_info = state_manager.get_last_run_info(self.config.pipeline, node_name)
+
+                can_resume = False
+                resume_reason = ""
+
+                if last_info and last_info.get("success"):
+                    last_hash = last_info.get("metadata", {}).get("version_hash")
+
+                    from odibi.utils.hashing import calculate_node_hash
+
+                    node_cfg = self.graph.nodes[node_name]
+                    current_hash = calculate_node_hash(node_cfg)
+
+                    if last_hash == current_hash:
+                        deps_ran = False
+                        for dep in node_config.depends_on:
+                            if dep in results.completed and dep not in results.skipped:
+                                deps_ran = True
+                                break
+
+                        if not deps_ran:
+                            can_resume = True
+                            resume_reason = "Previously succeeded and restored from storage"
+                        else:
+                            resume_reason = "Upstream dependency executed"
+                    else:
+                        resume_reason = (
+                            f"Configuration changed (Hash: {str(last_hash)[:7]}... "
+                            f"!= {str(current_hash)[:7]}...)"
+                        )
+                else:
+                    resume_reason = "No successful previous run found"
+
+                if can_resume:
+                    if node_config.write:
+                        try:
+                            temp_node = Node(
+                                config=node_config,
+                                context=self.context,
+                                engine=self.engine,
+                                connections=self.connections,
+                                performance_config=self.performance_config,
+                                pipeline_name=self.config.pipeline,
+                                project_config=self.project_config,
+                            )
+                            if temp_node.restore():
+                                node_ctx.info(
+                                    "Skipping node (restored from previous run)",
+                                    skipped=True,
+                                    reason="resume_from_failure",
+                                    version_hash=current_hash[:8],
+                                )
+                                result = NodeResult(
+                                    node_name=node_name,
+                                    success=True,
+                                    duration=0.0,
+                                    metadata={
+                                        "skipped": True,
+                                        "reason": "resume_from_failure",
+                                        "version_hash": current_hash,
+                                    },
+                                )
+                                return result
+                            else:
+                                node_ctx.debug(
+                                    "Re-running node: Restore failed",
+                                    reason="restore_failed",
+                                )
+                        except Exception as e:
+                            node_ctx.warning(
+                                f"Could not restore node: {e}",
+                                reason="restore_error",
+                            )
+                    else:
+                        node_ctx.debug(
+                            "Re-running node: In-memory transform (cannot be restored)",
+                            reason="no_write_config",
+                        )
+                else:
+                    node_ctx.debug(f"Re-running node: {resume_reason}")
+
+            # Lineage: Node Start
+            node_run_id = None
+            if self.lineage and parent_run_id:
+                node_run_id = self.lineage.emit_node_start(node_config, parent_run_id)
+
+            # Execute node with operation context
+            result = None
+            node_start = time.time()
+            node_ctx.debug(
+                "Executing node",
+                transformer=node_config.transformer,
+                has_read=bool(node_config.read),
+                has_write=bool(node_config.write),
+            )
+
+            try:
+                # Prepare batch write buffers for eliminating concurrency conflicts
+                batch_buffers = None
+                if self._batch_mode_enabled:
+                    batch_buffers = {
+                        "lineage": self._pending_lineage_records,
+                        "assets": self._pending_asset_records,
+                        "hwm": self._pending_hwm_updates,
+                    }
+
+                node = Node(
+                    config=node_config,
+                    context=self.context,
+                    engine=self.engine,
+                    connections=self.connections,
+                    dry_run=dry_run,
+                    retry_config=self.retry_config,
+                    catalog_manager=self.catalog_manager,
+                    performance_config=self.performance_config,
+                    pipeline_name=self.config.pipeline,
+                    batch_write_buffers=batch_buffers,
+                    config_file=node_config.source_yaml,
+                    run_id=self._current_run_id,
+                    project_config=self.project_config,
+                )
+                result = node.execute()
+
+                node_duration = time.time() - node_start
+                if result.success:
+                    node_ctx.info(
+                        "Node completed successfully",
+                        duration_ms=round(node_duration * 1000, 2),
+                        rows_processed=result.rows_processed,
+                    )
+                else:
+                    node_ctx.error(
+                        "Node execution failed",
+                        duration_ms=round(node_duration * 1000, 2),
+                        error=result.error,
+                    )
+
+            except Exception as e:
+                node_duration = time.time() - node_start
+                node_ctx.error(
+                    f"Node raised exception: {e}",
+                    duration_ms=round(node_duration * 1000, 2),
+                    error_type=type(e).__name__,
+                    suggestion="Check node configuration and input data",
+                )
+                result = NodeResult(node_name=node_name, success=False, duration=0.0, error=str(e))
+
+            # Lineage: Node Complete
+            if self.lineage and node_run_id:
+                self.lineage.emit_node_complete(node_config, result, node_run_id)
+
+            return result
+
+        if parallel:
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+
+            # NOTE: 'layers' already filtered by node/tag above - don't re-fetch from graph
+            self._ctx.info(
+                f"Starting parallel execution with {max_workers} workers",
+                total_layers=len(layers),
+                max_workers=max_workers,
+            )
+
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                for layer_idx, layer in enumerate(layers):
+                    layer_start = time.time()
+                    self._ctx.debug(
+                        f"Executing layer {layer_idx + 1}/{len(layers)}",
+                        layer_index=layer_idx,
+                        nodes_in_layer=list(layer),
+                        node_count=len(layer),
+                    )
+
+                    future_to_node = {
+                        executor.submit(process_node, node_name): node_name for node_name in layer
+                    }
+
+                    layer_failed = False
+                    for future in as_completed(future_to_node):
+                        node_name = future_to_node[future]
+                        try:
+                            result = future.result()
+                            results.node_results[node_name] = result
+
+                            if result.success:
+                                if result.metadata.get("skipped"):
+                                    if result.metadata.get("reason") == "dependency_failed":
+                                        results.skipped.append(node_name)
+                                        if progress:
+                                            progress.update_node(
+                                                node_name,
+                                                NodeStatus.SKIPPED,
+                                                result.duration,
+                                                result.rows_processed,
+                                            )
+                                    else:
+                                        results.completed.append(node_name)
+                                        if progress:
+                                            progress.update_node(
+                                                node_name,
+                                                NodeStatus.SKIPPED,
+                                                result.duration,
+                                                result.rows_processed,
+                                            )
+                                else:
+                                    results.completed.append(node_name)
+                                    if progress:
+                                        progress.update_node(
+                                            node_name,
+                                            NodeStatus.SUCCESS,
+                                            result.duration,
+                                            result.rows_processed,
+                                            result.metadata.get("phase_timings_ms"),
+                                        )
+                            else:
+                                if result.metadata.get("skipped"):
+                                    results.skipped.append(node_name)
+                                    if progress:
+                                        progress.update_node(
+                                            node_name,
+                                            NodeStatus.SKIPPED,
+                                            result.duration,
+                                            result.rows_processed,
+                                        )
+                                else:
+                                    results.failed.append(node_name)
+                                    layer_failed = True
+                                    if progress:
+                                        progress.update_node(
+                                            node_name,
+                                            NodeStatus.FAILED,
+                                            result.duration,
+                                            result.rows_processed,
+                                        )
+
+                                    node_config = self.graph.nodes[node_name]
+                                    strategy = (
+                                        ErrorStrategy(on_error)
+                                        if on_error
+                                        else node_config.on_error
+                                    )
+
+                                    if strategy == ErrorStrategy.FAIL_FAST:
+                                        self._ctx.error(
+                                            "FAIL_FAST triggered: Stopping pipeline",
+                                            failed_node=node_name,
+                                            error=result.error,
+                                            remaining_nodes=len(future_to_node) - 1,
+                                        )
+                                        executor.shutdown(cancel_futures=True, wait=False)
+                                        break
+
+                        except Exception as exc:
+                            self._ctx.error(
+                                "Node generated exception",
+                                node=node_name,
+                                error=str(exc),
+                                error_type=type(exc).__name__,
+                            )
+                            results.failed.append(node_name)
+                            layer_failed = True
+                            if progress:
+                                progress.update_node(node_name, NodeStatus.FAILED)
+
+                            node_config = self.graph.nodes[node_name]
+                            strategy = ErrorStrategy(on_error) if on_error else node_config.on_error
+                            if strategy == ErrorStrategy.FAIL_FAST:
+                                self._ctx.error(
+                                    "FAIL_FAST triggered: Stopping pipeline",
+                                    failed_node=node_name,
+                                )
+                                executor.shutdown(cancel_futures=True, wait=False)
+                                break
+
+                    layer_duration = time.time() - layer_start
+                    self._ctx.debug(
+                        f"Layer {layer_idx + 1} completed",
+                        layer_index=layer_idx,
+                        duration_ms=round(layer_duration * 1000, 2),
+                        layer_failed=layer_failed,
+                    )
+
+                    if layer_failed:
+                        for failed_node in results.failed:
+                            if self.graph.nodes[failed_node].on_error == ErrorStrategy.FAIL_FAST:
+                                return results
+
+        else:
+            self._ctx.info("Starting serial execution")
+            execution_order = self.graph.topological_sort()
+            for idx, node_name in enumerate(execution_order):
+                self._ctx.debug(
+                    f"Executing node {idx + 1}/{len(execution_order)}",
+                    node=node_name,
+                    order=idx + 1,
+                    total=len(execution_order),
+                )
+
+                result = process_node(node_name)
+                results.node_results[node_name] = result
+
+                if result.success:
+                    if (
+                        result.metadata.get("skipped")
+                        and result.metadata.get("reason") == "dependency_failed"
+                    ):
+                        results.skipped.append(node_name)
+                        results.failed.append(node_name)
+                        if progress:
+                            progress.update_node(
+                                node_name,
+                                NodeStatus.SKIPPED,
+                                result.duration,
+                                result.rows_processed,
+                            )
+                    else:
+                        results.completed.append(node_name)
+                        if progress:
+                            status = (
+                                NodeStatus.SKIPPED
+                                if result.metadata.get("skipped")
+                                else NodeStatus.SUCCESS
+                            )
+                            progress.update_node(
+                                node_name,
+                                status,
+                                result.duration,
+                                result.rows_processed,
+                            )
+                else:
+                    if result.metadata.get("skipped"):
+                        results.skipped.append(node_name)
+                        results.failed.append(node_name)
+                        if progress:
+                            progress.update_node(
+                                node_name,
+                                NodeStatus.SKIPPED,
+                                result.duration,
+                                result.rows_processed,
+                            )
+                    else:
+                        results.failed.append(node_name)
+                        if progress:
+                            progress.update_node(
+                                node_name,
+                                NodeStatus.FAILED,
+                                result.duration,
+                                result.rows_processed,
+                            )
+
+                        node_config = self.graph.nodes[node_name]
+                        strategy = ErrorStrategy(on_error) if on_error else node_config.on_error
+
+                        if strategy == ErrorStrategy.FAIL_FAST:
+                            self._ctx.error(
+                                "FAIL_FAST triggered: Stopping pipeline",
+                                failed_node=node_name,
+                                error=result.error,
+                                remaining_nodes=len(execution_order) - idx - 1,
+                            )
+                            break
+
+        # Calculate duration
+        results.duration = time.time() - start_time
+        results.end_time = datetime.now().isoformat()
+
+        # Batch write run records to catalog (much faster than per-node writes)
+        # Skip if performance.skip_run_logging is enabled
+        skip_run_logging = self.performance_config and getattr(
+            self.performance_config, "skip_run_logging", False
+        )
+        if self.catalog_manager and not skip_run_logging:
+            run_records = []
+            for node_result in results.node_results.values():
+                if node_result.metadata and "_run_record" in node_result.metadata:
+                    run_records.append(node_result.metadata.pop("_run_record"))
+            if run_records:
+                self.catalog_manager.log_runs_batch(run_records)
+                self._ctx.debug(
+                    f"Batch logged {len(run_records)} run records",
+                    record_count=len(run_records),
+                )
+
+            # Batch write output metadata for cross-pipeline dependencies
+            output_records = []
+            for node_result in results.node_results.values():
+                if node_result.metadata and "_output_record" in node_result.metadata:
+                    output_records.append(node_result.metadata.pop("_output_record"))
+            if output_records:
+                try:
+                    self.catalog_manager.register_outputs_batch(output_records)
+                    self._ctx.debug(
+                        f"Batch registered {len(output_records)} output(s)",
+                        output_count=len(output_records),
+                    )
+                except Exception as e:
+                    self._ctx.warning(
+                        f"Failed to register outputs (non-fatal): {e}",
+                        error_type=type(e).__name__,
+                    )
+
+            # Flush buffered catalog writes (lineage, assets, HWM)
+            self._flush_batch_writes()
+
+        elif skip_run_logging:
+            self._ctx.debug("Skipping run logging (skip_run_logging=true)")
+
+        # Finish progress display
+        if progress:
+            progress.finish(
+                completed=len(results.completed),
+                failed=len(results.failed),
+                skipped=len(results.skipped),
+                duration=results.duration,
+            )
+            # Print phase timing breakdown for performance analysis
+            progress.print_phase_timing_report(pipeline_duration_s=results.duration)
+
+        # Log pipeline completion summary
+        status = "SUCCESS" if not results.failed else "FAILED"
+        self._ctx.info(
+            f"Pipeline {status}: {self.config.pipeline}",
+            status=status,
+            duration_s=round(results.duration, 2),
+            completed=len(results.completed),
+            failed=len(results.failed),
+            skipped=len(results.skipped),
+            total_nodes=len(self.graph.nodes),
+        )
+
+        # =========================================================================
+        # LEVERAGE SUMMARY TABLES - Observability Logging
+        # =========================================================================
+        if self.catalog_manager and not dry_run:
+            import json
+            from datetime import timezone
+
+            from odibi.derived_updater import DerivedUpdater
+
+            run_id = self._current_run_id
+            now = datetime.now(timezone.utc)
+
+            # Parse start/end times from ISO strings
+            run_start_at = datetime.fromisoformat(results.start_time) if results.start_time else now
+            run_end_at = datetime.fromisoformat(results.end_time) if results.end_time else now
+
+            # Compute terminal nodes: nodes with no dependents in the DAG
+            # Terminal nodes = nodes that are NOT referenced as a dependency by any other node
+            terminal_node_names = []
+            rows_processed = None
+            try:
+                # Use full pipeline graph, not just executed nodes
+                all_pipeline_nodes = {n.name for n in self.config.nodes}
+                # Nodes referenced as upstream dependencies by other nodes
+                referenced_as_dependency = set()
+                for node_cfg in self.config.nodes:
+                    if node_cfg.depends_on:
+                        for dep in node_cfg.depends_on:
+                            referenced_as_dependency.add(dep)
+                # Terminal = nodes not referenced as dependency (leaf nodes)
+                terminal_node_names = sorted(all_pipeline_nodes - referenced_as_dependency)
+
+                # Sum rows_written for terminal nodes
+                # Sum available values - nodes without rows_written are treated as 0
+                terminal_rows_sum = 0
+                any_have_rows = False
+                for t_name in terminal_node_names:
+                    nr = results.node_results.get(t_name)
+                    if nr and nr.rows_written is not None:
+                        terminal_rows_sum += nr.rows_written
+                        any_have_rows = True
+
+                if terminal_node_names and any_have_rows:
+                    rows_processed = terminal_rows_sum
+                # else: rows_processed stays None (no nodes had row counts)
+            except Exception as term_ex:
+                self._ctx.debug(f"Terminal node detection failed: {term_ex}")
+                terminal_node_names = []
+                rows_processed = None
+
+            # Get first error summary
+            first_error = None
+            for fn in results.failed:
+                nr = results.node_results.get(fn)
+                if nr and nr.error:
+                    first_error = str(nr.error)[:500]
+                    break
+
+            # Build pipeline_run dict
+            # Fall back to project owner if pipeline owner not set
+            owner = getattr(self.config, "owner", None)
+            if not owner and self.project_config:
+                owner = getattr(self.project_config, "owner", None)
+
+            # Calculate estimated cost from duration and configured rate
+            estimated_cost_usd = None
+            cost_source = "none"
+            if self.project_config and hasattr(self.project_config, "system"):
+                system_config = getattr(self.project_config, "system", None)
+                if system_config:
+                    cost_per_hour = getattr(system_config, "cost_per_compute_hour", None)
+                    if cost_per_hour and results.duration:
+                        # duration is in seconds, convert to hours
+                        duration_hours = results.duration / 3600.0
+                        estimated_cost_usd = duration_hours * cost_per_hour
+                        cost_source = "configured_rate"
+
+            pipeline_run = {
+                "run_id": run_id,
+                "pipeline_name": self.config.pipeline,
+                "owner": owner,
+                "layer": getattr(self.config, "layer", None),
+                "run_start_at": run_start_at,
+                "run_end_at": run_end_at,
+                "duration_ms": int(results.duration * 1000),
+                "status": status,
+                "nodes_total": len(results.node_results),
+                "nodes_succeeded": len(results.completed),
+                "nodes_failed": len(results.failed),
+                "nodes_skipped": len(results.skipped),
+                "rows_processed": rows_processed,
+                "error_summary": first_error,
+                "terminal_nodes": ",".join(terminal_node_names) if terminal_node_names else None,
+                "environment": getattr(self.config, "environment", None),
+                "databricks_cluster_id": self._get_databricks_cluster_id(),
+                "databricks_job_id": self._get_databricks_job_id(),
+                "databricks_workspace_id": self._get_databricks_workspace_id(),
+                "estimated_cost_usd": estimated_cost_usd,
+                "actual_cost_usd": None,  # Populated by Databricks billing query if enabled
+                "cost_source": cost_source,
+                "created_at": now,
+            }
+
+            # Log pipeline run (wrapped to never fail pipeline)
+            try:
+                self.catalog_manager.log_pipeline_run(pipeline_run)
+                self._ctx.debug(f"Logged pipeline run {run_id}")
+            except Exception as e:
+                self._ctx.debug(f"Failed to log pipeline run (non-fatal): {e}")
+
+            # Build node_results list for meta_node_runs
+            node_run_records = []
+            environment = getattr(self.config, "environment", None)
+            for node_name, nr in results.node_results.items():
+                try:
+                    # Build metrics_json from metadata
+                    metrics = {}
+                    if nr.metadata:
+                        for k, v in nr.metadata.items():
+                            if k.startswith("_"):
+                                continue
+                            if isinstance(v, (str, int, float, bool, type(None))):
+                                metrics[k] = v
+                    metrics_json = json.dumps(metrics, default=str)
+
+                    # Calculate node-level estimated cost (proportional to duration)
+                    node_cost_usd = None
+                    if estimated_cost_usd and results.duration and nr.duration:
+                        node_cost_usd = estimated_cost_usd * (nr.duration / results.duration)
+
+                    node_run_records.append(
+                        {
+                            "run_id": run_id,
+                            "node_id": str(uuid.uuid4()),
+                            "pipeline_name": self.config.pipeline,
+                            "node_name": node_name,
+                            "status": "SUCCESS" if nr.success else "FAILURE",
+                            "run_start_at": run_start_at,  # Approximate, no per-node timing
+                            "run_end_at": run_end_at,
+                            "duration_ms": int(nr.duration * 1000) if nr.duration else 0,
+                            "rows_processed": nr.rows_processed,
+                            "estimated_cost_usd": node_cost_usd,
+                            "metrics_json": metrics_json,
+                            "environment": environment,
+                            "created_at": now,
+                        }
+                    )
+                except Exception as node_ex:
+                    self._ctx.debug(f"Failed to build node record for {node_name}: {node_ex}")
+
+            # Log node runs batch (wrapped to never fail pipeline)
+            try:
+                if node_run_records:
+                    self.catalog_manager.log_node_runs_batch(node_run_records)
+                    self._ctx.debug(f"Logged {len(node_run_records)} node runs")
+            except Exception as e:
+                self._ctx.debug(f"Failed to log node runs (non-fatal): {e}")
+
+            # Run derived updates (each wrapped independently)
+            try:
+                updater = DerivedUpdater(self.catalog_manager)
+                derived_updates = [
+                    ("meta_daily_stats", lambda: updater.update_daily_stats(run_id, pipeline_run)),
+                    ("meta_pipeline_health", lambda: updater.update_pipeline_health(pipeline_run)),
+                ]
+                freshness_sla = getattr(self.config, "freshness_sla", None)
+                if freshness_sla:
+                    freshness_anchor = getattr(self.config, "freshness_anchor", "run_completion")
+                    project_name = (
+                        getattr(self.project_config, "project", None)
+                        if self.project_config
+                        else None
+                    ) or "default"
+                    derived_updates.append(
+                        (
+                            "meta_sla_status",
+                            lambda: updater.update_sla_status(
+                                project_name,
+                                self.config.pipeline,
+                                owner,  # Uses owner from above (pipeline or project fallback)
+                                freshness_sla,
+                                freshness_anchor,
+                            ),
+                        )
+                    )
+                for dt, fn in derived_updates:
+                    updater.apply_derived_update(dt, run_id, fn)
+            except Exception as e:
+                self._ctx.debug(f"Derived updates failed (non-fatal): {e}")
+
+        # Start story generation in background thread (pure Python/file I/O, safe to parallelize)
+        # This runs concurrently with state saving below
+        story_future = None
+        story_executor = None
+        async_story = self.story_config.get("async_generation", False)
+
+        if self.generate_story:
+            from concurrent.futures import ThreadPoolExecutor
+
+            if hasattr(self.config, "model_dump"):
+                config_dump = self.config.model_dump(mode="json")
+            else:
+                config_dump = self.config.model_dump()
+
+            if self.project_config:
+                project_dump = (
+                    self.project_config.model_dump(mode="json")
+                    if hasattr(self.project_config, "model_dump")
+                    else self.project_config.model_dump()
+                )
+                for field in ["project", "plant", "asset", "business_unit", "layer"]:
+                    if field in project_dump and project_dump[field]:
+                        config_dump[field] = project_dump[field]
+
+            def generate_story():
+                try:
+                    # Get graph data for interactive DAG visualization
+                    graph_data_dict = self.graph.to_dict() if self.graph else None
+
+                    return self.story_generator.generate(
+                        node_results=results.node_results,
+                        completed=results.completed,
+                        failed=results.failed,
+                        skipped=results.skipped,
+                        duration=results.duration,
+                        start_time=results.start_time,
+                        end_time=results.end_time,
+                        context=self.context,
+                        config=config_dump,
+                        graph_data=graph_data_dict,
+                    )
+                except Exception as e:
+                    self._ctx.warning(f"Story generation failed: {e}")
+                    return None
+
+            story_executor = ThreadPoolExecutor(max_workers=1)
+            story_future = story_executor.submit(generate_story)
+
+        # Save state if running normally (not dry run)
+        # This runs while story generation happens in background
+        if not dry_run:
+            if not state_manager and self.project_config:
+                try:
+                    backend = create_state_backend(
+                        config=self.project_config,
+                        project_root=".",
+                        spark_session=getattr(self.engine, "spark", None),
+                    )
+                    state_manager = StateManager(backend=backend)
+                except Exception as e:
+                    self._ctx.warning(
+                        f"Could not initialize StateManager for saving run: {e}",
+                        suggestion="Check state backend configuration",
+                    )
+
+            if state_manager:
+                state_manager.save_pipeline_run(self.config.pipeline, results)
+                self._ctx.debug("Pipeline run state saved")
+
+        # Handle story completion based on async_generation setting
+        if story_future:
+            if async_story:
+                # Store future and executor for flush_stories()
+                self._story_future = story_future
+                self._story_executor = story_executor
+                self._ctx.debug("Story generation running async (can be flushed later)")
+            else:
+                # Wait for story generation to complete
+                try:
+                    story_path = story_future.result(timeout=60)
+                    if story_path:
+                        results.story_path = story_path
+                        self._ctx.info("Story generated", story_path=story_path)
+                except Exception as e:
+                    self._ctx.warning(f"Story generation failed: {e}")
+                finally:
+                    if story_executor:
+                        story_executor.shutdown(wait=False)
+
+        # Alert: on_success / on_failure
+        if results.failed:
+            self._send_alerts("on_failure", results)
+        else:
+            self._send_alerts("on_success", results)
+
+        # Catalog optimization (optional - can be slow, ~15-20s)
+        # Only run if explicitly enabled via optimize_catalog flag
+        if self.catalog_manager and getattr(self, "optimize_catalog", False):
+            self.catalog_manager.optimize()
+            self._ctx.debug("Catalog optimized")
+
+        # Catalog sync to secondary destination (if configured)
+        self._sync_catalog_if_configured()
+
+        # Lineage: Complete
+        if self.lineage:
+            self.lineage.emit_pipeline_complete(self.config, results)
+
+        return results
+
+    def flush_stories(self, timeout: float = 60.0) -> Optional[str]:
+        """Wait for any pending async story generation to complete.
+
+        Call this before operations that need story files to be written,
+        such as lineage generation.
+
+        Args:
+            timeout: Maximum seconds to wait for story generation
+
+        Returns:
+            Story path if generated, None otherwise
+        """
+        if self._story_future is None:
+            return None
+
+        try:
+            story_path = self._story_future.result(timeout=timeout)
+            self._ctx.info("Async story generation completed", story_path=story_path)
+            return story_path
+        except Exception as e:
+            self._ctx.warning(f"Async story generation failed: {e}")
+            return None
+        finally:
+            if self._story_executor:
+                self._story_executor.shutdown(wait=False)
+            self._story_future = None
+            self._story_executor = None
+
+    def _send_alerts(self, event: str, results: PipelineResults) -> None:
+        """Send alerts for a specific event.
+
+        Args:
+            event: Event name (on_start, on_success, on_failure)
+            results: Pipeline results
+        """
+        for alert_config in self.alerts:
+            event_values = [e.value if hasattr(e, "value") else e for e in alert_config.on_events]
+            if event in event_values:
+                status = "FAILED" if results.failed else "SUCCESS"
+                if event == "on_start":
+                    status = "STARTED"
+
+                context = {
+                    "pipeline": self.config.pipeline,
+                    "status": status,
+                    "duration": results.duration,
+                    "timestamp": datetime.now().isoformat(),
+                    "project_config": self.project_config,
+                    "event_type": event,
+                }
+
+                # Enrich with story summary (row counts, story URL)
+                if event != "on_start" and self.generate_story:
+                    story_summary = self.story_generator.get_alert_summary()
+                    context.update(story_summary)
+
+                msg = f"Pipeline '{self.config.pipeline}' {status}"
+                if results.failed:
+                    msg += f". Failed nodes: {', '.join(results.failed)}"
+
+                send_alert(alert_config, msg, context)
+
+    def buffer_lineage_record(self, record: Dict[str, Any]) -> None:
+        """Buffer a lineage record for batch write at pipeline end.
+
+        Args:
+            record: Dict with keys: source_table, target_table, target_pipeline,
+                    target_node, run_id, and optional source_pipeline, source_node
+        """
+        self._pending_lineage_records.append(record)
+
+    def buffer_asset_record(self, record: Dict[str, Any]) -> None:
+        """Buffer an asset registration record for batch write at pipeline end.
+
+        Args:
+            record: Dict with keys: project_name, table_name, path, format,
+                    pattern_type, and optional schema_hash
+        """
+        self._pending_asset_records.append(record)
+
+    def buffer_hwm_update(self, key: str, value: Any) -> None:
+        """Buffer a HWM update for batch write at pipeline end.
+
+        Args:
+            key: HWM state key
+            value: HWM value
+        """
+        self._pending_hwm_updates.append({"key": key, "value": value})
+
+    def _get_databricks_cluster_id(self) -> Optional[str]:
+        """Extract Databricks cluster ID from Spark context."""
+        try:
+            if hasattr(self.engine, "spark") and self.engine.spark:
+                return self.engine.spark.conf.get(
+                    "spark.databricks.clusterUsageTags.clusterId", None
+                )
+        except Exception:
+            pass
+        return None
+
+    def _get_databricks_job_id(self) -> Optional[str]:
+        """Extract Databricks job ID from Spark context."""
+        try:
+            if hasattr(self.engine, "spark") and self.engine.spark:
+                # Try job ID first, then run ID
+                job_id = self.engine.spark.conf.get("spark.databricks.job.id", None)
+                if job_id:
+                    return job_id
+                return self.engine.spark.conf.get("spark.databricks.job.runId", None)
+        except Exception:
+            pass
+        return None
+
+    def _get_databricks_workspace_id(self) -> Optional[str]:
+        """Extract Databricks workspace ID from Spark context or environment."""
+        import os
+
+        try:
+            if hasattr(self.engine, "spark") and self.engine.spark:
+                # Try multiple Spark config keys
+                for key in [
+                    "spark.databricks.workspaceId",
+                    "spark.databricks.workspaceUrl",
+                    "spark.databricks.clusterUsageTags.orgId",
+                ]:
+                    value = self.engine.spark.conf.get(key, None)
+                    if value:
+                        return value
+        except Exception:
+            pass
+
+        # Fallback to environment variables (set in Databricks jobs/notebooks)
+        for env_key in ["DATABRICKS_WORKSPACE_ID", "DATABRICKS_HOST"]:
+            value = os.environ.get(env_key)
+            if value:
+                # Extract workspace ID from host URL if needed
+                if "://" in value:
+                    # e.g., https://adb-1234567890.1.azuredatabricks.net -> adb-1234567890
+                    try:
+                        host = value.split("://")[1].split(".")[0]
+                        return host
+                    except Exception:
+                        return value
+                return value
+
+        return None
+
+    def _flush_batch_writes(self) -> None:
+        """Flush all buffered catalog writes in single batch operations.
+
+        This eliminates concurrency conflicts when running 35+ parallel nodes
+        by writing all lineage, assets, and HWM updates at once.
+        """
+        if not self.catalog_manager:
+            return
+
+        # Flush lineage records
+        if self._pending_lineage_records:
+            try:
+                self.catalog_manager.record_lineage_batch(self._pending_lineage_records)
+                self._ctx.debug(
+                    f"Batch recorded {len(self._pending_lineage_records)} lineage relationship(s)",
+                    lineage_count=len(self._pending_lineage_records),
+                )
+            except Exception as e:
+                self._ctx.warning(
+                    f"Failed to batch record lineage (non-fatal): {e}",
+                    error_type=type(e).__name__,
+                )
+            finally:
+                self._pending_lineage_records = []
+
+        # Flush asset records
+        if self._pending_asset_records:
+            try:
+                self.catalog_manager.register_assets_batch(self._pending_asset_records)
+                self._ctx.debug(
+                    f"Batch registered {len(self._pending_asset_records)} asset(s)",
+                    asset_count=len(self._pending_asset_records),
+                )
+            except Exception as e:
+                self._ctx.warning(
+                    f"Failed to batch register assets (non-fatal): {e}",
+                    error_type=type(e).__name__,
+                )
+            finally:
+                self._pending_asset_records = []
+
+        # Flush HWM updates
+        if self._pending_hwm_updates:
+            try:
+                if self.project_config:
+                    backend = create_state_backend(
+                        config=self.project_config,
+                        project_root=".",
+                        spark_session=getattr(self.engine, "spark", None),
+                    )
+                    state_manager = StateManager(backend=backend)
+                    state_manager.set_hwm_batch(self._pending_hwm_updates)
+                    self._ctx.debug(
+                        f"Batch updated {len(self._pending_hwm_updates)} HWM value(s)",
+                        hwm_count=len(self._pending_hwm_updates),
+                    )
+            except Exception as e:
+                self._ctx.warning(
+                    f"Failed to batch update HWM (non-fatal): {e}",
+                    error_type=type(e).__name__,
+                )
+            finally:
+                self._pending_hwm_updates = []
+
+    def _sync_catalog_if_configured(self) -> None:
+        """Sync catalog to secondary destination if sync_to is configured."""
+        if not self.catalog_manager:
+            return
+        if not self.project_config or not self.project_config.system:
+            return
+        if not self.project_config.system.sync_to:
+            return
+
+        sync_config = self.project_config.system.sync_to
+
+        # Only sync if on=after_run
+        if sync_config.on != "after_run":
+            return
+
+        try:
+            from odibi.catalog_sync import CatalogSyncer
+
+            # Get target connection
+            target_conn_name = sync_config.connection
+            target_conn = self.connections.get(target_conn_name)
+            if not target_conn:
+                self._ctx.warning(
+                    f"Sync target connection '{target_conn_name}' not found, skipping sync"
+                )
+                return
+
+            syncer = CatalogSyncer(
+                source_catalog=self.catalog_manager,
+                sync_config=sync_config,
+                target_connection=target_conn,
+                spark=getattr(self.engine, "spark", None),
+                environment=self.project_config.system.environment,
+            )
+
+            if sync_config.async_sync:
+                syncer.sync_async()
+                self._ctx.debug(f"Catalog sync started async to {target_conn_name}")
+            else:
+                results = syncer.sync()
+                success_count = sum(1 for r in results.values() if r.get("success"))
+                self._ctx.info(
+                    f"Catalog synced to {target_conn_name}",
+                    tables_synced=success_count,
+                    total_tables=len(results),
+                )
+
+        except Exception as e:
+            # Sync failures should never fail the pipeline
+            self._ctx.warning(
+                f"Catalog sync failed (non-fatal): {e}",
+                suggestion="Run 'odibi catalog sync' manually to retry",
+            )
+
+    def run_node(self, node_name: str, mock_data: Optional[Dict[str, Any]] = None) -> NodeResult:
+        """Execute a single node (for testing/debugging).
+
+        Args:
+            node_name: Name of node to execute
+            mock_data: Optional mock data to register in context
+
+        Returns:
+            NodeResult
+        """
+        if node_name not in self.graph.nodes:
+            available = ", ".join(self.graph.nodes.keys()) or "none"
+            raise ValueError(
+                f"Node '{node_name}' not found in pipeline. Available nodes: {available}"
+            )
+
+        # Register mock data if provided
+        if mock_data:
+            for name, data in mock_data.items():
+                self.context.register(name, data)
+
+        # Execute the node
+        node_config = self.graph.nodes[node_name]
+        node = Node(
+            config=node_config,
+            context=self.context,
+            engine=self.engine,
+            connections=self.connections,
+            performance_config=self.performance_config,
+            pipeline_name=self.config.pipeline,
+            config_file=node_config.source_yaml,
+        )
+
+        return node.execute()
+
+    def validate(self) -> Dict[str, Any]:
+        """Validate pipeline without executing.
+
+        Returns:
+            Validation results
+        """
+        self._ctx.info("Validating pipeline configuration")
+
+        validation = {
+            "valid": True,
+            "errors": [],
+            "warnings": [],
+            "node_count": len(self.graph.nodes),
+            "execution_order": [],
+        }
+
+        try:
+            execution_order = self.graph.topological_sort()
+            validation["execution_order"] = execution_order
+            self._ctx.debug(
+                "Dependency graph validated",
+                execution_order=execution_order,
+            )
+
+            for node_name, node in self.graph.nodes.items():
+                if node.transformer:
+                    # First check if it's a pattern (dimension, fact, scd2, etc.)
+                    from odibi.patterns import _PATTERNS
+
+                    if node.transformer in _PATTERNS:
+                        # Pattern validation is handled by the pattern class itself
+                        # Just verify it exists - detailed validation happens at runtime
+                        pass
+                    else:
+                        # It's a function from the registry
+                        try:
+                            FunctionRegistry.validate_params(node.transformer, node.params)
+                        except ValueError as e:
+                            validation["errors"].append(
+                                f"Node '{node_name}' transformer error: {e}"
+                            )
+                            validation["valid"] = False
+                            self._ctx.log_validation_result(
+                                passed=False,
+                                rule_name=f"transformer_params:{node_name}",
+                                failures=[str(e)],
+                            )
+
+                if node.transform and node.transform.steps:
+                    for i, step in enumerate(node.transform.steps):
+                        if isinstance(step, str):
+                            continue
+
+                        if hasattr(step, "function") and step.function:
+                            try:
+                                FunctionRegistry.validate_params(step.function, step.params)
+                            except ValueError as e:
+                                validation["errors"].append(
+                                    f"Node '{node_name}' step {i + 1} error: {e}"
+                                )
+                                validation["valid"] = False
+                                self._ctx.log_validation_result(
+                                    passed=False,
+                                    rule_name=f"step_params:{node_name}:step_{i + 1}",
+                                    failures=[str(e)],
+                                )
+
+        except DependencyError as e:
+            validation["valid"] = False
+            validation["errors"].append(str(e))
+            self._ctx.error(
+                "Dependency graph validation failed",
+                error=str(e),
+            )
+
+        for node in self.config.nodes:
+            if node.read and node.read.connection not in self.connections:
+                validation["warnings"].append(
+                    f"Node '{node.name}': connection '{node.read.connection}' not configured"
+                )
+            if node.write and node.write.connection not in self.connections:
+                validation["warnings"].append(
+                    f"Node '{node.name}': connection '{node.write.connection}' not configured"
+                )
+
+        self._ctx.info(
+            f"Validation {'passed' if validation['valid'] else 'failed'}",
+            valid=validation["valid"],
+            errors=len(validation["errors"]),
+            warnings=len(validation["warnings"]),
+        )
+
+        return validation
+
+    def get_execution_layers(self) -> List[List[str]]:
+        """Get nodes grouped by execution layers.
+
+        Returns:
+            List of layers, where each layer is a list of node names
+        """
+        return self.graph.get_execution_layers()
+
+    def visualize(self) -> str:
+        """Get text visualization of pipeline.
+
+        Returns:
+            String representation of pipeline graph
+        """
+        return self.graph.visualize()
+
+
+class PipelineManager:
+    """Manages multiple pipelines from a YAML configuration."""
+
+    def __init__(
+        self,
+        project_config: ProjectConfig,
+        connections: Dict[str, Any],
+    ):
+        """Initialize pipeline manager.
+
+        Args:
+            project_config: Validated project configuration
+            connections: Connection objects (already instantiated)
+        """
+        self.project_config = project_config
+        self.connections = connections
+        self._pipelines: Dict[str, Pipeline] = {}
+        self.catalog_manager = None
+        self.lineage_adapter = None
+
+        # Configure logging
+        configure_logging(
+            structured=project_config.logging.structured, level=project_config.logging.level.value
+        )
+
+        # Create manager-level logging context
+        self._ctx = create_logging_context(engine=project_config.engine)
+
+        self._ctx.info(
+            "Initializing PipelineManager",
+            project=project_config.project,
+            engine=project_config.engine,
+            pipeline_count=len(project_config.pipelines),
+            connection_count=len(connections),
+        )
+
+        # Initialize Lineage Adapter
+        self.lineage_adapter = OpenLineageAdapter(project_config.lineage)
+
+        # Initialize CatalogManager if configured
+        if project_config.system:
+            from odibi.catalog import CatalogManager
+
+            spark = None
+            engine_instance = None
+
+            if project_config.engine == "spark":
+                try:
+                    from odibi.engine.spark_engine import SparkEngine
+
+                    temp_engine = SparkEngine(connections=connections, config={})
+                    spark = temp_engine.spark
+                    self._ctx.debug("Spark session initialized for System Catalog")
+                except Exception as e:
+                    self._ctx.warning(
+                        f"Failed to initialize Spark for System Catalog: {e}",
+                        suggestion="Check Spark configuration",
+                    )
+
+            sys_conn = connections.get(project_config.system.connection)
+            if sys_conn:
+                base_path = sys_conn.get_path(project_config.system.path)
+
+                if not spark:
+                    try:
+                        from odibi.engine.pandas_engine import PandasEngine
+
+                        engine_instance = PandasEngine(config={})
+                        self._ctx.debug("PandasEngine initialized for System Catalog")
+                    except Exception as e:
+                        self._ctx.warning(
+                            f"Failed to initialize PandasEngine for System Catalog: {e}"
+                        )
+
+                if spark or engine_instance:
+                    self.catalog_manager = CatalogManager(
+                        spark=spark,
+                        config=project_config.system,
+                        base_path=base_path,
+                        engine=engine_instance,
+                        connection=sys_conn,
+                    )
+                    # Set project name for tagging all catalog records
+                    self.catalog_manager.project = project_config.project
+                    self.catalog_manager.bootstrap()
+                    self._ctx.info(
+                        "System Catalog initialized",
+                        path=base_path,
+                        project=project_config.project,
+                    )
+            else:
+                self._ctx.warning(
+                    f"System connection '{project_config.system.connection}' not found",
+                    suggestion="Configure the system connection in your config",
+                )
+
+        # Get story configuration
+        story_config = self._get_story_config()
+
+        # Create all pipeline instances
+        self._ctx.debug(
+            "Creating pipeline instances",
+            pipelines=[p.pipeline for p in project_config.pipelines],
+        )
+        for pipeline_config in project_config.pipelines:
+            pipeline_name = pipeline_config.pipeline
+
+            self._pipelines[pipeline_name] = Pipeline(
+                pipeline_config=pipeline_config,
+                engine=project_config.engine,
+                connections=connections,
+                generate_story=story_config.get("auto_generate", True),
+                story_config=story_config,
+                retry_config=project_config.retry,
+                alerts=project_config.alerts,
+                performance_config=project_config.performance,
+                catalog_manager=self.catalog_manager,
+                lineage_adapter=self.lineage_adapter,
+            )
+            self._pipelines[pipeline_name].project_config = project_config
+
+        self._ctx.info(
+            "PipelineManager ready",
+            pipelines=list(self._pipelines.keys()),
+        )
+
+    def _get_story_config(self) -> Dict[str, Any]:
+        """Build story config from project_config.story.
+
+        Resolves story output path using connection.
+
+        Returns:
+            Dictionary for StoryGenerator initialization
+        """
+        story_cfg = self.project_config.story
+
+        # Resolve story path using connection
+        story_conn = self.connections[story_cfg.connection]
+        output_path = story_conn.get_path(story_cfg.path)
+
+        # Get storage options (e.g., credentials) from connection if available
+        storage_options = {}
+        if hasattr(story_conn, "pandas_storage_options"):
+            storage_options = story_conn.pandas_storage_options()
+
+        return {
+            "auto_generate": story_cfg.auto_generate,
+            "max_sample_rows": story_cfg.max_sample_rows,
+            "output_path": output_path,
+            "storage_options": storage_options,
+            "async_generation": story_cfg.async_generation,
+        }
+
+    @classmethod
+    def from_yaml(cls, yaml_path: str, env: str = None) -> "PipelineManager":
+        """Create PipelineManager from YAML file.
+
+        Args:
+            yaml_path: Path to YAML configuration file
+            env: Environment name to apply overrides (e.g. 'prod')
+
+        Returns:
+            PipelineManager instance ready to run pipelines
+
+        Example:
+            >>> manager = PipelineManager.from_yaml("config.yaml", env="prod")
+            >>> results = manager.run()  # Run all pipelines
+        """
+        logger.info(f"Loading configuration from: {yaml_path}")
+
+        register_standard_library()
+
+        yaml_path_obj = Path(yaml_path)
+        config_dir = yaml_path_obj.parent.absolute()
+
+        import importlib.util
+        import os
+        import sys
+
+        def load_transforms_module(path):
+            if os.path.exists(path):
+                try:
+                    spec = importlib.util.spec_from_file_location("transforms_autodiscovered", path)
+                    if spec and spec.loader:
+                        module = importlib.util.module_from_spec(spec)
+                        sys.modules["transforms_autodiscovered"] = module
+                        spec.loader.exec_module(module)
+                        logger.info(f"Auto-loaded transforms from: {path}")
+                except Exception as e:
+                    logger.warning(f"Failed to auto-load transforms from {path}: {e}")
+
+        load_transforms_module(os.path.join(config_dir, "transforms.py"))
+
+        cwd = os.getcwd()
+        if os.path.abspath(cwd) != str(config_dir):
+            load_transforms_module(os.path.join(cwd, "transforms.py"))
+
+        try:
+            config = load_yaml_with_env(str(yaml_path_obj), env=env)
+            logger.debug("Configuration loaded successfully")
+        except FileNotFoundError:
+            logger.error(f"YAML file not found: {yaml_path}")
+            raise FileNotFoundError(
+                f"YAML file not found: {yaml_path}. "
+                f"Verify the file exists and consider using an absolute path."
+            )
+
+        project_config = ProjectConfig(**config)
+        logger.debug(
+            "Project config validated",
+            project=project_config.project,
+            pipelines=len(project_config.pipelines),
+        )
+
+        connections = cls._build_connections(project_config.connections)
+
+        return cls(
+            project_config=project_config,
+            connections=connections,
+        )
+
+    @staticmethod
+    def _build_connections(conn_configs: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+        """Convert connection configs to connection objects.
+
+        Args:
+            conn_configs: Connection configurations from ProjectConfig
+
+        Returns:
+            Dictionary of connection name -> connection object
+
+        Raises:
+            ValueError: If connection type is not supported
+        """
+        from odibi.connections.factory import register_builtins
+
+        logger.debug(f"Building {len(conn_configs)} connections")
+
+        connections = {}
+
+        register_builtins()
+        load_plugins()
+
+        for conn_name, conn_config in conn_configs.items():
+            if hasattr(conn_config, "model_dump"):
+                conn_config = conn_config.model_dump()
+            elif hasattr(conn_config, "dict"):
+                conn_config = conn_config.model_dump()
+
+            conn_type = conn_config.get("type", "local")
+
+            factory = get_connection_factory(conn_type)
+            if factory:
+                try:
+                    connections[conn_name] = factory(conn_name, conn_config)
+                    logger.debug(
+                        f"Connection created: {conn_name}",
+                        type=conn_type,
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Failed to create connection '{conn_name}'",
+                        type=conn_type,
+                        error=str(e),
+                    )
+                    raise ValueError(
+                        f"Failed to create connection '{conn_name}' (type={conn_type}): {e}"
+                    ) from e
+            else:
+                logger.error(
+                    f"Unsupported connection type: {conn_type}",
+                    connection=conn_name,
+                    suggestion="Check supported connection types in docs",
+                )
+                raise ValueError(
+                    f"Unsupported connection type: {conn_type}. "
+                    f"Supported types: local, azure_adls, azure_sql, delta, etc. "
+                    f"See docs for connection setup."
+                )
+
+        try:
+            from odibi.utils import configure_connections_parallel
+
+            connections, errors = configure_connections_parallel(connections, verbose=False)
+            if errors:
+                for error in errors:
+                    logger.warning(error)
+        except ImportError:
+            pass
+
+        logger.info(f"Built {len(connections)} connections successfully")
+
+        return connections
+
+    def register_outputs(
+        self,
+        pipelines: Optional[Union[str, List[str]]] = None,
+    ) -> Dict[str, int]:
+        """
+        Pre-register node outputs from pipeline configs without running them.
+
+        Scans pipeline nodes for output locations (write blocks, merge/scd2 params)
+        and registers them to meta_outputs. This enables cross-pipeline references
+        without requiring the source pipelines to have run first.
+
+        Args:
+            pipelines: Pipeline name(s) to register. If None, registers all pipelines.
+
+        Returns:
+            Dict mapping pipeline name to number of outputs registered
+
+        Example:
+            >>> manager = PipelineManager.from_yaml("pipelines.yaml")
+            >>> counts = manager.register_outputs("silver")  # Register just silver
+            >>> counts = manager.register_outputs()  # Register all pipelines
+        """
+        if pipelines is None:
+            pipeline_names = list(self._pipelines.keys())
+        elif isinstance(pipelines, str):
+            pipeline_names = [pipelines]
+        else:
+            pipeline_names = pipelines
+
+        results = {}
+        for name in pipeline_names:
+            if name not in self._pipelines:
+                self._ctx.warning(f"Pipeline not found: {name}")
+                continue
+
+            pipeline = self._pipelines[name]
+            count = pipeline.register_outputs()
+            results[name] = count
+
+        total = sum(results.values())
+        self._ctx.info(f"Pre-registered {total} outputs from {len(results)} pipelines")
+        return results
+
+    def run(
+        self,
+        pipelines: Optional[Union[str, List[str]]] = None,
+        dry_run: bool = False,
+        resume_from_failure: bool = False,
+        parallel: bool = False,
+        max_workers: int = 4,
+        on_error: Optional[str] = None,
+        tag: Optional[str] = None,
+        node: Optional[Union[str, List[str]]] = None,
+        console: bool = False,
+    ) -> Union[PipelineResults, Dict[str, PipelineResults]]:
+        """Run one, multiple, or all pipelines.
+
+        Args:
+            pipelines: Pipeline name(s) to run.
+            dry_run: Whether to simulate execution.
+            resume_from_failure: Whether to skip successfully completed nodes from last run.
+            parallel: Whether to run nodes in parallel.
+            max_workers: Maximum number of worker threads for parallel execution.
+            on_error: Override error handling strategy (fail_fast, fail_later, ignore).
+            tag: Filter nodes by tag (only nodes with this tag will run).
+            node: Run only specific node(s) by name - can be a string or list of strings.
+            console: Whether to show rich console output with progress.
+
+        Returns:
+            PipelineResults or Dict of results
+        """
+        if pipelines is None:
+            pipeline_names = list(self._pipelines.keys())
+        elif isinstance(pipelines, str):
+            pipeline_names = [pipelines]
+        else:
+            pipeline_names = pipelines
+
+        for name in pipeline_names:
+            if name not in self._pipelines:
+                available = ", ".join(self._pipelines.keys())
+                self._ctx.error(
+                    f"Pipeline not found: {name}",
+                    available=list(self._pipelines.keys()),
+                )
+                raise ValueError(f"Pipeline '{name}' not found. Available pipelines: {available}")
+
+        # Phase 2: Auto-register pipelines and nodes before execution
+        if self.catalog_manager:
+            self._auto_register_pipelines(pipeline_names)
+
+        self._ctx.info(
+            f"Running {len(pipeline_names)} pipeline(s)",
+            pipelines=pipeline_names,
+            dry_run=dry_run,
+            parallel=parallel,
+        )
+
+        results = {}
+        for idx, name in enumerate(pipeline_names):
+            # Invalidate cache before each pipeline so it sees latest outputs
+            if self.catalog_manager:
+                self.catalog_manager.invalidate_cache()
+
+            self._ctx.info(
+                f"Executing pipeline {idx + 1}/{len(pipeline_names)}: {name}",
+                pipeline=name,
+                order=idx + 1,
+            )
+
+            results[name] = self._pipelines[name].run(
+                dry_run=dry_run,
+                resume_from_failure=resume_from_failure,
+                parallel=parallel,
+                max_workers=max_workers,
+                on_error=on_error,
+                tag=tag,
+                node=node,
+                console=console,
+            )
+
+            result = results[name]
+            status = "SUCCESS" if not result.failed else "FAILED"
+            self._ctx.info(
+                f"Pipeline {status}: {name}",
+                status=status,
+                duration_s=round(result.duration, 2),
+                completed=len(result.completed),
+                failed=len(result.failed),
+            )
+
+            if result.story_path:
+                self._ctx.debug(f"Story generated: {result.story_path}")
+
+        # Generate combined lineage if configured
+        has_story = hasattr(self.project_config, "story") and self.project_config.story
+        generate_lineage_enabled = has_story and self.project_config.story.generate_lineage
+
+        self._ctx.debug(
+            "Lineage check",
+            has_story=has_story,
+            generate_lineage_enabled=generate_lineage_enabled,
+        )
+
+        if generate_lineage_enabled:
+            # Flush any pending async story writes before generating lineage
+            self._ctx.info("Generating combined lineage...")
+            self.flush_stories()
+
+            try:
+                lineage_result = generate_lineage(self.project_config)
+                if lineage_result:
+                    self._ctx.info(
+                        "Combined lineage generated",
+                        nodes=len(lineage_result.nodes),
+                        edges=len(lineage_result.edges),
+                        json_path=lineage_result.json_path,
+                    )
+                else:
+                    self._ctx.warning("Lineage generation returned None")
+            except Exception as e:
+                self._ctx.warning(f"Failed to generate combined lineage: {e}")
+
+        if len(pipeline_names) == 1:
+            return results[pipeline_names[0]]
+        else:
+            return results
+
+    def list_pipelines(self) -> List[str]:
+        """Get list of available pipeline names.
+
+        Returns:
+            List of pipeline names
+        """
+        return list(self._pipelines.keys())
+
+    def flush_stories(self, timeout: float = 60.0) -> Dict[str, Optional[str]]:
+        """Wait for all pending async story generation to complete.
+
+        Call this before operations that need story files to be written,
+        such as lineage generation with SemanticLayerRunner.
+
+        Args:
+            timeout: Maximum seconds to wait per pipeline
+
+        Returns:
+            Dict mapping pipeline name to story path (or None if no pending story)
+
+        Example:
+            >>> manager.run(pipelines=['bronze', 'silver', 'gold'])
+            >>> manager.flush_stories()  # Wait for all stories to be written
+            >>> semantic_runner.run()    # Now lineage can read the stories
+        """
+        results = {}
+        for name, pipeline in self._pipelines.items():
+            story_path = pipeline.flush_stories(timeout=timeout)
+            if story_path:
+                results[name] = story_path
+                self._ctx.debug(f"Story flushed for {name}", path=story_path)
+        if results:
+            self._ctx.info(f"Flushed {len(results)} pending story writes")
+        return results
+
+    def get_pipeline(self, name: str) -> Pipeline:
+        """Get a specific pipeline instance.
+
+        Args:
+            name: Pipeline name
+
+        Returns:
+            Pipeline instance
+
+        Raises:
+            ValueError: If pipeline not found
+        """
+        if name not in self._pipelines:
+            available = ", ".join(self._pipelines.keys())
+            raise ValueError(f"Pipeline '{name}' not found. Available: {available}")
+        return self._pipelines[name]
+
+    def deploy(self, pipelines: Optional[Union[str, List[str]]] = None) -> bool:
+        """Deploy pipeline definitions to the System Catalog.
+
+        This registers pipeline and node configurations in the catalog,
+        enabling drift detection and governance features.
+
+        Args:
+            pipelines: Optional pipeline name(s) to deploy. If None, deploys all.
+
+        Returns:
+            True if deployment succeeded, False otherwise.
+
+        Example:
+            >>> manager = PipelineManager.from_yaml("odibi.yaml")
+            >>> manager.deploy()  # Deploy all pipelines
+            >>> manager.deploy("sales_daily")  # Deploy specific pipeline
+        """
+        if not self.catalog_manager:
+            self._ctx.warning(
+                "System Catalog not configured. Cannot deploy.",
+                suggestion="Configure system catalog in your YAML config",
+            )
+            return False
+
+        if pipelines is None:
+            to_deploy = self.project_config.pipelines
+        elif isinstance(pipelines, str):
+            to_deploy = [p for p in self.project_config.pipelines if p.pipeline == pipelines]
+        else:
+            to_deploy = [p for p in self.project_config.pipelines if p.pipeline in pipelines]
+
+        if not to_deploy:
+            self._ctx.warning("No matching pipelines found to deploy.")
+            return False
+
+        self._ctx.info(
+            f"Deploying {len(to_deploy)} pipeline(s) to System Catalog",
+            pipelines=[p.pipeline for p in to_deploy],
+        )
+
+        try:
+            self.catalog_manager.bootstrap()
+
+            for pipeline_config in to_deploy:
+                self._ctx.debug(
+                    f"Deploying pipeline: {pipeline_config.pipeline}",
+                    node_count=len(pipeline_config.nodes),
+                )
+                self.catalog_manager.register_pipeline(pipeline_config, self.project_config)
+
+                for node in pipeline_config.nodes:
+                    self.catalog_manager.register_node(pipeline_config.pipeline, node)
+
+            self._ctx.info(
+                f"Deployment complete: {len(to_deploy)} pipeline(s)",
+                deployed=[p.pipeline for p in to_deploy],
+            )
+            return True
+
+        except Exception as e:
+            self._ctx.error(
+                f"Deployment failed: {e}",
+                error_type=type(e).__name__,
+                suggestion="Check catalog configuration and permissions",
+            )
+            return False
+
+    def _auto_register_pipelines(self, pipeline_names: List[str]) -> None:
+        """Auto-register pipelines and nodes before execution.
+
+        This ensures meta_pipelines and meta_nodes are populated automatically
+        when running pipelines, without requiring explicit deploy() calls.
+
+        Uses "check-before-write" pattern with batch writes for performance:
+        - Reads existing hashes in one read
+        - Compares version_hash to skip unchanged records
+        - Batch writes only changed/new records
+
+        Args:
+            pipeline_names: List of pipeline names to register
+        """
+        if not self.catalog_manager:
+            return
+
+        try:
+            import hashlib
+            import json
+
+            existing_pipelines = self.catalog_manager.get_all_registered_pipelines()
+            existing_nodes = self.catalog_manager.get_all_registered_nodes(pipeline_names)
+
+            pipeline_records = []
+            node_records = []
+
+            for name in pipeline_names:
+                pipeline = self._pipelines[name]
+                config = pipeline.config
+
+                if hasattr(config, "model_dump"):
+                    dump = config.model_dump(mode="json")
+                else:
+                    dump = config.model_dump()
+                dump_str = json.dumps(dump, sort_keys=True)
+                pipeline_hash = hashlib.md5(dump_str.encode("utf-8")).hexdigest()
+
+                if existing_pipelines.get(name) != pipeline_hash:
+                    all_tags = set()
+                    for node in config.nodes:
+                        if node.tags:
+                            all_tags.update(node.tags)
+
+                    pipeline_records.append(
+                        {
+                            "pipeline_name": name,
+                            "version_hash": pipeline_hash,
+                            "description": config.description or "",
+                            "layer": config.layer or "",
+                            "schedule": "",
+                            "tags_json": json.dumps(list(all_tags)),
+                        }
+                    )
+
+                pipeline_existing_nodes = existing_nodes.get(name, {})
+                for node in config.nodes:
+                    if hasattr(node, "model_dump"):
+                        node_dump = node.model_dump(
+                            mode="json", exclude={"description", "tags", "log_level"}
+                        )
+                    else:
+                        node_dump = node.model_dump(exclude={"description", "tags", "log_level"})
+                    node_dump_str = json.dumps(node_dump, sort_keys=True)
+                    node_hash = hashlib.md5(node_dump_str.encode("utf-8")).hexdigest()
+
+                    if pipeline_existing_nodes.get(node.name) != node_hash:
+                        node_type = "transform"
+                        if node.read:
+                            node_type = "read"
+                        if node.write:
+                            node_type = "write"
+
+                        node_records.append(
+                            {
+                                "pipeline_name": name,
+                                "node_name": node.name,
+                                "version_hash": node_hash,
+                                "type": node_type,
+                                "config_json": json.dumps(node_dump),
+                            }
+                        )
+
+            if pipeline_records:
+                self.catalog_manager.register_pipelines_batch(pipeline_records)
+                self._ctx.debug(
+                    f"Batch registered {len(pipeline_records)} changed pipeline(s)",
+                    pipelines=[r["pipeline_name"] for r in pipeline_records],
+                )
+            else:
+                self._ctx.debug("All pipelines unchanged - skipping registration")
+
+            if node_records:
+                self.catalog_manager.register_nodes_batch(node_records)
+                self._ctx.debug(
+                    f"Batch registered {len(node_records)} changed node(s)",
+                    nodes=[r["node_name"] for r in node_records],
+                )
+            else:
+                self._ctx.debug("All nodes unchanged - skipping registration")
+
+        except Exception as e:
+            self._ctx.warning(
+                f"Auto-registration failed (non-fatal): {e}",
+                error_type=type(e).__name__,
+            )
+
+    # -------------------------------------------------------------------------
+    # Phase 5: List/Query Methods
+    # -------------------------------------------------------------------------
+
+    def list_registered_pipelines(self) -> "pd.DataFrame":
+        """List all registered pipelines from the system catalog.
+
+        Returns:
+            DataFrame with pipeline metadata from meta_pipelines
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            self._ctx.warning("Catalog manager not configured")
+            return pd.DataFrame()
+
+        try:
+            df = self.catalog_manager._read_local_table(
+                self.catalog_manager.tables["meta_pipelines"]
+            )
+            return df
+        except Exception as e:
+            self._ctx.warning(f"Failed to list pipelines: {e}")
+            return pd.DataFrame()
+
+    def list_registered_nodes(self, pipeline: Optional[str] = None) -> "pd.DataFrame":
+        """List nodes from the system catalog.
+
+        Args:
+            pipeline: Optional pipeline name to filter by
+
+        Returns:
+            DataFrame with node metadata from meta_nodes
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            self._ctx.warning("Catalog manager not configured")
+            return pd.DataFrame()
+
+        try:
+            df = self.catalog_manager._read_local_table(self.catalog_manager.tables["meta_nodes"])
+            if not df.empty and pipeline:
+                df = df[df["pipeline_name"] == pipeline]
+            return df
+        except Exception as e:
+            self._ctx.warning(f"Failed to list nodes: {e}")
+            return pd.DataFrame()
+
+    def list_runs(
+        self,
+        pipeline: Optional[str] = None,
+        node: Optional[str] = None,
+        status: Optional[str] = None,
+        limit: int = 10,
+    ) -> "pd.DataFrame":
+        """List recent runs with optional filters.
+
+        Args:
+            pipeline: Optional pipeline name to filter by
+            node: Optional node name to filter by
+            status: Optional status to filter by (SUCCESS, FAILURE)
+            limit: Maximum number of runs to return
+
+        Returns:
+            DataFrame with run history from meta_runs
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            self._ctx.warning("Catalog manager not configured")
+            return pd.DataFrame()
+
+        try:
+            df = self.catalog_manager._read_local_table(self.catalog_manager.tables["meta_runs"])
+            if df.empty:
+                return df
+
+            if pipeline:
+                df = df[df["pipeline_name"] == pipeline]
+            if node:
+                df = df[df["node_name"] == node]
+            if status:
+                df = df[df["status"] == status]
+
+            if "timestamp" in df.columns:
+                df = df.sort_values("timestamp", ascending=False)
+
+            return df.head(limit)
+        except Exception as e:
+            self._ctx.warning(f"Failed to list runs: {e}")
+            return pd.DataFrame()
+
+    def list_tables(self) -> "pd.DataFrame":
+        """List registered assets from meta_tables.
+
+        Returns:
+            DataFrame with table/asset metadata
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            self._ctx.warning("Catalog manager not configured")
+            return pd.DataFrame()
+
+        try:
+            df = self.catalog_manager._read_local_table(self.catalog_manager.tables["meta_tables"])
+            return df
+        except Exception as e:
+            self._ctx.warning(f"Failed to list tables: {e}")
+            return pd.DataFrame()
+
+    # -------------------------------------------------------------------------
+    # Phase 5.2: State Methods
+    # -------------------------------------------------------------------------
+
+    def get_state(self, key: str) -> Optional[Dict[str, Any]]:
+        """Get a specific state entry (HWM, content hash, etc.).
+
+        Args:
+            key: The state key to look up
+
+        Returns:
+            Dictionary with state data or None if not found
+        """
+
+        if not self.catalog_manager:
+            return None
+
+        try:
+            df = self.catalog_manager._read_table(self.catalog_manager.tables["meta_state"])
+            if df.empty or "key" not in df.columns:
+                return None
+
+            row = df[df["key"] == key]
+            if row.empty:
+                return None
+
+            return row.iloc[0].to_dict()
+        except Exception:
+            return None
+
+    def get_all_state(self, prefix: Optional[str] = None) -> "pd.DataFrame":
+        """Get all state entries, optionally filtered by key prefix.
+
+        Args:
+            prefix: Optional key prefix to filter by
+
+        Returns:
+            DataFrame with state entries
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            return pd.DataFrame()
+
+        try:
+            df = self.catalog_manager._read_table(self.catalog_manager.tables["meta_state"])
+            if not df.empty and prefix and "key" in df.columns:
+                df = df[df["key"].str.startswith(prefix)]
+            return df
+        except Exception as e:
+            self._ctx.warning(f"Failed to get state: {e}")
+            return pd.DataFrame()
+
+    def clear_state(self, key: str) -> bool:
+        """Remove a state entry.
+
+        Args:
+            key: The state key to remove
+
+        Returns:
+            True if deleted, False otherwise
+        """
+        if not self.catalog_manager:
+            return False
+
+        try:
+            return self.catalog_manager.clear_state_key(key)
+        except Exception as e:
+            self._ctx.warning(f"Failed to clear state: {e}")
+            return False
+
+    # -------------------------------------------------------------------------
+    # Phase 5.3-5.4: Schema/Lineage and Stats Methods
+    # -------------------------------------------------------------------------
+
+    def get_schema_history(
+        self,
+        table: str,
+        limit: int = 5,
+    ) -> "pd.DataFrame":
+        """Get schema version history for a table.
+
+        Args:
+            table: Table identifier (supports smart path resolution)
+            limit: Maximum number of versions to return
+
+        Returns:
+            DataFrame with schema history
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            return pd.DataFrame()
+
+        try:
+            resolved_path = self._resolve_table_path(table)
+            history = self.catalog_manager.get_schema_history(resolved_path, limit)
+            return pd.DataFrame(history)
+        except Exception as e:
+            self._ctx.warning(f"Failed to get schema history: {e}")
+            return pd.DataFrame()
+
+    def get_lineage(
+        self,
+        table: str,
+        direction: str = "both",
+    ) -> "pd.DataFrame":
+        """Get lineage for a table.
+
+        Args:
+            table: Table identifier (supports smart path resolution)
+            direction: "upstream", "downstream", or "both"
+
+        Returns:
+            DataFrame with lineage relationships
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            return pd.DataFrame()
+
+        try:
+            resolved_path = self._resolve_table_path(table)
+
+            results = []
+            if direction in ("upstream", "both"):
+                upstream = self.catalog_manager.get_upstream(resolved_path)
+                for r in upstream:
+                    r["direction"] = "upstream"
+                results.extend(upstream)
+
+            if direction in ("downstream", "both"):
+                downstream = self.catalog_manager.get_downstream(resolved_path)
+                for r in downstream:
+                    r["direction"] = "downstream"
+                results.extend(downstream)
+
+            return pd.DataFrame(results)
+        except Exception as e:
+            self._ctx.warning(f"Failed to get lineage: {e}")
+            return pd.DataFrame()
+
+    def get_pipeline_status(self, pipeline: str) -> Dict[str, Any]:
+        """Get last run status, duration, timestamp for a pipeline.
+
+        Args:
+            pipeline: Pipeline name
+
+        Returns:
+            Dict with status info
+        """
+        if not self.catalog_manager:
+            return {}
+
+        try:
+            runs = self.list_runs(pipeline=pipeline, limit=1)
+            if runs.empty:
+                return {"status": "never_run", "pipeline": pipeline}
+
+            last_run = runs.iloc[0].to_dict()
+            return {
+                "pipeline": pipeline,
+                "last_status": last_run.get("status"),
+                "last_run_at": last_run.get("timestamp"),
+                "last_duration_ms": last_run.get("duration_ms"),
+                "last_node": last_run.get("node_name"),
+            }
+        except Exception as e:
+            self._ctx.warning(f"Failed to get pipeline status: {e}")
+            return {}
+
+    def get_node_stats(self, node: str, days: int = 7) -> Dict[str, Any]:
+        """Get average duration, row counts, success rate over period.
+
+        Args:
+            node: Node name
+            days: Number of days to look back
+
+        Returns:
+            Dict with node statistics
+        """
+        import pandas as pd
+
+        if not self.catalog_manager:
+            return {}
+
+        try:
+            avg_duration = self.catalog_manager.get_average_duration(node, days)
+
+            df = self.catalog_manager._read_local_table(self.catalog_manager.tables["meta_runs"])
+            if df.empty:
+                return {"node": node, "runs": 0}
+
+            if "timestamp" in df.columns:
+                cutoff = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=days)
+                if not pd.api.types.is_datetime64_any_dtype(df["timestamp"]):
+                    df["timestamp"] = pd.to_datetime(df["timestamp"])
+                if df["timestamp"].dt.tz is None:
+                    df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
+                df = df[df["timestamp"] >= cutoff]
+
+            node_runs = df[df["node_name"] == node]
+            if node_runs.empty:
+                return {"node": node, "runs": 0}
+
+            total = len(node_runs)
+            success = len(node_runs[node_runs["status"] == "SUCCESS"])
+            avg_rows = node_runs["rows_processed"].mean() if "rows_processed" in node_runs else None
+
+            return {
+                "node": node,
+                "runs": total,
+                "success_rate": success / total if total > 0 else 0,
+                "avg_duration_s": avg_duration,
+                "avg_rows": avg_rows,
+                "period_days": days,
+            }
+        except Exception as e:
+            self._ctx.warning(f"Failed to get node stats: {e}")
+            return {}
+
+    # -------------------------------------------------------------------------
+    # Phase 6: Smart Path Resolution
+    # -------------------------------------------------------------------------
+
+    def _resolve_table_path(self, identifier: str) -> str:
+        """Resolve a user-friendly identifier to a full table path.
+
+        Accepts:
+        - Relative path: "bronze/OEE/vw_OSMPerformanceOEE"
+        - Registered table: "test.vw_OSMPerformanceOEE"
+        - Node name: "opsvisdata_vw_OSMPerformanceOEE"
+        - Full path: "abfss://..." (used as-is)
+
+        Args:
+            identifier: User-friendly table identifier
+
+        Returns:
+            Full table path
+        """
+        if self._is_full_path(identifier):
+            return identifier
+
+        if self.catalog_manager:
+            resolved = self._lookup_in_catalog(identifier)
+            if resolved:
+                return resolved
+
+        for pipeline in self._pipelines.values():
+            for node in pipeline.config.nodes:
+                if node.name == identifier and node.write:
+                    conn = self.connections.get(node.write.connection)
+                    if conn:
+                        return conn.get_path(node.write.path or node.write.table)
+
+        sys_conn_name = (
+            self.project_config.system.connection if self.project_config.system else None
+        )
+        if sys_conn_name:
+            sys_conn = self.connections.get(sys_conn_name)
+            if sys_conn:
+                return sys_conn.get_path(identifier)
+
+        return identifier
+
+    def _is_full_path(self, identifier: str) -> bool:
+        """Check if identifier is already a full path."""
+        full_path_prefixes = ("abfss://", "s3://", "gs://", "hdfs://", "/", "C:", "D:")
+        return identifier.startswith(full_path_prefixes)
+
+    def _lookup_in_catalog(self, identifier: str) -> Optional[str]:
+        """Look up identifier in meta_tables catalog."""
+        if not self.catalog_manager:
+            return None
+
+        try:
+            df = self.catalog_manager._read_local_table(self.catalog_manager.tables["meta_tables"])
+            if df.empty or "table_name" not in df.columns:
+                return None
+
+            match = df[df["table_name"] == identifier]
+            if not match.empty and "path" in match.columns:
+                return match.iloc[0]["path"]
+
+            if "." in identifier:
+                parts = identifier.split(".", 1)
+                if len(parts) == 2:
+                    match = df[df["table_name"] == parts[1]]
+                    if not match.empty and "path" in match.columns:
+                        return match.iloc[0]["path"]
+
+        except Exception:
+            pass
+
+        return None
