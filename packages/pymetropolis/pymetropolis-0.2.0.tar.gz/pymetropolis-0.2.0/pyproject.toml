@@ -1,0 +1,55 @@
+# pyproject.toml
+
+[project]
+name = "pymetropolis"
+version = "0.2.0"
+description = "Helper functions to generate, calibrate, run, and analyze METROPOLIS2 simulation instances"
+readme = "README.md"
+authors = [{ name = "Lucas Javaudin", email = "lucas@lucasjavaudin.com" }]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE.txt"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["transport simulation", "metropolis2"]
+requires-python = ">=3.12"
+dependencies = [
+    "geopandas>=1.1.1",
+    "isodate>=0.7.2",
+    "loguru>=0.7.3",
+    "matplotlib>=3.10.8",
+    "networkx>=3.5",
+    "numpy>=2.3.4",
+    "osmium>=4.2.0",
+    "polars>=1.35.1",
+    "pyarrow>=22.0.0",
+    "pyproj>=3.7.2",
+    "pyogrio>=0.11.1",
+    "requests>=2.32.5",
+    "shapely>=2.1.2",
+    "termcolor>=3.2.0",
+    "typer>=0.20.0",
+    "toml>=0.10.2",
+    "typeguard>=4.4.4",
+]
+
+[project.urls]
+Homepage = "https://metropolis2.org"
+Documentation = "https://docs.metropolis2.org"
+Repository = "https://github.com/Metropolis2/pymetropolis"
+Issues = "https://github.com/Metropolis2/pymetropolis/issues"
+
+[project.scripts]
+pymetropolis = "pymetropolis:main"
+
+[dependency-groups]
+dev = [
+    "ipython>=8.37.0",
+    "pytest>=8.4.2",
+    "ruff>=0.14.3",
+]
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
