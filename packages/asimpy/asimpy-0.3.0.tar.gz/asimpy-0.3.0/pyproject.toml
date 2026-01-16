@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/asimpy"]
+
+[project]
+name = "asimpy"
+version = "0.3.0"
+requires-python = ">=3.13"
+authors = [
+    {name = "Greg Wilson", email = "gvwilson@third-bit.com"},
+]
+maintainers = [
+    {name = "Greg Wilson", email = "gvwilson@third-bit.com"},
+]
+description = "A simple discrete event simulator using async/await"
+keywords = ["open source", "discrete event simulation"]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.4.0",
+    "markdown-include>=0.8.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-awesome-pages-plugin>=2.10.1",
+    "mkdocs-material>=9.7.1",
+    "mkdocstrings[python]>=1.0.0",
+    "ruff>=0.14.10",
+    "taskipy>=1.14.1",
+    "twine>=6.2.0",
+    "ty>=0.0.11"
+]
+
+[tool.taskipy.tasks]
+build = {help = "build package", cmd = "python -m build"}
+check = {help = "check code issues", cmd = "ruff check ."}
+clean = {help = "clean up", cmd = """
+rm -rf ./dist &&
+find . -path './.venv' -prune -o -type d -name '__pycache__' -exec rm -rf {} + &&
+find . -path './.venv' -prune -o -type f -name '*~' -exec rm {} +
+"""}
+concat = {help = "concatenate files", cmd = """
+for f in src/asimpy/*.py
+do
+    echo '# ====' $f
+    echo ''
+    cat $f
+    echo ''
+done
+for f in examples/*.py
+do
+    echo '# ====' $f
+    echo ''
+    cat $f
+    echo ''
+    echo '# ----'
+    echo ''
+    cat output/$(basename $f .py).txt
+    echo ''
+done
+"""}
+docs = {help = "build documentation", cmd = "mkdocs build"}
+fix = {help = "fix code issues", cmd = "ruff check --fix ."}
+format = {help = "format code", cmd = "ruff format ."}
+lint = {help = "run all code checks", cmd = "task check && task types"}
+examples = {help = "regenerate example output", cmd = """
+mkdir -p output &&
+for file in examples/*.py
+do
+    name=$(basename "$file" .py)
+    python "$file" > "output/$name.txt" 2>&1
+done
+"""}
+publish = {help = "publish using ~/.pypirc credentials", cmd = "twine upload --verbose dist/*"}
+serve = {help = "serve documentation", cmd = "python -m http.server -d docs"}
+types = {help = "check types", cmd = "ty check ."}
