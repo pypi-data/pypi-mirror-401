@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claude-harness"
+version = "3.6.0"
+description = "Production-ready autonomous coding harness using Claude Code SDK"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    {name = "Nirmalarya", email = "hello@nirmalarya.com"}
+]
+keywords = ["claude", "autonomous", "coding", "agent", "ai", "sdk"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "claude-code-sdk>=0.0.25",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nirmalarya/claude-harness"
+Documentation = "https://github.com/nirmalarya/claude-harness/blob/main/README.md"
+Repository = "https://github.com/nirmalarya/claude-harness"
+Issues = "https://github.com/nirmalarya/claude-harness/issues"
+
+[project.scripts]
+claude-harness = "autonomous_agent:main"
+
+[tool.setuptools]
+packages = ["infra", "validators", "prompts", "harness_data"]
+py-modules = [
+    "agent",
+    "autonomous_agent",
+    "client",
+    "error_handler",
+    "loop_detector",
+    "lsp_plugins",
+    "output_formatter",
+    "progress",
+    "retry_manager",
+    "security",
+    "setup_mcp",
+    "skills_manager",
+]
+
+[tool.setuptools.package-data]
+"prompts" = ["*.md", "*.txt"]
+"harness_data" = [".claude/skills/**/*.md"]
+"*" = ["VERSION"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # function calls in argument defaults
+    "E722",  # bare except (existing patterns in codebase)
+    "W293",  # blank line contains whitespace
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+ignore_missing_imports = true
+no_implicit_optional = false
+allow_untyped_defs = true
+check_untyped_defs = false
