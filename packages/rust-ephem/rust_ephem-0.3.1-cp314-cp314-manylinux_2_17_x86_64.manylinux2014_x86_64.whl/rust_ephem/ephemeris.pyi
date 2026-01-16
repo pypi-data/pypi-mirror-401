@@ -1,0 +1,282 @@
+import abc
+from datetime import datetime
+from typing import Any
+
+import numpy as np
+import numpy.typing as npt
+
+from ._rust_ephem import (
+    GroundEphemeris as GroundEphemeris,
+)
+from ._rust_ephem import (
+    OEMEphemeris as OEMEphemeris,
+)
+from ._rust_ephem import (
+    PositionVelocityData,
+)
+from ._rust_ephem import (
+    SPICEEphemeris as SPICEEphemeris,
+)
+from ._rust_ephem import (
+    TLEEphemeris as TLEEphemeris,
+)
+
+class Ephemeris(abc.ABC):
+    @property
+    @abc.abstractmethod
+    def timestamp(self) -> npt.NDArray[np.datetime64]: ...
+    @property
+    @abc.abstractmethod
+    def gcrs_pv(self) -> PositionVelocityData: ...
+    @property
+    @abc.abstractmethod
+    def itrs_pv(self) -> PositionVelocityData: ...
+    @property
+    @abc.abstractmethod
+    def itrs(self) -> Any: ...  # Returns astropy.coordinates.SkyCoord
+    @property
+    @abc.abstractmethod
+    def gcrs(self) -> Any: ...  # Returns astropy.coordinates.SkyCoord
+    @property
+    @abc.abstractmethod
+    def earth(self) -> Any: ...  # Returns astropy.coordinates.SkyCoord
+    @property
+    @abc.abstractmethod
+    def sun(self) -> Any: ...  # Returns astropy.coordinates.SkyCoord
+    @property
+    @abc.abstractmethod
+    def moon(self) -> Any: ...  # Returns astropy.coordinates.SkyCoord
+    @property
+    @abc.abstractmethod
+    def sun_pv(self) -> PositionVelocityData: ...
+    @property
+    @abc.abstractmethod
+    def moon_pv(self) -> PositionVelocityData: ...
+    @property
+    @abc.abstractmethod
+    def obsgeoloc(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def obsgeovel(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def latitude(self) -> Any: ...  # Returns astropy.units.Quantity
+    @property
+    @abc.abstractmethod
+    def latitude_deg(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def latitude_rad(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def longitude(self) -> Any: ...  # Returns astropy.units.Quantity
+    @property
+    @abc.abstractmethod
+    def longitude_deg(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def longitude_rad(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def height(self) -> Any: ...  # Returns astropy.units.Quantity
+    @property
+    @abc.abstractmethod
+    def height_m(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def height_km(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def sun_radius(self) -> Any: ...  # Returns astropy.units.Quantity
+    @property
+    @abc.abstractmethod
+    def sun_radius_deg(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def moon_radius(self) -> Any: ...  # Returns astropy.units.Quantity
+    @property
+    @abc.abstractmethod
+    def moon_radius_deg(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def earth_radius(self) -> Any: ...  # Returns astropy.units.Quantity
+    @property
+    @abc.abstractmethod
+    def earth_radius_deg(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def sun_radius_rad(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def moon_radius_rad(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def earth_radius_rad(self) -> npt.NDArray[np.float64]: ...
+    @property
+    @abc.abstractmethod
+    def sun_ra_dec_deg(self) -> npt.NDArray[np.float64]:
+        """Right Ascension and Declination of the Sun in degrees.
+
+        Returns Nx2 array: column 0=RA [0,360), column 1=Dec [-90,90].
+        Cached for performance.
+        """
+        ...
+
+    @property
+    @abc.abstractmethod
+    def moon_ra_dec_deg(self) -> npt.NDArray[np.float64]:
+        """Right Ascension and Declination of the Moon in degrees.
+
+        Returns Nx2 array: column 0=RA [0,360), column 1=Dec [-90,90].
+        Cached for performance.
+        """
+        ...
+
+    @property
+    @abc.abstractmethod
+    def earth_ra_dec_deg(self) -> npt.NDArray[np.float64]:
+        """Right Ascension and Declination of the Earth in degrees.
+
+        Returns Nx2 array: column 0=RA [0,360), column 1=Dec [-90,90].
+        Cached for performance.
+        """
+        ...
+
+    @property
+    @abc.abstractmethod
+    def sun_ra_dec_rad(self) -> npt.NDArray[np.float64]:
+        """Right Ascension and Declination of the Sun in radians.
+
+        Returns Nx2 array: column 0=RA [0,2π), column 1=Dec [-π/2,π/2].
+        Cached for performance.
+        """
+        ...
+
+    @property
+    @abc.abstractmethod
+    def moon_ra_dec_rad(self) -> npt.NDArray[np.float64]:
+        """Right Ascension and Declination of the Moon in radians.
+
+        Returns Nx2 array: column 0=RA [0,2π), column 1=Dec [-π/2,π/2].
+        Cached for performance.
+        """
+        ...
+
+    @property
+    @abc.abstractmethod
+    def earth_ra_dec_rad(self) -> npt.NDArray[np.float64]:
+        """Right Ascension and Declination of the Earth in radians.
+
+        Returns Nx2 array: column 0=RA [0,2π), column 1=Dec [-π/2,π/2].
+        Cached for performance.
+        """
+        ...
+
+    @property
+    @abc.abstractmethod
+    def sun_ra_deg(self) -> npt.NDArray[np.float64]:
+        """Right Ascension of the Sun in degrees. Extracts column 0 from sun_ra_dec_deg."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def sun_dec_deg(self) -> npt.NDArray[np.float64]:
+        """Declination of the Sun in degrees. Extracts column 1 from sun_ra_dec_deg."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def moon_ra_deg(self) -> npt.NDArray[np.float64]:
+        """Right Ascension of the Moon in degrees. Extracts column 0 from moon_ra_dec_deg."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def moon_dec_deg(self) -> npt.NDArray[np.float64]:
+        """Declination of the Moon in degrees. Extracts column 1 from moon_ra_dec_deg."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def earth_ra_deg(self) -> npt.NDArray[np.float64]:
+        """Right Ascension of the Earth in degrees. Extracts column 0 from earth_ra_dec_deg."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def earth_dec_deg(self) -> npt.NDArray[np.float64]:
+        """Declination of the Earth in degrees. Extracts column 1 from earth_ra_dec_deg."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def sun_ra_rad(self) -> npt.NDArray[np.float64]:
+        """Right Ascension of the Sun in radians. Extracts column 0 from sun_ra_dec_rad."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def sun_dec_rad(self) -> npt.NDArray[np.float64]:
+        """Declination of the Sun in radians. Extracts column 1 from sun_ra_dec_rad."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def moon_ra_rad(self) -> npt.NDArray[np.float64]:
+        """Right Ascension of the Moon in radians. Extracts column 0 from moon_ra_dec_rad."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def moon_dec_rad(self) -> npt.NDArray[np.float64]:
+        """Declination of the Moon in radians. Extracts column 1 from moon_ra_dec_rad."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def earth_ra_rad(self) -> npt.NDArray[np.float64]:
+        """Right Ascension of the Earth in radians. Extracts column 0 from earth_ra_dec_rad."""
+        ...
+
+    @property
+    @abc.abstractmethod
+    def earth_dec_rad(self) -> npt.NDArray[np.float64]:
+        """Declination of the Earth in radians. Extracts column 1 from earth_ra_dec_rad."""
+        ...
+
+    @abc.abstractmethod
+    def index(self, time: datetime) -> int: ...
+    @abc.abstractmethod
+    def moon_illumination(
+        self, time_indices: list[int] | None = None
+    ) -> list[float]: ...
+    @abc.abstractmethod
+    def radec_to_altaz(
+        self, ra_deg: float, dec_deg: float, time_indices: list[int] | None = None
+    ) -> npt.NDArray[np.float64]: ...
+    @abc.abstractmethod
+    def calculate_airmass(
+        self, ra_deg: float, dec_deg: float, time_indices: list[int] | None = None
+    ) -> list[float]: ...
+    @abc.abstractmethod
+    def get_body_pv(
+        self, body: str, spice_kernel: str | None = ..., use_horizons: bool = ...
+    ) -> PositionVelocityData: ...
+    @abc.abstractmethod
+    def get_body(
+        self, body: str, spice_kernel: str | None = ..., use_horizons: bool = ...
+    ) -> Any: ...
+    @property
+    @abc.abstractmethod
+    def begin(self) -> datetime: ...
+    @property
+    @abc.abstractmethod
+    def end(self) -> datetime: ...
+    @property
+    @abc.abstractmethod
+    def step_size(self) -> int: ...
+    @property
+    @abc.abstractmethod
+    def polar_motion(self) -> bool: ...
+
+EphemerisType = TLEEphemeris | SPICEEphemeris | OEMEphemeris | GroundEphemeris
