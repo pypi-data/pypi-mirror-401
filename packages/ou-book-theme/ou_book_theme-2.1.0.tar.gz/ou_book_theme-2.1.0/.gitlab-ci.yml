@@ -1,0 +1,168 @@
+stages:
+  - build
+  - test
+  - publish
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+build-theme:
+  image:
+    name: node:20
+    pull_policy: if-not-present
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - ou_book_theme
+    expire_in: 300 seconds
+  interruptible: true
+
+build-package:
+  image:
+    name: python:3.11
+    pull_policy: if-not-present
+  stage: build
+  script:
+    - pip install hatch "click!=8.3.0"
+    - hatch build
+  dependencies:
+    - build-theme
+  needs:
+    - build-theme
+  artifacts:
+    paths:
+      - dist
+    expire_in: 300 seconds
+  interruptible: true
+
+build-docs-nodemodules:
+  image:
+    name: node:22
+    pull_policy: if-not-present
+  stage: build
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules
+    expire_in: 300 seconds
+
+build-docs:
+  image:
+    name: python:3.11
+    pull_policy: if-not-present
+  stage: build
+  script:
+    - apt-get update
+    - apt-get install -y nodejs npm ca-certificates fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils texlive latexmk texlive-xetex texlive-fonts-extra
+    - npm install
+    - export PATH="$PATH":node_modules/.bin
+    - npx puppeteer browsers install chrome-headless-shell
+    - "echo '{\"args\": [\"--no-sandbox\"]}' > puppeteer-config.json"
+    - "echo 'mermaid_cmd = \"mmdc -p puppeteer-config.json\"' >> docs/conf.py"
+    - pip install hatch "click!=8.3.0"
+    - hatch run python -m ou_book_theme build docs --output-format pdf
+    - mv docs/_build/latex/oubooktheme.pdf docs/_static/
+    - hatch run python -m ou_book_theme build docs
+    - cd docs/_build
+    - tar -jcf docs.tar.bz2 html
+  dependencies:
+    - build-theme
+    - build-docs-nodemodules
+  needs:
+    - build-theme
+    - build-docs-nodemodules
+  artifacts:
+    paths:
+      - docs/_build
+    expire_in: 300 seconds
+  interruptible: true
+
+run-tests:
+  image:
+    name: python:$PYTHON_VERSION
+    pull_policy: if-not-present
+  stage: test
+  script:
+    - pip install hatch "click!=8.3.0"
+    - hatch run cov --junitxml=junit.xml
+    - hatch run coverage xml
+  parallel:
+    matrix:
+     - PYTHON_VERSION:
+        - "3.10"
+        - "3.11"
+        - "3.12"
+        - "3.13"
+  dependencies:
+    - build-theme
+  artifacts:
+    when: always
+    paths:
+      - junit.xml
+      - coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: junit.xml
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  interruptible: true
+
+run-lint:
+  image:
+    name: python:3.11
+    pull_policy: if-not-present
+  stage: test
+  script:
+    - pip install hatch "click!=8.3.0"
+    - hatch run style-check
+  interruptible: true
+
+sast:
+  stage: test
+  interruptible: true
+
+publish-package:
+  image:
+    name: python:3.11
+    pull_policy: if-not-present
+  stage: publish
+  script:
+    - pip install hatch "click!=8.3.0"
+    - hatch publish --user __token__ --auth $PYPI_AUTH_TOKEN
+  dependencies:
+    - build-package
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^v[0-9]+\\.[0-9]+\\.[0-9]+(b[0-9]+)?$/"
+
+publish-dev-docs:
+  image:
+    name: quay.io/curl/curl:latest
+    pull_policy: if-not-present
+  stage: publish
+  script:
+    - cd docs/_build
+    - 'curl -X PUT -H "Authorization: Bearer $DOCS_TOKEN" -F "archive=@docs.tar.bz2"
+      https://docs-api.ocl.open.ac.uk/upload/ou-book-theme/latest'
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  interruptible: true
+
+publish-docs:
+  image:
+    name: quay.io/curl/curl:latest
+    pull_policy: if-not-present
+  stage: publish
+  script:
+    - export MAJOR_VERSION=`echo ${CI_COMMIT_TAG} | cut -d "." -f1`
+    - cd docs/_build
+    - 'curl -X PUT -H "Authorization: Bearer $DOCS_TOKEN" -F "archive=@docs.tar.bz2"
+      https://docs-api.ocl.open.ac.uk/upload/ou-book-theme/$MAJOR_VERSION'
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^v[0-9]+\\.[0-9]+\\.[0-9]+(b[0-9]+)?$/"

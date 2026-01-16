@@ -1,0 +1,82 @@
+\usepackage{tcolorbox}
+
+% Define custom fonts
+\usepackage{fontspec}
+\setfontfamily{\poppinsbold}{Poppins-Bold.ttf}
+
+% Define custom colours
+\usepackage[dvipsnames]{xcolor}
+\definecolor{ou-primary-blue}{RGB}{36,40,92}
+\definecolor{ou-error}{RGB}{163,30,33}
+
+\renewcommand{\sffamily}{\fontspec{Poppins}[
+    Extension = .ttf ,
+    UprightFont = *-Regular ,
+    BoldFont = *-Bold ,
+    ItalicFont = *-Italic ,
+    BoldItalicFont = *-BoldItalic
+  ]}
+
+% OU title page definition
+\renewcommand{\maketitle}{%
+  \setmainfont{Poppins}[
+    Extension = .ttf ,
+    UprightFont = *-Regular ,
+    BoldFont = *-Bold ,
+    ItalicFont = *-Italic ,
+    BoldItalicFont = *-BoldItalic
+  ]
+
+  \thispagestyle{empty}
+
+  \hspace{0.75\textwidth}%
+  \begin{minipage}[c][1.3cm][t]{0.25\textwidth}
+    \includegraphics[width=5cm]{ou_primary_logo.png}
+  \end{minipage} \\
+
+  \vspace{4em}
+  {\Huge\color{ou-primary-blue} \@title} \\
+}
+
+% Configure the chapter headings
+\renewcommand{\DOCH}{}
+\renewcommand{\DOTI}[1]{%
+\LARGE\color{ou-primary-blue}\thechapter\hspace{0.8em}\FmTi{#1}\par\nobreak
+\vskip 5\p@}
+
+% Configure the section headings
+\titleformat{\section}
+  {\normalfont\sffamily\Large\color{ou-primary-blue}}
+  {\thesection}{0.8em}{}
+\titleformat{\subsection}
+  {\normalfont\sffamily\large\color{ou-primary-blue}}
+  {\thesubsection}{0.8em}{}
+
+% OU Box line
+\newcommand{\ouboxline}{{\par\noindent\color{ou-primary-blue}\rule{\textwidth}{0.4pt}\par}}
+
+% Activity environments
+\newenvironment{ou-activity}
+  {\vspace{0.4em}\ouboxline\nopagebreak\vspace{0.4em}\color{ou-primary-blue}}
+  {\nopagebreak\ouboxline\vspace{0.4em}}
+
+\newcommand{\ouactivitytitle}[1]{{\large #1}}
+\newenvironment{ou-activity-answer}{\vspace{0.8em}{\large Activity Answer}}{}
+
+% Time command
+\newcommand{\outime}[1]{\faIcon{clock} {\small\textit{#1}}\par}
+
+% Video environment
+\newenvironment{ou-video}[1]
+  {\vspace{0.4em}\ouboxline\nopagebreak\vspace{0.4em}{\large\color{ou-primary-blue} Video}\par\url{#1}\par\vspace{0.8em}\noindent{\large\color{ou-primary-blue} Transcript}}
+  {\nopagebreak\ouboxline\vspace{0.4em}}
+
+% Where next environment
+\newenvironment{ou-where-next}
+  {\vspace{0.4em}\ouboxline\nopagebreak\vspace{0.4em}\faIcon[regular]{hand-point-right}\hspace{0.8em}{\large\color{ou-primary-blue} Where next?}}
+  {\nopagebreak\ouboxline\vspace{0.4em}}
+
+% Erratum environment
+\newenvironment{ou-erratum}[1]
+  {\vspace{0.4em}\ouboxline\nopagebreak\vspace{0.4em}\faIcon{eraser}\hspace{0.8em}{\color{ou-error}\textbf{#1}}}
+  {\nopagebreak\ouboxline\vspace{0.4em}}
