@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "councillm"
+version = "1.0"
+description = "Local LLM Council powered by Ollama"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "LICENSE" }
+
+authors = [
+  { name = "Raktim Kalita ", email = "raktmxx@gmail.com" }
+]
+
+dependencies = [
+  "ollama",
+  "httpx",
+  "textual",
+  "ddgs"
+]
+
+[project.scripts]
+councillm = "councillm.cli:run"
+
+# [project.scripts]
+# councillm = "councillm.cli:main"
