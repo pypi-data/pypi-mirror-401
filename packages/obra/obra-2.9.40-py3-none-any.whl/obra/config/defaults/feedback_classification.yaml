@@ -1,0 +1,202 @@
+# Feedback Classification Configuration (Obra Defaults - Tier 1)
+# Part of FEEDBACK-TRIAGE-001: Feedback Triage Orchestration System
+#
+# This config defines rules for automated triage of user feedback (bugs, enhancements, questions).
+# Customers can override these rules by creating .obra/config/feedback_classification.yaml
+#
+# Configuration priority: Customer (Tier 0) > Obra (Tier 1) > SOTA (Tier 2) > Baseline (Tier 3)
+
+# Valid feedback types
+feedback_types:
+  - bug          # Software defects, crashes, errors
+  - enhancement  # Feature requests, improvements
+  - question     # Support questions, documentation gaps
+
+# Spam detection rules
+spam_detection:
+  # Minimum description length (characters)
+  min_length: 10
+
+  # Regex patterns that indicate spam/test submissions
+  patterns:
+    - regex: '^test+$'
+      reason: "Test submission (only contains 'test')"
+    - regex: '^(a+|b+|c+)$'
+      reason: "Keyboard spam (repeated single character)"
+    - regex: '^\d+$'
+      reason: "Only contains numbers"
+    - regex: '^(hello|hi|hey)$'
+      reason: "Greeting only, no content"
+    - regex: '^(\.+|,+|;+)$'
+      reason: "Only contains punctuation"
+
+# Quality scoring weights (sum to 100)
+quality_scoring:
+  weights:
+    description_length: 20      # Longer descriptions are more helpful
+    has_repro_steps: 30          # Reproducible bugs are high priority
+    has_error_message: 25        # Error messages aid diagnosis
+    includes_context: 15         # Environment/session info valuable
+    clear_language: 10           # Coherent writing, proper grammar
+
+  # Minimum score thresholds
+  thresholds:
+    reject: 20         # Below this, auto-reject
+    low_quality: 40    # Needs improvement but processable
+    acceptable: 60     # Good quality
+    excellent: 80      # Exceptionally detailed
+
+  # Scoring rules for description_length (characters)
+  length_scoring:
+    - range: [0, 10]
+      score: 0
+    - range: [11, 50]
+      score: 5
+    - range: [51, 100]
+      score: 10
+    - range: [101, 200]
+      score: 15
+    - range: [201, 999999]
+      score: 20
+
+# Severity detection rules
+severity_detection:
+  # P0: Critical - System down, data loss, security breach
+  critical_keywords:
+    - crash
+    - data loss
+    - security
+    - vulnerability
+    - cannot start
+    - cannot run
+    - completely broken
+    - production down
+    - authentication bypass
+
+  # P1: High - Major feature broken, workaround exists
+  high_keywords:
+    - broken
+    - fails
+    - error
+    - exception
+    - timeout
+    - cannot access
+    - not working
+
+  # P2: Medium - Minor feature issue, cosmetic bugs
+  medium_keywords:
+    - slow
+    - confusing
+    - unclear
+    - minor issue
+    - display issue
+    - typo
+    - formatting
+
+  # P3: Low - Enhancement requests, nice-to-haves
+  low_keywords:
+    - enhancement
+    - feature request
+    - suggestion
+    - could
+    - should
+    - would be nice
+    - improvement
+
+# Duplicate detection configuration
+duplicate_detection:
+  # Minimum similarity score to flag as potential duplicate (0.0 - 1.0)
+  similarity_threshold: 0.7
+
+  # Fields to compare for similarity
+  compare_fields:
+    - title
+    - description
+    - error_hash
+
+  # Maximum age (days) to check for duplicates
+  # Older issues are less likely to be duplicates
+  max_age_days: 90
+
+# Escalation rules for human review
+escalation:
+  # Minimum confidence score for auto-classification (0.0 - 1.0)
+  # Below this threshold, escalate to human review
+  confidence_threshold: 0.8
+
+  # Auto-escalate conditions (always require human review)
+  auto_escalate:
+    - condition: severity_p0
+      reason: "Critical severity requires immediate human attention"
+    - condition: quality_score_below_40
+      reason: "Low quality may indicate spam or unclear requirements"
+    - condition: possible_duplicate
+      reason: "Duplicate consolidation requires human judgment"
+    - condition: classification_ambiguous
+      reason: "Cannot determine type with high confidence"
+
+# Type classification hints
+# Keywords that suggest the feedback is a specific type
+type_classification:
+  bug_indicators:
+    - error
+    - exception
+    - crash
+    - broken
+    - fails
+    - not working
+    - unexpected
+    - incorrect
+    - wrong
+
+  enhancement_indicators:
+    - feature
+    - add
+    - support
+    - improve
+    - enhancement
+    - would like
+    - suggestion
+    - could
+
+  question_indicators:
+    - how
+    - what
+    - why
+    - where
+    - when
+    - question
+    - help
+    - explain
+    - clarify
+
+# Routing rules (where to send classified feedback)
+routing:
+  bug:
+    destination: "docs/quality/MANUAL_TESTING_LOG.json"
+    requires_review: false  # Unless escalated
+
+  enhancement:
+    destination: "docs/development/backlog/ENHANCEMENTS.yaml"
+    requires_review: true   # Always review enhancements before adding to backlog
+
+  question:
+    destination: "docs/support/QUESTIONS.yaml"  # Future: FAQ generation
+    requires_review: true
+
+# Notification rules (when to notify users)
+notifications:
+  enabled: true
+
+  # Events that trigger user notification
+  notify_on:
+    - promoted_to_tracker    # Feedback promoted to bug tracker
+    - resolved               # Issue was fixed/addressed
+    - rejected               # Marked as spam/duplicate/invalid
+    - reclassified           # Changed from bug to enhancement, etc.
+    - needs_more_info        # Waiting for user clarification
+
+  # Don't spam users
+  rate_limit:
+    max_per_day: 5
+    max_per_week: 20

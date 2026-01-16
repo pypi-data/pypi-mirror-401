@@ -1,0 +1,138 @@
+# Feedback & Telemetry Configuration (Obra Defaults - Tier 1)
+# Part of FEEDBACK-TRIAGE-001: Feedback Triage Orchestration System
+#
+# This config defines privacy controls for user feedback submission.
+# Customers can override these rules by creating .obra/config/feedback.yaml
+#
+# Configuration priority: Customer (Tier 0) > Obra (Tier 1) > SOTA (Tier 2) > Baseline (Tier 3)
+
+# Telemetry consent
+# null = not asked yet (will prompt in interactive mode, block in non-interactive)
+# true = user has consented to data collection
+# false = user has explicitly opted out
+telemetry_consent: null
+
+# Data collection level
+# minimal: Only essential data (type, description, version, timestamp)
+# detailed: Adds diagnostic data (session_id, stack_trace, environment, logs)
+data_level: minimal
+
+# Data field definitions
+data_fields:
+  minimal:
+    - feedback_type          # bug, enhancement, question
+    - description            # User-provided text
+    - obra_version          # Obra version string
+    - timestamp             # Submission time (UTC)
+    - platform              # OS type (linux, darwin, win32)
+    - python_version        # Python version
+
+  detailed:
+    - feedback_type
+    - description
+    - obra_version
+    - timestamp
+    - platform
+    - python_version
+    - session_id            # Current session identifier
+    - stack_trace           # Error stack trace (if applicable)
+    - environment           # Environment variables (redacted)
+    - recent_logs           # Last 50 lines of session logs
+    - command_history       # Last 10 commands executed
+    - active_task_id        # Task being worked on when error occurred
+
+# Automatic redaction patterns
+# These patterns are applied to ALL submitted data regardless of data_level
+redaction:
+  enabled: true
+
+  # Secret patterns to scrub
+  patterns:
+    # API keys and tokens
+    - regex: '(api[_-]?key|token|secret|password)["\s:=]+[A-Za-z0-9_\-]{20,}'
+      replacement: '[REDACTED_API_KEY]'
+      reason: "API key or token"
+
+    # AWS keys
+    - regex: 'AKIA[0-9A-Z]{16}'
+      replacement: '[REDACTED_AWS_KEY]'
+      reason: "AWS access key"
+
+    # GitHub tokens
+    - regex: 'gh[pousr]_[A-Za-z0-9_]{36,}'
+      replacement: '[REDACTED_GITHUB_TOKEN]'
+      reason: "GitHub token"
+
+    # Generic secrets in environment variables
+    - regex: '([A-Z_]+_(?:KEY|TOKEN|SECRET|PASSWORD))=[\S]+'
+      replacement: '\1=[REDACTED]'
+      reason: "Environment variable secret"
+
+  # Path redaction
+  paths:
+    # Replace home directory with ~
+    replace_home: true
+
+    # Replace username with [USER]
+    replace_username: true
+
+    # Specific paths to always redact
+    redact_patterns:
+      - '/home/*/.obra/secrets'
+      - '/home/*/.ssh'
+      - '*/.env'
+      - '*/credentials.json'
+      - '*firebase-adminsdk*.json'
+
+# Preview settings (interactive mode only)
+preview:
+  # Show data before sending (requires user confirmation)
+  enabled_by_default: true
+
+  # Format for preview display
+  format: json
+
+  # Include redaction summary in preview
+  show_redaction_summary: true
+
+# Rate limiting (prevent abuse)
+rate_limit:
+  enabled: true
+
+  # Maximum submissions per hour
+  max_per_hour: 10
+
+  # Maximum submissions per day
+  max_per_day: 50
+
+  # Cooldown period after hitting limit (minutes)
+  cooldown_minutes: 60
+
+# Submission endpoints
+endpoints:
+  # Production endpoint (Cloud Function)
+  production: "https://us-central1-obra-205b0.cloudfunctions.net/feedback-submit"
+
+  # Development endpoint (for testing)
+  development: "http://localhost:5001/obra-205b0/us-central1/feedback-submit"
+
+  # Use production by default
+  default: production
+
+# Retry settings
+retry:
+  enabled: true
+  max_attempts: 3
+  backoff_seconds: 2
+  timeout_seconds: 10
+
+# Offline mode (future feature)
+offline:
+  # Queue submissions when offline
+  enabled: false
+
+  # Maximum queue size
+  max_queue_size: 100
+
+  # Auto-submit when connection restored
+  auto_submit: true
