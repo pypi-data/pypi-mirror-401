@@ -1,0 +1,33 @@
+[project]
+name = "chunkrank"
+version = "0.2.4"
+description = "Model-aware text chunking and answer re-ranking for LLM pipelines. Automatically adapts chunk size to tokenizer and context window, then consolidates and ranks answers across chunks."
+authors = [
+    { name = "Amit Nautiyal", email = "de.amit.nautiyal@gmail.com" }
+]
+readme = "README.md"
+homepage = "https://gitlab.com/gaafa/smart-chunks"
+repository = "https://gitlab.com/gaafa/smart-chunks"
+
+license = { text = "MIT" }
+requires-python = ">=3.14,<4.0"
+dependencies = [
+    "mypy (>=1.19.1,<2.0.0)",
+    "deptry (>=0.24.0,<0.25.0)",
+    "ruff (>=0.14.10,<0.15.0)",
+    "regex>=2023.10.3",
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "rank-bm25>=0.2.2"
+
+]
+
+[tool.poetry.urls]
+"Source Code" = "https://gitlab.com/gaafa/smart-chunks"
+"Issue Tracker" = "https://gitlab.com/gaafa/smart-chunks/-/issues"
+"Documentation" = "https://gitlab.com/gaafa/smart-chunks/-/blob/main/README.md"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
