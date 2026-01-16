@@ -1,0 +1,114 @@
+Metadata-Version: 2.4
+Name: pynicolet
+Version: 0.1.1
+Summary: A lightweight Python library for reading legacy Nicolet EEG files
+Author-email: Nathan Soares de Melo <nathan.soares@ensae.fr>
+License: MIT License
+        
+        Copyright (c) 2025 Nathan Soares de Melo
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Repository, https://github.com/NathENSAE/pynicolet
+Project-URL: Issues, https://github.com/NathENSAE/pynicolet/issues
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Healthcare Industry
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: tqdm
+Provides-Extra: dev
+Requires-Dist: matplotlib; extra == "dev"
+Requires-Dist: build; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Dynamic: license-file
+
+# pynicolet
+
+pynicolet is a lightweight Python library for reading legacy Nicolet EEG files and converting them into convenient Python data structures for analysis and visualization.
+
+## Features
+- Parse legacy Nicolet EEG file formats (amplifier/channel metadata, timestamps, and samples)
+- Export to NumPy arrays
+- Basic support for annotations and event markers
+- Streamlined API for quick loading and inspection
+- Small and dependency-light core
+
+## Installation
+Install from PyPI (when published):
+```
+pip install pynicolet
+```
+Or install from source:
+```
+git clone https://github.com/NathENSAE/pynicolet.git
+cd pynicolet
+pip install -e .
+```
+
+## Quickstart
+Load a Nicolet file and convert to NumPy:
+```python
+from pynicolet import NicoletReader
+
+# open file
+reader = NicoletReader(filename)
+
+# read header and channels info (optional, read_data does it automatically)
+header = reader.read_header()
+
+# read raw samples as NumPy array (samples x channels)
+# defaults to first segment and all matching channels
+data = reader.read_data()
+```
+
+## Supported Inputs
+- Nicolet legacy binary formats (commonly used clinical EEG recordings)
+- Header + data pairs typical of older Nicolet systems
+Note: If your files differ, open an issue with sample metadata (not patient data) to help extend support.
+
+## API Overview
+- `NicoletReader(filename)` -> `NicoletReader`
+- `NicoletReader.read_header()` -> `dict` metadata (channels, sampling rate, segments)
+- `NicoletReader.read_data(segment=0, chIdx=None, range_=None)` -> `NumPy array` [samples, channels]
+  - `segment`: 0-based index of the recording segment.
+  - `chIdx`: List of 0-based channel indices.
+  - `range_`: `[start, end]` 1-based sample range (inclusive).
+- `NicoletReader.read_events()` -> `list` of event dictionaries [sample, type, value]
+
+See the docs/ directory for full API documentation and examples.
+
+## Contributing
+Contributions are welcome. Please:
+- Open issues for bugs or feature requests
+- Add tests for new features
+- Follow existing code style and include changelog entries
+
+## Contact
+Project: pynicolet — for questions or help open an issue on the repository.
