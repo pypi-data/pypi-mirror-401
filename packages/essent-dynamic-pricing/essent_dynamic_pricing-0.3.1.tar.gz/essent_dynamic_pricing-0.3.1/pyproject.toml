@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "essent-dynamic-pricing"
+version = "0.3.1"
+description = "Async client for Essent dynamic energy prices"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.13"
+authors = [
+  {name = "Home Assistant Community"},
+]
+dependencies = [
+  "aiohttp>=3.9",
+  "mashumaro>=3.17",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.2",
+  "pytest-asyncio>=0.24",
+]
+
+[project.urls]
+Homepage = "https://github.com/jaapp/py-essent-dynamic-pricing"
+Repository = "https://github.com/jaapp/py-essent-dynamic-pricing"
+
+[tool.hatch.build.targets.wheel]
+force-include = {"src/essent_dynamic_pricing/py.typed" = "essent_dynamic_pricing/py.typed"}
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
