@@ -1,0 +1,64 @@
+#!/usr/bin/env cwl-runner
+
+cwlVersion: v1.2
+
+class: CommandLineTool
+label: Merge Monitoring Files
+baseCommand: ctapipe-merge
+doc: |
+  Merge multiple monitoring HDF5 files into a single output file using ctapipe-merge.
+
+inputs:
+  output_filename:
+    type: string
+    doc: name of the output filename
+    inputBinding:
+      position: 1
+      prefix: --output
+
+  same_ob:
+    type: boolean
+    default: false
+    inputBinding:
+      position: 2
+      prefix: --single-ob
+
+  configuration:
+    type: File?
+    inputBinding:
+      position: 3
+      prefix: --config
+    doc: The configuration file for ctapipe-merge
+
+  provenance_log_filename:
+    type: string
+    doc: file in which to write the local provenance.
+    default: ctapipe-merge.provenance.log
+    inputBinding:
+      position: 4
+      prefix: --provenance-log
+
+  input_files:
+    type: File[]
+    doc: |
+      Paths to monitoring files to be merged into output_filename
+    inputBinding:
+      position: 5
+
+  log-level:
+    type: string?
+    inputBinding:
+      prefix: --log-level
+
+outputs:
+  merged_output:
+    type: File
+    doc: output file.
+    outputBinding:
+      glob: $(inputs.output_filename)
+
+  provenance_log:
+    type: File
+    doc: ctapipe format provenance log for this step.
+    outputBinding:
+      glob: $(inputs.provenance_log_filename)
