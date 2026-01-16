@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "get_aws_details"
+version = "1.1.0"
+description = "Get multi-region details from AWS Organizations accounts."
+readme = "README.rst"
+authors = ["Ahmad Ferdaus Abd Razak <fer1035@gmail.com>"]
+license = "GPL-2.0-only"
+repository = "https://gitlab.com/fer1035_python/modules/pypi-get_aws_details"
+keywords = ["aws", "details", "json", "csv", "pagination", "organizations", "multi-region"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+boto3 = "^1.16.0"
+aws_authenticator = "^2.0.0"
+aws_crawler = "^1.2.0"
+multithreader = "^1.0.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+aws_details = { reference = "aws_details", type = "file" }

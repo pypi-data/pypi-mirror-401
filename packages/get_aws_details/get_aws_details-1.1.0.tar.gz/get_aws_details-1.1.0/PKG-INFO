@@ -1,0 +1,133 @@
+Metadata-Version: 2.1
+Name: get_aws_details
+Version: 1.1.0
+Summary: Get multi-region details from AWS Organizations accounts.
+Home-page: https://gitlab.com/fer1035_python/modules/pypi-get_aws_details
+License: GPL-2.0-only
+Keywords: aws,details,json,csv,pagination,organizations,multi-region
+Author: Ahmad Ferdaus Abd Razak
+Author-email: fer1035@gmail.com
+Requires-Python: >=3.9,<4.0
+Classifier: License :: OSI Approved :: GNU General Public License v2 (GPLv2)
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Dist: aws_authenticator (>=2.0.0,<3.0.0)
+Requires-Dist: aws_crawler (>=1.2.0,<2.0.0)
+Requires-Dist: boto3 (>=1.16.0,<2.0.0)
+Requires-Dist: multithreader (>=1.0.4,<2.0.0)
+Project-URL: Repository, https://gitlab.com/fer1035_python/modules/pypi-get_aws_details
+Description-Content-Type: text/x-rst
+
+===================
+**get_aws_details**
+===================
+
+Overview
+--------
+
+Get multi-region details from AWS Organizations accounts.
+
+This module helps to retrieve AWS details from multiple Organizations accounts and regions. It features the following capabilities:
+
+- SSO authentication
+- Pagination (see caveat)
+- Multithreading (requires a cross-account role to assume)
+- CSV output
+- Account filtering by status, Organizational Unit, or list (in this order of precedence)
+
+Caveat
+------
+
+Works with paginated AWS service commands only.
+
+Usage
+------
+
+- Installation:
+
+.. code-block:: BASH
+
+   pip3 install get_aws_details
+   # or
+   python3 -m pip install get_aws_details
+
+- Command example:
+
+.. code-block:: BASH
+
+   # Overview.
+   aws_details -h
+
+   # Get all VPC primary CIDR blocks.
+   aws_details \
+      -a 123456789012 \
+      -u https://my-sso-portal.awsapps.com/start/#/ \
+      -r MySSORoleName \
+      -n MyAssumedRoleName \
+      -s ACTIVE \
+      -v ec2 \
+      -p Vpcs \
+      -c describe_vpcs \
+      -k vpc_id=VpcId is_default=IsDefault cidr_block=CidrBlock
+
+- Output example:
+
+.. code-block:: CSV
+
+   vpc_id,is_default,cidr_block,account_id,region
+   vpc-0a1b2c3d4e5f6g7h,True,10.0.0.0/16,123456789012,us-east-1
+   vpc-321asd4f5g6h7j8k,False,192.168.1.0/24,987654321098,ap-southeast-3
+
+Arguments
+---------
+
+- Required:
+
+.. code-block:: BASH
+
+   -a, --sso_account_id SSO_ACCOUNT_ID
+                           SSO Account ID.
+   -u, --sso_url SSO_URL
+                           SSO URL.
+   -r, --sso_role_name SSO_ROLE_NAME
+                           SSO Role Name.
+   -v, --service SERVICE
+                           AWS service to query (example: ec2).
+   -p, --page_key PAGE_KEY
+                           Pagination key for the AWS service response (example: Vpcs).
+   -c, --command COMMAND
+                           AWS service command to execute (example: describe_vpcs).
+
+- Conditional:
+
+.. code-block:: BASH
+
+   -n, --assumed_role_name [ASSUMED_ROLE_NAME]
+                           Assumed Role Name (default: None).
+   -e, --external_id [EXTERNAL_ID]
+                           External ID for assumed role (default: None).
+   -s, --account_statuses [ACCOUNT_STATUSES]
+                           Comma-separated account statuses to filter (default: None).
+   -o, --account_ou [ACCOUNT_OU]
+                           Account Organizational Unit to filter (default: None).
+   -l, --account_list [ACCOUNT_LIST]
+                           Comma-separated list of account IDs to filter (default: None).
+   -k, --kvps KVPS [KVPS ...]
+                           Key-value pairs for CSV output (format: key=value).
+   -i, --filters [FILTERS ...]
+                           Filters for AWS service query (format: Name=Values).
+
+- Optional:
+
+.. code-block:: BASH
+
+   -h, --help            show this help message and exit
+   -V, --version         show program's version number and exit
+   -t, --thread_num [THREAD_NUM]
+                           Number of threads to use for multithreading (default: 10).
+   -f, --output_file [OUTPUT_FILE]
+                           Path to the output CSV file (default: aws_details.csv).
+
