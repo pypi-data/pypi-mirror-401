@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: OLIV
+Version: 1.1.1
+Summary: Open Library for Image Velocimetry
+Author-email: Pierre Horgue <pierre.horgue@toulouse-inp.fr>
+Project-URL: Documentation, https://oliv.readthedocs.io/en/main/
+Project-URL: Repository, https://gitlab.com/image-velocimetry/oliv
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.12
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: opencv-python>=4.12.0.88
+Requires-Dist: scipy>=1.16.2
+Requires-Dist: matplotlib>=3.10.6
+Requires-Dist: progress>=1.6.1
+Dynamic: license-file
+
+General Description
+===================
+
+OLIV (Open Library for Image Velocimetry) is an open-source toolbox developed by EDF, INRAE, Toulouse INP and CERFACS.
+
+The main developer is Pierre Horgue (Toulouse INP).
+
+Installation
+------------
+
+The recommended way to install ``oliv`` is via PyPI:
+
+.. code:: sh
+
+   pip install oliv
+
+You can use ``oliv`` directly in your python scripts with:
+
+.. code-block:: python
+
+   from oliv import *
+
+Note: If you downloaded the oliv archive directly, ensure you add its path to your Python script:
+
+.. code-block:: python
+
+   import sys
+   sys.path.append("/path/to/oliv")
+   from oliv import *
+
+Documentation
+-------------
+
+Informations about classes and usage can be found at : https://oliv.readthedocs.io/en/main/
+
+Script example can be found in **validation/** directory.
