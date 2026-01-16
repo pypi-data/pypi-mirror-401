@@ -1,0 +1,191 @@
+from typing import Any, Dict, Generator
+from requests import Response
+import requests
+import copy
+import re
+from urllib.parse import urlparse
+
+from learnosity_sdk.exceptions import DataApiException
+from learnosity_sdk.request import Init
+from learnosity_sdk._version import __version__
+
+
+class DataApi(object):
+
+    def _extract_consumer(self, security_packet: Dict[str, str]) -> str:
+        """
+        Extract the consumer key from the security packet.
+
+        Args:
+            security_packet (dict): The security object
+
+        Returns:
+            string: The consumer key
+        """
+        return security_packet.get('consumer_key', '')
+
+    def _derive_action(self, endpoint: str, action: str) -> str:
+        """
+        Derive the action metadata from the endpoint and action parameter.
+
+        The action format is: {action}_{endpoint_path}
+        For example: 'get_/itembank/items' or 'set_/itembank/activities'
+
+        Args:
+            endpoint (string): The full url to the endpoint
+            action (string): 'get', 'set', 'update', etc.
+
+        Returns:
+            string: The derived action string
+        """
+        # Parse the URL to extract the path
+        parsed_url = urlparse(endpoint)
+        path = parsed_url.path.rstrip("/")
+
+        # Remove version prefix if present (e.g., /v1, /v2, /latest)
+        # Only match 'v' followed by digits (v1, v2, etc.) or 'latest'
+        path_parts = path.split('/')
+        if len(path_parts) > 1:
+            first_segment = path_parts[1].lower()
+            # Match version patterns: v1, v2, v2023.1.lts, v2025.3.preview1, etc.
+            # Also match: latest, latest-lts, developer
+            if (re.fullmatch(r"v[\d.]+(?:\.(?:lts|preview\d+))?", first_segment) or
+                first_segment in ("latest", "latest-lts", "developer")):
+                path = '/' + '/'.join(path_parts[2:])
+
+        return f"{action}_{path}"
+
+    def request(self, endpoint: str, security_packet: Dict[str, str],
+                secret: str, request_packet:Dict[str, Any] = {}, action: str = 'get') -> Response:
+        """
+        Make a request to Data API
+
+        Uses the `requests` library to make a single call against Data API.
+        If the data spans multiple pages, then the meta.next property
+        of the response will need to be used to obtain the rest of the data.
+
+        see https://docs.learnosity.com/analytics/data/quickstart
+
+        Args:
+            endpoint (string): The full url to the endpoint
+            security_packet (dict): The security object
+            secret (string): The consumer secret key
+            request_packet (dict): The request parameters
+            action (string): 'get', 'set', 'update', etc.
+
+        Returns:
+            requests.Response: The response object
+
+            see http://docs.python-requests.org/en/master/api/#requests.Request
+        """
+        init = Init('data', security_packet, secret, request_packet, action)
+
+        # Extract metadata for routing
+        consumer = self._extract_consumer(security_packet)
+        derived_action = self._derive_action(endpoint, action)
+
+        # Add metadata as HTTP headers for ALB routing
+        sdk_version = __version__.lstrip('v')
+        headers = {
+            'X-Learnosity-Consumer': consumer,
+            'X-Learnosity-Action': derived_action,
+            'X-Learnosity-SDK': f'Python:{sdk_version}'
+        }
+
+        return requests.post(endpoint, data=init.generate(), headers=headers)
+
+    def results_iter(self, endpoint: str, security_packet: Dict[str, str],
+                     secret: str, request_packet: Dict[str, Any] = {},
+                     action:str = 'get') -> Generator[Dict[str, Any], None, None]:
+        """
+        Return an iterator of all results from a request to Data API
+
+        This method yields each element of the `data` result array,
+        automatically fetching the next page of results when needed.
+
+        Args:
+            endpoint (string): The full url to the endpoint
+            security_packet (dict): The security object
+            secret (string): The consumer secret key
+            request_packet (dict): The request parameters
+            action (string): 'get', 'set', 'update', etc.
+
+        Yields:
+            dict: An individual result (item, question, etc.) from the server
+
+        Raises:
+            DataApiException: Raised if there was a problem fetching
+            data or if the server returns an invalid response.
+        """
+        for response in self.request_iter(endpoint, security_packet,
+                                          secret, request_packet,
+                                          action):
+            if type(response['data']) == dict:
+                for key, value in response['data'].items():
+                    yield {key: value}
+            else:
+                for result in response['data']:
+                    yield result
+
+    def request_iter(self, endpoint: str, security_packet: Dict[str, str],
+                     secret: str, request_packet: Dict[str, Any] = {},
+                     action: str = 'get') -> Generator[Dict[str, Any], None, None]:
+        """
+        Iterate over the pages of results of a query to data api
+
+        Additional requests are sent to to Data API to fetch pages as needed.
+
+        Args:
+            endpoint (string): The full url to the endpoint
+            security_packet (dict): The security object
+            secret (string): The consumer secret key
+            request_packet (dict): The request parameters
+            action (string): 'get', 'set', 'update', etc.
+
+        Yields:
+            dict: The response from the server
+
+            A typical response contains `meta` and `data` keys.
+
+        Raises:
+            DataApiException: Raised if there was a problem fetching
+            data or if the server returns an invalid response.
+        """
+
+        # just in case the security_packet or request_packet
+        # are modified between yields
+        security_packet = copy.deepcopy(security_packet)
+        request_packet = copy.deepcopy(request_packet)
+
+        data_end = False
+
+        while not data_end:
+            res = self.request(
+                endpoint,
+                security_packet,
+                secret,
+                request_packet,
+                action
+            )
+
+            if not res.ok:
+                raise DataApiException(
+                    'server returned HTTP status ' + str(res.status_code)
+                    + ': ' + res.text)
+
+            try:
+                data = res.json()
+            except ValueError:
+                raise DataApiException(
+                    'server returned invalid json: ' + res.text)
+
+            if 'next' in data['meta'] and len(data['data']) > 0:
+                request_packet['next'] = data['meta']['next']
+            else:
+                data_end = True
+
+            if not data['meta']['status']:
+                raise DataApiException(
+                    'server returned unsuccessful status: ' + res.text)
+            else:
+                yield data
