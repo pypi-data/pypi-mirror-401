@@ -1,0 +1,197 @@
+# Logowatch Example Configuration
+# Demonstrates all available options and patterns
+
+sources:
+  # Single log file
+  - name: app
+    path: /var/log/app/application.log
+    type: file
+    encoding: utf-8
+
+  # Directory with multiple log files
+  - name: errors
+    path: /var/log/app/errors/
+    type: directory
+    pattern: "*.log"
+
+  # Glob pattern across directories
+  - name: all_logs
+    path: /var/log/
+    type: glob
+    pattern: "**/*.log"
+
+rules:
+  # =============================================================================
+  # CRITICAL ERRORS
+  # =============================================================================
+
+  # Basic error detection
+  - pattern: "ERROR|CRITICAL"
+    description: "Application errors"
+    severity: error
+    source: app
+    show_source: true
+
+  # Python exceptions with traceback context
+  - pattern: "Traceback \\(most recent call last\\)"
+    description: "Python exceptions"
+    severity: error
+    source: app
+    options:
+      context:
+        after: 15
+
+  # Out of memory
+  - pattern: "OutOfMemoryError|MemoryError"
+    description: "Memory errors"
+    severity: error
+    source: app
+
+  # =============================================================================
+  # WARNINGS
+  # =============================================================================
+
+  # Generic warnings
+  - pattern: "WARNING"
+    description: "Warnings"
+    severity: warning
+    source: app
+
+  # Connection issues (case-insensitive)
+  - pattern: "timeout|connection refused|connection reset"
+    description: "Connection issues"
+    severity: warning
+    source: app
+    case_insensitive: true
+    options:
+      context:
+        before: 1
+        after: 2
+
+  # Retry attempts
+  - pattern: "retry|retrying|attempt \\d+ of"
+    description: "Retry attempts"
+    severity: warning
+    source: app
+    case_insensitive: true
+
+  # =============================================================================
+  # PERFORMANCE & METRICS
+  # =============================================================================
+
+  # Slow queries (extract duration)
+  - pattern: "query took \\d+ ms"
+    description: "Slow queries"
+    severity: warning
+    source: app
+    options:
+      extract:
+        pattern: "took (\\d+) ms"
+        name: "duration_ms"
+      aggregate:
+        by: "(\\d+)"
+        format: count
+
+  # HTTP status codes (aggregate distribution)
+  - pattern: "status_code=\\d{3}"
+    description: "HTTP status code distribution"
+    severity: info
+    source: app
+    options:
+      aggregate:
+        by: "status_code=(\\d{3})"
+        format: count
+
+  # Response times
+  - pattern: "response_time=\\d+\\.\\d+"
+    description: "Response times"
+    severity: info
+    source: app
+    options:
+      extract:
+        pattern: "response_time=(\\d+\\.\\d+)"
+        name: "time_sec"
+
+  # =============================================================================
+  # USER & REQUEST TRACKING
+  # =============================================================================
+
+  # Errors with user IDs (extract and aggregate)
+  - pattern: "\\[user:\\d+\\].*ERROR"
+    description: "User-specific errors"
+    severity: error
+    source: app
+    options:
+      extract:
+        pattern: "\\[user:(\\d+)\\]"
+        name: "user_id"
+      aggregate:
+        by: "\\[user:(\\d+)\\]"
+        format: count
+
+  # Request IDs (find related patterns)
+  - pattern: "\\[req:[a-f0-9]+\\].*ERROR"
+    description: "Request errors"
+    severity: error
+    source: app
+    options:
+      extract:
+        pattern: "\\[req:([a-f0-9]+)\\]"
+        name: "request_id"
+      find_related:
+        pattern: "started|completed|duration"
+        lines: 5
+        direction: both
+
+  # =============================================================================
+  # SYSTEM EVENTS
+  # =============================================================================
+
+  # Application restarts
+  - pattern: "Starting application|Application started|SIGTERM"
+    description: "Application lifecycle"
+    severity: info
+    source: app
+
+  # Config changes
+  - pattern: "Configuration|config loaded|settings updated"
+    description: "Configuration events"
+    severity: info
+    source: app
+    case_insensitive: true
+
+  # =============================================================================
+  # SECURITY
+  # =============================================================================
+
+  # Authentication failures
+  - pattern: "authentication failed|invalid credentials|unauthorized"
+    description: "Authentication failures"
+    severity: warning
+    source: app
+    case_insensitive: true
+    options:
+      extract:
+        pattern: "user[_id]*[=:]\\s*([\\w@.-]+)"
+        name: "username"
+      aggregate:
+        by: "user[_id]*[=:]\\s*([\\w@.-]+)"
+        format: count
+
+  # Suspicious patterns
+  - pattern: "SQL injection|XSS|CSRF|security violation"
+    description: "Security alerts"
+    severity: error
+    source: app
+    case_insensitive: true
+    options:
+      context:
+        before: 2
+        after: 5
+
+# Configuration options
+defaults:
+  max_examples: 10
+
+cache_dir: .logowatch_cache
+cache_timeout_hours: 24

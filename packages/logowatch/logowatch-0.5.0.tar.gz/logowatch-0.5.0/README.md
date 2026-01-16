@@ -1,0 +1,291 @@
+# Logowatch
+
+Autonomous log analysis tool with configurable pattern rules, incremental detection, and rich output.
+
+## Features
+
+- **Pattern-based rules** - Define regex patterns to match in log files
+- **Incremental detection** - Only show new errors since last check
+- **Extended options** - Context, value extraction, aggregations
+- **Multiple sources** - Files, directories, glob patterns
+- **Multi-source timestamp aggregation** - Merge logs from multiple sources in chronological order
+- **Rich output** - Colored CLI output with tables and panels
+- **JSON output** - Machine-readable output for automation
+- **Legacy support** - Convert from pipe-delimited format
+
+## Installation
+
+```bash
+pip install logowatch
+```
+
+## Quick Start
+
+### 1. Create a configuration file
+
+```bash
+logowatch init
+```
+
+This creates a `logowatch.yaml` file you can customize.
+
+### 2. Run analysis
+
+```bash
+logowatch analyze logowatch.yaml
+```
+
+### Quick scan a single file
+
+```bash
+logowatch scan /var/log/app.log --pattern "ERROR" --pattern "Exception"
+```
+
+## Configuration
+
+### YAML Format
+
+```yaml
+# logowatch.yaml
+
+sources:
+  - name: app
+    path: /var/log/app.log
+    type: file
+
+  - name: errors
+    path: /var/log/app/errors/
+    type: directory
+    pattern: "*.log"
+
+rules:
+  # Basic rule
+  - pattern: "ERROR|CRITICAL"
+    description: "Application errors"
+    severity: error
+    source: app
+
+  # With context (show lines after match)
+  - pattern: "Traceback"
+    description: "Python exceptions"
+    severity: error
+    source: app
+    options:
+      context:
+        after: 10
+
+  # Extract values
+  - pattern: "user_id=\\d+"
+    description: "Errors with user IDs"
+    severity: error
+    source: app
+    options:
+      extract:
+        pattern: "user_id=(\\d+)"
+        name: "user_id"
+
+  # Aggregate by extracted value
+  - pattern: "status_code=\\d+"
+    description: "HTTP status codes"
+    severity: warning
+    source: app
+    options:
+      extract:
+        pattern: "status_code=(\\d+)"
+        name: "status"
+      aggregate:
+        by: "(\\d{3})"
+        format: count
+
+  # Case-insensitive matching
+  - pattern: "timeout|connection refused"
+    description: "Connection issues"
+    severity: warning
+    source: app
+    case_insensitive: true
+```
+
+### Rule Options
+
+| Option | Description |
+|--------|-------------|
+| `context.before` | Lines to show before match |
+| `context.after` | Lines to show after match |
+| `extract.pattern` | Regex with capture group |
+| `extract.name` | Name for extracted value |
+| `aggregate.by` | Regex for grouping |
+| `find_related.pattern` | Related pattern to find |
+| `find_related.lines` | Lines to search |
+| `find_related.direction` | before/after/both |
+
+### Severity Levels
+
+- `error` - Critical issues (shown in red)
+- `warning` - Warnings (shown in yellow)
+- `info` - Informational (shown in cyan)
+
+## CLI Commands
+
+### `analyze`
+
+Run full analysis with configuration file:
+
+```bash
+logowatch analyze config.yaml [OPTIONS]
+
+Options:
+  -l, --limit INTEGER      Max examples per rule (default: 5)
+  --no-incremental         Show all errors (not just new)
+  -s, --source TEXT        Analyze specific source(s)
+  --json                   Output as JSON
+  -c, --cache-path PATH    Custom cache file path
+```
+
+### `scan`
+
+Quick scan a single file:
+
+```bash
+logowatch scan logfile.log [OPTIONS]
+
+Options:
+  -p, --pattern TEXT    Pattern(s) to search for
+  -l, --limit INTEGER   Max matches (default: 10)
+```
+
+### `convert`
+
+Convert legacy pipe-delimited config to YAML:
+
+```bash
+logowatch convert rules.conf -o logowatch.yaml
+```
+
+### `init`
+
+Create sample configuration:
+
+```bash
+logowatch init
+```
+
+## Incremental Mode
+
+By default, logowatch tracks which lines it has already processed and only shows **new** errors since the last check. This is perfect for daily monitoring.
+
+Cache is stored in `.logowatch_cache.json` by default.
+
+To show all errors (ignore cache):
+
+```bash
+logowatch analyze config.yaml --no-incremental
+```
+
+## Multi-Source Timestamp Aggregation
+
+Merge log entries from multiple sources into a unified chronological transcript by parsing and sorting on timestamps.
+
+### Configuration
+
+```yaml
+sources:
+  - name: api
+    path: /var/log/api.log
+    timestamp:
+      field: "timestamp"  # For JSON/JSONL logs
+
+  - name: nginx
+    path: /var/log/nginx/access.log
+    timestamp:
+      pattern: '\[(?P<ts>[^\]]+)\]'  # Regex with named group
+      format: "%d/%b/%Y:%H:%M:%S %z"  # strptime format
+
+  - name: syslog
+    path: /var/log/syslog
+    timestamp:
+      auto: true  # Auto-detect common formats
+
+output:
+  mode: sequential
+  sort_by: timestamp  # Sort by timestamp instead of line number
+```
+
+### Timestamp Extraction Options
+
+| Option | Description |
+|--------|-------------|
+| `timestamp.field` | JSON field path (e.g., `timestamp`, `@timestamp`) |
+| `timestamp.pattern` | Regex with named group `ts` or first capture group |
+| `timestamp.format` | strptime format string for explicit parsing |
+| `timestamp.timezone` | Default timezone (default: UTC) |
+| `timestamp.auto` | Auto-detect ISO 8601, CLF, syslog formats |
+
+### Output
+
+In multi-source mode, output includes source identifiers:
+
+```
+[L1] [api] 2026-01-14T09:15:32.123Z INFO Request received
+[L1] [nginx] 2026-01-14T09:15:32.456Z "GET /api" 200
+[L2] [api] 2026-01-14T09:15:33.789Z INFO Processing complete
+```
+
+### Log Format Recommendations
+
+```bash
+logowatch init --show-formats
+```
+
+Displays recommended log formats for optimal timestamp parsing:
+- **Tier 1:** JSON/JSONL with ISO 8601 timestamps (best)
+- **Tier 2:** Structured text with ISO 8601 prefix
+- **Tier 3:** Common formats (nginx CLF, syslog)
+- **Tier 4:** Avoid custom formats without standard timestamps
+
+## Python API
+
+```python
+from logowatch import LogAnalyzer, load_config
+
+# Load configuration
+config = load_config("logowatch.yaml")
+
+# Create analyzer
+analyzer = LogAnalyzer(config, incremental=True)
+
+# Run analysis
+result = analyzer.analyze()
+
+# Check results
+print(f"Errors: {result.total_errors}")
+print(f"Warnings: {result.total_warnings}")
+
+for rule_result in result.rule_results:
+    print(f"{rule_result.rule.description}: {rule_result.total_count}")
+    for match in rule_result.matches[:3]:
+        print(f"  {match.content}")
+```
+
+## Legacy Format Support
+
+If you have existing rules in pipe-delimited format:
+
+```
+# pattern|description|severity|show_source|case_insensitive|source|options
+ERROR|Application errors|ERROR|true|false|app
+Timeout|Timeout issues|WARNING|false|true|app|{"context": {"after": 3}}
+```
+
+Convert to YAML:
+
+```bash
+logowatch convert rules.conf -o logowatch.yaml
+```
+
+## License
+
+MIT
+
+## Author
+
+LifeAiTools Team <dev@muid.io>
