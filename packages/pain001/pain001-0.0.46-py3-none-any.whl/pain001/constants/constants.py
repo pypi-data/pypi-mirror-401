@@ -1,0 +1,29 @@
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Defines the valid XML types for the ISO 20022 Payment Initiation
+# message types that are supported by the pain001 library.
+# All versions support Customer Credit Transfer Initiation (CstmrCdtTrfInitn)
+valid_xml_types = [
+    "pain.001.001.03",  # Customer Credit Transfer Initiation V03
+    "pain.001.001.04",  # Customer Credit Transfer Initiation V04
+    "pain.001.001.05",  # Customer Credit Transfer Initiation V05
+    "pain.001.001.06",  # Customer Credit Transfer Initiation V06
+    "pain.001.001.07",  # Customer Credit Transfer Initiation V07
+    "pain.001.001.08",  # Customer Credit Transfer Initiation V08
+    "pain.001.001.09",  # Customer Credit Transfer Initiation V09
+    "pain.001.001.10",  # Customer Credit Transfer Initiation V10
+    "pain.001.001.11",  # Customer Credit Transfer Initiation V11
+]
