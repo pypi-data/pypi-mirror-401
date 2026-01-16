@@ -1,0 +1,85 @@
+name: pip
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    # branches:
+    #   - main
+
+jobs:
+  build:
+    name: Build with pip
+    runs-on: ${{ matrix.platform }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest]
+        # python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.11"]
+        experimental: [false]
+        include:
+          - platform: windows-latest
+            python-version: "3.11"
+            experimental: true
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Set min macOS version
+      if: runner.os == 'macOS'
+      run: |
+        echo "MACOS_DEPLOYMENT_TARGET=10.14" >> $GITHUB_ENV
+
+    - name: Dependencies
+      run: |
+        python -m pip install pip -U
+
+    - name: Check versions
+      run: |
+        python --version
+        pip --version
+        cmake --version
+
+    - name: Build and install kima
+      run: |
+        pip install --verbose .[test]
+
+    - name: Test
+      run: |
+        python -m pytest -s tests/ 
+        python -m pytest -s tests/ --mpl  --mpl-results-path=tests/baseline --mpl-generate-summary=html
+
+    - name: Run benchmark
+      run: |
+        python -m pytest -s tests/test_benchmarks.py --benchmark-json output.json
+
+    - name: Download previous benchmark data
+      uses: actions/cache@v4
+      with:
+        path: ./cache
+        key: ${{ runner.os }}-benchmark
+
+    - name: Store benchmark result
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'pytest'
+        output-file-path: output.json
+        external-data-json-path: ./cache/benchmark-data.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        skip-fetch-gh-pages: true
+        auto-push: false
+        summary-always: true
+        # comment-always: true
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mpl-results-${{ matrix.platform }}
+        path: tests/baseline
+        retention-days: 2
