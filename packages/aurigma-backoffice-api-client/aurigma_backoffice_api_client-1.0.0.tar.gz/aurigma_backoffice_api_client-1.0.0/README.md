@@ -1,0 +1,271 @@
+# aurigma-backoffice-api-client
+
+Python client library for [Aurigma BackOffice API](https://customerscanvas.com/dev/backoffice/api/backoffice/overview.html).
+
+## Requirements.
+
+- Python 3.9+
+- Dependencies:
+  - python-dateutil>=2.8.2
+  - httpx>=0.28.1
+  - pydantic>=2
+  - typing-extensions>=4.7.1
+
+## Installation & Usage
+### pip install
+
+```sh
+pip install aurigma-backoffice-api-client
+```
+
+Then import the package:
+```python
+import aurigma.backoffice
+```
+
+## Getting Started
+
+Please follow the [installation procedure](#installation--usage) and then run the following:
+
+```python
+
+import aurigma.backoffice
+from aurigma.backoffice.rest import ApiException
+from pprint import pprint
+
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aurigma.storefront.Configuration(
+    host = "http://api.customerscanvashub.com/"
+)
+
+
+
+
+# Enter a context with an instance of the API client
+async with aurigma.backoffice.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aurigma.backoffice.BuildInfoApi(api_client)
+
+    try:
+        # Returns assembly build info.
+        api_response = await api_instance.build_info_get_info()
+        print("The response of BuildInfoApi->build_info_get_info:\n")
+        pprint(api_response)
+    except ApiException as e:
+        print("Exception when calling BuildInfoApi->build_info_get_info: %s\n" % e)
+
+```
+
+## Documentation for API Endpoints
+
+Depending on the geographical location of your Customer's Canvas Hub instance, the API gateway address may vary: 
+ 
+https://api.customerscanvashub.com/ - United States instance
+https://api.eu.customerscanvashub.com/ - European instance
+https://api.au.customerscanvashub.com/ - Australian instance
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+*BuildInfoApi* | [**build_info_get_info**](docs/BuildInfoApi.md#build_info_get_info) | **GET** /api/backoffice/v1/info | Returns assembly build info.
+*BuildInfoApi* | [**build_info_head_info**](docs/BuildInfoApi.md#build_info_head_info) | **HEAD** /api/backoffice/v1/info | Returns assembly build info.
+*ProductReferencesManagementApi* | [**product_references_management_create**](docs/ProductReferencesManagementApi.md#product_references_management_create) | **POST** /api/backoffice/v1/product-references | Creates a new storefront product reference.
+*ProductReferencesManagementApi* | [**product_references_management_delete**](docs/ProductReferencesManagementApi.md#product_references_management_delete) | **DELETE** /api/backoffice/v1/product-references/{reference} | Deletes the storefront product reference.
+*ProductReferencesManagementApi* | [**product_references_management_get**](docs/ProductReferencesManagementApi.md#product_references_management_get) | **GET** /api/backoffice/v1/product-references/{reference} | Returns a storefront product reference.
+*ProductReferencesManagementApi* | [**product_references_management_get_all**](docs/ProductReferencesManagementApi.md#product_references_management_get_all) | **GET** /api/backoffice/v1/product-references | Returns all storefront product references relevant to the specified query parameters.
+*ProductsManagementApi* | [**products_management_create_designs_connections**](docs/ProductsManagementApi.md#products_management_create_designs_connections) | **POST** /api/backoffice/v1/products/{id}/design-connections | Creates new designs connections for a specified product.
+*ProductsManagementApi* | [**products_management_create_documents_connections**](docs/ProductsManagementApi.md#products_management_create_documents_connections) | **POST** /api/backoffice/v1/products/{id}/document-connections | Creates new documents connections for a specified product.
+*ProductsManagementApi* | [**products_management_create_mockups_connections**](docs/ProductsManagementApi.md#products_management_create_mockups_connections) | **POST** /api/backoffice/v1/products/{id}/mockup-connections | Creates new mockups connections for a specified product.
+*ProductsManagementApi* | [**products_management_create_product**](docs/ProductsManagementApi.md#products_management_create_product) | **POST** /api/backoffice/v1/products | Creates a new product and returns its description.
+*ProductsManagementApi* | [**products_management_delete_product**](docs/ProductsManagementApi.md#products_management_delete_product) | **DELETE** /api/backoffice/v1/products/{id} | Deletes a product by its identifier.
+*ProductsManagementApi* | [**products_management_get_all_products**](docs/ProductsManagementApi.md#products_management_get_all_products) | **GET** /api/backoffice/v1/products | Returns all products, relevant to the specified query parameters.
+*ProductsManagementApi* | [**products_management_get_available_personalization_workflows**](docs/ProductsManagementApi.md#products_management_get_available_personalization_workflows) | **GET** /api/backoffice/v1/products/available-workflows | Returns all available product personalization workflows.
+*ProductsManagementApi* | [**products_management_get_available_processing_pipelines**](docs/ProductsManagementApi.md#products_management_get_available_processing_pipelines) | **GET** /api/backoffice/v1/products/available-pipelines | Returns all available product processing pipelines.
+*ProductsManagementApi* | [**products_management_get_product**](docs/ProductsManagementApi.md#products_management_get_product) | **GET** /api/backoffice/v1/products/{id} | Returns a product by its identifier.
+*ProductsManagementApi* | [**products_management_get_product_options**](docs/ProductsManagementApi.md#products_management_get_product_options) | **GET** /api/backoffice/v1/products/{id}/options | Returns a list of product options.
+*ProductsManagementApi* | [**products_management_get_product_variant**](docs/ProductsManagementApi.md#products_management_get_product_variant) | **GET** /api/backoffice/v1/products/{id}/variants/{productVariantId} | Returns a product variant.
+*ProductsManagementApi* | [**products_management_get_product_variant_designs**](docs/ProductsManagementApi.md#products_management_get_product_variant_designs) | **GET** /api/backoffice/v1/products/{id}/variant-designs | Returns a list of product variant designs.
+*ProductsManagementApi* | [**products_management_get_product_variant_documents**](docs/ProductsManagementApi.md#products_management_get_product_variant_documents) | **GET** /api/backoffice/v1/products/{id}/variant-documents | Returns a list of product variant documents.
+*ProductsManagementApi* | [**products_management_get_product_variant_mockups**](docs/ProductsManagementApi.md#products_management_get_product_variant_mockups) | **GET** /api/backoffice/v1/products/{id}/variant-mockups | Returns a list of product variant mockups.
+*ProductsManagementApi* | [**products_management_get_product_variants**](docs/ProductsManagementApi.md#products_management_get_product_variants) | **GET** /api/backoffice/v1/products/{id}/variants | Returns a list of product variants.
+*ProductsManagementApi* | [**products_management_import_products**](docs/ProductsManagementApi.md#products_management_import_products) | **POST** /api/backoffice/v1/products/import | Imports products from a specific CSV file and returns a list of imported products descriptions.
+*ProductsManagementApi* | [**products_management_remove_designs_connections**](docs/ProductsManagementApi.md#products_management_remove_designs_connections) | **DELETE** /api/backoffice/v1/products/{id}/design-connections | Removes designs connections for a specified product.
+*ProductsManagementApi* | [**products_management_remove_documents_connections**](docs/ProductsManagementApi.md#products_management_remove_documents_connections) | **DELETE** /api/backoffice/v1/products/{id}/document-connections | Removes documents connections for a specified product.
+*ProductsManagementApi* | [**products_management_remove_mockups_connections**](docs/ProductsManagementApi.md#products_management_remove_mockups_connections) | **DELETE** /api/backoffice/v1/products/{id}/mockup-connections | Removes mockups connections for a specified product.
+*ProductsManagementApi* | [**products_management_set_product_image**](docs/ProductsManagementApi.md#products_management_set_product_image) | **POST** /api/backoffice/v1/products/{id}/set-image | Set a thumbnail image for an existing product.
+*ProductsManagementApi* | [**products_management_set_product_variant_availability**](docs/ProductsManagementApi.md#products_management_set_product_variant_availability) | **POST** /api/backoffice/v1/products/{id}/set-variant-availability | Set product variants availability. Variants identifiers will be changed.
+*ProductsManagementApi* | [**products_management_set_product_variant_price**](docs/ProductsManagementApi.md#products_management_set_product_variant_price) | **POST** /api/backoffice/v1/products/{id}/set-variant-price | Set product variants price. Variants identifiers will be changed.
+*ProductsManagementApi* | [**products_management_set_product_variant_sku**](docs/ProductsManagementApi.md#products_management_set_product_variant_sku) | **POST** /api/backoffice/v1/products/{id}/set-variant-sku | Set product variants SKU. Variants identifiers will be changed.
+*StorefrontsManagementApi* | [**storefronts_management_create_big_commerce_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_create_big_commerce_storefront) | **POST** /api/backoffice/v1/storefronts/bigcommerce | Creates new BigCommerce storefront.
+*StorefrontsManagementApi* | [**storefronts_management_create_custom_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_create_custom_storefront) | **POST** /api/backoffice/v1/storefronts/custom | Creates new custom storefront.
+*StorefrontsManagementApi* | [**storefronts_management_create_magento_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_create_magento_storefront) | **POST** /api/backoffice/v1/storefronts/magento | Creates new Magento storefront.
+*StorefrontsManagementApi* | [**storefronts_management_create_nop_commerce_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_create_nop_commerce_storefront) | **POST** /api/backoffice/v1/storefronts/nopcommerce | Creates new NopCommerce storefront.
+*StorefrontsManagementApi* | [**storefronts_management_create_woo_commerce_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_create_woo_commerce_storefront) | **POST** /api/backoffice/v1/storefronts/woocommerce | Creates new WooCommerce storefront.
+*StorefrontsManagementApi* | [**storefronts_management_delete**](docs/StorefrontsManagementApi.md#storefronts_management_delete) | **DELETE** /api/backoffice/v1/storefronts/{id} | Deletes an existing storefront by its identifier.
+*StorefrontsManagementApi* | [**storefronts_management_get**](docs/StorefrontsManagementApi.md#storefronts_management_get) | **GET** /api/backoffice/v1/storefronts/{id} | Returns a storefront by identifier.
+*StorefrontsManagementApi* | [**storefronts_management_get_all**](docs/StorefrontsManagementApi.md#storefronts_management_get_all) | **GET** /api/backoffice/v1/storefronts | Returns all storefronts, relevant to the specified query parameters.
+*StorefrontsManagementApi* | [**storefronts_management_get_big_commerce_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_get_big_commerce_storefront) | **GET** /api/backoffice/v1/storefronts/bigcommerce/{id} | Returns extended information about BigCommerce storefront.
+*StorefrontsManagementApi* | [**storefronts_management_get_custom_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_get_custom_storefront) | **GET** /api/backoffice/v1/storefronts/custom/{id} | Returns extended information about custom storefront.
+*StorefrontsManagementApi* | [**storefronts_management_get_magento_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_get_magento_storefront) | **GET** /api/backoffice/v1/storefronts/magento/{id} | Returns extended information about Magento storefront.
+*StorefrontsManagementApi* | [**storefronts_management_get_nop_commerce_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_get_nop_commerce_storefront) | **GET** /api/backoffice/v1/storefronts/nopcommerce/{id} | Returns extended information about NopCommerce storefront.
+*StorefrontsManagementApi* | [**storefronts_management_get_woo_commerce_storefront**](docs/StorefrontsManagementApi.md#storefronts_management_get_woo_commerce_storefront) | **GET** /api/backoffice/v1/storefronts/woocommerce/{id} | Returns extended information about WooCommerce storefront.
+*UsersManagementApi* | [**users_management_create**](docs/UsersManagementApi.md#users_management_create) | **POST** /api/backoffice/v1/users | Creates a new tenant user.
+*UsersManagementApi* | [**users_management_delete**](docs/UsersManagementApi.md#users_management_delete) | **DELETE** /api/backoffice/v1/users/{id} | Deletes an existing tenant user.
+*UsersManagementApi* | [**users_management_get**](docs/UsersManagementApi.md#users_management_get) | **GET** /api/backoffice/v1/users/{id} | Returns a tenant user by user identifier.
+*UsersManagementApi* | [**users_management_get_all**](docs/UsersManagementApi.md#users_management_get_all) | **GET** /api/backoffice/v1/users | Returns a tenant users list.
+*UsersManagementApi* | [**users_management_get_all_roles**](docs/UsersManagementApi.md#users_management_get_all_roles) | **GET** /api/backoffice/v1/users/roles | Returns all tenant user roles, relevant to the specified query parameters.
+
+
+## Documentation For Models
+
+ - [AppearanceDataDto](docs/AppearanceDataDto.md)
+ - [AppearanceDataItemDto](docs/AppearanceDataItemDto.md)
+ - [AppearanceDataType](docs/AppearanceDataType.md)
+ - [BigCommerceSettingsDto](docs/BigCommerceSettingsDto.md)
+ - [BigCommerceStorefrontDto](docs/BigCommerceStorefrontDto.md)
+ - [BuildInfoModel](docs/BuildInfoModel.md)
+ - [ConflictType](docs/ConflictType.md)
+ - [CreateBigCommerceStorefrontDto](docs/CreateBigCommerceStorefrontDto.md)
+ - [CreateCustomStorefrontDto](docs/CreateCustomStorefrontDto.md)
+ - [CreateMagentoStorefrontDto](docs/CreateMagentoStorefrontDto.md)
+ - [CreateNopCommerceStorefrontDto](docs/CreateNopCommerceStorefrontDto.md)
+ - [CreateProductDesignConnectionsDto](docs/CreateProductDesignConnectionsDto.md)
+ - [CreateProductDocumentConnectionsDto](docs/CreateProductDocumentConnectionsDto.md)
+ - [CreateProductDto](docs/CreateProductDto.md)
+ - [CreateProductMockupConnectionsDto](docs/CreateProductMockupConnectionsDto.md)
+ - [CreateProductOptionDto](docs/CreateProductOptionDto.md)
+ - [CreateProductOptionValueDto](docs/CreateProductOptionValueDto.md)
+ - [CreateProductReferenceDto](docs/CreateProductReferenceDto.md)
+ - [CreateTenantUserDto](docs/CreateTenantUserDto.md)
+ - [CreateWooCommerceStorefrontDto](docs/CreateWooCommerceStorefrontDto.md)
+ - [CustomStorefrontDto](docs/CustomStorefrontDto.md)
+ - [GeneralConflictDto](docs/GeneralConflictDto.md)
+ - [ImageInfo](docs/ImageInfo.md)
+ - [MagentoSettingsDto](docs/MagentoSettingsDto.md)
+ - [MagentoStorefrontDto](docs/MagentoStorefrontDto.md)
+ - [MicrosoftAspNetCoreMvcProblemDetails](docs/MicrosoftAspNetCoreMvcProblemDetails.md)
+ - [NopCommerceSettingsDto](docs/NopCommerceSettingsDto.md)
+ - [NopCommerceStorefrontDto](docs/NopCommerceStorefrontDto.md)
+ - [OptionType](docs/OptionType.md)
+ - [PagedOfPersonalizationWorkflowDto](docs/PagedOfPersonalizationWorkflowDto.md)
+ - [PagedOfProcessingPipelineDto](docs/PagedOfProcessingPipelineDto.md)
+ - [PagedOfProductDto](docs/PagedOfProductDto.md)
+ - [PagedOfProductOptionDto](docs/PagedOfProductOptionDto.md)
+ - [PagedOfProductReferenceDto](docs/PagedOfProductReferenceDto.md)
+ - [PagedOfProductVariantDesignDto](docs/PagedOfProductVariantDesignDto.md)
+ - [PagedOfProductVariantDocumentDto](docs/PagedOfProductVariantDocumentDto.md)
+ - [PagedOfProductVariantDto](docs/PagedOfProductVariantDto.md)
+ - [PagedOfProductVariantMockupDto](docs/PagedOfProductVariantMockupDto.md)
+ - [PagedOfStorefrontDto](docs/PagedOfStorefrontDto.md)
+ - [PagedOfTenantUserDto](docs/PagedOfTenantUserDto.md)
+ - [PagedOfTenantUserRoleDto](docs/PagedOfTenantUserRoleDto.md)
+ - [PersonalizationWorkflowDto](docs/PersonalizationWorkflowDto.md)
+ - [ProcessingPipelineDto](docs/ProcessingPipelineDto.md)
+ - [ProductAssetConnectionOptionsDto](docs/ProductAssetConnectionOptionsDto.md)
+ - [ProductDesignConnectionDto](docs/ProductDesignConnectionDto.md)
+ - [ProductDocumentConnectionDto](docs/ProductDocumentConnectionDto.md)
+ - [ProductDto](docs/ProductDto.md)
+ - [ProductMockupConnectionDto](docs/ProductMockupConnectionDto.md)
+ - [ProductMockupType](docs/ProductMockupType.md)
+ - [ProductOptionDto](docs/ProductOptionDto.md)
+ - [ProductOptionValueDto](docs/ProductOptionValueDto.md)
+ - [ProductReferenceCreationConflictDto](docs/ProductReferenceCreationConflictDto.md)
+ - [ProductReferenceDto](docs/ProductReferenceDto.md)
+ - [ProductReferenceInfo](docs/ProductReferenceInfo.md)
+ - [ProductReferenceType](docs/ProductReferenceType.md)
+ - [ProductVariantAvailabilityDto](docs/ProductVariantAvailabilityDto.md)
+ - [ProductVariantDesignDto](docs/ProductVariantDesignDto.md)
+ - [ProductVariantDocumentDto](docs/ProductVariantDocumentDto.md)
+ - [ProductVariantDto](docs/ProductVariantDto.md)
+ - [ProductVariantMockupDto](docs/ProductVariantMockupDto.md)
+ - [ProductVariantMockupType](docs/ProductVariantMockupType.md)
+ - [ProductVariantOptionDto](docs/ProductVariantOptionDto.md)
+ - [ProductVariantPriceDto](docs/ProductVariantPriceDto.md)
+ - [ProductVariantResourceDto](docs/ProductVariantResourceDto.md)
+ - [ProductVariantResourcePreview](docs/ProductVariantResourcePreview.md)
+ - [ProductVariantResourceType](docs/ProductVariantResourceType.md)
+ - [ProductVariantSkuDto](docs/ProductVariantSkuDto.md)
+ - [RemoveProductAssetConnectionDto](docs/RemoveProductAssetConnectionDto.md)
+ - [RemoveProductDesignConnectionsDto](docs/RemoveProductDesignConnectionsDto.md)
+ - [RemoveProductDocumentConnectionsDto](docs/RemoveProductDocumentConnectionsDto.md)
+ - [RemoveProductMockupConnectionsDto](docs/RemoveProductMockupConnectionsDto.md)
+ - [SetProductVariantAvailabilityDto](docs/SetProductVariantAvailabilityDto.md)
+ - [SetProductVariantPriceDto](docs/SetProductVariantPriceDto.md)
+ - [SetProductVariantSkuDto](docs/SetProductVariantSkuDto.md)
+ - [SimpleOptionValue](docs/SimpleOptionValue.md)
+ - [StorefrontDto](docs/StorefrontDto.md)
+ - [StorefrontType](docs/StorefrontType.md)
+ - [SurfaceUsageType](docs/SurfaceUsageType.md)
+ - [TenantUserDto](docs/TenantUserDto.md)
+ - [TenantUserRoleDto](docs/TenantUserRoleDto.md)
+ - [WooCommerceSettingsDto](docs/WooCommerceSettingsDto.md)
+ - [WooCommerceStorefrontDto](docs/WooCommerceStorefrontDto.md)
+ - [WorkflowType](docs/WorkflowType.md)
+
+
+<a id="documentation-for-authorization"></a>
+## Documentation For Authorization
+
+
+Authentication schemes defined for the API:
+<a id="ApiKey"></a>
+### ApiKey
+
+- **Type**: API key
+- **API key parameter name**: X-API-Key
+- **Location**: HTTP header
+
+<a id="Bearer"></a>
+### Bearer
+
+- **Type**: API key
+- **API key parameter name**: Authorization
+- **Location**: HTTP header
+
+<a id="OAuth2ClientCredentials"></a>
+### OAuth2ClientCredentials
+
+- **Type**: OAuth
+- **Flow**: application
+- **Authorization URL**: 
+- **Scopes**: N/A
+
+<a id="OAuth2Implicit"></a>
+### OAuth2Implicit
+
+- **Type**: OAuth
+- **Flow**: implicit
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Projects_full**: Manipulate projects
+ - **Projects_read**: Read projects
+ - **Templates_full**: Manipulate products
+ - **Templates_read**: Read products
+ - **Storefronts_full**: Manipulate products
+ - **Storefronts_read**: Read products
+ - **StorefrontUsers_full**: Manipulate storefront users
+ - **StorefrontUsers_read**: Read storefront users
+ - **TenantUsers_full**: Manipulate storefront users
+ - **TenantUsers_read**: Read storefront users
+
+<a id="oauth2-code"></a>
+### oauth2-code
+
+- **Type**: OAuth
+- **Flow**: accessCode
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Projects_full**: Manipulate projects
+ - **Projects_read**: Read projects
+ - **Templates_full**: Manipulate products
+ - **Templates_read**: Read products
+ - **Storefronts_full**: Manipulate products
+ - **Storefronts_read**: Read products
+ - **StorefrontUsers_full**: Manipulate storefront users
+ - **StorefrontUsers_read**: Read storefront users
+ - **TenantUsers_full**: Manipulate storefront users
+ - **TenantUsers_read**: Read storefront users
+
+
+
+
+
