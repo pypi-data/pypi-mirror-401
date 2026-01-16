@@ -1,0 +1,34 @@
+[package]
+name = "aether-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Core library for AI-powered code injection framework"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+handlebars = { workspace = true }
+regex = { workspace = true }
+tracing = { workspace = true }
+futures = "0.3.31"
+async-stream = "0.3.6"
+tokio-stream = "0.1.17"
+tempfile = "3.17"
+fastembed = "5.8"
+dashmap = "5.5.3"
+serde_yaml = "0.9"
+reqwest = { version = "0.12", features = ["json"] }
+rhai = "1.20"
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = { version = "0.5", features = ["async_tokio"] }
+
+[[bench]]
+name = "template_benchmark"
+harness = false
