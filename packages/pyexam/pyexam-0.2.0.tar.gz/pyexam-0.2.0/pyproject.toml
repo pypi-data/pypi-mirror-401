@@ -1,0 +1,62 @@
+[project]
+name = "pyexam"
+version = "0.2.0"
+description = "Convert simple YAML documents to LaTeX and PDF exams"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [ { name = "Rui Almeida", email = "ruial@outlook.com" } ]
+keywords = ["exam", "latex", "pdf", "template", "yaml"]
+dynamic = [ "classifiers" ]
+urls = { Homepage = "https://github.com/ruial/pyexam", Repository = "https://github.com/ruial/pyexam" }
+requires-python = ">=3.11"
+dependencies = [
+  "pyyaml (>=6.0.0,<7.0.0)",
+  "pydantic (>=2.0.0,<3.0.0)",
+  "jinja2 (>=3.0.0,<4.0.0)",
+]
+
+[project.scripts]
+pyexam = "pyexam.__main__:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+include = [
+  "examples/*.png",
+  "examples/*.yml",
+]
+
+[tool.poetry.group.dev.dependencies]
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+isort = "*"
+black = "*"
+flake8 = "*"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.mypy]
+python_version = "3.11"
+
+[[tool.mypy.overrides]]
+module = [
+    "yaml"
+]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+omit = [
+    "pyexam/__main__.py"
+]
+
+[tool.coverage.report]
+fail_under = 80
