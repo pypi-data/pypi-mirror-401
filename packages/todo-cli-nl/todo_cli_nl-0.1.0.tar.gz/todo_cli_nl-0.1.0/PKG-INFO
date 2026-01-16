@@ -1,0 +1,198 @@
+Metadata-Version: 2.4
+Name: todo-cli-nl
+Version: 0.1.0
+Summary: A command-line todo list application with natural language input
+Project-URL: Homepage, https://gitlab.com/roscom/todo
+Project-URL: Repository, https://gitlab.com/roscom/todo
+Project-URL: Issues, https://gitlab.com/roscom/todo/-/issues
+Author: Ross Cameron
+License: MIT License
+        
+        Copyright (c) 2026 Ross Cameron
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: cli,natural-language,task-manager,todo
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Utilities
+Requires-Python: >=3.10
+Requires-Dist: pydantic>=2.0
+Description-Content-Type: text/markdown
+
+# Todo CLI
+
+A command-line todo list application that accepts natural language input.
+
+## Features
+
+- **Natural language input** - No need to remember exact commands
+- **Intent classification** - Automatically understands what you want to do
+- **Local persistence** - Todos saved to `~/.todo/todos.json`
+- **Simple and fast** - Operations complete in under 0.5 seconds
+
+## Installation
+
+### From PyPI
+
+```bash
+pip install todo-cli-nl
+```
+
+### From Source
+
+Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/).
+
+```bash
+git clone https://gitlab.com/roscom/todo.git
+cd todo
+uv sync
+```
+
+## Usage
+
+```bash
+# If installed via pip
+todo <command>
+
+# If running from source
+uv run todo <command>
+```
+
+### Add a Todo
+
+```bash
+uv run todo add buy groceries
+uv run todo "remember to call mom"
+uv run todo "I need to finish the report"
+```
+
+### List Open Todos
+
+```bash
+uv run todo list
+uv run todo "show my todos"
+uv run todo "what do I need to do"
+```
+
+Output:
+```
+Open todos:
+  #1  buy groceries
+  #2  call mom
+  #3  finish the report
+```
+
+### Complete a Todo
+
+By ID:
+```bash
+uv run todo "done #1"
+uv run todo "complete #2"
+```
+
+By title:
+```bash
+uv run todo "done buy groceries"
+uv run todo "finish the report"
+```
+
+### Delete a Todo
+
+```bash
+uv run todo "delete #1"
+uv run todo "remove call mom"
+```
+
+### Help
+
+```bash
+uv run todo
+uv run todo help
+uv run todo --help
+```
+
+## Supported Commands
+
+| Intent | Keywords |
+|--------|----------|
+| Add | `add`, `create`, `new`, `remember`, `need to`, `todo` |
+| List | `list`, `show`, `display`, `what`, `todos`, `tasks` |
+| Complete | `done`, `complete`, `finish`, `finished`, `check` |
+| Delete | `delete`, `remove`, `cancel`, `drop` |
+
+## Data Storage
+
+Todos are stored in JSON format at `~/.todo/todos.json`.
+
+To reset all todos:
+```bash
+rm -rf ~/.todo
+```
+
+## Development
+
+### Run Tests
+
+```bash
+# All tests
+uv run pytest
+
+# Unit tests only
+uv run pytest tests/unit -v
+
+# Integration tests only
+uv run pytest tests/integration -v
+
+# With coverage
+uv run pytest --cov=src
+```
+
+### Lint
+
+```bash
+uvx ruff check src/ tests/
+```
+
+## Project Structure
+
+```
+src/
+├── models/todo.py       # TodoItem model + Intent enum
+├── services/
+│   ├── storage.py       # JSON file persistence
+│   └── classifier.py    # Intent classification
+├── cli/main.py          # CLI entry point
+└── lib/utils.py         # Utilities
+
+tests/
+├── unit/                # Unit tests
+└── integration/         # CLI integration tests
+```
+
+## License
+
+MIT

@@ -1,0 +1,57 @@
+stages:
+  - lint
+  - test
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/uv"
+
+default:
+  image: python:3.12-slim
+  before_script:
+    - pip install uv
+    - uv sync --frozen
+
+cache:
+  paths:
+    - .cache/pip
+    - .cache/uv
+    - .venv
+
+lint:
+  stage: lint
+  script:
+    - uvx ruff check src/ tests/
+  allow_failure: false
+
+test:unit:
+  stage: test
+  script:
+    - uv run pytest tests/unit -v --junitxml=report-unit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report-unit.xml
+
+test:integration:
+  stage: test
+  script:
+    - uv run pytest tests/integration -v --junitxml=report-integration.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report-integration.xml
+
+test:all:
+  stage: test
+  script:
+    - uv run pytest --cov=src --cov-report=term --cov-report=xml:coverage.xml -v
+  coverage: '/TOTAL.*\s+(\d+%)/'
+  artifacts:
+    when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
