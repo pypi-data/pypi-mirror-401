@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: embed-term
+Version: 0.1.0
+Summary: A basic module to embed a terminal-like input in Python applications
+Author-email: Glenn Sutherland <dev.glenn@flench.me>
+License: MIT
+Project-URL: Repository, https://github.com/yourusername/embed-term
+Project-URL: Issues, https://github.com/yourusername/embed-term/issues
+Keywords: terminal,input,interactive
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# embed-term
+
+A basic module to embed a terminal-like input in Python applications.
+
+## Features
+
+- Terminal-like input handling with cursor control
+- Cross-platform support (Windows, Linux, macOS)
+- ANSI escape code support for text formatting
+- Raw character input processing
+
+## Installation
+
+```bash
+pip install embed-term
+```
+
+## Usage
+
+```python
+from embed_term import EmbedTerminal
+
+# Create a terminal instance
+terminal = EmbedTerminal()
+
+# Initialize the terminal
+terminal.init_terminal()
+
+# Read user input
+terminal.tick()
+
+# Display input
+terminal.display_input()
+
+# Reset terminal
+terminal.reset_terminal()
+```
+
+## API
+
+### EmbedTerminal
+
+Main class for handling terminal-like input.
+
+#### Methods
+
+- `init_terminal()` - Initialize the terminal for raw input
+- `reset_terminal()` - Reset the terminal to normal mode
+- `read_input()` - Get the current input as a string
+- `display_input(type="sl")` - Display input with prompt
+  - `"sl"` - Single line display (default)
+  - `"nl"` - New line display
+  - `"er"` - Erase display
+  - `"cl"` - Clear and redisplay
+- `clear_input()` - Clear the input buffer
+- `tick()` - Process one character of input
+
+## License
+
+MIT
+
+## Author
+
+Glenn Sutherland
