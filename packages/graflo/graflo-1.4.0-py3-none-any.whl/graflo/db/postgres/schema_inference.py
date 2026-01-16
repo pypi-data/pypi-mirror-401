@@ -1,0 +1,639 @@
+"""Schema inference from PostgreSQL database introspection.
+
+This module provides functionality to infer graflo Schema objects from PostgreSQL
+3NF database schemas by analyzing table structures, relationships, and column types.
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING
+
+from graflo.architecture.edge import Edge, EdgeConfig, WeightConfig
+from graflo.architecture.onto import Index, IndexType
+from graflo.architecture.schema import Schema, SchemaMetadata
+from graflo.architecture.vertex import Field, FieldType, Vertex, VertexConfig
+from graflo.onto import DBFlavor
+
+from ...architecture.onto_sql import EdgeTableInfo, SchemaIntrospectionResult
+from ..util import load_reserved_words, sanitize_attribute_name
+from .conn import PostgresConnection
+from .types import PostgresTypeMapper
+
+if TYPE_CHECKING:
+    from graflo.architecture.resource import Resource
+
+logger = logging.getLogger(__name__)
+
+
+class PostgresSchemaInferencer:
+    """Infers graflo Schema from PostgreSQL schema introspection results.
+
+    This class takes the output from PostgresConnection.introspect_schema() and
+    generates a complete graflo Schema with vertices, edges, and weights.
+    """
+
+    def __init__(
+        self,
+        db_flavor: DBFlavor = DBFlavor.ARANGO,
+        conn: PostgresConnection | None = None,
+    ):
+        """Initialize the schema inferencer.
+
+        Args:
+            db_flavor: Target database flavor for the inferred schema
+            conn: PostgreSQL connection for sampling data to infer types (optional)
+        """
+        self.db_flavor = db_flavor
+        self.type_mapper = PostgresTypeMapper()
+        self.conn = conn
+        # Load reserved words for the target database flavor
+        self.reserved_words = load_reserved_words(db_flavor)
+
+    def infer_vertex_config(
+        self, introspection_result: SchemaIntrospectionResult
+    ) -> VertexConfig:
+        """Infer VertexConfig from vertex tables.
+
+        Args:
+            introspection_result: Result from PostgresConnection.introspect_schema()
+
+        Returns:
+            VertexConfig: Inferred vertex configuration
+        """
+        vertex_tables = introspection_result.vertex_tables
+        vertices = []
+
+        for table_info in vertex_tables:
+            table_name = table_info.name
+            columns = table_info.columns
+            pk_columns = table_info.primary_key
+
+            # Create fields from columns
+            fields = []
+            for col in columns:
+                field_name = col.name
+                field_type = self.type_mapper.map_type(col.type)
+                fields.append(Field(name=field_name, type=field_type))
+
+            # Create indexes from primary key
+            indexes = []
+            if pk_columns:
+                indexes.append(
+                    Index(fields=pk_columns, type=IndexType.PERSISTENT, unique=True)
+                )
+
+            # Create vertex
+            vertex = Vertex(
+                name=table_name,
+                dbname=table_name,
+                fields=fields,
+                indexes=indexes,
+            )
+
+            vertices.append(vertex)
+            logger.debug(
+                f"Inferred vertex '{table_name}' with {len(fields)} fields and "
+                f"{len(indexes)} indexes"
+            )
+
+        return VertexConfig(vertices=vertices, db_flavor=self.db_flavor)
+
+    def _infer_type_from_samples(
+        self, table_name: str, schema_name: str, column_name: str, pg_type: str
+    ) -> str:
+        """Infer field type by sampling 5 rows from the table.
+
+        Uses heuristics to determine if a column contains integers, floats, datetimes, etc.
+        Falls back to PostgreSQL type mapping if sampling fails or is unavailable.
+
+        Args:
+            table_name: Name of the table
+            schema_name: Schema name
+            column_name: Name of the column to sample
+            pg_type: PostgreSQL type from schema introspection
+
+        Returns:
+            str: FieldType value (INT, FLOAT, DATETIME, STRING, etc.)
+        """
+        # First try PostgreSQL type mapping
+        mapped_type = self.type_mapper.map_type(pg_type)
+
+        # If we have a connection, sample data to refine the type
+        if self.conn is None:
+            logger.debug(
+                f"No connection available for sampling, using mapped type '{mapped_type}' "
+                f"for column '{column_name}' in table '{table_name}'"
+            )
+            return mapped_type
+
+        try:
+            # Sample 5 rows from the table
+            query = (
+                f'SELECT "{column_name}" FROM "{schema_name}"."{table_name}" LIMIT 5'
+            )
+            samples = self.conn.read(query)
+
+            if not samples:
+                logger.debug(
+                    f"No samples found for column '{column_name}' in table '{table_name}', "
+                    f"using mapped type '{mapped_type}'"
+                )
+                return mapped_type
+
+            # Extract non-None values
+            values = [
+                row[column_name] for row in samples if row[column_name] is not None
+            ]
+
+            if not values:
+                logger.debug(
+                    f"All samples are NULL for column '{column_name}' in table '{table_name}', "
+                    f"using mapped type '{mapped_type}'"
+                )
+                return mapped_type
+
+            # Heuristics to infer type from values
+            # Check for integers (all values are integers)
+            if all(isinstance(v, int) for v in values):
+                logger.debug(
+                    f"Inferred INT type for column '{column_name}' in table '{table_name}' "
+                    f"from samples"
+                )
+                return FieldType.INT.value
+
+            # Check for floats (all values are floats or ints that could be floats)
+            if all(isinstance(v, (int, float)) for v in values):
+                # If any value has decimal part, it's a float
+                if any(isinstance(v, float) and v != float(int(v)) for v in values):
+                    logger.debug(
+                        f"Inferred FLOAT type for column '{column_name}' in table '{table_name}' "
+                        f"from samples"
+                    )
+                    return FieldType.FLOAT.value
+                # All integers, but might be stored as float - check PostgreSQL type
+                if mapped_type == FieldType.FLOAT.value:
+                    return FieldType.FLOAT.value
+                return FieldType.INT.value
+
+            # Check for datetime/date objects
+            from datetime import date, datetime, time
+
+            if all(isinstance(v, (datetime, date, time)) for v in values):
+                logger.debug(
+                    f"Inferred DATETIME type for column '{column_name}' in table '{table_name}' "
+                    f"from samples"
+                )
+                return FieldType.DATETIME.value
+
+            # Check for ISO format datetime strings
+            if all(isinstance(v, str) for v in values):
+                # Try to parse as ISO datetime
+                iso_datetime_count = 0
+                for v in values:
+                    try:
+                        # Try ISO format (with or without timezone)
+                        datetime.fromisoformat(v.replace("Z", "+00:00"))
+                        iso_datetime_count += 1
+                    except (ValueError, AttributeError):
+                        # Try other common formats
+                        try:
+                            datetime.strptime(v, "%Y-%m-%d %H:%M:%S")
+                            iso_datetime_count += 1
+                        except ValueError:
+                            try:
+                                datetime.strptime(v, "%Y-%m-%d")
+                                iso_datetime_count += 1
+                            except ValueError:
+                                pass
+
+                # If most values look like datetimes, infer DATETIME
+                if iso_datetime_count >= len(values) * 0.8:  # 80% threshold
+                    logger.debug(
+                        f"Inferred DATETIME type for column '{column_name}' in table '{table_name}' "
+                        f"from ISO format strings"
+                    )
+                    return FieldType.DATETIME.value
+
+            # Default to mapped type
+            logger.debug(
+                f"Using mapped type '{mapped_type}' for column '{column_name}' in table '{table_name}' "
+                f"(could not infer from samples)"
+            )
+            return mapped_type
+
+        except Exception as e:
+            logger.warning(
+                f"Error sampling data for column '{column_name}' in table '{table_name}': {e}. "
+                f"Using mapped type '{mapped_type}'"
+            )
+            return mapped_type
+
+    def infer_edge_weights(self, edge_table_info: EdgeTableInfo) -> WeightConfig | None:
+        """Infer edge weights from edge table columns with types.
+
+        Uses PostgreSQL column types and optionally samples data to infer accurate types.
+
+        Args:
+            edge_table_info: Edge table information from introspection
+
+        Returns:
+            WeightConfig if there are weight columns, None otherwise
+        """
+        columns = edge_table_info.columns
+        pk_columns = set(edge_table_info.primary_key)
+        fk_columns = {fk.column for fk in edge_table_info.foreign_keys}
+
+        # Find non-PK, non-FK columns (these become weights)
+        weight_columns = [
+            col
+            for col in columns
+            if col.name not in pk_columns and col.name not in fk_columns
+        ]
+
+        if not weight_columns:
+            return None
+
+        # Create Field objects with types for each weight column
+        direct_weights = []
+        for col in weight_columns:
+            # Infer type: use PostgreSQL type first, then sample if needed
+            field_type = self._infer_type_from_samples(
+                edge_table_info.name,
+                edge_table_info.schema_name,
+                col.name,
+                col.type,
+            )
+            direct_weights.append(Field(name=col.name, type=field_type))
+
+        logger.debug(
+            f"Inferred {len(direct_weights)} weights for edge table "
+            f"'{edge_table_info.name}': {[f.name for f in direct_weights]}"
+        )
+
+        return WeightConfig(direct=direct_weights)
+
+    def infer_edge_config(
+        self,
+        introspection_result: SchemaIntrospectionResult,
+        vertex_config: VertexConfig,
+    ) -> EdgeConfig:
+        """Infer EdgeConfig from edge tables.
+
+        Args:
+            introspection_result: Result from PostgresConnection.introspect_schema()
+            vertex_config: Inferred vertex configuration
+
+        Returns:
+            EdgeConfig: Inferred edge configuration
+        """
+        edge_tables = introspection_result.edge_tables
+        edges = []
+
+        vertex_names = vertex_config.vertex_set
+
+        for edge_table_info in edge_tables:
+            table_name = edge_table_info.name
+            source_table = edge_table_info.source_table
+            target_table = edge_table_info.target_table
+
+            # Verify source and target vertices exist
+            if source_table not in vertex_names:
+                logger.warning(
+                    f"Source vertex '{source_table}' for edge table '{table_name}' "
+                    f"not found in vertex config, skipping"
+                )
+                continue
+
+            if target_table not in vertex_names:
+                logger.warning(
+                    f"Target vertex '{target_table}' for edge table '{table_name}' "
+                    f"not found in vertex config, skipping"
+                )
+                continue
+
+            # Infer weights
+            weights = self.infer_edge_weights(edge_table_info)
+            indexes = []
+            # Create edge
+            edge = Edge(
+                source=source_table,
+                target=target_table,
+                indexes=indexes,
+                weights=weights,
+                relation=edge_table_info.relation,
+            )
+
+            edges.append(edge)
+            logger.debug(
+                f"Inferred edge '{table_name}' from {source_table} to {target_table}"
+            )
+
+        return EdgeConfig(edges=edges)
+
+    def _sanitize_schema_attributes(self, schema: Schema) -> Schema:
+        """Sanitize attribute names and vertex names in the schema to avoid reserved words.
+
+        This method modifies:
+        - Field names in vertices and edges
+        - Vertex names themselves
+        - Edge source/target/by references to vertices
+        - Resource apply lists that reference vertices
+
+        The sanitization is deterministic: the same input always produces the same output.
+
+        Args:
+            schema: The schema to sanitize
+
+        Returns:
+            Schema with sanitized attribute names and vertex names
+        """
+        if not self.reserved_words:
+            # No reserved words to check, return schema as-is
+            return schema
+
+        # Track name mappings for attributes (fields/weights)
+        attribute_mappings: dict[str, str] = {}
+        # Track name mappings for vertex names (separate from attributes)
+        vertex_mappings: dict[str, str] = {}
+
+        # First pass: Sanitize vertex names
+        for vertex in schema.vertex_config.vertices:
+            original_vertex_name = vertex.name
+            if original_vertex_name not in vertex_mappings:
+                sanitized_vertex_name = sanitize_attribute_name(
+                    original_vertex_name, self.reserved_words, suffix="_vertex"
+                )
+                if sanitized_vertex_name != original_vertex_name:
+                    vertex_mappings[original_vertex_name] = sanitized_vertex_name
+                    logger.debug(
+                        f"Sanitizing vertex name '{original_vertex_name}' -> '{sanitized_vertex_name}'"
+                    )
+                else:
+                    vertex_mappings[original_vertex_name] = original_vertex_name
+            else:
+                sanitized_vertex_name = vertex_mappings[original_vertex_name]
+
+            # Update vertex name if it changed
+            if sanitized_vertex_name != original_vertex_name:
+                vertex.name = sanitized_vertex_name
+                # Also update dbname if it matches the original name (default behavior)
+                if vertex.dbname == original_vertex_name or vertex.dbname is None:
+                    vertex.dbname = sanitized_vertex_name
+
+        # Rebuild VertexConfig's internal _vertices_map after renaming vertices
+        schema.vertex_config._vertices_map = {
+            vertex.name: vertex for vertex in schema.vertex_config.vertices
+        }
+
+        # Update blank_vertices references if they were sanitized
+        schema.vertex_config.blank_vertices = [
+            vertex_mappings.get(v, v) for v in schema.vertex_config.blank_vertices
+        ]
+
+        # Update force_types keys if they were sanitized
+        schema.vertex_config.force_types = {
+            vertex_mappings.get(k, k): v
+            for k, v in schema.vertex_config.force_types.items()
+        }
+
+        # Second pass: Sanitize vertex field names
+        for vertex in schema.vertex_config.vertices:
+            for field in vertex.fields:
+                original_name = field.name
+                if original_name not in attribute_mappings:
+                    sanitized_name = sanitize_attribute_name(
+                        original_name, self.reserved_words
+                    )
+                    if sanitized_name != original_name:
+                        attribute_mappings[original_name] = sanitized_name
+                        logger.debug(
+                            f"Sanitizing field name '{original_name}' -> '{sanitized_name}' "
+                            f"in vertex '{vertex.name}'"
+                        )
+                    else:
+                        attribute_mappings[original_name] = original_name
+                else:
+                    sanitized_name = attribute_mappings[original_name]
+
+                # Update field name if it changed
+                if sanitized_name != original_name:
+                    field.name = sanitized_name
+
+            # Update index field references if they were sanitized
+            for index in vertex.indexes:
+                updated_fields = []
+                for field_name in index.fields:
+                    sanitized_field_name = attribute_mappings.get(
+                        field_name, field_name
+                    )
+                    updated_fields.append(sanitized_field_name)
+                index.fields = updated_fields
+
+        # Third pass: Update edge references to sanitized vertex names
+        for edge in schema.edge_config.edges:
+            # Update source vertex reference
+            if edge.source in vertex_mappings:
+                edge.source = vertex_mappings[edge.source]
+                logger.debug(
+                    f"Updated edge source reference '{edge.source}' (sanitized vertex name)"
+                )
+
+            # Update target vertex reference
+            if edge.target in vertex_mappings:
+                edge.target = vertex_mappings[edge.target]
+                logger.debug(
+                    f"Updated edge target reference '{edge.target}' (sanitized vertex name)"
+                )
+
+            # Update 'by' vertex reference for indirect edges
+            # Note: edge.by might be a vertex name or a dbname (if finish_init was already called)
+            # We check both the direct mapping and reverse lookup via dbname
+            if edge.by is not None:
+                if edge.by in vertex_mappings:
+                    # edge.by is a vertex name that needs sanitization
+                    edge.by = vertex_mappings[edge.by]
+                    logger.debug(
+                        f"Updated edge 'by' reference to '{edge.by}' (sanitized vertex name)"
+                    )
+                else:
+                    # edge.by might be a dbname - try to find the vertex that has this dbname
+                    # and check if its name was sanitized
+                    try:
+                        vertex = schema.vertex_config._get_vertex_by_name_or_dbname(
+                            edge.by
+                        )
+                        vertex_name = vertex.name
+                        if vertex_name in vertex_mappings:
+                            # This vertex was sanitized, update edge.by to use sanitized name
+                            # (finish_init will convert it back to dbname)
+                            edge.by = vertex_mappings[vertex_name]
+                            logger.debug(
+                                f"Updated edge 'by' reference from dbname '{edge.by}' "
+                                f"to sanitized vertex name '{vertex_mappings[vertex_name]}'"
+                            )
+                    except (KeyError, AttributeError):
+                        # edge.by is neither a vertex name nor a dbname we recognize
+                        # This shouldn't happen in normal operation, but we'll skip it
+                        pass
+
+            # Sanitize edge weight field names
+            if edge.weights and edge.weights.direct:
+                for weight_field in edge.weights.direct:
+                    original_name = weight_field.name
+                    if original_name not in attribute_mappings:
+                        sanitized_name = sanitize_attribute_name(
+                            original_name, self.reserved_words
+                        )
+                        if sanitized_name != original_name:
+                            attribute_mappings[original_name] = sanitized_name
+                            logger.debug(
+                                f"Sanitizing weight field name '{original_name}' -> "
+                                f"'{sanitized_name}' in edge '{edge.source}' -> '{edge.target}'"
+                            )
+                        else:
+                            attribute_mappings[original_name] = original_name
+                    else:
+                        sanitized_name = attribute_mappings[original_name]
+
+                    # Update weight field name if it changed
+                    if sanitized_name != original_name:
+                        weight_field.name = sanitized_name
+
+        # Fourth pass: Re-initialize edges after vertex name sanitization
+        # This ensures edge._source, edge._target, and edge.by are correctly set
+        # with the sanitized vertex names
+        schema.edge_config.finish_init(schema.vertex_config)
+
+        # Fifth pass: Update resource apply lists that reference vertices
+        for resource in schema.resources:
+            self._sanitize_resource_vertex_references(resource, vertex_mappings)
+
+        return schema
+
+    def _sanitize_resource_vertex_references(
+        self, resource: Resource, vertex_mappings: dict[str, str]
+    ) -> None:
+        """Sanitize vertex name references in a resource's apply list.
+
+        Resources can reference vertices in their apply list through:
+        - {"vertex": vertex_name} for VertexActor
+        - {"target_vertex": vertex_name, ...} for mapping actors
+        - {"source": vertex_name, "target": vertex_name} for EdgeActor
+        - Nested structures in tree_likes resources
+
+        Args:
+            resource: The resource to sanitize
+            vertex_mappings: Dictionary mapping original vertex names to sanitized names
+        """
+        if not hasattr(resource, "apply") or not resource.apply:
+            return
+
+        def sanitize_apply_item(item):
+            """Recursively sanitize vertex references in apply items."""
+            if isinstance(item, dict):
+                # Handle vertex references in dictionaries
+                sanitized_item = {}
+                for key, value in item.items():
+                    if key == "vertex" and isinstance(value, str):
+                        # {"vertex": vertex_name}
+                        sanitized_item[key] = vertex_mappings.get(value, value)
+                        if value != sanitized_item[key]:
+                            logger.debug(
+                                f"Updated resource '{resource.resource_name}' apply item: "
+                                f"'{key}': '{value}' -> '{sanitized_item[key]}'"
+                            )
+                    elif key == "target_vertex" and isinstance(value, str):
+                        # {"target_vertex": vertex_name, ...}
+                        sanitized_item[key] = vertex_mappings.get(value, value)
+                        if value != sanitized_item[key]:
+                            logger.debug(
+                                f"Updated resource '{resource.resource_name}' apply item: "
+                                f"'{key}': '{value}' -> '{sanitized_item[key]}'"
+                            )
+                    elif key in ("source", "target") and isinstance(value, str):
+                        # {"source": vertex_name, "target": vertex_name} for EdgeActor
+                        sanitized_item[key] = vertex_mappings.get(value, value)
+                        if value != sanitized_item[key]:
+                            logger.debug(
+                                f"Updated resource '{resource.resource_name}' apply item: "
+                                f"'{key}': '{value}' -> '{sanitized_item[key]}'"
+                            )
+                    elif key == "name" and isinstance(value, str):
+                        # Keep transform names as-is
+                        sanitized_item[key] = value
+                    elif key == "children" and isinstance(value, list):
+                        # Recursively sanitize children in tree_likes resources
+                        sanitized_item[key] = [
+                            sanitize_apply_item(child) for child in value
+                        ]
+                    elif isinstance(value, dict):
+                        # Recursively sanitize nested dictionaries
+                        sanitized_item[key] = sanitize_apply_item(value)
+                    elif isinstance(value, list):
+                        # Recursively sanitize lists
+                        sanitized_item[key] = [
+                            sanitize_apply_item(subitem) for subitem in value
+                        ]
+                    else:
+                        sanitized_item[key] = value
+                return sanitized_item
+            elif isinstance(item, list):
+                # Recursively sanitize lists
+                return [sanitize_apply_item(subitem) for subitem in item]
+            else:
+                # Return non-dict/list items as-is
+                return item
+
+        # Sanitize the entire apply list
+        resource.apply = [sanitize_apply_item(item) for item in resource.apply]
+
+    def infer_schema(
+        self,
+        introspection_result: SchemaIntrospectionResult,
+        schema_name: str | None = None,
+    ) -> Schema:
+        """Infer complete Schema from PostgreSQL introspection.
+
+        Args:
+            introspection_result: Result from PostgresConnection.introspect_schema()
+            schema_name: Schema name (defaults to schema_name from introspection if None)
+
+        Returns:
+            Schema: Complete inferred schema with vertices, edges, and metadata
+        """
+        if schema_name is None:
+            schema_name = introspection_result.schema_name
+
+        logger.info(f"Inferring schema from PostgreSQL schema '{schema_name}'")
+
+        # Infer vertex configuration
+        vertex_config = self.infer_vertex_config(introspection_result)
+        logger.info(f"Inferred {len(vertex_config.vertices)} vertices")
+
+        # Infer edge configuration
+        edge_config = self.infer_edge_config(introspection_result, vertex_config)
+        edges_count = len(list(edge_config.edges_list()))
+        logger.info(f"Inferred {edges_count} edges")
+
+        # Create schema metadata
+        metadata = SchemaMetadata(name=schema_name)
+
+        # Create schema (resources will be created separately)
+        schema = Schema(
+            general=metadata,
+            vertex_config=vertex_config,
+            edge_config=edge_config,
+            resources=[],  # Resources will be created separately
+        )
+
+        # Sanitize attribute names to avoid reserved words
+        schema = self._sanitize_schema_attributes(schema)
+
+        logger.info(
+            f"Successfully inferred schema '{schema_name}' with "
+            f"{len(vertex_config.vertices)} vertices and "
+            f"{len(list(edge_config.edges_list()))} edges"
+        )
+
+        return schema
