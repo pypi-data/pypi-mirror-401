@@ -1,0 +1,40 @@
+[project]
+name = "prefect-keeper"
+version = "0.1.1"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "patacoing", email = "romain.lefebvre1104@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "keeper-secrets-manager-core>=17.0.0",
+    "prefect>=3.6.10",
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent"
+]
+
+license = "MIT"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/patacoing/prefect-keeper"
+Issues = "https://github.com/patacoing/prefect-keeper/issues"
+
+[project.scripts]
+prefect-keeper = "prefect_keeper:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.11",
+    "ty>=0.0.11",
+]
