@@ -1,0 +1,88 @@
+"""
+String replacements for cleaning REDCap data exports.
+
+FIELD_NAMES: dict
+    Edit the report column names, as well as the variable field names.
+
+FORM_NAMES: dict
+    Edit the names of the REDCap modules, for filenames and event names in reports.
+"""
+
+FIELD_NAMES = {
+    'study_id': 'participant_id',
+    '_baseline1': '',
+    '_baseline2': '',
+    '_baseline': '',
+    '_base': '',
+    '_screening': '',
+    '_screen': '',
+    '_06m': '',
+    '_6m': '',
+    '_12m': '',
+    '_18m': '',
+    '_phq9_q_': 'phq9_',
+    '_gad7_q_': 'gad7_',
+
+    'field_record_id': 'record_id',
+    'field_response_time_in_ms_0': 'response_time_ms',
+    'field_response_time_0': 'response_timestamp',
+    'field_pklmnqdkk6miupdm': 'current_anxiety',
+    'field_hy4taybfpx3yo3c1': 'current_mood',
+    'field_response_time_in_ms_1': 'response_time_ID_ms',
+    'field_response_time_1': 'response_timestamp_ID',
+    'field_7uslb44zkd7bybb6': 'participant_id',
+    'field_response_time_in_ms_2': 'response_time_diary_ms',
+    'field_response_time_2': 'response_timestamp_diary',
+    'field_res51w6jbr0ujmcc': 'date',
+    'field_yhnwqo8z38c39jqd': 'try_sleep_time',
+    'field_lu9kgstnzadjskjk': 'onset_latency_min',
+    'field_ald1uf0d20qi0ivt': 'fall_asleep_add_info',
+    'field_wymkttfl5ivn2ylh': 'awake_count',
+    'field_au7iton7aacjnucj': 'awake_duration_min',
+    'field_ak6iv1snsgeqk0tb': 'awake_add_info',
+    'field_0f2osu5ubuh4i199': 'wake_time',
+    'field_lcuzw7xi12vy8w8j': 'out_of_bed_time',
+    'field_c5oo53v72euepu5u': 'wake_add_info',
+    'field_nuw8zyv0l5ptm2jw': 'sleep_quality',
+    'field_bxeujl7bybtt167n': 'readiness',
+    'field_hcwf8m9pmkl5jl0c': 'sleep_aid',
+    'field_qj1mzba6ohnyl71h': 'sleep_aid_add_info',
+    'field_4t92j6ele3oqlyn1': 'nap_count',
+    'field_rggutbxdck7yts2s': 'nap_duration_min',
+    'field_ou19u0gymv5jbmtl': 'nap_add_info',
+    'field_e5gnf8ueamdaipze': 'diary_anxiety',
+    'field_y81izqgynluwadux': 'diary_mood',
+    'field_response_time_in_ms_3': 'response_time_end_ms',
+    'field_response_time_3': 'response_timestamp_end',
+    'field_8kdde6jjhi7tz42y': 'thank_you',
+
+    'module_668iz31tqbpitfqj': 'mood_anxiety',
+    'module_bfef9dv80oupx78m': 'sleep_diary',
+    'module_ghitpgzwt9b55m44': 'participant_id',
+    'module_zqiq9wq4l10gbkiz': 'end_period',
+
+    'module_': '',
+    'field_': '',
+    r'_p\d+': '',  # Remove period suffixes (_p2, _p3, etc.)
+}
+
+FORM_NAMES = {
+    'participant_information': 'initial_contact',
+    'baseline_researcher_cb': 'Baseline',
+    'baseline_participant_questionnaire': 'Baseline',
+    'postbaseline_researcher_admin': 'Baseline',
+    'screening': 'Screening',
+    'm_followup_researcher_questionnaire_e70e': '12-month follow-up',
+    'm_followup_participant_questionnaire_6517': '12-month follow-up',
+    'm_followup_researcher_questionnaire_df3a': '18-month follow-up',
+    'm_followup_participant_questionnaire_13e1': '18-month follow-up',
+    'm_followup_researcher_questionnaire': '6-month follow-up',
+    'm_followup_participant_questionnaire': '6-month follow-up',
+
+    'module_668iz31tqbpitfqj': 'mood_anxiety',
+    'module_bfef9dv80oupx78m': 'sleep_diary',
+    'module_ghitpgzwt9b55m44': 'participant_id',
+    'module_zqiq9wq4l10gbkiz': 'end_period',
+
+    'module_': ''
+}
