@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ForcomeBot"
+version = "2.2.15"
+description = "FORCOME 康康 - 千寻微信框架Pro与LangBot的中间件"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Your Name", email = "your@email.com" }
+]
+keywords = ["wechat", "langbot", "qianxun", "chatbot", "middleware", "onebot"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: AsyncIO",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Communications :: Chat",
+]
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "httpx>=0.25.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+    "python-multipart>=0.0.6",
+    "websockets>=11.0",
+    "apscheduler>=3.10.0",
+    # auth 模块依赖
+    "sqlalchemy[asyncio]>=2.0.0",
+    "aiosqlite>=0.19.0",
+    "python-jose[cryptography]>=3.3.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "hypothesis>=6.0.0",
+]
+
+[project.scripts]
+forcomebot = "src.__main__:main"
+ForcomeBot = "src.__main__:main"
+forcome-kangkang = "src.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/yourname/ForcomeBot"
+Documentation = "https://github.com/yourname/ForcomeBot#readme"
+Repository = "https://github.com/yourname/ForcomeBot"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+artifacts = ["src/static/**/*"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/**/*.py",
+    "src/static/**/*",
+    "config.example.yaml",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
