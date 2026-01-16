@@ -1,0 +1,293 @@
+Metadata-Version: 2.4
+Name: xai-blockchain-sdk
+Version: 1.0.0
+Summary: Python SDK for XAI Blockchain - AI compute pooling and governance
+Author-email: XAI Blockchain <info@xaiblockchain.com>
+Maintainer-email: XAI Blockchain <info@xaiblockchain.com>
+License-Expression: Apache-2.0
+Project-URL: Homepage, https://xaiblockchain.com
+Project-URL: Documentation, https://docs.xaiblockchain.com
+Project-URL: Repository, https://github.com/xai-blockchain/xai
+Project-URL: Bug Tracker, https://github.com/xai-blockchain/xai/issues
+Project-URL: Changelog, https://github.com/xai-blockchain/xai/blob/main/sdk/python/CHANGELOG.md
+Keywords: blockchain,xai,sdk,cryptocurrency,ai-compute,governance,web3,decentralized
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.28.0
+Requires-Dist: urllib3>=1.26.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: types-requests>=2.28.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Dynamic: license-file
+
+# XAI Blockchain SDK for Python
+
+A lightweight Python SDK for interacting with the XAI blockchain platform. Supports wallet operations, transactions, governance proposals, AI compute task matching, and more.
+
+## Installation
+
+```bash
+pip install xai-blockchain-sdk
+```
+
+For development:
+
+```bash
+pip install xai-blockchain-sdk[dev]
+```
+
+## Quick Start
+
+```python
+from xai_blockchain_sdk import XAIClient
+
+# Connect to testnet
+client = XAIClient(base_url="https://testnet-rpc.xaiblockchain.com")
+
+# Get blockchain stats
+stats = client.blockchain.get_stats()
+print(f"Chain height: {stats.chain_height}")
+print(f"Network: {stats.network}")
+
+# Check wallet balance
+balance = client.wallet.get_balance("xai1yourawlletaddress...")
+print(f"Balance: {balance.balance_xai} XAI")
+```
+
+## Features
+
+### Blockchain Operations
+
+```python
+# Get blockchain statistics
+stats = client.blockchain.get_stats()
+
+# Get a specific block
+block = client.blockchain.get_block(100)
+print(f"Block {block.index}: {block.hash}")
+
+# List recent blocks
+result = client.blockchain.list_blocks(limit=10)
+for block in result["blocks"]:
+    print(f"Block {block.index}: {len(block.transactions)} transactions")
+
+# Check node health
+health = client.blockchain.get_health()
+```
+
+### Wallet Operations
+
+```python
+# Get wallet balance
+balance = client.wallet.get_balance("xai1...")
+print(f"Available: {balance.available_balance}")
+print(f"Locked: {balance.locked_balance}")
+
+# Get transaction history
+history = client.wallet.get_history("xai1...", limit=20)
+```
+
+### Transactions
+
+```python
+# Get transaction details
+tx = client.transaction.get("txhash...")
+print(f"Status: {tx.status}")
+print(f"Confirmations: {tx.confirmations}")
+
+# Get pending transactions (mempool)
+pending = client.transaction.get_pending(limit=10)
+```
+
+### Governance
+
+```python
+# List all proposals
+proposals = client.governance.list_proposals()
+
+# Filter by status
+active = client.governance.list_proposals(status="active")
+
+# Get specific proposal
+proposal = client.governance.get_proposal("proposal-id")
+
+# Get governance statistics
+gov_stats = client.governance.get_stats()
+print(f"Active proposals: {gov_stats['proposals']['active']}")
+
+# Check voting power
+power = client.governance.get_voting_power("xai1...")
+```
+
+### AI Compute
+
+```python
+# Get available AI models
+models = client.ai.list_models()
+for name, info in models.items():
+    print(f"{name}: quality={info['quality_score']}, speed={info['speed_score']}")
+
+# Get supported task types
+task_types = client.ai.list_task_types()
+
+# Match a task to the best model
+match = client.ai.match_task(
+    task_type="security_audit",
+    complexity="complex",
+    priority="high"
+)
+print(f"Recommended model: {match['recommended_model']}")
+
+# Get AI compute statistics
+ai_stats = client.ai.get_stats()
+print(f"Available models: {ai_stats['available_models']}")
+```
+
+### Mining
+
+```python
+# Get mining status
+status = client.mining.get_status()
+print(f"Mining: {status.mining}")
+print(f"Hashrate: {status.hashrate}")
+```
+
+### Trading/Exchange
+
+```python
+# Get exchange rates
+rates = client.trading.get_rates()
+
+# List available pairs
+pairs = client.trading.list_pairs()
+
+# Get order book
+orderbook = client.trading.get_order_book("XAI/USDT")
+```
+
+## Configuration
+
+### Custom Base URL
+
+```python
+# Testnet (default)
+client = XAIClient(base_url="https://testnet-rpc.xaiblockchain.com")
+
+# Mainnet (when available)
+client = XAIClient(base_url="https://rpc.xaiblockchain.com")
+
+# Local development
+client = XAIClient(base_url="http://localhost:12570")
+```
+
+### API Key Authentication
+
+```python
+client = XAIClient(
+    base_url="https://testnet-rpc.xaiblockchain.com",
+    api_key="your-api-key"
+)
+```
+
+### Request Timeout
+
+```python
+client = XAIClient(
+    base_url="https://testnet-rpc.xaiblockchain.com",
+    timeout=30  # seconds
+)
+```
+
+### Retry Configuration
+
+```python
+client = XAIClient(
+    base_url="https://testnet-rpc.xaiblockchain.com",
+    max_retries=3,
+    retry_delay=1.0  # seconds
+)
+```
+
+## Error Handling
+
+```python
+from xai_blockchain_sdk import (
+    XAIClient,
+    XAIError,
+    NetworkError,
+    ValidationError,
+    AuthenticationError,
+    RateLimitError,
+)
+
+client = XAIClient(base_url="https://testnet-rpc.xaiblockchain.com")
+
+try:
+    balance = client.wallet.get_balance("invalid-address")
+except ValidationError as e:
+    print(f"Invalid input: {e}")
+except NetworkError as e:
+    print(f"Network issue: {e}")
+except AuthenticationError as e:
+    print(f"Auth failed: {e}")
+except RateLimitError as e:
+    print(f"Rate limited: {e}")
+except XAIError as e:
+    print(f"XAI error: {e}")
+```
+
+## Data Models
+
+The SDK provides typed data models for all responses:
+
+- `Wallet` - Wallet information
+- `Balance` - Wallet balance details
+- `Transaction` - Transaction data
+- `Block` - Block information
+- `BlockchainStats` - Network statistics
+- `Proposal` - Governance proposal
+- `MiningStatus` - Mining information
+- `TradeOrder` - Exchange order
+
+```python
+from xai_blockchain_sdk import Block, Transaction, TransactionStatus
+
+# Models are dataclasses with type hints
+block: Block = client.blockchain.get_block(100)
+print(block.index)  # int
+print(block.hash)   # str
+print(block.transactions)  # list
+```
+
+## Requirements
+
+- Python 3.9+
+- requests >= 2.28.0
+
+## Links
+
+- [Documentation](https://docs.xaiblockchain.com/sdk/python)
+- [API Reference](https://docs.xaiblockchain.com/api)
+- [GitHub Repository](https://github.com/xai-blockchain/xai)
+- [Issue Tracker](https://github.com/xai-blockchain/xai/issues)
+- [XAI Website](https://xaiblockchain.com)
+
+## License
+
+Apache License 2.0 - see [LICENSE](LICENSE) for details.
