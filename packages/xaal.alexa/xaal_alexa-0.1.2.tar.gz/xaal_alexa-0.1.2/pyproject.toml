@@ -1,0 +1,31 @@
+[project]
+name = "xaal.alexa"
+version = "0.1.2"
+description = "xAAL devices for Amazon Alexa"
+readme = "README.rst"
+authors = [ { name = "Jerome Kerdreux", email = "Jerome.Kerdreux@imt-atlantique.fr" } ]
+license = "GPL-3.0-or-later"
+classifiers = ["Programming Language :: Python",
+"Topic :: Software Development :: Libraries :: Python Modules"]
+keywords = ["xaal", "alexa"]
+dependencies = ["xaal.lib", "xaal.schemas"]
+
+[tool.setuptools.packages.find]
+include = ["xaal*"]
+namespaces = true
+
+[project.urls]
+Homepage = "https://recherche.imt-atlantique.fr/xaal/"
+Documentation = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/assistants/Alexa/README.rst"
+Source = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/assistants/Alexa"
+
+[tool.ruff]
+line-length = 122
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 122
+skip-string-normalization = true
+
