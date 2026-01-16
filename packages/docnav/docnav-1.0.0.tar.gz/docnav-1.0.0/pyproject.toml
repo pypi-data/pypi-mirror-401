@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docnav"
+version = "1.0.0"
+description = "Local-first document navigation with AI-powered queries and citations"
+readme = "README.md"
+authors = [
+    {name = "DocNav Team", email = "hello@docnav.ai"}
+]
+license = "MIT"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["documents", "ai", "rag", "search", "pdf", "query"]
+dependencies = [
+    "numpy>=1.20.0",
+    "faiss-cpu>=1.7.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.3.0",
+    "pypdf>=3.0.0",
+    "python-docx>=0.8.0",
+    "markdown>=3.0",
+    "pandas>=1.3.0",
+    "python-pptx>=0.6.0",
+    "pdf2image>=1.16.0",
+    "pytesseract>=0.3.0",
+    "pillow>=9.0.0",
+    "sentence-transformers>=2.2.0",
+    "tqdm>=4.65.0",
+    "rich>=13.0.0",
+    "python-multipart>=0.0.6",
+    "chromadb>=0.4.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0", "black>=23.0.0", "mypy>=1.0.0"]
+
+[project.scripts]
+docnav = "docnav.cli:main"
+

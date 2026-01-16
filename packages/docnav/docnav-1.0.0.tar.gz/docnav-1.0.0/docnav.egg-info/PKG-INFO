@@ -1,0 +1,59 @@
+Metadata-Version: 2.4
+Name: docnav
+Version: 1.0.0
+Summary: Local-first document navigation with AI-powered queries and citations
+Author-email: DocNav Team <hello@docnav.ai>
+License-Expression: MIT
+Keywords: documents,ai,rag,search,pdf,query
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: faiss-cpu>=1.7.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: google-generativeai>=0.3.0
+Requires-Dist: pypdf>=3.0.0
+Requires-Dist: python-docx>=0.8.0
+Requires-Dist: markdown>=3.0
+Requires-Dist: pandas>=1.3.0
+Requires-Dist: python-pptx>=0.6.0
+Requires-Dist: pdf2image>=1.16.0
+Requires-Dist: pytesseract>=0.3.0
+Requires-Dist: pillow>=9.0.0
+Requires-Dist: sentence-transformers>=2.2.0
+Requires-Dist: tqdm>=4.65.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: chromadb>=0.4.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+
+# docnav 
+# DocNav
+
+DocNav is a local-first Python library for navigating, understanding, and querying documents using AI. It provides precise, citation-backed answers from real files (PDFs, Word documents, slides, spreadsheets, text) using a simple API.
+
+## Features
+
+- **Zero-config ingestion**: Works with PDFs, DOCX, TXT, Markdown, PPTX, Excel, CSV
+- **Smart chunking**: Structure-aware document splitting
+- **Local-first**: Works offline with local embeddings
+- **Cloud LLM support**: OpenAI and Google Gemini
+- **Persistent storage**: Update documents incrementally
+- **Citations**: Every answer includes source references
+- **CLI & Python API**: Use from terminal or code
+- **Production-ready**: Supports continuous updates, not just one-time indexing
+
+## Installation
+
+```bash
+pip install docnav
