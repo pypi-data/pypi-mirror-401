@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amdf"
+version = "1.0.2"
+description = "Transform Kubernetes CRDs into type-safe KCL schemas and developer-friendly blueprints"
+authors = [{name = "AMDF Team"}]
+maintainers = [{name = "AMDF Team"}]
+keywords = ["kubernetes", "crossplane", "kcl", "infrastructure-as-code", "crd", "schema-generation", "mcp", "platform-engineering"]
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "pyyaml>=6.0",
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "typer>=0.9.0",
+    "ollama>=0.6.0",
+]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+build_command = "python -m build"
+
+[project.urls]
+Documentation = "https://amdf.readthedocs.io/en/latest/"
+Repository = "https://github.com/segoja7/agnostic-multicloud-delivery-framework"
+
+[project.scripts]
+amdf = "amdf.interfaces.cli.main:app"
+amdf-mcp = "amdf.interfaces.mcp.server:main"
+
+[project.entry-points."mcp.servers"]
+amdf = "amdf.interfaces.mcp.server:main"
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "flake8", "mypy", "pre-commit"]
+docs = ["mkdocs", "mkdocs-material", "mkdocs-mermaid2-plugin"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+amdf = ["templates/**/*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
