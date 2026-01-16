@@ -1,0 +1,45 @@
+[build-system]
+requires = ["maturin>=1.11.5"]
+build-backend = "maturin"
+
+[project]
+name = "markdown-readtime"
+version = "0.1.2"
+description = "A library to estimate reading time for Markdown content with support for Chinese and English texts"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "hualayn", email = "witity@hotmail.com" }
+]
+keywords = ["markdown", "reading-time", "readtime", "text-analysis"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/hualayn/py-markdown-readtime"
+Repository = "https://github.com/hualayn/py-markdown-readtime"
+
+[project.optional-dependencies]
+dev = [
+    "maturin>=1.11.5",
+]
+
+[tool.maturin]
+bindings = "pyo3"
+module-name = "markdown_readtime"
+python-source = "markdown_readtime"
