@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = [""]
+include = ["pyserini*"]
+exclude = ["tests", "integrations"]
+namespaces = false
+
+[tool.black]
+skip-string-normalization = true
+
+[project]
+name = "pyserini"
+version = "1.5.0"
+license = "Apache-2.0"
+license-files = ["LICENSE.txt",
+]
+authors = [
+    { name="Jimmy Lin", email="jimmylin@uwaterloo.ca" },
+]
+description = "A Python toolkit for reproducible information retrieval research with sparse and dense representations"
+readme = "project-description.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "tqdm",
+    "pyyaml",
+    "requests",
+    "Cython",
+    "numpy>=2",
+    "pandas",
+    "pyjnius>=1.7.0",
+    "scikit-learn",
+    "scipy",
+    "transformers>=4.57",
+    "torch>=2.9",
+    "onnxruntime>=1.23",
+    "openai>=2.12.0",
+    "sentencepiece>=0.2",
+    "tiktoken>=0.12",
+    "flask",
+    "pillow>=12",
+    "fastapi>=0.124",
+    "uvicorn>=0.38",
+    "fastmcp>=2.14",
+    "datasets",
+    "matplotlib"
+]
+
+[project.urls]
+Homepage = "https://github.com/castorini/pyserini"
+Issues = "https://github.com/castorini/pyserini/issues"
+
+[project.optional-dependencies]
+optional = [
+    "faiss>1.7.0",
+    "spacy>=3.2.1",
+    "pyarrow>=15.0.0",
+    "pybind11>=2.11.0",
+    "uniir-for-pyserini>=0.1.2"
+]
