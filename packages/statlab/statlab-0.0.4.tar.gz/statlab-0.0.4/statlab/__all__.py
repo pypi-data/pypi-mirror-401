@@ -1,0 +1,1 @@
+from .ord import * # this line allows users to write "from statlab.__all__ import *; TreeOrdinalClassifier(base_clf)"
