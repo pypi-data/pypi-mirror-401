@@ -1,0 +1,188 @@
+# NEXAFLOPS Python SDK
+
+Official Python SDK for the NEXAFLOPS Control Plane API.
+
+## Installation
+
+```bash
+pip install nexaflops-sdk
+```
+
+## Quick Start
+
+```python
+from nexaflops_sdk import NexaflopsClient
+
+# Initialize client with your API key
+client = NexaflopsClient(api_key="nxf_live_your_api_key_here")
+
+# Get host fingerprint for license binding
+fingerprint = client.get_fingerprint()
+
+# Validate license before training
+result = client.licenses.validate(
+    license_id="your-license-uuid",
+    host_fingerprint=fingerprint
+)
+
+if result.valid:
+    print(f"License valid until {result.expires_at}")
+    print(f"Tier: {result.tier}")
+    print(f"Features: {result.features}")
+    # Proceed with ML training
+else:
+    print(f"License invalid: {result.reason}")
+```
+
+## Features
+
+- **License Validation**: Verify licenses before running ML workloads
+- **Host Fingerprinting**: Secure, privacy-preserving host identification
+- **Type Safety**: Full Pydantic models for all API responses
+- **Error Handling**: Comprehensive exception hierarchy
+- **Async Support**: Coming soon
+
+## API Reference
+
+### NexaflopsClient
+
+The main entry point for the SDK.
+
+```python
+client = NexaflopsClient(
+    api_key="nxf_live_xxx",           # Required
+    base_url="https://api.nexaflops.io",  # Optional
+    timeout=...,                       # Optional httpx.Timeout
+    verify_ssl=True,                   # Optional
+)
+```
+
+### License Operations
+
+```python
+# Validate a license
+result = client.licenses.validate(
+    license_id="uuid",
+    host_fingerprint=fingerprint,
+    raise_on_invalid=False  # Set True to raise exception on failure
+)
+
+# Get license details
+license = client.licenses.get("uuid")
+print(f"Expires in {license.days_until_expiry} days")
+
+# Issue new license (admin only)
+from nexaflops_sdk.models import LicenseIssueRequest, LicenseTier
+
+new_license = client.licenses.issue(
+    LicenseIssueRequest(
+        organization_name="Acme Corp",
+        tier=LicenseTier.PROFESSIONAL,
+        validity_days=365,
+    )
+)
+
+# Revoke license (admin only)
+client.licenses.revoke("uuid", reason="Contract terminated")
+```
+
+### Host Fingerprinting
+
+```python
+# Get fingerprint for license validation
+fingerprint = client.get_fingerprint()
+
+# Get detailed component info (for debugging)
+info = client.get_fingerprint_info()
+print(info)
+# {'cpu': 'Intel...', 'mac': 'AA:BB:CC:DD:EE:FF', ...}
+```
+
+### Exception Handling
+
+```python
+from nexaflops_sdk.exceptions import (
+    NexaflopsError,
+    AuthenticationError,
+    LicenseValidationError,
+    LicenseExpiredError,
+    LicenseRevokedError,
+    HostMismatchError,
+    RateLimitError,
+    NetworkError,
+)
+
+try:
+    result = client.licenses.validate(
+        license_id="uuid",
+        host_fingerprint=fingerprint,
+        raise_on_invalid=True  # Raise on failure
+    )
+except LicenseExpiredError as e:
+    print(f"License expired: {e.license_id}")
+except LicenseRevokedError as e:
+    print(f"License revoked: {e.license_id}")
+except HostMismatchError as e:
+    print(f"Running on unauthorized host: {e.license_id}")
+except AuthenticationError:
+    print("Invalid API key")
+except RateLimitError as e:
+    print(f"Rate limited, retry after {e.retry_after}s")
+except NetworkError as e:
+    print(f"Network error: {e}")
+```
+
+## Models
+
+### License
+
+```python
+from nexaflops_sdk.models import License, LicenseStatus, LicenseTier
+
+license: License
+license.id              # UUID string
+license.organization_name
+license.tier            # LicenseTier.TRIAL | PROFESSIONAL | ENTERPRISE
+license.status          # LicenseStatus.ACTIVE | EXPIRED | REVOKED
+license.issued_at       # datetime
+license.expires_at      # datetime
+license.is_valid        # bool property
+license.days_until_expiry  # int property
+license.features        # dict[str, bool]
+license.limits          # dict[str, int]
+```
+
+### ValidationResult
+
+```python
+from nexaflops_sdk.models import ValidationResult
+
+result: ValidationResult
+result.valid            # bool
+result.license_id       # str
+result.tier             # Optional[LicenseTier]
+result.expires_at       # Optional[datetime]
+result.reason           # Optional[str] - failure reason
+result.features         # dict[str, bool]
+result.raise_if_invalid()  # Raises LicenseValidationError if invalid
+```
+
+## Development
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Type checking
+mypy nexaflops_sdk
+
+# Linting
+ruff check nexaflops_sdk
+```
+
+## License
+
+MIT License - see LICENSE file for details.
