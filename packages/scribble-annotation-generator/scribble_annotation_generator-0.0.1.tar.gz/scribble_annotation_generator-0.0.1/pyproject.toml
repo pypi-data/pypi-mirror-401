@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scribble-annotation-generator"
+description = "Programmatically generate semi-realistic synthetic scribble annotations based on statistics from existing scribble datasets"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Alex Senden" }]
+keywords = [
+    "scribble",
+    "annotation",
+    "segmentation",
+    "computer-vision",
+    "synthetic-data",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = ["numpy", "scipy", "scikit-image", "opencv-python"]
+
+# Version is automatically provided by hatch-vcs
+dynamic = ["version"]
+
+[project.scripts]
+scribble-annotation-generator = "scribble_annotation_generator.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/alexsenden/scribble-annotation-generator"
+Repository = "https://github.com/alexsenden/scribble-annotation-generator"
+Issues = "https://github.com/alexsenden/scribble-annotation-generator/issues"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.sdist]
+include = ["scribble_annotation_generator/**", "README.md"]
+
+[tool.hatch.build.targets.wheel]
+include = ["scribble_annotation_generator/**"]
