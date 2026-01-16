@@ -1,0 +1,16 @@
+pkg:
+  id: "<pkg-id>"
+  root: "/path/to/release/<pkg-id>"
+  status: "open"
+
+include:
+  releases: []
+
+git:
+  repo_root: null  # optional override; default is git rev-parse from cwd
+  keywords: []
+  since: null
+  until: null
+
+collectors:
+  enabled: ["checksums"]
