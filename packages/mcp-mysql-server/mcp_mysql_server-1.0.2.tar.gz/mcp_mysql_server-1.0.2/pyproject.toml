@@ -1,0 +1,43 @@
+[project]
+name = "mcp-mysql-server"
+version = "1.0.2"
+description = "A Model Context Protocol (MCP) server for MySQL databases with multi-database support and read-only mode. Enables AI assistants to securely query multiple MySQL databases."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+keywords = ["mcp", "mysql", "database", "ai", "llm", "model-context-protocol", "cursor", "claude"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "mysql-connector-python>=9.1.0",
+]
+
+[[project.authors]]
+name = "Hao Wang"
+email = "wanghao@shopee.com"
+
+[project.urls]
+Homepage = "https://github.com/aahowe/mcp-mysql-server"
+Repository = "https://github.com/aahowe/mcp-mysql-server"
+Documentation = "https://github.com/aahowe/mcp-mysql-server#readme"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mysql_mcp_server"]
+
+[project.scripts]
+mcp-mysql-server = "mysql_mcp_server:main"
+mysql-mcp-server = "mysql_mcp_server:main"
+mysql_mcp_server = "mysql_mcp_server:main"
