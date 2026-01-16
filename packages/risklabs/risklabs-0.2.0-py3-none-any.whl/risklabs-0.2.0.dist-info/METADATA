@@ -1,0 +1,79 @@
+Metadata-Version: 2.4
+Name: risklabs
+Version: 0.2.0
+Summary: Decision-Risk & Robustness Simulator by Eiffel Labs
+Author-email: Antigravity <antigravity@gemini.com>
+Requires-Python: >=3.11
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: pandas>=2.2.0
+Requires-Dist: pydantic-settings>=2.1.0
+Requires-Dist: pydantic>=2.6.0
+Requires-Dist: yfinance>=0.2.36
+Provides-Extra: dev
+Requires-Dist: black>=24.1.0; extra == 'dev'
+Requires-Dist: httpx>=0.26.0; extra == 'dev'
+Requires-Dist: mypy>=1.8.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.15; extra == 'dev'
+Provides-Extra: server
+Requires-Dist: fastapi>=0.109.0; extra == 'server'
+Requires-Dist: python-multipart>=0.0.9; extra == 'server'
+Requires-Dist: uvicorn>=0.27.0; extra == 'server'
+Description-Content-Type: text/markdown
+
+# RiskLabs
+
+**Decision-Risk & Robustness Simulator** by [Eiffel Labs](https://eiffellabs.com/)
+
+RiskLabs is a Python library designed to help quantitative researchers and portfolio managers evaluate the robustness of their strategies. It goes beyond simple backtesting by subjecting strategies to various "flight path" scenarios, such as historical crashes, volatility spikes, and correlation breakdowns.
+
+## Features
+
+-   **Scenario Analysis**: Simulate strategies under stress conditions (e.g., 2008 Crash, COVID-19 Volatility).
+-   **Robustness Metrics**: Calculate specialized scores based on performance stability across regimes.
+-   **Regime Detection**: Analyze strategy behavior in Bull vs. Bear markets.
+-   **HTML Reporting**: Generate beautiful, standalone HTML dashboards with interactive charts.
+-   **Privacy-First**: Runs entirely locally. No data leaves your machine.
+
+## Installation
+
+```bash
+pip install risklabs
+```
+
+## Quick Start
+
+```python
+from risklabs.client import create_strategy, analyze
+
+# 1. Define a Strategy
+strategy = create_strategy(
+    name="My 60/40 Portfolio",
+    allocations=[
+        {"ticker": "SPY", "weight": 0.6},
+        {"ticker": "AGG", "weight": 0.4}
+    ]
+)
+
+# 2. Run Robustness Analysis
+print("Running simulations...")
+report = analyze(strategy)
+
+# 3. Generate Report
+report.to_file("my_portfolio_report.html")
+print("Report generated: my_portfolio_report.html")
+```
+
+## How It Works
+
+1.  **Define Strategy**: You specify target allocations (static weights for MVP).
+2.  **Fetch Data**: The library automatically downloads historical data for the tickers using `yfinance`.
+3.  **Simulate Scenarios**: The engine runs multiple simulations:
+    -   *Historical Baseline*: Standard backtest.
+    -   *Crash Replay*: Applies historical shock factors.
+    -   *Regime Stress*: Modifies volatility and correlation matrices.
+4.  **Score & Report**: Aggregates results into a "Robustness Score" and renders an HTML dashboard.
+
+## License
+
+MIT
