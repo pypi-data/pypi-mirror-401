@@ -1,0 +1,38 @@
+# repo secrets 
+.env 
+.env*
+
+# python stuff 
+.venv
+.ruff_cache/
+__pycache__/
+*.py[cod]
+*$py.class
+
+.vscode/
+
+# project specific files
+/sample_metadata.tsv
+sample_metadata_*.tsv
+*.vcf
+*.vcf.gz
+*.vcf.gz.csi
+!tests/fixtures/*.vcf.gz
+tests/fixtures/temp*
+tests/fixtures/merged*
+
+# query job config files
+bcftools_divbase_job_config.json
+
+# benchmarking files
+vcf_dimensions.tsv
+mock*.tsv
+task_records*.json
+
+#MacOS artifacts
+.DS_Store
+
+# mkdocs build cache
+.cache/
+# pypi 
+dist/
