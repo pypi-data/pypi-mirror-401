@@ -1,0 +1,76 @@
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "C4",
+    "SIM",
+    "TCH",
+    "PTH",
+    "PGH",
+    "PL",
+    "RUF",
+]
+ignore = [
+    "E501",
+    "PLR0913",
+    "PLR0915",
+]
+per-file-ignores = { "tests/*" = ["S101", "ARG"] }
+
+[tool.mypy]
+# Python version to target (PEP 8 compatible)
+python_version = "3.12"
+
+# Enable strict type checking following PEP 8
+type_checking_mode = "strict"
+
+# Error reporting settings
+show_error_codes = true
+show_error_context = true
+show_column_numbers = true
+pretty = true
+
+# Incremental mode for faster checks
+incremental = true
+
+# Cache directory
+cache_dir = ".mypy_cache"
+
+# Basic strictness settings
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+# Typing discipline settings
+allow_untyped_defs = false
+allow_untyped_calls = false
+allow_untyped_decorators = false
+allow_incomplete_defs = false
+strict_optional = true
+
+# Import settings
+no_implicit_optional = true
+
+# Error handling
+warn_redundant_casts = true
+
+# Exclude specific directories
+exclude = [
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".ruff_cache",
+    ".venv",
+    ".git",
+    "rust/"
+]
