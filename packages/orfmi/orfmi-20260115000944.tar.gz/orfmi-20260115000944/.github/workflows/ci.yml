@@ -1,0 +1,97 @@
+---
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Python dependencies
+        run: |
+          pip install yamllint pylint pytest mypy pytest-cov \
+            types-PyYAML boto3-stubs botocore-stubs types-paramiko \
+            assert-no-linter-config-files assert-no-inline-directives \
+            assert-one-assert-per-pytest -e .
+      - name: assert-no-linter-config-files
+        run: |
+          assert-no-linter-config-files \
+            --linters mypy,pylint,yamllint --verbose .
+      - name: assert-no-inline-directives
+        run: |
+          shopt -s globstar
+          assert-no-inline-directives \
+            --tools coverage,mypy,pylint,yamllint --verbose \
+            **/*.py **/*.yml **/*.toml
+      - name: assert-one-assert-per-pytest
+        run: assert-one-assert-per-pytest --verbose test/
+      - name: yamllint
+        run: |
+          EMPTY_LINES='empty-lines: {max: 0, max-start: 0, max-end: 1}'
+          KEY_ORDERING='key-ordering: enable'
+          TRUTHY='truthy: {allowed-values: ["true", "false", "on"]}'
+          RULES="$EMPTY_LINES, $KEY_ORDERING, $TRUTHY"
+          shopt -s globstar
+          yamllint --strict --format github \
+            --config-data "{extends: default, rules: {$RULES}}" \
+            .github/workflows/*.yml
+      - name: pylint (src)
+        run: python3 -m pylint src/ --fail-on=C,R,W --fail-under=10.0
+      - name: pylint (test)
+        run: |
+          python3 -m pylint test/ --fail-on=C,R,W --fail-under=10.0 \
+            --max-module-lines=1500 \
+            --min-similarity-lines=15
+      - name: mypy (src)
+        run: python3 -m mypy --strict src/
+      - name: mypy (test)
+        run: python3 -m mypy test/
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Node dependencies
+        run: npm install -g markdownlint-cli jscpd
+      - name: markdownlint
+        run: markdownlint '*.md'
+      - name: jscpd (src)
+        run: jscpd --pattern "**/*.py" --threshold 0 --reporters console src/
+      - name: jscpd (test)
+        run: jscpd --pattern "**/*.py" --threshold 0 --reporters console test/
+      - name: Unit tests
+        run: |
+          python3 -m pytest test/unit/ \
+            --verbose --pythonwarnings=error \
+            --cov=orfmi \
+            --cov-fail-under=100
+      - name: Integration tests
+        run: |
+          python3 -m pytest test/integration/ \
+            --verbose --pythonwarnings=error
+      - name: E2E tests
+        run: python3 -m pytest test/e2e/ --verbose --pythonwarnings=error
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "*.md"
+      - ".github/workflows/ci.yml"
+      - "pyproject.toml"
+      - "src/**"
+      - "test/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "*.md"
+      - ".github/workflows/ci.yml"
+      - "pyproject.toml"
+      - "src/**"
+      - "test/**"
