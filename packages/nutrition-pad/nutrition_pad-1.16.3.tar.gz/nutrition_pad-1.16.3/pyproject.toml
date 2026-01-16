@@ -1,0 +1,20 @@
+[project]
+name = "nutrition-pad"
+version = "1.16.3"
+description = "Nutrition tracking with tablet-friendly interface"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [ "flask>=2.0.0", "toml>=0.10.2",]
+
+[build-system]
+requires = [ "setuptools>=45", "wheel",]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+nutrition-pad = "nutrition_pad.main:main"
+nutrition-notes = "nutrition_pad.notes_cli:main"
+nutrition-food = "nutrition_pad.food_cli:main"
+nutrition-client = "nutrition_pad.client_cli:main"
+
+[tool.setuptools]
+packages = [ "nutrition_pad",]
