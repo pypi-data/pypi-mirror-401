@@ -1,0 +1,33 @@
+FROM python:3.11-slim
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy source code first (needed for editable install)
+COPY . .
+
+# Install package in editable mode and test requirements
+RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -r tests/integration/requirements.txt
+
+# Install capiscio binary if it exists (built by CI and copied to repo root)
+# The binary is optional - if not present, tests requiring it will be skipped
+RUN if [ -f /workspace/capiscio ]; then \
+        cp /workspace/capiscio /usr/local/bin/capiscio && \
+        chmod +x /usr/local/bin/capiscio && \
+        echo "capiscio binary installed"; \
+    else \
+        echo "capiscio binary not found - some tests may be skipped"; \
+    fi
+
+# Set environment variable for capiscio binary location
+ENV CAPISCIO_BINARY=/usr/local/bin/capiscio
+ENV PATH="/usr/local/bin:${PATH}"
+
+CMD ["pytest", "tests/integration/", "-v"]
