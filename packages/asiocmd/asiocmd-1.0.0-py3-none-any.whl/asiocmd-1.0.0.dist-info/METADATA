@@ -1,0 +1,116 @@
+Metadata-Version: 2.4
+Name: asiocmd
+Version: 1.0.0
+Summary: Modern and asynchronous support for cmd.Cmd
+Author-email: Parth Acharya <parthacharya@protonmail.com>
+License:  The MIT License (MIT)
+        
+        Copyright © 2026 <copyright holders>
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
+Project-URL: Repository, https://github.com/parthacharyaaaaa/async_cmd
+Project-URL: Download, https://github.com/parthacharyaaaaa/async_cmd/archive/refs/heads/main.zip
+Keywords: asiocmd,async,tool,cmd,cli
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest>=9.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=1.3.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.15.1; extra == "dev"
+Dynamic: license-file
+
+# asiocmd: Modern cmd with async support
+
+# Overview
+`asiocmd` provides a very lightweight repacking of Python's cmd.Cmd class for building command line interfaces. The package contains 2 classes, namely `Cmd` and an inherited `AsyncCmd`
+
+### Cmd
+`Cmd` provides virtually the same functionality and development interface as `cmd.Cmd`, with the primary difference being in the way methods are looked up at runtime.
+
+### AsyncCmd
+An implementation of `Cmd` with added support for asynchronous methods 
+
+# Usage
+```python
+from asiocmd import (AsyncCmd,
+                  command, command_helper,
+                  async_command, async_command_helper)
+
+class DemoCmd(AsyncCmd):
+    # Instance methods decorated with @command are registered as CLI commands
+
+    # Command names can be specified as the decorator argument
+    @command("foo")
+    def arbitrary_name(self, line: str) -> None: ...
+
+    # If the name argument is not provided,
+    # the function name is taken as command name
+    @command
+    def bar(self, line: str) -> None: ...
+
+    # Legacy support for cmd.Cmd's naming convention of do_*
+    def do_xyz(self, line: str) -> None: ...
+
+    # Helpers can be registered with @command_helper(<command_name>)
+    @command_helper("foo")
+    def arbitrary_helper(self) -> None: ...
+
+    # Again, cmd.Cmd's helper naming convention is still supported
+    def help_bar(self) -> None: ...
+
+    # Asynchronous methods and helpers follow
+    # the same convention, just with different decorators
+
+    @async_command("afoo")
+    async def async_name(self, line: str) -> None: ...
+
+    @async_command
+    async def abar(self, line: str) -> None: ...
+
+    async def do_abc(self, line: str) -> None: ...
+
+    @async_command_helper("afoo")
+    async def afoo_helper(self) -> None: ...
+
+# Launching the CLI
+if __name__ == '__main__':
+    asyncio.run(DemoCmd().acmdloop())
+```
+
+Note: **Cmd** uses cmdloop() to launch itself, the coroutine `acmdloop` belongs only to **AsyncCmd** to provide support for asynchronous methods.
+
+Stacking of decorators are also supported, given that function metadata is preserved using `functools.wraps`
+
+```python
+from asiocmd import (AsyncCmd, command)
+import functools
+
+def generic_method_decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Some working
+        return func(*args, **kwargs)
+    return wrapper
+
+class DemoCmd(AsyncCmd):
+    @generic_method_decorator
+    @command_helper("foo")
+    def abc(self) -> None: pass
+
+    @generic_method_decorator
+    def do_bar(self, line: str) -> None: pass
+```
