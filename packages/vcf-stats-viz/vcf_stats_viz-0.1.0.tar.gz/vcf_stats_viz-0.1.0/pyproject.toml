@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vcf-stats-viz"
+version = "0.1.0"
+description = "Herramienta para el análisis y visualización de variantes genómicas (VCF) con visualizacion interactiva."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Alejandro Lana", email = "alejandrolana1@gmail.com"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+    # --- Data & Logic ---
+    "pandas",
+    "dask",          # Añadido por tu petición (procesamiento paralelo)
+    "dask[dataframe]",
+    "cyvcf2",        # Tu parser VCF principal
+    "pyarrow",       # Motor Parquet
+    "fastparquet",   # Motor Parquet alternativo (listado en tu YAML)
+    "psutil",        # Gestión de recursos del sistema
+    "pysam",         # Manipulación de archivos SAM/BAM/VCF
+
+    # --- Visualization & Web ---
+    "plotly",
+    "dash",
+    "flask",         # Dash corre sobre Flask, es seguro incluirlo explícitamente
+    "matplotlib",    # Gráficos estáticos
+
+    # --- Reporting ---
+    "jinja2",        # Motor de plantillas
+    "weasyprint"     # Generación de PDFs
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "jupyterlab"
+]
+
+[project.scripts]
+# Comando para ejecutar tu pipeline desde cualquier lugar
+vcf-analyze = "vcf_stats.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+# Incluye templates, estáticos y CSS de weasyprint si tienes
+"vcf_stats.visualization" = ["templates/*.html", "static/*.js", "static/*.css"]
