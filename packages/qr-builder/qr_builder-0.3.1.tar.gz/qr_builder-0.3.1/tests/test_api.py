@@ -1,0 +1,205 @@
+"""Tests for qr_builder.api module."""
+
+import io
+import os
+import zipfile
+
+import pytest
+from PIL import Image
+
+# Disable authentication for tests
+os.environ["QR_BUILDER_AUTH_ENABLED"] = "false"
+
+from fastapi.testclient import TestClient
+
+from qr_builder.api import app
+
+
+@pytest.fixture
+def client():
+    """Create a test client."""
+    return TestClient(app)
+
+
+class TestHealthEndpoint:
+    """Tests for the health check endpoint."""
+
+    def test_health_returns_ok(self, client):
+        response = client.get("/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "ok"
+        assert "auth_enabled" in data
+
+
+class TestQREndpoint:
+    """Tests for the /qr endpoint."""
+
+    def test_create_qr_basic(self, client):
+        response = client.post("/qr", data={"data": "https://example.com"})
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "image/png"
+
+        # Verify it's a valid PNG image
+        img = Image.open(io.BytesIO(response.content))
+        assert img.format == "PNG"
+        assert img.size == (500, 500)  # Default size
+
+    def test_create_qr_custom_size(self, client):
+        response = client.post("/qr", data={"data": "test", "size": 300})
+        assert response.status_code == 200
+
+        img = Image.open(io.BytesIO(response.content))
+        assert img.size == (300, 300)
+
+    def test_create_qr_custom_colors(self, client):
+        response = client.post(
+            "/qr",
+            data={
+                "data": "test",
+                "fill_color": "blue",
+                "back_color": "yellow",
+            },
+        )
+        assert response.status_code == 200
+
+    def test_create_qr_empty_data(self, client):
+        response = client.post("/qr", data={"data": ""})
+        # FastAPI returns 422 for validation errors, 400 for business logic errors
+        assert response.status_code in (400, 422)
+
+
+class TestEmbedEndpoint:
+    """Tests for the /embed endpoint."""
+
+    @pytest.fixture
+    def sample_image(self):
+        """Create a sample image in memory."""
+        img = Image.new("RGB", (800, 600), color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+        return buf
+
+    def test_embed_qr_basic(self, client, sample_image):
+        response = client.post(
+            "/embed",
+            data={"data": "https://example.com"},
+            files={"background": ("test.png", sample_image, "image/png")},
+        )
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "image/png"
+
+        img = Image.open(io.BytesIO(response.content))
+        assert img.size == (800, 600)
+
+    def test_embed_qr_invalid_scale(self, client, sample_image):
+        response = client.post(
+            "/embed",
+            data={"data": "test", "scale": 1.5},
+            files={"background": ("test.png", sample_image, "image/png")},
+        )
+        assert response.status_code == 400
+
+
+class TestBatchEmbedEndpoint:
+    """Tests for the /batch/embed endpoint."""
+
+    @pytest.fixture
+    def sample_images(self):
+        """Create multiple sample images."""
+        images = []
+        for i in range(3):
+            img = Image.new("RGB", (400 + i * 100, 300 + i * 50), color="white")
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            buf.seek(0)
+            images.append((f"image_{i}.png", buf, "image/png"))
+        return images
+
+    def test_batch_embed_returns_zip(self, client, sample_images):
+        response = client.post(
+            "/batch/embed",
+            data={"data": "https://example.com"},
+            files=[("backgrounds", img) for img in sample_images],
+        )
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "application/zip"
+
+
+class TestBatchQREndpoint:
+    """Tests for the /qr/batch endpoint."""
+
+    def test_batch_qr_accepts_json_body(self, client):
+        """Test that endpoint accepts JSON body as specified in spec."""
+        response = client.post(
+            "/qr/batch",
+            json={"urls": ["https://example.com", "https://google.com", "https://github.com"]},
+        )
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "application/zip"
+
+    def test_batch_qr_returns_correct_files(self, client):
+        """Test that ZIP contains correctly named files."""
+        response = client.post(
+            "/qr/batch",
+            json={"urls": ["https://example.com", "https://test.com"]},
+        )
+        assert response.status_code == 200
+
+        # Verify ZIP contents
+        zip_data = io.BytesIO(response.content)
+        with zipfile.ZipFile(zip_data, 'r') as zf:
+            files = zf.namelist()
+            assert len(files) == 2
+            assert "qr_1.png" in files
+            assert "qr_2.png" in files
+
+            # Verify images are valid PNGs
+            for filename in files:
+                img_data = zf.read(filename)
+                img = Image.open(io.BytesIO(img_data))
+                assert img.format == "PNG"
+                assert img.size == (500, 500)  # Default size
+
+    def test_batch_qr_custom_parameters(self, client):
+        """Test custom size and colors."""
+        response = client.post(
+            "/qr/batch",
+            json={
+                "urls": ["https://example.com"],
+                "size": 300,
+                "fill_color": "blue",
+                "back_color": "yellow",
+            },
+        )
+        assert response.status_code == 200
+
+    def test_batch_qr_enforces_batch_limit(self, client):
+        """Test that batch size limits are enforced."""
+        # Create list exceeding limits
+        urls = [f"https://example{i}.com" for i in range(100)]
+        response = client.post(
+            "/qr/batch",
+            json={"urls": urls},
+        )
+        assert response.status_code == 403
+        assert "batch size" in response.json()["detail"].lower()
+
+    def test_batch_qr_empty_urls_array(self, client):
+        """Test error handling for empty URLs array."""
+        response = client.post(
+            "/qr/batch",
+            json={"urls": []},
+        )
+        # Should fail validation (min_length=1 in Pydantic model)
+        assert response.status_code == 422
+
+    def test_batch_qr_invalid_size(self, client):
+        """Test error handling for invalid size."""
+        response = client.post(
+            "/qr/batch",
+            json={"urls": ["https://example.com"], "size": 10000},
+        )
+        # Pydantic validation catches size > 2000 before tier check
+        assert response.status_code == 422
