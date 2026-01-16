@@ -1,0 +1,35 @@
+Metadata-Version: 2.4
+Name: xaal.fakeinput
+Version: 0.4.2
+Summary: xAAL fake switch, buttons, contact devices 
+Author-email: Jerome Kerdreux <Jerome.Kerdreux@imt-atlantique.fr>
+License-Expression: GPL-3.0-or-later
+Project-URL: Homepage, https://recherche.imt-atlantique.fr/xaal/
+Project-URL: Documentation, https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/tests/fakeinput/README.rst
+Project-URL: Source, https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/tests/fakeinput
+Keywords: xaal,json
+Classifier: Programming Language :: Python
+Classifier: Topic :: Home Automation
+Description-Content-Type: text/x-rst
+Requires-Dist: xaal.lib
+Requires-Dist: xaal.schemas
+Requires-Dist: bottle
+Requires-Dist: gevent
+Requires-Dist: gevent-websocket
+
+xaal.fakeinput
+==============
+This package provides some dummy (fake) input devices for the xAAL Project. It come with a web interface to control the devices.
+We use this package to fake the lab inputs for testing purpose.
+
+Usage
+-----
+Just edit the 'fakeinput.ini' file to fit your needs and run the package.
+
+.. code-block:: bash
+
+    $ python -m xaal.fakeinput
+    # or
+    $ xaal-pkgrun fakeinput
+
+Open the web interface to control the devices (http://localhost:8081).
