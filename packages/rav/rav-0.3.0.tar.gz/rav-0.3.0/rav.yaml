@@ -1,0 +1,53 @@
+name: rav
+
+scripts:
+  # Existing commands (backward compatibility)
+  server: python3 -m http.server
+  sup: echo "sup"
+  test: .venv/bin/python3 -m pytest
+  build:
+    - rm -rf dist/
+    - .venv/bin/python3 -m build
+    - .venv/bin/pip uninstall rav
+    - .venv/bin/pip install -e .
+  publish:
+    - git add .
+    - git commit -m "Ready for release"
+    - git push
+    - git tag v0.1.1
+    - git push origin v0.1.1
+  echo: echo "hello"
+  fail: adfasd
+  multi:
+      - echo this is
+      - echo awesome
+      - echo simple
+      - echo and
+      - echo easy
+  raise:
+    - python23 -c "raise Exception('This is an error, you need to fix it')"
+
+
+
+  
+downloads:
+  staticfiles:
+    name: vendor
+    destination: temp/staticfiles/vendor
+    verbose: true
+    raise_on_error: true
+    overwrite: true
+    files:
+      - name: flowbite.min.css
+        overwrite: false
+        destination: temp/staticfiles/vendor/css
+        url: https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.css 
+      - name: flowbite.min.js
+        url: https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.js
+      - name: flowbite.min.js.map
+        destination: temp/staticfiles/vendor/js
+        url: https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.js.map
+      - name: htmx.min.js
+        destination: temp/staticfiles/vendor/js
+        url: https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js
+        integrity: sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm
