@@ -1,0 +1,91 @@
+Metadata-Version: 2.4
+Name: pymicroconf
+Version: 0.1.0
+Summary: A Python library for managing configuration files using TOML and environment variables
+Project-URL: Homepage, https://github.com/NickBrisebois/pymicroconf
+Project-URL: Source, https://github.com/NickBrisebois/pymicroconf
+Project-URL: Tracker, https://github.com/NickBrisebois/pymicroconf/issues
+Author-email: Nick Brisebois <email@nick-b.ca>
+Maintainer-email: Nick Brisebois <email@nick-b.ca>
+License: MIT License
+        
+        Copyright (c) 2026 Nick Brisebois
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: config,configuration,dataclass,environment,environment variables,settings,toml
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+
+# PyMicroConf
+
+A lightweight, type-safe TOML configuration loader with environment variable overrides for Python applications.
+
+PyMicroConf provides a simple way to manage application configuration using TOML files while supporting environment variable overrides. It uses Python dataclasses and type annotations for type safety and automatic validation.
+
+## Features
+
+-  **Lightweight**: Minimal dependencies, uses only Python standard library
+-  **Type-safe**: Full type checking with dataclasses and type annotations
+-  **Environment Override**: Environment variables take precedence over config files
+-  **Nested Configuration**: Support for nested configuration structures
+- **Automatic Validation**: Built-in validation for required fields and types
+-  **Easy to Use**: Intuitive API with minimal boilerplate
+
+## Installation
+
+```bash
+pip install pymicroconf
+```
+
+## Usage
+
+Define a configuration class using dataclasses and type annotations:
+
+```python
+from pathlib import Path
+from typing import Annotated
+from pymicroconf import ConfigHandler, ConfigField, BaseConfig
+
+class AppConfig(BaseConfig):
+    api_key: Annotated[str, ConfigField("API_KEY", required=True)]
+    database_url: Annotated[str, ConfigField("DATABASE_URL", required=True)]
+    debug: Annotated[str, ConfigField("DEBUG", default=False)]
+
+config = Config(Path("config.toml"), AppConfig).load_config()
+```
+
+Access configuration values:
+
+```python
+print(config.api_key)
+print(config.database_url)
+print(config.debug)
+```
