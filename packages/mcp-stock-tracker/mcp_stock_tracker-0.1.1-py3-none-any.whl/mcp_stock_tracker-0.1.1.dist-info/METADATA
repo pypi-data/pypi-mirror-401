@@ -1,0 +1,101 @@
+Metadata-Version: 2.4
+Name: mcp-stock-tracker
+Version: 0.1.1
+Summary: MCP server providing real-time stock price tracking with an interactive dashboard
+Project-URL: Homepage, https://github.com/DOsinga/mcp_app_stocks
+Project-URL: Documentation, https://github.com/DOsinga/mcp_app_stocks#readme
+Project-URL: Repository, https://github.com/DOsinga/mcp_app_stocks
+Project-URL: Issues, https://github.com/DOsinga/mcp_app_stocks/issues
+Author-email: Douwe Osinga <douwe.osinga@gmail.com>
+License: MIT
+License-File: LICENSE
+Keywords: dashboard,finance,mcp,real-time,stocks
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Office/Business :: Financial
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Requires-Dist: fastmcp>=2.13
+Requires-Dist: httpx>=0.24.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# MCP Stock Tracker
+
+A Model Context Protocol (MCP) server that provides real-time stock price tracking with an interactive dashboard.
+
+## Installation
+
+### Goose
+
+[![Install in Goose](https://block.github.io/goose/img/extension-install-dark.svg)](https://block.github.io/goose/extension?cmd=uvx&arg=mcp-stock-tracker&id=mcp-stock-tracker&name=MCP%20Stock%20Tracker&description=Real-time%20stock%20price%20tracking%20with%20an%20interactive%20dashboard&env=ALPHA_VANTAGE_API_KEY)
+
+Or install manually: Go to `Advanced settings` -> `Extensions` -> `Add custom extension`. Name to your liking, use type `STDIO`, and set the `command` to `uvx mcp-stock-tracker`. Click "Add Extension".
+
+### Other MCP Clients (Claude Desktop, etc.)
+
+Add to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "stock-tracker": {
+      "command": "uvx",
+      "args": ["mcp-stock-tracker"],
+      "env": {
+        "ALPHA_VANTAGE_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+## Getting an API Key
+
+This server requires an Alpha Vantage API key to fetch stock data.
+
+1. Visit <https://www.alphavantage.co/support/#api-key>
+2. Sign up for a free API key (25 requests/day)
+3. Premium tiers with higher limits available at <https://www.alphavantage.co/premium/>
+
+## Features
+
+- Real-time stock quotes via Alpha Vantage API
+- Interactive web dashboard for tracking multiple stocks
+- Auto-refresh every 30 seconds
+- Visual price change indicators (green/red)
+- Track price, volume, and daily high/low
+
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `get_stock_quote` | Fetch real-time stock data for a symbol |
+
+## Resources
+
+| Resource | Description |
+|----------|-------------|
+| `ui://stock-tracker/dashboard` | Interactive dashboard UI |
+
+## Development
+
+```bash
+git clone https://github.com/DOsinga/mcp_app_stocks.git
+cd mcp_app_stocks
+pip install -e ".[dev]"
+```
+
+## License
+
+MIT License
