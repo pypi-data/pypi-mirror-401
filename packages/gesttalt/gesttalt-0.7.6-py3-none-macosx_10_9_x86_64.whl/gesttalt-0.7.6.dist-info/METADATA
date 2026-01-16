@@ -1,0 +1,69 @@
+Metadata-Version: 2.4
+Name: gesttalt
+Version: 0.7.6
+Summary: A universal OAuth2.0 client written in Zig concurrency-ready
+Author-email: Pedro Pinera Buendia <pedro@ppinera.es>
+License: MIT
+Project-URL: Homepage, https://github.com/pepicrft/gesttalt
+Project-URL: Repository, https://github.com/pepicrft/gesttalt
+Project-URL: Issues, https://github.com/pepicrft/gesttalt/issues
+Keywords: gesttalt,snippets,crud,zig,ffi
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Dynamic: license-file
+
+# Gesttalt Python Bindings
+
+A universal OAuth2.0 client written in Zig concurrency-ready.
+
+## Install
+
+```bash
+pip install gesttalt
+```
+
+## Usage
+
+```python
+from gesttalt import create_snippet, read_snippet, update_snippet, delete_snippet
+
+project_dir = "."
+timestamp = 1735148400
+
+path = create_snippet(project_dir, timestamp, "Example snippet", "const x = 1;", "example.zig")
+print(path)
+
+snippet = read_snippet(project_dir, timestamp)
+print(snippet)
+
+update_snippet(project_dir, timestamp, description="Updated description")
+
+delete_snippet(project_dir, timestamp)
+```
+
+## Development
+
+```bash
+# From project root
+zig build -Doptimize=ReleaseFast
+
+cd bindings/python
+pip install -e .
+pytest
+```
+
+## License
+
+MIT
