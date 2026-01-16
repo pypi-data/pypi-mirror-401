@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.vladkarpman/screen-buffer-mcp",
+  "description": "MCP server for fast Android screenshots via scrcpy frame buffer (~50ms latency).",
+  "repository": {
+    "url": "https://github.com/vladkarpman/screen-buffer-mcp",
+    "source": "github"
+  },
+  "version": "2.0.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "screen-buffer-mcp",
+      "version": "2.0.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "environmentVariables": [
+    {
+      "name": "SCREEN_BUFFER_LOG_LEVEL",
+      "description": "Set logging level (DEBUG, INFO, WARNING, ERROR)",
+      "isRequired": false,
+      "isSecret": false
+    }
+  ]
+}
