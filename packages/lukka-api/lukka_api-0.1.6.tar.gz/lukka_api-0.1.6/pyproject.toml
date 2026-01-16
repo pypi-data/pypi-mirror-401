@@ -1,0 +1,131 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lukka-api"
+version = "0.1.6"
+description = "Python client for Lukka cryptocurrency data API"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "KENOT-IO", email = "du.tran@kenot.io"}
+]
+maintainers = [
+    {name = "KENOT-IO", email = "vladimir.depoel@kenot.io"}
+]
+keywords = [
+    "lukka",
+    "cryptocurrency",
+    "bitcoin",
+    "ethereum",
+    "crypto",
+    "api",
+    "data",
+    "finance"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandas>=2.3.0",
+    "numpy>=2.0.0",
+    "requests>=2.32.0",
+    "python-dotenv>=1.0.0",
+    "portalocker>=3.0.0",
+    "pyarrow>=22.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "bandit>=1.7.0",
+    "safety>=2.0.0",
+]
+redis = [
+    "redis>=5.0.0",
+]
+all = [
+    "redis>=5.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/KENOT-IO/lukka-api"
+Documentation = "https://github.com/KENOT-IO/lukka-api#readme"
+Repository = "https://github.com/KENOT-IO/lukka-api"
+"Bug Tracker" = "https://github.com/KENOT-IO/lukka-api/issues"
+Changelog = "https://github.com/KENOT-IO/lukka-api/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+packages = ["lukka_api"]
+
+[tool.setuptools.package-data]
+lukka_api = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ['py313']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.venv-314
+  | \.venv-wsl
+  | __pycache__
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=lukka_api --cov-report=html --cov-report=term"
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+check_untyped_defs = true
+
+# Enable strict checking for improved modules
+[[tool.mypy.overrides]]
+module = "lukka_api.caching"
+disallow_untyped_defs = true
+
+[tool.coverage.run]
+source = ["lukka_api"]
+omit = [
+    "*/tests/*",
+    "*/examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

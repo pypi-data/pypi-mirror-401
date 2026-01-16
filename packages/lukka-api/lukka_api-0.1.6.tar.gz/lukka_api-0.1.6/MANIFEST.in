@@ -1,0 +1,23 @@
+# Include documentation
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+
+# Include requirements
+include requirements.txt
+include .env.example
+
+# Include package data
+recursive-include lukka_api *.py
+recursive-include lukka_api py.typed
+
+# Exclude unnecessary files
+recursive-exclude tests *
+recursive-exclude examples *
+recursive-exclude docs *
+recursive-exclude .venv* *
+recursive-exclude __pycache__ *
+recursive-exclude tmp *
+exclude .gitignore
+exclude .env
