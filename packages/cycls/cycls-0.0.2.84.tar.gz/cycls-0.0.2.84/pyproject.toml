@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "cycls"
+version = "0.0.2.84"
+
+packages = [{ include = "cycls" }]
+include = ["cycls/themes/**/*"]
+description = "Distribute Intelligence"
+authors = ["Mohammed J. AlRujayi <mj@cycls.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.111.0"
+httpx = "^0.27.0"
+pyjwt = "^2.8.0"
+docker = "^7.1.0"
+cloudpickle = "^3.1.1"
+
+[tool.poetry.scripts]
+cycls = "cycls.cli:main"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.0"
+requests = "^2.31.0"
+
+
+[tool.poetry.group.dev.dependencies]
+grpcio-tools = "^1.76.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
