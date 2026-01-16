@@ -1,0 +1,172 @@
+# Compresr Python SDK
+
+Intelligent context compression service to optimize LLM costs and performance.
+
+## Installation
+
+```bash
+pip install compresr
+```
+
+## Quick Start
+
+### API Key Setup
+
+Get your API key from [compresr.ai](https://compresr.ai) and set it up:
+
+```python
+import os
+os.environ["COMPRESR_API_KEY"] = "cmp_your_api_key_here"
+
+# Or pass directly to client
+from compresr import CompressionClient
+client = CompressionClient(api_key="cmp_your_api_key_here")
+```
+
+### Compression Client
+
+Get compressed context for use with your own LLM:
+
+```python
+from compresr import CompressionClient
+
+client = CompressionClient(api_key="cmp_your_api_key")
+
+# Get compressed context
+result = client.compress(
+    context="Your very long context that needs compression...",
+    compression_model_name="cmprsr_v1"
+)
+
+compressed_context = result.data.compressed_context
+print(f"Original: {result.data.original_tokens} tokens")
+print(f"Compressed: {result.data.compressed_tokens} tokens")
+print(f"Compression ratio: {result.data.actual_compression_ratio:.2%}")
+print(f"Tokens saved: {result.data.tokens_saved}")
+
+# Use compressed context with your own LLM
+# openai.chat.completions.create(messages=[{"role": "user", "content": compressed_context}])
+```
+
+## Streaming Support
+
+Compression client supports real-time streaming:
+
+```python
+from compresr import CompressionClient
+
+client = CompressionClient(api_key="cmp_your_api_key")
+
+# Compression streaming  
+for chunk in client.compress_stream(
+    context="Your long context...",
+    compression_model_name="cmprsr_v1"
+):
+    print(chunk.content, end="", flush=True)
+```
+
+## Async Support
+
+All methods have async variants:
+
+```python
+import asyncio
+from compresr import CompressionClient
+
+async def main():
+    client = CompressionClient(api_key="cmp_your_api_key")
+    
+    result = await client.compress_async(
+        context="Your context...",
+        compression_model_name="cmprsr_v1"
+    )
+    
+    print(result.data.compressed_context)
+    await client.close()
+
+asyncio.run(main())
+```
+
+## Batch Processing
+
+Process multiple contexts efficiently:
+
+```python
+from compresr import CompressionClient
+
+client = CompressionClient(api_key="cmp_your_api_key")
+results = client.compress_batch(
+    contexts=[
+        "First context to compress...",
+        "Second context to compress..."
+    ],
+    compression_model_name="cmprsr_v1"
+)
+
+for result in results.data.results:
+    print(f"Original tokens: {result.original_tokens}")
+    print(f"Compressed: {result.compressed_context}")
+    print(f"Tokens saved: {result.tokens_saved}")
+```
+
+## Key Features
+
+- **🗜️ Intelligent Compression**: Reduce context lengths while preserving meaning
+- **💰 Cost Optimization**: Save 30-70% on LLM API costs through intelligent compression
+- **⚡ Compression Service**: Focus on context compression for your own LLM integration
+- **🔄 Streaming Support**: Real-time response streaming
+- **📊 Usage Tracking**: Monitor credits, costs, and compression ratios
+- **🔗 Async Ready**: Full async/await support
+- **📦 Batch Processing**: Handle multiple requests efficiently
+
+## Available Models
+
+**Compression Models:**
+- `cmprsr_v1` - Compresr V1 (default compression model)
+
+## Error Handling
+
+```python
+from compresr import CompressionClient
+from compresr.exceptions import CompresrError, AuthenticationError, RateLimitError
+
+client = CompressionClient(api_key="cmp_your_api_key")
+
+try:
+    result = client.compress(
+        context="Your context...",
+        compression_model_name="cmprsr_v1"
+    )
+except AuthenticationError:
+    print("Invalid API key")
+except RateLimitError:
+    print("Rate limit exceeded")
+except CompresrError as e:
+    print(f"API error: {e}")
+```
+
+## Authentication
+
+The Compresr SDK uses API key authentication. You can get your API key from [compresr.ai](https://compresr.ai):
+
+1. Create an account at [compresr.ai](https://compresr.ai)
+2. Navigate to your API Keys section  
+3. Generate a new API key
+4. Use it with the SDK
+
+## Requirements
+
+- Python 3.9+
+- `httpx >= 0.27.0`
+- `pydantic >= 2.10.0`
+
+## License
+
+Proprietary License
+
+## Support
+
+- 📖 Documentation: [docs.compresr.ai](https://docs.compresr.ai)
+- 💬 Support: [hello@compresr.ai](mailto:hello@compresr.ai)
+- 🐛 Issues: [GitHub Issues](https://github.com/compresr/sdk/issues)
+- 🌐 Website: [compresr.ai](https://compresr.ai)
