@@ -1,0 +1,64 @@
+# FORCOME 康康 - 千寻微信框架Pro与LangBot中间件配置
+
+# 中间件服务配置
+server:
+  host: "0.0.0.0"
+  port: 789
+
+# 认证配置
+auth:
+  enabled: false              # 是否启用认证（false时所有API无需登录）
+  jwt_secret: "your-jwt-secret-key-change-in-production"  # JWT密钥（生产环境请修改）
+  jwt_expire_hours: 24        # Token过期时间（小时）
+
+# 钉钉配置（启用认证时需要配置）
+dingtalk:
+  app_key: ""                 # 钉钉应用AppKey
+  app_secret: ""              # 钉钉应用AppSecret
+  corp_id: ""                 # 企业CorpId
+  agent_id: ""                # 应用AgentId（工作台应用需要）
+
+# 千寻框架配置
+qianxun:
+  # 千寻框架HTTP API地址
+  api_url: "http://127.0.0.1:7777/qianxun/httpapi"
+  # 机器人wxid（留空自动获取）
+  robot_wxid: ""
+
+# LangBot配置
+langbot:
+  ws_host: "127.0.0.1"
+  ws_port: 2280
+  access_token: ""
+
+# 限流配置
+rate_limit:
+  min_interval: 1       # 回复最小间隔（秒）
+  max_interval: 3       # 回复最大间隔（秒）
+  batch_min_interval: 2 # 群发/定时任务最小间隔（秒）
+  batch_max_interval: 5 # 群发/定时任务最大间隔（秒）
+
+# 过滤配置
+filter:
+  ignore_wxids: []      # 忽略的wxid列表
+  reply_at_all: false   # 是否回复@所有人
+  # 群消息转发模式
+  # strict: 严格模式，只有@机器人/关键词触发才转发到LangBot（默认）
+  # all: 全部转发，所有群消息都转发到LangBot，由LangBot决定是否响应
+  group_forward_mode: strict
+  # 关键词触发配置
+  keywords:
+    enabled: false      # 是否启用关键词触发
+    list: []            # 触发关键词列表
+    match_mode: contains  # 匹配模式: contains(包含), startswith(开头), exact(精确)
+
+# 消息分段配置
+message_split:
+  enabled: false
+  separator: "/!"
+  min_delay: 1
+  max_delay: 3
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR

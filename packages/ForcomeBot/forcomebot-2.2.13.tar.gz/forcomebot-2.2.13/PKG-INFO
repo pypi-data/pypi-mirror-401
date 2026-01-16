@@ -1,0 +1,346 @@
+Metadata-Version: 2.4
+Name: ForcomeBot
+Version: 2.2.13
+Summary: FORCOME 康康 - 千寻微信框架Pro与LangBot的中间件
+Project-URL: Homepage, https://github.com/yourname/ForcomeBot
+Project-URL: Documentation, https://github.com/yourname/ForcomeBot#readme
+Project-URL: Repository, https://github.com/yourname/ForcomeBot
+Author-email: Your Name <your@email.com>
+License-Expression: MIT
+Keywords: chatbot,langbot,middleware,onebot,qianxun,wechat
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: AsyncIO
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Communications :: Chat
+Requires-Python: >=3.10
+Requires-Dist: aiosqlite>=0.19.0
+Requires-Dist: apscheduler>=3.10.0
+Requires-Dist: fastapi>=0.104.0
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: python-jose[cryptography]>=3.3.0
+Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: sqlalchemy[asyncio]>=2.0.0
+Requires-Dist: uvicorn>=0.24.0
+Requires-Dist: websockets>=11.0
+Provides-Extra: dev
+Requires-Dist: hypothesis>=6.0.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# FORCOME 康康
+
+这是一个用于连接千寻微信框架Pro和LangBot的中间件，实现微信消息与LangBot AI对话的双向通信。
+
+## 架构
+
+```
+微信用户 <-> 千寻框架Pro <-> 本中间件 <-> LangBot (OneBot v11)
+```
+
+## 功能特性
+
+- 支持私聊消息
+- 支持群聊消息（@机器人触发）
+- 支持多轮对话（基于用户ID维护会话）
+- 支持图片消息（发送和接收）
+- 支持语音消息（接收）
+- 支持引用消息
+- 支持拍一拍消息
+- 支持多微信账号
+- 入群欢迎功能
+- 昵称检测功能
+- 定时提醒功能
+- 群发功能（文本、图片、文件、分享链接、小程序）
+- Web管理界面（React前端）
+- 配置热更新
+- 指数退避重连机制
+- API重试机制
+- 状态持久化
+
+## 📦 快速开始
+
+### 方式一：uvx 一键启动（推荐）
+
+需要先安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+```bash
+# 从 PyPI 一键启动（发布后可用）
+uvx ForcomeBot
+
+# 或指定 Python 版本
+uvx --python 3.12 ForcomeBot
+```
+
+首次运行会自动在当前目录创建 `config.yaml` 配置文件，修改配置后重新运行即可。
+
+### 方式二：从源码使用 uvx 启动
+
+```bash
+# 克隆项目
+git clone https://github.com/yourname/ForcomeBot.git
+cd ForcomeBot
+
+# 创建并编辑配置文件
+cp config.example.yaml config.yaml
+# 编辑 config.yaml 填入你的配置
+
+# 使用 uvx 从本地源码启动
+uvx --from . ForcomeBot
+```
+
+### 方式三：pip 安装后启动
+
+```bash
+# 从 PyPI 安装（发布后可用）
+pip install ForcomeBot
+
+# 或从源码安装
+git clone https://github.com/yourname/ForcomeBot.git
+cd ForcomeBot
+pip install .
+
+# 启动
+ForcomeBot
+```
+
+### 方式四：直接运行 Python
+
+```bash
+git clone https://github.com/yourname/ForcomeBot.git
+cd ForcomeBot
+pip install -r requirements.txt
+python main.py
+```
+
+### 配置千寻框架
+
+在千寻框架Pro中设置HTTP事件回调地址为：
+
+```
+http://你的IP:8000/qianxun/callback
+```
+
+## 访问地址
+
+启动后可访问以下地址：
+
+| 地址 | 说明 |
+|------|------|
+| `http://IP:8000/app/` | React管理界面 |
+| `http://IP:8000/docs` | API文档（Swagger） |
+| `http://IP:8000/health` | 健康检查 |
+| `ws://IP:8000/api/ws` | WebSocket实时推送 |
+
+## 配置说明
+
+```yaml
+# 中间件服务配置
+server:
+  host: "0.0.0.0"
+  port: 8000
+
+# 千寻框架配置
+qianxun:
+  api_url: "http://127.0.0.1:7777/qianxun/httpapi"
+  robot_wxid: "wxid_xxx"  # 机器人微信ID
+
+# LangBot配置（OneBot v11 WebSocket）
+langbot:
+  ws_host: "127.0.0.1"
+  ws_port: 2280
+  access_token: ""  # 可选
+
+# 消息限流配置
+rate_limit:
+  min_interval: 1  # 最小发送间隔（秒）
+  max_interval: 3  # 最大发送间隔（秒）
+
+# 消息分段发送
+message_split:
+  enabled: false
+  separator: "/!"
+  min_delay: 1
+  max_delay: 3
+
+# 过滤配置
+filter:
+  ignore_wxids: []  # 忽略的wxid列表
+  reply_at_all: false  # 是否回复@所有人
+
+# 入群欢迎配置
+welcome:
+  - target_groups: ["xxx@chatroom"]
+    message: "欢迎加入！"
+
+# 昵称检测配置
+nickname_check:
+  - task_id: "check1"
+    enabled: true
+    cron: "0 9 * * *"
+    target_groups: ["xxx@chatroom"]
+    regex: "^[\\u4e00-\\u9fa5]+$"
+    message_tpl: "⚠️ @{user} 请修改昵称"
+    exclude_users: []
+
+# 定时提醒配置
+scheduled_reminders:
+  - task_name: "daily_reminder"
+    enabled: true
+    cron: "0 9 * * *"
+    target_groups: ["xxx@chatroom"]
+    mention_users: ["all"]
+    content: "早上好！"
+
+# 日志配置
+logging:
+  level: "INFO"
+```
+
+## 目录结构
+
+```
+forcome-kangkang/
+├── main.py                    # 主程序入口
+├── config.yaml                # 配置文件
+├── config.example.yaml        # 配置文件示例
+├── pyproject.toml             # 项目配置
+├── requirements.txt           # Python依赖
+├── data/                      # 持久化数据目录
+│   └── state.json             # 状态数据
+├── src/
+│   ├── __init__.py            # 模块导出
+│   ├── models.py              # 数据模型
+│   ├── web.py                 # 旧版Web路由（兼容）
+│   │
+│   ├── core/                  # 核心服务层
+│   │   ├── config_manager.py  # 配置管理器
+│   │   ├── state_store.py     # 状态存储器
+│   │   └── log_collector.py   # 日志收集器
+│   │
+│   ├── clients/               # 客户端层
+│   │   ├── qianxun.py         # 千寻客户端（带重试）
+│   │   └── langbot.py         # LangBot客户端（带重连）
+│   │
+│   ├── handlers/              # 业务处理层
+│   │   ├── message_handler.py # 消息处理器
+│   │   ├── message_parser.py  # 消息解析器
+│   │   └── scheduler.py       # 定时任务调度器
+│   │
+│   ├── utils/                 # 工具模块
+│   │   ├── text_processor.py  # 文本处理（换行符、emoji）
+│   │   └── xml_parser.py      # XML解析工具
+│   │
+│   └── api/                   # API层
+│       ├── routes.py          # RESTful API路由
+│       └── websocket.py       # WebSocket处理
+│
+├── web/                       # React前端
+│   ├── src/
+│   │   ├── api/               # API调用
+│   │   ├── components/        # 组件
+│   │   ├── pages/             # 页面
+│   │   └── hooks/             # 自定义hooks
+│   └── dist/                  # 构建产物
+│
+└── tests/                     # 测试
+    ├── test_infrastructure.py # 基础设施测试
+    ├── test_clients.py        # 客户端测试
+    └── test_handlers.py       # 处理器测试
+```
+
+## 模块说明
+
+### 核心服务层 (src/core/)
+
+| 模块 | 说明 |
+|------|------|
+| ConfigManager | 配置管理器，支持热更新、验证、观察者模式 |
+| StateStore | 状态存储器，管理消息去重、图片缓存、ID映射，支持持久化 |
+| LogCollector | 日志收集器，支持WebSocket实时推送 |
+
+### 客户端层 (src/clients/)
+
+| 模块 | 说明 |
+|------|------|
+| QianXunClient | 千寻框架HTTP API客户端，带自动重试（最多3次） |
+| LangBotClient | LangBot OneBot v11 WebSocket客户端，带指数退避重连 |
+
+### 业务处理层 (src/handlers/)
+
+| 模块 | 说明 |
+|------|------|
+| MessageParser | 消息解析器，统一处理各种消息类型 |
+| MessageHandler | 消息处理器，处理私聊/群聊消息 |
+| TaskScheduler | 定时任务调度器，支持昵称检测和定时提醒 |
+
+### 工具模块 (src/utils/)
+
+| 模块 | 说明 |
+|------|------|
+| TextProcessor | 文本处理，换行符转换、emoji编解码 |
+| XMLParser | XML解析，处理引用消息、拍一拍、语音等 |
+
+## API接口
+
+### RESTful API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/config | 获取配置 |
+| POST | /api/config | 更新配置 |
+| POST | /api/config/validate | 验证配置 |
+| GET | /api/status | 获取系统状态 |
+| GET | /api/status/langbot | 获取LangBot连接状态 |
+| GET | /api/status/memory | 获取内存使用情况 |
+| GET | /api/logs | 获取消息日志 |
+| GET | /api/tasks | 获取定时任务列表 |
+| POST | /api/tasks/{id}/run | 手动执行任务 |
+| GET | /api/tasks/history | 获取任务执行历史 |
+| POST | /api/cache/clear | 清理缓存 |
+| GET | /api/chatrooms | 获取群聊列表 |
+| GET | /api/friends | 获取好友列表 |
+| GET | /api/group_members/{id} | 获取群成员列表 |
+| GET | /api/robot_info | 获取机器人信息 |
+
+### WebSocket
+
+连接 `ws://IP:8000/api/ws` 可接收实时推送：
+
+```json
+{"type": "log", "data": {...}}      // 消息日志
+{"type": "status", "data": {...}}   // 状态变更
+```
+
+## 开发
+
+### 安装开发依赖
+
+```bash
+pip install -e ".[dev]"
+```
+
+### 运行测试
+
+```bash
+pytest
+```
+
+### 构建前端
+
+```bash
+cd web
+npm install
+npm run build
+```
+
+## License
+
+MIT
