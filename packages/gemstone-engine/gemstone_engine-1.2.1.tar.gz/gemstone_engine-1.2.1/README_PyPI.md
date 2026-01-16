@@ -1,0 +1,97 @@
+# GEMSTONe: Generic Engine for Modular Software Task Orchestration and Negotiation
+
+## Overview
+
+GEMSTONe is an engine that runs customizable modular workflows. We use the term "module" in the usual sense — a standalone process that takes inputs and produces outputs. 
+When modules are linked together in a workflow, GEMSTONe refers to each one as a "stage"; otherwise terms "module" and "stage" can be used interchangeably.  
+Each stage is a standalone processing step: it reads input files, does its job, and writes outputs. A workflow links these stages together in sequence. GEMSTONe takes care of running them in order, passing data along the way.
+
+Your role is to make each stage GEMSTONe-ready so the engine can:
+
+- Start it with the right parameters  
+- Handle all file paths and connections between stages automatically
+
+## Install
+
+```bash
+pip install gemstone-engine
+```
+
+## Design Goals
+
+- **No proprietary language.** Simple and obvious human-readable syntax for all configuration files (`specs.txt`, `iofiles.txt`, `stageflows.txt`, etc.)
+
+- **Boilerplate code eliminated.** Parameter validation, path management, file compatibility, and chaining are handled by the engine.
+
+- **Zero coupling.** Module code and engine code are 100% independent — changes to one never require changes to the other.
+
+## Quick Start
+
+To plug a stage into GEMSTONe, just include these three files:
+
+- `specs.txt`: lists user input parameters and any defaults or constraints  
+- `iofiles.txt`: defines the stage’s inputs and outputs in table format  
+- `run.py`: contains `def run(params, paths):`, which launches your code  
+- Your module’s own implementation lives in a `runtime/` subdirectory inside the stage folder.
+
+To connect stages into a workflow, add:
+
+- `stageflows.txt`: shows how outputs from one stage become inputs to the next  
+- `standards.txt`: lists the types of files your workflow uses  
+
+That’s it. With these files in place, GEMSTONe handles path management and input validation automatically — no need to write custom code for filenames, directories, or parameter parsing.
+
+## Example Usage
+
+**Launching a workflow**
+
+A GEMSTONe workflow is started from the command line through the standard entry point:
+
+```python
+from gemstone.cli import main
+
+if __name__ == "__main__":
+    main()
+```
+
+This accepts:
+
+```
+<param file>
+[<jobid override>]
+[--testmode]
+```
+
+**Inside a stage (`run.py`)**
+
+Each stage defines:
+
+```python
+def run(params: Params, paths: Paths):
+    param_file = paths.get_parameter_file_path()
+    write_param_file(param_file, params)
+    args = make_args(params, param_file, paths)
+
+    subprocess.run(
+        args,
+        cwd=paths.stage,
+        capture_output=True,
+        text=True,
+        check=True
+    )
+```
+
+The engine supplies both `params` and `paths`; your code focuses only on launching the underlying executable.
+
+## Project Status
+
+GEMSTONe is under active development and already in use for production research pipelines. Interfaces shown here are stable, but minor refinements are expected as the documentation and tooling expand.
+
+## Documentation
+
+Full integration documentation will be released with the public source repository.  
+Until then, concise usage notes and guidance are available—please reach out through the project’s PyPI page or institutional contact channels if you need assistance integrating a module or workflow.
+
+## License
+
+Creative Commons BY‑ND 4.0

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gemstone_engine"         # distribution name (pip install gemstone_engine)
+version = "1.2.1"                # bump on each release
+description = "GEMSTONe: Generic Engine for Modular Software Task Orchestration and Negotiation"
+authors = [
+    { name="Milo Fryling", email="milo.fryling@duke.edu" }
+]
+readme = "README_PyPI.md"
+license = { text = "CC BY-ND 4.0" }
+requires-python = ">=3.8"
+classifiers = [ "Programming Language :: Python :: 3" ]
+
+# what gets installed as the importable package
+[tool.setuptools.packages.find]
+include = ["gemstone"]
+where = ["src"]
+
+
+[project.scripts]
+gemstone = "gemstone.cli:main"
