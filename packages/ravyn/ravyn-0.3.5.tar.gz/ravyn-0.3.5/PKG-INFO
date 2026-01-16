@@ -1,0 +1,547 @@
+Metadata-Version: 2.4
+Name: ravyn
+Version: 0.3.5
+Summary: Ravyn combines performance, type safety, and elegance. A next-generation async Python framework for APIs, microservices, and web applications.
+Project-URL: Homepage, https://github.com/dymmond/ravyn
+Project-URL: Documentation, https://ravyn.dymmond.com/
+Project-URL: Changelog, https://ravyn.dymmond.com/release-notes/
+Project-URL: Funding, https://github.com/sponsors/tarsil
+Project-URL: Source, https://github.com/dymmond/ravyn
+Author-email: Tiago Silva <tiago.silva@dymmond.com>
+Maintainer: devkral, kokoserver
+Maintainer-email: Tiago Silva <tiago.silva@dymmond.com>
+License-Expression: BSD-3-Clause
+License-File: LICENSE
+Keywords: ai,aiohttp,anyio,aop,api,api-key,api-server,asgi,async,async-framework,asyncio,authentication,auto-documentation,autodoc,backend,background-tasks,caching,cloud-native,concurrency,controllers,cors,csrf,data-validation,dependency-injection,developer-friendly,django,dymmond,esmerald,event-driven,exception-handling,fastapi,flask,graphql,graphql-support,high-performance,http,hypercorn,interceptors,json,jwt,lilya,machine-learning,microservices,middlewares,ml,modern-python,non-blocking,oauth2,observables,openapi,openapi-schema,openapi3,pydantic,python,python-types,python3,quart,ravyn,ravyn-framework,redoc,request-handling,response-models,rest,rest-api,routing,security,serialization,sse,starlette,streaming,swagger,type-hints,typed-api,uvicorn,validation,web,web-framework,websocket,websocket-server
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: AnyIO
+Classifier: Framework :: AsyncIO
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Internet
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: HTTP Servers
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Requires-Dist: lilya[standard]>=0.23.1
+Requires-Dist: monkay>=0.5.0
+Requires-Dist: msgspec<0.21.0,>=0.20.0
+Requires-Dist: orjson<4.0.0,>=3.8.5
+Requires-Dist: pydantic-settings>=2.9.0
+Provides-Extra: all
+Requires-Dist: a2wsgi; extra == 'all'
+Requires-Dist: asyncz>=0.11.0; extra == 'all'
+Requires-Dist: bcrypt>=4.3.0; extra == 'all'
+Requires-Dist: email-validator<3.0.0,>=2.2.0; extra == 'all'
+Requires-Dist: httpx<0.30.0,>=0.25.0; extra == 'all'
+Requires-Dist: httpx>=0.25.0; extra == 'all'
+Requires-Dist: ipython; extra == 'all'
+Requires-Dist: itsdangerous<3.0.0,>=2.1.2; extra == 'all'
+Requires-Dist: jinja2<4.0.0,>=3.1.2; extra == 'all'
+Requires-Dist: ptpython; extra == 'all'
+Requires-Dist: pyjwt<3,>=2.10.1; extra == 'all'
+Requires-Dist: uvicorn[standard]>=0.37.0; extra == 'all'
+Provides-Extra: dev
+Requires-Dist: uvicorn[standard]>=0.37.0; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: a2wsgi>=1.9.0; extra == 'docs'
+Requires-Dist: griffe-typingdoc<1.0,>=0.2.2; extra == 'docs'
+Requires-Dist: httpx>=0.25.0; extra == 'docs'
+Requires-Dist: lilya[standard]>=0.23.1; extra == 'docs'
+Requires-Dist: mdx-include>=1.4.2; extra == 'docs'
+Requires-Dist: mkdocs-macros-plugin>=0.4.0; extra == 'docs'
+Requires-Dist: mkdocs-material>=9.4.4; extra == 'docs'
+Requires-Dist: mkdocs-meta-descriptions-plugin>=2.3.0; extra == 'docs'
+Requires-Dist: mkdocs<2.0.0,>=1.1.2; extra == 'docs'
+Requires-Dist: mkdocstrings[python]>=0.23.0; extra == 'docs'
+Requires-Dist: pyyaml<7.0.0,>=6.0; extra == 'docs'
+Requires-Dist: typing-extensions>=3.10.0; extra == 'docs'
+Provides-Extra: jwt
+Requires-Dist: bcrypt>=4.3.0; extra == 'jwt'
+Requires-Dist: pyjwt<3,>=2.10.1; extra == 'jwt'
+Provides-Extra: schedulers
+Requires-Dist: asyncz>=0.11.0; extra == 'schedulers'
+Provides-Extra: standard
+Requires-Dist: a2wsgi; extra == 'standard'
+Requires-Dist: email-validator<3.0.0,>=2.2.0; extra == 'standard'
+Requires-Dist: httpx<0.30.0,>=0.25.0; extra == 'standard'
+Requires-Dist: itsdangerous<3.0.0,>=2.1.2; extra == 'standard'
+Requires-Dist: jinja2<4.0.0,>=3.1.2; extra == 'standard'
+Requires-Dist: uvicorn[standard]>=0.37.0; extra == 'standard'
+Provides-Extra: test
+Requires-Dist: httpx>=0.25.0; extra == 'test'
+Provides-Extra: testing
+Requires-Dist: anyio[trio]<5.0.0,>=3.6.2; extra == 'testing'
+Requires-Dist: brotli<2.0.0,>=1.0.9; extra == 'testing'
+Requires-Dist: databasez>=0.9.7; extra == 'testing'
+Requires-Dist: edgy[postgres]>=0.31.3; extra == 'testing'
+Requires-Dist: fakeredis>=2.27.0; extra == 'testing'
+Requires-Dist: fastapi>=0.121.1; extra == 'testing'
+Requires-Dist: flask<4.0.0,>=1.1.2; extra == 'testing'
+Requires-Dist: freezegun<2.0.0,>=1.2.2; extra == 'testing'
+Requires-Dist: grpcio-tools>=1.71.0; extra == 'testing'
+Requires-Dist: ipdb; extra == 'testing'
+Requires-Dist: litestar>=2.18.0; extra == 'testing'
+Requires-Dist: loguru<0.8.0,>=0.7.0; extra == 'testing'
+Requires-Dist: mongoz>=0.13.0; extra == 'testing'
+Requires-Dist: mypy==1.19.1; extra == 'testing'
+Requires-Dist: polyfactory<4.0.0,>=2.5.0; extra == 'testing'
+Requires-Dist: pytest-asyncio>=0.26.0; extra == 'testing'
+Requires-Dist: pytest-cov<8.0.0,>=4.1.0; extra == 'testing'
+Requires-Dist: pytest<10.0.0,>=7.1.3; extra == 'testing'
+Requires-Dist: pytz; extra == 'testing'
+Requires-Dist: redis; extra == 'testing'
+Requires-Dist: structlog>=25.2.0; extra == 'testing'
+Requires-Dist: types-orjson==3.6.2; extra == 'testing'
+Requires-Dist: types-ujson==5.10.0.20250822; extra == 'testing'
+Requires-Dist: ujson<6,>=5.7.0; extra == 'testing'
+Description-Content-Type: text/markdown
+
+<p align="center">
+  <a href="https://ravyn.dev"><img src="https://res.cloudinary.com/dymmond/image/upload/v1759490296/ravyn/img/logo_pb3fis.png" alt='Ravyn'></a>
+</p>
+
+<p align="center">
+    <em>A next-generation async Python framework for building high-performance APIs, microservices, and web applications with type safety and elegance. 🚀</em>
+</p>
+
+<p align="center">
+<a href="https://github.com/dymmond/ravyn/actions/workflows/test-suite.yml/badge.svg?event=push&branch=main" target="_blank">
+    <img src="https://github.com/dymmond/ravyn/actions/workflows/test-suite.yml/badge.svg?event=push&branch=main" alt="Test Suite">
+</a>
+
+<a href="https://pypi.org/project/ravyn" target="_blank">
+    <img src="https://img.shields.io/pypi/v/ravyn?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+
+<a href="https://pypi.org/project/ravyn" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/ravyn.svg?color=%2334D058" alt="Supported Python versions">
+</a>
+</p>
+
+---
+
+**Documentation**: [https://ravyn.dev](https://www.ravyn.dev) 📚
+
+**Source Code**: [https://github.com/dymmond/ravyn](https://github.com/dymmond/ravyn)
+
+**The official supported version is always the latest released**.
+
+!!! Info "Coming from Esmerald?"
+    If you came looking for Esmerald, you are in the right place. Esmerald was rebranded to Ravyn. All features remain and continue to grow.
+
+---
+
+## Quick Start
+
+Get your first Ravyn API running in minutes.
+
+### Installation
+
+```shell
+pip install ravyn[standard]
+```
+
+This installs Ravyn with recommended extras. You'll also need an ASGI server:
+
+```shell
+pip install uvicorn
+```
+
+### Your First API
+
+Create a file called `app.py`:
+
+```python
+from ravyn import Ravyn, get, JSONResponse
+
+app = Ravyn()
+
+@app.get("/")
+def welcome() -> JSONResponse:
+    return JSONResponse({"message": "Welcome to Ravyn!"})
+
+@app.get("/hello/{name}")
+def greet(name: str) -> JSONResponse:
+    return JSONResponse({"message": f"Hello, {name}!"})
+```
+
+### Run It
+
+```shell
+uvicorn app:app --reload
+```
+
+Visit [http://127.0.0.1:8000/hello/World](http://127.0.0.1:8000/hello/World) and you'll see:
+
+```json
+{"message": "Hello, World!"}
+```
+
+### Explore the Docs
+
+Ravyn automatically generates interactive API documentation:
+
+- **Swagger UI**: [http://127.0.0.1:8000/docs/swagger](http://127.0.0.1:8000/docs/swagger)
+- **ReDoc**: [http://127.0.0.1:8000/docs/redoc](http://127.0.0.1:8000/docs/redoc)
+- **Stoplight Elements**: [http://127.0.0.1:8000/docs/elements](http://127.0.0.1:8000/docs/elements)
+
+**Congratulations!** 🎉 You've built your first Ravyn API.
+
+---
+
+## Why Ravyn?
+
+Ravyn combines the best ideas from FastAPI, Django, Flask, and NestJS into a framework designed for real-world applications. from prototypes to enterprise systems.
+
+### Key Features
+
+- **⚡ Fast**: Built on [Lilya](https://lilya.dev/) and [Pydantic](https://pydantic-docs.helpmanual.io/), with async-first design
+- **🎯 Type-Safe**: Full Python 3.10+ type hints for better IDE support and fewer bugs
+- **🧩 Flexible**: Choose OOP (controllers) or functional style. or mix both
+- **🔋 Batteries Included**: Dependency injection, middleware, permissions, schedulers, and more
+- **Database Ready**: Native support for [Edgy ORM][edgy_orm] and [Mongoz ODM][mongoz_odm]
+- **🧪 Testable**: Built-in test client for easy testing
+- **📖 Auto-Documented**: OpenAPI/Swagger docs generated automatically
+
+---
+
+## Core Concepts
+
+### Routes and Handlers
+
+Ravyn uses **decorators** or **Gateway objects** to define routes.
+
+!!! warning "Critical Requirements"
+    1. **At least one route is required**: An empty `Ravyn()` application does nothing. You must define routes to handle requests.
+    2. **Return types are important**: Always specify return type hints (e.g., `-> dict`, `-> JSONResponse`). Ravyn uses these to:
+        - Serialize your data correctly
+        - Generate accurate API documentation
+        - Validate responses
+
+#### Decorator Style (Recommended for Simple APIs)
+
+```python
+from ravyn import Ravyn, get, post
+
+app = Ravyn()
+
+@app.get("/users")
+def list_users() -> dict:
+    return {"users": ["Alice", "Bob"]}
+
+@app.post("/users")
+def create_user(name: str) -> dict:
+    return {"created": name}
+```
+
+#### Gateway Style (Recommended for Larger Apps)
+
+```python
+from ravyn import Ravyn, Gateway, get
+
+@get()
+def list_users() -> dict:
+    return {"users": ["Alice", "Bob"]}
+
+app = Ravyn(
+    routes=[
+        Gateway("/users", handler=list_users)
+    ]
+)
+```
+
+!!! tip
+    Use decorators for quick prototypes. Use Gateway + Include for scalable, organized applications.
+
+### Dependency Injection
+
+Inject dependencies at any level. from application-wide to individual routes.
+
+```python
+from ravyn import Ravyn, Gateway, Inject, Injects, get
+
+def get_database():
+    return {"db": "connected"}
+
+@get()
+def users(db: dict = Injects()) -> dict:
+    return {"users": [], "db_status": db}
+
+app = Ravyn(
+    routes=[Gateway("/users", handler=users)],
+    dependencies={"db": Inject(get_database)}
+)
+```
+
+Learn more in the [Dependencies](./dependencies.md) guide.
+
+### Settings Management
+
+Ravyn uses environment-based settings inspired by Django.
+
+```python
+from ravyn import RavynSettings
+from ravyn.conf.enums import EnvironmentType
+
+class DevelopmentSettings(RavynSettings):
+    app_name: str = "My App (Dev)"
+    environment: str = EnvironmentType.DEVELOPMENT
+    debug: bool = True
+```
+
+Load your settings via environment variable:
+
+```shell
+# MacOS/Linux
+RAVYN_SETTINGS_MODULE='myapp.settings.DevelopmentSettings' uvicorn app:app --reload
+
+# Windows
+$env:RAVYN_SETTINGS_MODULE="myapp.settings.DevelopmentSettings"; uvicorn app:app --reload
+```
+
+If no `RAVYN_SETTINGS_MODULE` is set, Ravyn uses sensible defaults.
+
+Learn more in [Application Settings](./application/settings.md).
+
+---
+
+## Organizing Larger Applications
+
+As your app grows, use **Include** to organize routes into modules.
+
+### Project Structure
+
+```
+myapp/
+├── app.py
+├── urls.py
+└── accounts/
+    ├── controllers.py
+    └── urls.py
+```
+
+### accounts/controllers.py
+
+```python
+from ravyn import get, post
+
+@get()
+def list_accounts() -> dict:
+    return {"accounts": []}
+
+@post()
+def create_account(name: str) -> dict:
+    return {"created": name}
+```
+
+### accounts/urls.py
+
+```python
+from ravyn import Gateway
+from .controllers import list_accounts, create_account
+
+route_patterns = [
+    Gateway("/", handler=list_accounts),
+    Gateway("/create", handler=create_account),
+]
+```
+
+### urls.py
+
+```python
+from ravyn import Include
+
+route_patterns = [
+    Include("/accounts", namespace="myapp.accounts.urls"),
+]
+```
+
+### app.py
+
+```python
+from ravyn import Ravyn
+
+app = Ravyn(routes="myapp.urls")
+```
+
+Now your routes are organized:
+
+- `GET /accounts/` → list_accounts
+- `POST /accounts/create` → create_account
+
+Learn more in [Routing](./routing/routes.md).
+
+---
+
+## Additional Installation Options
+
+### Testing Support
+
+```shell
+pip install ravyn[test]
+```
+
+Includes the `RavynTestClient` for testing your application.
+
+### JWT Support
+
+```shell
+pip install ravyn[jwt]
+```
+
+For JWT-based authentication.
+
+### Scheduler Support
+
+```shell
+pip install ravyn[schedulers]
+```
+
+For background task scheduling.
+
+### Interactive Shell
+
+```shell
+pip install ravyn[ipython]  # IPython shell
+pip install ravyn[ptpython]  # ptpython shell
+```
+
+Learn more about the [shell](./directives/shell.md).
+
+---
+
+## Start a Project with Scaffolding
+
+!!! warning
+    This is for users comfortable with Python project structures. If you're new to Ravyn, continue learning the basics first.
+
+Generate a **simple** project scaffold:
+
+```shell
+ravyn createproject myproject --simple
+```
+
+Or generate a **complete** scaffold (recommended for enterprise apps):
+
+```shell
+ravyn createproject myproject
+```
+
+This creates a ready-to-go structure with:
+
+- Pre-configured application
+- Sample routes
+- Test setup
+
+Learn more in [Directives](./directives/directives.md).
+
+---
+
+## Next Steps
+
+Now that you have Ravyn running, explore these topics:
+
+### Essential Concepts
+- [Dependencies](./dependencies.md) - Master dependency injection
+- [Routing](./routing/routes.md) - Advanced routing patterns
+- [Responses](./responses.md) - Different response types
+- [Testing](./testclient.md) - Test your application
+
+### Building Features
+- [Middleware](./middleware/index.md) - Add request/response processing
+- [Permissions](./permissions/index.md) - Secure your endpoints
+- [Database Integration](./databases/edgy/motivation.md) - Connect to databases
+- [Background Tasks](./background-tasks.md) - Run async tasks
+
+### Going to Production
+- [Settings](./application/settings.md) - Environment configuration
+- [Deployment](./deployment/intro.md) - Deploy your application
+- [OpenAPI Configuration](./configurations/openapi/config.md) - Customize API docs
+
+---
+
+## Requirements
+
+- **Python 3.10+**
+
+Ravyn is built on:
+
+- <a href="https://lilya.dev/" class="external-link" target="_blank">Lilya</a> - High-performance ASGI framework
+- <a href="https://pydantic-docs.helpmanual.io/" class="external-link" target="_blank">Pydantic</a> - Data validation
+
+---
+
+## About Ravyn
+
+### History
+
+Ravyn is the evolution of Esmerald, rebranded to align with a growing ecosystem of tools. **Esmerald continues to exist** for its specific use cases, while Ravyn represents the next generation with improved consistency and future-focused design.
+
+### Motivation
+
+While frameworks like FastAPI, Flask, and Django solve 99% of common problems, they sometimes leave gaps in structure and business logic organization. Ravyn was built to fill those gaps while keeping the best features from:
+
+- **FastAPI** - API design and automatic documentation
+- **Django** - Permissions and settings management
+- **Flask** - Simplicity and flexibility
+- **NestJS** - Controllers and dependency injection
+- **Starlite** - Transformers and signature models
+
+Learn more in [About Ravyn](./about.md).
+
+---
+
+## Join the Community
+
+Ravyn is an open source project and we love your contribution!
+
+<p align="center">
+    <a href="https://github.com/dymmond/ravyn" target="_blank">
+        <img src="https://img.shields.io/github/stars/dymmond/ravyn?style=social" alt="GitHub stars">
+    </a>
+    <a href="https://discord.gg/eMrM9sWWvu" target="_blank">
+        <img src="https://img.shields.io/discord/1018998928332570634?logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" alt="Discord">
+    </a>
+    <a href="https://twitter.com/ravyn_framework" target="_blank">
+        <img src="https://img.shields.io/twitter/follow/ravyn_framework?style=social" alt="Twitter">
+    </a>
+</p>
+
+- **Star us on GitHub** to show your support! ⭐️
+- **Join our Discord** to ask questions and share your projects.
+- **Follow us on X (Twitter)** for the latest updates.
+
+## Sponsors
+
+Currently there are no sponsors of Ravyn but you can financially help and support the author though
+[GitHub sponsors](https://github.com/sponsors/tarsil) and become a **Special one** or a **Legend**.
+
+### Powered by
+
+Worth mentioning who is helping us.
+
+**JetBrains**
+
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSourceSupport)
+
+[edgy_orm]: https://ravyn.dev/databases/edgy/motivation
+[mongoz_odm]: https://ravyn.dev/databases/mongoz/motivation
+
+[edgy_orm]: ./databases/edgy/motivation.md
+[mongoz_odm]: ./databases/mongoz/motivation.md
