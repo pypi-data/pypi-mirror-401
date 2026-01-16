@@ -1,0 +1,18 @@
+preset: python-uv
+
+# Avoid context pressure restarts during E2E runs
+context_restart_threshold: 0.98
+context_limit: 400000
+
+# Explicit run_end trigger with validation commands
+validation_triggers:
+  run_end:
+    failure_mode: continue
+    commands:
+      - ref: test
+        command: "uv run pytest --cov=src --cov-report=xml:coverage.xml --cov-fail-under=0 -o cache_dir=/tmp/pytest-${AGENT_ID:-default}"
+
+coverage:
+  format: xml
+  file: coverage.xml
+  threshold: 0
