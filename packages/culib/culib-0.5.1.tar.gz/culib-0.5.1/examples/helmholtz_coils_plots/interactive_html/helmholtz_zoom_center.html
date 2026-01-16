@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-9a61ad1139e271c9b60cb6c876baf9cd"}, "mark": {"type": "line", "point": true}, "encoding": {"color": {"field": "color_param_display", "scale": {"range": ["#00354B", "#65BBA9", "#DB4140", "#EEA320", "#3e4242", "#b2c4cb"], "scheme": "dark2"}, "title": "Baxis/Coil", "type": "ordinal"}, "tooltip": [{"field": "x_mm", "type": "quantitative"}, {"field": "Bx_mT", "type": "quantitative"}, {"field": "color_param_display", "title": "Baxis/Coil", "type": "ordinal"}], "x": {"field": "x_mm", "title": "x (mm)", "type": "quantitative"}, "y": {"field": "Bx_mT", "scale": {"domain": [56.04578758995613, 56.15827243666197], "zero": false}, "title": "Bx (mT)", "type": "quantitative"}}, "height": 550, "params": [{"name": "param_2", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": {"text": ["Helmholtz circular coils (distance btw coils = radius)", "Zoom on region pos_mm = 0.00 +/- 0.50 mm", ""], "subtitle": ["Bx = f(x)", "Field discrepancy ratio = 0.00 % for Bx_total_mT"], "color": "black", "subtitleColor": "black", "fontSize": 19, "subtitleFontSize": 17}, "transform": [{"fold": ["Bx_total_mT"], "as": ["Baxis_Coil", "Bx_mT"]}, {"calculate": "{'Bx_total_mT': 'Bx Total'}[datum.Baxis_Coil]", "as": "color_param_display"}], "width": 550, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-9a61ad1139e271c9b60cb6c876baf9cd": [{"index": 1589, "x_mm": -0.5, "Bx_total_mT": 56.10188947943556}, {"index": 1590, "x_mm": -0.45000000000000284, "Bx_total_mT": 56.1019429164118}, {"index": 1591, "x_mm": -0.3999999999999915, "Bx_total_mT": 56.10199069366878}, {"index": 1592, "x_mm": -0.3499999999999943, "Bx_total_mT": 56.10203282279638}, {"index": 1593, "x_mm": -0.29999999999999716, "Bx_total_mT": 56.10206931402182}, {"index": 1594, "x_mm": -0.25, "Bx_total_mT": 56.102100176209554}, {"index": 1595, "x_mm": -0.20000000000000284, "Bx_total_mT": 56.10212541686066}, {"index": 1596, "x_mm": -0.14999999999999147, "Bx_total_mT": 56.10214504211285}, {"index": 1597, "x_mm": -0.09999999999999432, "Bx_total_mT": 56.102159056739985}, {"index": 1598, "x_mm": -0.04999999999999716, "Bx_total_mT": 56.102167464152195}, {"index": 1599, "x_mm": 0.0, "Bx_total_mT": 56.102170266395575}, {"index": 1600, "x_mm": 0.04999999999999716, "Bx_total_mT": 56.102167464152195}, {"index": 1601, "x_mm": 0.10000000000000853, "Bx_total_mT": 56.10215905673998}, {"index": 1602, "x_mm": 0.15000000000000568, "Bx_total_mT": 56.10214504211284}, {"index": 1603, "x_mm": 0.20000000000000284, "Bx_total_mT": 56.10212541686066}, {"index": 1604, "x_mm": 0.25, "Bx_total_mT": 56.102100176209554}, {"index": 1605, "x_mm": 0.29999999999999716, "Bx_total_mT": 56.10206931402182}, {"index": 1606, "x_mm": 0.3500000000000085, "Bx_total_mT": 56.10203282279637}, {"index": 1607, "x_mm": 0.4000000000000057, "Bx_total_mT": 56.10199069366877}, {"index": 1608, "x_mm": 0.45000000000000284, "Bx_total_mT": 56.1019429164118}, {"index": 1609, "x_mm": 0.5, "Bx_total_mT": 56.10188947943556}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

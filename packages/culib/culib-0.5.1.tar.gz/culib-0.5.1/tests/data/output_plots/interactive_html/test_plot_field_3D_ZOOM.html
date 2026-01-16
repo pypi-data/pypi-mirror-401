@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-b3fd3f42f7f4726cf26d9943981dad27"}, "mark": {"type": "line", "point": true}, "encoding": {"color": {"field": "color_param_display", "scale": {"range": ["#00354B", "#65BBA9", "#DB4140", "#EEA320", "#3e4242", "#b2c4cb"], "scheme": "dark2"}, "title": "Baxis/Coil", "type": "ordinal"}, "tooltip": [{"field": "x_mm", "type": "quantitative"}, {"field": "Bx_mT", "type": "quantitative"}, {"field": "color_param_display", "title": "Baxis/Coil", "type": "ordinal"}], "x": {"field": "x_mm", "title": "x (mm)", "type": "quantitative"}, "y": {"field": "Bx_mT", "scale": {"domain": [-0.5294577430839379, 2.3947439049655133], "zero": false}, "title": "Bx (mT)", "type": "quantitative"}}, "height": 550, "params": [{"name": "param_7", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": {"text": ["3D fields along main axis of coil A + coil_B", "Zoom on region pos_mm = 6.00 +/- 10.00 mm", ""], "subtitle": ["Bx = f(x) at fixed (y_mm, z_mm) = (12.0, -4.0)", "Field discrepancy ratio = 361.52 % for Bx_total_mT"], "color": "black", "subtitleColor": "black", "fontSize": 19, "subtitleFontSize": 17}, "transform": [{"fold": ["Bx_total_mT"], "as": ["Baxis_Coil", "Bx_mT"]}, {"calculate": "{'Bx_total_mT': 'Bx Total'}[datum.Baxis_Coil]", "as": "color_param_display"}], "width": 550, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-b3fd3f42f7f4726cf26d9943981dad27": [{"index": 13157, "x_mm": -4.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": -0.5242155872118197}, {"index": 14118, "x_mm": -2.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": -0.2590543614283849}, {"index": 15079, "x_mm": 0.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 0.0}, {"index": 16040, "x_mm": 2.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 0.25905436142838334}, {"index": 17001, "x_mm": 4.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 0.5242155872118197}, {"index": 17962, "x_mm": 6.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 0.8008653356313273}, {"index": 18923, "x_mm": 8.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 1.0928170528793255}, {"index": 19884, "x_mm": 10.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 1.4012636533761809}, {"index": 20845, "x_mm": 12.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 1.723496667924807}, {"index": 21806, "x_mm": 14.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 2.051531087895957}, {"index": 22767, "x_mm": 16.0, "y_mm": 12.0, "z_mm": -4.0, "Bx_total_mT": 2.3710335692727855}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

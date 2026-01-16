@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-825d6be28f3792eb6fc799ad312fdbfe"}, "mark": {"type": "line", "point": true}, "encoding": {"color": {"field": "color_param_display", "scale": {"range": ["#00354B", "#65BBA9", "#DB4140", "#EEA320", "#3e4242", "#b2c4cb"], "scheme": "dark2"}, "title": "Baxis/Coil", "type": "ordinal"}, "tooltip": [{"field": "z_mm", "type": "quantitative"}, {"field": "Bz_mT", "type": "quantitative"}, {"field": "color_param_display", "title": "Baxis/Coil", "type": "ordinal"}], "x": {"field": "z_mm", "title": "z (mm)", "type": "quantitative"}, "y": {"field": "Bz_mT", "scale": {"domain": [20.74649888850689, 28.170457083055286], "zero": false}, "title": "Bz (mT)", "type": "quantitative"}}, "height": 550, "params": [{"name": "param_1", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": {"text": ["Main field along main axis of coil A + coil B", "Full line z", ""], "subtitle": ["My param = 12", "AWG = 22", "Distance btw coils (mm) = 60", "Bz = f(z)"], "color": "black", "subtitleColor": "black", "fontSize": 19, "subtitleFontSize": 17}, "transform": [{"fold": ["Bz_total_mT"], "as": ["Baxis_Coil", "Bz_mT"]}, {"calculate": "{'Bz_total_mT': 'Bz Total'}[datum.Baxis_Coil]", "as": "color_param_display"}], "width": 550, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-825d6be28f3792eb6fc799ad312fdbfe": [{"z_mm": -40.0, "Bz_total_mT": 23.982041747106113}, {"z_mm": -39.0, "Bz_total_mT": 24.56083820308249}, {"z_mm": -38.0, "Bz_total_mT": 25.10611426741406}, {"z_mm": -37.0, "Bz_total_mT": 25.61313142015567}, {"z_mm": -36.0, "Bz_total_mT": 26.077450925304607}, {"z_mm": -35.0, "Bz_total_mT": 26.49503484751325}, {"z_mm": -34.0, "Bz_total_mT": 26.862338548359105}, {"z_mm": -33.0, "Bz_total_mT": 27.176391982091275}, {"z_mm": -32.0, "Bz_total_mT": 27.434867874294195}, {"z_mm": -31.0, "Bz_total_mT": 27.636135571877276}, {"z_mm": -30.0, "Bz_total_mT": 27.779299912950997}, {"z_mm": -29.0, "Bz_total_mT": 27.864224838930905}, {"z_mm": -28.0, "Bz_total_mT": 27.891541666391372}, {"z_mm": -27.0, "Bz_total_mT": 27.862642004211104}, {"z_mm": -26.0, "Bz_total_mT": 27.7796553235696}, {"z_mm": -25.0, "Bz_total_mT": 27.645411256022278}, {"z_mm": -24.0, "Bz_total_mT": 27.463386889349092}, {"z_mm": -23.0, "Bz_total_mT": 27.237639703554123}, {"z_mm": -22.0, "Bz_total_mT": 26.972727348028812}, {"z_mm": -21.0, "Bz_total_mT": 26.673616163878577}, {"z_mm": -20.0, "Bz_total_mT": 26.34558111642881}, {"z_mm": -19.0, "Bz_total_mT": 25.99410050589436}, {"z_mm": -18.0, "Bz_total_mT": 25.624749346161646}, {"z_mm": -17.0, "Bz_total_mT": 25.243095538730994}, {"z_mm": -16.0, "Bz_total_mT": 24.854602859082917}, {"z_mm": -15.0, "Bz_total_mT": 24.464544309622163}, {"z_mm": -14.0, "Bz_total_mT": 24.07792862718086}, {"z_mm": -13.0, "Bz_total_mT": 23.699441759392784}, {"z_mm": -12.0, "Bz_total_mT": 23.33340406356205}, {"z_mm": -11.0, "Bz_total_mT": 22.98374295572846}, {"z_mm": -10.0, "Bz_total_mT": 22.653979848731396}, {"z_mm": -9.0, "Bz_total_mT": 22.347229535203468}, {"z_mm": -8.0, "Bz_total_mT": 22.0662097254809}, {"z_mm": -7.0, "Bz_total_mT": 21.813258237347014}, {"z_mm": -6.0, "Bz_total_mT": 21.5903553239309}, {"z_mm": -5.0, "Bz_total_mT": 21.399148772155968}, {"z_mm": -4.0, "Bz_total_mT": 21.240979656148827}, {"z_mm": -3.0, "Bz_total_mT": 21.11690694064}, {"z_mm": -2.0, "Bz_total_mT": 21.027729459998078}, {"z_mm": -1.0, "Bz_total_mT": 20.97400412175061}, {"z_mm": 0.0, "Bz_total_mT": 20.95605948334029}, {"z_mm": 1.0, "Bz_total_mT": 20.97400412175061}, {"z_mm": 2.0, "Bz_total_mT": 21.027729459998078}, {"z_mm": 3.0, "Bz_total_mT": 21.11690694064}, {"z_mm": 4.0, "Bz_total_mT": 21.240979656148824}, {"z_mm": 5.0, "Bz_total_mT": 21.39914877215597}, {"z_mm": 6.0, "Bz_total_mT": 21.590355323930904}, {"z_mm": 7.0, "Bz_total_mT": 21.813258237347014}, {"z_mm": 8.0, "Bz_total_mT": 22.0662097254809}, {"z_mm": 9.0, "Bz_total_mT": 22.347229535203468}, {"z_mm": 10.0, "Bz_total_mT": 22.653979848731396}, {"z_mm": 11.0, "Bz_total_mT": 22.98374295572846}, {"z_mm": 12.0, "Bz_total_mT": 23.33340406356205}, {"z_mm": 13.0, "Bz_total_mT": 23.69944175939278}, {"z_mm": 14.0, "Bz_total_mT": 24.077928627180864}, {"z_mm": 15.0, "Bz_total_mT": 24.464544309622163}, {"z_mm": 16.0, "Bz_total_mT": 24.854602859082917}, {"z_mm": 17.0, "Bz_total_mT": 25.24309553873099}, {"z_mm": 18.0, "Bz_total_mT": 25.624749346161646}, {"z_mm": 19.0, "Bz_total_mT": 25.99410050589436}, {"z_mm": 20.0, "Bz_total_mT": 26.34558111642881}, {"z_mm": 21.0, "Bz_total_mT": 26.67361616387857}, {"z_mm": 22.0, "Bz_total_mT": 26.972727348028815}, {"z_mm": 23.0, "Bz_total_mT": 27.23763970355412}, {"z_mm": 24.0, "Bz_total_mT": 27.463386889349096}, {"z_mm": 25.0, "Bz_total_mT": 27.645411256022278}, {"z_mm": 26.0, "Bz_total_mT": 27.7796553235696}, {"z_mm": 27.0, "Bz_total_mT": 27.8626420042111}, {"z_mm": 28.0, "Bz_total_mT": 27.891541666391372}, {"z_mm": 29.0, "Bz_total_mT": 27.864224838930905}, {"z_mm": 30.0, "Bz_total_mT": 27.779299912950997}, {"z_mm": 31.0, "Bz_total_mT": 27.636135571877272}, {"z_mm": 32.0, "Bz_total_mT": 27.434867874294195}, {"z_mm": 33.0, "Bz_total_mT": 27.176391982091275}, {"z_mm": 34.0, "Bz_total_mT": 26.8623385483591}, {"z_mm": 35.0, "Bz_total_mT": 26.495034847513253}, {"z_mm": 36.0, "Bz_total_mT": 26.07745092530461}, {"z_mm": 37.0, "Bz_total_mT": 25.61313142015567}, {"z_mm": 38.0, "Bz_total_mT": 25.10611426741406}, {"z_mm": 39.0, "Bz_total_mT": 24.560838203082497}, {"z_mm": 40.0, "Bz_total_mT": 23.982041747106113}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
