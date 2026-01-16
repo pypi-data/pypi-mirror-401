@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "packaging_workshop_pmat"
+version = "0.1.0"
+description = "Workshop package for practicing modern Python packaging."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/packaging_workshop_pmat"]
+
+[project.scripts]
+packaging_workshop_pmat = "packaging_workshop_pmat.cli:main"
+pws = "packaging_workshop_pmat.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  "black",
+  "mypy",
+]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+fixable = ["ALL"]
+
+[tool.mypy]
+python_version = "3.13"
+mypy_path = ["src"]
+strict = true

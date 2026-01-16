@@ -1,0 +1,25 @@
+name: packaging_workshop
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pip
+  - git
+  # Packaging / build & publish
+  - twine
+  - setuptools
+  - wheel
+  - hatchling
+  # Testing
+  - pytest
+  - pytest-cov
+  # Dev tooling
+  - ruff
+  - black
+  - mypy
+  - pre-commit
+  # Quality-of-life (optional but commonly useful)
+  - rich
+  - pip:
+      # Keep pip-only deps here if you need them later.
+      - build
