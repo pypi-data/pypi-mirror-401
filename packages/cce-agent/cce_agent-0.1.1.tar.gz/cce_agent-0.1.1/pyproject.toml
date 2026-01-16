@@ -1,0 +1,300 @@
+[project]
+name = "cce-agent"
+version = "0.1.1"
+description = "Context-aware Code Evolution Agent - AI-powered code analysis and transformation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "jkbrooks" }
+]
+keywords = ["ai", "agent", "code-analysis", "langchain", "langgraph", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    # === LangChain Ecosystem ===
+    # Upgraded to 1.x (tickets #117, #118)
+    "langchain>=1.1.0,<2.0.0",
+    "langchain-core>=1.2.0,<2.0.0",
+    "langchain-anthropic>=1.2.0,<2.0.0",
+    "langchain-openai>=1.0.0,<2.0.0",
+    # Unused dependencies (no references in src/, scripts/, tests/).
+    # Keep commented for now; re-enable if/when used.
+    # "langchain-text-splitters>=0.3.0",
+    "langchain-mcp-adapters>=0.1.0",
+    
+    # === LangGraph for Agent Workflows ===
+    # Upgraded to 1.0.5 GA release (ticket #116)
+    "langgraph>=1.0.5,<2.0.0",
+    "langgraph-checkpoint>=2.1.0,<4.0.0",
+    "langgraph-checkpoint-sqlite>=2.1.0,<4.0.0",
+    
+    # === AI/LLM Providers ===
+    "anthropic",
+    "openai",
+    
+    # === Deep Agents Framework ===
+    # Upgraded to 0.3.x (ticket #119)
+    "deepagents>=0.3.1",
+    
+    # === Code Analysis & Tree-sitter ===
+    "tree-sitter>=0.20.0",
+    "tree-sitter-python>=0.20.0",
+    "tree-sitter-javascript>=0.20.0",
+    "tree-sitter-typescript>=0.20.0",
+    
+    # === HTTP & Web ===
+    "aiohttp",
+    # "httpx",
+    "requests",
+    
+    # === Machine Learning & Embeddings ===
+    # "numpy",
+    # "scikit-learn",
+    # "sentence-transformers",
+    # "transformers",
+    
+    # === Data Processing ===
+    # "pandas",
+    # "polars",
+    
+    # === Visualization & UI ===
+    # "matplotlib",
+    # "seaborn",
+    # "plotly",
+    # "altair",
+    "rich",
+    
+    # === Database & Storage ===
+    # "sqlalchemy",
+    # "chromadb",
+    # "weaviate-client",
+    "langsmith",
+    
+    # === Observability ===
+    # "logfire==4.3.6",
+    # "opentelemetry-api==1.36.0",
+    # "opentelemetry-sdk==1.36.0",
+    # "opentelemetry-exporter-otlp-proto-http==1.36.0",
+    
+    # === Utilities ===
+    "python-dotenv",
+]
+
+[project.scripts]
+cce = "cce_agent.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "coverage>=7.0",
+    "ruff>=0.8.0",
+    "mypy>=1.10",
+    "pre-commit>=4.0",
+]
+
+# Legacy development tools (for backward compatibility)
+legacy-dev = [
+    "black",
+    "flake8",
+]
+
+# All development dependencies
+all = [
+    "cce-agent[dev]",
+    "cce-agent[legacy-dev]",
+]
+
+[project.urls]
+Homepage = "https://github.com/jkbrooks/cce-agent"
+Repository = "https://github.com/jkbrooks/cce-agent"
+Issues = "https://github.com/jkbrooks/cce-agent/issues"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "cce_agent*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.txt", "*.yaml", "*.yml", "*.json"]
+
+# === Ruff Configuration ===
+# Modern Python linter and formatter (replaces flake8, isort, black)
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    ".pytest_cache",
+    ".venv",
+    "venv",
+    ".mypy_cache",
+    "scratch/",      # Don't lint reference repos
+    "notebooks/",    # Notebooks have different conventions
+    ".artifacts/",   # Generated artifacts
+    "build/",
+    "dist/",
+    "*.egg-info/",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort (import sorting)
+    "UP",     # pyupgrade (Python version upgrades)
+    "B",      # flake8-bugbear (common bugs)
+    "SIM",    # flake8-simplify
+    "C4",     # flake8-comprehensions
+]
+ignore = [
+    # Line length - handled by formatter
+    "E501",
+
+    # Allow function calls in default arguments (common pattern in LangChain)
+    "B008",
+
+    # Allow zip without strict= (backward compat)
+    "B905",
+
+    # f-string without placeholders - too many to fix now, allow them
+    "F541",
+
+    # Module level import not at top - some files have valid reasons
+    "E402",
+
+    # Bare except - we'll address these incrementally
+    "E722",
+
+    # Deprecated imports from typing - many to fix, address incrementally
+    "UP035",
+
+    # Collapsible if statements - stylistic, low priority
+    "SIM102",
+
+    # If-else instead of ternary - stylistic, low priority
+    "SIM108",
+
+    # Unused loop control variable - many false positives
+    "B007",
+
+    # Needless bool - stylistic
+    "SIM103",
+
+    # Reimplemented builtin - needs careful review
+    "SIM110",
+
+    # Raise without from - needs careful review
+    "B904",
+
+    # If-else instead of dict lookup - stylistic
+    "SIM116",
+
+    # Suppressible exception - stylistic
+    "SIM105",
+
+    # in-dict-keys - stylistic
+    "SIM118",
+
+    # Duplicate isinstance call - stylistic
+    "SIM101",
+
+    # Unnecessary generator/cast - stylistic
+    "C401",
+    "C414",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/tests/*" = ["S101", "F401", "F811", "F841"]
+"src/deep_agents/tests/*" = ["S101", "F401", "F811", "F841"]
+"src/agent.py" = ["F401", "F841", "F811"]
+"src/deep_agents/*.py" = ["F401", "F841", "F811", "F402", "F823"]
+"src/tools/*.py" = ["F401", "F841"]
+"src/tools/commands/*.py" = ["F401", "F841"]
+"src/graphs/*.py" = ["F401", "F841"]
+"src/stakeholder_generator/*.py" = ["F401", "F841"]
+"src/prompts/*.py" = ["F401"]
+"src/agent_testing_improvements.py" = ["F841"]
+"src/mcp_integration.py" = ["F401"]
+"src/observability/*.py" = ["F401", "F841"]
+"src/prompt_cache.py" = ["F841"]
+"src/tools/langchain_tool_adapters.py" = ["F811"]
+"src/tools/shell_runner.py" = ["F811"]
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+# === MyPy Configuration ===
+[tool.mypy]
+python_version = "3.11"
+strict = false                    # Start lenient, tighten over time
+ignore_missing_imports = true     # Many LangChain types are dynamic
+warn_return_any = false
+warn_unused_ignores = false
+show_error_codes = true
+exclude = [
+    "scratch/",
+    "notebooks/",
+    ".artifacts/",
+]
+
+# === Pytest Configuration ===
+[tool.pytest.ini_options]
+testpaths = ["src/tests", "src/deep_agents/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "-ra",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+# === Coverage Configuration ===
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/scratch/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

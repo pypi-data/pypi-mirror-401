@@ -1,0 +1,313 @@
+Metadata-Version: 2.4
+Name: cce-agent
+Version: 0.1.1
+Summary: Context-aware Code Evolution Agent - AI-powered code analysis and transformation
+Author: jkbrooks
+License: MIT
+Project-URL: Homepage, https://github.com/jkbrooks/cce-agent
+Project-URL: Repository, https://github.com/jkbrooks/cce-agent
+Project-URL: Issues, https://github.com/jkbrooks/cce-agent/issues
+Keywords: ai,agent,code-analysis,langchain,langgraph,llm
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: langchain<2.0.0,>=1.1.0
+Requires-Dist: langchain-core<2.0.0,>=1.2.0
+Requires-Dist: langchain-anthropic<2.0.0,>=1.2.0
+Requires-Dist: langchain-openai<2.0.0,>=1.0.0
+Requires-Dist: langchain-mcp-adapters>=0.1.0
+Requires-Dist: langgraph<2.0.0,>=1.0.5
+Requires-Dist: langgraph-checkpoint<4.0.0,>=2.1.0
+Requires-Dist: langgraph-checkpoint-sqlite<4.0.0,>=2.1.0
+Requires-Dist: anthropic
+Requires-Dist: openai
+Requires-Dist: deepagents>=0.3.1
+Requires-Dist: tree-sitter>=0.20.0
+Requires-Dist: tree-sitter-python>=0.20.0
+Requires-Dist: tree-sitter-javascript>=0.20.0
+Requires-Dist: tree-sitter-typescript>=0.20.0
+Requires-Dist: aiohttp
+Requires-Dist: requests
+Requires-Dist: rich
+Requires-Dist: langsmith
+Requires-Dist: python-dotenv
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.24; extra == "dev"
+Requires-Dist: coverage>=7.0; extra == "dev"
+Requires-Dist: ruff>=0.8.0; extra == "dev"
+Requires-Dist: mypy>=1.10; extra == "dev"
+Requires-Dist: pre-commit>=4.0; extra == "dev"
+Provides-Extra: legacy-dev
+Requires-Dist: black; extra == "legacy-dev"
+Requires-Dist: flake8; extra == "legacy-dev"
+Provides-Extra: all
+Requires-Dist: cce-agent[dev]; extra == "all"
+Requires-Dist: cce-agent[legacy-dev]; extra == "all"
+
+# Constitutional Context Engineering (CCE) Agent
+
+## System Overview
+
+The CCE Agent is a sophisticated LangGraph-based system for autonomous software engineering that combines constitutional AI principles with advanced context engineering. It orchestrates complex multi-phase workflows for code analysis, planning, implementation, and validation using a hybrid approach of LLM reasoning and deterministic tool execution.
+
+## Installation
+
+```bash
+# Runtime install
+pip install -e .
+
+# Development install (tests, linting, tooling)
+pip install -e ".[dev]"
+```
+
+Optional Makefile shortcuts:
+
+```bash
+make install
+make install-dev
+make install-uv
+```
+
+## Core Architecture
+
+### 1. Dual-Phase Execution Model
+
+The system operates through two primary phases orchestrated by the main `CCEAgent` class:
+
+#### **Planning Phase**
+- **Multi-Stakeholder Analysis**: Coordinates domain experts (AIDER Integration, Context Engineering, LangGraph Architecture, Production Stability, Developer Experience) through specialized subgraphs
+- **Command-Orchestrated Planning**: Uses structured command sequences (`research_codebase` → `create_plan`) instead of pure LLM reasoning
+- **Stakeholder Synthesis**: Combines multiple perspectives into coherent implementation plans using the `SynthesisEngine`
+- **Quality Gates**: Validates plan completeness and implementation readiness
+- **Human Feedback Integration**: Supports quality-based interrupts for human oversight
+
+#### **Execution Phase**
+- **Iterative Work Cycles**: Executes implementation through controlled cycles with orientation, execution, and reconciliation
+- **Command-Driven Implementation**: Uses the `CommandOrchestrator` to execute structured sequences
+- **AiderGraph Integration**: Leverages the specialized AIDER pipeline for code modifications
+- **Continuous Validation**: Integrated testing and validation throughout execution
+
+### 2. LangGraph State Management
+
+#### **Planning State** (`PlanningState`)
+```python
+class PlanningState(TypedDict):
+    messages: Annotated[List[AnyMessage], add_messages]
+    shared_plan: str
+    technical_analysis: str
+    architectural_analysis: str
+    consensus_reached: bool
+    structured_phases: Optional[List[Dict[str, Any]]]
+    # Command orchestration results
+    research_result: Optional[str]
+    plan_creation_result: Optional[str]
+```
+
+#### **Execution State** (`ExecutionState`)
+```python
+class ExecutionState(TypedDict):
+    messages: Annotated[List[BaseMessage], add_messages]
+    plan: str
+    orientation: str
+    cycle_count: int
+    agent_status: str
+    cycle_results: List[CycleResult]
+    structured_phases: Optional[List[Dict[str, Any]]]
+    # Command orchestration tracking
+    orchestration_summaries: List[str]
+```
+
+### 3. Multi-Stakeholder System
+
+The system implements a sophisticated stakeholder coordination pattern:
+
+#### **Stakeholder Types**
+- **AIDER_INTEGRATION**: Tooling, RepoMap, editing strategies, validation
+- **CONTEXT_ENGINEERING**: Memory systems, token optimization, context management  
+- **LANGGRAPH_ARCHITECTURE**: State management, orchestration, tool integration
+- **PRODUCTION_STABILITY**: Reliability, performance, operational concerns
+- **DEVELOPER_EXPERIENCE**: API design, maintainability, debugging capabilities
+
+#### **Coordination Flow**
+1. **SupervisorGraph** orchestrates stakeholder participation
+2. **Individual Subgraphs** provide domain-specific analysis
+3. **SynthesisEngine** combines perspectives into unified architecture
+4. **QualityGates** evaluate completeness and implementation readiness
+5. **ADRManager** tracks architectural decisions
+
+### 4. AIDER Integration Pipeline
+
+The `AiderGraph` provides a sophisticated LangGraph pipeline for code modifications:
+
+#### **Core Workflow**
+```
+plan_edits → validate → human_approval → setup_git_branch → commit → create_pull_request
+     ↓ (on validation failure)
+plan_edits (with validation context)
+```
+
+#### **Key Features**
+- **Intelligent Target Discovery**: Uses AIDER's AI to identify files requiring modification
+- **Semantic File Ranking**: Prioritizes files by relevance using embedding-based similarity
+- **Phased Execution**: Supports structured multi-phase implementation plans
+- **Validation Integration**: Continuous linting and testing with retry logic
+- **Git Branch Management**: Isolated changes with automatic PR creation
+- **Human Approval Gates**: Quality checkpoints with detailed context
+
+### 5. Command Orchestration System
+
+The `CommandOrchestrator` replaces ad-hoc LLM calls with structured command sequences:
+
+#### **Available Commands**
+- `research_codebase`: Semantic codebase analysis and understanding
+- `create_plan`: Structured implementation plan generation  
+- `update_plan`: Plan refinement based on feedback
+- `implement_plan`: Systematic plan execution with validation
+- `evaluate_implementation`: Quality assessment and gap analysis
+- `run_tests`: Comprehensive testing and validation
+- `commit_and_push`: Git operations with proper messaging
+
+#### **Orchestration Patterns**
+- **Planning Sequence**: Research → Create Plan → Quality Assessment
+- **Execution Sequence**: Orientation → Implementation → Reconciliation → Testing
+- **Validation Sequence**: Lint → Test → Evaluate → Address Issues
+
+### 6. Advanced Memory Management
+
+The `ContextMemoryManager` implements a three-layer memory architecture:
+
+#### **Memory Layers**
+- **Working Memory**: Current conversation context with intelligent trimming (800K token limit)
+- **Episodic Memory**: Summaries of past interactions and key outcomes (1000 records)
+- **Procedural Memory**: Successful patterns and reusable workflows (500 records)
+
+#### **Semantic Enhancement**
+- **Embedding-Based Retrieval**: Uses OpenAI or local embeddings for similarity search
+- **Intelligent Context Selection**: Relevance scoring based on recency, tags, and content
+- **Memory-Driven Context Engineering**: Enhances prompts with relevant past experiences
+
+### 7. Tool Integration Architecture
+
+#### **Core Tool Services**
+- **ShellRunner**: Safe command execution with timeout protection
+- **GitOps**: Git operations with branch management and PR creation
+- **CodeAnalyzer**: Static code analysis and semantic understanding
+- **AiderctlWrapper**: Python wrapper for AIDER CLI with enhanced error handling
+- **ValidationRunner**: Comprehensive linting and testing pipeline
+
+#### **LangChain Integration**
+- **Tool Adapters**: Seamless integration with LangChain tool ecosystem
+- **Safety Constraints**: Restricted tool access for planning vs execution phases
+- **Error Handling**: Robust error recovery and fallback strategies
+
+### 8. Observability and Quality Assurance
+
+#### **Comprehensive Tracking**
+- **RunTracker**: Complete audit trail of agent executions
+- **TokenTrackingLLM**: Detailed token usage monitoring and optimization
+- **Custom Tracing**: Integration with LangSmith for workflow observability
+- **Quality Gates**: Multi-dimensional quality assessment
+
+#### **Human-in-the-Loop**
+- **Quality-Based Interrupts**: Automatic human involvement for low-quality outputs
+- **Approval Workflows**: Human review of critical changes before implementation
+- **Feedback Integration**: Continuous improvement based on human feedback
+
+## Key Design Principles
+
+### 1. Constitutional AI Integration
+- **Structured Decision Making**: Constitutional principles guide agent behavior
+- **Quality Assurance**: Built-in quality gates and validation at every step
+- **Human Oversight**: Strategic human involvement at critical decision points
+
+### 2. Context Engineering Excellence
+- **Semantic Tagging**: Dynamic context injection based on semantic understanding
+- **Memory-Driven Enhancement**: Past experiences inform current decisions
+- **Token Optimization**: Intelligent context window management for large codebases
+
+### 3. Deterministic Reliability
+- **Command-Based Execution**: Structured commands replace unpredictable LLM calls
+- **State Persistence**: Full checkpointing and recovery capabilities
+- **Validation-First**: Continuous validation prevents errors from propagating
+
+### 4. Multi-Modal Collaboration
+- **Stakeholder Coordination**: Multiple domain experts provide comprehensive analysis
+- **Synthesis Integration**: Unified architecture from diverse perspectives
+- **Consensus Building**: Structured processes for reaching agreement
+
+## Installation
+
+### Prerequisites
+- Python 3.11 or higher
+- Git
+
+### Quick Start (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/jkbrooks/cce-agent.git
+cd cce-agent
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install with development dependencies
+pip install -e ".[dev]"
+
+# Copy environment template and configure
+cp env.example .env
+# Edit .env with your API keys
+```
+
+### Alternative Installation Methods
+
+```bash
+# Install with uv (faster)
+uv pip install -e ".[dev]"
+
+# Install production dependencies only
+pip install -e .
+
+# Install with all optional dependencies
+pip install -e ".[all]"
+```
+
+### Environment Configuration
+
+Required environment variables (in `.env`):
+
+```bash
+ANTHROPIC_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here
+LANGSMITH_API_KEY=your_key_here  # Optional, for tracing
+```
+
+See `env.example` for complete configuration options.
+
+## Technology Stack
+
+- **LangGraph**: State management and workflow orchestration
+- **LangChain**: Tool integration and LLM abstractions
+- **AIDER**: AI-powered code editing and analysis
+- **OpenAI GPT-4**: Primary reasoning and analysis
+- **Git**: Version control and change management
+- **Python**: Core implementation language with async/await patterns
+
+## Usage Patterns
+
+The system supports multiple operational modes:
+
+1. **Autonomous Mode**: Full automation with quality gates
+2. **Guided Mode**: Human oversight at key decision points  
+3. **Expert Mode**: Direct stakeholder consultation and synthesis
+4. **Development Mode**: Enhanced debugging and observability
+
+This architecture enables the CCE Agent to handle complex software engineering tasks with high reliability, comprehensive quality assurance, and sophisticated context management while maintaining human oversight and constitutional AI principles.
