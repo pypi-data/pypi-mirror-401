@@ -1,0 +1,101 @@
+[tool.poetry]
+name = "emdash-ai"
+version = "0.1.35"
+description = "Graph-based coding intelligence system - The 'Senior Engineer' Context Engine"
+authors = ["Em Dash Team"]
+readme = "README.md"
+packages = [{include = "emdash"}]
+exclude = ["emdash/kanban-app", "emdash/kanban_app", "emdash/venv", "venv", "benchmarks", ".venv", "*.venv", "node_modules"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+# CLI
+click = "^8.1.7"
+rich = ">=13.7.0"
+prompt_toolkit = "^3.0.43"
+textual = ">=0.47.0"
+
+# Database
+cmake = ">=3.25.0"  # Required to build kuzu from source
+kuzu = ">=0.4.0"
+supabase = ">=2.0.0"
+
+# LLM
+openai = ">=1.0.0"
+
+# Vector operations
+numpy = ">=1.26.0"
+sentence-transformers = ">=2.2.0"
+
+# Code Analysis
+astroid = "^3.0.1"
+
+# Git
+gitpython = "^3.1.40"
+pygithub = "^2.1.1"
+
+# Analytics
+networkx = "^3.2.1"
+python-louvain = "^0.16"
+scipy = "^1.11.4"
+
+# HTTP
+httpx = ">=0.25.0"
+
+# Utilities
+pydantic = "^2.5.0"
+python-dotenv = "^1.0.0"
+loguru = "^0.7.2"
+tqdm = "^4.66.1"
+
+# Image Processing
+pillow = "^10.0.0"
+
+# Monorepo packages (local dev) - comment out for PyPI release
+emdash-core = ">=0.1.35"
+emdash-cli = ">=0.1.35"
+# emdash-graph-mcp = {path = "packages/graph-mcp", develop = true}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+black = "^23.11.0"
+ruff = "^0.1.6"
+mypy = "^1.7.1"
+
+# Optional dependencies for local LLM support
+pyinstaller = {version = ">=6.0,<7.0", python = ">=3.10,<3.15"}
+[tool.poetry.extras]
+local = ["transformers", "torch", "accelerate"]
+
+[tool.poetry.group.local]
+optional = true
+
+[tool.poetry.group.local.dependencies]
+transformers = "^4.36.0"
+torch = "^2.1.0"
+accelerate = "^0.25.0"
+
+[tool.poetry.scripts]
+# Entry points now use emdash-cli which calls the FastAPI server
+emdash = "emdash_cli.main:cli"
+em = "emdash_cli.main:start_coding_agent"
+"--" = "emdash_cli.main:start_coding_agent"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
