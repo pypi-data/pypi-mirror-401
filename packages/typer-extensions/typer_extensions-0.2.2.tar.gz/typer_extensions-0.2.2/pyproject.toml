@@ -1,0 +1,92 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "typer-extensions"
+version = "0.2.2"
+description = "Command aliases for Typer CLI applications"
+readme = "README.md"
+authors = [{name = "Rob Webb"}]
+requires-python = ">=3.9"
+license = {text = "MIT"}
+keywords = ["typer", "cli", "aliases", "command-line", "click"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Shells",
+    "Typing :: Typed",
+]
+dependencies = [
+    "click>=8.0.0,<9.0.0",
+    "typer>=0.9.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "rust-just>=1.46.0,<2.0.0",
+    "prek>=0.2.28,<1.0.0",
+    "pytest>=8.0.0,<10.0.0",
+    "pytest-cov>=7.0.0,<8.0.0",
+    "ruff>=0.14.11,<15.0.0",
+    "ty>=0.0.12,<0.1.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/rdawebb/typer-extensions"
+Documentation = "https://github.com/rdawebb/typer-extensions#readme"
+Repository = "https://github.com/rdawebb/typer-extensions"
+Changelog = "https://github.com/rdawebb/typer-extensions/blob/main/CHANGELOG.md"
+Issues = "https://github.com/rdawebb/typer-extensions/issues"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/README.md",
+    "/LICENSE"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/typer_extensions"]
+
+[tool.ruff]
+src = ["src", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]    # allow unused imports in __init__.py
+"tests/**/*.py" = ["ARG"]   # allow unused arguments in tests
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "@abc.abstractmethod",
+]
