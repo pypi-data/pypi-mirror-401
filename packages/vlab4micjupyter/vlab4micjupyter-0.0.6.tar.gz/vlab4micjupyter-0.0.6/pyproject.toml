@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vlab4micjupyter"
+version = "0.0.6"
+description = "Jupyter widgets for VLab4Mic"
+authors = [
+    { name = "Damian Martinez", email = "jdmartinezigc@gmail.com" },
+    { name = "Bruno Saraiva", email = "bruno.msaraiva2@gmail.com" },
+    { name = "Mario del Rosario", email = "mario.delrosario@itqb.unl.pt" },
+    { name = "Ricardo Henriques", email = "ricardo@henriqueslab.org" },
+]
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+requires-python = ">= 3.9"
+dependencies = [
+    "vlab4mic>=0.0.10",
+    "jupyterlab>=4.3.4",
+    "ipywidgets>=7.7.1",
+    "ipykernel>=6.29.5",
+    "ipympl>=0.9.4",
+    "ezinput>=0.0.6",
+]
+[project.optional-dependencies]
+all = ["vlab4micjupyter[dev, test]"]
+dev = [
+    "pre-commit>=3.7.0",
+    "ruff>=0.4.3",
+    "gptrepo>=1.0.3",
+    "pdoc>=12.3.1",
+    "build",
+    "gptrepo"
+]
+test = [
+    "pytest>=8.2.0",
+    "pytest-xdist>=3.6.1",
+    "pytest-cov>=5.0.0",
+    "nbmake>=1.5.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml"]
+
+[tool.pytest.ini_options]
+addopts = "--nbmake --cov=vlabjupyter --cov-report=term-missing --cov-report=xml"

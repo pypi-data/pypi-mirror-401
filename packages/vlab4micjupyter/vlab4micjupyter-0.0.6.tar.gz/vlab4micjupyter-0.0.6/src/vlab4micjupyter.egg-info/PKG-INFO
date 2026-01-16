@@ -1,0 +1,38 @@
+Metadata-Version: 2.4
+Name: vlab4micjupyter
+Version: 0.0.6
+Summary: Jupyter widgets for VLab4Mic
+Author-email: Damian Martinez <jdmartinezigc@gmail.com>, Bruno Saraiva <bruno.msaraiva2@gmail.com>, Mario del Rosario <mario.delrosario@itqb.unl.pt>, Ricardo Henriques <ricardo@henriqueslab.org>
+License: MIT
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: vlab4mic>=0.0.10
+Requires-Dist: jupyterlab>=4.3.4
+Requires-Dist: ipywidgets>=7.7.1
+Requires-Dist: ipykernel>=6.29.5
+Requires-Dist: ipympl>=0.9.4
+Requires-Dist: ezinput>=0.0.6
+Provides-Extra: all
+Requires-Dist: vlab4micjupyter[dev,test]; extra == "all"
+Provides-Extra: dev
+Requires-Dist: pre-commit>=3.7.0; extra == "dev"
+Requires-Dist: ruff>=0.4.3; extra == "dev"
+Requires-Dist: gptrepo>=1.0.3; extra == "dev"
+Requires-Dist: pdoc>=12.3.1; extra == "dev"
+Requires-Dist: build; extra == "dev"
+Requires-Dist: gptrepo; extra == "dev"
+Provides-Extra: test
+Requires-Dist: pytest>=8.2.0; extra == "test"
+Requires-Dist: pytest-xdist>=3.6.1; extra == "test"
+Requires-Dist: pytest-cov>=5.0.0; extra == "test"
+Requires-Dist: nbmake>=1.5.3; extra == "test"
+Dynamic: license-file
+
+# vlab4micjupyter
+
+
+Dedicated library for jupyter widgets creation to use with VLab4Mic
