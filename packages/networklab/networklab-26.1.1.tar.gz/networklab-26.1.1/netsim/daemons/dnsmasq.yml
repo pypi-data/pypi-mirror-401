@@ -1,0 +1,31 @@
+---
+description: DNSmasq - DNS and DHCP server
+packages:
+  dnsmasq: dnsmasq
+daemon_config:
+  dnsmasq: /etc/dnsmasq.conf                # dnsmasq configuration (including DHCP config)
+  dhcp: /etc/dhcp.ignore                    # Empty file to keep everyone happy
+node:
+  module: [ dhcp ]
+clab:
+  group_vars:
+    docker_shell: bash -il
+  image: netlab/dnsmasq:latest
+  build: True
+  features:
+    initial:
+      roles: [ host ]
+
+libvirt:                        # Not yet available on libvirt or virtualbox
+  image:
+virtualbox:
+  image:
+features:
+  dhcp:
+    server: true
+  initial:
+    reload: false
+    roles: [ host ]
+dhcp:
+  server: true
+module: [ dhcp ]
