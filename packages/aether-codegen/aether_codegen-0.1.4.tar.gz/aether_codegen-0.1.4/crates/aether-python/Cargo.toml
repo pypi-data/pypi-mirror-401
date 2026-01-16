@@ -1,0 +1,18 @@
+[package]
+name = "aether-python"
+version.workspace = true
+edition.workspace = true
+description = "Python bindings for Aether AI code injection framework"
+license.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "aether"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module", "abi3-py37"] }
+aether-core = { workspace = true }
+aether-ai = { workspace = true }
+tokio = { version = "1", features = ["full"] }
+rhai = "1.23"
