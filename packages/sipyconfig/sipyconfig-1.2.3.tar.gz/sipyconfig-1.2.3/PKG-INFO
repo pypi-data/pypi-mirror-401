@@ -1,0 +1,47 @@
+Metadata-Version: 2.4
+Name: sipyconfig
+Version: 1.2.3
+Summary: Python replacement for the functionality of SportIdent Config+
+Author-email: Teichi <tobias@teichmann.top>
+License: GPL-3.0-only
+Project-URL: Homepage, https://gitlab.com/Teigi/sipyconfig
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: Unix
+Classifier: Typing :: Typed
+Classifier: Topic :: Utilities
+Classifier: Development Status :: 4 - Beta
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pyserial
+Dynamic: license-file
+
+# SportIdent Config+ Implementation
+
+A python implementation of the functionality of SPORTident Config+.
+
+Currently only working and tested under Linux.
+
+Note that you might need to add your user to a group that has access to the systems serial interfaces.
+
+## Install
+
+install via pip:
+`pip install --upgrade sipyconfig`
+
+
+## Usage
+
+Create a `SiUSBStation` object using:
+```
+from sipyconfig import SiUSBStation
+
+si = SiUSBStation()
+si.trigger_feedback()
+```
+have fun :)
+
+## API docs
+
+a part of the api is documented in [Api.md](docs/Api.md)
