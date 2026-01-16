@@ -1,0 +1,342 @@
+Metadata-Version: 2.4
+Name: git-surgeon
+Version: 0.1.0
+Summary: Git subcommand for change-centric workflows.
+Author-email: konfou <mail@konfou.xyz>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/konfou/git-surgeon
+Project-URL: Issues, https://github.com/konfou/git-surgeon/issues
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# git-surgeon
+
+A Git subcommand for change-centric workflows, borrowing ideas from Jujutsu’s
+change‑centric UX while staying within Git’s history model.
+
+## Install
+
+For development, install the project in editable mode:
+
+```bash
+pip install -e .
+```
+
+Or copy the wrapper script onto your `PATH`:
+
+```bash
+chmod +x git-surgeon
+cp git-surgeon ~/bin/
+```
+
+Then you can call it as a Git subcommand:
+
+```bash
+git surgeon --help
+```
+
+## Usage
+
+```bash
+git surgeon <command> [options]
+```
+
+Run `git surgeon <command> --help` for command-specific help.
+
+## Commands
+
+### Diff a commit
+
+```bash
+git surgeon diff <commit> --head -- path/to/file
+```
+
+Compare a commit to its parent or to `HEAD`.
+
+### Show a file at a commit
+
+```bash
+git surgeon show <commit> path/to/file
+```
+
+Prints the file contents as they existed in the commit.
+
+### Show reflog entries
+
+```bash
+git surgeon op log --count 20
+```
+
+Displays the recent reflog operations.
+
+### Restore a reflog entry
+
+```bash
+git surgeon op restore HEAD@{1}
+```
+
+Resets the repo to a specific reflog entry.
+
+### Abandon a rebase
+
+```bash
+git surgeon op abandon
+```
+
+Resets the repo to the commit before the last rebase.
+
+### Revert a commit via operation history
+
+```bash
+git surgeon op revert HEAD
+```
+
+Creates a new commit that reverts the specified commit.
+
+### Save WIP without stashing
+
+```bash
+git surgeon stashless --message "WIP: refactor" --keep-branch
+```
+
+Creates a WIP commit on a temporary branch.
+
+### Create a new empty commit
+
+```bash
+git surgeon new -m "WIP"
+```
+
+Creates an empty commit without staging changes.
+
+### Undo last git operation
+
+```bash
+git surgeon undo --hard --steps 1
+```
+
+Resets `HEAD` to a previous reflog entry.
+
+### Go to the commit before a rebase
+
+```bash
+git surgeon pre-rebase --hard
+```
+
+Resets to the commit before the last rebase.
+
+### Resolve the current operation
+
+```bash
+git surgeon resolve --continue
+```
+
+Continues, aborts, or skips the active rebase/merge/cherry-pick.
+
+### Reword a commit
+
+```bash
+git surgeon reword <commit> "New message"
+```
+
+Quickly amend the commit message with a new one.
+
+### Describe a commit message
+
+```bash
+git surgeon describe <commit> -m "Updated message"
+```
+
+`reword` requires a new message and amends immediately, while `describe` can
+open the editor and keep the original dates.
+
+### Edit a commit
+
+```bash
+git surgeon edit <commit>
+```
+
+Stops an interactive rebase at the commit, keeps the original dates, and
+prompts you to amend. Add `--message` to update the message immediately.
+
+### Set commit dates
+
+```bash
+git surgeon metaedit date <commit> "2024-01-01T12:00:00Z"
+```
+
+Sets committer date by default (RFC2822 or RFC3339). Use `-a` for author dates
+or `-ca` to set both.
+
+### Set commit author
+
+```bash
+git surgeon metaedit author <commit> "New Author"
+```
+
+Updates the author name without changing content.
+
+### Set commit author email
+
+```bash
+git surgeon metaedit mail <commit> "new@example.com"
+```
+
+Updates the author email without changing content.
+
+### Absorb staged changes
+
+```bash
+git surgeon absorb
+```
+
+Creates a fixup commit and autosquashes into the latest touching commit.
+
+### Squash a commit into its parent
+
+```bash
+git surgeon squash <commit>
+```
+
+Squashes the commit into its parent with interactive rebase.
+
+```bash
+git surgeon squash <commit> --into <target>
+```
+
+Squashes the commit into a specific ancestor.
+
+### Fixup a commit into its parent
+
+```bash
+git surgeon fixup <commit>
+```
+
+Fixups the commit into its parent, discarding its message.
+
+### Drop a commit
+
+```bash
+git surgeon drop <commit>
+```
+
+Drops the commit via interactive rebase.
+
+### Merge a commit or branch
+
+```bash
+git surgeon merge <commit>
+```
+
+Merges another commit or branch into the current branch.
+
+### Split a commit into two
+
+```bash
+git surgeon split <commit>
+```
+
+The tool resets the commit, then asks you to stage and create two new commits.
+Use `--first-message` and `--second-message` to set messages automatically.
+
+### Split a commit interactively
+
+```bash
+git surgeon split -i <commit>
+```
+
+Uses `git add -p` for the first split commit.
+
+### Swap two commits
+
+```bash
+git surgeon swap <commit-a> <commit-b>
+```
+
+Swaps two commits in a linear history.
+
+### Move a commit after another
+
+```bash
+git surgeon move <commit> <destination> --before
+```
+
+Moves a commit before or after another in linear history.
+
+```bash
+git surgeon move <commit> <destination> --onto
+```
+
+Moves a commit and its descendants onto the destination.
+
+### Untrack a file (keep it on disk)
+
+```bash
+git surgeon file untrack path/to/file
+```
+
+Removes the file from the current commit while keeping it on disk. Use
+`--from <commit>` or `--root` to rewrite history.
+
+### Track a file
+
+```bash
+git surgeon file track path/to/file
+```
+
+Starts tracking the file in the current commit. Use `--from <commit>` or
+`--root` to rewrite history.
+
+## Notes
+
+- `edit`, `reword`, and `split` preserve original author/committer dates.
+- `squash` and `fixup` use the default interactive rebase behavior for messages.
+- `swap` expects the commits to be on the same ancestry path.
+- `move` expects the commits to be on the same ancestry path.
+- `file track` and `file untrack` only rewrite history when `--from` or `--root`
+  is provided.
+- `metaedit date` supports `-a`/`-c` with the special values `author`/`commit` to
+  swap dates.
+- `pre-rebase` uses `ORIG_HEAD` or the reflog entry for rebase start.
+- `op restore --pre-rebase` or `op restore pre-rebase` use the same target.
+- `op revert --pre-rebase` or `op revert pre-rebase` revert that target.
+- If a rebase is already in progress, the tool will exit with an error.
+- Most commands that take a commit accept `-r`/`--commit` as an alias for the
+  commit argument.
+- `describe` also accepts `desc`, and `split -i` enables interactive staging.
+- Short aliases include `op log -n`, `undo -n`, `stashless -b/-k`,
+  `metaedit date -a/-c`, `squash -f/--from -t/--to`, `diff -f/--from -t/--to`,
+  and `move -A/-B -f/--from -t/--to`.
+- Command aliases include `reword r`, `edit e`, `squash s`, `fixup f`,
+  `drop d`, and `merge m`.
+
+## Comparisons
+
+| Tool         | Focus                                            | Link                             |
+| ------------ | ------------------------------------------------ | -------------------------------- |
+| git-surgeon  | History helpers for commit rewriting/modifying   | README.md                        |
+| git-extras   | Many Git helper commands                         | https://github.com/tj/git-extras |
+| git-town     | Branch workflow automation and syncing           | https://www.git-town.com         |
+| jujutsu (jj) | Change-centric VCS with powerful history editing | https://github.com/jj-vcs/jj     |
+
+`git surgeon` is a namespaced subcommand (`git surgeon ...`), so its
+subcommands do not collide with standalone `git-*` commands from other tools.
+
+Compared to jj, `git surgeon` stays inside Git’s history model and wraps
+interactive rebase, reflog, and merge flows. jj provides a change-centric DAG
+with richer undo/redo semantics and native operations for moving, splitting,
+and absorbing changes without the same history‑rewrite steps.
+
+## AI-assistance disclaimer
+
+Portions of this project were created or refined with assistance from AI
+tools (spec. Codex). AI contributions were used for code generation,
+refactoring, architectural exploration, naming convention review, and
+documentation improvement, as well as for providing guidance on compiler
+issues.
+
+All AI-generated or AI-assisted content has been reviewed, validated,
+and approved by me; the human developer responsible for this project,
+and someone I am reasonably confident is, in fact, human.
