@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devclean"
+version = "1.0.36"
+authors = [
+  { name="appsfolder", email="axelixdev@gmail.com" },
+]
+description = "CLI tool to strip comments and file formatting safely."
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Utilities",
+    "Intended Audience :: Developers",
+]
+keywords = ["devclean", "cleanup", "refactoring", "comments", "formatter", "minifier"]
+
+# --- ДОБАВЛЕНО ---
+[project.urls]
+"Homepage" = "https://github.com/appsfolder/devclean"
+"Repository" = "https://github.com/appsfolder/devclean"
+"Issues" = "https://github.com/appsfolder/devclean/issues"
+# -----------------
+
+[project.scripts]
+devclean = "devclean.core:main"
