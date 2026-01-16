@@ -1,0 +1,120 @@
+Metadata-Version: 2.4
+Name: skysurvey
+Version: 0.27.3
+Summary: Simulating Transient in the sky and how to observe them
+Author-email: Mickael Rigault <m.rigault@ipnl.in2p3.fr>
+License-Expression: Apache-2.0
+Project-URL: Homepage, https://github.com/MickaelRigault/skysurvey
+Keywords: astronomy,astrophysics
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering :: Astronomy
+Classifier: Topic :: Scientific/Engineering :: Physics
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.26
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: healpy
+Requires-Dist: shapely
+Requires-Dist: geopandas
+Requires-Dist: astropy
+Requires-Dist: sncosmo
+Requires-Dist: dustmaps
+Requires-Dist: extinction
+Requires-Dist: modeldag>=0.11.0
+Requires-Dist: ztffields>=0.4.3
+Provides-Extra: docs
+Requires-Dist: matplotlib; extra == "docs"
+Requires-Dist: myst-nb; extra == "docs"
+Requires-Dist: nbsphinx; extra == "docs"
+Requires-Dist: numpydoc; extra == "docs"
+Requires-Dist: pandas-sphinx; extra == "docs"
+Requires-Dist: sphinx-book-theme; extra == "docs"
+Requires-Dist: sphinx_copybutton; extra == "docs"
+Requires-Dist: sphinx-design; extra == "docs"
+Provides-Extra: tests
+Requires-Dist: pytest; extra == "tests"
+Requires-Dist: coverage; extra == "tests"
+Dynamic: license-file
+
+[![PyPI](https://img.shields.io/pypi/v/skysurvey.svg?style=flat-square)](https://pypi.python.org/pypi/skysurvey)
+[![Documentation Status](https://readthedocs.org/projects/skysurvey/badge/?version=latest)](https://skysurvey.readthedocs.io/en/latest/?badge=latest)
+
+
+# skysurvey 
+
+Simulate transients within the sky
+
+skysurvey relies on sncosmo for bandpass and lightcurve generations. (https://sncosmo.readthedocs.io/en/stable/)
+
+**See documentation on [read the docs](https://skysurvey.readthedocs.io/en/latest/)**
+
+# Install
+```bash
+pip install skysurvey
+```
+or 
+```bash
+git clone https://github.com/MickaelRigault/skysurvey.git
+cd skysurvey
+pip install .
+```
+
+# Quick Start
+You need to create a `Target` and a `Survey` to then
+simulate how your survey would observe your targets ; 
+aka a `DataSet`. 
+
+Here is a quick example:
+
+## Step 1: targets (truth)
+```python
+import skysurvey
+snia = skysurvey.SNeIa()
+data = snia.draw(size=50_000, tstart=56_000, tstop=56_100, inplace=True) # see options
+data.head(5) # also snia.data
+```
+
+## Step 2: Survey (pointing and observing conditions)
+```python
+import numpy as np
+from skysurvey.tools import utils
+
+size = 10_000
+
+# footprint
+from shapely import geometry
+sq_footprint = geometry.box(-1, -1, +1, +1)
+
+# Observing data
+ra, dec = utils.random_radec(size=size, ra_range=[200,250], dec_range=[-20,10])
+
+data = {}
+data["ra"] = ra
+data["dec"] = dec
+data["gain"] = 1
+data["zp"] = 30
+data["skynoise"] = np.random.normal(size=size, loc=150, scale=20)
+data["mjd"] = np.random.uniform(56_000-10, 56_100 + 10, size=size)
+data["band"] = np.random.choice(["desg","desr","desi"], size=size)
+
+# Build the survey
+survey = skysurvey.Survey.from_pointings(data, footprint=sq_footprint)
+survey.data
+```
+
+## Step 3: Dataset
+
+And now let's build the dataset. The simulated lightcurves are in
+dset.data, the input survey is stored in dset.survey, the input
+targets is stored in dset.targets
+
+```python
+from skysurvey import dataset
+dset = dataset.DataSet.from_targets_and_survey(snia, survey)
+dset.data
+```
+
