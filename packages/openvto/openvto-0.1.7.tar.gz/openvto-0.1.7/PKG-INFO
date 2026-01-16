@@ -1,0 +1,73 @@
+Metadata-Version: 2.4
+Name: openvto
+Version: 0.1.7
+Summary: Open-source toolkit for building studio-quality virtual try-ons with generative AI
+Project-URL: Homepage, https://openvto.com
+Project-URL: Repository, https://github.com/Prompt-Haus/OpenVTO
+Project-URL: Issues, https://github.com/Prompt-Haus/OpenVTO/issues
+Author: Prompt Haus
+License-Expression: MIT
+Keywords: fashion,generative-ai,image-generation,video-generation,virtual-try-on
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Image Processing
+Requires-Python: >=3.10
+Requires-Dist: google-auth>=2.0.0
+Requires-Dist: google-genai>=1.0.0
+Requires-Dist: pillow>=9.0
+Requires-Dist: python-dotenv>=1.0.0
+Provides-Extra: dev
+Requires-Dist: pytest-cov>=4.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# OpenVTO SDK
+
+Open-source toolkit for building studio-quality virtual try-ons with generative AI.
+
+## Installation
+
+```bash
+pip install openvto
+```
+
+## Quick Start
+
+```python
+from openvto import OpenVTO
+
+# Initialize client
+vto = OpenVTO(provider="google")
+
+# Generate avatar from selfie + posture
+avatar = vto.generate_avatar(
+    selfie="selfie.jpg",
+    posture="fullbody.jpg"
+)
+
+# Try on clothes
+tryon = vto.generate_tryon(
+    avatar=avatar,
+    clothes=["shirt.jpg", "pants.jpg"]
+)
+
+# Generate video loop
+video = vto.generate_videoloop(tryon.image)
+```
+
+## Documentation
+
+See the main [README](../../README.md) for full documentation.
+
+## License
+
+MIT
+
