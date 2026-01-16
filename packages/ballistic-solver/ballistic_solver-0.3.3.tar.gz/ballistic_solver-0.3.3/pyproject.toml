@@ -1,0 +1,21 @@
+[build-system]
+requires = [
+  "scikit-build-core>=0.11",
+  "pybind11>=2.11",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "ballistic-solver"
+version = "0.3.3"
+requires-python = ">=3.10"
+readme = "README.md"
+license = "MIT"
+description = "Numerical launch-angle solver for moving targets under gravity and quadratic drag."
+
+[tool.scikit-build]
+cmake.source-dir = "bindings/python"
+cmake.build-type = "Release"
+wheel.packages = ["bindings/python/ballistic_solver"]
+
+sdist.include = ["include/**", "src/**", "bindings/python/**", "CMakeLists.txt"]
