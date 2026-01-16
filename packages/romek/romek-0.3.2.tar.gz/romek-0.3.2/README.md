@@ -1,0 +1,361 @@
+<div align="center">
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jacobgadek/romek/main/logo/romeklogo.svg" alt="Romek" width="200">
+</p>
+
+# Romek
+
+**Persistent auth for AI agents. Works on any site, today.**
+
+No website integration required. No OAuth adoption needed. Just secure session management that works.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://img.shields.io/pypi/v/romek.svg)](https://pypi.org/project/romek/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Dev.to](https://img.shields.io/badge/read-blog%20post-black?logo=dev.to)](https://dev.to/jacobgadek/reverse-engineering-chromes-cookie-encryption-to-authenticate-ai-agents-212i)
+
+[Quick Start](#quick-start) • [LangChain](#langchain-integration) • [n8n](#n8n-integration) • [How It Works](#how-it-works) • [Roadmap](#roadmap)
+
+</div>
+
+---
+
+## The Problem
+
+```python
+# What every agent developer does today
+cookies = {"session_id": "abc123..."}  # Hardcoded. Breaks constantly. Security nightmare.
+```
+
+Sessions expire. Cookies leak into git history. No audit trail. No access control.
+
+## The Solution
+
+```python
+from romek import Vault
+
+vault = Vault()
+cookies = vault.get_session("linkedin.com")  # Encrypted. Scoped. Audited.
+```
+
+```bash
+pip install romek
+```
+
+**Works on sites as they exist today.** No website changes. No OAuth adoption. No waiting for the ecosystem.
+
+---
+
+## See It In Action
+
+![One command to grab cookies from Chrome](https://raw.githubusercontent.com/jacobgadek/romek/main/docs/images/grab-demo.gif)
+
+*Agent automatically authenticates using stored session—no manual login, no hardcoded cookies.*
+
+---
+
+## How It Works
+
+1. **Log into any site** in Chrome (you probably already are)
+2. **Run `romek grab <domain>`** — cookies are encrypted and stored locally
+3. **Your agent retrieves them** securely on-demand
+
+No extension required. No copy-paste. One command.
+
+---
+
+## Quick Start
+
+```bash
+pip install romek
+romek grab linkedin.com
+```
+
+That's it. Your LinkedIn session is now stored in an encrypted vault.
+
+The `grab` command reads cookies directly from Chrome—no extension needed, no manual export.
+
+```python
+from romek import Vault
+
+vault = Vault()
+cookies = vault.get_session("linkedin.com")
+
+# Use with requests, Playwright, or any HTTP library
+import requests
+response = requests.get("https://linkedin.com/feed", cookies=cookies)
+```
+
+Works with any site you're logged into:
+
+```bash
+romek grab github.com
+romek grab notion.so
+romek grab twitter.com
+```
+
+---
+
+## Multiple Chrome Profiles
+
+If you use multiple Chrome profiles, specify which one to grab from:
+```bash
+romek grab linkedin.com --profile "Profile 1"
+romek grab github.com --profile "Work"
+```
+
+To find your profile names:
+```bash
+# Mac
+ls ~/Library/Application\ Support/Google/Chrome/
+
+# Linux
+ls ~/.config/google-chrome/
+
+# Windows
+dir %LOCALAPPDATA%\Google\Chrome\User Data\
+```
+
+Default profile is used if no --profile flag is specified.
+
+---
+
+## ☁️ Remote Servers (VPS / Headless / Docker)
+
+Running n8n or scripts on a server without Chrome? Sync your local session:
+
+**On your local machine:**
+```bash
+romek grab linkedin.com
+romek export linkedin.com -o cookies.json
+```
+
+**Copy to server:**
+```bash
+scp cookies.json user@your-server:~/
+```
+
+**On your server:**
+```bash
+pip install romek
+romek import cookies.json --domain linkedin.com
+```
+
+Your server can now access your authenticated sessions.
+
+---
+
+## Project Config (Team Workflows)
+
+Define sessions your project needs in a config file:
+```bash
+romek init
+```
+
+Creates `romek.yaml`:
+```yaml
+sessions:
+  - linkedin.com
+  - github.com
+  - gmail.com
+```
+
+Then sync all sessions at once:
+```bash
+romek sync
+```
+
+Check health of all project sessions:
+```bash
+romek doctor
+```
+
+Output:
+```
+Checking session health...
+
+linkedin.com
+├── Status: ✅ Fresh
+├── Cookies: 26 stored
+└── Expires: in ~4 weeks
+
+github.com
+├── Status: ✅ Fresh
+├── Cookies: 16 stored
+└── Expires: in ~4 weeks
+
+Health: 2/2 sessions ready
+```
+
+Share `romek.yaml` with your team. Each dev runs `romek sync` locally.
+
+---
+
+## Why Romek?
+
+| Without Romek | With Romek |
+|---|---|
+| Hardcoded cookies in code | Encrypted vault storage |
+| Sessions in git history | Secrets separate from code |
+| Any code can access anything | Scoped access per agent |
+| No idea what accessed what | Full audit logging |
+| Sessions break silently | Expiration notifications |
+
+---
+
+## LangChain Integration
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+from romek.langchain import get_romek_tools
+
+tools = get_romek_tools(
+    agent_name="sales-bot",
+    vault_password="your-vault-password"  # Password auto-retrieved from system keyring if not provided
+)
+
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+agent = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# Agent automatically uses stored sessions
+response = agent.run("Get my LinkedIn notifications")
+```
+
+**Available tools:**
+- `authenticated_request` — Make HTTP requests with stored session cookies
+- `get_session_cookies` — Retrieve cookies for custom requests
+
+---
+
+## n8n Integration
+
+Use Romek in your n8n workflows with our community node.
+
+```bash
+npm install n8n-nodes-romek
+```
+
+The node lets you:
+- Store and retrieve session cookies in n8n workflows
+- Use authenticated sessions with HTTP Request nodes
+- Build automation flows that require login
+
+📦 [View on npm](https://www.npmjs.com/package/n8n-nodes-romek) | [GitHub](https://github.com/jacobgadek/n8n-nodes-romek)
+
+---
+
+## Playwright Integration
+
+```python
+from playwright.sync_api import sync_playwright
+from romek import Vault
+
+vault = Vault()
+cookies = vault.get_session("github.com")
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    context = browser.new_context()
+    context.add_cookies(cookies)
+    
+    page = context.new_page()
+    page.goto("https://github.com/notifications")
+    # Already authenticated!
+```
+
+---
+
+## CLI Reference
+
+| Command | Description |
+|---------|-------------|
+| `romek grab <domain>` | Grab cookies from Chrome |
+| `romek grab <domain> --profile "Name"` | Grab from specific Chrome profile |
+| `romek list` | List all stored sessions |
+| `romek delete <domain>` | Delete a stored session |
+| `romek refresh <domain>` | Re-grab cookies for a domain |
+| `romek init` | Create romek.yaml config file |
+| `romek sync` | Grab all sessions from romek.yaml |
+| `romek doctor` | Check health of all project sessions |
+| `romek status <domain>` | Check status of a specific session |
+| `romek export <domain> -o file.json` | Export cookies to JSON file |
+| `romek import <file> --domain <domain>` | Import cookies from JSON file |
+| `romek version` | Show current version |
+
+---
+
+## Security
+
+- **AES-256 encryption** with PBKDF2 key derivation (100k iterations)
+- **Ed25519 keypairs** for agent identity
+- **Scoped access** — agents only access approved domains
+- **Audit logging** — every access logged with timestamp
+- **SQLite storage** — encrypted database at `~/.romek/vault.db`
+
+---
+
+## Roadmap
+
+- [x] ~~Chrome extension for cookie export~~ (replaced by `grab` command)
+- [x] Encrypted local vault
+- [x] Direct Chrome cookie extraction (`romek grab`)
+- [x] Playwright integration
+- [x] LangChain integration
+- [x] **n8n integration** — [n8n-nodes-romek](https://github.com/jacobgadek/n8n-nodes-romek)
+- [x] Project config (romek.yaml)
+- [x] Session health checks (romek doctor)
+- [x] Export/Import for remote servers
+- [ ] Firefox extension
+- [ ] Selenium examples
+- [ ] Cloud vault sync
+
+---
+
+## Examples
+
+Working demos available in the [`examples/`](./examples) folder.
+
+### GitHub Agent Demo
+
+**Setup:**
+
+```bash
+# 1. Create the agent
+romek create-agent github-agent --scopes github.com
+
+# 2. Grab cookies from Chrome
+romek grab github.com
+
+# 3. Your session is now stored and ready to use
+```
+
+**Run:**
+
+```bash
+PYTHONPATH=. python examples/github_agent.py
+```
+
+---
+
+## Contributing
+
+PRs welcome. Check out the [issues](https://github.com/jacobgadek/romek/issues) for feature requests.
+
+---
+
+## License
+
+MIT
+
+<div align="center">
+
+⭐ **Star us if Romek helps your agents authenticate!**
+
+</div>
