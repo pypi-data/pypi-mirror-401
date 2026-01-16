@@ -1,0 +1,220 @@
+Metadata-Version: 2.4
+Name: aws-sso-lite
+Version: 0.0.7
+Summary: A lightweight package to do aws sso without aws cli
+Home-page: https://github.com/kejun91/aws-sso-lite
+Author: Jun Ke
+Author-email: kejun91@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+Dynamic: summary
+
+# AWS SSO Lite
+
+AWS SSO Lite is a lightweight Python library that allows users to authenticate with AWS Single Sign-On (SSO) without requiring the AWS CLI. This library simplifies the process of obtaining temporary AWS credentials using SSO, making it easier to integrate SSO authentication into your Python applications.
+
+## Features
+
+- **SSO Authentication**: Authenticate with AWS SSO without needing the AWS CLI.
+- **Device Authorization Flow**: Implements OAuth 2.0 device authorization flow for SSO login.
+- **Token Management**: Automatic token caching and validation.
+- **Account & Role Discovery**: List available AWS accounts and roles.
+- **Temporary Credentials**: Retrieve temporary AWS credentials for use in your Python applications.
+- **Simple Integration**: Easily integrate AWS SSO authentication into your Python scripts or tools.
+
+## Installation
+
+You can install the library from PyPI using `pip`:
+
+```bash
+pip install aws-sso-lite
+```
+
+## Usage
+
+### Basic Authentication
+
+```python
+from aws_sso_lite.sso import AWSSSO
+
+# Initialize the SSO client
+sso = AWSSSO(
+    start_url="https://your-company.awsapps.com/start",
+    sso_region="us-east-1"  # The region where your SSO instance is deployed
+)
+
+# Check if there's a valid cached token
+if not sso.has_valid_access_token():
+    # Start device authorization
+    auth_response = sso.start_device_authorization()
+    
+    print(f"Visit: {auth_response['verificationUriComplete']}")
+    print(f"Or enter code: {auth_response['userCode']} at {auth_response['verificationUri']}")
+    
+    # Wait for user to authorize, then create token
+    result = sso.create_token(auth_response['deviceCode'])
+    
+    if result['status'] == 'successful':
+        print("Successfully authenticated!")
+    else:
+        print(f"Authentication failed: {result.get('error', 'Unknown error')}")
+```
+
+### Listing AWS Accounts and Roles
+
+```python
+# List all available AWS accounts
+accounts = sso.get_aws_accounts()
+for account in accounts:
+    print(f"Account: {account['accountName']} ({account['accountId']})")
+
+# Get roles for a specific account
+account_id = "123456789012"
+roles = sso.get_aws_account_roles(account_id)
+for role in roles:
+    print(f"Role: {role['roleName']}")
+
+# Get account ID by account name
+account_id = sso.get_account_id_by_account_name("Production")
+```
+
+### Getting boto3 Sessions (Recommended)
+
+```python
+# Get a boto3 session directly (handles credential management automatically)
+session = sso.get_boto3_session(
+    account_id="123456789012",
+    sso_role_name="AdministratorAccess"
+)
+
+# Use the session to create AWS service clients
+s3 = session.client('s3')
+ec2 = session.client('ec2', region_name='us-west-2')
+
+# With assumed role (for cross-account access)
+session = sso.get_boto3_session(
+    account_id="123456789012",
+    sso_role_name="AdministratorAccess",
+    assumed_role_arn="arn:aws:iam::999999999999:role/CrossAccountRole"
+)
+```
+
+### Getting Temporary Credentials (Manual)
+
+```python
+# If you need raw credentials instead of a session
+credentials = sso.get_role_credentials(
+    account_id="123456789012",
+    role_name="AdministratorAccess"
+)
+
+# Use the credentials with boto3
+import boto3
+
+session = boto3.Session(
+    aws_access_key_id=credentials['roleCredentials']['accessKeyId'],
+    aws_secret_access_key=credentials['roleCredentials']['secretAccessKey'],
+    aws_session_token=credentials['roleCredentials']['sessionToken']
+)
+
+# Now you can use AWS services
+s3 = session.client('s3')
+```
+
+### Legacy API (Backward Compatible)
+
+```python
+from aws_sso_lite import do_sso_login
+import botocore.session
+
+start_url = "https://your-company.awsapps.com/start"
+botocore_session = botocore.session.Session()
+region = 'us-east-1'
+
+do_sso_login(botocore_session, region, start_url)
+```
+
+## API Reference
+
+### `AWSSSO` Class
+
+#### `__init__(start_url: str, sso_region: str)`
+Initialize the SSO client.
+
+**Parameters:**
+- `start_url`: Your AWS SSO start URL (e.g., `https://your-company.awsapps.com/start`)
+- `sso_region`: The AWS region where your SSO instance is deployed (e.g., `us-east-1`)
+
+#### `start_device_authorization() -> dict`
+Initiates the device authorization flow.
+
+**Returns:** Dictionary with `deviceCode`, `userCode`, `verificationUri`, and `verificationUriComplete`
+
+#### `create_token(device_code: str, store_token: bool = True) -> dict`
+Creates and stores an SSO access token.
+
+**Returns:** Dictionary with `status` ("successful", "pending", or "error")
+
+#### `has_valid_access_token() -> bool`
+Checks if a valid cached access token exists.
+
+#### `get_aws_accounts() -> list`
+Lists all AWS accounts accessible via SSO.
+
+#### `get_aws_account_roles(account_id: str) -> list`
+Lists all roles available for the specified account.
+
+#### `get_account_id_by_account_name(account_name: str) -> str | None`
+Finds an account ID by account name.
+
+#### `get_role_credentials(account_id: str, role_name: str) -> dict`
+Retrieves temporary AWS credentials for a specific account and role.
+
+#### `get_boto3_session(account_id: str, sso_role_name: str, assumed_role_arn: str = None) -> boto3.Session`
+Creates a boto3 session with automatic credential management and caching.
+
+**Parameters:**
+- `account_id`: The AWS account ID
+- `sso_role_name`: The SSO role name to use
+- `assumed_role_arn`: (Optional) ARN of a role to assume for cross-account access
+
+**Returns:** A configured `boto3.Session` object
+
+**Note:** Sessions and credentials are automatically cached and reused until they e
+- Cache keys include the access token hash, so cache is automatically invalidated when you re-authenticate.
+- The `AWSSSO` instance can be safely kept alive for long periods - it handles token expiration gracefully.xpire.
+
+## Caching Behavior
+
+This library implements intelligent caching at multiple levels:
+
+1. **SSO Tokens**: Cached in `~/.aws/sso/cache/` (shared with AWS CLI)
+2. **Account/Role Lists**: Cached in-memory, automatically invalidated when SSO token changes
+3. **boto3 Sessions**: Cached in-memory with automatic expiration handling
+4. **Temporary Credentials**: Cached and reused until they expire
+
+All caches are automatically invalidated when tokens expire or change, ensuring you always work with valid credentials.
+
+## Requirements
+
+- Python 3.7+
+- botocore
+- boto3
+
+## Notes
+
+- The SSO region is the region where your SSO instance is deployed, **not** the region where your AWS resources are located.
+- Tokens are cached in `~/.aws/sso/cache/` and are automatically reused if valid.
+- One SSO start URL can provide access to multiple AWS accounts across all regions.
