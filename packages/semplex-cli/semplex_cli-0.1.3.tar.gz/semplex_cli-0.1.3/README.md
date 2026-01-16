@@ -1,0 +1,817 @@
+# CLI - Python Command Line Interface
+
+Python-based command-line interface for the Semplex platform. Silently monitors directories for data file changes (Excel, CSV, TSV) and extracts/sends metadata to a backend service.
+
+## Quick Start
+
+### Installation
+
+```bash
+# Using uv (recommended)
+cd cli
+uv pip install -e .
+
+# Or using pip
+pip install -e .
+```
+
+### Basic Usage
+
+```bash
+# 1. Configure (interactive wizard)
+semplex init
+
+# 2. Start watching
+semplex start
+
+# 3. Check status
+semplex status
+
+# 4. Stop watching
+semplex stop
+```
+
+For detailed usage instructions, see [QUICKSTART.md](./QUICKSTART.md).
+
+## Features
+
+The Semplex CLI provides:
+- **Silent File Monitoring**: Watch directories for file changes
+- **Automatic Header Extraction**: Extract metadata from Excel, CSV, TSV files
+- **Async Processing**: Non-blocking metadata sending
+- **Debug Mode**: Write requests to file instead of sending to API
+- **Background Operation**: Run as daemon process
+- **Configuration Management**: Interactive setup and persistent config
+
+## Technology Stack
+
+- **Language**: Python 3.11+
+- **CLI Framework**: Click or Typer (recommendation: Typer)
+- **HTTP Client**: httpx (async support)
+- **Configuration**: Pydantic + YAML/TOML
+- **File Processing**: pandas, openpyxl
+- **Output Formatting**: Rich (beautiful terminal output)
+- **Testing**: Pytest
+- **Type Checking**: mypy
+
+## Project Structure
+
+```
+cli/
+├── semplex_cli/
+│   ├── __init__.py
+│   ├── __main__.py         # Entry point
+│   ├── cli.py              # Main CLI app
+│   ├── commands/
+│   │   ├── __init__.py
+│   │   ├── auth.py         # Authentication commands
+│   │   ├── files.py        # File operations
+│   │   ├── metadata.py     # Metadata commands
+│   │   ├── watch.py        # Directory watching
+│   │   └── export.py       # Export commands
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── client.py       # API client
+│   │   └── models.py       # API models
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── config.py       # Configuration management
+│   │   ├── formatters.py   # Output formatting
+│   │   └── validators.py   # Input validation
+│   └── extractors/
+│       ├── __init__.py
+│       ├── base.py
+│       ├── excel.py
+│       ├── csv.py
+│       └── tsv.py
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── fixtures/
+├── docs/
+│   └── commands.md
+├── pyproject.toml          # Project metadata & deps
+├── setup.py
+├── requirements.txt
+├── requirements-dev.txt
+├── README.md
+└── .env.example
+```
+
+## Installation
+
+### From Source
+
+```bash
+# Clone repository
+git clone <repository-url>
+cd good-head/cli
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install in development mode
+pip install -e .
+
+# Or install from requirements
+pip install -r requirements.txt
+```
+
+### From PyPI (Future)
+
+```bash
+pip install semplex-cli
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# .env or environment
+SEMPLEX_API_URL=http://localhost:3000
+SEMPLEX_API_KEY=your-api-key
+SEMPLEX_CONFIG_FILE=~/.config/semplex/config.yaml
+```
+
+### Configuration File
+
+```yaml
+# ~/.config/semplex/config.yaml
+api:
+  url: http://localhost:3000
+  timeout: 30
+  retry_attempts: 3
+
+auth:
+  api_key: your-api-key
+  # Or use token-based auth
+  access_token: null
+
+watch:
+  directories:
+    - /path/to/watch1
+    - /path/to/watch2
+  file_types:
+    - .xlsx
+    - .csv
+    - .tsv
+  recursive: true
+  ignore_patterns:
+    - "*.tmp"
+    - "~$*"
+
+output:
+  format: table  # table, json, yaml, csv
+  verbose: false
+  color: true
+```
+
+## CLI Commands
+
+### Authentication
+
+```bash
+# Login (interactive)
+semplex auth login
+
+# Login with credentials
+semplex auth login --email user@example.com --password secret
+
+# Login with API key
+semplex auth login --api-key your-api-key
+
+# Logout
+semplex auth logout
+
+# Check auth status
+semplex auth status
+```
+
+### File Operations
+
+```bash
+# Upload a file
+semplex file upload /path/to/data.xlsx
+
+# Upload multiple files
+semplex file upload /path/to/data/*.csv
+
+# Upload with metadata
+semplex file upload data.xlsx --tags "finance,q4" --category "reports"
+
+# Process existing file
+semplex file process <file-id>
+
+# List uploaded files
+semplex file list
+
+# Get file details
+semplex file get <file-id>
+
+# Delete file
+semplex file delete <file-id>
+```
+
+### Metadata Operations
+
+```bash
+# List metadata
+semplex metadata list
+
+# Filter metadata
+semplex metadata list --file-type csv --date-from 2024-01-01
+
+# Get specific metadata
+semplex metadata get <metadata-id>
+
+# Export metadata
+semplex metadata export --format json --output metadata.json
+
+# Search metadata
+semplex metadata search "column:email"
+
+# Update metadata tags
+semplex metadata tag <metadata-id> --add tag1 tag2 --remove tag3
+```
+
+### Directory Watching
+
+```bash
+# Start watching a directory
+semplex watch start /path/to/directory
+
+# Watch with options
+semplex watch start /path/to/dir --recursive --file-types .xlsx,.csv
+
+# List watched directories
+semplex watch list
+
+# Stop watching
+semplex watch stop /path/to/directory
+
+# Stop all watchers
+semplex watch stop --all
+```
+
+### Export Commands
+
+```bash
+# Export all metadata
+semplex export metadata --format csv --output data.csv
+
+# Export with filters
+semplex export metadata --file-type xlsx --format json
+
+# Export files list
+semplex export files --output files.json
+```
+
+### Configuration
+
+```bash
+# Show current configuration
+semplex config show
+
+# Set configuration value
+semplex config set api.url http://api.example.com
+
+# Initialize configuration
+semplex config init
+```
+
+## Implementation with Typer
+
+### Main CLI Application
+
+```python
+# semplex_cli/cli.py
+import typer
+from rich.console import Console
+
+app = typer.Typer(
+    name="semplex",
+    help="Semplex CLI - Metadata tracking and curation",
+    add_completion=True,
+)
+console = Console()
+
+# Register command groups
+from .commands import auth, files, metadata, watch, export
+
+app.add_typer(auth.app, name="auth", help="Authentication commands")
+app.add_typer(files.app, name="file", help="File operations")
+app.add_typer(metadata.app, name="metadata", help="Metadata operations")
+app.add_typer(watch.app, name="watch", help="Directory watching")
+app.add_typer(export.app, name="export", help="Export commands")
+
+def version_callback(value: bool):
+    if value:
+        console.print("Semplex CLI v0.1.0")
+        raise typer.Exit()
+
+@app.callback()
+def main(
+    version: bool = typer.Option(
+        None,
+        "--version",
+        "-v",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version and exit"
+    )
+):
+    """
+    Semplex CLI - Interact with the Semplex platform from the command line.
+    """
+    pass
+
+if __name__ == "__main__":
+    app()
+```
+
+### Authentication Commands
+
+```python
+# semplex_cli/commands/auth.py
+import typer
+from rich.console import Console
+from rich.prompt import Prompt
+from ..api.client import APIClient
+from ..utils.config import Config
+
+app = typer.Typer()
+console = Console()
+
+@app.command()
+def login(
+    email: str = typer.Option(None, "--email", "-e", help="Email address"),
+    password: str = typer.Option(None, "--password", "-p", help="Password"),
+    api_key: str = typer.Option(None, "--api-key", help="API key"),
+):
+    """Login to Semplex platform"""
+
+    if api_key:
+        # API key authentication
+        config = Config()
+        config.set("auth.api_key", api_key)
+        console.print("[green]Successfully authenticated with API key[/green]")
+        return
+
+    # Interactive login
+    if not email:
+        email = Prompt.ask("Email")
+    if not password:
+        password = Prompt.ask("Password", password=True)
+
+    try:
+        client = APIClient()
+        response = client.login(email, password)
+
+        # Save token
+        config = Config()
+        config.set("auth.access_token", response["access_token"])
+        config.set("auth.refresh_token", response["refresh_token"])
+
+        console.print(f"[green]Successfully logged in as {email}[/green]")
+    except Exception as e:
+        console.print(f"[red]Login failed: {e}[/red]")
+        raise typer.Exit(1)
+
+@app.command()
+def logout():
+    """Logout from Semplex platform"""
+    config = Config()
+    config.set("auth.access_token", None)
+    config.set("auth.api_key", None)
+    console.print("[green]Successfully logged out[/green]")
+
+@app.command()
+def status():
+    """Check authentication status"""
+    config = Config()
+    api_key = config.get("auth.api_key")
+    token = config.get("auth.access_token")
+
+    if api_key:
+        console.print("[green]Authenticated with API key[/green]")
+    elif token:
+        # Verify token with API
+        try:
+            client = APIClient()
+            user = client.get_current_user()
+            console.print(f"[green]Authenticated as {user['email']}[/green]")
+        except Exception:
+            console.print("[red]Authentication expired[/red]")
+    else:
+        console.print("[yellow]Not authenticated[/yellow]")
+```
+
+### File Commands
+
+```python
+# semplex_cli/commands/files.py
+import typer
+from pathlib import Path
+from rich.console import Console
+from rich.table import Table
+from rich.progress import Progress
+from ..api.client import APIClient
+from ..extractors import get_extractor
+
+app = typer.Typer()
+console = Console()
+
+@app.command()
+def upload(
+    files: list[Path] = typer.Argument(..., help="Files to upload"),
+    tags: str = typer.Option(None, "--tags", help="Comma-separated tags"),
+    category: str = typer.Option(None, "--category", help="File category"),
+    auto_process: bool = typer.Option(True, help="Process immediately"),
+):
+    """Upload file(s) to Semplex platform"""
+
+    client = APIClient()
+    tag_list = tags.split(",") if tags else []
+
+    with Progress() as progress:
+        task = progress.add_task("[cyan]Uploading files...", total=len(files))
+
+        for file_path in files:
+            if not file_path.exists():
+                console.print(f"[red]File not found: {file_path}[/red]")
+                continue
+
+            try:
+                # Extract metadata locally
+                extractor = get_extractor(file_path)
+                metadata = extractor.extract(file_path)
+
+                # Upload to API
+                response = client.upload_file(
+                    file_path=file_path,
+                    metadata=metadata,
+                    tags=tag_list,
+                    category=category,
+                    auto_process=auto_process
+                )
+
+                console.print(
+                    f"[green]✓[/green] Uploaded: {file_path.name} (ID: {response['id']})"
+                )
+
+            except Exception as e:
+                console.print(f"[red]✗[/red] Failed: {file_path.name} - {e}")
+
+            progress.advance(task)
+
+@app.command("list")
+def list_files(
+    limit: int = typer.Option(20, "--limit", "-l", help="Number of files to show"),
+    offset: int = typer.Option(0, "--offset", help="Offset for pagination"),
+    file_type: str = typer.Option(None, "--type", help="Filter by file type"),
+):
+    """List uploaded files"""
+
+    client = APIClient()
+
+    try:
+        response = client.list_files(
+            limit=limit,
+            offset=offset,
+            file_type=file_type
+        )
+
+        files = response["data"]
+
+        if not files:
+            console.print("[yellow]No files found[/yellow]")
+            return
+
+        # Display as table
+        table = Table(title="Uploaded Files")
+        table.add_column("ID", style="cyan")
+        table.add_column("Filename", style="white")
+        table.add_column("Type", style="magenta")
+        table.add_column("Size", style="green")
+        table.add_column("Status", style="yellow")
+        table.add_column("Uploaded", style="blue")
+
+        for file in files:
+            table.add_row(
+                file["id"][:8],
+                file["filename"],
+                file["file_type"],
+                format_size(file["size"]),
+                file["status"],
+                file["created_at"]
+            )
+
+        console.print(table)
+        console.print(f"\nShowing {len(files)} of {response['meta']['total']} files")
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+
+def format_size(bytes: int) -> str:
+    """Format file size"""
+    for unit in ['B', 'KB', 'MB', 'GB']:
+        if bytes < 1024:
+            return f"{bytes:.1f} {unit}"
+        bytes /= 1024
+    return f"{bytes:.1f} TB"
+```
+
+### API Client
+
+```python
+# semplex_cli/api/client.py
+import httpx
+from pathlib import Path
+from typing import Optional, Dict, Any
+from ..utils.config import Config
+
+class APIClient:
+    def __init__(self):
+        self.config = Config()
+        self.base_url = self.config.get("api.url", "http://localhost:3000")
+        self.timeout = self.config.get("api.timeout", 30)
+
+    def _get_headers(self) -> Dict[str, str]:
+        """Get authentication headers"""
+        headers = {"Content-Type": "application/json"}
+
+        api_key = self.config.get("auth.api_key")
+        if api_key:
+            headers["X-API-Key"] = api_key
+            return headers
+
+        token = self.config.get("auth.access_token")
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        return headers
+
+    async def _request(
+        self,
+        method: str,
+        endpoint: str,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """Make HTTP request"""
+        url = f"{self.base_url}{endpoint}"
+        headers = self._get_headers()
+
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.request(
+                method=method,
+                url=url,
+                headers=headers,
+                **kwargs
+            )
+            response.raise_for_status()
+            return response.json()
+
+    async def login(self, email: str, password: str) -> Dict[str, Any]:
+        """Login with email and password"""
+        return await self._request(
+            "POST",
+            "/auth/login",
+            json={"email": email, "password": password}
+        )
+
+    async def upload_file(
+        self,
+        file_path: Path,
+        metadata: Dict[str, Any],
+        tags: list[str] = None,
+        category: str = None,
+        auto_process: bool = True
+    ) -> Dict[str, Any]:
+        """Upload file with metadata"""
+        with open(file_path, "rb") as f:
+            files = {"file": f}
+            data = {
+                "metadata": metadata,
+                "tags": tags or [],
+                "category": category,
+                "auto_process": auto_process
+            }
+
+            return await self._request(
+                "POST",
+                "/files/upload",
+                files=files,
+                data=data
+            )
+
+    async def list_files(
+        self,
+        limit: int = 20,
+        offset: int = 0,
+        file_type: str = None
+    ) -> Dict[str, Any]:
+        """List uploaded files"""
+        params = {"limit": limit, "offset": offset}
+        if file_type:
+            params["file_type"] = file_type
+
+        return await self._request("GET", "/files", params=params)
+```
+
+### Metadata Extractor
+
+```python
+# semplex_cli/extractors/excel.py
+import openpyxl
+from pathlib import Path
+from typing import Dict, Any
+from .base import BaseExtractor
+
+class ExcelExtractor(BaseExtractor):
+    """Extract metadata from Excel files"""
+
+    def extract(self, file_path: Path) -> Dict[str, Any]:
+        """Extract metadata from Excel file"""
+        workbook = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+        sheet = workbook.active
+
+        # Get dimensions
+        rows = sheet.max_row
+        cols = sheet.max_column
+
+        # Get column headers (first row)
+        headers = [cell.value for cell in sheet[1]]
+
+        # Sample data (first 5 rows)
+        sample_data = []
+        for row in list(sheet.iter_rows(min_row=2, max_row=6, values_only=True)):
+            sample_data.append(list(row))
+
+        return {
+            "filename": file_path.name,
+            "file_type": "xlsx",
+            "size": file_path.stat().st_size,
+            "row_count": rows,
+            "column_count": cols,
+            "columns": headers,
+            "sample_data": sample_data,
+            "sheet_names": workbook.sheetnames,
+            "modified_at": file_path.stat().st_mtime
+        }
+```
+
+## Directory Watching
+
+```python
+# semplex_cli/commands/watch.py
+import typer
+from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from ..api.client import APIClient
+from ..extractors import get_extractor
+
+class FileWatchHandler(FileSystemEventHandler):
+    def __init__(self, file_types: list[str], client: APIClient):
+        self.file_types = file_types
+        self.client = client
+
+    def on_created(self, event):
+        if event.is_directory:
+            return
+
+        file_path = Path(event.src_path)
+        if file_path.suffix in self.file_types:
+            self.process_file(file_path)
+
+    def on_modified(self, event):
+        if event.is_directory:
+            return
+
+        file_path = Path(event.src_path)
+        if file_path.suffix in self.file_types:
+            self.process_file(file_path)
+
+    def process_file(self, file_path: Path):
+        """Process detected file"""
+        try:
+            extractor = get_extractor(file_path)
+            metadata = extractor.extract(file_path)
+            self.client.upload_file(file_path, metadata)
+            print(f"Processed: {file_path.name}")
+        except Exception as e:
+            print(f"Error processing {file_path.name}: {e}")
+
+@app.command()
+def start(
+    directory: Path = typer.Argument(..., help="Directory to watch"),
+    recursive: bool = typer.Option(True, "--recursive", "-r"),
+    file_types: str = typer.Option(".xlsx,.csv,.tsv", "--types"),
+):
+    """Start watching directory for file changes"""
+    file_type_list = file_types.split(",")
+    client = APIClient()
+
+    event_handler = FileWatchHandler(file_type_list, client)
+    observer = Observer()
+    observer.schedule(event_handler, str(directory), recursive=recursive)
+    observer.start()
+
+    print(f"Watching {directory} for changes...")
+    print("Press Ctrl+C to stop")
+
+    try:
+        observer.join()
+    except KeyboardInterrupt:
+        observer.stop()
+        observer.join()
+```
+
+## Testing
+
+```python
+# tests/unit/test_extractors.py
+import pytest
+from pathlib import Path
+from semplex_cli.extractors.excel import ExcelExtractor
+
+def test_excel_extractor(tmp_path):
+    # Create test Excel file
+    # ... (create test file)
+
+    extractor = ExcelExtractor()
+    metadata = extractor.extract(test_file)
+
+    assert metadata["file_type"] == "xlsx"
+    assert metadata["row_count"] > 0
+    assert metadata["column_count"] > 0
+    assert isinstance(metadata["columns"], list)
+```
+
+## Dependencies
+
+```toml
+# pyproject.toml
+[project]
+name = "semplex-cli"
+version = "0.1.0"
+description = "CLI for Semplex platform"
+requires-python = ">=3.11"
+
+dependencies = [
+    "typer[all]>=0.9.0",
+    "httpx>=0.25.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "watchdog>=3.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "mypy>=1.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+semplex = "semplex_cli.__main__:main"
+```
+
+## Best Practices
+
+1. **User Experience**: Clear, helpful error messages
+2. **Progress Feedback**: Use Rich progress bars
+3. **Configuration**: Support multiple config sources
+4. **Idempotency**: Safe to re-run commands
+5. **Output Formats**: Support JSON, YAML, table
+6. **Verbosity Levels**: `--verbose`, `--quiet` flags
+7. **Error Handling**: Graceful error handling
+8. **Testing**: Comprehensive test coverage
+9. **Documentation**: Inline help and examples
+
+## Resources
+
+- [Typer Documentation](https://typer.tiangolo.com/)
+- [Rich Documentation](https://rich.readthedocs.io/)
+- [httpx Documentation](https://www.python-httpx.org/)
+- [Click Documentation](https://click.palletsprojects.com/)
+
+## Contributing
+
+See main repository README. For CLI-specific:
+1. Follow Python best practices (PEP 8)
+2. Use type hints
+3. Write comprehensive tests
+4. Update command documentation
+5. Run linters (black, ruff, mypy)
