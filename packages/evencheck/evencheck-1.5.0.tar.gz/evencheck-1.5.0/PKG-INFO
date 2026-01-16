@@ -1,0 +1,96 @@
+Metadata-Version: 2.4
+Name: evencheck
+Version: 1.5.0
+Summary: The most inefficient way to check if a number is even.
+Author: GussApenas
+License: MIT License
+        
+        Copyright (c) 2026 GussApenas
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Repository, https://github.com/GussApenass/evencheck
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aiohttp
+Requires-Dist: aiofiles
+Dynamic: license-file
+
+# evencheck
+
+The most inefficient way to check if a number is even.
+
+## Installation
+
+```bash
+pip install evencheck
+```
+
+## Usage
+
+```python
+from evencheck import iseven
+
+number_true = iseven(2) # True
+print(number_true)
+number_false = iseven(7) # False
+print(number_false)
+```
+
+## Hot it Works
+
+- Downloads a huge JSON file
+- Reads it line by line
+- Stops when the number is found
+- Deletes the file
+
+Absolutely useless. By design.
+
+## 🤝 Contributing
+
+We do accept contributions - with one very important rule:
+
+Your contribution must make the code worse.
+Rules for contributing
+If you want to contribute to `evencheck`, you must follow these guidelines:
+
+- ❌ **|** Do not optimize anything
+- ❌ **|** Do not remove unnecessary steps
+- ❌ **|** Do not improve performance
+- ❌ **|** Do not reduce memory usage
+- ❌ **|** Do not simplify logic
+
+What we do want
+
+- ✅ **|** More I/O operations
+- ✅ **|** Extra loops
+- ✅ **|** Redundant checks
+- ✅ **|** Worse performance
+- ✅ **|** Longer execution time
+- ✅ **|** More unnecessary downloads
+
+If your pull request makes the code faster, cleaner, or smarter, it will be rejected immediately.
+
+--
+
+I would like to express my sincere thanks to [kleeedolinux](https://github.com/kleeedolinux) for helping make evencheck possible.
+
+With much love,  
+Made by Guss
