@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wtf-ai"
+version = "0.4.7"
+description = "A command-line AI assistant that provides contextual help based on terminal history"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    {name = "wtf-ai contributors"}
+]
+keywords = ["cli", "ai", "assistant", "terminal", "shell"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: System :: Shells",
+]
+
+dependencies = [
+    "anthropic>=0.18.0",
+    "openai>=1.12.0",
+    "google-generativeai>=0.3.0",
+    "llm>=0.13.0",
+    "llm-anthropic>=0.9.0",  # Claude models via llm
+    "llm-gemini>=0.5.0",     # Gemini models via llm
+    "llm-ollama>=0.8.0",     # Local models via Ollama
+    "rich>=13.7.0",
+    "ddgs>=9.0.0",           # DuckDuckGo search (free, no API key)
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+]
+
+[project.scripts]
+wtf = "wtf.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/davefowler/wtf-terminal-ai"
+Documentation = "https://github.com/davefowler/wtf-terminal-ai"
+Repository = "https://github.com/davefowler/wtf-terminal-ai"
+Issues = "https://github.com/davefowler/wtf-terminal-ai/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wtf", "wtf.*"]
