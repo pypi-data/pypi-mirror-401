@@ -1,0 +1,108 @@
+Metadata-Version: 2.4
+Name: scribble-annotation-generator
+Version: 0.0.1
+Summary: Programmatically generate semi-realistic synthetic scribble annotations based on statistics from existing scribble datasets
+Project-URL: Homepage, https://github.com/alexsenden/scribble-annotation-generator
+Project-URL: Repository, https://github.com/alexsenden/scribble-annotation-generator
+Project-URL: Issues, https://github.com/alexsenden/scribble-annotation-generator/issues
+Author: Alex Senden
+License: MIT
+Keywords: annotation,computer-vision,scribble,segmentation,synthetic-data
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Image Processing
+Requires-Python: >=3.8
+Requires-Dist: numpy
+Requires-Dist: opencv-python
+Requires-Dist: scikit-image
+Requires-Dist: scipy
+Description-Content-Type: text/markdown
+
+# Scribble Annotation Generator
+
+Programmatically generate semi-realistic scribble annotations for segmentation-style tasks. The project exposes a single CLI entrypoint for two workflows: synthetic crop-field generation and training/inference of the neural scribble generator.
+
+## Installation
+
+```bash
+pip install -e .
+# or
+pip install scribble-annotation-generator
+```
+
+After installation, the CLI command `scribble-annotation-generator` becomes available.
+
+## Colour Map Specification
+
+Many commands require a colour map that links RGB tuples to class IDs. Provide it in either form:
+
+-   Inline string: `R,G,B=class;R,G,B=class` (also accepts `R,G,B:class`)
+    -   Example: `0,0,0=0;0,128,255=1;124,255,121=2`
+-   File path: a text file with one entry per line. Each line is `R,G,B,class`. If the class column is omitted, class IDs are assigned by line order starting at 0.
+
+## CLI
+
+### 1) Crop-field synthesis
+
+Generate synthetic crop-field scribble images using a procedural model.
+
+```bash
+scribble-annotation-generator crop-field \
+  --colour-map "0,0,0=0;0,128,255=1;124,255,121=2" \
+  --output-dir ./path/to/output \
+  --num-samples 50 \
+  --min-rows 4 \
+  --max-rows 6
+```
+
+Key flags:
+
+-   `--colour-map` (required): inline or file as described above
+-   `--output-dir`: where PNGs are written (default `./local/crop_field`)
+-   `--num-samples`: number of images to create (default `200`)
+-   `--min-rows`, `--max-rows`: range for rows per sample
+
+### 2) Train and run neural generator
+
+Train the transformer-based object generator on a dataset of scribble annotations, then render model predictions on the validation set.
+
+```bash
+scribble-annotation-generator train-nn \
+  --train-dir ./local/soybean1/train \
+  --val-dir ./local/soybean1/val \
+  --colour-map ./colour_map.csv \
+  --checkpoint-dir ./local/nn-checkpoints \
+  --inference-dir ./local/nn-inference \
+  --batch-size 8 \
+  --num-workers 4 \
+  --max-epochs 50
+```
+
+Key flags:
+
+-   `--train-dir`, `--val-dir` (required): directories containing training and validation data
+-   `--colour-map` (required): inline or file form
+-   `--checkpoint-dir`: where PyTorch Lightning checkpoints are stored (default `./local/nn-checkpoints`)
+-   `--inference-dir`: where rendered scribbles from validation samples are saved (default `./local/nn-inference`)
+-   `--batch-size`, `--num-workers`, `--max-epochs`: training configuration
+-   `--num-classes`: override number of classes; by default derived from the colour map
+
+## Python API
+
+Instead of calling the CLI, you can call the main functions directly:
+
+-   `scribble_annotation_generator.crop_field.generate_crop_field_dataset(output_dir, colour_map, num_samples=..., min_rows=..., max_rows=...)`
+-   `scribble_annotation_generator.nn.train_and_infer(train_dir, val_dir, colour_map, checkpoint_dir=..., inference_dir=..., batch_size=..., num_workers=..., max_epochs=..., num_classes=None)`
+
+## License
+
+MIT
