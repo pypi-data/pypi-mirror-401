@@ -1,0 +1,857 @@
+Metadata-Version: 2.4
+Name: pyxesxxn
+Version: 1.0.0
+Summary: PyXESXXN - Python for eXtended Energy System Analysis - Independent multi-carrier energy system modeling and optimization library
+Home-page: https://github.com/pyxesxxn/pyxesxxn
+Author: PyXESXXN Development Team
+Author-email: PyXESXXN Development Team <support@pyxesxxn.org>
+Maintainer-email: PyXESXXN Development Team <support@pyxesxxn.org>
+License: Proprietary - Free for use, closed source
+Project-URL: Homepage, https://github.com/pyxesxxn/pyxesxxn
+Project-URL: Documentation, https://pyxesxxn.readthedocs.io
+Project-URL: Repository, https://github.com/pyxesxxn/pyxesxxn
+Project-URL: Issues, https://github.com/pyxesxxn/pyxesxxn/issues
+Project-URL: Website, https://pyxesxxn.org
+Keywords: energy,optimization,multi-carrier,power-systems,renewable-energy,energy-system,independent,closed-source,energy-hub,power-flow,reinforcement-learning,stochastic-optimization
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Operating System :: OS Independent
+Classifier: Natural Language :: English
+Classifier: Natural Language :: Chinese (Simplified)
+Classifier: Typing :: Typed
+Classifier: License :: Other/Proprietary License
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.21
+Requires-Dist: scipy>=1.7
+Requires-Dist: pandas>=1.3
+Requires-Dist: xarray>=0.20
+Requires-Dist: matplotlib>=3.5
+Requires-Dist: plotly>=5.0
+Requires-Dist: seaborn>=0.11
+Requires-Dist: geopandas>=0.10
+Requires-Dist: shapely>=1.8
+Requires-Dist: networkx>=2.6
+Requires-Dist: deprecation>=2.1
+Requires-Dist: highspy>=1.5
+Requires-Dist: scikit-learn>=1.0
+Requires-Dist: pyyaml>=5.4
+Requires-Dist: imbalanced-learn>=0.8
+Requires-Dist: feature-engine>=1.2
+Requires-Dist: dash>=2.0
+Requires-Dist: dash-bootstrap-components>=1.0
+Requires-Dist: numba>=0.55
+Requires-Dist: joblib>=1.1
+Requires-Dist: torch>=1.11.0
+Requires-Dist: gymnasium>=0.26.0
+Provides-Extra: hdf5
+Requires-Dist: tables>=3.7; extra == "hdf5"
+Provides-Extra: excel
+Requires-Dist: openpyxl>=3.0; extra == "excel"
+Requires-Dist: python-calamine>=0.1; extra == "excel"
+Provides-Extra: netcdf
+Requires-Dist: netcdf4>=1.6; extra == "netcdf"
+Provides-Extra: cloudpath
+Requires-Dist: cloudpathlib>=0.6; extra == "cloudpath"
+Provides-Extra: cartopy
+Requires-Dist: cartopy>=0.21; extra == "cartopy"
+Provides-Extra: geospatial
+Requires-Dist: geopandas>=0.12; extra == "geospatial"
+Requires-Dist: cartopy>=0.21; extra == "geospatial"
+Requires-Dist: pyproj>=3.0; extra == "geospatial"
+Provides-Extra: gurobi
+Requires-Dist: gurobipy>=10.0; extra == "gurobi"
+Provides-Extra: cplex
+Requires-Dist: docplex>=2.22; extra == "cplex"
+Provides-Extra: scip
+Requires-Dist: pyscipopt>=4.0; extra == "scip"
+Provides-Extra: pyomo
+Requires-Dist: pyomo>=6.6.0; extra == "pyomo"
+Requires-Dist: omlt>=0.5.0; extra == "pyomo"
+Provides-Extra: interactive
+Requires-Dist: plotly>=5.0; extra == "interactive"
+Requires-Dist: dash>=2.0; extra == "interactive"
+Requires-Dist: ipywidgets>=8.0; extra == "interactive"
+Provides-Extra: webgl
+Requires-Dist: pydeck>=0.8; extra == "webgl"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Requires-Dist: pytest-mpl>=0.15; extra == "dev"
+Requires-Dist: coverage>=7.0; extra == "dev"
+Requires-Dist: pytest-xdist>=3.0; extra == "dev"
+Requires-Dist: hypothesis>=6.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0; extra == "dev"
+Requires-Dist: ruff>=0.1; extra == "dev"
+Requires-Dist: mypy>=1.0; extra == "dev"
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: isort>=5.12; extra == "dev"
+Requires-Dist: jupyter>=1.0; extra == "dev"
+Requires-Dist: ipython>=8.0; extra == "dev"
+Requires-Dist: typing-extensions>=4.5; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=7.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.3; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints>=1.23; extra == "docs"
+Requires-Dist: sphinx-copybutton>=0.5; extra == "docs"
+Requires-Dist: sphinx-design>=0.4; extra == "docs"
+Requires-Dist: myst-parser>=2.0; extra == "docs"
+Requires-Dist: nbsphinx>=0.9; extra == "docs"
+Requires-Dist: jupyter-sphinx>=0.4; extra == "docs"
+Provides-Extra: full
+Requires-Dist: pyxesxxn[cloudpath,cplex,excel,geospatial,gurobi,hdf5,interactive,netcdf,scip,webgl]; extra == "full"
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# PyXESXXN - Python for eXtended Energy System Analysis
+
+**独立、通用的多载体能源系统建模与优化Python框架**
+
+<div align="center">
+
+[![PyPI version](https://img.shields.io/pypi/v/pyxesxxn.svg)](https://pypi.python.org/pypi/pyxesxxn)
+![Python Version](https://img.shields.io/badge/python-3.11%2B-blue)
+[![License](https://img.shields.io/badge/License-Closed%20Source-blue.svg)](LICENSE)
+
+</div>
+
+PyXESXXN（发音：**pai-eks-es**）是**能源系统建模领域的优秀成功范例**，一个**完全独立、通用的免费闭源Python框架**，专为**多场景、多载体能源系统建模与优化**设计。它提供了强大的工具来分析和优化包含多种能源载体（电力、热力、氢能、天然气等）的复杂能源系统，适用于各类能源系统建模场景，**无需依赖任何特定能源系统建模库**。
+
+作为独立的能源系统建模框架，PyXESXXN展现了卓越的设计理念和技术实现，提供了全面的功能来建模能源转换设备（如电解槽、燃料电池、热泵等）、能源枢纽优化、多载体网络分析以及可再生能源集成。该框架特别适合研究人员、能源规划师和工程师进行能源系统转型研究、碳中和路径分析和综合能源系统设计，是能源系统建模领域的杰出代表。
+
+PyXESXXN的成功在于其独立的架构设计、全面的功能覆盖、高性能的计算能力以及创新的功能模块，使其成为能源系统建模领域的优秀范例。
+
+## 🌟 核心优势
+
+作为独立的能源系统建模框架，PyXESXXN展现了以下核心优势：
+
+- ✅ **独立性与通用性**：不依赖特定能源系统建模库，可独立运行和扩展
+- ✅ **多载体能源建模**：支持电力、热力、氢能、天然气等多种能源载体
+- ✅ **场景化设备库**：覆盖城市、农村、港口、岛屿、工业、铁路等多种场景
+- ✅ **高级优化算法**：混合整数优化、多目标优化、不确定性分析
+- ✅ **高性能计算**：并行计算、分布式处理、内存优化
+- ✅ **创新功能模块**：故障精准定位与智能自愈决策
+- ✅ **专业潮流计算**：高可靠性、高精度的潮流分析
+- ✅ **丰富的可视化**：实时拓扑图、动态结果展示
+
+## 🔄 灵活的API设计
+
+PyXESXXN采用灵活的API设计，支持多种使用方式：
+
+```python
+# 基础导入方式
+import pyxesxxn
+
+# 创建能源枢纽模型
+hub = pyxesxxn.EnergyHubModel()
+
+# 配置能源载体
+hub.add_carrier("electricity", cost=80)  # 元/MWh
+hub.add_carrier("hydrogen", cost=300)   # 元/kg
+hub.add_carrier("heat", cost=60)       # 元/MWh
+
+# 添加转换设备
+hub.add_converter(
+    "electrolyzer", 
+    input_carrier="electricity",
+    output_carrier="hydrogen", 
+    efficiency=0.7,
+    capacity=10  # MW
+)
+
+# 运行优化
+results = hub.optimize()
+```
+
+### 网络模型创建示例
+
+```python
+import pyxesxxn
+
+# 创建多载体网络
+network = pyxesxxn.MultiCarrierNetwork()
+
+# 添加电力网络
+network.add_electricity_network(buses=["bus1", "bus2"], lines=[("bus1", "bus2", 100)])
+
+# 添加氢能网络
+network.add_hydrogen_network(nodes=["node1", "node2"], pipelines=[("node1", "node2", 50)])
+
+# 优化网络
+results = network.optimize()
+```
+
+## 🌟 核心特性
+
+作为独立的能源系统建模框架，PyXESXXN提供了全面的核心功能：
+
+### 🔄 多载体能源转换
+- **跨载体转换设备建模**：电解槽、燃料电池、热泵、燃气轮机等
+- **能源枢纽优化**：多输入多输出的能源系统优化
+- **转换效率建模**：精确的热力学和电化学转换效率计算
+
+### 📊 场景化设备库
+- **通用设备库**：标准化的设备参数和性能曲线
+- **场景专用库**：城市、农村、港口、岛屿、工业、铁路等场景
+- **可扩展架构**：支持用户自定义设备模型
+
+### 🔧 高级优化功能
+- **混合整数优化**：支持离散决策变量的复杂优化问题
+- **多目标优化**：成本、碳排放、可靠性等多目标权衡（默认使用**MOMTHRO算法** - 改进多目标田忌赛马优化算法）
+- **时序优化**：小时级到年度的时序优化分析
+- **不确定性分析**：可再生能源波动性和需求不确定性建模
+
+### 🌍 可再生能源集成
+- **多载体储能**：电池、氢储、热储等储能系统建模
+- **灵活性评估**：系统灵活性资源和调节能力分析
+- **碳中和路径**：长期能源转型路径规划
+
+### ⚡ 专业潮流计算
+- **多种潮流算法**：牛顿-拉夫逊法、快速分解法等
+- **可靠性验证**：潮流计算可靠性评估
+- **敏感性分析**：系统参数敏感性分析
+
+### 🚀 高性能计算
+- **并行计算**：多核心并行处理
+- **分布式计算**：多节点分布式处理
+- **内存优化**：高效的内存管理
+- **数值优化**：高性能数值计算
+
+### 📈 丰富的可视化
+- **实时拓扑图**：动态展示能源网络结构
+- **动态结果展示**：实时更新计算结果
+- **多种可视化方式**：Matplotlib、Plotly、Web界面
+
+### 🛠️ 创新功能模块
+- **配电网拓扑-量测数据融合**：构建GNN可识别的图数据结构
+- **多态数据预处理**：归一化、异常值处理、数据增强
+- **实时仿真与闭环验证**：对接PSCAD/EMTDC、OpenDSS、MATLAB等
+- **故障精准定位与智能自愈**：AI辅助的故障诊断与恢复
+
+### 🌍 地理空间分析
+- **空间聚类**：能源资源和负荷的空间聚类
+- **区域分析**：基于地理区域的能源系统分析
+- **空间匹配**：负荷与能源资源的空间匹配
+
+### 🏭 专用场景支持
+- **城市能源系统**：城市综合能源系统建模
+- **农村能源系统**：农村分布式能源系统
+- **港口能源系统**：港口综合能源解决方案
+- **岛屿能源系统**：离网/并网岛屿能源系统
+- **工业能源系统**：工业企业能源优化
+- **铁路能源系统**：铁路牵引供电系统分析
+
+## 🏗️ 框架结构
+
+PyXESXXN 采用模块化设计，具有清晰的架构层次，确保了框架的可扩展性和可维护性。作为独立的能源系统建模框架，其核心架构如下：
+
+### 📦 核心模块结构
+
+```
+pyxesxxn/
+├── clustering/           # 聚类算法（空间和时序聚类）
+├── components/           # 组件定义和管理
+├── data/                 # 内置数据存储
+├── data_interface/       # 数据接口和处理
+├── definitions/          # 系统定义
+├── dynamic_simulation/   # 动态仿真
+├── equipment_library/    # 场景化设备库
+├── geospatial/           # 地理空间分析
+├── high_performance/     # 高性能计算
+├── multi_carrier/        # 多载体能源系统建模
+├── network/              # 核心网络组件和模型
+├── optimization/         # 优化框架和算法
+├── plot/                 # 可视化模块
+├── scenario_evaluation/  # 场景评估
+├── scenario_templates/   # 场景模板
+├── statistics/           # 统计分析
+└── thermodynamics/       # 热力学计算
+```
+
+### 🎯 模块功能说明
+
+| 模块 | 主要功能 |
+|------|----------|
+| **clustering** | 空间聚类、时序聚类、数据降维、能源资源和负荷聚类分析 |
+| **components** | 组件定义、属性管理、类型系统、组件生命周期管理 |
+| **data** | 内置数据存储、标准组件属性、设备参数库 |
+| **data_interface** | 数据导入/导出、格式转换、数据验证、多格式支持 |
+| **definitions** | 系统定义、结构规范、组件属性定义 |
+| **dynamic_simulation** | 动态仿真、控制策略、时间序列分析、实时模拟 |
+| **equipment_library** | 场景化设备库（城市、农村、港口、岛屿、工业、铁路等）、设备参数管理 |
+| **geospatial** | 地理空间数据处理、区域分析、空间聚类、负荷资源匹配 |
+| **high_performance** | 并行计算、分布式处理、内存优化、数值计算优化 |
+| **multi_carrier** | 多载体能源转换、能源枢纽建模、跨载体优化、MOMTHRO算法实现 |
+| **network** | 核心网络组件（母线、发电机、线路等）、网络拓扑管理、基础网络操作、潮流计算 |
+| **optimization** | 优化模型构建、求解器接口、线性/非线性/多目标优化算法、正则化分解 |
+| **plot** | 可视化模块、静态和交互式绘图、地图可视化、统计图表 |
+| **scenario_evaluation** | 场景评估、经济性分析、环境影响评估、可靠性分析 |
+| **scenario_templates** | 场景模板库、预定义场景配置、快速场景构建 |
+| **statistics** | 统计分析、数据描述性统计、概率分布分析 |
+| **thermodynamics** | 热力学计算、能源转换效率建模、热力学平衡分析 |
+
+### 🔗 模块间关系
+
+PyXESXXN 框架采用分层架构，各模块之间通过清晰的接口进行交互：
+
+1. **底层基础**：components、data、data_interface、definitions 模块构成框架基础
+2. **核心功能**：network、optimization、multi_carrier 模块提供核心建模和优化能力
+3. **应用支持**：equipment_library、geospatial、scenario_templates 模块支持不同场景应用
+4. **增强功能**：high_performance、clustering、statistics、thermodynamics 模块提升框架性能和分析能力
+5. **可视化与分析**：plot、scenario_evaluation 模块提供结果展示和评估功能
+6. **动态仿真**：dynamic_simulation 模块支持实时模拟和控制策略分析
+
+## 🚀 快速开始
+
+### 安装
+
+PyXESXXN 可以通过 pip 安装：
+```bash
+pip install pyxesxxn
+```
+
+### 基础用法
+
+```python
+import pyxesxxn
+
+# 创建能源枢纽模型
+hub = pyxesxxn.EnergyHubModel()
+
+# 配置能源载体
+hub.add_carrier("electricity", cost=80)  # 元/MWh
+hub.add_carrier("hydrogen", cost=300)   # 元/kg
+hub.add_carrier("heat", cost=60)       # 元/MWh
+
+# 添加转换设备
+hub.add_converter(
+    "electrolyzer", 
+    input_carrier="electricity",
+    output_carrier="hydrogen", 
+    efficiency=0.7,
+    capacity=10  # MW
+)
+
+# 添加负荷需求
+hub.add_load("hydrogen_demand", carrier="hydrogen", profile=[1, 2, 3])  # kg/h
+
+# 运行优化
+results = hub.optimize()
+
+# 查看结果
+print(results.summary())
+results.plot_energy_flow()
+```
+
+### 高级示例：城市能源系统
+
+```python
+from pyxesxxn.equipment_library.urban import UrbanEquipmentLibrary
+from pyxesxxn.multi_carrier import EnergyHubModel
+
+# 加载城市场景设备库
+urban_lib = UrbanEquipmentLibrary()
+
+# 创建城市能源枢纽
+city_hub = EnergyHubModel(scenario="urban")
+
+# 配置城市典型设备
+city_hub.configure_from_library(urban_lib)
+
+# 设置城市负荷特征
+city_hub.set_urban_load_profile(population=100000, area_type="mixed")
+
+# 添加可再生能源
+city_hub.add_renewable_generator("solar", capacity=50, profile="solar_profile.csv")
+city_hub.add_renewable_generator("wind", capacity=30, profile="wind_profile.csv")
+
+# 添加储能系统
+city_hub.add_storage("battery", capacity=100, efficiency=0.95, cost=200)
+city_hub.add_storage("hydrogen_tank", capacity=50, efficiency=0.9, cost=150)
+
+# 优化城市能源系统
+results = city_hub.optimize(objectives=["cost", "carbon", "reliability"])
+
+# 查看结果
+print(results.summary())
+results.plot_energy_flow()
+results.plot_carbon_emissions()
+
+# 生成详细报告
+report = results.generate_report()
+report.export_to_excel("urban_energy_system.xlsx")
+report.export_to_html("urban_energy_system.html")
+```
+
+## 📊 功能特性概览
+
+PyXESXXN作为独立的能源系统建模框架，支持以下核心功能：
+
+### 🔄 多载体能源系统建模
+- **多载体网络分析**：电力、热力、氢能、天然气等多载体耦合网络
+- **能源转换设备**：电解槽、燃料电池、热泵、燃气轮机等复杂设备
+- **时序优化**：小时级到年度的多时段优化分析
+- **能源枢纽优化**：多输入多输出的能源系统优化
+
+### 🎯 优化算法
+- **混合整数优化**：支持离散决策变量的复杂优化问题
+- **多目标优化**：成本、碳排放、可靠性等多目标权衡（默认使用**MOMTHRO算法** - 改进多目标田忌赛马优化算法）
+- **时序优化**：小时级到年度的多时段优化分析
+- **不确定性分析**：可再生能源波动性和需求不确定性建模
+- **正则化分解**：高效求解大规模优化问题
+
+### ⚡ 专业潮流计算
+- **多种潮流算法**：牛顿-拉夫逊法、快速分解法等
+- **可靠性验证**：潮流计算可靠性评估
+- **敏感性分析**：系统参数敏感性分析
+- **扩展潮流计算**：考虑多载体耦合的潮流分析
+
+### 🌍 可再生能源集成
+- **多载体储能**：电池、氢储、热储等储能系统建模
+- **灵活性评估**：系统灵活性资源和调节能力分析
+- **碳中和路径**：长期能源转型路径规划
+- **可再生能源波动性建模**：光伏、风电等间歇性电源建模
+
+### 📊 场景化设备库
+- **通用设备库**：标准化的设备参数和性能曲线
+- **场景专用库**：城市、农村、港口、岛屿、工业、铁路等场景
+- **可扩展架构**：支持用户自定义设备模型
+
+### 🏭 专用场景支持
+- **城市能源系统**：城市综合能源系统建模
+- **农村能源系统**：农村分布式能源系统
+- **港口能源系统**：港口综合能源解决方案
+- **岛屿能源系统**：离网/并网岛屿能源系统
+- **工业能源系统**：工业企业能源优化
+- **铁路能源系统**：铁路牵引供电系统分析
+
+### 🚀 高性能计算
+- **并行计算**：多核心并行处理
+- **分布式计算**：多节点分布式处理
+- **内存优化**：高效的内存管理
+- **数值优化**：高性能数值计算
+
+### 📈 丰富的可视化
+- **实时拓扑图**：动态展示能源网络结构
+- **动态结果展示**：实时更新计算结果
+- **多种可视化方式**：Matplotlib、Plotly、Web界面
+- **地图可视化**：地理空间数据可视化
+
+### 🌍 地理空间分析
+- **空间聚类**：能源资源和负荷的空间聚类
+- **区域分析**：基于地理区域的能源系统分析
+- **空间匹配**：负荷与能源资源的空间匹配
+
+### 🛠️ 创新功能模块
+- **配电网拓扑-量测数据融合**：构建GNN可识别的图数据结构
+- **多态数据预处理**：归一化、异常值处理、数据增强
+- **实时仿真与闭环验证**：对接PSCAD/EMTDC、OpenDSS、MATLAB等
+- **故障精准定位与智能自愈**：AI辅助的故障诊断与恢复
+
+## 🚀 创新模块：故障精准定位与智能自愈决策
+
+PyXESXXN提供了多个创新模块，专门针对配电网故障定位与自愈决策场景：
+
+### 🔄 配电网拓扑-量测数据融合模块
+- **功能**：将配电网拓扑结构与实时量测数据进行结构化融合
+- **特点**：支持多种中性点接地方式，构建GNN可识别的图数据结构
+- **应用**：为AI模型提供静态拓扑属性+动态时序特征的输入
+
+```python
+from pyxesxxn.topology_metering_fusion import TopologyMeteringFusion
+
+# 初始化融合模块
+fusion = TopologyMeteringFusion()
+
+# 构建拓扑图
+graph_data = fusion.build_topology_graph(network_topology)
+
+# 处理量测数据
+processed_measurements = fusion.process_measurement_data(measurement_data)
+
+# 创建GNN特征
+gnn_features = fusion.create_gnn_features(graph_data, processed_measurements)
+
+# 故障定位分析
+fault_analysis = fusion.analyze_fault_location(gnn_features)
+```
+
+### 📊 多态数据预处理模块
+- **功能**：针对多源异构数据提供归一化、异常值处理、数据增强
+- **特点**：支持缺失数据补全、故障数据增强、数据质量评估
+- **应用**：提升AI模型的鲁棒性和泛化能力
+
+```python
+from pyxesxxn.multimodal_preprocessing import MultimodalPreprocessor
+
+# 初始化预处理模块
+preprocessor = MultimodalPreprocessor()
+
+# 完整预处理流水线
+processed_data = preprocessor.preprocess_pipeline(
+    raw_data, 
+    data_type='measurement',
+    steps=['quality_check', 'outlier_detection', 'imputation', 'normalization']
+)
+
+# 故障数据增强
+augmented_data = preprocessor.augment_fault_data(fault_sample, augmentation_factor=5)
+```
+
+### 🔧 实时仿真与闭环验证接口模块
+- **功能**：对接PSCAD/EMTDC、OpenDSS、MATLAB等仿真平台
+- **特点**：支持仿真数据与PyXESXXN模型库的双向交互
+- **应用**：故障场景模拟、模型闭环验证与性能测试
+
+```python
+from pyxesxxn.simulation_interface import SimulationInterface
+
+# 初始化仿真接口
+sim_interface = SimulationInterface()
+
+# 运行仿真
+sim_result = sim_interface.run_simulation(sim_config, network_data)
+
+# 鲁棒性测试
+robustness_results = sim_interface.run_robustness_tests(sim_config, network_data)
+```
+
+### ⚡ 专业潮流计算模块
+- **功能**：提供高可靠性、高精度的专业潮流计算功能
+- **特点**：支持多种潮流算法、可靠性验证、敏感性分析、扩展潮流计算
+- **应用**：电力系统稳态分析、故障分析、可靠性评估
+
+```python
+from pyxesxxn.power_flow_enhanced import NewtonRaphsonSolver, PowerFlowMethod
+from pyxesxxn.power_flow_reliability import assess_power_flow_reliability
+
+# 初始化潮流求解器
+solver = NewtonRaphsonSolver(network)
+
+# 运行潮流计算
+result = solver.solve(method=PowerFlowMethod.NEWTON_RAPHSON)
+
+# 分析潮流计算可靠性
+metrics, report = assess_power_flow_reliability(network, result)
+
+print(f"潮流计算收敛: {result.converged}")
+print(f"迭代次数: {result.iterations}")
+print(f"最大误差: {result.error:.6e}")
+print(f"可靠性等级: {metrics.overall_reliability}")
+```
+
+### 📈 高级可视化模块
+- **功能**：构建动态拓扑图，展示故障定位结果和自愈策略
+- **特点**：支持Web界面与Matplotlib/Plotly可视化、地图可视化
+- **应用**：实时展示故障区段、开关操作序列、供电恢复过程
+
+```python
+from pyxesxxn.visualization import PowerGridVisualizer
+
+# 初始化可视化模块
+visualizer = PowerGridVisualizer()
+
+# 创建拓扑图可视化
+topology_plot = visualizer.create_topology_plot(network_data, fault_data)
+
+# 生成综合报告
+report_html = visualizer.generate_report([topology_plot, time_series_plot])
+```
+
+### 🔍 故障定位与智能自愈
+- **功能**：基于AI的故障精准定位和智能自愈决策
+- **特点**：支持多种故障类型、高精度定位、快速自愈策略生成
+- **应用**：配电网故障处理、提高供电可靠性
+
+```python
+from pyxesxxn.fault_location_with_dg import FaultLocator
+
+# 初始化故障定位器
+fault_locator = FaultLocator()
+
+# 进行故障定位
+fault_result = fault_locator.locate_fault(network_data, measurement_data)
+
+# 获取自愈策略
+self_healing_strategy = fault_locator.generate_self_healing_strategy(fault_result)
+```
+
+### 🎯 集成示例：故障精准定位+智能自愈决策全流程
+
+```python
+from examples.innovation_modules_example import integrated_demo
+
+# 运行完整演示
+results = integrated_demo()
+
+# 查看智能自愈决策建议
+fault_probability = results['fault_analysis']['fault_probability']
+if fault_probability > 0.7:
+    print("🔴 高概率故障检测，建议执行自愈操作")
+```
+
+## 📚 文档与教程
+
+完整文档请访问：[pyxesxxn.readthedocs.org](https://pyxesxxn.readthedocs.org)
+
+### 教程资源
+- [快速入门指南](docs/quick_start_guide.md)
+- [安装指南](docs/installation_guide.md)
+- [API参考文档](API_REFERENCE.md)
+- [优化算法文档](docs/optimization_algorithms.md) - 详细说明MOMTHRO等多目标优化算法
+- [创新模块API文档](docs/innovation_modules_api.md)
+- [测试套件指南](docs/test_suite_guide.md)
+- [版本管理](docs/version_management.md)
+
+### 示例集合
+- [基础用法示例](examples/basic_usage_example.py)
+- [高级用法示例](examples/advanced_usage_example.py)
+- [创新模块示例](examples/innovation_modules_example.py)
+- [多场景示例](examples/) - 城市、农村、港口、岛屿、工业、铁路等场景
+- [综合演示](examples/comprehensive_demo.py)
+
+## 🔧 安装指南
+
+PyXESXXN需要Python 3.11或更高版本。
+
+### 安装方法
+
+PyXESXXN可以通过pip直接安装：
+
+```bash
+# 安装核心功能
+pip install pyxesxxn
+
+# 安装完整功能（包括所有可选依赖）
+pip install pyxesxxn[full]
+
+# 安装特定功能集
+pip install pyxesxxn[geospatial]  # 地理空间分析
+pip install pyxesxxn[optimization]  # 高级优化功能
+pip install pyxesxxn[visualization]  # 高级可视化
+```
+
+### 从源码安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/pyxesxxn/pyxesxxn.git
+cd pyxesxxn
+
+# 安装开发依赖
+pip install -e .[dev]
+
+# 运行测试
+pytest
+```
+
+## 💡 使用示例
+
+PyXESXXN提供了丰富的示例，展示其在各种能源系统应用中的强大能力：
+
+### 基础能源枢纽优化
+
+```python
+import pyxesxxn
+
+# 创建能源枢纽模型
+hub = pyxesxxn.EnergyHubModel()
+
+# 配置能源载体
+hub.add_carrier("electricity", cost=80)  # 元/MWh
+hub.add_carrier("hydrogen", cost=300)   # 元/kg
+hub.add_carrier("heat", cost=60)       # 元/MWh
+
+# 添加转换设备
+hub.add_converter(
+    "electrolyzer", 
+    input_carrier="electricity",
+    output_carrier="hydrogen", 
+    efficiency=0.7,
+    capacity=10  # MW
+)
+
+hub.add_converter(
+    "heat_pump",
+    input_carrier="electricity",
+    output_carrier="heat",
+    efficiency=3.5,
+    capacity=5  # MW
+)
+
+# 添加负荷需求
+hub.add_load("hydrogen_demand", carrier="hydrogen", profile=[1, 2, 3])  # kg/h
+hub.add_load("heat_demand", carrier="heat", profile=[10, 15, 20])  # MWh
+
+# 运行优化
+results = hub.optimize(objectives=["cost", "carbon"])
+
+# 查看结果
+print(results.summary())
+results.plot_energy_flow()
+```
+
+### 多场景示例
+
+```bash
+# 城市能源系统示例
+python examples/city_energy_system_test.py
+
+# 农村能源系统示例
+python examples/rural_energy_system_test.py
+
+# 港口能源系统示例
+python examples/port_energy_system_test.py
+
+# 岛屿能源系统示例
+python examples/island_energy_system_test.py
+
+# 工业能源系统示例
+python examples/industrial_energy_optimization_example.py
+
+# 铁路能源系统示例
+python examples/railway_energy_system_test.py
+```
+
+### 高级功能示例
+
+```bash
+# 可再生能源集成示例
+python examples/renewable_integration_example.py
+
+# 能源市场与需求响应示例
+python examples/energy_market_demand_response_example.py
+
+# 微电网与分布式能源示例
+python examples/microgrid_distributed_energy_example.py
+
+# 多场景耦合测试
+python examples/multi_scenario_coupling_test.py
+
+# 概率潮流计算示例
+python examples/probabilistic_power_flow_example.py
+
+# 连续潮流计算示例
+python examples/continuous_power_flow_example.py
+```
+
+### 创新模块示例
+
+```bash
+# 创新模块综合示例
+python examples/innovation_modules_example.py
+
+# 集成创新示例
+python examples/integrated_innovation_example.py
+```
+
+## 🔧 依赖项
+
+PyXESXXN依赖于多个Python包，主要包括：
+
+### 核心依赖
+* **numpy** - 线性代数和矩阵计算
+* **scipy** - 科学计算和优化算法
+* **pandas** - 组件数据和时序数据存储
+* **xarray** - 多维数组处理
+* **matplotlib** - 静态绘图
+* **plotly** - 交互式绘图
+* **seaborn** - 统计可视化
+* **geopandas** - 地理空间数据处理
+* **networkx** - 网络计算
+* **highspy** - 高性能求解器接口
+* **deprecation** - 废弃功能管理
+
+### 创新模块依赖
+* **scikit-learn** - 机器学习算法
+* **pyyaml** - YAML配置文件处理
+* **imbalanced-learn** - 不平衡数据处理
+* **feature-engine** - 特征工程
+* **dash** - Web应用框架
+* **numba** - 数值计算加速
+* **joblib** - 并行计算
+
+### 可选依赖
+* **tables** - HDF5数据存储
+* **openpyxl**, **python-calamine** - Excel文件支持
+* **netcdf4** - NetCDF文件支持
+* **cloudpathlib** - 云存储支持
+* **cartopy** - 地理空间可视化
+* **gurobipy**, **docplex**, **pyscipopt** - 商业求解器接口
+
+完整依赖列表请查看`pyproject.toml`文件。
+
+## 🔧 求解器支持
+
+PyXESXXN使用[Pyomo](http://www.pyomo.org/)建模优化问题，支持多种求解器：
+
+- **开源求解器**：[HiGHS](https://highs.dev/)（默认安装，适合中小规模问题）
+- **商业求解器**：[Gurobi](http://www.gurobi.com/)、[FICO Xpress](https://www.fico.com/en/products/fico-xpress-optimization)（学术版免费，适合大规模问题）
+- **其他求解器**：CPLEX、SCIP等
+
+### 求解器配置
+
+```python
+import pyxesxxn
+
+# 配置求解器
+hub = pyxesxxn.EnergyHubModel(solver="gurobi")
+# 或
+hub = pyxesxxn.EnergyHubModel(solver="highs")
+
+# 设置求解器参数
+hub.set_solver_options({
+    "time_limit": 3600,  # 求解时间限制（秒）
+    "mip_gap": 0.01,     # MIP间隙容忍度
+    "threads": 4         # 并行线程数
+})
+```
+
+## 📖 引用
+
+如果您在研究中使用了PyXESXXN，请引用：
+
+```bibtex
+@software{PyXESXXN2025,
+  author = {PyXESXXN Development Team},
+  title = {PyXESXXN: Python for eXtended Energy System Analysis},
+  year = {2025},
+  publisher = {PyXESXXN},
+  version = {1.0.0},
+  url = {https://pyxesxxn.org}
+}
+```
+
+## 📄 许可证
+
+PyXESXXN是一个免费闭源库。所有权利保留。详见[CLOSED_SOURCE_NOTICE.md](CLOSED_SOURCE_NOTICE.md)文件。
+
+## 📞 联系方式
+
+- **项目主页**：[pyxesxxn.org](https://pyxesxxn.org)
+- **文档网站**：[docs.pyxesxxn.org](https://docs.pyxesxxn.org)
+- **技术支持邮箱**：support@pyxesxxn.org
+
+## 🙏 致谢
+
+感谢以广西科技大学徐骁楠（Xiaonan-Xu/Denver Xu）为核心贡献者的PyXESXXN开发团队和所有贡献者的努力，使PyXESXXN成为能源系统建模领域的优秀独立框架。
+
+特别感谢在框架开发过程中提供技术支持和反馈的研究机构、能源企业和学术合作伙伴。
+
+---
+
+<div align="center">
+
+**PyXESXXN - 构建可持续能源未来的智能工具**
+
+</div>
+
