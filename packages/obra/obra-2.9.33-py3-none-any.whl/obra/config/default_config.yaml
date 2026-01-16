@@ -1,0 +1,1399 @@
+# Default configuration for Claude Code Orchestrator
+# This file provides sensible defaults for all settings.
+# Override in .obra/config.yaml or via environment variables (OBRA_* prefix, or ORCHESTRATOR_* [deprecated]).
+
+config_version: "1"
+
+# Project Management (ADR-022: Installable Tool Architecture)
+projects:
+  # Default directory for Obra-managed projects
+  # Separate from Obra's dev code (~/projects/Obra) and runtime data (~/obra-runtime)
+  default_directory: ~/obra-projects
+  # Projects created without explicit path will be placed here
+  # Example: obra project create "My App" → ~/obra-projects/my-app
+
+# ====================================================================================
+# HIERARCHICAL FEATURE CONFIGURATION (CHORE-CONFIG-001)
+# ====================================================================================
+# Organize Obra features into logical groups for easier management
+# Use presets for common configurations (minimal, standard, full-features, beta-tester-default)
+# Override specific features by setting enabled: true/false in user config
+#
+# To use a preset: Add "preset: standard" to your .obra/config.yaml
+# To customize: Override specific features.*.enabled flags
+#
+# Feature Groups:
+#   - core_orchestration: Essential system (cannot be disabled)
+#   - quality_automation: Code quality, security, debugging
+#   - advanced_planning: Workflows, patterns, execution strategies
+#   - documentation_governance: Auto documentation maintenance
+#   - performance_control: Budgets, checkpointing, session management
+#   - development_debug: Logging, monitoring, breakpoints
+#   - user_experience: Natural language commands, clarification
+#   - integration_automation: Git integration, external tools
+# ====================================================================================
+
+features:
+  # === MANDATORY CORE ===
+  core_orchestration:
+    enabled: true  # Cannot be disabled - system will not function
+    description: "Essential orchestration - cannot run without these"
+    state_manager: true
+    orchestrator: true
+    llm_provider: true
+    implementation_agent: true
+    config_loading: true
+    response_validation: true
+    context_awareness: true
+    working_memory: true
+
+  # === QUALITY AUTOMATION ===
+  quality_automation:
+    enabled: true  # Default: enabled (standard preset)
+    description: "Automated code quality, security, and debugging"
+
+    agents:
+      description: "Specialized agents for quality tasks"
+      rca_agent: true               # Root cause analysis (ADR-025)
+      code_review: true             # Architecture/quality review
+      security_audit: false         # Opt-in for enterprise (OWASP scanning)
+      test_generation: true         # Intelligent test generation
+      test_execution: true          # Run tests during review
+      doc_audit: false              # Documentation audit (ROT checks)
+
+    quality_assessment: true
+    retry_system: true
+
+  # === ADVANCED PLANNING ===
+  advanced_planning:
+    enabled: true  # Default: enabled (standard preset)
+    description: "Structured workflows, patterns, and execution strategies"
+
+    workflow_orchestration: true    # ADR-021: Pattern-guided workflows
+    derivative_plans: true          # ADR-022: User → execution plan derivation
+    pattern_library: true           # Reusable workflow patterns
+    drift_detection: true           # Detect deviations from patterns
+    auto_decompose: true            # Auto-decompose on timeout
+
+  # === DOCUMENTATION & GOVERNANCE ===
+  documentation_governance:
+    enabled: true  # Default: enabled (standard preset)
+    description: "Automatic documentation maintenance and synchronization"
+
+    maintenance:
+      enabled: true
+      description: "Auto-maintain docs at lifecycle events (ADR-015)"
+      triggers:
+        epic_complete: true
+        milestone: true
+        version_bump: true
+        periodic: true
+      auto_archive: true
+
+    tracking:
+      issue_log: true              # Manual testing log maintenance
+      dg001_coupling: true         # Doc-code coupling (DG-001)
+
+  # === PERFORMANCE & CONTROL ===
+  performance_control:
+    enabled: true  # Default: enabled (standard preset)
+    description: "Budget limits, checkpointing, and session management"
+
+    budgets:
+      enabled: true  # Default: enabled (non-enforcing by default)
+      description: "Enforce resource limits (ADR-020)"
+      tokens:
+        enforce: false
+        agent_budget: 150000       # Claude Code tokens per task
+        llm_budget: 75000          # Qwen tokens per task
+      progress:
+        stall_detection: true
+        no_progress_threshold: 3
+      max_turns:
+        enabled: false  # Disabled by default (use token budgets instead)
+
+    checkpointing:
+      enabled: true
+      description: "Save progress at key points (ADR-019)"
+      basic_checkpoints: true
+      verification: false          # Expensive - disabled by default
+      manager:
+        enabled: true
+        triggers:
+          threshold: true          # Context usage trigger
+          time: false              # Time-based (disabled by default)
+          operation: true          # Operation count trigger
+          event: true              # Event-based trigger
+
+    session_continuity:
+      enabled: true
+      description: "Preserve state across sessions (ADR-019)"
+      self_handoff: false          # Advanced feature - disabled by default
+      decision_records: true
+      progress_reporting: true
+      metrics: true
+      continuation_prompts: true
+
+    memory:
+      description: "Context and narrative compression (ADR-018)"
+      session_memory: true
+      episodic_memory: false       # Opt-in for long-term storage
+      context_summarization: true
+
+    auto_retry: true
+
+  # === DEVELOPMENT & DEBUG ===
+  development_debug:
+    enabled: false  # Production default: disabled (enable for debugging)
+    description: "Logging, monitoring, breakpoints, and debugging"
+
+    production_logging:
+      enabled: true  # Always-on logging even when debug disabled
+      description: "Always-on structured logging for monitoring (LOG-001)"
+      events:
+        iteration_results: true
+        heartbeat: true
+        task_completion: true
+        breakpoint_hit: true
+      privacy:
+        redact_pii: true
+        redact_secrets: true
+      rotation:
+        max_bytes: 104857600       # 100MB
+        backup_count: 10
+
+    breakpoints:
+      enabled: true
+      description: "Fail-safe intervention points (ADR-017)"
+      triggers:
+        low_confidence: true
+        quality_too_low: true
+        validation_failed: true
+        rate_limit_hit: true
+        unexpected_error: true
+
+    debug_features:
+      description: "Development-only troubleshooting tools"
+      debug_mode: false
+      verbose_logging: false
+      save_interactions: false
+      audit_logging: true
+
+    monitoring:
+      file_watcher: false          # Disabled by default (CLI only)
+      output_monitor: true
+
+    interactive:
+      description: "Rich terminal experience"
+      rich_output: true
+      syntax_highlighting: true
+
+  # === USER EXPERIENCE ===
+  user_experience:
+    enabled: true  # Default: enabled
+    description: "Natural language commands and quality clarification"
+
+    nl_commands:
+      enabled: false  # Opt-in (requires LLM)
+      description: "Natural language interface for commands"
+      confidence_threshold: 0.8
+      max_context_turns: 5
+
+    quality_clarification:
+      enabled: true
+      description: "Ask clarifying questions on low quality (ADR-022)"
+      max_iterations: 5
+      auto_fill_on_pass: true
+
+    # EPIC-QUALITY-001: Smart Defaults & Input Validation
+    smart_defaults:
+      enabled: true
+      description: "Intelligent assumption generation for underspecified prompts"
+      # Threshold configuration - confidence scores from NL pipeline
+      # Higher thresholds = more prompts get assumptions/clarification
+      thresholds:
+        # >0.7: READY - Proceed automatically (prompt has sufficient detail)
+        auto_proceed: 0.7
+        # 0.4-0.7: SHOW_ASSUMPTIONS - Show generated defaults, Enter to proceed
+        show_assumptions: 0.4
+        # 0.2-0.4: OFFER_OPTIONS - Present concrete choices for ambiguous prompts
+        offer_options: 0.2
+        # <0.2: NEEDS_CONTEXT - Request minimal information (hard block)
+
+      # Assumption generation behavior
+      assumption_generation:
+        # Use pattern-based matching first (fast)
+        pattern_matching: true
+        # Fall back to LLM for unrecognized patterns
+        llm_fallback: true
+        # Pattern confidence threshold (use pattern if above this)
+        pattern_confidence: 0.6
+        # Cache LLM-generated assumptions
+        cache_enabled: true
+        cache_max_size: 100
+
+      # User interaction behavior
+      interaction:
+        # Show assumption rationale by default
+        show_rationale: true
+        # Allow editing/customizing assumptions
+        allow_editing: true
+        # Show attribution message when proceeding with defaults
+        show_attribution: true
+
+    interactive_repl:
+      enabled: true
+      emacs_mode: false
+      vi_mode: false
+
+  # === INTEGRATION & AUTOMATION ===
+  integration_automation:
+    enabled: false  # Opt-in for automation
+    description: "Git automation and external tool integration"
+
+    git:
+      enabled: false
+      description: "Automatic commits, branches, and PRs"
+      auto_commit: false
+      create_branch: false
+      auto_pr: false
+
+    retry_on_failure: true
+
+  # === SAAS PARITY (EPIC-SAAS-PARITY-001) ===
+  saas_parity:
+    enabled: true  # Default: enabled (all new collections active)
+    description: "Controls new Firestore collections from EPIC-SAAS-PARITY-001"
+
+    # New collection writes - all enabled by default for feature parity
+    # Disable individual collections to reduce Firestore writes during gradual rollout
+    collections:
+      # Clarification tracking (ADR-022)
+      clarifications: true
+      # LLM interaction history (ADR-022)
+      interactions: true
+      # State snapshots for rollback
+      checkpoints: true
+      # Events requiring human intervention
+      breakpoints: true
+      # Workspace file tracking
+      file_changes: true
+
+    # Analytics tracking - can be disabled to reduce write volume
+    analytics:
+      # Template parameter effectiveness (ADR-023)
+      parameter_tracking: true
+      # Prompt rule violations (ADR-023)
+      rule_violations: true
+      # Task complexity estimates (ADR-021)
+      complexity_estimates: true
+      # Parallel agent attempts (ADR-025)
+      parallel_attempts: true
+
+# ====================================================================================
+# DETAILED CONFIGURATION
+# ====================================================================================
+# The sections below provide detailed settings for each feature.
+# These settings are active only when the corresponding feature is enabled above.
+# ====================================================================================
+
+# Orchestrator LLM Configuration
+# The orchestrator LLM handles reasoning, validation, and decision-making
+# Supports multiple providers: openai-codex, ollama, or custom implementations
+
+# DEFAULT: Claude Code CLI (recommended for most users)
+# SUBSCRIPTION MODEL: Flat-rate pricing (monthly/yearly)
+# NO API KEY NEEDED: Browser-based OAuth authentication
+llm:
+  type: claude-cli  # LLM provider type (matches LLMRegistry)
+  cli_command: claude  # CLI command (or full path: /usr/local/bin/claude)
+                       # Note: 'claude_command' also works for backward compatibility
+  model: null  # Model: null = auto-select based on subscription (RECOMMENDED)
+               # Optional override: sonnet, opus, haiku
+  bypass_permissions: true  # Auto-approve for automated orchestration
+  timeout: 1800  # Timeout for CLI subprocess (30 minutes)
+  retry_attempts: 3  # Number of retry attempts on failure
+  # Authentication:
+  #   Browser-based OAuth (one-time setup, credentials stored locally)
+
+  # Git Repository Validation (GIT-HARD-001)
+  # Controls git repository checks before LLM execution
+  git:
+    skip_check: false  # Skip git repository validation (default: false)
+    auto_init: false  # Auto-initialize git repo if not present (default: false)
+
+# ALTERNATIVE: Local LLM via Ollama (requires local hardware)
+# Uncomment and configure to use local LLM instead:
+# llm:
+#   type: ollama  # LLM provider type (matches LLMRegistry)
+#   model: qwen2.5-coder:32b  # Model to use (e.g., qwen2.5-coder, llama3, mistral)
+#   api_url: http://localhost:11434  # Ollama API endpoint
+#   temperature: 0.7  # Generation temperature (0.0-2.0)
+#   timeout: 30  # Timeout for generation (seconds)
+#   max_tokens: 4096  # Maximum tokens to generate
+#   context_length: 32768  # Model context window size
+
+# ALTERNATIVE: Gemini CLI (free tier available, 1M context window)
+# Authentication: `gemini auth login` (browser OAuth, one-time setup)
+# Uncomment and configure to use Gemini CLI instead:
+# llm:
+#   type: gemini-cli  # LLM provider type (matches LLMRegistry)
+#   cli_command: gemini  # CLI command (or full path: /usr/local/bin/gemini)
+#                        # Note: 'gemini_command' also works for backward compatibility
+#   model: gemini-2.5-pro  # Model: gemini-2.5-pro, gemini-2.5-flash
+#   output_format: json  # Output: json (default), text, stream-json
+#   yolo: true  # Auto-approve all actions (--yolo flag)
+#   timeout: 1800  # Timeout for CLI subprocess (30 minutes)
+#   retry_attempts: 3  # Number of retry attempts on failure
+
+# ALTERNATIVE: OpenAI Codex CLI (flat-rate subscription)
+# Authentication: `codex --login` (browser OAuth, one-time setup)
+# Uncomment and configure to use OpenAI Codex instead:
+# llm:
+#   type: openai-codex  # LLM provider type (matches LLMRegistry)
+#   cli_command: codex  # CLI command (or full path: /usr/local/bin/codex)
+#                       # Note: 'codex_command' also works for backward compatibility
+#   model: null  # Model: null = auto-select based on subscription (RECOMMENDED)
+#   full_auto: true  # Use --full-auto for automatic execution
+#   timeout: 1800  # Timeout for CLI subprocess (30 minutes)
+#   retry_attempts: 3  # Number of retry attempts on failure
+#   auto_init_git: false  # FEAT-CLI-GIT-TRUST-002: Auto-initialize git in non-git directories
+#                         # When true: Runs 'git init' and creates .gitignore if needed
+#                         # When false (default): Fails with error if not in git repo
+
+# Agent Configuration
+agent:
+  # Agent type: claude-code-local (default), openai-codex-agent, claude-code-ssh, mock
+  type: claude-code-local
+  timeout: 1800  # Default timeout for agent operations (30 minutes for complex coding tasks)
+  max_retries: 3  # Maximum retry attempts on failure
+  workspace_path: ./workspace  # Agent workspace directory
+
+  # Local agent config (for claude_code_local agent)
+  # Runs Claude Code CLI as subprocess on same machine
+  # Use for: development, single-host deployment, low latency
+  local:
+    command: claude  # Claude Code CLI command (or full path)
+    workspace_dir: ./workspace  # Workspace directory for agent
+    timeout_ready: 30  # Seconds to wait for agent ready signal
+    timeout_response: 1800  # Seconds to wait for response (30 minutes)
+
+  # SSH-specific config (for claude_code_ssh agent)
+  # Runs Claude Code CLI on remote machine via SSH
+  # Use for: production, isolated VM, strong isolation
+  ssh:
+    host: localhost
+    port: 22
+    user: claude
+    key_path: ~/.ssh/id_rsa
+    # Note: Set via ORCHESTRATOR_AGENT_SSH_KEY_PATH env var for security
+
+  # OpenAI Codex agent config (for openai-codex-agent)
+  # Runs OpenAI Codex CLI as subprocess on same machine
+  # Use for: alternative to Claude Code, different model capabilities
+  # Authentication: `codex --login` (browser OAuth) or OPENAI_API_KEY for CI/CD
+  codex:
+    command: codex  # Codex CLI command (or full path)
+    workspace_dir: ./workspace  # Workspace directory for agent
+    timeout_response: 7200  # Seconds to wait for response (2 hours)
+    model: null  # Model: null = auto-select (RECOMMENDED)
+                 # Optional override: gpt-5-codex, o3, codex-mini-latest
+    skip_git_check: true  # Allow non-git directories
+    approval_mode: full-auto  # Approval policy: suggest, auto-edit, full-auto
+    bypass_sandbox: false  # Bypass sandbox restrictions (DANGEROUS)
+
+  # Gemini CLI agent config (for gemini-cli)
+  # Runs Gemini CLI as subprocess on same machine (headless mode)
+  # Use for: Google's Gemini models, 1M+ context window, free tier available
+  # Authentication: `gemini auth login` (browser OAuth, one-time setup)
+  gemini:
+    command: gemini  # Gemini CLI command (or full path: /usr/local/bin/gemini)
+    workspace_dir: ./workspace  # Workspace directory for agent
+    timeout_response: 7200  # Seconds to wait for response (2 hours)
+    model: null  # Model: null = auto-select (RECOMMENDED)
+                 # Optional override: gemini-2.5-pro, gemini-2.5-flash
+    auto_approve: true  # Auto-approve all actions (--yolo flag)
+    verify_cli: true  # Verify CLI is available on initialization
+
+# Database Configuration
+database:
+  # Backend type: sqlalchemy (default) or firestore
+  # - sqlalchemy: Standalone CLI, local development (SQLite/PostgreSQL)
+  # - firestore: SaaS deployment with Firebase (user isolation, scalable)
+  backend: sqlalchemy  # Default: standalone CLI mode
+
+  # SQLAlchemy backend configuration (for backend=sqlalchemy)
+  url: sqlite:///data/orchestrator.db  # SQLite for simplicity
+  # For PostgreSQL: postgresql://user:password@localhost/orchestrator
+  pool_size: 10  # Connection pool size
+  max_overflow: 20  # Max overflow connections
+  echo: false  # Log SQL queries (set true for debugging)
+
+  # Schema migration settings (Rule 4: Migration-Only Schema Changes)
+  # Controls database schema initialization and migration behavior
+  schema:
+    auto_migrate: true  # Auto-apply pending migrations on startup
+                        # true: Development-friendly, auto-runs 'alembic upgrade head'
+                        # false: Production-safe, fails if schema out-of-date
+    require_exact: false  # Require database exactly at HEAD revision
+                          # false: Allow any valid schema (forward-compatible)
+                          # true: Strict mode, only HEAD revision accepted
+    # Notes:
+    # - auto_migrate=true is recommended for local development
+    # - auto_migrate=false, require_exact=true for production (explicit migrations)
+    # - See docs/operations/database-migrations.md for migration workflows
+
+  # Firestore backend configuration (for backend=firestore)
+  # firebase_project_id: obra-205b0  # Firebase project ID (required for SaaS)
+  # Firestore user isolation: user_id must be provided at runtime
+
+# Interactive REPL Configuration (v2.1.0)
+interactive:
+  # Editing mode: 'emacs' (default) or 'vi'
+  editing_mode: emacs
+
+  # Enable rich output formatting (tables, colors)
+  rich_output: true
+
+  # Enable syntax highlighting for slash commands
+  syntax_highlighting: true
+
+# Orchestration Settings
+orchestration:
+  max_iterations: 100  # Maximum iterations per task (increased from 50 for complex tasks)
+  iteration_timeout: 300  # Timeout per iteration (seconds)
+  task_timeout: 3600  # Overall task timeout (seconds)
+  concurrent_tasks: 1  # Number of tasks to run in parallel
+  auto_retry: true  # Automatically retry failed operations
+  auto_decompose_on_timeout: true  # Automatically ask agent to decompose task on timeout
+
+  # Network Timeout Configuration (C17)
+  # Extracted from hardcoded values for configurability
+  timeouts:
+    default: 30  # Default timeout for general network operations (seconds)
+    llm_request: 120  # Timeout for LLM API operations (seconds)
+
+    # Agent Execution Timeouts (FIX-TIMEOUT-CONSOLIDATION-001)
+    # Configurable timeouts for agent operations and handlers
+    agent_execution_s: 5400  # Agent execution timeout for execute/fix handlers (90 minutes)
+    review_agent_s: 1800  # Per-agent timeout for review operations (30 minutes)
+    cli_runner_s: 7200  # Default timeout for CLI LLM invocations (120 minutes)
+
+  # Progress Visibility (FEAT-PROGRESS-VISIBILITY-001)
+  # Heartbeat and file change notifications during long-running execution
+  progress:
+    heartbeat_interval_s: 60  # Base interval for heartbeat messages (seconds)
+                               # Scaled by verbosity: QUIET=3x (180s), PROGRESS=1x (60s), DETAIL=0.5x (30s)
+    heartbeat_initial_delay_s: 30  # Delay before first heartbeat (seconds)
+                                    # Prevents noise for quick tasks (<30s duration)
+
+  # Liveness Monitoring (FEAT-TIMEOUT-LIVENESS-001)
+  # Master control for liveness monitoring thread
+  monitoring:
+    enabled: true  # Enable liveness monitoring thread (default: true)
+                   # When disabled: No liveness checks, no hang detection
+                   # Note: Requires production_logger and session_id in agent context
+
+  # Intelligent Timeout with Liveness Detection (FEAT-TIMEOUT-LIVENESS-001)
+  # 3-tier monitoring system: detect hangs vs slow progress
+  timeout:
+    # Liveness monitoring settings
+    liveness_check_interval: 180  # Check liveness every 3 minutes (seconds)
+    min_alive_indicators: 2  # Minimum indicators (of 5) to consider task alive
+
+    # Timeout limits
+    base_timeout: 1200  # 20 minutes if no liveness detected (seconds)
+    extended_timeout: 3600  # 60 minutes for tasks showing progress (seconds)
+
+    # Liveness indicator thresholds
+    cpu_delta_threshold: 1.0  # Minimum CPU seconds per check interval
+    log_silence_threshold: 300  # Max seconds without new log entries (5 min)
+    file_mtime_window: 300  # Max seconds since last file modification (5 min)
+    db_update_window: 300  # Max seconds since last DB write (5 min)
+
+  # Hang investigation settings
+  hang_investigation:
+    enabled: true  # Enable hang investigation for ambiguous cases
+    max_investigation_time: 300  # Max time for investigation (5 minutes)
+    auto_kill_on_confirmed_hang: true  # Auto-kill on confirmed real hang
+
+    # Investigation thresholds
+    cpu_stagnation_window: 30  # Seconds to measure CPU delta for stagnation
+    subprocess_timeout: 60  # Seconds before declaring subprocess hung
+
+  # Budget Framework (ADR-020) - Master feature flag
+  # Controls token budgets, stall detection, and max_turns calculation
+  budgets:
+    enabled: false  # Disable budget framework by default (simpler execution)
+    # When disabled: No token limits, no stall detection, no max_turns
+    # When enabled: Full budget control (token limits, stall detection, max_turns)
+
+    # Max turns limiter (sub-component, only active if budgets.enabled = true)
+    max_turns:
+      enabled: false  # Disable max_turns limiter (use token budgets instead)
+      # Only relevant if budgets.enabled = true
+      # When disabled: Claude Code runs without turn limits (token budgets still apply)
+      # When enabled: Turn limits calculated via MaxTurnsCalculator
+
+  # ADR-021: Workflow Orchestration vs Validation Mode
+  # Feature flags for backward compatibility and safe rollback
+  workflow:
+    enabled: true   # ✅ RE-ENABLED: Fixing workflow orchestration bug
+  validation:
+    enabled: true  # Response validation (quality checks, completeness verification)
+
+  # Context Quality Enhancements (FEAT-CONTEXT-QUALITY-001)
+  # Improves goal retention, failure recovery, and quality decay detection
+  # Based on Manus engineering insights (#4, #5, #8)
+  context_quality:
+    # Story 1: Objective Recitation
+    # Injects objective recap at end of each iteration prompt to combat goal drift
+    objective_recap_enabled: true  # Enable objective recap in task prompts
+
+    # Story 2: Failure Context Preservation
+    # Passes full failure traces between iterations to improve recovery
+    failure_context_enabled: true  # Enable failure context in prompts
+    failure_history_limit: 2  # Number of recent failures to include (default: 2)
+
+    # Story 3: Quality Decay Detection
+    # Tracks quality heuristics beyond token count for early degradation detection
+    quality_decay_detection_enabled: true  # Enable quality decay heuristics
+    response_length_decline_threshold: 0.5  # Flag if response <50% of recent average
+    tool_success_rate_threshold: 0.7  # Flag if tool success rate <70%
+    iteration_overrun_threshold: 2.0  # Flag if iterations >2x estimated
+
+  # Project Context Notes (FEAT-PROJECT-CONTEXT-001)
+  # Inject user-defined project conventions into orchestration prompts
+  # Enables LLM-agnostic operation by providing context to all LLM providers
+  project_context:
+    injection_enabled: true  # Enable project context injection into prompts
+    # Notes stored in .obra/context/notes.yaml (managed via CLI)
+    # Token budget: ~2000 tokens max, most recent notes prioritized
+    # Injected into: task_execution and planning prompts
+
+  # Prompt file retention (CHORE-PROMPT-FILE-001)
+  prompts:
+    retain: false  # Keep prompt files on disk for debugging
+
+  # Autonomous Workplan Runner (AUTO-RUN-001)
+  # Story-level automation for executing multi-story workplans
+  auto:
+    enabled: true  # Enable autonomous workplan runner
+    retry_count: 2  # Number of retries for transient failures
+    retry_delay_seconds: 30  # Delay between retries (seconds)
+    error_assessor: null  # LLM error assessment: null=disabled, "fast"=use fast-tier model, or specific model name
+    escalate_on_skip: true  # Escalate (halt) when story is skipped after retries
+
+  # File Access Safety (Directory Validation Framework)
+  file_access:
+    # Directory validation behavior
+    create_directory_on_project_creation: true  # Auto-create working_dir (default: true)
+    validate_directory_exists_before_task: true  # Check before each task (default: true)
+
+    # Overlap detection policy
+    overlap_policy: warn  # Options: allow, warn (default: warn)
+    allow_identical_directories: false  # Forbid identical paths (default: false)
+
+    # Additional whitelisted paths (beyond working_directory)
+    # These paths will be allowed in future sandboxing implementation
+    additional_allowed_paths:
+      - "/tmp/obra-*"  # Temporary files matching this glob pattern
+      # Examples:
+      # - "/home/user/.cache/obra/*"  # Cache directory
+      # - "/var/log/obra/*"  # Log directory
+
+# Workflow Configuration (ADR-021 Story 6)
+workflow:
+  # Pattern library configuration
+  patterns_path: "config/patterns.yaml"
+
+  # Drift detection settings
+  drift_detection:
+    enabled: true
+    severity_threshold: "medium"  # Warn on medium+ severity (low/medium/high)
+
+  # Workflow execution settings
+  max_corrective_attempts: 3  # Max retries for failed validation
+  auto_checkpoint: true  # Auto-create checkpoints between steps
+
+  # Max turns calculation (MaxTurnsCalculator config)
+  max_turns:
+    default: 100  # Default max_turns (was 50, increased for better UX)
+    min: 3        # Minimum allowed (simple tasks)
+    max: 150      # Maximum allowed (complex epics)
+    by_obra_task_type:  # Override by Obra task type
+      TASK: 100
+      STORY: 100
+      EPIC: 150
+      SUBTASK: 50
+
+  # BUDGET FRAMEWORK (ADR-020)
+  budgets:
+    # Token Budgets (Phase 1)
+    tokens:
+      max_agent_tokens: 150000      # Claude Code tokens per task
+      max_local_llm_tokens: 75000   # Qwen tokens per task
+      enforce: true                 # Hard limits (true) vs warnings (false)
+
+    # Progress Budget (Phase 1)
+    progress:
+      stall_detection_enabled: true
+      max_repeated_errors: 3        # Same error 3x = stalled
+      max_no_diff_iterations: 2     # No changes 2x = stalled
+      quality_stuck_threshold: 0.05 # Quality range <5% = stuck
+
+  # Turn Calculation (Phase 2 - ADR-020)
+  # DEPRECATED: Turn calculation superseded by workflow progression (ADR-021)
+  # These settings ignored if orchestration.workflow.enabled = true
+  turn_calculation:
+    mode: token_aware  # DEPRECATED - Options: heuristic, token_aware, adaptive, token_aware_adaptive
+
+    # Token-aware calculation (Phase 2) - DEPRECATED
+    token_aware:
+      enabled: true  # DEPRECATED
+      historical_window_days: 30
+
+    # Adaptive learning (Phase 2) - DEPRECATED
+    adaptive_learning:
+      enabled: false  # DEPRECATED
+      min_similar_tasks: 10
+      percentile: 95
+      safety_margin: 0.20
+
+# Quality Assessment (ADR-022)
+quality:
+  enabled: true  # Enable/disable quality assessment (ADR-022 Story 2.1)
+
+  # LLM for quality assessment
+  assessment_model: orch  # Options: orch (orchestrator LLM), imp (implementation agent)
+
+  # Quality thresholds (0.0 - 1.0)
+  threshold_needs_hints: 0.5   # Below this: offer hints + defaults
+  threshold_needs_detail: 0.3  # Below this: demand more detail
+
+  # Auto-fill behavior
+  auto_fill_on_pass: true  # Generate missing context fields when quality passes
+
+  # Clarification loop settings
+  max_clarification_iterations: 5  # Maximum iterations in clarification loop
+
+# Clarification History (ADR-022 M4)
+clarification:
+  # Archival settings
+  retention_days: 30     # Days to keep before archiving
+  archive_path: ~/obra-runtime/archives/clarifications  # Default archive directory
+  auto_archive: false    # Auto-archive on startup (requires manual trigger for now)
+
+# Derivation Engine (ADR-022)
+derivation:
+  # Agent for derivation
+  agent: orch  # Options: orch (orchestrator LLM), imp (implementation agent)
+
+  # Derivation parameters
+  max_depth: 3          # How deep to decompose (Epic → Story → Task)
+  approval_required: true  # Require user approval for derived plans
+  granularity: fine     # Options: auto, coarse, fine - 'fine' creates more granular items for incremental progress
+  auto_derive_on_execute: true  # Auto-derive when executing NOT_DERIVED/STALE items (Story 4.2)
+
+  # Plan validation (FEAT-PLAN-VALIDATION-001)
+  plan_validation:
+    enabled: true  # Enable comprehensive validation of MACHINE_PLAN.yaml files before import
+
+    # Pydantic schema validator (FEAT-PLAN-VALIDATION-REDESIGN-001)
+    # Feature flag for safe rollout: false (v2.2.0) → true (v2.2.1) → remove flag (v2.3.0)
+    use_pydantic: false  # Use Pydantic schema validation instead of legacy multi-layer validator
+
+    # Auto-fix configuration (FEAT-YAML-VALIDATION-001)
+    auto_fix:
+      enabled: true  # Enable automatic fixing of common YAML issues
+      level: common  # Fix level: common (safe patterns), aggressive (more patterns), off (disable)
+      log_details: false  # Log detailed per-fix information at DEBUG level
+      max_attempts: 3  # Maximum sanitization attempts to prevent infinite loops
+
+# Re-derivation (ADR-022)
+rederivation:
+  # Trigger behavior
+  trigger: on_execute  # Options: on_execute, on_edit, manual
+
+  # Preservation
+  preserve_completed: true  # Keep completed execution items on re-derivation
+
+# Natural Language Processing (ADR-021 Story 2)
+nl:
+  # Interpreter type controls NL parsing strategy
+  interpreter_type: single_shot_claude  # Options: '5_stage' (v1.8, deprecated - requires archived templates), 'single_shot_claude' (v2.0)
+
+  # Single-shot interpreter configuration
+  single_shot:
+    confidence_threshold: 0.5  # Minimum confidence to execute (0.0-1.0)
+
+# Orchestrator Settings (ADR-018, ADR-019)
+orchestrator:
+  # Context Window Management (ADR-018)
+  context_window:
+    # Storage paths
+    artifact_storage_path: .obra/memory/artifacts  # External artifacts storage
+    archive_path: .obra/archive  # Archived operations
+    checkpoint_dir: .obra/memory/checkpoints  # Checkpoint files
+
+    # Usage limits
+    utilization_limit: 0.85  # Use 85% of context window (red zone threshold)
+    fallback_context_window: 16384  # Fallback if auto-detection fails
+
+    # Optimization thresholds
+    summarization_threshold: 500  # Summarize operations >500 tokens
+    externalization_threshold: 2000  # Externalize large items >2000 tokens
+
+    # Context zones (percentage of effective max)
+    zones:
+      green_threshold: 0.45  # 0-45%: green zone
+      yellow_threshold: 0.65  # 45-65%: yellow zone
+      orange_threshold: 0.75  # 65-75%: orange zone
+      red_threshold: 0.85  # 75-85%: red zone
+
+    # Working memory configuration
+    working_memory:
+      max_operations: 20  # Maximum operations to keep (adaptive sizing)
+      max_age_hours: 1  # Prune operations older than 1 hour
+      eviction_policy: fifo  # First-in-first-out eviction
+
+    # Checkpoint configuration (basic - full in ADR-019)
+    checkpoints:
+      enabled: true  # Enable automatic checkpointing
+      auto_checkpoint_orange: true  # Auto-checkpoint in orange zone
+      auto_checkpoint_red: true  # Auto-checkpoint in red zone (mandatory)
+      verification_enabled: true  # Verify checkpoints after creation
+      max_checkpoints: 10  # Keep last 10 checkpoints
+
+  # Checkpoint verification (CheckpointVerifier - ADR-019)
+  checkpoint:
+    verification:
+      enabled: true  # Enable checkpoint verification
+      require_verification: true  # Fail checkpoint if verification fails
+      verify_git_clean: true  # Require clean git state
+      verify_tests_passing: true  # Require tests passing
+      verify_coverage: true  # Require coverage meets baseline
+      min_coverage: 0.88  # Minimum coverage threshold (88% baseline)
+      verify_task_boundary: false  # Require task at boundary (optional)
+      quick_test_timeout: 30  # Timeout for quick tests (seconds)
+      verify_tests_on_resume: false  # Run tests when resuming checkpoint
+      max_age_hours: 168  # Max checkpoint age (1 week)
+      warn_on_branch_mismatch: true  # Warn on git branch mismatch
+      require_file_existence: true  # Require checkpoint files exist
+
+  # Session Continuity (ADR-019)
+  session_continuity:
+    # Self-handoff configuration
+    self_handoff:
+      enabled: true  # Enable automatic self-handoff
+      trigger_zone: red  # Zone that triggers handoff (yellow/orange/red)
+      min_operations_before_handoff: 10  # Minimum operations before first handoff
+      max_handoffs_per_session: 5  # Maximum handoffs in single session
+
+    # Checkpoint configuration (ADR-019 enhanced)
+    checkpoints:
+      # Trigger types (multiple can be active)
+      triggers:
+        threshold:  # Context usage threshold
+          enabled: true
+          usage_threshold: 0.85  # Trigger at 85% usage
+        time:  # Time-based checkpoints
+          enabled: true
+          interval_minutes: 30  # Every 30 minutes
+        operation_count:  # Operation count checkpoints
+          enabled: true
+          count_threshold: 50  # Every 50 operations
+        manual:  # Manual checkpoint requests
+          enabled: true
+
+      # Checkpoint behavior
+      retention:
+        keep_count: 10  # Keep last 10 checkpoints
+        max_age_hours: 24  # Delete checkpoints older than 24h
+        preserve_milestones: true  # Never delete milestone checkpoints
+
+      # Verification settings
+      verification:
+        enabled: true  # Verify checkpoints after creation
+        verify_completeness: true  # Check all required fields present
+        verify_state_consistency: true  # Validate state consistency
+        verify_git_clean: false  # Require clean git state (optional)
+
+    # Decision record generation
+    decision_records:
+      enabled: true  # Generate decision records
+      format: adr  # Format: adr, markdown, json
+      output_dir: docs/decisions  # Output directory
+      auto_number: true  # Auto-number ADRs
+      include_context: true  # Include full context in records
+
+    # Progress reporting
+    progress_reporting:
+      enabled: true  # Enable progress reports
+      report_frequency: iteration  # When to report: iteration, task, milestone
+      include_metrics: true  # Include performance metrics
+      include_context_usage: true  # Include context usage stats
+      log_to_production: true  # Log to production logger
+
+    # Session metrics collection
+    metrics:
+      enabled: true  # Enable metrics collection
+      collect_context_usage: true  # Track context usage over time
+      collect_operation_types: true  # Track operation type distribution
+      collect_decision_quality: true  # Track decision quality scores
+      collect_handoff_stats: true  # Track handoff statistics
+      retention_days: 30  # Keep metrics for 30 days
+
+    # Continuation prompts (ADR-018)
+    continuation_prompts:
+      enabled: true  # Generate continuation prompts
+      output_dir: docs/development/.continuation_prompts  # Output directory
+      auto_generate_on_handoff: true  # Auto-generate during handoff
+      include_recent_operations: 5  # Include last N operations
+      include_context_summary: true  # Include context summary
+      include_next_steps: true  # Include suggested next steps
+
+# Checkpoint Manager (ADR-018 Phase 2 - Story 2.1)
+checkpoint_manager:
+  enabled: true  # Enable checkpoint manager
+  storage_path: .obra/memory/checkpoints  # Checkpoint storage directory
+
+  # Trigger types (multiple can be active simultaneously)
+  triggers:
+    threshold:  # Context usage threshold trigger
+      enabled: true
+      percentage: 0.70  # Checkpoint at 70% context usage
+
+    time:  # Time-based trigger
+      enabled: true
+      interval_minutes: 15  # Checkpoint every 15 minutes
+
+    operation:  # Operation count trigger
+      enabled: true
+      interval_operations: 10  # Checkpoint every 10 operations
+
+    event:  # Event-based trigger
+      enabled: true
+      events:
+        - task_complete
+        - milestone_reached
+        - validation_pass
+
+# Session Memory Manager (ADR-018 Phase 2 - Story 2.2)
+session_memory:
+  enabled: true  # Enable session memory management
+  budget_percentage: 0.20  # Use 20% of context window for session narrative
+  min_events_for_compression: 5  # Minimum events before compression
+  recent_events_to_keep: 3  # Keep N most recent events uncompressed
+  compression_trigger_pct: 0.80  # Compress when 80% of budget used
+
+# Episodic Memory Manager (ADR-018 Phase 2 - Story 2.3)
+episodic_memory:
+  enabled: true  # Enable episodic memory (long-term storage)
+  storage_path: .obra/memory/episodes  # Episode storage directory
+  max_episodes: 100  # Maximum episodes to keep
+  archive_after_days: 90  # Archive episodes older than 90 days
+  use_embeddings: false  # Future: embedding-based similarity search
+
+# Breakpoint Configuration
+breakpoints:
+  enabled: true  # Enable breakpoint system
+  auto_resolve_timeout: 300  # Auto-resolve timeout (seconds, 0 = wait forever)
+
+  # Story 8 (ADR-017): Timeout for confirmation prompts (seconds)
+  confirmation_timeout_seconds: 60
+
+  # When to trigger breakpoints
+  triggers:
+    low_confidence:
+      enabled: true
+      threshold: 50  # Confidence below this triggers breakpoint
+    quality_too_low:
+      enabled: true
+      threshold: 60  # Quality score below this triggers breakpoint
+    validation_failed:
+      enabled: true
+      max_retries: 3  # Trigger after this many validation failures
+    rate_limit_hit:
+      enabled: true
+    unexpected_error:
+      enabled: true
+
+# Validation Settings
+validation:
+  response:
+    check_completeness: true
+    check_code_blocks_closed: true
+    min_length: 10  # Minimum response length (characters)
+
+  quality:
+    enabled: true
+    threshold: 70  # Minimum acceptable quality score (0-100)
+    run_tests: true  # Execute tests if applicable
+    check_syntax: true  # Validate code syntax
+
+# Confidence Scoring
+confidence:
+  threshold: 70  # Minimum confidence to proceed without breakpoint
+  weights:
+    validation: 0.3  # Weight for validation result
+    quality: 0.4  # Weight for quality score
+    agent_health: 0.1  # Weight for agent health status
+    retry_count: 0.2  # Weight for number of retries
+
+# Context Management
+context:
+  # DYNAMIC CALCULATION: max_tokens is calculated dynamically based on the
+  # implementation agent's model context window (from obra.model_registry).
+  # This fallback value is only used when model info is unavailable.
+  # See: obra/model_registry.py:calculate_max_prompt_tokens()
+  #
+  # Tiered calculation (with hard safety limits 30K-100K reserved):
+  #   500K+ models: 92% for prompt (e.g., GPT-5.2 400K → 352K)
+  #   200K-500K:    88% for prompt (e.g., Claude Sonnet → 176K)
+  #   100K-200K:    82% for prompt
+  #   <100K:        75% for prompt
+  max_tokens: 100000  # Fallback when model context window unknown
+
+  prioritization:
+    - recent_interactions  # Most recent interactions (highest priority)
+    - task_description  # Current task description
+    - relevant_files  # Files mentioned in task
+    - project_context  # General project context
+
+  summarization:
+    enabled: true  # Summarize old context when limit reached
+    keep_recent: 5  # Keep this many recent interactions unsummarized
+
+# Prompt Templates
+prompts:
+  template_dir: config/prompt_templates  # Directory for Jinja2 templates
+
+# Performance
+performance:
+  enable_caching: true  # Enable caching where applicable
+  cache_ttl: 300  # Cache time-to-live (seconds)
+
+# M9: Retry Configuration
+retry:
+  max_attempts: 5  # Maximum number of retry attempts
+  base_delay: 1.0  # Initial delay in seconds
+  max_delay: 60.0  # Maximum delay in seconds
+  backoff_multiplier: 2.0  # Exponential backoff multiplier (1s → 2s → 4s → 8s)
+  jitter: 0.1  # Random jitter factor (0.0-1.0) to prevent thundering herd
+  retryable_errors:  # Error patterns that should trigger retry
+    - "rate limit"
+    - "rate_limit"
+    - "too many requests"
+    - "timeout"
+    - "timed out"
+    - "connection"
+    - "network"
+    - "service unavailable"
+    - "temporarily unavailable"
+    - "try again"
+
+# M9: Task Dependencies
+dependencies:
+  max_depth: 10  # Maximum dependency chain depth
+  allow_cycles: false  # Whether to allow circular dependencies
+  fail_on_dependency_error: true  # Fail task if dependency fails
+
+# M9: Git Integration
+git:
+  enabled: false  # Enable git auto-integration (opt-in)
+  auto_commit: true  # Automatically commit after task completion
+  commit_strategy: per_task  # per_task | per_milestone | manual
+  create_branch: true  # Create branch per task
+  branch_prefix: "obra/task-"  # Branch name prefix
+  auto_pr: false  # Automatically create pull requests
+  pr_base_branch: main  # Base branch for PRs
+  commit_message_template: semantic  # Commit message style
+  include_metadata: true  # Include Obra metadata in commits
+
+# Natural Language Command Interface (Story 4-5)
+nl_commands:
+  enabled: true  # Enable NL command processing (master kill switch)
+  llm_provider: ollama  # LLM provider for NL processing (uses llm.type if not specified)
+  confidence_threshold: 0.7  # Threshold for CLARIFICATION_NEEDED
+  max_context_turns: 10  # Maximum conversation history turns to keep
+  schema_path: src/nl/schemas/obra_schema.json  # Path to Obra schema for entity extraction
+  default_project_id: 1  # Default project ID if not specified
+  require_confirmation_for:  # Operations requiring user confirmation
+    - delete
+    - update
+    - execute
+  fallback_to_info: true  # Fallback to informational response for QUESTION intent
+  experimental_features: false  # Enable experimental NL features
+
+  # Story 8 (ADR-017): Destructive operation safety
+  # Auto-confirm destructive operations (UPDATE/DELETE) in non-interactive mode
+  # WARNING: Setting this to true bypasses safety confirmations
+  # Recommended: false (prompt user), true only for trusted automation
+  auto_confirm_destructive: false
+
+# ADR-015: Project Infrastructure Maintenance System (v1.4.0)
+# Automatic documentation maintenance at key project events
+documentation:
+  enabled: false  # Master enable/disable switch for documentation maintenance
+  auto_maintain: true  # Automatically create maintenance tasks (vs just notify)
+
+  # Event-driven triggers
+  triggers:
+    # Epic completion: Lightweight update (CHANGELOG, architecture if needed)
+    epic_complete:
+      enabled: true  # Enable epic completion trigger
+      scope: lightweight  # Maintenance scope: lightweight | comprehensive | full_review
+      auto_create_task: true  # Automatically create task (vs notification only)
+
+    # Milestone achievement: Comprehensive update (all docs, ADRs, archiving)
+    milestone_achieved:
+      enabled: true  # Enable milestone achievement trigger
+      scope: comprehensive  # Always comprehensive for milestones
+      auto_create_task: true  # Automatically create task
+
+    # Version bump: Full documentation review
+    version_bump:
+      enabled: true  # Enable version bump trigger
+      scope: full_review  # Full review of all documentation
+      auto_create_task: true  # Automatically create task
+
+    # Periodic checks: Regular freshness scanning (Story 2.1)
+    periodic:
+      enabled: true  # Enable periodic freshness checks
+      interval_days: 7  # Check interval in days (7 = weekly, 30 = monthly)
+      scope: lightweight  # Maintenance scope: lightweight | comprehensive | full_review
+      auto_create_task: true  # Automatically create task (vs notification only)
+
+  # Documents to maintain (paths relative to project root)
+  maintenance_targets:
+    - CHANGELOG.md  # Project changelog
+    - docs/architecture/ARCHITECTURE.md  # System architecture
+    - docs/README.md  # Documentation index
+    - docs/decisions/  # Architecture Decision Records (ADRs)
+    - docs/guides/  # User and developer guides
+
+  # Freshness thresholds (days since last update)
+  freshness_thresholds:
+    critical: 30  # CHANGELOG, README (update within 30 days)
+    important: 60  # Architecture docs, ADRs (update within 60 days)
+    normal: 90  # Guides, design docs (update within 90 days)
+
+  # Archive settings for completed implementation plans
+  archive:
+    enabled: true  # Enable automatic archiving
+    source_dir: docs/development  # Source directory to scan
+    archive_dir: docs/archive/development  # Archive destination
+    patterns:  # File patterns to archive (glob syntax)
+      - "*_IMPLEMENTATION_PLAN.md"
+      - "*_COMPLETION_PLAN.md"
+      - "*_GUIDE.md"
+
+  # Maintenance task configuration
+  task_config:
+    priority: 3  # Task priority (1-10, lower = higher priority)
+    assigned_agent: null  # null = use default agent from agent.type
+    assigned_llm: null  # null = use default LLM from llm.type
+    auto_execute: false  # Require manual approval before execution
+
+# Advanced / Diagnostics
+advanced:
+  # File Monitoring
+  monitoring:
+    file_watcher:
+      enabled: true
+      debounce_ms: 500  # Debounce rapid changes
+      ignore_patterns:
+        - "**/__pycache__/**"
+        - "**/.git/**"
+        - "**/.venv/**"
+        - "**/*.pyc"
+        - "**/node_modules/**"
+
+    output_monitor:
+      completion_markers:
+        - "Task completed"
+        - "Done"
+        - "Finished"
+      error_markers:
+        - "Error:"
+        - "Failed:"
+        - "Exception:"
+
+    # Production Logging (LOG-001)
+    # Structured JSONL logging for monitoring and analytics
+    production_logging:
+      enabled: true
+      path: ~/obra-runtime/logs/production.jsonl
+
+      # Flush behavior - enables real-time log streaming (Story 1)
+      flush:
+        immediate: true  # Flush after each event for real-time monitoring (tail -f)
+
+      # Event types to log
+      events:
+        user_input: true            # User commands and natural language input
+        nl_results: true            # NL parsing results with quality metrics
+        execution_results: true     # Task execution outcomes
+        errors: true                # Errors with stage and context
+        task_termination: true      # Task termination with budget usage (ADR-020)
+        pattern_applied: true       # Pattern application events (FW-001)
+
+        # LOG-001: Real-time monitoring events
+        iteration_results: true     # Per-iteration metrics (Story 2 - CRITICAL for monitoring)
+        heartbeat: true             # Periodic heartbeat for stall detection (Story 4)
+
+        # Advanced/optional events
+        orchestrator_prompts: false # Orchestrator→Implementer prompts (verbose)
+        implementer_responses: false # Implementer responses (verbose)
+        agent_send: false           # Agent communication - sent messages (verbose)
+        agent_receive: false        # Agent communication - received messages (verbose)
+        context_pressure: true      # Context zone transitions (ADR-018)
+
+      # Privacy settings
+      privacy:
+        redact_pii: true      # Redact emails, IPs, SSNs, phone numbers
+        redact_secrets: true  # Redact API keys, tokens
+
+      # Log rotation
+      rotation:
+        max_file_size_mb: 100  # Rotate when log exceeds this size
+        max_files: 10          # Keep this many backup files
+
+  # Logging
+  logging:
+    level: INFO  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: logs/orchestrator.log  # Log file path
+    max_bytes: 10485760  # Max log file size (10MB)
+    backup_count: 5  # Number of backup files to keep
+
+  # Development/Debug Settings (disable in production)
+  debug:
+    enabled: false  # Enable debug mode
+    save_interactions: true  # Save all interactions for debugging
+    verbose_logging: false  # Extra verbose logging
+
+  # Story 8 (ADR-017): Audit logging for destructive operations
+  audit:
+    # Audit log file for destructive operations (JSONL format)
+    destructive_operations_file: logs/destructive_operations_audit.jsonl
+
+  # METRICS-001: Work Unit Metrics Report Configuration
+  # Display orchestration metrics on work unit completion to show user value
+  metrics:
+    # Display summary in terminal when work unit completes (epic/story/milestone)
+    display_on_completion: true
+
+    # Verbosity level: minimal (~8 lines), standard (~15 lines), detailed (~25 lines)
+    verbosity: standard
+
+    # Save report files to .obra/reports/
+    save_to_file: true
+
+    # File format for saved reports (generates both MD and JSON when true)
+    file_format: json
+
+    # Minimum tasks in work unit before showing report (suppress for trivial work)
+    min_tasks_for_report: 1
+
+    # First-run explainer shown flag (auto-set true after first display)
+    # Shows educational footer explaining what the metrics mean
+    first_run_explainer_shown: false
+
+    # Config initialization tracking flag (auto-set true after first config init)
+    # Tracks when config was auto-initialized from bundled default_config.yaml
+    config_initialized: false
+
+    # Reports directory (relative to project root)
+    reports_dir: .obra/reports
+
+  # =============================================================================
+  # OBSERVABILITY CONFIGURATION (SAAS-OBSERVABILITY-PARITY)
+  # =============================================================================
+  # Unified observability settings for both CLI and SaaS modes.
+  # In CLI mode: Events written to JSONL files via CLIEventEmitter
+  # In SaaS mode: Events written to Cloud Logging and Firestore via SaaSEventEmitter
+  # =============================================================================
+  observability:
+    # Master enable/disable switch for the observability system
+    enabled: true
+
+    # Event batching settings (for Firestore writes in SaaS mode)
+    batch_size: 50  # Number of events to batch before writing to Firestore
+    auto_flush: true  # Automatically flush batch when size reached
+
+    # Emit to Firestore (SaaS mode only)
+    # Set to false to only write to Cloud Logging without Firestore persistence
+    emit_to_firestore: true
+
+    # Event retention
+    retention:
+      # TTL for events in Firestore (days)
+      ttl_days: 30
+      # Maximum events to keep per session (0 = unlimited)
+      max_events_per_session: 10000
+
+    # Event types to emit
+    # Set to false to disable specific event categories
+    events:
+      # Session lifecycle events
+      session_started: true
+      session_completed: true
+      session_escalated: true
+
+      # Iteration events
+      iteration_result: true
+      iteration_progress: true
+
+      # Validation events
+      validation_passed: true
+      validation_failed: true
+
+      # Task events
+      task_started: true
+      task_completed: true
+
+      # Quality events (from refinement)
+      gate_decision: true
+      issues_found: true
+
+# =============================================================================
+# SCAFFOLDED PLANNING (INTENT ENRICHMENT)
+# =============================================================================
+planning:
+  scaffolded:
+    enabled: false
+    always_on: true
+    stages:
+      assumptions:
+        model_tier: medium
+        reasoning_level: medium
+        max_passes: 1
+        timeout_s: 20
+        max_questions: 3
+      analogues:
+        model_tier: high
+        reasoning_level: high
+        max_passes: 1
+        timeout_s: 40
+      brief:
+        model_tier: medium
+        reasoning_level: medium
+        max_passes: 1
+        timeout_s: 20
+      derive:
+        model_tier: high
+        reasoning_level: high
+        max_passes: 1
+        timeout_s: 60
+      review:
+        model_tier: high
+        reasoning_level: high
+        max_passes: 1
+        timeout_s: 30
+    non_inferable_categories:
+      - platform
+      - environment
+      - taste
+      - brand
+      - legal
+      - compliance
+    diff:
+      path_template: "~/.obra/intents/{intent_id}.diff.md"
+      retention:
+        max_age_days: 30
+        max_files: 200
+    artifacts:
+      dir: "~/.obra/intents/artifacts"
+      retention:
+        max_age_days: 30
+        max_files: 200
+    analogue_cache:
+      global_path: "~/.obra/analogue_cache.yaml"
+      project_path: ".obra/analogue_cache.yaml"
+    telemetry:
+      enabled: false
+      include_content: false
+      output_path: "~/.obra/telemetry/scaffolded.jsonl"
+
+# ITERATIVE-PLAN-REFINEMENT: Plan Refinement Configuration (D6)
+# Configuration for iterative plan refinement with quality gates
+refinement:
+  # Global refinement iteration cap (can be overridden per sub-feature)
+  max_iterations: 10
+  # Plan refinement settings
+  planning:
+    enabled: true  # Enable iterative plan refinement (D1)
+    max_iterations: 10  # Override max iterations for plan refinement
+
+    # Extended thinking configuration (D1, D3)
+    thinking_mode:
+      enabled: true  # Enable extended thinking on first pass
+      level: high  # Default thinking level: off, minimal, standard, high, maximum
+      first_pass_only: true  # Only use extended thinking on initial derivation
+
+    # Quality gate configuration (D12, D13, D14)
+    quality_gate:
+      enabled: true  # Enable quality gates
+      min_score: 0.7  # Minimum quality score to pass (0.0-1.0)
+      enforce_strict: false  # Block on quality failure (vs warning)
+
+    # Multi-pass derivation (D1, D2)
+    derivation:
+      max_passes: 3  # Maximum derivation passes
+      improvement_threshold: 0.1  # Minimum improvement to continue
+
+    # Plan versioning configuration (D9, D10)
+    versioning:
+      enabled: true  # Enable plan versioning
+      track_changes: true  # Track changes between versions
+      max_versions: 10  # Maximum versions to retain
+      auto_increment: true  # Auto-increment version on update
+
+    # Feedback integration (D11)
+    feedback:
+      enabled: true  # Enable feedback collection
+      store_history: true  # Store feedback history
+      apply_patterns: true  # Apply feedback patterns to future derivations
+
+  # LLM provider configuration for refinement
+  llm:
+    # Load provider config from config/llm_providers.yaml
+    providers_config: config/llm_providers.yaml
+    # Default provider for refinement operations (null = inherit main provider)
+    default_provider: null
+    # Default interface type (api, cli)
+    default_interface: cli
+
+
+    # System events
+    heartbeat: true
+    error: true
+
+  # PII redaction settings
+  # Applies to both CLI and SaaS modes
+  redaction:
+    enabled: true
+    # Types of data to redact
+    types:
+      - email
+      - ip_address
+      - api_key
+      - jwt_token
+      - phone_number
+      - ssn
+      - credit_card
+
+  # Cloud Logging settings (SaaS mode only)
+  cloud_logging:
+    log_name: "obra-events"  # Log name in Cloud Logging
+    include_trace_context: true  # Include X-Cloud-Trace-Context for distributed tracing
+
+  # Metrics settings (SaaS mode only)
+  metrics:
+    enabled: true
+    # Metric categories to record
+    record_session_metrics: true
+    record_iteration_metrics: true
+    record_quality_metrics: true
