@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-taxcode"
+version = "0.1.0"
+description = "MCP server for searching the US Tax Code (IRC)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{ name = "eugene" }]
+dependencies = ["httpx>=0.28.0"]
+
+[project.scripts]
+mcp-taxcode = "mcp_taxcode.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_taxcode"]

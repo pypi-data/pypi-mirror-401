@@ -1,0 +1,34 @@
+# mcp-taxcode
+
+MCP server for searching the US Tax Code (Internal Revenue Code).
+
+## Installation
+
+```bash
+uvx mcp-taxcode
+```
+
+## Claude Code Configuration
+
+Add to your `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "taxcode": {
+      "command": "uvx",
+      "args": ["mcp-taxcode"]
+    }
+  }
+}
+```
+
+## Available Tools
+
+- `search_tax_code`: Search the US Tax Code with natural language queries
+
+## Examples
+
+- "What is the SALT deduction limit?"
+- "Standard deduction for 2025"
+- "Section 401k rules"
