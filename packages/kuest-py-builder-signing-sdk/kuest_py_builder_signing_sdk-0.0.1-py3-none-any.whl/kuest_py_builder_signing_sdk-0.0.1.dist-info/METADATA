@@ -1,0 +1,69 @@
+Metadata-Version: 2.4
+Name: kuest-py-builder-signing-sdk
+Version: 0.0.1
+Summary: Python builder signing sdk
+Home-page: https://github.com/kuestcom/py-builder-signing-sdk
+Author: Kuest Engineering
+Author-email: engineering@kuest.com
+Maintainer: Kuest Engineering
+Maintainer-email: engineering@kuest.com
+Project-URL: Bug Tracker, https://github.com/kuestcom/py-builder-signing-sdk/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: python-dotenv
+Requires-Dist: requests
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Kuest Builder Signing SDK
+
+<a href='https://pypi.org/project/kuest-py-builder-signing-sdk'>
+    <img src='https://img.shields.io/pypi/v/kuest-py-builder-signing-sdk.svg' alt='PyPI'/>
+</a>
+
+Python SDK for Kuest builder authentication and signing.
+
+## Installation
+
+```bash
+pip install kuest-py-builder-signing-sdk
+```
+
+## Usage
+
+```python
+from py_builder_signing_sdk import BuilderConfig, BuilderApiKeyCreds, RemoteBuilderConfig
+
+# Local signing
+creds = BuilderApiKeyCreds(
+    key="your-api-key",
+    secret="your-secret", 
+    passphrase="your-passphrase"
+)
+config = BuilderConfig(local_builder_creds=creds)
+
+# Remote signing
+remote_config = RemoteBuilderConfig(
+    url="http://localhost:3000/sign",
+    token="your-auth-token"  # optional
+)
+config = BuilderConfig(remote_builder_config=remote_config)
+
+# Generate signed headers
+headers = config.generate_builder_headers("POST", "/order", '{"data": "example"}')
+```
