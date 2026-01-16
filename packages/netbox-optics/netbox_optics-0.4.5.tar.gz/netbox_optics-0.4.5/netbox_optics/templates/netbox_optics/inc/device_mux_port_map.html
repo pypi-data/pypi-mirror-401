@@ -1,0 +1,57 @@
+<div class="card">
+    <h5 class="card-header d-flex justify-content-between align-items-center">
+        <span>Mux Port Map</span>
+                {% if mux_span %}
+            <a href="{{ mux_span.get_absolute_url }}" class="btn btn-sm btn-outline-secondary">{{ mux_span }}</a>
+                {% else %}
+            <a href="{% url 'plugins:netbox_optics:opticalspan_list' %}?site={{ device.site.pk }}" class="btn btn-sm btn-outline-secondary">
+                Not assigned to span
+            </a>
+                {% endif %}
+    </h5>
+    {% if mux_maps %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Port</th>
+                    <th>Wavelength</th>
+                    <th>Connection</th>
+                <th>Map</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mapping in mux_maps %}
+                    <tr>
+                        <td>
+                            <a href="{{ mapping.port.get_absolute_url }}">{{ mapping.port.name }}</a>
+                        </td>
+                        <td>
+                            <a href="{{ mapping.wavelength.get_absolute_url }}">{{ mapping.wavelength.value }} nm</a>
+                        </td>
+                        <td>
+                            {% if mapping.connection %}
+                                <a href="{{ mapping.connection.get_absolute_url }}">{{ mapping.connection }}</a>
+                            {% else %}
+                            <a href="{% url 'plugins:netbox_optics:opticalconnection_add' %}?wavelength={{ mapping.wavelength.id }}{% if mux_span %}&span={{ mux_span.pk }}{% endif %}" class="btn btn-sm btn-success">
+                                <span class="mdi mdi-plus-thick"></span> Add Connection
+                            </a>
+                            {% endif %}
+                        </td>
+                    <td>
+                        <a href="{{ mapping.get_absolute_url }}" class="btn btn-sm btn-outline-secondary">
+                            <span class="mdi mdi-eye"></span>
+                        </a>
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    <div class="card-body text-muted text-center">No port mappings configured</div>
+    {% endif %}
+    <div class="card-footer text-end noprint">
+        <a href="{% url 'plugins:netbox_optics:muxwavelengthmap_add' %}?mux_a={{ device.pk }}" class="btn btn-sm btn-primary">
+            <span class="mdi mdi-plus-thick" aria-hidden="true"></span> Add Mapping
+        </a>
+    </div>
+</div>
