@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "PinaTracker"
+version = "0.1.0"
+authors = [
+  { name="PinaKot", email="pinakoteka.cs@gmail.com" },
+]
+description = "Библиотека для поиска изображений на экране и клика по ним"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "opencv-python",
+    "numpy",
+    "pyautogui",
+    "Pillow" 
+]
+
+[project.urls]
