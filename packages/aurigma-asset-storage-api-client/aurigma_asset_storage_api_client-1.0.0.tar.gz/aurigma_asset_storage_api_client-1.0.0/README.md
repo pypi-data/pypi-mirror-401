@@ -1,0 +1,549 @@
+# aurigma-asset-storage-api-client
+
+Python client library for [Aurigma Asset Storage API](https://customerscanvas.com/dev/backoffice/api/asset-storage/overview.html).
+
+## Requirements.
+
+- Python 3.9+
+- Dependencies:
+  - python-dateutil>=2.8.2
+  - httpx>=0.28.1
+  - pydantic>=2
+  - typing-extensions>=4.7.1
+
+## Installation & Usage
+### pip install
+
+```sh
+pip install aurigma-asset-storage-api-client
+```
+
+Then import the package:
+```python
+import aurigma.asset_storage
+```
+
+## Getting Started
+
+In your own code, to use this library to connect and interact with aurigma-asset-storage-api-client,
+you can run the following:
+
+```python
+
+import aurigma.asset_storage
+from aurigma.asset_storage.rest import ApiException
+from pprint import pprint
+
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aurigma.storefront.Configuration(
+    host = "http://api.customerscanvashub.com/"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: ApiKey
+configuration.api_key['ApiKey'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['ApiKey'] = 'Bearer'
+
+configuration.access_token = os.environ["ACCESS_TOKEN"]
+
+configuration.access_token = os.environ["ACCESS_TOKEN"]
+
+configuration.access_token = os.environ["ACCESS_TOKEN"]
+
+# Configure API key authorization: Bearer
+configuration.api_key['Bearer'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['Bearer'] = 'Bearer'
+
+
+# Enter a context with an instance of the API client
+async with aurigma.asset_storage.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aurigma.asset_storage.ArtifactsApi(api_client)
+    file = None # bytearray | File content.
+    name = 'name_example' # str | Entity name.
+    tenant_id = 56 # int | Tenant ID. (optional)
+    description = 'description_example' # str | Artifact description. (optional)
+    group = 'group_example' # str | Artifact group. (optional)
+    alias = 'alias_example' # str | Artifact alias (special name within group). (optional)
+    type = aurigma.asset_storage.ArtifactType() # ArtifactType | Artifact type. (optional)
+    format = 'format_example' # str | Artifact file format. (optional)
+    anonymous_access = True # bool | Artifact 'anonymous access' tag. It indicates whether artifact can be accessed anonymously. (optional)
+    custom_fields = None # Dict[str, Optional[object]] | Entity custom attributes. (optional)
+
+    try:
+        # Creates a new entity.
+        api_response = await api_instance.artifacts_create(file, name, tenant_id=tenant_id, description=description, group=group, alias=alias, type=type, format=format, anonymous_access=anonymous_access, custom_fields=custom_fields)
+        print("The response of ArtifactsApi->artifacts_create:\n")
+        pprint(api_response)
+    except ApiException as e:
+        print("Exception when calling ArtifactsApi->artifacts_create: %s\n" % e)
+
+```
+
+## Documentation for API Endpoints
+
+Depending on the geographical location of your Customer's Canvas Hub instance, the API gateway address may vary: 
+ 
+https://api.customerscanvashub.com/ - United States instance
+https://api.eu.customerscanvashub.com/ - European instance
+https://api.au.customerscanvashub.com/ - Australian instance
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+*ArtifactsApi* | [**artifacts_create**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_create) | **POST** /api/storage/v1/artifacts | Creates a new entity.
+*ArtifactsApi* | [**artifacts_delete**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_delete) | **DELETE** /api/storage/v1/artifacts/{id} | Deletes the specified entity.
+*ArtifactsApi* | [**artifacts_delete_group**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_delete_group) | **DELETE** /api/storage/v1/artifacts/groups/{group} | Deletes all entities within the specified group.
+*ArtifactsApi* | [**artifacts_get**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_get) | **GET** /api/storage/v1/artifacts/{id} | Returns an entity by ID.
+*ArtifactsApi* | [**artifacts_get_all**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_get_all) | **GET** /api/storage/v1/artifacts | Returns all entities relevant to specified query parameters.
+*ArtifactsApi* | [**artifacts_get_file**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_get_file) | **GET** /api/storage/v1/artifacts/{id}/file | Returns an entity file from file storage.
+*ArtifactsApi* | [**artifacts_get_file_storage_info**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_get_file_storage_info) | **GET** /api/storage/v1/artifacts/file-storage-info | Returns information about storage usage by artifact files.
+*ArtifactsApi* | [**artifacts_update**](aurigma\asset_storage/docs/ArtifactsApi.md#artifacts_update) | **PUT** /api/storage/v1/artifacts/{id} | Updates the specified entity.
+*BuildInfoApi* | [**build_info_get_info**](aurigma\asset_storage/docs/BuildInfoApi.md#build_info_get_info) | **GET** /api/storage/v1/info | Returns an assembly build info.
+*BuildInfoApi* | [**build_info_head_info**](aurigma\asset_storage/docs/BuildInfoApi.md#build_info_head_info) | **HEAD** /api/storage/v1/info | Returns an assembly build info.
+*ColorProfilesApi* | [**color_profiles_batch_copy**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_batch_copy) | **POST** /api/storage/v1/color-profiles/batch-copy | Copies the specified entities and folders to another folder.
+*ColorProfilesApi* | [**color_profiles_batch_delete**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_batch_delete) | **POST** /api/storage/v1/color-profiles/batch-delete | Deletes the specified entities and folders.
+*ColorProfilesApi* | [**color_profiles_batch_update_custom_fields**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_batch_update_custom_fields) | **POST** /api/storage/v1/color-profiles/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*ColorProfilesApi* | [**color_profiles_batch_update_parent_folder**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_batch_update_parent_folder) | **POST** /api/storage/v1/color-profiles/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*ColorProfilesApi* | [**color_profiles_copy**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_copy) | **POST** /api/storage/v1/color-profiles/{id} | Copies the specified entity.
+*ColorProfilesApi* | [**color_profiles_create**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_create) | **POST** /api/storage/v1/color-profiles | Creates a new entity.
+*ColorProfilesApi* | [**color_profiles_create_folder**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_create_folder) | **POST** /api/storage/v1/color-profiles/folders | Creates a new folder.
+*ColorProfilesApi* | [**color_profiles_delete**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_delete) | **DELETE** /api/storage/v1/color-profiles/{id} | Deletes the specified entity.
+*ColorProfilesApi* | [**color_profiles_delete_folder**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_delete_folder) | **DELETE** /api/storage/v1/color-profiles/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*ColorProfilesApi* | [**color_profiles_delete_folder_by_id**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_delete_folder_by_id) | **DELETE** /api/storage/v1/color-profiles/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*ColorProfilesApi* | [**color_profiles_get**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get) | **GET** /api/storage/v1/color-profiles/{id} | Returns an entity by ID.
+*ColorProfilesApi* | [**color_profiles_get_all**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get_all) | **GET** /api/storage/v1/color-profiles | Returns all entities relevant to specified query parameters.
+*ColorProfilesApi* | [**color_profiles_get_all_folders**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get_all_folders) | **GET** /api/storage/v1/color-profiles/folders/all | Returns all folders.
+*ColorProfilesApi* | [**color_profiles_get_file**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get_file) | **GET** /api/storage/v1/color-profiles/{id}/file | Returns an entity file from file storage.
+*ColorProfilesApi* | [**color_profiles_get_file_storage_info**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get_file_storage_info) | **GET** /api/storage/v1/color-profiles/file-storage-info | Returns information about the use of file storage.
+*ColorProfilesApi* | [**color_profiles_get_folder**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get_folder) | **GET** /api/storage/v1/color-profiles/folders/content-by-path | Returns a folder and its content by folder path.
+*ColorProfilesApi* | [**color_profiles_get_folder_info**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_get_folder_info) | **GET** /api/storage/v1/color-profiles/folders/{id} | Returns a folder by ID.
+*ColorProfilesApi* | [**color_profiles_update**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_update) | **PUT** /api/storage/v1/color-profiles/{id} | Updates the specified entity.
+*ColorProfilesApi* | [**color_profiles_update_folder**](aurigma\asset_storage/docs/ColorProfilesApi.md#color_profiles_update_folder) | **PUT** /api/storage/v1/color-profiles/folders/{id} | Updates the specified folder.
+*DataSchemasApi* | [**data_schemas_batch_copy**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_batch_copy) | **POST** /api/storage/v1/data-schemas/batch-copy | Copies the specified entities and folders to another folder.
+*DataSchemasApi* | [**data_schemas_batch_delete**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_batch_delete) | **POST** /api/storage/v1/data-schemas/batch-delete | Deletes the specified entities and folders.
+*DataSchemasApi* | [**data_schemas_batch_update_custom_fields**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_batch_update_custom_fields) | **POST** /api/storage/v1/data-schemas/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*DataSchemasApi* | [**data_schemas_batch_update_parent_folder**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_batch_update_parent_folder) | **POST** /api/storage/v1/data-schemas/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*DataSchemasApi* | [**data_schemas_copy**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_copy) | **POST** /api/storage/v1/data-schemas/{id} | Copies the specified entity.
+*DataSchemasApi* | [**data_schemas_create**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_create) | **POST** /api/storage/v1/data-schemas | Creates a new entity.
+*DataSchemasApi* | [**data_schemas_create_folder**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_create_folder) | **POST** /api/storage/v1/data-schemas/folders | Creates a new folder.
+*DataSchemasApi* | [**data_schemas_delete**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_delete) | **DELETE** /api/storage/v1/data-schemas/{id} | Deletes the specified entity.
+*DataSchemasApi* | [**data_schemas_delete_folder**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_delete_folder) | **DELETE** /api/storage/v1/data-schemas/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*DataSchemasApi* | [**data_schemas_delete_folder_by_id**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_delete_folder_by_id) | **DELETE** /api/storage/v1/data-schemas/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*DataSchemasApi* | [**data_schemas_get**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get) | **GET** /api/storage/v1/data-schemas/{id} | Returns an entity by ID.
+*DataSchemasApi* | [**data_schemas_get_all**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get_all) | **GET** /api/storage/v1/data-schemas | Returns all entities relevant to specified query parameters.
+*DataSchemasApi* | [**data_schemas_get_all_folders**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get_all_folders) | **GET** /api/storage/v1/data-schemas/folders/all | Returns all folders.
+*DataSchemasApi* | [**data_schemas_get_file**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get_file) | **GET** /api/storage/v1/data-schemas/{id}/file | Returns an entity file from file storage.
+*DataSchemasApi* | [**data_schemas_get_file_storage_info**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get_file_storage_info) | **GET** /api/storage/v1/data-schemas/file-storage-info | Returns information about the use of file storage.
+*DataSchemasApi* | [**data_schemas_get_folder**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get_folder) | **GET** /api/storage/v1/data-schemas/folders/content-by-path | Returns a folder and its content by folder path.
+*DataSchemasApi* | [**data_schemas_get_folder_info**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_get_folder_info) | **GET** /api/storage/v1/data-schemas/folders/{id} | Returns a folder by ID.
+*DataSchemasApi* | [**data_schemas_update**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_update) | **PUT** /api/storage/v1/data-schemas/{id} | Updates the specified entity.
+*DataSchemasApi* | [**data_schemas_update_folder**](aurigma\asset_storage/docs/DataSchemasApi.md#data_schemas_update_folder) | **PUT** /api/storage/v1/data-schemas/folders/{id} | Updates the specified folder.
+*DataSetsApi* | [**data_sets_batch_copy**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_batch_copy) | **POST** /api/storage/v1/data-sets/batch-copy | Copies the specified entities and folders to another folder.
+*DataSetsApi* | [**data_sets_batch_delete**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_batch_delete) | **POST** /api/storage/v1/data-sets/batch-delete | Deletes the specified entities and folders.
+*DataSetsApi* | [**data_sets_batch_update_custom_fields**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_batch_update_custom_fields) | **POST** /api/storage/v1/data-sets/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*DataSetsApi* | [**data_sets_batch_update_parent_folder**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_batch_update_parent_folder) | **POST** /api/storage/v1/data-sets/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*DataSetsApi* | [**data_sets_copy**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_copy) | **POST** /api/storage/v1/data-sets/{id} | Copies the specified entity.
+*DataSetsApi* | [**data_sets_create**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_create) | **POST** /api/storage/v1/data-sets | Creates a new entity.
+*DataSetsApi* | [**data_sets_create_folder**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_create_folder) | **POST** /api/storage/v1/data-sets/folders | Creates a new folder.
+*DataSetsApi* | [**data_sets_delete**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_delete) | **DELETE** /api/storage/v1/data-sets/{id} | Deletes the specified entity.
+*DataSetsApi* | [**data_sets_delete_folder**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_delete_folder) | **DELETE** /api/storage/v1/data-sets/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*DataSetsApi* | [**data_sets_delete_folder_by_id**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_delete_folder_by_id) | **DELETE** /api/storage/v1/data-sets/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*DataSetsApi* | [**data_sets_get**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get) | **GET** /api/storage/v1/data-sets/{id} | Returns an entity by ID.
+*DataSetsApi* | [**data_sets_get_all**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get_all) | **GET** /api/storage/v1/data-sets | Returns all entities relevant to specified query parameters.
+*DataSetsApi* | [**data_sets_get_all_folders**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get_all_folders) | **GET** /api/storage/v1/data-sets/folders/all | Returns all folders.
+*DataSetsApi* | [**data_sets_get_file**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get_file) | **GET** /api/storage/v1/data-sets/{id}/file | Returns an entity file from file storage.
+*DataSetsApi* | [**data_sets_get_file_storage_info**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get_file_storage_info) | **GET** /api/storage/v1/data-sets/file-storage-info | Returns information about the use of file storage.
+*DataSetsApi* | [**data_sets_get_folder**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get_folder) | **GET** /api/storage/v1/data-sets/folders/content-by-path | Returns a folder and its content by folder path.
+*DataSetsApi* | [**data_sets_get_folder_info**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_get_folder_info) | **GET** /api/storage/v1/data-sets/folders/{id} | Returns a folder by ID.
+*DataSetsApi* | [**data_sets_update**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_update) | **PUT** /api/storage/v1/data-sets/{id} | Updates the specified entity.
+*DataSetsApi* | [**data_sets_update_folder**](aurigma\asset_storage/docs/DataSetsApi.md#data_sets_update_folder) | **PUT** /api/storage/v1/data-sets/folders/{id} | Updates the specified folder.
+*DesignsApi* | [**designs_add_preview**](aurigma\asset_storage/docs/DesignsApi.md#designs_add_preview) | **PUT** /api/storage/v1/designs/{id}/preview | Creates a preview entity for specified source entity.
+*DesignsApi* | [**designs_batch_copy**](aurigma\asset_storage/docs/DesignsApi.md#designs_batch_copy) | **POST** /api/storage/v1/designs/batch-copy | Copies the specified entities and folders to another folder.
+*DesignsApi* | [**designs_batch_delete**](aurigma\asset_storage/docs/DesignsApi.md#designs_batch_delete) | **POST** /api/storage/v1/designs/batch-delete | Deletes the specified entities and folders.
+*DesignsApi* | [**designs_batch_update_custom_fields**](aurigma\asset_storage/docs/DesignsApi.md#designs_batch_update_custom_fields) | **POST** /api/storage/v1/designs/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*DesignsApi* | [**designs_batch_update_parent_folder**](aurigma\asset_storage/docs/DesignsApi.md#designs_batch_update_parent_folder) | **POST** /api/storage/v1/designs/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*DesignsApi* | [**designs_copy**](aurigma\asset_storage/docs/DesignsApi.md#designs_copy) | **POST** /api/storage/v1/designs/{id} | Copies the specified entity.
+*DesignsApi* | [**designs_create**](aurigma\asset_storage/docs/DesignsApi.md#designs_create) | **POST** /api/storage/v1/designs | Creates a new entity.
+*DesignsApi* | [**designs_create_folder**](aurigma\asset_storage/docs/DesignsApi.md#designs_create_folder) | **POST** /api/storage/v1/designs/folders | Creates a new folder.
+*DesignsApi* | [**designs_delete**](aurigma\asset_storage/docs/DesignsApi.md#designs_delete) | **DELETE** /api/storage/v1/designs/{id} | Deletes the specified entity.
+*DesignsApi* | [**designs_delete_folder**](aurigma\asset_storage/docs/DesignsApi.md#designs_delete_folder) | **DELETE** /api/storage/v1/designs/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*DesignsApi* | [**designs_delete_folder_by_id**](aurigma\asset_storage/docs/DesignsApi.md#designs_delete_folder_by_id) | **DELETE** /api/storage/v1/designs/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*DesignsApi* | [**designs_get**](aurigma\asset_storage/docs/DesignsApi.md#designs_get) | **GET** /api/storage/v1/designs/{id} | Returns an entity by ID.
+*DesignsApi* | [**designs_get_all**](aurigma\asset_storage/docs/DesignsApi.md#designs_get_all) | **GET** /api/storage/v1/designs | Returns all entities relevant to specified query parameters.
+*DesignsApi* | [**designs_get_all_folders**](aurigma\asset_storage/docs/DesignsApi.md#designs_get_all_folders) | **GET** /api/storage/v1/designs/folders/all | Returns all folders.
+*DesignsApi* | [**designs_get_file**](aurigma\asset_storage/docs/DesignsApi.md#designs_get_file) | **GET** /api/storage/v1/designs/{id}/file | Returns an entity file from file storage.
+*DesignsApi* | [**designs_get_file_storage_info**](aurigma\asset_storage/docs/DesignsApi.md#designs_get_file_storage_info) | **GET** /api/storage/v1/designs/file-storage-info | Returns information about the use of file storage.
+*DesignsApi* | [**designs_get_folder**](aurigma\asset_storage/docs/DesignsApi.md#designs_get_folder) | **GET** /api/storage/v1/designs/folders/content-by-path | Returns a folder and its content by folder path.
+*DesignsApi* | [**designs_get_folder_info**](aurigma\asset_storage/docs/DesignsApi.md#designs_get_folder_info) | **GET** /api/storage/v1/designs/folders/{id} | Returns a folder by ID.
+*DesignsApi* | [**designs_update**](aurigma\asset_storage/docs/DesignsApi.md#designs_update) | **PUT** /api/storage/v1/designs/{id} | Updates the specified entity.
+*DesignsApi* | [**designs_update_folder**](aurigma\asset_storage/docs/DesignsApi.md#designs_update_folder) | **PUT** /api/storage/v1/designs/folders/{id} | Updates the specified folder.
+*DocumentsApi* | [**documents_batch_copy**](aurigma\asset_storage/docs/DocumentsApi.md#documents_batch_copy) | **POST** /api/storage/v1/documents/batch-copy | Copies the specified entities and folders to another folder.
+*DocumentsApi* | [**documents_batch_delete**](aurigma\asset_storage/docs/DocumentsApi.md#documents_batch_delete) | **POST** /api/storage/v1/documents/batch-delete | Deletes the specified entities and folders.
+*DocumentsApi* | [**documents_batch_update_custom_fields**](aurigma\asset_storage/docs/DocumentsApi.md#documents_batch_update_custom_fields) | **POST** /api/storage/v1/documents/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*DocumentsApi* | [**documents_batch_update_parent_folder**](aurigma\asset_storage/docs/DocumentsApi.md#documents_batch_update_parent_folder) | **POST** /api/storage/v1/documents/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*DocumentsApi* | [**documents_copy**](aurigma\asset_storage/docs/DocumentsApi.md#documents_copy) | **POST** /api/storage/v1/documents/{id} | Copies the specified entity.
+*DocumentsApi* | [**documents_create**](aurigma\asset_storage/docs/DocumentsApi.md#documents_create) | **POST** /api/storage/v1/documents | Creates a new entity.
+*DocumentsApi* | [**documents_create_folder**](aurigma\asset_storage/docs/DocumentsApi.md#documents_create_folder) | **POST** /api/storage/v1/documents/folders | Creates a new folder.
+*DocumentsApi* | [**documents_delete**](aurigma\asset_storage/docs/DocumentsApi.md#documents_delete) | **DELETE** /api/storage/v1/documents/{id} | Deletes the specified entity.
+*DocumentsApi* | [**documents_delete_folder**](aurigma\asset_storage/docs/DocumentsApi.md#documents_delete_folder) | **DELETE** /api/storage/v1/documents/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*DocumentsApi* | [**documents_delete_folder_by_id**](aurigma\asset_storage/docs/DocumentsApi.md#documents_delete_folder_by_id) | **DELETE** /api/storage/v1/documents/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*DocumentsApi* | [**documents_get**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get) | **GET** /api/storage/v1/documents/{id} | Returns an entity by ID.
+*DocumentsApi* | [**documents_get_all**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get_all) | **GET** /api/storage/v1/documents | Returns all entities relevant to specified query parameters.
+*DocumentsApi* | [**documents_get_all_folders**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get_all_folders) | **GET** /api/storage/v1/documents/folders/all | Returns all folders.
+*DocumentsApi* | [**documents_get_file**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get_file) | **GET** /api/storage/v1/documents/{id}/file | Returns an entity file from file storage.
+*DocumentsApi* | [**documents_get_file_storage_info**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get_file_storage_info) | **GET** /api/storage/v1/documents/file-storage-info | Returns information about the use of file storage.
+*DocumentsApi* | [**documents_get_folder**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get_folder) | **GET** /api/storage/v1/documents/folders/content-by-path | Returns a folder and its content by folder path.
+*DocumentsApi* | [**documents_get_folder_info**](aurigma\asset_storage/docs/DocumentsApi.md#documents_get_folder_info) | **GET** /api/storage/v1/documents/folders/{id} | Returns a folder by ID.
+*DocumentsApi* | [**documents_update**](aurigma\asset_storage/docs/DocumentsApi.md#documents_update) | **PUT** /api/storage/v1/documents/{id} | Updates the specified entity.
+*DocumentsApi* | [**documents_update_folder**](aurigma\asset_storage/docs/DocumentsApi.md#documents_update_folder) | **PUT** /api/storage/v1/documents/folders/{id} | Updates the specified folder.
+*FontsApi* | [**fonts_add_preview**](aurigma\asset_storage/docs/FontsApi.md#fonts_add_preview) | **PUT** /api/storage/v1/fonts/{id}/preview | Creates a preview entity for specified source entity.
+*FontsApi* | [**fonts_batch_copy**](aurigma\asset_storage/docs/FontsApi.md#fonts_batch_copy) | **POST** /api/storage/v1/fonts/batch-copy | Copies the specified entities and folders to another folder.
+*FontsApi* | [**fonts_batch_delete**](aurigma\asset_storage/docs/FontsApi.md#fonts_batch_delete) | **POST** /api/storage/v1/fonts/batch-delete | Deletes the specified entities and folders.
+*FontsApi* | [**fonts_batch_update_custom_fields**](aurigma\asset_storage/docs/FontsApi.md#fonts_batch_update_custom_fields) | **POST** /api/storage/v1/fonts/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*FontsApi* | [**fonts_batch_update_parent_folder**](aurigma\asset_storage/docs/FontsApi.md#fonts_batch_update_parent_folder) | **POST** /api/storage/v1/fonts/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*FontsApi* | [**fonts_copy**](aurigma\asset_storage/docs/FontsApi.md#fonts_copy) | **POST** /api/storage/v1/fonts/{id} | Copies the specified entity.
+*FontsApi* | [**fonts_create**](aurigma\asset_storage/docs/FontsApi.md#fonts_create) | **POST** /api/storage/v1/fonts | Creates a new entity.
+*FontsApi* | [**fonts_create_folder**](aurigma\asset_storage/docs/FontsApi.md#fonts_create_folder) | **POST** /api/storage/v1/fonts/folders | Creates a new folder.
+*FontsApi* | [**fonts_delete**](aurigma\asset_storage/docs/FontsApi.md#fonts_delete) | **DELETE** /api/storage/v1/fonts/{id} | Deletes the specified entity.
+*FontsApi* | [**fonts_delete_folder**](aurigma\asset_storage/docs/FontsApi.md#fonts_delete_folder) | **DELETE** /api/storage/v1/fonts/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*FontsApi* | [**fonts_delete_folder_by_id**](aurigma\asset_storage/docs/FontsApi.md#fonts_delete_folder_by_id) | **DELETE** /api/storage/v1/fonts/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*FontsApi* | [**fonts_get**](aurigma\asset_storage/docs/FontsApi.md#fonts_get) | **GET** /api/storage/v1/fonts/{id} | Returns an entity by ID.
+*FontsApi* | [**fonts_get_all**](aurigma\asset_storage/docs/FontsApi.md#fonts_get_all) | **GET** /api/storage/v1/fonts | Returns all entities relevant to specified query parameters.
+*FontsApi* | [**fonts_get_all_folders**](aurigma\asset_storage/docs/FontsApi.md#fonts_get_all_folders) | **GET** /api/storage/v1/fonts/folders/all | Returns all folders.
+*FontsApi* | [**fonts_get_file**](aurigma\asset_storage/docs/FontsApi.md#fonts_get_file) | **GET** /api/storage/v1/fonts/{id}/file | Returns an entity file from file storage.
+*FontsApi* | [**fonts_get_file_storage_info**](aurigma\asset_storage/docs/FontsApi.md#fonts_get_file_storage_info) | **GET** /api/storage/v1/fonts/file-storage-info | Returns information about the use of file storage.
+*FontsApi* | [**fonts_get_folder**](aurigma\asset_storage/docs/FontsApi.md#fonts_get_folder) | **GET** /api/storage/v1/fonts/folders/content-by-path | Returns a folder and its content by folder path.
+*FontsApi* | [**fonts_get_folder_info**](aurigma\asset_storage/docs/FontsApi.md#fonts_get_folder_info) | **GET** /api/storage/v1/fonts/folders/{id} | Returns a folder by ID.
+*FontsApi* | [**fonts_update**](aurigma\asset_storage/docs/FontsApi.md#fonts_update) | **PUT** /api/storage/v1/fonts/{id} | Updates the specified entity.
+*FontsApi* | [**fonts_update_folder**](aurigma\asset_storage/docs/FontsApi.md#fonts_update_folder) | **PUT** /api/storage/v1/fonts/folders/{id} | Updates the specified folder.
+*ImagesApi* | [**images_add_preview**](aurigma\asset_storage/docs/ImagesApi.md#images_add_preview) | **PUT** /api/storage/v1/images/{id}/preview | Creates a preview entity for specified source entity.
+*ImagesApi* | [**images_batch_copy**](aurigma\asset_storage/docs/ImagesApi.md#images_batch_copy) | **POST** /api/storage/v1/images/batch-copy | Copies the specified entities and folders to another folder.
+*ImagesApi* | [**images_batch_delete**](aurigma\asset_storage/docs/ImagesApi.md#images_batch_delete) | **POST** /api/storage/v1/images/batch-delete | Deletes the specified entities and folders.
+*ImagesApi* | [**images_batch_update_custom_fields**](aurigma\asset_storage/docs/ImagesApi.md#images_batch_update_custom_fields) | **POST** /api/storage/v1/images/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*ImagesApi* | [**images_batch_update_parent_folder**](aurigma\asset_storage/docs/ImagesApi.md#images_batch_update_parent_folder) | **POST** /api/storage/v1/images/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*ImagesApi* | [**images_copy**](aurigma\asset_storage/docs/ImagesApi.md#images_copy) | **POST** /api/storage/v1/images/{id} | Copies the specified entity.
+*ImagesApi* | [**images_create**](aurigma\asset_storage/docs/ImagesApi.md#images_create) | **POST** /api/storage/v1/images | Creates a new entity.
+*ImagesApi* | [**images_create_folder**](aurigma\asset_storage/docs/ImagesApi.md#images_create_folder) | **POST** /api/storage/v1/images/folders | Creates a new folder.
+*ImagesApi* | [**images_delete**](aurigma\asset_storage/docs/ImagesApi.md#images_delete) | **DELETE** /api/storage/v1/images/{id} | Deletes the specified entity.
+*ImagesApi* | [**images_delete_folder**](aurigma\asset_storage/docs/ImagesApi.md#images_delete_folder) | **DELETE** /api/storage/v1/images/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*ImagesApi* | [**images_delete_folder_by_id**](aurigma\asset_storage/docs/ImagesApi.md#images_delete_folder_by_id) | **DELETE** /api/storage/v1/images/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*ImagesApi* | [**images_get**](aurigma\asset_storage/docs/ImagesApi.md#images_get) | **GET** /api/storage/v1/images/{id} | Returns an entity by ID.
+*ImagesApi* | [**images_get_all**](aurigma\asset_storage/docs/ImagesApi.md#images_get_all) | **GET** /api/storage/v1/images | Returns all entities relevant to specified query parameters.
+*ImagesApi* | [**images_get_all_folders**](aurigma\asset_storage/docs/ImagesApi.md#images_get_all_folders) | **GET** /api/storage/v1/images/folders/all | Returns all folders.
+*ImagesApi* | [**images_get_file**](aurigma\asset_storage/docs/ImagesApi.md#images_get_file) | **GET** /api/storage/v1/images/{id}/file | Returns an entity file from file storage.
+*ImagesApi* | [**images_get_file_storage_info**](aurigma\asset_storage/docs/ImagesApi.md#images_get_file_storage_info) | **GET** /api/storage/v1/images/file-storage-info | Returns information about the use of file storage.
+*ImagesApi* | [**images_get_folder**](aurigma\asset_storage/docs/ImagesApi.md#images_get_folder) | **GET** /api/storage/v1/images/folders/content-by-path | Returns a folder and its content by folder path.
+*ImagesApi* | [**images_get_folder_info**](aurigma\asset_storage/docs/ImagesApi.md#images_get_folder_info) | **GET** /api/storage/v1/images/folders/{id} | Returns a folder by ID.
+*ImagesApi* | [**images_update**](aurigma\asset_storage/docs/ImagesApi.md#images_update) | **PUT** /api/storage/v1/images/{id} | Updates the specified entity.
+*ImagesApi* | [**images_update_folder**](aurigma\asset_storage/docs/ImagesApi.md#images_update_folder) | **PUT** /api/storage/v1/images/folders/{id} | Updates the specified folder.
+*MockupsApi* | [**mockups_add_preview**](aurigma\asset_storage/docs/MockupsApi.md#mockups_add_preview) | **PUT** /api/storage/v1/mockups/{id}/preview | Creates a preview entity for specified source entity.
+*MockupsApi* | [**mockups_batch_copy**](aurigma\asset_storage/docs/MockupsApi.md#mockups_batch_copy) | **POST** /api/storage/v1/mockups/batch-copy | Copies the specified entities and folders to another folder.
+*MockupsApi* | [**mockups_batch_delete**](aurigma\asset_storage/docs/MockupsApi.md#mockups_batch_delete) | **POST** /api/storage/v1/mockups/batch-delete | Deletes the specified entities and folders.
+*MockupsApi* | [**mockups_batch_update_custom_fields**](aurigma\asset_storage/docs/MockupsApi.md#mockups_batch_update_custom_fields) | **POST** /api/storage/v1/mockups/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*MockupsApi* | [**mockups_batch_update_parent_folder**](aurigma\asset_storage/docs/MockupsApi.md#mockups_batch_update_parent_folder) | **POST** /api/storage/v1/mockups/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*MockupsApi* | [**mockups_copy**](aurigma\asset_storage/docs/MockupsApi.md#mockups_copy) | **POST** /api/storage/v1/mockups/{id} | Copies the specified entity.
+*MockupsApi* | [**mockups_create**](aurigma\asset_storage/docs/MockupsApi.md#mockups_create) | **POST** /api/storage/v1/mockups | Creates a new entity.
+*MockupsApi* | [**mockups_create_folder**](aurigma\asset_storage/docs/MockupsApi.md#mockups_create_folder) | **POST** /api/storage/v1/mockups/folders | Creates a new folder.
+*MockupsApi* | [**mockups_delete**](aurigma\asset_storage/docs/MockupsApi.md#mockups_delete) | **DELETE** /api/storage/v1/mockups/{id} | Deletes the specified entity.
+*MockupsApi* | [**mockups_delete_folder**](aurigma\asset_storage/docs/MockupsApi.md#mockups_delete_folder) | **DELETE** /api/storage/v1/mockups/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*MockupsApi* | [**mockups_delete_folder_by_id**](aurigma\asset_storage/docs/MockupsApi.md#mockups_delete_folder_by_id) | **DELETE** /api/storage/v1/mockups/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*MockupsApi* | [**mockups_get**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get) | **GET** /api/storage/v1/mockups/{id} | Returns an entity by ID.
+*MockupsApi* | [**mockups_get_all**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get_all) | **GET** /api/storage/v1/mockups | Returns all entities relevant to specified query parameters.
+*MockupsApi* | [**mockups_get_all_folders**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get_all_folders) | **GET** /api/storage/v1/mockups/folders/all | Returns all folders.
+*MockupsApi* | [**mockups_get_file**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get_file) | **GET** /api/storage/v1/mockups/{id}/file | Returns an entity file from file storage.
+*MockupsApi* | [**mockups_get_file_storage_info**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get_file_storage_info) | **GET** /api/storage/v1/mockups/file-storage-info | Returns information about the use of file storage.
+*MockupsApi* | [**mockups_get_folder**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get_folder) | **GET** /api/storage/v1/mockups/folders/content-by-path | Returns a folder and its content by folder path.
+*MockupsApi* | [**mockups_get_folder_info**](aurigma\asset_storage/docs/MockupsApi.md#mockups_get_folder_info) | **GET** /api/storage/v1/mockups/folders/{id} | Returns a folder by ID.
+*MockupsApi* | [**mockups_update**](aurigma\asset_storage/docs/MockupsApi.md#mockups_update) | **PUT** /api/storage/v1/mockups/{id} | Updates the specified entity.
+*MockupsApi* | [**mockups_update_folder**](aurigma\asset_storage/docs/MockupsApi.md#mockups_update_folder) | **PUT** /api/storage/v1/mockups/folders/{id} | Updates the specified folder.
+*PalettesApi* | [**palettes_add_preview**](aurigma\asset_storage/docs/PalettesApi.md#palettes_add_preview) | **PUT** /api/storage/v1/palettes/{id}/preview | Creates a preview entity for specified source entity.
+*PalettesApi* | [**palettes_batch_copy**](aurigma\asset_storage/docs/PalettesApi.md#palettes_batch_copy) | **POST** /api/storage/v1/palettes/batch-copy | Copies the specified entities and folders to another folder.
+*PalettesApi* | [**palettes_batch_delete**](aurigma\asset_storage/docs/PalettesApi.md#palettes_batch_delete) | **POST** /api/storage/v1/palettes/batch-delete | Deletes the specified entities and folders.
+*PalettesApi* | [**palettes_batch_update_custom_fields**](aurigma\asset_storage/docs/PalettesApi.md#palettes_batch_update_custom_fields) | **POST** /api/storage/v1/palettes/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*PalettesApi* | [**palettes_batch_update_parent_folder**](aurigma\asset_storage/docs/PalettesApi.md#palettes_batch_update_parent_folder) | **POST** /api/storage/v1/palettes/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*PalettesApi* | [**palettes_copy**](aurigma\asset_storage/docs/PalettesApi.md#palettes_copy) | **POST** /api/storage/v1/palettes/{id} | Copies the specified entity.
+*PalettesApi* | [**palettes_create**](aurigma\asset_storage/docs/PalettesApi.md#palettes_create) | **POST** /api/storage/v1/palettes | Creates a new entity.
+*PalettesApi* | [**palettes_create_folder**](aurigma\asset_storage/docs/PalettesApi.md#palettes_create_folder) | **POST** /api/storage/v1/palettes/folders | Creates a new folder.
+*PalettesApi* | [**palettes_delete**](aurigma\asset_storage/docs/PalettesApi.md#palettes_delete) | **DELETE** /api/storage/v1/palettes/{id} | Deletes the specified entity.
+*PalettesApi* | [**palettes_delete_folder**](aurigma\asset_storage/docs/PalettesApi.md#palettes_delete_folder) | **DELETE** /api/storage/v1/palettes/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*PalettesApi* | [**palettes_delete_folder_by_id**](aurigma\asset_storage/docs/PalettesApi.md#palettes_delete_folder_by_id) | **DELETE** /api/storage/v1/palettes/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*PalettesApi* | [**palettes_get**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get) | **GET** /api/storage/v1/palettes/{id} | Returns an entity by ID.
+*PalettesApi* | [**palettes_get_all**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get_all) | **GET** /api/storage/v1/palettes | Returns all entities relevant to specified query parameters.
+*PalettesApi* | [**palettes_get_all_folders**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get_all_folders) | **GET** /api/storage/v1/palettes/folders/all | Returns all folders.
+*PalettesApi* | [**palettes_get_file**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get_file) | **GET** /api/storage/v1/palettes/{id}/file | Returns an entity file from file storage.
+*PalettesApi* | [**palettes_get_file_storage_info**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get_file_storage_info) | **GET** /api/storage/v1/palettes/file-storage-info | Returns information about the use of file storage.
+*PalettesApi* | [**palettes_get_folder**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get_folder) | **GET** /api/storage/v1/palettes/folders/content-by-path | Returns a folder and its content by folder path.
+*PalettesApi* | [**palettes_get_folder_info**](aurigma\asset_storage/docs/PalettesApi.md#palettes_get_folder_info) | **GET** /api/storage/v1/palettes/folders/{id} | Returns a folder by ID.
+*PalettesApi* | [**palettes_update**](aurigma\asset_storage/docs/PalettesApi.md#palettes_update) | **PUT** /api/storage/v1/palettes/{id} | Updates the specified entity.
+*PalettesApi* | [**palettes_update_folder**](aurigma\asset_storage/docs/PalettesApi.md#palettes_update_folder) | **PUT** /api/storage/v1/palettes/folders/{id} | Updates the specified folder.
+*PreviewsApi* | [**previews_delete**](aurigma\asset_storage/docs/PreviewsApi.md#previews_delete) | **DELETE** /api/storage/v1/previews/{id} | Deletes the specified entity.
+*PreviewsApi* | [**previews_get**](aurigma\asset_storage/docs/PreviewsApi.md#previews_get) | **GET** /api/storage/v1/previews/{id} | Returns preview entity by ID.
+*PreviewsApi* | [**previews_get_all**](aurigma\asset_storage/docs/PreviewsApi.md#previews_get_all) | **GET** /api/storage/v1/previews | Returns all entities relevant to specified query parameters.
+*PreviewsApi* | [**previews_get_file**](aurigma\asset_storage/docs/PreviewsApi.md#previews_get_file) | **GET** /api/storage/v1/previews/{id}/file | Returns a preview entity file from file storage.
+*PreviewsApi* | [**previews_get_file_storage_info**](aurigma\asset_storage/docs/PreviewsApi.md#previews_get_file_storage_info) | **GET** /api/storage/v1/previews/file-storage-info | Returns information about storage usage by preview files.
+*PrivateDesignsApi* | [**private_designs_add_preview**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_add_preview) | **PUT** /api/storage/v1/private-designs/{id}/preview | Creates a preview entity for specified source entity.
+*PrivateDesignsApi* | [**private_designs_batch_copy**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_batch_copy) | **POST** /api/storage/v1/private-designs/batch-copy | Copies the specified entities and folders to another folder.
+*PrivateDesignsApi* | [**private_designs_batch_delete**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_batch_delete) | **POST** /api/storage/v1/private-designs/batch-delete | Deletes the specified entities and folders.
+*PrivateDesignsApi* | [**private_designs_batch_update_custom_fields**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_batch_update_custom_fields) | **POST** /api/storage/v1/private-designs/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*PrivateDesignsApi* | [**private_designs_batch_update_owner**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_batch_update_owner) | **POST** /api/storage/v1/private-designs/batch-update-owner | Updates owner for the specified entities and folders.
+*PrivateDesignsApi* | [**private_designs_batch_update_parent_folder**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_batch_update_parent_folder) | **POST** /api/storage/v1/private-designs/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*PrivateDesignsApi* | [**private_designs_copy**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_copy) | **POST** /api/storage/v1/private-designs/{id} | Copies the specified entity.
+*PrivateDesignsApi* | [**private_designs_create**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_create) | **POST** /api/storage/v1/private-designs | Creates a new entity.
+*PrivateDesignsApi* | [**private_designs_create_folder**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_create_folder) | **POST** /api/storage/v1/private-designs/folders | Creates a new folder.
+*PrivateDesignsApi* | [**private_designs_delete**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_delete) | **DELETE** /api/storage/v1/private-designs/{id} | Deletes the specified entity.
+*PrivateDesignsApi* | [**private_designs_delete_folder**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_delete_folder) | **DELETE** /api/storage/v1/private-designs/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*PrivateDesignsApi* | [**private_designs_delete_folder_by_id**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_delete_folder_by_id) | **DELETE** /api/storage/v1/private-designs/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*PrivateDesignsApi* | [**private_designs_get**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get) | **GET** /api/storage/v1/private-designs/{id} | Returns an entity by ID.
+*PrivateDesignsApi* | [**private_designs_get_all**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_all) | **GET** /api/storage/v1/private-designs | Returns all entities relevant to specified query parameters.
+*PrivateDesignsApi* | [**private_designs_get_all_folders**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_all_folders) | **GET** /api/storage/v1/private-designs/folders/all | Returns all folders.
+*PrivateDesignsApi* | [**private_designs_get_file**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_file) | **GET** /api/storage/v1/private-designs/{id}/file | Returns an entity file from file storage.
+*PrivateDesignsApi* | [**private_designs_get_file_storage_info**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_file_storage_info) | **GET** /api/storage/v1/private-designs/file-storage-info | Returns information about the use of file storage.
+*PrivateDesignsApi* | [**private_designs_get_folder**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_folder) | **GET** /api/storage/v1/private-designs/folders/content-by-path | Returns a folder and its content by folder path.
+*PrivateDesignsApi* | [**private_designs_get_folder_info**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_folder_info) | **GET** /api/storage/v1/private-designs/folders/{id} | Returns a folder by ID.
+*PrivateDesignsApi* | [**private_designs_get_retention_policy**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_get_retention_policy) | **GET** /api/storage/v1/private-designs/{id}/retention-policy | Returns an entity retention policy by entity identifier.
+*PrivateDesignsApi* | [**private_designs_set_retention_policy**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_set_retention_policy) | **POST** /api/storage/v1/private-designs/{id}/retention-policy | Updates an entity retention policy by entity identifier.
+*PrivateDesignsApi* | [**private_designs_update**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_update) | **PUT** /api/storage/v1/private-designs/{id} | Updates the specified entity.
+*PrivateDesignsApi* | [**private_designs_update_folder**](aurigma\asset_storage/docs/PrivateDesignsApi.md#private_designs_update_folder) | **PUT** /api/storage/v1/private-designs/folders/{id} | Updates the specified folder.
+*PrivateImagesApi* | [**private_images_add_preview**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_add_preview) | **PUT** /api/storage/v1/private-images/{id}/preview | Creates a preview entity for specified source entity.
+*PrivateImagesApi* | [**private_images_batch_copy**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_batch_copy) | **POST** /api/storage/v1/private-images/batch-copy | Copies the specified entities and folders to another folder.
+*PrivateImagesApi* | [**private_images_batch_delete**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_batch_delete) | **POST** /api/storage/v1/private-images/batch-delete | Deletes the specified entities and folders.
+*PrivateImagesApi* | [**private_images_batch_update_custom_fields**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_batch_update_custom_fields) | **POST** /api/storage/v1/private-images/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*PrivateImagesApi* | [**private_images_batch_update_owner**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_batch_update_owner) | **POST** /api/storage/v1/private-images/batch-update-owner | Updates owner for the specified entities and folders.
+*PrivateImagesApi* | [**private_images_batch_update_parent_folder**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_batch_update_parent_folder) | **POST** /api/storage/v1/private-images/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*PrivateImagesApi* | [**private_images_copy**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_copy) | **POST** /api/storage/v1/private-images/{id} | Copies the specified entity.
+*PrivateImagesApi* | [**private_images_create**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_create) | **POST** /api/storage/v1/private-images | Creates a new entity.
+*PrivateImagesApi* | [**private_images_create_folder**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_create_folder) | **POST** /api/storage/v1/private-images/folders | Creates a new folder.
+*PrivateImagesApi* | [**private_images_delete**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_delete) | **DELETE** /api/storage/v1/private-images/{id} | Deletes the specified entity.
+*PrivateImagesApi* | [**private_images_delete_folder**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_delete_folder) | **DELETE** /api/storage/v1/private-images/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*PrivateImagesApi* | [**private_images_delete_folder_by_id**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_delete_folder_by_id) | **DELETE** /api/storage/v1/private-images/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*PrivateImagesApi* | [**private_images_get**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get) | **GET** /api/storage/v1/private-images/{id} | Returns an entity by ID.
+*PrivateImagesApi* | [**private_images_get_all**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_all) | **GET** /api/storage/v1/private-images | Returns all entities relevant to specified query parameters.
+*PrivateImagesApi* | [**private_images_get_all_folders**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_all_folders) | **GET** /api/storage/v1/private-images/folders/all | Returns all folders.
+*PrivateImagesApi* | [**private_images_get_file**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_file) | **GET** /api/storage/v1/private-images/{id}/file | Returns an entity file from file storage.
+*PrivateImagesApi* | [**private_images_get_file_storage_info**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_file_storage_info) | **GET** /api/storage/v1/private-images/file-storage-info | Returns information about the use of file storage.
+*PrivateImagesApi* | [**private_images_get_folder**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_folder) | **GET** /api/storage/v1/private-images/folders/content-by-path | Returns a folder and its content by folder path.
+*PrivateImagesApi* | [**private_images_get_folder_info**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_folder_info) | **GET** /api/storage/v1/private-images/folders/{id} | Returns a folder by ID.
+*PrivateImagesApi* | [**private_images_get_retention_policy**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_get_retention_policy) | **GET** /api/storage/v1/private-images/{id}/retention-policy | Returns an entity retention policy by entity identifier.
+*PrivateImagesApi* | [**private_images_set_retention_policy**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_set_retention_policy) | **POST** /api/storage/v1/private-images/{id}/retention-policy | Updates an entity retention policy by entity identifier.
+*PrivateImagesApi* | [**private_images_update**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_update) | **PUT** /api/storage/v1/private-images/{id} | Updates the specified entity.
+*PrivateImagesApi* | [**private_images_update_folder**](aurigma\asset_storage/docs/PrivateImagesApi.md#private_images_update_folder) | **PUT** /api/storage/v1/private-images/folders/{id} | Updates the specified folder.
+*PrivateMockupsApi* | [**private_mockups_add_preview**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_add_preview) | **PUT** /api/storage/v1/private-mockups/{id}/preview | Creates a preview entity for specified source entity.
+*PrivateMockupsApi* | [**private_mockups_batch_copy**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_batch_copy) | **POST** /api/storage/v1/private-mockups/batch-copy | Copies the specified entities and folders to another folder.
+*PrivateMockupsApi* | [**private_mockups_batch_delete**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_batch_delete) | **POST** /api/storage/v1/private-mockups/batch-delete | Deletes the specified entities and folders.
+*PrivateMockupsApi* | [**private_mockups_batch_update_custom_fields**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_batch_update_custom_fields) | **POST** /api/storage/v1/private-mockups/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*PrivateMockupsApi* | [**private_mockups_batch_update_owner**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_batch_update_owner) | **POST** /api/storage/v1/private-mockups/batch-update-owner | Updates owner for the specified entities and folders.
+*PrivateMockupsApi* | [**private_mockups_batch_update_parent_folder**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_batch_update_parent_folder) | **POST** /api/storage/v1/private-mockups/batch-update-parent-folder | Updates parent folder for the specified entities and folders.
+*PrivateMockupsApi* | [**private_mockups_copy**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_copy) | **POST** /api/storage/v1/private-mockups/{id} | Copies the specified entity.
+*PrivateMockupsApi* | [**private_mockups_create**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_create) | **POST** /api/storage/v1/private-mockups | Creates a new entity.
+*PrivateMockupsApi* | [**private_mockups_create_folder**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_create_folder) | **POST** /api/storage/v1/private-mockups/folders | Creates a new folder.
+*PrivateMockupsApi* | [**private_mockups_delete**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_delete) | **DELETE** /api/storage/v1/private-mockups/{id} | Deletes the specified entity.
+*PrivateMockupsApi* | [**private_mockups_delete_folder**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_delete_folder) | **DELETE** /api/storage/v1/private-mockups/folders/content-by-path | Deletes the specified folder and its content by folder path.
+*PrivateMockupsApi* | [**private_mockups_delete_folder_by_id**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_delete_folder_by_id) | **DELETE** /api/storage/v1/private-mockups/folders/{id} | Deletes the specified folder and its content by folder identifier.
+*PrivateMockupsApi* | [**private_mockups_get**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get) | **GET** /api/storage/v1/private-mockups/{id} | Returns an entity by ID.
+*PrivateMockupsApi* | [**private_mockups_get_all**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_all) | **GET** /api/storage/v1/private-mockups | Returns all entities relevant to specified query parameters.
+*PrivateMockupsApi* | [**private_mockups_get_all_folders**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_all_folders) | **GET** /api/storage/v1/private-mockups/folders/all | Returns all folders.
+*PrivateMockupsApi* | [**private_mockups_get_file**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_file) | **GET** /api/storage/v1/private-mockups/{id}/file | Returns an entity file from file storage.
+*PrivateMockupsApi* | [**private_mockups_get_file_storage_info**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_file_storage_info) | **GET** /api/storage/v1/private-mockups/file-storage-info | Returns information about the use of file storage.
+*PrivateMockupsApi* | [**private_mockups_get_folder**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_folder) | **GET** /api/storage/v1/private-mockups/folders/content-by-path | Returns a folder and its content by folder path.
+*PrivateMockupsApi* | [**private_mockups_get_folder_info**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_folder_info) | **GET** /api/storage/v1/private-mockups/folders/{id} | Returns a folder by ID.
+*PrivateMockupsApi* | [**private_mockups_get_retention_policy**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_get_retention_policy) | **GET** /api/storage/v1/private-mockups/{id}/retention-policy | Returns an entity retention policy by entity identifier.
+*PrivateMockupsApi* | [**private_mockups_set_retention_policy**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_set_retention_policy) | **POST** /api/storage/v1/private-mockups/{id}/retention-policy | Updates an entity retention policy by entity identifier.
+*PrivateMockupsApi* | [**private_mockups_update**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_update) | **PUT** /api/storage/v1/private-mockups/{id} | Updates the specified entity.
+*PrivateMockupsApi* | [**private_mockups_update_folder**](aurigma\asset_storage/docs/PrivateMockupsApi.md#private_mockups_update_folder) | **PUT** /api/storage/v1/private-mockups/folders/{id} | Updates the specified folder.
+*PrivateResourcesApi* | [**private_resources_batch_copy**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_batch_copy) | **POST** /api/storage/v1/private-resources/batch-copy | Copies the specified entities.
+*PrivateResourcesApi* | [**private_resources_batch_delete**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_batch_delete) | **POST** /api/storage/v1/private-resources/batch-delete | Deletes the specified entities.
+*PrivateResourcesApi* | [**private_resources_batch_update_custom_fields**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_batch_update_custom_fields) | **POST** /api/storage/v1/private-resources/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*PrivateResourcesApi* | [**private_resources_batch_update_owner**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_batch_update_owner) | **POST** /api/storage/v1/private-resources/batch-update-owner | Updates owner for the specified entities.
+*PrivateResourcesApi* | [**private_resources_copy**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_copy) | **POST** /api/storage/v1/private-resources/{id} | Copies the specified entity.
+*PrivateResourcesApi* | [**private_resources_create**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_create) | **POST** /api/storage/v1/private-resources | Creates a new entity.
+*PrivateResourcesApi* | [**private_resources_delete**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_delete) | **DELETE** /api/storage/v1/private-resources/{id} | Deletes the specified entity.
+*PrivateResourcesApi* | [**private_resources_delete_by_namespace**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_delete_by_namespace) | **DELETE** /api/storage/v1/private-resources/namespaces/{namespace} | Deletes all resources that use a specified namespace.
+*PrivateResourcesApi* | [**private_resources_get**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_get) | **GET** /api/storage/v1/private-resources/{id} | Returns an entity by ID.
+*PrivateResourcesApi* | [**private_resources_get_all**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_get_all) | **GET** /api/storage/v1/private-resources | Returns all entities relevant to specified query parameters.
+*PrivateResourcesApi* | [**private_resources_get_file**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_get_file) | **GET** /api/storage/v1/private-resources/{id}/file | Returns an entity file from file storage.
+*PrivateResourcesApi* | [**private_resources_get_file_storage_info**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_get_file_storage_info) | **GET** /api/storage/v1/private-resources/file-storage-info | Returns information about storage usage by private resource files.
+*PrivateResourcesApi* | [**private_resources_get_retention_policy**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_get_retention_policy) | **GET** /api/storage/v1/private-resources/{id}/retention-policy | Returns an entity retention policy by entity identifier.
+*PrivateResourcesApi* | [**private_resources_set_retention_policy**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_set_retention_policy) | **POST** /api/storage/v1/private-resources/{id}/retention-policy | Updates an entity retention policy by entity identifier.
+*PrivateResourcesApi* | [**private_resources_update**](aurigma\asset_storage/docs/PrivateResourcesApi.md#private_resources_update) | **PUT** /api/storage/v1/private-resources/{id} | Updates the specified entity.
+*ResourcesApi* | [**resources_batch_copy**](aurigma\asset_storage/docs/ResourcesApi.md#resources_batch_copy) | **POST** /api/storage/v1/resources/batch-copy | Copies the specified entities.
+*ResourcesApi* | [**resources_batch_delete**](aurigma\asset_storage/docs/ResourcesApi.md#resources_batch_delete) | **POST** /api/storage/v1/resources/batch-delete | Deletes the specified entities.
+*ResourcesApi* | [**resources_batch_update_custom_fields**](aurigma\asset_storage/docs/ResourcesApi.md#resources_batch_update_custom_fields) | **POST** /api/storage/v1/resources/batch-update-custom-fields | Updates custom fields values for the specified entities.
+*ResourcesApi* | [**resources_copy**](aurigma\asset_storage/docs/ResourcesApi.md#resources_copy) | **POST** /api/storage/v1/resources/{id} | Copies the specified entity.
+*ResourcesApi* | [**resources_create**](aurigma\asset_storage/docs/ResourcesApi.md#resources_create) | **POST** /api/storage/v1/resources | Creates a new entity.
+*ResourcesApi* | [**resources_delete**](aurigma\asset_storage/docs/ResourcesApi.md#resources_delete) | **DELETE** /api/storage/v1/resources/{id} | Deletes the specified entity.
+*ResourcesApi* | [**resources_delete_by_namespace**](aurigma\asset_storage/docs/ResourcesApi.md#resources_delete_by_namespace) | **DELETE** /api/storage/v1/resources/namespaces/{namespace} | Deletes all resources that use a specified namespace.
+*ResourcesApi* | [**resources_get**](aurigma\asset_storage/docs/ResourcesApi.md#resources_get) | **GET** /api/storage/v1/resources/{id} | Returns an entity by ID.
+*ResourcesApi* | [**resources_get_all**](aurigma\asset_storage/docs/ResourcesApi.md#resources_get_all) | **GET** /api/storage/v1/resources | Returns all entities relevant to specified query parameters.
+*ResourcesApi* | [**resources_get_file**](aurigma\asset_storage/docs/ResourcesApi.md#resources_get_file) | **GET** /api/storage/v1/resources/{id}/file | Returns an entity file from file storage.
+*ResourcesApi* | [**resources_get_file_storage_info**](aurigma\asset_storage/docs/ResourcesApi.md#resources_get_file_storage_info) | **GET** /api/storage/v1/resources/file-storage-info | Returns information about storage usage by resource files.
+*ResourcesApi* | [**resources_update**](aurigma\asset_storage/docs/ResourcesApi.md#resources_update) | **PUT** /api/storage/v1/resources/{id} | Updates the specified entity.
+*TenantsApi* | [**tenants_clean_up**](aurigma\asset_storage/docs/TenantsApi.md#tenants_clean_up) | **POST** /api/storage/v1/tenants/{id}/clean-up | Forcefully starts obsolete assets clean-up as background job.
+*TenantsApi* | [**tenants_create**](aurigma\asset_storage/docs/TenantsApi.md#tenants_create) | **POST** /api/storage/v1/tenants | Creates a new tenant.
+*TenantsApi* | [**tenants_delete**](aurigma\asset_storage/docs/TenantsApi.md#tenants_delete) | **DELETE** /api/storage/v1/tenants/{id} | Deletes the specified tenant.
+*TenantsApi* | [**tenants_get**](aurigma\asset_storage/docs/TenantsApi.md#tenants_get) | **GET** /api/storage/v1/tenants/{id} | Returns a tenant by ID.
+*TenantsApi* | [**tenants_get_all**](aurigma\asset_storage/docs/TenantsApi.md#tenants_get_all) | **GET** /api/storage/v1/tenants | Returns all tenants.
+*TenantsApi* | [**tenants_update**](aurigma\asset_storage/docs/TenantsApi.md#tenants_update) | **PUT** /api/storage/v1/tenants/{id} | Updates the specified tenant.
+
+
+## Documentation For Models
+
+ - [ArtifactDto](aurigma\asset_storage/docs/ArtifactDto.md)
+ - [ArtifactType](aurigma\asset_storage/docs/ArtifactType.md)
+ - [AssetRelation](aurigma\asset_storage/docs/AssetRelation.md)
+ - [BatchConflictDto](aurigma\asset_storage/docs/BatchConflictDto.md)
+ - [BatchCopyInput](aurigma\asset_storage/docs/BatchCopyInput.md)
+ - [BatchCopyResourcesInput](aurigma\asset_storage/docs/BatchCopyResourcesInput.md)
+ - [BatchDeleteInput](aurigma\asset_storage/docs/BatchDeleteInput.md)
+ - [BatchDeleteResourcesInput](aurigma\asset_storage/docs/BatchDeleteResourcesInput.md)
+ - [BatchUpdateCustomFieldsInput](aurigma\asset_storage/docs/BatchUpdateCustomFieldsInput.md)
+ - [BatchUpdateOwnerInput](aurigma\asset_storage/docs/BatchUpdateOwnerInput.md)
+ - [BatchUpdateParentFolderInput](aurigma\asset_storage/docs/BatchUpdateParentFolderInput.md)
+ - [BatchUpdateResourcesOwnerInput](aurigma\asset_storage/docs/BatchUpdateResourcesOwnerInput.md)
+ - [BuildInfoModel](aurigma\asset_storage/docs/BuildInfoModel.md)
+ - [ColorProfileClass](aurigma\asset_storage/docs/ColorProfileClass.md)
+ - [ColorProfileDto](aurigma\asset_storage/docs/ColorProfileDto.md)
+ - [ColorProfileMetadata](aurigma\asset_storage/docs/ColorProfileMetadata.md)
+ - [ColorSpace](aurigma\asset_storage/docs/ColorSpace.md)
+ - [ConflictDto](aurigma\asset_storage/docs/ConflictDto.md)
+ - [ConflictResolvingStrategy](aurigma\asset_storage/docs/ConflictResolvingStrategy.md)
+ - [ConflictSpecifierDto](aurigma\asset_storage/docs/ConflictSpecifierDto.md)
+ - [ConflictType](aurigma\asset_storage/docs/ConflictType.md)
+ - [CreateFolderDto](aurigma\asset_storage/docs/CreateFolderDto.md)
+ - [CreateTenantDto](aurigma\asset_storage/docs/CreateTenantDto.md)
+ - [CustomFieldsUpdateStrategy](aurigma\asset_storage/docs/CustomFieldsUpdateStrategy.md)
+ - [DataSchemaDto](aurigma\asset_storage/docs/DataSchemaDto.md)
+ - [DataSchemaMetadata](aurigma\asset_storage/docs/DataSchemaMetadata.md)
+ - [DataSetDto](aurigma\asset_storage/docs/DataSetDto.md)
+ - [DataSetMetadata](aurigma\asset_storage/docs/DataSetMetadata.md)
+ - [DesignDto](aurigma\asset_storage/docs/DesignDto.md)
+ - [DesignFontMetadata](aurigma\asset_storage/docs/DesignFontMetadata.md)
+ - [DesignMetadata](aurigma\asset_storage/docs/DesignMetadata.md)
+ - [DesignPaletteMetadata](aurigma\asset_storage/docs/DesignPaletteMetadata.md)
+ - [DesignPrintAreaMetadata](aurigma\asset_storage/docs/DesignPrintAreaMetadata.md)
+ - [DesignSurfaceMetadata](aurigma\asset_storage/docs/DesignSurfaceMetadata.md)
+ - [DocumentDto](aurigma\asset_storage/docs/DocumentDto.md)
+ - [DocumentFormatType](aurigma\asset_storage/docs/DocumentFormatType.md)
+ - [DocumentType](aurigma\asset_storage/docs/DocumentType.md)
+ - [FileStorageInfoDto](aurigma\asset_storage/docs/FileStorageInfoDto.md)
+ - [FolderContentOfColorProfileDto](aurigma\asset_storage/docs/FolderContentOfColorProfileDto.md)
+ - [FolderContentOfDataSchemaDto](aurigma\asset_storage/docs/FolderContentOfDataSchemaDto.md)
+ - [FolderContentOfDataSetDto](aurigma\asset_storage/docs/FolderContentOfDataSetDto.md)
+ - [FolderContentOfDesignDto](aurigma\asset_storage/docs/FolderContentOfDesignDto.md)
+ - [FolderContentOfDocumentDto](aurigma\asset_storage/docs/FolderContentOfDocumentDto.md)
+ - [FolderContentOfFontDto](aurigma\asset_storage/docs/FolderContentOfFontDto.md)
+ - [FolderContentOfImageDto](aurigma\asset_storage/docs/FolderContentOfImageDto.md)
+ - [FolderContentOfMockupDto](aurigma\asset_storage/docs/FolderContentOfMockupDto.md)
+ - [FolderContentOfPaletteDto](aurigma\asset_storage/docs/FolderContentOfPaletteDto.md)
+ - [FolderDto](aurigma\asset_storage/docs/FolderDto.md)
+ - [FolderInfoDto](aurigma\asset_storage/docs/FolderInfoDto.md)
+ - [FontDto](aurigma\asset_storage/docs/FontDto.md)
+ - [FontMetadata](aurigma\asset_storage/docs/FontMetadata.md)
+ - [ImageDto](aurigma\asset_storage/docs/ImageDto.md)
+ - [ImageMetadata](aurigma\asset_storage/docs/ImageMetadata.md)
+ - [ImagePageMetadata](aurigma\asset_storage/docs/ImagePageMetadata.md)
+ - [MockupDto](aurigma\asset_storage/docs/MockupDto.md)
+ - [MockupFormatType](aurigma\asset_storage/docs/MockupFormatType.md)
+ - [MockupMetadataDto](aurigma\asset_storage/docs/MockupMetadataDto.md)
+ - [MockupType](aurigma\asset_storage/docs/MockupType.md)
+ - [PagedOfArtifactDto](aurigma\asset_storage/docs/PagedOfArtifactDto.md)
+ - [PagedOfColorProfileDto](aurigma\asset_storage/docs/PagedOfColorProfileDto.md)
+ - [PagedOfDataSchemaDto](aurigma\asset_storage/docs/PagedOfDataSchemaDto.md)
+ - [PagedOfDataSetDto](aurigma\asset_storage/docs/PagedOfDataSetDto.md)
+ - [PagedOfDesignDto](aurigma\asset_storage/docs/PagedOfDesignDto.md)
+ - [PagedOfDocumentDto](aurigma\asset_storage/docs/PagedOfDocumentDto.md)
+ - [PagedOfFontDto](aurigma\asset_storage/docs/PagedOfFontDto.md)
+ - [PagedOfImageDto](aurigma\asset_storage/docs/PagedOfImageDto.md)
+ - [PagedOfMockupDto](aurigma\asset_storage/docs/PagedOfMockupDto.md)
+ - [PagedOfPaletteDto](aurigma\asset_storage/docs/PagedOfPaletteDto.md)
+ - [PagedOfPreviewDto](aurigma\asset_storage/docs/PagedOfPreviewDto.md)
+ - [PagedOfResourceDto](aurigma\asset_storage/docs/PagedOfResourceDto.md)
+ - [PagedOfTenantDto](aurigma\asset_storage/docs/PagedOfTenantDto.md)
+ - [PaletteDto](aurigma\asset_storage/docs/PaletteDto.md)
+ - [PaletteMetadata](aurigma\asset_storage/docs/PaletteMetadata.md)
+ - [PreviewDto](aurigma\asset_storage/docs/PreviewDto.md)
+ - [PreviewMetadata](aurigma\asset_storage/docs/PreviewMetadata.md)
+ - [ProblemDetails](aurigma\asset_storage/docs/ProblemDetails.md)
+ - [ResourceDto](aurigma\asset_storage/docs/ResourceDto.md)
+ - [RetentionPolicy](aurigma\asset_storage/docs/RetentionPolicy.md)
+ - [TenantDto](aurigma\asset_storage/docs/TenantDto.md)
+ - [TenantSettingsDto](aurigma\asset_storage/docs/TenantSettingsDto.md)
+ - [UpdateFolderDto](aurigma\asset_storage/docs/UpdateFolderDto.md)
+ - [UpdateTenantDto](aurigma\asset_storage/docs/UpdateTenantDto.md)
+
+
+<a id="documentation-for-authorization"></a>
+## Documentation For Authorization
+
+
+Authentication schemes defined for the API:
+<a id="ApiKey"></a>
+### ApiKey
+
+- **Type**: API key
+- **API key parameter name**: X-API-Key
+- **Location**: HTTP header
+
+<a id="Bearer"></a>
+### Bearer
+
+- **Type**: API key
+- **API key parameter name**: Authorization
+- **Location**: HTTP header
+
+<a id="OAuth2Code"></a>
+### OAuth2Code
+
+- **Type**: OAuth
+- **Flow**: accessCode
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Assets_full**: Manipulate public assets (images, designs, fonts, etc.)
+ - **Assets_read**: Read public assets (images, designs, fonts, etc.)
+ - **Private_assets_full**: Manipulate private user images and designs
+ - **Private_assets_update**: Read and Update private user images and designs
+ - **Private_assets_read**: Read private user images and designs
+ - **Tenants_full**: Manipulate tenants
+ - **Tenants_update**: Read and Update tenants
+
+<a id="OAuth2Implicit"></a>
+### OAuth2Implicit
+
+- **Type**: OAuth
+- **Flow**: implicit
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Assets_full**: Manipulate public assets (images, designs, fonts, etc.)
+ - **Assets_read**: Read public assets (images, designs, fonts, etc.)
+ - **Private_assets_full**: Manipulate private user images and designs
+ - **Private_assets_update**: Read and Update private user images and designs
+ - **Private_assets_read**: Read private user images and designs
+ - **Tenants_full**: Manipulate tenants
+ - **Tenants_update**: Read and Update tenants
+
+<a id="OAuth2ClientCredentials"></a>
+### OAuth2ClientCredentials
+
+- **Type**: OAuth
+- **Flow**: application
+- **Authorization URL**: 
+- **Scopes**: 
+ - **Assets_full**: Manipulate public assets (images, designs, fonts, etc.)
+ - **Assets_read**: Read public assets (images, designs, fonts, etc.)
+ - **Private_assets_full**: Manipulate private user images and designs
+ - **Private_assets_update**: Read and Update private user images and designs
+ - **Private_assets_read**: Read private user images and designs
+ - **Tenants_full**: Manipulate tenants
+ - **Tenants_update**: Read and Update tenants
+
+
+
+
+
