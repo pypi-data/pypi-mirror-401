@@ -1,0 +1,60 @@
+Metadata-Version: 2.4
+Name: anscom
+Version: 0.4.0
+Summary: A fast native C recursive file scanner and analyzer
+Home-page: https://github.com/PC5518
+Author: Aditya Narayan Singh
+Author-email: adityansdsdc@outlook.com
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: C
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-python
+Dynamic: summary
+
+# Anscom
+
+**Anscom** is a high-performance, native C extension for Python that recursively scans directories and categorizes files with blazingly fast speed.
+
+## Features
+- **Native C Speed:** Written in pure C (C89 compliant).
+- **Visual Tree:** Prints a diagrammatic folder tree in the terminal.
+- **Detailed Analysis:** Breakdowns by category and specific file extensions.
+- **Cross-Platform:** Works on Windows, Linux, and macOS.
+
+## Installation
+```bash
+pip install anscom
+
+
+
+Usage
+code
+Python
+import anscom
+
+# Scan the current directory
+anscom.scan(".")
+
+# Scan a specific path
+anscom.scan("C:/Users/Documents")
+code
+Code
+---
+
+### Step 2: Create a `MANIFEST.in`
+When you package C modules, Python needs to know exactly which source files to include. Create a file named `MANIFEST.in`:
+
+```text
+include *.c
+include *.h
+include LICENSE
+include README.md
