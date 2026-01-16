@@ -1,0 +1,62 @@
+{%- extends 'lab/base.html.j2' -%}
+
+{#
+  Override cell rendering to add custom IDs for CSS targeting.
+  This allows the generated CSS rules (#cell-0, #cell-0-input, #cell-0-output)
+  to properly target the HTML elements.
+#}
+
+{% block codecell %}
+{%- if not cell.outputs -%}
+{%- set no_output_class="jp-mod-noOutputs" -%}
+{%- endif -%}
+{%- if not resources.global_content_filter.include_input -%}
+{%- set no_input_class="jp-mod-noInput" -%}
+{%- endif -%}
+{%- set custom_class = cell.metadata.get('cell_class', '') -%}
+<div {{ cell_id_anchor(cell) }} id="cell-{{ loop.index0 }}" class="jp-Cell jp-CodeCell jp-Notebook-cell {{ no_output_class }} {{ no_input_class }} {{ celltags(cell) }}{% if custom_class %} {{ custom_class }}{% endif %}">
+{{ super() }}
+</div>
+{%- endblock codecell %}
+
+{% block input_group -%}
+{%- set input_custom_class = cell.metadata.get('input_cell_class', '') -%}
+<div class="jp-Cell-inputWrapper{% if input_custom_class %} {{ input_custom_class }}{% endif %}" id="cell-{{ loop.index0 }}-input">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+{{ super() }}
+</div>
+</div>
+{% endblock input_group %}
+
+{% block output_group %}
+{%- set output_custom_class = cell.metadata.get('output_cell_class', '') -%}
+<div class="jp-Cell-outputWrapper{% if output_custom_class %} {{ output_custom_class }}{% endif %}" id="cell-{{ loop.index0 }}-output">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+{{ super() }}
+</div>
+{% endblock output_group %}
+
+{% block markdowncell scoped %}
+{%- set custom_class = cell.metadata.get('cell_class', '') -%}
+<div {{ cell_id_anchor(cell) }} id="cell-{{ loop.index0 }}" class="jp-Cell jp-MarkdownCell jp-Notebook-cell{% if custom_class %} {{ custom_class }}{% endif %}">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput {{ celltags(cell) }}" data-mime-type="text/markdown">
+{{ cell.source  | markdown2html | strip_files_prefix }}
+</div>
+</div>
+</div>
+</div>
+{%- endblock markdowncell %}
+
+{% block rawcell scoped %}
+{%- set custom_class = cell.metadata.get('cell_class', '') -%}
+<div {{ cell_id_anchor(cell) }} id="cell-{{ loop.index0 }}" class="jp-Cell jp-RawCell jp-Notebook-cell{% if custom_class %} {{ custom_class }}{% endif %}">
+{{ cell.source | wrap_text(80) }}
+</div>
+{%- endblock rawcell %}
