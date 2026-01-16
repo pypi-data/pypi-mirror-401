@@ -1,0 +1,31 @@
+[project]
+name = "xaal.gtknotify"
+version = "0.1.2"
+description = "xAAL Desktop notification device"
+readme = "README.rst"
+authors = [ { name = "Jerome Kerdreux", email = "Jerome.Kerdreux@imt-atlantique.fr" } ]
+license = "GPL-3.0-or-later"
+classifiers = ["Programming Language :: Python",
+"Topic :: Software Development :: Libraries :: Python Modules"]
+keywords = ["xaal", "gtk", "notify"]
+dependencies = ["xaal.lib", "pycairo", "PyGObject"]
+
+[tool.setuptools.packages.find]
+include = ["xaal*"]
+namespaces = true
+
+[project.urls]
+Homepage = "https://recherche.imt-atlantique.fr/xaal/"
+Documentation = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/notifications/gtk-notify/README.rst"
+Source = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/notifications/gtk-notify"
+
+[tool.ruff]
+line-length = 122
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 122
+skip-string-normalization = true
+
