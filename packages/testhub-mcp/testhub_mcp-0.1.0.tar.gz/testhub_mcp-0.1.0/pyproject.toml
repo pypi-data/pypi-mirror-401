@@ -1,0 +1,68 @@
+[project]
+name = "testhub-mcp"
+version = "0.1.0"
+description = "TestHub MCP Server - 提供开发任务管理和项目文档集成"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "TestHub Team" }]
+keywords = ["mcp", "cursor", "testhub", "documentation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.25.0",
+    "loguru>=0.7.0",
+]
+
+[project.optional-dependencies]
+# SSE 模式依赖（HTTP 远程访问）
+sse = [
+    "starlette>=0.27.0",
+    "uvicorn>=0.23.0",
+    "sse-starlette>=1.6.0",
+]
+# 开发依赖
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+# 全部依赖
+all = [
+    "testhub-mcp[sse,dev]",
+]
+
+[project.scripts]
+testhub-mcp = "testhub_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["testhub_mcp"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "W", "I", "UP"]
+ignore = []
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
