@@ -1,0 +1,82 @@
+Metadata-Version: 2.4
+Name: vibekit-cli
+Version: 0.1.0
+Summary: VibeKit CLI - Configure AI coding workflows in SaaS, execute locally
+Author-email: ZySec AI <hello@zysec.ai>
+License: MIT
+Project-URL: Homepage, https://vkcli.com
+Project-URL: Documentation, https://vkcli.com/docs
+Project-URL: Repository, https://github.com/ZySec-AI/vkcli
+Keywords: vibekit,vkcli,claude-code,ai-coding,cli
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: keyring>=25.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: PyJWT>=2.8.0
+Dynamic: license-file
+
+# vkcli
+
+CLI for [VibeKit](https://vkcli.com) - Configure AI coding workflows in SaaS, execute locally with Claude Code.
+
+## Installation
+
+```bash
+pip install vibekit-cli
+```
+
+## Quick Start
+
+```bash
+# Login to VibeKit
+vk login
+
+# Link to your project
+vk link owner/project-name
+
+# Pull configuration
+vk pull
+
+# Push updates
+vk push
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `vk login` | Authenticate with VibeKit |
+| `vk logout` | Clear credentials |
+| `vk init` | Initialize new project |
+| `vk link <slug>` | Link existing project |
+| `vk pull` | Pull config from SaaS |
+| `vk push` | Push updates to SaaS |
+| `vk status` | Show sync status |
+
+## How It Works
+
+1. **Configure** your project at [vkcli.com](https://vkcli.com)
+2. **Pull** configuration to your local `.vk/` folder
+3. **Code** with Claude Code using your rules and context
+4. **Push** metrics and status back to SaaS
+
+## Documentation
+
+Full documentation at [vkcli.com/docs](https://vkcli.com/docs)
+
+## License
+
+MIT
