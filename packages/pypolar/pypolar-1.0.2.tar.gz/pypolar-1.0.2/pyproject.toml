@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["pypolar"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pypolar.__version__"}
+
+[project]
+name = "pypolar"
+authors = [
+    { name = "Scott Prahl", email = "scott.prahl@oit.edu" }
+]
+description = "Routines for analysis of polarization"
+keywords = [
+    "retarder",
+    "quarter wave",
+    "half wave",
+    "Jones calculus",
+    "birefringent",
+    "ellipsometry",
+    "Fresnel",
+    "Mueller calculus",
+    "Stokes vector",
+    ]
+readme = "README.rst"
+license = "MIT"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "sympy"
+]
+
+[project.optional-dependencies]
+docs = [
+  "Sphinx==8.1.3",
+  "nbsphinx==0.9.7",
+  "sphinx_automodapi",
+  "sphinx_rtd_theme",
+]
+
+dev = [
+  # only needed if driving an ellipsometer 
+  "pyserial",
+
+  # needed for dynamic cells in notebooks
+  "ipywidgets",
+
+  # Testing / Lint / QA
+  "pytest",
+  "ruff",
+  "yamllint",
+  "rstcheck",
+  "pylint",
+  "pyroma",
+  "black[jupyter]",
+
+  # Release / packaging checks
+  "build",
+  "check-manifest",
+  "libarchive-c",
+  "pyyaml",
+  "setuptools",
+
+  # Notebooks (local JupyterLab workflows)
+  "jupyterlab",
+  "nbconvert",
+  "nbformat",
+]
+
+lite = [
+  "jupyterlite-core==0.6.4",
+  "jupyterlite-pyodide-kernel==0.6.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/scottprahl/pypolar"
+Documentation = "https://pypolar.readthedocs.io"
+Source = "https://github.com/scottprahl/pypolar"
+Tracker = "https://github.com/scottprahl/pypolar/issues"
+Changelog = "https://github.com/scottprahl/pypolar/blob/main/docs/CHANGELOG.rst"
+
+[tool.black]
+line-length = 120
+target-version = ["py39", "py310", "py311", "py312", "py313"]
+
+[tool.pylint]
+disable = [
+    "C0103", "C0209", "C0302",
+    "R0902", "R0904", "R0912", "R0913", "R0914", "R0915", "R0917", "R1702",
+    "W0511"
+]
+max-line-length = 120
+
+[tool.ruff]
+line-length = 120
+exclude = ["docs", ".venv"]
+lint.select = ["D", "E", "F", "W"]
+lint.ignore = ["D200", "D212", "F403"]
+lint.pydocstyle.convention = "google"
+
+[tool.check-manifest]
+ignore = [
+  ".readthedocs.yaml",
+  ".testignore",
+  "docs/*",
+  "docs/**/*",
+  "Makefile",
+  "pypolar/gaerter-arduino-controller.ino",
+  "pypolar/jupyter_lite_config.json",
+  "release.txt",
+]
