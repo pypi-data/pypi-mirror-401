@@ -1,0 +1,145 @@
+Metadata-Version: 2.3
+Name: hotopy
+Version: 0.24
+Summary: A toolbox for X-ray holo-tomography in Python
+Author: Jens Lucht, Paul Meyer, Leon M. Lohse
+Author-email: Jens Lucht <jens.lucht@uni-goettingen.de>, Paul Meyer <paul.meyer@uni-goettingen.de>, Leon M. Lohse <llohse@uni-goettingen.de>
+License: GPL-3.0-or-later
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Scientific/Engineering :: Image Processing
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: OS Independent
+Requires-Dist: matplotlib
+Requires-Dist: scipy
+Requires-Dist: numpy>=2
+Requires-Dist: pooch>=1.2
+Requires-Dist: torch
+Requires-Dist: scikit-image
+Requires-Dist: tqdm
+Requires-Dist: ptwt
+Requires-Dist: ruff>=0.7.2 ; extra == 'dev'
+Requires-Dist: pre-commit>=4.1.0 ; extra == 'dev'
+Requires-Dist: sphinx ; extra == 'docs'
+Requires-Dist: pydata-sphinx-theme ; extra == 'docs'
+Requires-Dist: sphinxcontrib-bibtex ; extra == 'docs'
+Requires-Dist: nbsphinx ; extra == 'docs'
+Requires-Dist: ipykernel ; extra == 'docs'
+Requires-Dist: astra-toolbox>=2.4.1 ; extra == 'tomo'
+Requires-Python: >=3.10
+Project-URL: documentation, https://irp.pages.gwdg.de/hotopy/
+Project-URL: homepage, https://gitlab.gwdg.de/irp/hotopy
+Project-URL: repository, https://gitlab.gwdg.de/irp/hotopy.git
+Provides-Extra: dev
+Provides-Extra: docs
+Provides-Extra: tomo
+Description-Content-Type: text/markdown
+
+HoToPy - A toolbox for X-ray holo-tomography in Python
+
+# HoToPy
+
+## Installation
+
+We recommend to install HoToPy in a dedicated [Python virtual environment](https://docs.python.org/3/library/venv.html#creating-virtual-environments),
+which can be created using [`uv venv`](https://docs.astral.sh/uv/pip/environments/) or vanilla Python venv `python3 -m venv`.
+
+### pip installation
+
+HoToPy can be installed through pip by running
+```commandline
+pip install hotopy
+```
+for a basic HoToPy installation. 
+
+### Tomography backend
+
+The base installation of HoToPy does not contain a tomography backend. If you intend to use  the _tomographic functions_
+in `hotopy.tomo`, you need to install the [ASTRA toolbox][astra] as tomographic backend.
+
+It can be conveniently installation through the optional dependency `tomo` of HoToPy by running,
+```commandline
+pip install hotopy[tomo]
+```
+Alternative installation methods of the [ASTRA toolbox][astra] can be found in its documentation.
+
+### PyTorch CUDA version
+
+#### uv
+
+You can use [Astral's `uv`][uv] (an extremely fast Python package and project manager) built-in features to install
+different versions of CUDA backends.
+Consult their uv [PyTorch integration documentation](https://docs.astral.sh/uv/guides/integration/pytorch/) for details.
+
+For example, you can explicitly request PyTorch with CUDA-13.0 with:
+```commandline
+uv pip install hotopy --torch-backend=cu130
+```
+Replace `cu130` with your desired version, e.g. `cpu`, `cu126`, `cu128`, etc. See [available targets][pytorch-legacy-versions].
+Also, an automatic PyTorch backend selection is possible with `auto`.
+
+#### pip
+
+*We strongly recommend using the uv tool, see above.*
+
+For pip-based installation, you can use the index URLs provided by the PyTorch project, see their
+[Getting started documentation](https://pytorch.org/get-started/locally/).
+For example, you can install HoToPy with PyTorch using CUDA-13.0 by running:
+```commandline
+pip install hotopy --index-url https://download.pytorch.org/whl/cu130 --extra-index-url https://pypi.org/simple/
+```
+Replace `cu130` with your desired version, e.g. `cpu`, `cu126`, `cu128`, etc. See [available targets][pytorch-legacy-versions].
+
+### Source installations
+
+You can also install bleeding-edge versions of HoToPy by cloning the repository.
+```commandline
+git clone https://gitlab.gwdg.de/irp/hotopy.git
+cd hotopy
+[uv] pip install '.[tomo,dev]'
+```
+Here, the optional dependencies for tomography and development (`dev`) are included in the installation. You may add the
+`--editable` flag to the installation, for an editable development deployment.
+
+## Getting started
+
+You can find examples in the dedicated [HoToPy-Examples repository](https://gitlab.gwdg.de/irp/hotopy-examples).
+
+## Documentation
+
+Check out our online documentation at [https://irp.pages.gwdg.de/hotopy](https://irp.pages.gwdg.de/hotopy).
+
+## Paper & Citation
+
+If you use HoToPy, please cite the paper [HoToPy: a toolbox for X-ray holo-tomography in Python][paper]
+
+```
+@article{Lucht2025_hotopy,
+    author = "Lucht, Jens and Meyer, Paul and Lohse, Leon Merten and Salditt, Tim",
+    title = "{{\it HoToPy}: a toolbox for X-ray holo-tomography in Python}",
+    journal = "Journal of Synchrotron Radiation",
+    year = "2025",
+    volume = "32",
+    number = "6",
+    pages = "1586--1594",
+    month = "Nov",
+    doi = {10.1107/S1600577525008550},
+    url = {https://doi.org/10.1107/S1600577525008550},
+    keywords = {X-ray imaging, phase retrieval, computed tomography, phase contrast, holography},
+}
+```
+
+[holotomo]: https://gitlab.gwdg.de/irp/holotomotoolbox
+[astra]: https://astra-toolbox.com/
+[paper]: https://doi.org/10.1107/S1600577525008550
+[uv]: https://docs.astral.sh/uv/
+[pytorch-legacy-versions]: https://pytorch.org/get-started/previous-versions/
