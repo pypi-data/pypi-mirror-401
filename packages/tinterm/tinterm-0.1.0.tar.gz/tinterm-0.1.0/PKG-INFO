@@ -1,0 +1,640 @@
+Metadata-Version: 2.4
+Name: tinterm
+Version: 0.1.0
+Summary: A lightweight Python library for coloring terminal output with zero dependencies.
+Author: Tobias Hafner
+License:                                  Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           1. Definitions.
+        
+              "License" shall mean the terms and conditions for use, reproduction,
+              and distribution as defined by Sections 1 through 9 of this document.
+        
+              "Licensor" shall mean the copyright owner or entity authorized by
+              the copyright owner that is granting the License.
+        
+              "Legal Entity" shall mean the union of the acting entity and all
+              other entities that control, are controlled by, or are under common
+              control with that entity. For the purposes of this definition,
+              "control" means (i) the power, direct or indirect, to cause the
+              direction or management of such entity, whether by contract or
+              otherwise, or (ii) ownership of fifty percent (50%) or more of the
+              outstanding shares, or (iii) beneficial ownership of such entity.
+        
+              "You" (or "Your") shall mean an individual or Legal Entity
+              exercising permissions granted by this License.
+        
+              "Source" form shall mean the preferred form for making modifications,
+              including but not limited to software source code, documentation
+              source, and configuration files.
+        
+              "Object" form shall mean any form resulting from mechanical
+              transformation or translation of a Source form, including but
+              not limited to compiled object code, generated documentation,
+              and conversions to other media types.
+        
+              "Work" shall mean the work of authorship, whether in Source or
+              Object form, made available under the License, as indicated by a
+              copyright notice that is included in or attached to the work
+              (an example is provided in the Appendix below).
+        
+              "Derivative Works" shall mean any work, whether in Source or Object
+              form, that is based on (or derived from) the Work and for which the
+              editorial revisions, annotations, elaborations, or other modifications
+              represent, as a whole, an original work of authorship. For the purposes
+              of this License, Derivative Works shall not include works that remain
+              separable from, or merely link (or bind by name) to the interfaces of,
+              the Work and Derivative Works thereof.
+        
+              "Contribution" shall mean any work of authorship, including
+              the original version of the Work and any modifications or additions
+              to that Work or Derivative Works thereof, that is intentionally
+              submitted to Licensor for inclusion in the Work by the copyright owner
+              or by an individual or Legal Entity authorized to submit on behalf of
+              the copyright owner. For the purposes of this definition, "submitted"
+              means any form of electronic, verbal, or written communication sent
+              to the Licensor or its representatives, including but not limited to
+              communication on electronic mailing lists, source code control systems,
+              and issue tracking systems that are managed by, or on behalf of, the
+              Licensor for the purpose of discussing and improving the Work, but
+              excluding communication that is conspicuously marked or otherwise
+              designated in writing by the copyright owner as "Not a Contribution."
+        
+              "Contributor" shall mean Licensor and any individual or Legal Entity
+              on behalf of whom a Contribution has been received by Licensor and
+              subsequently incorporated within the Work.
+        
+           2. Grant of Copyright License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              copyright license to reproduce, prepare Derivative Works of,
+              publicly display, publicly perform, sublicense, and distribute the
+              Work and such Derivative Works in Source or Object form.
+        
+           3. Grant of Patent License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              (except as stated in this section) patent license to make, have made,
+              use, offer to sell, sell, import, and otherwise transfer the Work,
+              where such license applies only to those patent claims licensable
+              by such Contributor that are necessarily infringed by their
+              Contribution(s) alone or by combination of their Contribution(s)
+              with the Work to which such Contribution(s) was submitted. If You
+              institute patent litigation against any entity (including a
+              cross-claim or counterclaim in a lawsuit) alleging that the Work
+              or a Contribution incorporated within the Work constitutes direct
+              or contributory patent infringement, then any patent licenses
+              granted to You under this License for that Work shall terminate
+              as of the date such litigation is filed.
+        
+           4. Redistribution. You may reproduce and distribute copies of the
+              Work or Derivative Works thereof in any medium, with or without
+              modifications, and in Source or Object form, provided that You
+              meet the following conditions:
+        
+              (a) You must give any other recipients of the Work or
+                  Derivative Works a copy of this License; and
+        
+              (b) You must cause any modified files to carry prominent notices
+                  stating that You changed the files; and
+        
+              (c) You must retain, in the Source form of any Derivative Works
+                  that You distribute, all copyright, patent, trademark, and
+                  attribution notices from the Source form of the Work,
+                  excluding those notices that do not pertain to any part of
+                  the Derivative Works; and
+        
+              (d) If the Work includes a "NOTICE" text file as part of its
+                  distribution, then any Derivative Works that You distribute must
+                  include a readable copy of the attribution notices contained
+                  within such NOTICE file, excluding those notices that do not
+                  pertain to any part of the Derivative Works, in at least one
+                  of the following places: within a NOTICE text file distributed
+                  as part of the Derivative Works; within the Source form or
+                  documentation, if provided along with the Derivative Works; or,
+                  within a display generated by the Derivative Works, if and
+                  wherever such third-party notices normally appear. The contents
+                  of the NOTICE file are for informational purposes only and
+                  do not modify the License. You may add Your own attribution
+                  notices within Derivative Works that You distribute, alongside
+                  or as an addendum to the NOTICE text from the Work, provided
+                  that such additional attribution notices cannot be construed
+                  as modifying the License.
+        
+              You may add Your own copyright statement to Your modifications and
+              may provide additional or different license terms and conditions
+              for use, reproduction, or distribution of Your modifications, or
+              for any such Derivative Works as a whole, provided Your use,
+              reproduction, and distribution of the Work otherwise complies with
+              the conditions stated in this License.
+        
+           5. Submission of Contributions. Unless You explicitly state otherwise,
+              any Contribution intentionally submitted for inclusion in the Work
+              by You to the Licensor shall be under the terms and conditions of
+              this License, without any additional terms or conditions.
+              Notwithstanding the above, nothing herein shall supersede or modify
+              the terms of any separate license agreement you may have executed
+              with Licensor regarding such Contributions.
+        
+           6. Trademarks. This License does not grant permission to use the trade
+              names, trademarks, service marks, or product names of the Licensor,
+              except as required for reasonable and customary use in describing the
+              origin of the Work and reproducing the content of the NOTICE file.
+        
+           7. Disclaimer of Warranty. Unless required by applicable law or
+              agreed to in writing, Licensor provides the Work (and each
+              Contributor provides its Contributions) on an "AS IS" BASIS,
+              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+              implied, including, without limitation, any warranties or conditions
+              of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+              PARTICULAR PURPOSE. You are solely responsible for determining the
+              appropriateness of using or redistributing the Work and assume any
+              risks associated with Your exercise of permissions under this License.
+        
+           8. Limitation of Liability. In no event and under no legal theory,
+              whether in tort (including negligence), contract, or otherwise,
+              unless required by applicable law (such as deliberate and grossly
+              negligent acts) or agreed to in writing, shall any Contributor be
+              liable to You for damages, including any direct, indirect, special,
+              incidental, or consequential damages of any character arising as a
+              result of this License or out of the use or inability to use the
+              Work (including but not limited to damages for loss of goodwill,
+              work stoppage, computer failure or malfunction, or any and all
+              other commercial damages or losses), even if such Contributor
+              has been advised of the possibility of such damages.
+        
+           9. Accepting Warranty or Additional Liability. While redistributing
+              the Work or Derivative Works thereof, You may choose to offer,
+              and charge a fee for, acceptance of support, warranty, indemnity,
+              or other liability obligations and/or rights consistent with this
+              License. However, in accepting such obligations, You may act only
+              on Your own behalf and on Your sole responsibility, not on behalf
+              of any other Contributor, and only if You agree to indemnify,
+              defend, and hold each Contributor harmless for any liability
+              incurred by, or claims asserted against, such Contributor by reason
+              of your accepting any such warranty or additional liability.
+        
+           END OF TERMS AND CONDITIONS
+        
+           APPENDIX: How to apply the Apache License to your work.
+        
+              To apply the Apache License to your work, attach the following
+              boilerplate notice, with the fields enclosed by brackets "[]"
+              replaced with your own identifying information. (Don't include
+              the brackets!)  The text should be enclosed in the appropriate
+              comment syntax for the file format. We also recommend that a
+              file or class name and description of purpose be included on the
+              same "printed page" as the copyright notice for easier
+              identification within third-party archives.
+        
+           Copyright [yyyy] [name of copyright owner]
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+        
+Project-URL: Homepage, https://github.com/TobiasHafner/tinterm
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: colorama; platform_system == "Windows"
+Provides-Extra: dev
+Requires-Dist: pytest>=9.0.2; extra == "dev"
+Dynamic: license-file
+
+# TinTerm
+
+A lightweight Python library for styling terminal output with colors and text modifiers.
+
+## Why Another Terminal Color Library?
+
+TinTerm takes a different approach to terminal styling with three key design principles:
+
+1. **Strict separation of style and text:** Style information is kept separate from your text content, making it easy to work with the plain text while keeping styles consistent.
+
+2. **Lazy rendering:** Styled objects don't generate ANSI codes until you explicitly render them, giving you full control over when and where colors are applied.
+
+3. **Zero-configuration color control:** Toggle colors on/off globally with a single call. Perfect for logging to files, CI environments, or respecting `NO_COLOR` conventions.
+
+## Getting Started For Regular Users
+Install TinTerm using pip:
+
+```bash
+pip install tinterm
+```
+
+**Note:** On Windows, the `colorama` package is automatically installed as a dependency to enable ANSI color support.
+
+## Getting Started For Developers
+If you want to build and install TinTerm from source:
+
+### 1. Clone the repository
+```bash
+git clone git@github.com:TobiasHafner/tinterm.git
+cd tinterm
+```
+
+### 2. Create a virtual environment
+```bash
+python3 -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+**Linux / macOS**
+```bash
+source .venv/bin/activate
+```
+
+**Windows**
+In cmd:
+```bash
+.venv\Scripts\activate
+```
+
+In powershell:
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+### 4. Install in development mode
+```bash
+pip install -e .
+```
+
+This installs the package in "editable" mode, so changes to the source code are immediately reflected without reinstalling.
+
+### 5. Install development dependencies
+```bash
+pip install -e ".[dev]"
+```
+
+### 6. Build the package
+```bash
+python -m build
+```
+
+This creates distribution files in the `dist/` directory:
+- `tinterm-x.x.x-py3-none-any.whl` (wheel format)
+- `tinterm-x.x.x.tar.gz` (source distribution)
+
+### 7. Install from the built package
+```bash
+pip install dist/tinterm-x.x.x-py3-none-any.whl
+```
+
+### 8. Run the Demo
+To verify the installation and to see TinTerm's features in action, you can run the included demo application:
+
+```bash
+# From the repository root directory
+python demo/demo.py
+```
+
+The demo displays:
+- All 16 foreground colors (standard and bright variants)
+- All background colors with contrasting text
+- All 7 text modifiers (bold, dim, italic, underline, blink, reverse, strikethrough)
+- Practical examples like error/success/warning messages
+- Creative combinations like rainbow text
+
+## Basic Concepts
+Understanding these core concepts will help you use TinTerm effectively.
+
+### Colors
+TinTerm supports two types of colors: **foreground** (text color) and **background** (background color). Colors are defined using the `Color` enum and can be applied to text through the style dictionary.
+TinTerm provides 16 colors total: 8 standard colors and 8 bright variants.
+
+**Standard Colors:**
+- `Color.BLACK` - Standard black
+- `Color.RED` - Standard red
+- `Color.GREEN` - Standard green
+- `Color.YELLOW` - Standard yellow
+- `Color.BLUE` - Standard blue
+- `Color.MAGENTA` - Standard magenta
+- `Color.CYAN` - Standard cyan
+- `Color.WHITE` - Standard white
+
+**Bright Colors:**
+- `Color.BRIGHT_BLACK` - Bright black (gray)
+- `Color.BRIGHT_RED` - Bright red
+- `Color.BRIGHT_GREEN` - Bright green
+- `Color.BRIGHT_YELLOW` - Bright yellow
+- `Color.BRIGHT_BLUE` - Bright blue
+- `Color.BRIGHT_MAGENTA` - Bright magenta
+- `Color.BRIGHT_CYAN` - Bright cyan
+- `Color.BRIGHT_WHITE` - Bright white
+
+### Modifiers
+Modifiers change how text appears beyond just color. They can make text bold, underlined, italic, and more. Multiple modifiers can be combined on the same text.
+
+**Available Modifiers:**
+
+| Modifier | Effect | ANSI Code | Terminal Support |
+|----------|--------|-----------|------------------|
+| `Modifier.BOLD` | Bold/bright text | 1 | Universal |
+| `Modifier.DIM` | Dimmed text | 2 | Most terminals |
+| `Modifier.ITALIC` | Italic text | 3 | Modern terminals |
+| `Modifier.UNDERLINE` | Underlined text | 4 | Universal |
+| `Modifier.BLINK` | Blinking text | 5 | Limited support |
+| `Modifier.REVERSE` | Inverted foreground/background | 7 | Universal |
+| `Modifier.STRIKETHROUGH` | Strikethrough text | 9 | Modern terminals |
+
+### Styles
+A style is a dictionary that defines how text should appear. It uses `StyleKey` enum values as keys and specifies colors and modifiers as values. All style keys are optional. You can specify just a foreground color, just modifiers, or any combination.
+
+**Example:**
+```python
+style = {
+    StyleKey.FOREGROUND: Color.RED,           # Optional: text color
+    StyleKey.BACKGROUND: Color.WHITE,         # Optional: background color
+    StyleKey.MODIFIERS: [Modifier.BOLD]       # Optional: text modifiers (list)
+}
+```
+
+**Important Note About Modifiers:**
+Modifiers should be provided as a **list** (not a tuple):
+
+```python
+# Correct
+style = {StyleKey.MODIFIERS: [Modifier.BOLD, Modifier.UNDERLINE]}
+
+# Also works, but list is preferred
+style = {StyleKey.MODIFIERS: (Modifier.BOLD, Modifier.UNDERLINE)}
+```
+
+**Reusing Styles:**
+It's good practice to define styles once and reuse them throughout your application:
+
+```python
+# Define your application's style guide
+STYLES = {
+    'error': {
+        StyleKey.FOREGROUND: Color.RED,
+        StyleKey.MODIFIERS: [Modifier.BOLD]
+    },
+    'success': {
+        StyleKey.FOREGROUND: Color.GREEN,
+        StyleKey.MODIFIERS: [Modifier.BOLD]
+    },
+    'info': {
+        StyleKey.FOREGROUND: Color.BLUE
+    },
+    'warning': {
+        StyleKey.FOREGROUND: Color.YELLOW
+    }
+}
+
+# Use them consistently
+error_msg = StyledString("Error occurred", style=STYLES['error'])
+success_msg = StyledString("Task completed", style=STYLES['success'])
+```
+
+### Styled Strings
+A `StyledString` is the fundamental building block of TinTerm. It's a string with associated styling information.
+
+**Key Characteristics:**
+- **Stores text and style separately**: The text is stored in the `text` attribute, and styling in the `style` dictionary
+- **Lightweight**: Uses `__slots__` for memory efficiency
+- **String representation**: The `__str__()` method returns only the plain text without styling
+- **Immutable styling**: Once created, the style doesn't change (but you can create new styled strings)
+- **Composable**: Can be concatenated with other styled strings or plain strings/objects
+
+**Creating Styled Strings:**
+```python
+# With style
+my_style = {
+    StyleKey.FOREGROUND: Color.RED,
+    StyleKey.MODIFIERS: [Modifier.BOLD]
+}
+styled = StyledString("Hello", style=my_style)
+
+# Without style (plain text)
+plain = StyledString("Hello", style={})
+# or simply
+plain = StyledString("Hello")
+```
+
+**Accessing Properties:**
+```python
+s = StyledString("hello", style={StyleKey.FOREGROUND: Color.BLUE})
+
+# Access the plain text
+s.text          # "hello"
+str(s)          # "hello" (same as s.text)
+
+# Access the style dictionary
+s.style         # {StyleKey.FOREGROUND: Color.BLUE}
+
+# Get length
+len(s)          # 5 (length of the text)
+```
+
+**Concatenation:**
+When you concatenate `StyledString` objects, you create a `StyledText` object:
+
+```python
+red = StyledString("Red", style={StyleKey.FOREGROUND: Color.RED})
+blue = StyledString("Blue", style={StyleKey.FOREGROUND: Color.BLUE})
+
+# All of these create StyledText objects
+combined1 = red + blue              # Two StyledStrings
+combined2 = red + " "               # StyledString + plain string
+combined3 = "Prefix: " + red        # Plain string + StyledString
+```
+
+**Notes:**
+- The `StyledString` class doesn't provide string manipulation methods like `upper()`, `lower()`, `split()`, etc. You need to manipulate the text yourself and create new `StyledString` objects if needed
+- Converting to string with `str()` returns only the plain text without any styling or ANSI codes
+- Empty strings can have styles: `StyledString("", style={StyleKey.FOREGROUND: Color.RED})`
+
+### Styled Text
+A `StyledText` object represents multiple parts concatenated together, where each part can have its own independent styling. Each part is stored internally as a `StyledString`.
+
+**Creating Styled Texts:**
+You don't typically create `StyledText` objects directly using the constructor. They're automatically created when you concatenate `StyledString` objects or mix styled strings with plain strings/objects:
+
+```python
+part1 = StyledString("Error", style={StyleKey.FOREGROUND: Color.RED})
+part2 = StyledString(": ", style={})
+part3 = StyledString("Connection failed", style={StyleKey.FOREGROUND: Color.YELLOW})
+
+# This automatically creates a StyledText with three parts
+message = part1 + part2 + part3
+
+# Mixing with plain strings also works
+mixed = part1 + " " + part2  # The " " becomes a StyledString internally
+```
+
+**How StyledText._from_parts() Works:**
+The `_from_parts()` static method intelligently handles different input types:
+- `StyledText` objects are flattened (their parts are extracted and added individually)
+- `StyledString` objects are added directly
+- Other objects are converted to strings and wrapped in a `StyledString` with no styling
+
+```python
+# These all work
+text1 = StyledString("Hello") + StyledString("World")
+text2 = StyledString("Hello") + " World"  # String becomes StyledString
+text3 = StyledString("Count: ") + 42       # Number becomes StyledString("42")
+```
+
+**Structure:**
+A `StyledText` maintains a list of `StyledString` parts accessible via the `parts` property:
+
+```python
+# Accessing parts
+for part in message.parts:
+    print(f"Text: {part.text}, Style: {part.style}")
+```
+
+**Operations:**
+`StyledText` supports several operations:
+
+```python
+text = red_string + " " + blue_string + " " + green_string
+
+# Concatenation (returns new StyledText)
+more_text = text + StyledString(" More", style={StyleKey.FOREGROUND: Color.YELLOW})
+more_text = text + " More"  # Also works
+
+# Length (total length of all parts)
+len(text)
+
+# Iteration over parts
+for part in text:
+    print(render(part))
+
+# String representation (plain text only, no styling)
+str(text)  # Concatenated plain text from all parts
+```
+
+**Why StyledText Matters:**
+`StyledText` allows you to build complex, multi-colored output while keeping each part's styling independent:
+
+```python
+# Build a colorful log message
+timestamp = StyledString("[2024-01-12 10:30:15]", style={
+    StyleKey.FOREGROUND: Color.BRIGHT_BLACK
+})
+
+level = StyledString(" ERROR ", style={
+    StyleKey.FOREGROUND: Color.WHITE,
+    StyleKey.BACKGROUND: Color.RED,
+    StyleKey.MODIFIERS: [Modifier.BOLD]
+})
+
+message = StyledString(" Database connection failed", style={
+    StyleKey.FOREGROUND: Color.RED
+})
+
+log_line = timestamp + level + message
+print(render(log_line))
+```
+
+### The Render Function
+
+The `render()` function converts your styled objects (`StyledString` or `StyledText`) into a string with ANSI escape codes that can be printed to the terminal.
+
+**Usage:**
+```python
+from tinterm.render import render
+
+styled = StyledString("Hello", style={StyleKey.FOREGROUND: Color.RED})
+output = render(styled)
+print(output)  # Prints "Hello" in red
+```
+
+**How It Works:**
+The render function processes styled objects using a stack-based approach:
+- For `StyledText` objects, it processes each part individually
+- For `StyledString` objects, it extracts color and modifier information from the style dictionary and generates appropriate ANSI codes
+- ANSI codes are wrapped around the text: `\033[<codes>m<text>\033[0m`
+
+**Color Control:**
+You can globally enable or disable color rendering:
+
+```python
+from tinterm.render import enable_colors, disable_colors
+
+# Disable colors (returns plain text without ANSI codes)
+disable_colors()
+print(render(styled))  # Prints plain "Hello" without colors
+
+# Re-enable colors
+enable_colors()
+print(render(styled))  # Prints "Hello" in red again
+```
+
+When colors are disabled, `render()` returns only the plain text content, which is useful for:
+- Logging to files
+- Running in environments without ANSI support
+- Testing
+- Piping output to other programs
+
+**Performance:**
+Rendering is lightweight, but if you're rendering the same styled text repeatedly in a loop, consider rendering once and reusing the result:
+
+```python
+# Less efficient
+for i in range(1000):
+    print(render(styled_text))
+
+# More efficient
+rendered = render(styled_text)
+for i in range(1000):
+    print(rendered)
+```
+
+## Complete Example
+
+Here's a complete example showing how to use TinTerm:
+
+```python
+from tinterm.styled import StyledString, StyledText
+from tinterm.attributes import Color, Modifier, StyleKey
+from tinterm.render import render
+
+# Define some styles
+error_style = {
+    StyleKey.FOREGROUND: Color.RED,
+    StyleKey.MODIFIERS: [Modifier.BOLD]
+}
+
+success_style = {
+    StyleKey.FOREGROUND: Color.GREEN,
+    StyleKey.MODIFIERS: [Modifier.BOLD]
+}
+
+info_style = {
+    StyleKey.FOREGROUND: Color.CYAN
+}
+
+# Create styled strings
+header = StyledString("=== System Status ===", style={
+    StyleKey.FOREGROUND: Color.BRIGHT_WHITE,
+    StyleKey.MODIFIERS: [Modifier.BOLD, Modifier.UNDERLINE]
+})
+
+error_msg = StyledString("ERROR: ", style=error_style) + "Database connection failed"
+success_msg = StyledString("SUCCESS: ", style=success_style) + "Server started on port 8080"
+info_msg = StyledString("INFO: ", style=info_style) + "Loading configuration..."
+
+# Render and print
+print(render(header))
+print(render(error_msg))
+print(render(success_msg))
+print(render(info_msg))
+```
