@@ -1,0 +1,33 @@
+[project]
+name = "gepa-rpc"
+dynamic = ["version"]
+description = "Run GEPA on your favorite non-python libraries."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "gepa>=0.0.22",
+    "pydantic>=2.12.5",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "requests>=2.32.0",
+    "datasets>=4.4.2",
+    "dotenv>=0.9.9",
+    "litellm>=1.80.11",
+    "instructor>=1.13.0",
+]
+
+[project.scripts]
+gepa-rpc = "gepa_rpc.cli:main"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+include = ["gepa_rpc"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["gepa_rpc"]
+
+[tool.hatch.version]
+source = "vcs"
