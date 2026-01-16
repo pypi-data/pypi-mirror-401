@@ -1,0 +1,38 @@
+# DDFM Configuration for Exchange Rate Dataset
+# Based on original TensorFlow DDFM implementation (DDFM/run_exchange_rate_original.py)
+# Data: 8 exchange rate series (AUD_USD, GBP_USD, CAD_USD, CHF_USD, CNY_USD, JPY_USD, SGD_USD, NZD_USD)
+# Clock: Daily (d) - all series are daily frequency
+# Date range: 1990-01-01 to 2010-10-10
+
+# Neural Network Architecture (matching original TensorFlow DDFM)
+encoder_layers: [16, 4]  # Hidden layers: [16] -> latent: 4 (matching original structure_encoder=(16, 4))
+activation: relu  # Matching original link='relu'
+use_batch_norm: true  # Matching original batch_norm=True
+
+# Training Parameters (matching original TensorFlow DDFM)
+learning_rate: 0.005  # Matching original learning_rate=0.005
+n_mc_samples: 10  # Number of MC samples per MCMC iteration (matching original epochs=10)
+window_size: 100  # Time-step batch size for training (matching original batch_size=100)
+
+# MCMC/Iterative Parameters (matching original TensorFlow DDFM)
+max_epoch: 200  # Maximum MCMC iterations (matching original max_iter=200)
+tolerance: 0.0005  # Convergence tolerance (matching original tolerance=0.0005)
+disp: 10  # Display frequency for training progress (matching original disp=10)
+seed: 3  # Random seed (matching original seed=3)
+
+# Data Handling (used by Dataset, not Model)
+clock: d  # Daily clock frequency (all series are daily)
+target_scaler: null  # No target scaler - data should be pre-scaled before passing to Dataset
+
+# Frequency mapping (all series are daily)
+# If not specified, all series use clock frequency (d)
+# Format: {"series_name": "frequency_code"}
+# frequency:
+#   AUD_USD: d
+#   GBP_USD: d
+#   CAD_USD: d
+#   CHF_USD: d
+#   CNY_USD: d
+#   JPY_USD: d
+#   SGD_USD: d
+#   NZD_USD: d
