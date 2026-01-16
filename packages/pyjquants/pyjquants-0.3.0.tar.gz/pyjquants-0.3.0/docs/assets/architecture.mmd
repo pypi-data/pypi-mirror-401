@@ -1,0 +1,35 @@
+flowchart TB
+    subgraph User["User Code"]
+        UC[Your Python Code]
+    end
+
+    subgraph Domain["Domain Layer"]
+        Ticker["Ticker('7203')"]
+        Index["Index.topix()"]
+        Market["Market()"]
+        Download["download()"]
+        Search["search()"]
+    end
+
+    subgraph Infra["Infrastructure Layer"]
+        Client[JQuantsClient]
+        Session[Session]
+        Cache[Cache]
+        Config[Config]
+    end
+
+    subgraph Adapters["Adapters Layer"]
+        Endpoints[Endpoint Definitions]
+    end
+
+    subgraph External["External"]
+        API["J-Quants API"]
+    end
+
+    UC --> Ticker & Index & Market & Download & Search
+    Ticker & Index & Market --> Client
+    Client --> Endpoints
+    Client --> Session
+    Session --> Cache
+    Session --> Config
+    Session --> API
