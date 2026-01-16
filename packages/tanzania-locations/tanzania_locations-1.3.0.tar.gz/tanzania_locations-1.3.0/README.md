@@ -1,0 +1,181 @@
+
+````markdown
+# Tanzania Locations 🗺️
+
+[![PyPI version](https://img.shields.io/pypi/v/tanzania-locations)](https://pypi.org/project/tanzania-locations/)
+[![Python Version](https://img.shields.io/pypi/pyversions/tanzania-locations)](https://pypi.org/project/tanzania-locations/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+A lightweight Python package providing **Tanzania regions and districts** for easy integration into **Django forms**, scripts, or any Python project. Perfect for building **dynamic dependent dropdowns** for location selection.
+
+---
+
+## ⚡ Installation
+
+Install via PyPI:
+
+```bash
+pip install tanzania-locations
+```
+
+> For testing with TestPyPI:
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ tanzania-locations
+```
+
+---
+
+## 🐍 Quick Usage
+
+```python
+from tanzania_locations import get_regions, get_districts
+
+# List all regions
+regions = get_regions()
+print(regions)
+# ['Arusha', 'Dar es Salaam', 'Dodoma', 'Mwanza', ...]
+
+# List districts for a region
+districts = get_districts("Dar es Salaam")
+print(districts)
+# ['Ilala', 'Kinondoni', 'Temeke', 'Ubungo', 'Kigamboni']
+```
+
+---
+
+## 🏗 Django Integration
+
+### 1️⃣ `views.py`
+
+```python
+from django.shortcuts import render
+from django.http import JsonResponse
+from tanzania_locations import get_regions, get_districts
+
+# Display the form with regions
+def location_form(request):
+    context = {
+        # Convert list of regions to tuples for template
+        "regions": [(r, r) for r in get_regions()]
+    }
+    return render(request, "app/location_form.html", context)
+
+# Return districts as JSON for a given region
+def load_districts(request):
+    region = request.GET.get("region")
+    districts_data = get_districts(region)
+    districts = districts_data['districts']
+    return JsonResponse({"districts": districts})
+```
+
+### 2️⃣ `urls.py`
+
+```python
+from django.urls import path,include
+from . import views
+urlpatterns = [
+    path("", views.location_form, name="location_form"),
+    path("ajax/load-districts/", views.load_districts, name="load_districts"),
+]
+```
+
+### 3️⃣ `location_form.html`
+
+```html
+<form method="post">
+    {% csrf_token %}
+    <label for="region">Region</label><br>
+    <select id="region" name="region">
+        <option value="">-- Select Region --</option>
+        {% for value, label in regions %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label for="district">District</label><br>
+    <select id="district" name="district">
+        <option value="">-- Select District --</option>
+    </select>
+
+    <br><br>
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const regionSelect = document.getElementById("region");
+    const districtSelect = document.getElementById("district");
+
+    regionSelect.addEventListener("change", function () {
+        const region = this.value;
+        districtSelect.innerHTML = '<option value="">Loading...</option>';
+
+        if (!region) {
+            districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+            return;
+        }
+
+        fetch("{% url 'load_districts' %}?region=" + encodeURIComponent(region))
+            .then(res => res.json())
+            .then(data => {
+                districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+                data.districts.forEach(d => {
+                    const option = document.createElement("option");
+                    option.value = d;
+                    option.textContent = d;
+                    districtSelect.appendChild(option);
+                });
+            })
+            .catch(err => console.error(err));
+    });
+});
+</script>
+```
+
+---
+
+## ✅ Features
+
+* List all **Tanzania regions**
+* List **districts by region**
+* Works with **Django forms**, **vanilla JS**, or plain Python
+* Fully **offline-ready**
+* Can be extended for **wards** or other administrative levels
+
+---
+
+## 🔧 Advanced Usage
+
+Preload all districts for **no-AJAX forms**:
+
+```python
+from tanzania_locations import get_regions, get_districts
+
+locations = {region: get_districts(region) for region in get_regions()}
+```
+
+Now your JS can populate **district dropdowns instantly** without any server requests.
+
+---
+
+## 📜 License
+
+MIT License – free to use, modify, and distribute.
+
+---
+
+## 💡 Example Output
+
+```python
+from tanzania_locations import get_regions, get_districts
+
+for region in get_regions():
+    print(region, get_districts(region))
+```
+
+This prints all regions and their districts, perfect for **forms, scripts, or data analysis**.
+
+```
