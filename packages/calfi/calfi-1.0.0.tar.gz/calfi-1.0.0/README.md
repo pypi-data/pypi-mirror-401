@@ -1,0 +1,129 @@
+# Calfi
+
+A Python library for financial date calculations, business calendars, and day count conventions.
+
+## Installation
+
+Install Calfi using pip:
+
+```bash
+pip install calfi
+```
+
+Or install from source:
+
+```bash
+git clone <repository-url>
+cd calfi
+pip install -e .
+```
+
+## Features
+
+- **Business Calendars**: Define custom business calendars with holidays and weekends.
+- **Predefined Calendars**: Ready-to-use calendars like TARGET and US Government calendars.
+- **Day Count Conventions**: Support for ACT/360, ACT/365, ACT/ACT, and 30/360 day count methods.
+- **Business Day Conventions**: Adjust dates according to Following, Modified Following, Preceding, Modified Preceding, and End of Month rules.
+- **Frequency Calculations**: Handle periodic date calculations for financial instruments.
+
+## Usage
+
+### Basic Business Calendar
+
+```python
+from datetime import date
+from calfi import BusinessCalendar, Target
+
+# Create a custom calendar or use predefined
+calendar = Target()
+
+# Check if a date is a business day
+dt = date(2023, 12, 25)  # Christmas
+is_business = calendar.is_business_day(dt)  # False
+
+# Find next business day
+next_business = calendar.next_business_day(date(2023, 12, 25))
+print(next_business)  # 2023-12-26
+```
+
+### Creating Custom Holidays
+
+Calfi provides helper functions to easily define custom holidays for your business calendars. These functions return callable objects that can be passed to the `BusinessCalendar` constructor.
+
+```python
+from calfi.fin_cal import BusinessCalendar, fixed_day, nth_weekday_of_month, last_weekday_of_month, us_dayoff_adjust, easter_sunday_delta
+
+# Fixed date holidays
+new_years = fixed_day(1, 1)  # January 1st every year
+christmas = fixed_day(12, 25)  # December 25th
+
+# Nth weekday of month (e.g., third Monday in January)
+mlk_day = nth_weekday_of_month(1, 0, 3)  # 0 = Monday
+
+# Last weekday of month (e.g., last Monday in May)
+memorial_day = last_weekday_of_month(5, 0)
+
+# Easter-related holidays
+good_friday = easter_sunday_delta(-2)  # 2 days before Easter Sunday
+easter_monday = easter_sunday_delta(1)  # 1 day after Easter Sunday
+
+# US-style holiday adjustment (moves weekend holidays to Monday)
+adjusted_christmas = us_dayoff_adjust(christmas)
+
+# Create custom calendar
+custom_calendar = BusinessCalendar(days_off=[new_years, adjusted_christmas, mlk_day, memorial_day, good_friday, easter_monday])
+```
+
+### Day Count Conventions
+
+```python
+from calfi import DayCountConvention
+
+start = date(2023, 1, 1)
+end = date(2023, 1, 15)
+
+days = DayCountConvention.ACT_360.days(start, end)
+print(days)  # 14
+
+denom = DayCountConvention.ACT_360.denominator()
+print(denom)  # 360
+```
+
+### Business Day Adjustments
+
+```python
+from calfi import BusinessDayConvention
+
+dt = date(2023, 12, 25)  # Sunday
+adjusted = BusinessDayConvention.FOLLOWING.adjust_date(dt, calendar)
+print(adjusted)  # Next business day
+```
+
+## API Reference
+
+### Classes
+
+- `BusinessCalendar`: Base class for business calendars.
+- `Target`: TARGET calendar (European banking days).
+- `USGovt`: US Government calendar.
+- `DayCountConvention`: Enum for day count methods.
+- `BusinessDayConvention`: Enum for business day adjustment rules.
+- `Frequency`: Enum for payment frequencies.
+
+### Methods
+
+- `BusinessCalendar.is_business_day(date)`: Check if date is a business day.
+- `BusinessCalendar.next_business_day(date, included=True)`: Get next business day.
+- `BusinessCalendar.previous_business_day(date, included=True)`: Get previous business day.
+- `DayCountConvention.days(start, end)`: Calculate days between dates.
+- `DayCountConvention.denominator(year=None)`: Get denominator for fraction.
+- `BusinessDayConvention.adjust_date(date, calendar)`: Adjust date per convention.
+- `Frequency.next_date(base_date)`: Calculate next date per frequency.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
