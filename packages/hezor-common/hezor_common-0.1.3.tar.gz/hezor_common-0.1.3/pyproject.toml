@@ -1,0 +1,33 @@
+[project]
+name = "hezor-common"
+version = "0.1.3"
+description = "Common utilities and data models for Hezor projects"
+readme = "README.md"
+authors = [{ name = "Silo QIAN", email = "qtisan@hotmail.com" }]
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.0.0"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+keywords = ["hezor", "common", "utilities"]
+
+[project.urls]
+Homepage = "https://github.com/lennon/hezor_common"
+Repository = "https://github.com/lennon/hezor_common"
+Issues = "https://github.com/lennon/hezor_common/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hezor_common"]
+
+[project.optional-dependencies]
+dev = ["bump-my-version"]
