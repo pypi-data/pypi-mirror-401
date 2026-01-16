@@ -1,0 +1,57 @@
+# py-smoldot-light
+
+Python bindings for the `smoldot_light` Rust crate using PyO3. The goal is to run a lightweight
+Polkadot client in Python and connect it to `py-polkadot-sdk`.
+
+## Overview
+- Rust core: `smoldot_light` provides the light client implementation.
+- Python API: `SmoldotClient` exposes JSON-RPC request/response plumbing.
+- Build system: `maturin` builds and installs the extension module.
+
+## Quick Start
+Build and install into your active virtualenv:
+
+```bash
+maturin develop
+```
+
+## Example Usage (Python)
+```python
+from smoldot_light import SmoldotClient
+
+client = SmoldotClient()
+
+# Load a chain spec JSON string (Polkadot, Kusama, or a local chain).
+with open("polkadot.json", "r", encoding="utf-8") as f:
+    chain_spec = f.read()
+
+relay_chain_id = client.add_chain(chain_spec)
+
+# If you are connecting a parachain, pass the relay chain id(s).
+# asset_hub_id = client.add_chain(asset_hub_spec, relay_chain_ids=[relay_chain_id])
+
+# Send a JSON-RPC request.
+client.json_rpc_request(relay_chain_id, '{"id":1,"jsonrpc":"2.0","method":"system_name","params":[]}')
+
+# Drain any available responses (non-blocking).
+responses = client.drain_responses(relay_chain_id, max=10)
+for msg in responses:
+    print(msg)
+```
+
+## Getting a Substrate Chain Spec
+You can fetch a live Substrate chain spec JSON from a running node:
+
+```python
+from substrateinterface import SubstrateInterface
+
+substrate = SubstrateInterface(
+    url="ws://127.0.0.1:9944"
+)
+
+response = substrate.rpc_request(method="sync_state_genSyncSpec", params=[False])
+```
+
+## Notes
+- JSON-RPC requests are queued; responses are drained via `drain_responses`.
+- Chain specs are standard Substrate JSON spec files.
