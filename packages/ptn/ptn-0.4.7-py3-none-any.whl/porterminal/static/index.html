@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Terminal">
+    <meta name="theme-color" content="#1e1e1e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Terminal">
+    <meta name="msapplication-TileColor" content="#1e1e1e">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="format-detection" content="telephone=no">
+    <title>Terminal</title>
+
+    <!-- Icons (PWA disabled - not useful for tunnel-based access) -->
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+  <script type="module" crossorigin src="/static/assets/app-DlWNJWFE.js"></script>
+  <link rel="stylesheet" crossorigin href="/static/assets/app-xPAM7YhQ.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Tab Bar with Shell Selector -->
+        <div id="tab-bar">
+            <span id="connection-dot"></span>
+            <button id="btn-textview" title="Plain Text View">TXT</button>
+            <!-- Tabs rendered by JS -->
+            <div id="shell-selector">
+                <select id="shell-select"><option>...</option></select>
+                <button id="btn-info" title="Help">ⓘ</button>
+                <button id="btn-shutdown" title="Shutdown">⏻</button>
+            </div>
+        </div>
+
+        <!-- Terminal Area -->
+        <div id="terminal-container">
+            <div id="terminal"></div>
+        </div>
+
+        <!-- Bottom Toolbar - Two rows -->
+        <!-- Buttons with data-key are generated from config/keys.ts -->
+        <div id="toolbar">
+            <div class="toolbar-row" id="toolbar-row1">
+                <button class="tool-btn" id="btn-escape">Esc</button>
+                <!-- Generated buttons inserted here -->
+                <button class="tool-btn icon" id="btn-backspace">⌫</button>
+            </div>
+            <div class="toolbar-row" id="toolbar-row2">
+                <button class="tool-btn modifier" id="btn-ctrl">Ctl</button>
+                <button class="tool-btn modifier" id="btn-alt">Alt</button>
+                <button class="tool-btn modifier" id="btn-shift">Sft</button>
+                <!-- Generated buttons inserted here -->
+                <button class="tool-btn icon" id="btn-paste">⎘</button>
+            </div>
+            <div class="toolbar-row hidden" id="toolbar-row3">
+                <!-- Custom buttons from config inserted here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Copy Button (iOS) -->
+    <button id="copy-button">Copy</button>
+
+    <!-- Connection Lost Overlay -->
+    <div id="disconnect-overlay" class="hidden">
+        <div id="disconnect-content">
+            <div id="disconnect-icon">○</div>
+            <div id="disconnect-text">Connection Lost</div>
+            <button id="disconnect-retry">Retry</button>
+        </div>
+    </div>
+
+    <!-- Help Popup -->
+    <div id="help-overlay" class="hidden">
+        <div id="help-content">
+            <div id="help-header">
+                <span>Touch Controls</span>
+                <button id="help-close">×</button>
+            </div>
+            <div id="help-body">
+                <div class="help-section">
+                    <div class="help-title">Swipe</div>
+                    <div class="help-item"><span class="help-key">←</span> ↑ Last command</div>
+                    <div class="help-item"><span class="help-key">→</span> ↓ Next command</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">Selection</div>
+                    <div class="help-item"><span class="help-key">Long press</span> Start selection</div>
+                    <div class="help-item"><span class="help-key">Drag</span> Extend selection</div>
+                    <div class="help-item"><span class="help-key">Double tap</span> Select word</div>
+                    <div class="help-item"><span class="help-key">Tap</span> Clear selection</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">Zoom</div>
+                    <div class="help-item"><span class="help-key">Pinch</span> Change font size</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">Modifiers (Ctl, Alt, Sft)</div>
+                    <div class="help-item"><span class="help-key">Tap</span> Sticky (one use)</div>
+                    <div class="help-item"><span class="help-key">Double tap</span> Lock on/off</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">Tabs</div>
+                    <div class="help-item"><span class="help-key">Hold ×</span> Close tab</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">TXT Button</div>
+                    <div class="help-item">Plain text view for easy scrolling, selection and review</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plain Text View Popup -->
+    <div id="textview-overlay" class="hidden">
+        <div id="textview-content">
+            <div id="textview-header">
+                <span id="textview-title">Text</span>
+                <button class="textview-zoom-btn" id="textview-zoom-out">−</button>
+                <button class="textview-zoom-btn" id="textview-zoom-in">+</button>
+                <button id="textview-close">×</button>
+            </div>
+            <pre id="textview-body"></pre>
+        </div>
+    </div>
+
+    <!-- Auth Overlay -->
+    <div id="auth-overlay" class="hidden">
+        <div id="auth-content">
+            <div id="auth-header">Authentication Required</div>
+            <div id="auth-body">
+                <div id="auth-error" class="hidden"></div>
+                <input type="password" id="auth-password" placeholder="Enter password" autocomplete="current-password">
+                <button id="auth-submit">Connect</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
