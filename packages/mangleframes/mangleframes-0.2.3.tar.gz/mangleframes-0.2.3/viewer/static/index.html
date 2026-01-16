@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MangleFrames Viewer</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>MangleFrames</h1>
+        <div class="controls">
+            <select id="frame-select">
+                <option value="">Select DataFrame...</option>
+            </select>
+            <button id="refresh-btn" title="Refresh">↻</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="toolbar">
+            <input type="text" id="search-input" placeholder="Search...">
+            <div class="export-buttons">
+                <button data-format="csv">CSV</button>
+                <button data-format="json">JSON</button>
+                <button data-format="parquet">Parquet</button>
+            </div>
+        </div>
+
+        <div class="table-container" id="table-container">
+            <table id="data-table">
+                <thead id="table-head"></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+            <div id="scroll-sentinel"></div>
+        </div>
+        <div class="resize-handle" id="resize-handle"></div>
+
+        <div class="status-bar">
+            <span id="row-count">No data</span>
+            <span id="load-status"></span>
+        </div>
+
+        <details class="stats-panel" id="section-stats">
+            <summary><span class="drag-handle" draggable="true">⋮⋮</span>Statistics</summary>
+            <div id="stats-content"></div>
+        </details>
+
+        <details class="quality-panel" id="section-quality">
+            <summary><span class="drag-handle" draggable="true">⋮⋮</span>Data Quality (DQX)</summary>
+            <div class="quality-container">
+                <div class="dqx-availability" id="dqx-availability"></div>
+
+                <div class="quality-actions">
+                    <button id="profile-btn" class="quality-btn" disabled>Profile Data</button>
+                    <button id="run-checks-btn" class="quality-btn primary" disabled>Run Checks</button>
+                    <button id="clear-quality-btn" class="quality-btn secondary" disabled>Clear</button>
+                </div>
+
+                <div class="quality-config" id="quality-config" style="display: none;">
+                    <h4>Configure Quality Rules</h4>
+                    <div class="quality-columns" id="quality-columns"></div>
+                </div>
+
+                <div class="quality-summary" id="quality-summary" style="display: none;">
+                    <h4>Quality Summary</h4>
+                    <div class="summary-stats" id="summary-stats"></div>
+                </div>
+
+                <div class="profile-results" id="profile-results" style="display: none;">
+                    <h4>Profile Results</h4>
+                    <div class="codegen-actions" id="codegen-actions" style="display: none;">
+                        <button id="copy-python-btn" class="codegen-btn">Copy Python</button>
+                        <button id="copy-yaml-btn" class="codegen-btn">Copy YAML</button>
+                    </div>
+                    <div class="suggested-rules" id="suggested-rules"></div>
+                </div>
+            </div>
+        </details>
+
+        <details class="sql-panel" id="section-sql">
+            <summary><span class="drag-handle" draggable="true">⋮⋮</span>SQL Query</summary>
+            <div class="sql-container">
+                <textarea id="sql-input" placeholder="SELECT * FROM my_frame LIMIT 10"></textarea>
+                <button id="run-sql">Run</button>
+            </div>
+            <div id="sql-result"></div>
+        </details>
+
+        <details class="join-panel" id="section-join">
+            <summary><span class="drag-handle" draggable="true">⋮⋮</span>Join Analysis</summary>
+            <div class="join-container">
+                <div class="join-frames">
+                    <div class="frame-selector" data-side="left">
+                        <label>Left Frame</label>
+                        <select id="join-left-frame">
+                            <option value="">Select frame...</option>
+                        </select>
+                        <div class="column-picker" id="left-columns">
+                            <span class="picker-label">Join Keys (click to select)</span>
+                            <div class="column-chips"></div>
+                        </div>
+                    </div>
+
+                    <div class="join-connector">
+                        <div class="connector-line"></div>
+                        <div class="connector-icon">&#x2A1D;</div>
+                        <div class="connector-line"></div>
+                    </div>
+
+                    <div class="frame-selector" data-side="right">
+                        <label>Right Frame</label>
+                        <select id="join-right-frame">
+                            <option value="">Select frame...</option>
+                        </select>
+                        <div class="column-picker" id="right-columns">
+                            <span class="picker-label">Join Keys (click to select)</span>
+                            <div class="column-chips"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="additional-frames" id="additional-frames">
+                    <div class="additional-frames-header">
+                        <span class="picker-label">Additional Frames (up to 5 total)</span>
+                        <button id="add-frame-btn" class="add-frame-btn" title="Add another frame">+ Add Frame</button>
+                    </div>
+                    <div id="additional-frames-list"></div>
+                </div>
+
+                <div class="temporal-config" id="temporal-config">
+                    <div class="temporal-header">
+                        <label>Date Analysis Granularity</label>
+                        <span class="temporal-hint">(applies when join keys are date columns)</span>
+                    </div>
+                    <div class="temporal-controls">
+                        <select id="bucket-size">
+                            <option value="day">Daily</option>
+                            <option value="week">Weekly</option>
+                            <option value="month" selected>Monthly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="analyze-buttons">
+                    <button id="analyze-join" class="analyze-btn">Analyze Join</button>
+                    <button id="analyze-history" class="analyze-btn analyze-history-btn">Analyze Coverage</button>
+                </div>
+
+                <div class="coverage-timeline" id="coverage-timeline" style="display: none;">
+                    <h4>Coverage Timeline</h4>
+                    <div class="timeline-legend">
+                        <span class="legend-item" title="Time periods where all selected frames have data - INNER join retains these"><span class="legend-box all-present"></span>All frames present</span>
+                        <span class="legend-item" title="Time periods where some frames lack data - INNER join loses these"><span class="legend-box partial"></span>Partial coverage</span>
+                    </div>
+                    <div id="timeline-chart"></div>
+                    <div id="timeline-labels"></div>
+                </div>
+
+                <div class="temporal-coverage" id="temporal-coverage" style="display: none;">
+                    <h4>Date Range Analysis</h4>
+                    <div class="overlap-zone-banner" id="overlap-zone-banner"></div>
+                    <table class="temporal-ranges-table" id="temporal-ranges-table">
+                        <thead>
+                            <tr>
+                                <th>Frame</th>
+                                <th>Min Date</th>
+                                <th>Max Date</th>
+                                <th>Span</th>
+                                <th>Rows</th>
+                                <th>Null Dates</th>
+                                <th>Gaps</th>
+                            </tr>
+                        </thead>
+                        <tbody id="temporal-ranges-body"></tbody>
+                    </table>
+                    <div class="data-loss-section" id="data-loss-section" style="display: none;">
+                        <h5>Data Loss on INNER Join</h5>
+                        <div id="data-loss-grid"></div>
+                    </div>
+                    <div class="internal-gaps-section" id="internal-gaps-section" style="display: none;">
+                        <h5>Internal Gaps Detected</h5>
+                        <div id="internal-gaps-list"></div>
+                    </div>
+                </div>
+
+                <div class="join-predictions" id="join-predictions" style="display: none;">
+                    <h4>Join Predictions</h4>
+                    <table id="predictions-table">
+                        <thead>
+                            <tr>
+                                <th title="The type of join operation being predicted">Join Type</th>
+                                <th title="Estimated number of rows the join would produce">Est. Rows</th>
+                                <th title="For LEFT joins: rows where joined columns would be NULL due to missing keys">NULL Columns</th>
+                                <th title="% of rows retained. INNER = matched keys / total. LEFT = 100% (all rows kept)">Coverage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="predictions-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="pairwise-overlaps" id="pairwise-overlaps" style="display: none;">
+                    <h4>Pairwise Key Overlap</h4>
+                    <div id="overlaps-grid"></div>
+                </div>
+
+                <div class="join-stats" id="join-stats" style="display: none;">
+                    <div class="stat-row stat-row-primary">
+                        <div class="stat-block stat-match">
+                            <span class="stat-value" id="stat-match-rate">--</span>
+                            <span class="stat-label">Match Rate (Left)</span>
+                        </div>
+                        <div class="stat-block stat-cardinality">
+                            <span class="stat-value" id="stat-cardinality">--</span>
+                            <span class="stat-label">Cardinality</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-row stat-row-details">
+                        <div class="stat-group">
+                            <h4>Left Frame</h4>
+                            <div class="stat-mini">
+                                <span class="mini-label">Total Rows</span>
+                                <span class="mini-value" id="stat-left-total">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="mini-label">Unmatched</span>
+                                <span class="mini-value issue" id="stat-left-unmatched">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="mini-label">Null Keys</span>
+                                <span class="mini-value" id="stat-left-nulls">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="mini-label">Duplicate Keys</span>
+                                <span class="mini-value" id="stat-left-dupes">0</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-group">
+                            <h4>Right Frame</h4>
+                            <div class="stat-mini">
+                                <span class="mini-label">Total Rows</span>
+                                <span class="mini-value" id="stat-right-total">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="mini-label">Unmatched</span>
+                                <span class="mini-value issue" id="stat-right-unmatched">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="mini-label">Null Keys</span>
+                                <span class="mini-value" id="stat-right-nulls">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="mini-label">Duplicate Keys</span>
+                                <span class="mini-value" id="stat-right-dupes">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unmatched-viewer" id="unmatched-viewer" style="display: none;">
+                    <div class="viewer-tabs">
+                        <button class="tab active" data-side="left">
+                            Left Unmatched
+                            <span class="tab-count" id="tab-left-count">0</span>
+                        </button>
+                        <button class="tab" data-side="right">
+                            Right Unmatched
+                            <span class="tab-count" id="tab-right-count">0</span>
+                        </button>
+                    </div>
+
+                    <div class="viewer-toolbar">
+                        <input type="text" id="unmatched-search" placeholder="Search unmatched rows...">
+                        <div class="export-group">
+                            <button data-format="csv">CSV</button>
+                            <button data-format="json">JSON</button>
+                            <button data-format="parquet">Parquet</button>
+                        </div>
+                    </div>
+
+                    <div class="unmatched-table-container">
+                        <table id="unmatched-table">
+                            <thead id="unmatched-head"></thead>
+                            <tbody id="unmatched-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="viewer-pagination">
+                        <span id="unmatched-status">No data</span>
+                        <div class="page-controls">
+                            <button id="prev-page" disabled>Prev</button>
+                            <button id="next-page" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details class="reconcile-panel" id="section-reconcile">
+            <summary><span class="drag-handle" draggable="true">⋮⋮</span>Reconciliation</summary>
+            <div class="reconcile-container">
+                <div class="source-type-section">
+                    <h4>Source</h4>
+                    <div class="source-type-toggle">
+                        <button id="source-type-csv" class="source-type-btn active">CSV Upload</button>
+                        <button id="source-type-df" class="source-type-btn">DataFrame</button>
+                    </div>
+                </div>
+
+                <div class="upload-section" id="csv-upload-section">
+                    <div class="upload-controls">
+                        <input type="file" id="csv-file-input" accept=".csv">
+                        <input type="text" id="csv-frame-name" placeholder="Frame name (optional)">
+                        <button id="upload-csv-btn">Upload</button>
+                    </div>
+                    <div class="upload-status" id="upload-status"></div>
+                </div>
+
+                <div class="df-source-section" id="df-source-section" style="display:none;">
+                    <div class="frame-select-group">
+                        <select id="reconcile-source-df">
+                            <option value="">Select DataFrame...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="reconcile-config" id="reconcile-config" style="display:none;">
+                    <h4>Reconciliation Setup</h4>
+
+                    <div class="frame-selection">
+                        <div class="frame-select-group" id="csv-source-group">
+                            <label>Source (CSV)</label>
+                            <select id="reconcile-source">
+                                <option value="">Select CSV...</option>
+                            </select>
+                        </div>
+                        <div class="frame-select-group">
+                            <label>Target (DataFrame)</label>
+                            <select id="reconcile-target">
+                                <option value="">Select DataFrame...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="join-type-selection">
+                        <label>Join Type</label>
+                        <div class="join-type-buttons">
+                            <button data-join="inner" class="active">Inner</button>
+                            <button data-join="left">Left</button>
+                            <button data-join="right">Right</button>
+                            <button data-join="full">Full Outer</button>
+                        </div>
+                    </div>
+
+                    <div class="group-by-section">
+                        <h5>Step 1: Group By Columns</h5>
+                        <div class="group-by-mapping">
+                            <div class="source-group-by">
+                                <span class="picker-label">Source Group By</span>
+                                <div class="column-chips" id="source-group-by-chips"></div>
+                            </div>
+                            <div class="target-group-by">
+                                <span class="picker-label">Target Group By</span>
+                                <div class="column-chips" id="target-group-by-chips"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="join-key-section">
+                        <h5>Step 2: Join Keys (from Group By)</h5>
+                        <div class="join-key-mapping">
+                            <div class="source-join-keys">
+                                <span class="picker-label">Source Join Keys</span>
+                                <div class="column-chips" id="source-join-key-chips"></div>
+                            </div>
+                            <div class="target-join-keys">
+                                <span class="picker-label">Target Join Keys</span>
+                                <div class="column-chips" id="target-join-key-chips"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="aggregation-config">
+                        <h5>Step 3: Aggregations</h5>
+                        <div class="agg-hint">Select numeric columns and aggregation functions</div>
+                        <div id="aggregation-columns"></div>
+                    </div>
+
+                    <button id="run-reconcile" class="analyze-btn">Run Reconciliation</button>
+                </div>
+
+                <div class="reconcile-results" id="reconcile-results" style="display:none;">
+                    <div class="reconcile-stats" id="reconcile-stats"></div>
+                    <div class="aggregate-comparisons" id="aggregate-comparisons"></div>
+
+                    <div class="reconcile-unmatched" id="reconcile-unmatched">
+                        <div class="viewer-tabs">
+                            <button class="tab active" data-side="source">
+                                Source Only <span class="tab-count" id="source-only-count">0</span>
+                            </button>
+                            <button class="tab" data-side="target">
+                                Target Only <span class="tab-count" id="target-only-count">0</span>
+                            </button>
+                            <button class="tab" data-side="matched">
+                                Matched Sample
+                            </button>
+                        </div>
+                        <div class="reconcile-table-container">
+                            <table id="reconcile-table">
+                                <thead id="reconcile-head"></thead>
+                                <tbody id="reconcile-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="export-section">
+                        <h5>Export Report</h5>
+                        <button id="export-dashboard-btn" class="analyze-btn">Download Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </details>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>
