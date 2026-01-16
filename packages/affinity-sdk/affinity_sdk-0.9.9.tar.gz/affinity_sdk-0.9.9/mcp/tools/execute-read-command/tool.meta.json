@@ -1,0 +1,42 @@
+{
+  "name": "execute-read-command",
+  "description": "Execute a read-only CLI command (get, search, list, export). Use discover-commands first to find the right command.\n\nKey concepts:\n- Entities (Company, Person, Opportunity): Global CRM records. Use 'company ls', 'person ls' to search ALL entities.\n- Lists: Collections with custom fields. Use 'list export <name>' to get entries from a specific list.\n- To filter by list-specific fields (Status, Stage, etc.), use 'list export', NOT 'company ls'.\n\nGetting field values:\n- Default list export returns only basic columns (listEntryId, entityType, entityId, entityName)\n- Use --field for each custom field you need: list export Dealflow --field \"Team Member\" --field \"Owner\"\n- --saved-view can be combined with --field for server-side filtering + explicit field selection\n\nExamples:\n- list export Dealflow --field \"Owner\" --field \"Status\" --filter 'Status=\"New\"'\n- interaction ls --type all --company-id 12345 (fetches all interaction types; --days or --after optional, defaults to all-time)\n- company ls --filter 'name =~ \"Acme\"'\n- field ls --list-id Dealflow (see list fields and dropdown options)\n- person get john@example.com\n\nFilter syntax: 'field op \"value\"' where op is = != =~ (contains) =^ (starts) =$ (ends) > < >= <=",
+  "inputSchema": {
+    "type": "object",
+    "required": ["command"],
+    "properties": {
+      "command": {
+        "type": "string",
+        "description": "CLI command path (e.g., 'person get', 'company ls', 'list export'). Use discover-commands to find available commands."
+      },
+      "argv": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Command arguments as array. Include IDs as first element, then flags. Example: ['12345', '--filter', 'Status=Active', '--limit', '50']"
+      },
+      "maxOutputBytes": {
+        "type": "integer",
+        "default": 50000,
+        "description": "Maximum output size in bytes (default 50000). Larger outputs are truncated with truncated=true marker. Use --limit flag to reduce output size."
+      },
+      "dryRun": {
+        "type": "boolean",
+        "default": false,
+        "description": "If true, return the command that would be executed without running it. Useful for verification."
+      },
+      "format": {
+        "type": "string",
+        "enum": ["json", "jsonl", "markdown", "toon", "csv"],
+        "default": "json",
+        "description": "Output format. Use 'markdown' for analysis (best LLM comprehension), 'toon' for large datasets (40% fewer tokens), 'json' for programmatic processing. Passed as --output flag to CLI."
+      }
+    }
+  },
+  "timeoutSecs": 30,
+  "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": true
+  }
+}
