@@ -1,0 +1,101 @@
+"""
+:mod:`etlplus.file.parquet` module.
+
+Helpers for reading/writing Parquet files.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import cast
+
+from ..types import JSONData
+from ..types import JSONList
+from ._io import normalize_records
+from ._pandas import get_pandas
+
+# SECTION: EXPORTS ========================================================== #
+
+
+__all__ = [
+    'read',
+    'write',
+]
+
+
+# SECTION: FUNCTIONS ======================================================== #
+
+
+def read(
+    path: Path,
+) -> JSONList:
+    """
+    Read Parquet content from ``path``.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the PARQUET file on disk.
+
+    Returns
+    -------
+    JSONList
+        The list of dictionaries read from the Parquet file.
+
+    Raises
+    ------
+    ImportError
+        If optional dependencies for Parquet support are missing.
+    """
+    pandas = get_pandas('Parquet')
+    try:
+        frame = pandas.read_parquet(path)
+    except ImportError as e:  # pragma: no cover
+        raise ImportError(
+            'Parquet support requires optional dependency '
+            '"pyarrow" or "fastparquet".\n'
+            'Install with: pip install pyarrow',
+        ) from e
+    return cast(JSONList, frame.to_dict(orient='records'))
+
+
+def write(
+    path: Path,
+    data: JSONData,
+) -> int:
+    """
+    Write ``data`` to Parquet at ``path`` and return record count.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the PARQUET file on disk.
+    data : JSONData
+        Data to write.
+
+    Returns
+    -------
+    int
+        Number of records written.
+
+    Raises
+    ------
+    ImportError
+        If optional dependencies for Parquet support are missing.
+    """
+    records = normalize_records(data, 'Parquet')
+    if not records:
+        return 0
+
+    pandas = get_pandas('Parquet')
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frame = pandas.DataFrame.from_records(records)
+    try:
+        frame.to_parquet(path, index=False)
+    except ImportError as e:  # pragma: no cover
+        raise ImportError(
+            'Parquet support requires optional dependency '
+            '"pyarrow" or "fastparquet".\n'
+            'Install with: pip install pyarrow',
+        ) from e
+    return len(records)
