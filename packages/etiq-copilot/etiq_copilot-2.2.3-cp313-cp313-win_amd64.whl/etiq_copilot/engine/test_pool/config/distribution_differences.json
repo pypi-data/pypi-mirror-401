@@ -1,0 +1,50 @@
+{
+  "tests": [
+    {
+      "name": "scan_distribution_change",
+      "alias": "compare distribution (Kolmogorov-Smirnov)",
+      "parameters": {
+        "dataset": "",
+        "comparison_dataset": "",
+        "metric_filter":["kolmogorov_smirnov"],
+        "features": [],
+        "thresholds": {
+          "kolmogorov_smirnov": [0.05,1.0]
+        }
+      },
+      "number_of_datasets_required": 2,
+      "number_of_models_required": 0,
+      "description": "Calculate Kolmogorov-Smirnov test on two datasets and returns the p value.",
+      "feature_type": [
+        "numerical"
+      ],
+      "category": "distribution_differences",
+      "version": "2.0.0",
+      "active": true,
+      "dsa_eligible": false
+    },
+    {
+      "name": "scan_distribution_change",
+      "alias": "compare distribution (Andersen-Darling)",
+      "parameters": {
+        "dataset": "",
+        "comparison_dataset": "",
+        "metric_filter":["anderson_darling"],
+        "thresholds": {
+          "anderson_darling": [0.05,1.0]
+        },
+        "features": []
+      },
+      "number_of_datasets_required": 2,
+      "number_of_models_required": 0,
+      "description": "Calculate Anderson-Darling test on two datasets and returns the p-value.",
+      "feature_type": [
+        "numerical"
+      ],
+      "category": "distribution_differences",
+      "version": "2.0.0",
+      "active": true,
+      "dsa_eligible": false
+    }
+  ]
+}
