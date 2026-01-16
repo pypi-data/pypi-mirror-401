@@ -1,0 +1,28 @@
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_editorial_dilve" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.editorial.dilve</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="gestion_editorial.res_config_settings_view_form_editorial"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='module_dilve_warning']" position="replace" remove="1"/>
+                <xpath expr="//setting[@id='gestion_editorial_integrations_dilve']" position="inside">
+                    <div class="content-group" id="dilve_configuration_settings" invisible="not module_dilve">
+                        <div class="row mt16">
+                            <label for="dilve_user" string="Usuario" class="col-4 col-lg-4 o_light_label"/>
+                            <field name="dilve_user"/>
+                        </div>
+                        <div class="row mt16">
+                            <label for="dilve_pass" string="Contraseña" class="col-4 col-lg-4 o_light_label"/>
+                            <field name="dilve_pass" password="True"/>
+                        </div>
+                        <div class="row mt16">
+                            <label for="dilve_publisher_code" string="Código de editorial" class="col-4 col-lg-4 o_light_label"/>
+                            <field name="dilve_publisher_code"/>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

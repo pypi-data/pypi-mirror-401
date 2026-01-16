@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="dilve_import_products_step1_wizard" model="ir.ui.view">
+        <field name="name">Obtener datos de DILVE</field>
+        <field name="model">dilve.import.products.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="3">
+                    <group>
+                        <field name="from_date"/>
+                    </group>
+
+                    <group>
+                        <field name="to_date"/>
+                    </group>
+
+                    <div>
+                        <button string="Actualizar listado" name="refresh_list" class="oe_highlight" type="object"/>
+                    </div>
+                </group>
+
+                <group>
+                    <field name="select_all"/>
+                </group>
+
+                <field name="dilve_records" widget="many2many">
+                    <tree mode="readonly"
+                          editable="bottom"
+                          decoration-success="type == 'new'"
+                          decoration-warning="type == 'changed'"
+                          limit="9999999">
+                        <field name="is_selected" nolabel="1"/>
+                        <field name="isbn" readonly="True"/>
+                        <field name="name" readonly="True"/>
+                        <field name="type" readonly="True" column_invisible="True"/>
+                    </tree>
+                </field>
+
+                <footer>
+                    <button string="Siguiente" name="next_page" class="oe_link" type="object"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="dilve_import_products_step1_action" model="ir.actions.act_window">
+        <field name="name">Selecciona qué publicaciones importar</field>
+        <field name="res_model">dilve.import.products.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="dilve_import_products_step1_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_products_kanban_inherit" model="ir.ui.view">
+        <field name="name">product.product.kanban.view.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <menu>
+                    <action name="%(dilve_import_products_step1_action)d"/>
+                </menu>
+            </xpath>
+        </field>
+    </record>
+</odoo>
