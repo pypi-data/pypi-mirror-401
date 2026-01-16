@@ -1,0 +1,74 @@
+[project]
+name = "sirchmunk"
+dynamic = ["version", "dependencies", "optional-dependencies"]
+description = "sirchmunk"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {text = "Apache License 2.0"}
+authors = [
+  {name = "sirchmunk team"},
+  {email = "xx@yy.com"}
+]
+keywords = ["sirchmunk", "Software"]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "License :: OSI Approved :: Apache Software License"
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "sirchmunk.version.__version__"}
+dependencies = {file = "requirements/framework.txt"}
+
+[tool.setuptools.dynamic.optional-dependencies]
+docs = {file = "requirements/docs.txt"}
+tests = {file = "requirements/tests.txt"}
+
+[project.urls]
+Homepage = "https://github.com"
+
+[project.scripts]
+sirchmunk = "sirchmunk.cli.cli:run_cmd"
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sirchmunk*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+include = "\\.pyi?$"
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | sirchmunk/.*/__pycache__
+)/
+'''
+
+[tool.ruff]
+select = ["E", "W", "F", "I"]
+ignore = ["E501"]
+target-version = "py311"
+line-length = 88
