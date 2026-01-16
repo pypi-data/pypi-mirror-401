@@ -1,0 +1,46 @@
+interactions:
+- request:
+    body: markdown=%23+Test+Heading%0A%0A++++This+is+a+test+markdown+document.%0A%0A++++%23%23+Section+1%0A++++-+Item+1%0A++++-+Item+2%0A++++
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '131'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.32.3
+      authorization:
+      - DUMMY
+    method: POST
+    uri: https://middleman-ai.com/api/v1/tools/md-to-pdf/form
+  response:
+    body:
+      string: '{"pdf_url":"https://middleman-ai.com/s/cd6b4bab/1pWXW5I51n","important_remark_for_user":"The
+        URL expires in 1 hour.Please note that you will not be able to download the
+        file after it has expired."}'
+    headers:
+      content-length:
+      - '201'
+      content-type:
+      - application/json
+      date:
+      - FILTERED
+      server:
+      - FILTERED
+      set-cookie:
+      - FILTERED
+      vary:
+      - Accept-Encoding
+      x-middleware-rewrite:
+      - FILTERED
+      x-request-id:
+      - FILTERED
+    status:
+      code: 200
+      message: OK
+version: 1
