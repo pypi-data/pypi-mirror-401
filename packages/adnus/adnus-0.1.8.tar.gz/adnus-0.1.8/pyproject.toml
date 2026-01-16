@@ -1,0 +1,47 @@
+# pyproject.toml
+[project]
+name = "adnus"
+dynamic = ["version"]
+description = "A Python library for Advanced Number Systems (AdNuS), including Bicomplex, Neutrosophic, Hyperreal numbers, reals, Complex, Quaternion, Octonion, Sedenion, Pathion, Chingon, Routon, Voudon."
+authors = [
+    {name = "Mehmet Keçeci", email = "mkececi@yaani.com"}
+]
+maintainers = [
+    {name = "Mehmet Keçeci", email = "mkececi@yaani.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.3.3,<3.0.0",
+    "hypercomplex==0.3.4"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.2,<10.0.0"
+]
+build = [
+    "setuptools>=80.9.0,<85.0.0",
+    "cython>=3.1.4,<4.0.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
+
+[tool.setuptools.dynamic]
+version = {attr = "adnus._version.__version__"}
+
+[build-system]
+requires = [
+    "setuptools>=80.9.0",
+    "wheel",
+    "setuptools_scm>=9.2.0"
+]
+build-backend = "setuptools.build_meta"
