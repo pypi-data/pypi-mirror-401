@@ -1,0 +1,70 @@
+[project]
+name = "sn2md"
+version = "2.6.0"
+description = "Convert Supernote .note, .spd, PDF, or image files to text/images"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Dane Summers", email = "dsummersl@gmail.com" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Typing :: Typed",
+]
+dependencies = [
+  "click>=8.1.7,<9.0",
+  "supernotelib>=0.6.2,<1.0",
+  "pyyaml>=6.0.1,<7.0",
+  "platformdirs>=4.2.2,<5.0",
+  "jinja2>=3.1.4,<4.0",
+  "llm>=0.26,<1.0",
+  "pymupdf>=1.25.2,<2.0",
+  "tqdm>=4.67.1,<5.0",
+  "pydantic>=2.10.6,<3.0",
+]
+
+[tool.basedpyright]
+extraPaths = ["summarizer"]
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
+reportUnknownParameterType = false
+reportUnknownMemberType = false
+reportMissingParameterType = false
+reportAny = false
+reportMissingTypeArgument = false
+
+[project.urls]
+homepage = "https://github.com/dsummersl/sn2md"
+issues = "https://github.com/dsummersl/sn2md/issues"
+
+[dependency-groups]
+dev = [
+  "autoimport>=1.5.0",
+  "black>=25.1.0",
+  "isort>=6.0.1",
+  "mypy>=1.10",
+  "pre-commit>=3.7",
+  "pytest-cov>=6.2.1",
+  "pytest>=8.2.0",
+  "radon>=6.0.1",
+  "ruff>=0.5",
+  "treepeat>=0.1.0",
+  "types-pyyaml>=6.0.12.20250915",
+  "types-tqdm>=4.67.0.20250809",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--cov=sn2md --cov-report=term-missing --cov-fail-under=85"
+
+[project.scripts]
+sn2md = "sn2md.cli:cli"
+
+[tool.ruff]
+line-length = 100
+exclude = [".venv", ".git", "build", "dist"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+packages = ["sn2md"]
+ignore_missing_imports = true
