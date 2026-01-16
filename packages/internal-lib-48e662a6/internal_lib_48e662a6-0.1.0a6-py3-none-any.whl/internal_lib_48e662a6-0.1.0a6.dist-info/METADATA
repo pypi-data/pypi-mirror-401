@@ -1,0 +1,75 @@
+Metadata-Version: 2.4
+Name: internal-lib-48e662a6
+Version: 0.1.0a6
+Summary: Internal utility package
+Project-URL: Homepage, https://github.com/seu-usuario/sage_x3_requests
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: httpx
+Requires-Dist: pydantic
+
+# Sage X3 Requests Wrapper (ALPHA)
+
+> ⚠️ **AVISO: BIBLIOTECA EM DESENVOLVIMENTO (ALPHA)** ⚠️
+>
+> Esta biblioteca foi publicada para uso pessoal e testes. **Não é recomendada para produção.**
+> A API pode mudar drasticamente a qualquer momento sem aviso prévio. Use por sua conta e risco.
+
+## Instalação
+
+```bash
+pip install internal-lib-48e662a6
+```
+
+## Exemplos de Uso
+
+### Configuração
+```python
+from sage_x3_requests import SageX3Config, SageX3Requester
+
+config = SageX3Config(
+    base_url="https://seu-erp.com",
+    username="admin",
+    password="password",
+    folder="SEED"
+)
+```
+
+### Pedir 5 Registos (Limit)
+Pode passar o limite diretamente no método `.get_resources(limit=5)`.
+
+```python
+with SageX3Requester(config) as client:
+    # Opção 1: Passar limit no get_resources (Maneira mais simples!)
+    registos = client.request("CLIENTES", "BPC") \
+                     .get_resources(limit=5)
+    
+    # Opção 2: Usar .count(5) antes
+    registos = client.request("CLIENTES", "BPC") \
+                     .count(5) \
+                     .get_resources()
+```
+
+### Pedir TODOS os Registos (Paginação Automática)
+Use `.get_resources(fetch_all=True)` para buscar todos os dados, percorrendo todas as páginas automaticamente.
+
+```python
+with SageX3Requester(config) as client:
+    # Busca todos os clientes (cuidado com grandes volumes de dados!)
+    todos_clientes = client.request("CLIENTES", "BPC") \
+                           .get_resources(fetch_all=True)
+                           
+    print(f"Total encontrado: {len(todos_clientes)}")
+```
+
+### Contagem Total
+Para saber quantos registos existem sem trazer os dados:
+
+```python
+with SageX3Requester(config) as client:
+    query = client.request("CLIENTES", "BPC").count(True).execute()
+    total = query.get("count") # ou verificar estrutura de retorno
+```
