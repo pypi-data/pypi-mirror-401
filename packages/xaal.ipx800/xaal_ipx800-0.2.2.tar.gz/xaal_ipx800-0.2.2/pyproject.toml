@@ -1,0 +1,32 @@
+[project]
+name = "xaal.ipx800"
+version = "0.2.2"
+description = "xAAL devices for IPX-800 Ethernet Control System"
+readme = "README.rst"
+authors = [
+    { name = "Jerome Kerdreux", email = "Jerome.Kerdreux@imt-atlantique.fr" },
+]
+license = "GPL-3.0-or-later"
+classifiers = ["Programming Language :: Python", "Topic :: Home Automation"]
+keywords = ["xaal", "ipx-800"]
+dependencies = ["xaal.lib", "gevent"]
+
+[tool.setuptools.packages.find]
+include = ["xaal*"]
+namespaces = true
+
+[project.urls]
+Homepage = "https://recherche.imt-atlantique.fr/xaal/"
+Documentation = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/protocols/IPX-800/README.rst"
+Source = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/protocols/IPX-800"
+
+[tool.ruff]
+line-length = 122
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 122
+skip-string-normalization = true
+
