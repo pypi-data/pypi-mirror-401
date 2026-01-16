@@ -1,0 +1,372 @@
+Metadata-Version: 2.4
+Name: aurigma-asset-processor-api-client
+Version: 1.0.0
+Summary: Aurigma Asset Processor API client
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: python-dateutil>=2.8.2
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: pydantic<3,>=2
+Requires-Dist: typing-extensions>=4.7.1; python_version < "3.11"
+
+# aurigma-asset-processor-api-client
+
+Python client library for [Aurigma Asset Processor API](https://customerscanvas.com/dev/backoffice/api/asset-processor/overview.html).
+
+## Requirements.
+
+- Python 3.9+
+- Dependencies:
+  - python-dateutil>=2.8.2
+  - httpx>=0.28.1
+  - pydantic>=2
+  - typing-extensions>=4.7.1
+
+## Installation & Usage
+### pip install
+
+```sh
+pip install aurigma-asset-processor-api-client
+```
+
+Then import the package:
+```python
+import aurigma.asset_processor
+```
+
+## Getting Started
+
+Please follow the [installation procedure](#installation--usage) and then run the following:
+
+```python
+
+import aurigma.asset_processor
+from aurigma.asset_processor.rest import ApiException
+from pprint import pprint
+
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aurigma.storefront.Configuration(
+    host = "http://api.customerscanvashub.com/"
+)
+
+
+
+# Enter a context with an instance of the API client
+async with aurigma.asset_processor.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aurigma.asset_processor.BuildInfoApi(api_client)
+
+    try:
+        # Get assembly build info.
+        api_response = await api_instance.build_info_get_info()
+        print("The response of BuildInfoApi->build_info_get_info:\n")
+        pprint(api_response)
+    except ApiException as e:
+        print("Exception when calling BuildInfoApi->build_info_get_info: %s\n" % e)
+
+```
+
+## Documentation for API Endpoints
+
+Depending on the geographical location of your Customer's Canvas Hub instance, the API gateway address may vary: 
+ 
+https://api.customerscanvashub.com/ - United States instance
+https://api.eu.customerscanvashub.com/ - European instance
+https://api.au.customerscanvashub.com/ - Australian instance
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+*BuildInfoApi* | [**build_info_get_info**](docs/BuildInfoApi.md#build_info_get_info) | **GET** /api/processor/v1/info | Get assembly build info.
+*BuildInfoApi* | [**build_info_head_info**](docs/BuildInfoApi.md#build_info_head_info) | **HEAD** /api/processor/v1/info | Get assembly build info.
+*ColorProfileProcessorApi* | [**color_profile_processor_import_color_profile**](docs/ColorProfileProcessorApi.md#color_profile_processor_import_color_profile) | **POST** /api/processor/v1/color-profiles/import | Imports color profile and saves it to storage.
+*ColorProfileProcessorApi* | [**color_profile_processor_update**](docs/ColorProfileProcessorApi.md#color_profile_processor_update) | **POST** /api/processor/v1/color-profiles/{id}/update | Updates color profile file and metadata in storage.
+*DataSchemaProcessorApi* | [**data_schema_processor_get_links**](docs/DataSchemaProcessorApi.md#data_schema_processor_get_links) | **GET** /api/processor/v1/data-schemas/{id}/links | Gets all links associated with this data schema.
+*DataSchemaProcessorApi* | [**data_schema_processor_import_data_schema**](docs/DataSchemaProcessorApi.md#data_schema_processor_import_data_schema) | **POST** /api/processor/v1/data-schemas/import | Imports data schema and saves it to storage.
+*DataSchemaProcessorApi* | [**data_schema_processor_update**](docs/DataSchemaProcessorApi.md#data_schema_processor_update) | **POST** /api/processor/v1/data-schemas/{id}/update | Updates data schema file and metadata in storage.
+*DataSetProcessorApi* | [**data_set_processor_check**](docs/DataSetProcessorApi.md#data_set_processor_check) | **POST** /api/processor/v1/data-sets/{id}/check | Checks if data set taken from storage has any problems.
+*DataSetProcessorApi* | [**data_set_processor_embed_data_schema**](docs/DataSetProcessorApi.md#data_set_processor_embed_data_schema) | **POST** /api/processor/v1/data-sets/{id}/schema/embed | Embeds linked data schema to the data set.
+*DataSetProcessorApi* | [**data_set_processor_export_data_set**](docs/DataSetProcessorApi.md#data_set_processor_export_data_set) | **GET** /api/processor/v1/data-sets/{id}/export | Exports data set.
+*DataSetProcessorApi* | [**data_set_processor_extract_data_schema**](docs/DataSetProcessorApi.md#data_set_processor_extract_data_schema) | **POST** /api/processor/v1/data-sets/{id}/schema/extract | Extracts data schema from data set and saves it to the specified folder.
+*DataSetProcessorApi* | [**data_set_processor_import_data_set**](docs/DataSetProcessorApi.md#data_set_processor_import_data_set) | **POST** /api/processor/v1/data-sets/import | Imports data set and saves it to storage.
+*DataSetProcessorApi* | [**data_set_processor_link_data_schema**](docs/DataSetProcessorApi.md#data_set_processor_link_data_schema) | **POST** /api/processor/v1/data-sets/{id}/schema/link | Links data schema to the data set.
+*DataSetProcessorApi* | [**data_set_processor_update**](docs/DataSetProcessorApi.md#data_set_processor_update) | **POST** /api/processor/v1/data-sets/{id}/update | Updates data set file and metadata in storage.
+*DesignProcessorApi* | [**design_processor_calculate_count_per_sheet**](docs/DesignProcessorApi.md#design_processor_calculate_count_per_sheet) | **POST** /api/processor/v1/designs/{id}/calculate-count-per-sheet | Calculates the design count per sheet of the specified size.
+*DesignProcessorApi* | [**design_processor_check**](docs/DesignProcessorApi.md#design_processor_check) | **POST** /api/processor/v1/designs/{id}/check | Checks if design taken from storage has any problems.
+*DesignProcessorApi* | [**design_processor_create_blank_design**](docs/DesignProcessorApi.md#design_processor_create_blank_design) | **POST** /api/processor/v1/designs/blank | Creates design using basic settings and saves it to storage.
+*DesignProcessorApi* | [**design_processor_create_design_from_mockup**](docs/DesignProcessorApi.md#design_processor_create_design_from_mockup) | **POST** /api/processor/v1/designs/from-mockup | Creates design compatible to specified mockup and saves it to storage.
+*DesignProcessorApi* | [**design_processor_embed_all_linked_data**](docs/DesignProcessorApi.md#design_processor_embed_all_linked_data) | **POST** /api/processor/v1/designs/{id}/embed-all-linked-data | Embeds all linked data to the design file.
+*DesignProcessorApi* | [**design_processor_embed_data_schema**](docs/DesignProcessorApi.md#design_processor_embed_data_schema) | **POST** /api/processor/v1/designs/{id}/schema/embed | Embeds linked data schema to the design file.
+*DesignProcessorApi* | [**design_processor_embed_images**](docs/DesignProcessorApi.md#design_processor_embed_images) | **POST** /api/processor/v1/designs/{id}/images/embed | Embeds linked images to the design file.
+*DesignProcessorApi* | [**design_processor_embed_palettes**](docs/DesignProcessorApi.md#design_processor_embed_palettes) | **POST** /api/processor/v1/designs/{id}/palettes/embed | Embeds linked palettes to the design file.
+*DesignProcessorApi* | [**design_processor_embed_toggle_set**](docs/DesignProcessorApi.md#design_processor_embed_toggle_set) | **POST** /api/processor/v1/designs/{id}/toggle-set/embed | Embeds linked toggle set to the design file.
+*DesignProcessorApi* | [**design_processor_export_design**](docs/DesignProcessorApi.md#design_processor_export_design) | **GET** /api/processor/v1/designs/{id}/export | Exports design file.
+*DesignProcessorApi* | [**design_processor_extract_data_schema**](docs/DesignProcessorApi.md#design_processor_extract_data_schema) | **POST** /api/processor/v1/designs/{id}/schema/extract | Extracts data schema from design file and saves it to the specified folder.
+*DesignProcessorApi* | [**design_processor_extract_palettes**](docs/DesignProcessorApi.md#design_processor_extract_palettes) | **POST** /api/processor/v1/designs/{id}/palettes/extract | Extracts palettes from design file and saves it to the specified folder.   Due to possibility of having linked and embedded palettes for same design, all linked palettes will be embedded before extraction.
+*DesignProcessorApi* | [**design_processor_extract_toggle_set**](docs/DesignProcessorApi.md#design_processor_extract_toggle_set) | **POST** /api/processor/v1/designs/{id}/toggle-set/extract | Extracts toggle set from design file and saves it to the specified folder.
+*DesignProcessorApi* | [**design_processor_get_deposit_photos**](docs/DesignProcessorApi.md#design_processor_get_deposit_photos) | **POST** /api/processor/v1/designs/{id}/depositphotos | Returns information about inserted images from DepositPhotos.
+*DesignProcessorApi* | [**design_processor_import_design**](docs/DesignProcessorApi.md#design_processor_import_design) | **POST** /api/processor/v1/designs/import | Imports design from source file and saves it to storage.
+*DesignProcessorApi* | [**design_processor_link_data_schema**](docs/DesignProcessorApi.md#design_processor_link_data_schema) | **POST** /api/processor/v1/designs/{id}/schema/link | Links data schema to the design file.
+*DesignProcessorApi* | [**design_processor_link_palettes**](docs/DesignProcessorApi.md#design_processor_link_palettes) | **POST** /api/processor/v1/designs/{id}/palettes/link | Links palettes to the design file.
+*DesignProcessorApi* | [**design_processor_link_toggle_set**](docs/DesignProcessorApi.md#design_processor_link_toggle_set) | **POST** /api/processor/v1/designs/{id}/toggle-set/link | Links toggle set to the design file.
+*DesignProcessorApi* | [**design_processor_prepare_preview**](docs/DesignProcessorApi.md#design_processor_prepare_preview) | **GET** /api/processor/v1/designs/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for design taken from storage.
+*DesignProcessorApi* | [**design_processor_prepare_preview_url**](docs/DesignProcessorApi.md#design_processor_prepare_preview_url) | **GET** /api/processor/v1/designs/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for design taken from storage.
+*DesignProcessorApi* | [**design_processor_reimport_design**](docs/DesignProcessorApi.md#design_processor_reimport_design) | **POST** /api/processor/v1/designs/{id}/re-import | Re-imports design from source file and updates design file and metadata in storage.
+*DesignProcessorApi* | [**design_processor_remove_data_schema**](docs/DesignProcessorApi.md#design_processor_remove_data_schema) | **POST** /api/processor/v1/designs/{id}/schema/remove | Removes data schema from the design file.
+*DesignProcessorApi* | [**design_processor_remove_palettes**](docs/DesignProcessorApi.md#design_processor_remove_palettes) | **POST** /api/processor/v1/designs/{id}/palettes/remove | Removes palettes from the design file.
+*DesignProcessorApi* | [**design_processor_remove_toggle_set**](docs/DesignProcessorApi.md#design_processor_remove_toggle_set) | **POST** /api/processor/v1/designs/{id}/toggle-set/remove | Removes toggle set from the design file.
+*DesignProcessorApi* | [**design_processor_update**](docs/DesignProcessorApi.md#design_processor_update) | **POST** /api/processor/v1/designs/{id}/update | Updates design file and metadata in storage.
+*DesignProcessorApi* | [**design_processor_validate_design_import_settings**](docs/DesignProcessorApi.md#design_processor_validate_design_import_settings) | **POST** /api/processor/v1/designs/validate-import-settings | Validates the design import settings.
+*DocumentProcessorApi* | [**document_processor_create_blank_toggle_set**](docs/DocumentProcessorApi.md#document_processor_create_blank_toggle_set) | **POST** /api/processor/v1/documents/blank-toggle-set | Creates a new blank toggle set and saves it to the storage.
+*DocumentProcessorApi* | [**document_processor_import_document**](docs/DocumentProcessorApi.md#document_processor_import_document) | **POST** /api/processor/v1/documents/import | Imports a document from the source file and saves it to the storage.
+*DocumentProcessorApi* | [**document_processor_update**](docs/DocumentProcessorApi.md#document_processor_update) | **POST** /api/processor/v1/documents/{id}/update | Updates the document file and metadata in the storage.
+*FontProcessorApi* | [**font_processor_import_font**](docs/FontProcessorApi.md#font_processor_import_font) | **POST** /api/processor/v1/fonts/import | Imports font from source file and saves it to storage.
+*FontProcessorApi* | [**font_processor_prepare_preview**](docs/FontProcessorApi.md#font_processor_prepare_preview) | **GET** /api/processor/v1/fonts/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for font taken from storage.
+*FontProcessorApi* | [**font_processor_prepare_preview_url**](docs/FontProcessorApi.md#font_processor_prepare_preview_url) | **GET** /api/processor/v1/fonts/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for font taken from storage.
+*FontProcessorApi* | [**font_processor_update**](docs/FontProcessorApi.md#font_processor_update) | **POST** /api/processor/v1/fonts/{id}/update | Updates font file and metadata in storage.
+*ImageProcessorApi* | [**image_processor_export_image**](docs/ImageProcessorApi.md#image_processor_export_image) | **GET** /api/processor/v1/images/{id}/export | Returns a content of an existing image file. If &#x60;pageIndex&#x60; is set, extracts a page from an existing multi-page image and returns its content as a separate file.
+*ImageProcessorApi* | [**image_processor_import_image**](docs/ImageProcessorApi.md#image_processor_import_image) | **POST** /api/processor/v1/images/import | Imports image from source file and saves it to storage.
+*ImageProcessorApi* | [**image_processor_prepare_preview**](docs/ImageProcessorApi.md#image_processor_prepare_preview) | **GET** /api/processor/v1/images/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for image taken from storage.
+*ImageProcessorApi* | [**image_processor_prepare_preview_url**](docs/ImageProcessorApi.md#image_processor_prepare_preview_url) | **GET** /api/processor/v1/images/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for image taken from storage.
+*ImageProcessorApi* | [**image_processor_update**](docs/ImageProcessorApi.md#image_processor_update) | **POST** /api/processor/v1/images/{id}/update | Updates image file and metadata in storage.
+*MockupProcessorApi* | [**mockup_processor_batch_create_mockup_links**](docs/MockupProcessorApi.md#mockup_processor_batch_create_mockup_links) | **POST** /api/processor/v1/mockups/{id}/batch-create-mockup-links | Creates multiple mockup link files for specified layer groups of an existing 2D-mockup.
+*MockupProcessorApi* | [**mockup_processor_check**](docs/MockupProcessorApi.md#mockup_processor_check) | **POST** /api/processor/v1/mockups/{id}/check | Checks if an existing mockup has any problems.
+*MockupProcessorApi* | [**mockup_processor_create_mockup_link**](docs/MockupProcessorApi.md#mockup_processor_create_mockup_link) | **POST** /api/processor/v1/mockups/{id}/create-mockup-link | Creates single mockup link file for specified layers of an existing 2D-mockup.
+*MockupProcessorApi* | [**mockup_processor_get_layers_groups**](docs/MockupProcessorApi.md#mockup_processor_get_layers_groups) | **GET** /api/processor/v1/mockups/{id}/groups | Returns a list of layers groups for an existing mockup.
+*MockupProcessorApi* | [**mockup_processor_import_mockup**](docs/MockupProcessorApi.md#mockup_processor_import_mockup) | **POST** /api/processor/v1/mockups/import | Imports a mockup from the source file and saves it to the storage.
+*MockupProcessorApi* | [**mockup_processor_prepare_preview**](docs/MockupProcessorApi.md#mockup_processor_prepare_preview) | **GET** /api/processor/v1/mockups/{id}/preview/{namespace}/{name}/{width}x{height} | Creates a preview for the mockup taken from the storage.
+*MockupProcessorApi* | [**mockup_processor_prepare_preview_url**](docs/MockupProcessorApi.md#mockup_processor_prepare_preview_url) | **GET** /api/processor/v1/mockups/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates a preview for the mockup taken from the storage.
+*MockupProcessorApi* | [**mockup_processor_update**](docs/MockupProcessorApi.md#mockup_processor_update) | **POST** /api/processor/v1/mockups/{id}/update | Updates the mockup file and metadata in the storage.
+*PaletteProcessorApi* | [**palette_processor_import_palette**](docs/PaletteProcessorApi.md#palette_processor_import_palette) | **POST** /api/processor/v1/palettes/import | Imports palette from source file and saves it to storage.
+*PaletteProcessorApi* | [**palette_processor_prepare_preview**](docs/PaletteProcessorApi.md#palette_processor_prepare_preview) | **GET** /api/processor/v1/palettes/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for palette taken from storage.
+*PaletteProcessorApi* | [**palette_processor_prepare_preview_url**](docs/PaletteProcessorApi.md#palette_processor_prepare_preview_url) | **GET** /api/processor/v1/palettes/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for palette taken from storage.
+*PaletteProcessorApi* | [**palette_processor_reimport_palette**](docs/PaletteProcessorApi.md#palette_processor_reimport_palette) | **POST** /api/processor/v1/palettes/{id}/re-import | Re-imports palette from source file and updates palette file and metadata in storage.
+*PaletteProcessorApi* | [**palette_processor_update**](docs/PaletteProcessorApi.md#palette_processor_update) | **POST** /api/processor/v1/palettes/{id}/update | Updates palette file and metadata in storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_calculate_count_per_sheet**](docs/PrivateDesignProcessorApi.md#private_design_processor_calculate_count_per_sheet) | **POST** /api/processor/v1/private-designs/{id}/calculate-count-per-sheet | Calculates the private design count per sheet of the specified size.
+*PrivateDesignProcessorApi* | [**private_design_processor_check**](docs/PrivateDesignProcessorApi.md#private_design_processor_check) | **POST** /api/processor/v1/private-designs/{id}/check | Checks if design taken from private storage has any problems.
+*PrivateDesignProcessorApi* | [**private_design_processor_copy_design_from_public_design**](docs/PrivateDesignProcessorApi.md#private_design_processor_copy_design_from_public_design) | **POST** /api/processor/v1/private-designs/from-design | Copies design file from specified public design and saves it to private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_copy_design_from_public_resource**](docs/PrivateDesignProcessorApi.md#private_design_processor_copy_design_from_public_resource) | **POST** /api/processor/v1/private-designs/from-resource | Copies design file from specified public resource and saves it to storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_create_blank_design**](docs/PrivateDesignProcessorApi.md#private_design_processor_create_blank_design) | **POST** /api/processor/v1/private-designs/blank | Creates design by product model and saves it to private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_create_design_from_mockup**](docs/PrivateDesignProcessorApi.md#private_design_processor_create_design_from_mockup) | **POST** /api/processor/v1/private-designs/from-mockup | Creates design compatible to specified mockup and saves it to storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_embed_all_linked_data**](docs/PrivateDesignProcessorApi.md#private_design_processor_embed_all_linked_data) | **POST** /api/processor/v1/private-designs/{id}/embed-all-linked-data | Embeds all linked data to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_embed_data_schema**](docs/PrivateDesignProcessorApi.md#private_design_processor_embed_data_schema) | **POST** /api/processor/v1/private-designs/{id}/schema/embed | Embeds linked data schema to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_embed_images**](docs/PrivateDesignProcessorApi.md#private_design_processor_embed_images) | **POST** /api/processor/v1/private-designs/{id}/images/embed | Embeds linked images to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_embed_palettes**](docs/PrivateDesignProcessorApi.md#private_design_processor_embed_palettes) | **POST** /api/processor/v1/private-designs/{id}/palettes/embed | Embeds linked palettes to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_embed_toggle_set**](docs/PrivateDesignProcessorApi.md#private_design_processor_embed_toggle_set) | **POST** /api/processor/v1/private-designs/{id}/toggle-set/embed | Embeds linked toggle set to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_export_design**](docs/PrivateDesignProcessorApi.md#private_design_processor_export_design) | **GET** /api/processor/v1/private-designs/{id}/export | Exports design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_extract_data_schema**](docs/PrivateDesignProcessorApi.md#private_design_processor_extract_data_schema) | **POST** /api/processor/v1/private-designs/{id}/schema/extract | Extracts data schema from design file and saves it to the specified folder.
+*PrivateDesignProcessorApi* | [**private_design_processor_extract_palettes**](docs/PrivateDesignProcessorApi.md#private_design_processor_extract_palettes) | **POST** /api/processor/v1/private-designs/{id}/palettes/extract | Extracts palettes from design file and saves it to the specified folder.
+*PrivateDesignProcessorApi* | [**private_design_processor_extract_toggle_set**](docs/PrivateDesignProcessorApi.md#private_design_processor_extract_toggle_set) | **POST** /api/processor/v1/private-designs/{id}/toggle-set/extract | Extracts toggle set from design file and saves it to the specified folder.
+*PrivateDesignProcessorApi* | [**private_design_processor_get_deposit_photos**](docs/PrivateDesignProcessorApi.md#private_design_processor_get_deposit_photos) | **POST** /api/processor/v1/private-designs/{id}/depositphotos | Return information about inserted images from DepositPhotos.
+*PrivateDesignProcessorApi* | [**private_design_processor_import_design**](docs/PrivateDesignProcessorApi.md#private_design_processor_import_design) | **POST** /api/processor/v1/private-designs/import | Imports design from source file and saves it to private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_link_data_schema**](docs/PrivateDesignProcessorApi.md#private_design_processor_link_data_schema) | **POST** /api/processor/v1/private-designs/{id}/schema/link | Links data schema to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_link_palettes**](docs/PrivateDesignProcessorApi.md#private_design_processor_link_palettes) | **POST** /api/processor/v1/private-designs/{id}/palettes/link | Links palettes to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_link_toggle_set**](docs/PrivateDesignProcessorApi.md#private_design_processor_link_toggle_set) | **POST** /api/processor/v1/private-designs/{id}/toggle-set/link | Links toggle set to the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_prepare_preview**](docs/PrivateDesignProcessorApi.md#private_design_processor_prepare_preview) | **GET** /api/processor/v1/private-designs/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for design taken from private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_prepare_preview_url**](docs/PrivateDesignProcessorApi.md#private_design_processor_prepare_preview_url) | **GET** /api/processor/v1/private-designs/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for design taken from private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_reimport_design**](docs/PrivateDesignProcessorApi.md#private_design_processor_reimport_design) | **POST** /api/processor/v1/private-designs/{id}/re-import | Re-imports design from source file and updates design file and metadata in private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_remove_data_schema**](docs/PrivateDesignProcessorApi.md#private_design_processor_remove_data_schema) | **POST** /api/processor/v1/private-designs/{id}/schema/remove | Removes data schema from the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_remove_palettes**](docs/PrivateDesignProcessorApi.md#private_design_processor_remove_palettes) | **POST** /api/processor/v1/private-designs/{id}/palettes/remove | Removes palettes from the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_remove_toggle_set**](docs/PrivateDesignProcessorApi.md#private_design_processor_remove_toggle_set) | **POST** /api/processor/v1/private-designs/{id}/toggle-set/remove | Removes toggle set from the design file.
+*PrivateDesignProcessorApi* | [**private_design_processor_update**](docs/PrivateDesignProcessorApi.md#private_design_processor_update) | **POST** /api/processor/v1/private-designs/{id}/update | Updates design file and metadata in private storage.
+*PrivateDesignProcessorApi* | [**private_design_processor_validate_design_import_settings**](docs/PrivateDesignProcessorApi.md#private_design_processor_validate_design_import_settings) | **POST** /api/processor/v1/private-designs/validate-import-settings | Validates the design import settings.
+*PrivateImageProcessorApi* | [**private_image_processor_export_image**](docs/PrivateImageProcessorApi.md#private_image_processor_export_image) | **GET** /api/processor/v1/private-images/{id}/export | Returns a content of an existing image file. If &#x60;pageIndex&#x60; is set, extracts a page from an existing multi-page image and returns its content as a separate file.
+*PrivateImageProcessorApi* | [**private_image_processor_import_image**](docs/PrivateImageProcessorApi.md#private_image_processor_import_image) | **POST** /api/processor/v1/private-images/import | Imports image from source file and saves it to private storage.
+*PrivateImageProcessorApi* | [**private_image_processor_prepare_preview**](docs/PrivateImageProcessorApi.md#private_image_processor_prepare_preview) | **GET** /api/processor/v1/private-images/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for image taken from private storage.
+*PrivateImageProcessorApi* | [**private_image_processor_prepare_preview_url**](docs/PrivateImageProcessorApi.md#private_image_processor_prepare_preview_url) | **GET** /api/processor/v1/private-images/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for image taken from private storage.
+*PrivateImageProcessorApi* | [**private_image_processor_update**](docs/PrivateImageProcessorApi.md#private_image_processor_update) | **POST** /api/processor/v1/private-images/{id}/update | Updates image file and metadata in private storage.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_batch_create_mockup_links**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_batch_create_mockup_links) | **POST** /api/processor/v1/private-mockups/{id}/batch-create-mockup-links | Creates multiple mockup link files for specified layer groups of an existing 2D-mockup.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_check**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_check) | **POST** /api/processor/v1/private-mockups/{id}/check | Checks if an existing mockup has any problems.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_create_mockup_link**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_create_mockup_link) | **POST** /api/processor/v1/private-mockups/{id}/create-mockup-link | Creates single mockup link file for specified layers of an existing 2D-mockup.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_get_layers_groups**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_get_layers_groups) | **GET** /api/processor/v1/private-mockups/{id}/groups | Returns a list of layers groups for an existing mockup.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_import_mockup**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_import_mockup) | **POST** /api/processor/v1/private-mockups/import | Imports mockup from source file and saves it to private storage.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_prepare_preview**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_prepare_preview) | **GET** /api/processor/v1/private-mockups/{id}/preview/{namespace}/{name}/{width}x{height} | Creates preview image for mockup taken from private storage.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_prepare_preview_url**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_prepare_preview_url) | **GET** /api/processor/v1/private-mockups/{id}/preview/{namespace}/{name}/{width}x{height}/url | Creates preview image for mockup taken from private storage.
+*PrivateMockupProcessorApi* | [**private_mockup_processor_update**](docs/PrivateMockupProcessorApi.md#private_mockup_processor_update) | **POST** /api/processor/v1/private-mockups/{id}/update | Updates mockup file and metadata in private storage
+
+
+## Documentation For Models
+
+ - [AssetRelation](docs/AssetRelation.md)
+ - [BlankDesignSettingsModel](docs/BlankDesignSettingsModel.md)
+ - [BlankDesignSourceSettingsModel](docs/BlankDesignSourceSettingsModel.md)
+ - [BuildInfoModel](docs/BuildInfoModel.md)
+ - [ColorProfileClass](docs/ColorProfileClass.md)
+ - [ColorProfileDto](docs/ColorProfileDto.md)
+ - [ColorProfileMetadata](docs/ColorProfileMetadata.md)
+ - [ColorSpace](docs/ColorSpace.md)
+ - [ConflictDto](docs/ConflictDto.md)
+ - [ConflictType](docs/ConflictType.md)
+ - [CopyDesignFromPublicDesignModel](docs/CopyDesignFromPublicDesignModel.md)
+ - [CopyDesignFromPublicResourceModel](docs/CopyDesignFromPublicResourceModel.md)
+ - [CreateBlankDesignModel](docs/CreateBlankDesignModel.md)
+ - [CreateBlankToggleSetModel](docs/CreateBlankToggleSetModel.md)
+ - [CreateDesignFromMockupModel](docs/CreateDesignFromMockupModel.md)
+ - [DataSchemaDto](docs/DataSchemaDto.md)
+ - [DataSchemaLinkInfo](docs/DataSchemaLinkInfo.md)
+ - [DataSchemaLinksInfo](docs/DataSchemaLinksInfo.md)
+ - [DataSchemaMetadata](docs/DataSchemaMetadata.md)
+ - [DataSchemaValidationRule](docs/DataSchemaValidationRule.md)
+ - [DataSetDataSchemaMissingProblemDto](docs/DataSetDataSchemaMissingProblemDto.md)
+ - [DataSetDataSchemaValidationProblemDto](docs/DataSetDataSchemaValidationProblemDto.md)
+ - [DataSetDto](docs/DataSetDto.md)
+ - [DataSetExtractDataSchemaModel](docs/DataSetExtractDataSchemaModel.md)
+ - [DataSetLinkDataSchemaModel](docs/DataSetLinkDataSchemaModel.md)
+ - [DataSetMetadata](docs/DataSetMetadata.md)
+ - [DataSetProblemDto](docs/DataSetProblemDto.md)
+ - [DepositPhotoInfo](docs/DepositPhotoInfo.md)
+ - [DesignAssetRelation](docs/DesignAssetRelation.md)
+ - [DesignCountPerSheetCalculationModel](docs/DesignCountPerSheetCalculationModel.md)
+ - [DesignCountPerSheetCalculationResultDto](docs/DesignCountPerSheetCalculationResultDto.md)
+ - [DesignCreateConflictDto](docs/DesignCreateConflictDto.md)
+ - [DesignDataSchemaMissingProblemDto](docs/DesignDataSchemaMissingProblemDto.md)
+ - [DesignDataSchemaValidationProblemDto](docs/DesignDataSchemaValidationProblemDto.md)
+ - [DesignDto](docs/DesignDto.md)
+ - [DesignExtractDataSchemaModel](docs/DesignExtractDataSchemaModel.md)
+ - [DesignExtractPalettesModel](docs/DesignExtractPalettesModel.md)
+ - [DesignExtractToggleSetModel](docs/DesignExtractToggleSetModel.md)
+ - [DesignFontMetadata](docs/DesignFontMetadata.md)
+ - [DesignFontMissingProblemDto](docs/DesignFontMissingProblemDto.md)
+ - [DesignImportConflictDto](docs/DesignImportConflictDto.md)
+ - [DesignLinkDataSchemaModel](docs/DesignLinkDataSchemaModel.md)
+ - [DesignLinkPalettesModel](docs/DesignLinkPalettesModel.md)
+ - [DesignLinkToggleSetModel](docs/DesignLinkToggleSetModel.md)
+ - [DesignMetadata](docs/DesignMetadata.md)
+ - [DesignPaletteMetadata](docs/DesignPaletteMetadata.md)
+ - [DesignPaletteMissingProblemDto](docs/DesignPaletteMissingProblemDto.md)
+ - [DesignPaletteValidationProblemDto](docs/DesignPaletteValidationProblemDto.md)
+ - [DesignParamsModel](docs/DesignParamsModel.md)
+ - [DesignPreviewFormat](docs/DesignPreviewFormat.md)
+ - [DesignPreviewSettingsModel](docs/DesignPreviewSettingsModel.md)
+ - [DesignPrintAreaMetadata](docs/DesignPrintAreaMetadata.md)
+ - [DesignProblemDto](docs/DesignProblemDto.md)
+ - [DesignSurfaceMetadata](docs/DesignSurfaceMetadata.md)
+ - [DesignToggleSetMissingProblemDto](docs/DesignToggleSetMissingProblemDto.md)
+ - [DesignToggleSetValidationProblemDto](docs/DesignToggleSetValidationProblemDto.md)
+ - [DesignUpdateConflictDto](docs/DesignUpdateConflictDto.md)
+ - [DocumentCreateConflictDto](docs/DocumentCreateConflictDto.md)
+ - [DocumentDto](docs/DocumentDto.md)
+ - [DocumentFormatType](docs/DocumentFormatType.md)
+ - [DocumentImportConflictDto](docs/DocumentImportConflictDto.md)
+ - [DocumentType](docs/DocumentType.md)
+ - [DocumentUpdateConflictDto](docs/DocumentUpdateConflictDto.md)
+ - [DocumentValidationConflictDto](docs/DocumentValidationConflictDto.md)
+ - [FontDto](docs/FontDto.md)
+ - [FontMetadata](docs/FontMetadata.md)
+ - [FontPreviewFormat](docs/FontPreviewFormat.md)
+ - [FontPreviewHorizontalAlignment](docs/FontPreviewHorizontalAlignment.md)
+ - [FontPreviewVerticalAlignment](docs/FontPreviewVerticalAlignment.md)
+ - [GeneralConflictDto](docs/GeneralConflictDto.md)
+ - [IdentificationConflictDto](docs/IdentificationConflictDto.md)
+ - [ImageDepositPhoto](docs/ImageDepositPhoto.md)
+ - [ImageDto](docs/ImageDto.md)
+ - [ImageMetadata](docs/ImageMetadata.md)
+ - [ImagePageMetadata](docs/ImagePageMetadata.md)
+ - [ImagePreviewFitMode](docs/ImagePreviewFitMode.md)
+ - [ImagePreviewInterpolationMode](docs/ImagePreviewInterpolationMode.md)
+ - [ImportDocumentFormatType](docs/ImportDocumentFormatType.md)
+ - [ImportDocumentType](docs/ImportDocumentType.md)
+ - [ImportMockupType](docs/ImportMockupType.md)
+ - [MissingFontInfoDto](docs/MissingFontInfoDto.md)
+ - [MissingFontsConflictDto](docs/MissingFontsConflictDto.md)
+ - [MissingImageInfoDto](docs/MissingImageInfoDto.md)
+ - [MissingImagesConflictDto](docs/MissingImagesConflictDto.md)
+ - [MissingPaletteInfoDto](docs/MissingPaletteInfoDto.md)
+ - [MissingPalettesConflictDto](docs/MissingPalettesConflictDto.md)
+ - [MockupDto](docs/MockupDto.md)
+ - [MockupFormatType](docs/MockupFormatType.md)
+ - [MockupLayerDto](docs/MockupLayerDto.md)
+ - [MockupLayerType](docs/MockupLayerType.md)
+ - [MockupLayersGroupDto](docs/MockupLayersGroupDto.md)
+ - [MockupLinkCreationModel](docs/MockupLinkCreationModel.md)
+ - [MockupLinksBatchCreationModel](docs/MockupLinksBatchCreationModel.md)
+ - [MockupMetadataDto](docs/MockupMetadataDto.md)
+ - [MockupPreviewFitMode](docs/MockupPreviewFitMode.md)
+ - [MockupPreviewInterpolationMode](docs/MockupPreviewInterpolationMode.md)
+ - [MockupProblemDto](docs/MockupProblemDto.md)
+ - [MockupType](docs/MockupType.md)
+ - [MockupValidationProblemDto](docs/MockupValidationProblemDto.md)
+ - [MockupValidationProblemType](docs/MockupValidationProblemType.md)
+ - [PaletteDto](docs/PaletteDto.md)
+ - [PaletteImportConflictDto](docs/PaletteImportConflictDto.md)
+ - [PaletteMetadata](docs/PaletteMetadata.md)
+ - [PalettePreviewFormat](docs/PalettePreviewFormat.md)
+ - [PaletteUpdateConflictDto](docs/PaletteUpdateConflictDto.md)
+ - [PaletteValidationConflictDto](docs/PaletteValidationConflictDto.md)
+ - [Position](docs/Position.md)
+ - [PreviewMetadata](docs/PreviewMetadata.md)
+ - [PrintGapModel](docs/PrintGapModel.md)
+ - [PrintMarginModel](docs/PrintMarginModel.md)
+ - [ProblemDetails](docs/ProblemDetails.md)
+ - [ValidationResultDto](docs/ValidationResultDto.md)
+
+
+<a id="documentation-for-authorization"></a>
+## Documentation For Authorization
+
+
+Authentication schemes defined for the API:
+<a id="ApiKey"></a>
+### ApiKey
+
+- **Type**: API key
+- **API key parameter name**: X-API-Key
+- **Location**: HTTP header
+
+<a id="Bearer"></a>
+### Bearer
+
+- **Type**: API key
+- **API key parameter name**: Authorization
+- **Location**: HTTP header
+
+<a id="OAuth2Code"></a>
+### OAuth2Code
+
+- **Type**: OAuth
+- **Flow**: accessCode
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+<a id="OAuth2Implicit"></a>
+### OAuth2Implicit
+
+- **Type**: OAuth
+- **Flow**: implicit
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+<a id="OAuth2ClientCredentials"></a>
+### OAuth2ClientCredentials
+
+- **Type**: OAuth
+- **Flow**: application
+- **Authorization URL**: 
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+
+
+
