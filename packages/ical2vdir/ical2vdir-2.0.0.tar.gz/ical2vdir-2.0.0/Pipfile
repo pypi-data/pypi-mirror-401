@@ -1,0 +1,31 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+ical2vdir = {editable = true, path = "."}
+
+[dev-packages]
+black = "*"
+# >=0.1.1 for https://github.com/blu3r4y/blinkcheck/pull/2
+blinkcheck = {version = ">=0.1.1", markers = "python_version >= '3.8'"}
+mypy = "*"
+pylint = "*"
+pytest = "*"
+pytest-cov = "*"
+
+# python3.10 compatibility
+# >    File "[...]/lib/python3.10/site-packages/_pytest/_code/code.py", line 60, in <module>
+# >     from exceptiongroup import BaseExceptionGroup
+# > ModuleNotFoundError: No module named 'exceptiongroup'
+exceptiongroup = {markers = "python_version < '3.11'"}
+# >   File "[...]/lib/python3.10/site-packages/_pytest/config/findpaths.py", line 71, in load_config_dict_from_file
+# >     import tomli as tomllib
+# > ModuleNotFoundError: No module named 'tomli'
+tomli = {markers = "python_version < '3.11'"}
+
+[requires]
+python_version = "3"
+
+# Pipfile syntax: https://github.com/pypa/pipfile#pipfile

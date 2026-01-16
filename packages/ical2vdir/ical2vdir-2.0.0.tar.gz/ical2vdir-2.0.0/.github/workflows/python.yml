@@ -1,0 +1,104 @@
+---
+# https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions
+
+# shown in badge
+# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow#adding-a-workflow-status-badge-to-your-repository
+name: tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron: '0 20 * * 5'
+
+jobs:
+  code-format:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ['3.13']
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+        # did not reduce runtime of `pipenv install` (still approx. 1 min)
+        #cache: pipenv
+    - run: pip install --upgrade pipenv==2025.0.4
+    - run: pipenv install --python "$PYTHON_VERSION" --deploy --dev
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+    - run: pipenv graph
+    - run: pipenv run black --check .
+  tests:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version:
+        - '3.10'
+        - '3.11'
+        - '3.12'
+        - '3.13'
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+        # did not reduce runtime of `pipenv install` (still approx. 1 min)
+        #cache: pipenv
+    # with pipenv v2023.6.26:
+    # > $ pipenv run pytest --cov="$(cat *.egg-info/top_level.txt)"
+    # . --cov-report=term-missing --cov-fail-under=100
+    # > cat: '*.egg-info/top_level.txt': No such file or directory
+    # > [...]
+    # > [...]/coverage/inorout.py:507: CoverageWarning:
+    # . Module  was never imported. (module-not-imported)
+    - run: pip install --upgrade pipenv==2023.6.18
+    # by default pipenv picks the latest version in PATH
+    - run: pipenv install --python "$PYTHON_VERSION" --deploy --dev
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+    - run: pipenv graph
+    - run: pipenv run pytest --cov="$(cat *.egg-info/top_level.txt)"
+        --cov-report=term-missing --cov-fail-under=100
+    - run: pipenv run pylint "$(cat *.egg-info/top_level.txt)"
+    # workaround pylint reporting:
+    # > E0401: Unable to import 'ical2vdir' (import-error)
+    # pyproject.toml broken?
+    - run: >-
+        printenv GITHUB_WORKSPACE
+        | tee "$(pipenv --venv)/lib/python${PYTHON_VERSION}/site-packages/easy-install.pth"
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+    - run: pipenv run pylint tests
+    - run: pipenv run mypy "$(cat *.egg-info/top_level.txt)" tests
+  install:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with: {python-version: 3.11}
+    - run: '! ical2vdir --help'
+    - run: pip install wheel==0.45.1
+    - run: python setup.py bdist_wheel
+    - run: pip install dist/*.whl
+    - run: ical2vdir --help
+  check-links:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ['3.13']
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: pip install --upgrade pipenv==2025.0.4
+    - run: pipenv install --python "$PYTHON_VERSION" --deploy --dev
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+    - run: pipenv graph
+    # `--include '*.md'` fails for https://securipi.co.uk/cc1101.pdf (HTTP403).
+    # `--include '*.py'` identifies `logging.INFO` as an url.
+    - run: pipenv run blinkcheck --include CHANGELOG.md
