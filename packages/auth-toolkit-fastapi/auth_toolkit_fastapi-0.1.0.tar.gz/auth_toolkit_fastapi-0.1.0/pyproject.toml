@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auth-toolkit-fastapi"
+version = "0.1.0"
+description = "Flexible authentication fastapi toolkit with websocet if u need"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "linecodesx", email = "feyte11@icloud.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "jwt",
+    "pwdlib>=1.0.0",
+]
+
+[project.optional-dependencies]
+websocket = ["fastapi>=0.100.0"]
+
+[project.urls]
+Homepage = "https://github.com/linecodesxx/auth_toolkit"
+Repository = "https://github.com/linecodesxx/auth_toolkit"
