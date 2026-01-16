@@ -1,0 +1,339 @@
+Metadata-Version: 2.4
+Name: SleePyPhases
+Version: 0.6.0
+Summary: A framwork for creating deep learning pipelines for sleep data
+Home-page: https://gitlab.com/sleep-is-all-you-need/sleepyphases
+Author: Franz Ehrlich
+Author-email: fehrlichd@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.5
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: SleepHarmonizer
+Requires-Dist: pyPhasesML
+Requires-Dist: phases
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# SleePyPhases
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/pypi/v/sleepyphases.svg)](https://pypi.org/project/sleepyphases/)
+
+**SleePyPhases** is an open-source Python workflow framework that provides unified, FAIR-compliant access to multiple sleep data repositories through a configuration-driven harmonization approach.
+
+## Overview
+
+Sleep research relies on polysomnography (PSG) data from diverse public repositories and vendor systems, yet the lack of standardized access methods and semantic harmonization creates substantial barriers to data reuse and reproducibility. SleePyPhases addresses these challenges by:
+
+- **Standardizing channel naming** across different datasets and vendors
+- **Harmonizing annotation semantics** for sleep stages, arousals, respiratory events, and leg movements
+- **Unifying data formats** to enable seamless multi-dataset studies
+- **Providing configuration-driven preprocessing** with efficient storage mechanisms
+- **Ensuring reproducibility** through configuration-based provenance tracking
+
+## Features
+
+- 🔌 **Unified Data Access**: Load data from 10+ public repositories and 2 commercial vendors through a single interface
+- ⚙️ **Configuration-Driven**: Define preprocessing, data manipulation, and training pipelines through YAML configuration
+- 🔄 **Automatic Synchronization**: Generated artifacts stay synchronized with configuration changes
+- 🧩 **Modular Architecture**: Extend functionality through plugins for datasets, preprocessing, and ML frameworks
+- 📊 **ML Pipeline Integration**: Built-in support for PyTorch and TensorFlow training workflows
+- 📈 **Comprehensive Evaluation**: Segment-wise and event-wise evaluation with clinical metrics
+
+## Supported Datasets & Formats
+
+### Public Repositories
+- Sleep Heart Health Study (SHHS)
+- Multi-Ethnic Study of Atherosclerosis (MESA)
+- MrOS Sleep Study
+- PhysioNet 2018 Challenge
+- SleepEDF Database Expanded
+- Cleveland Family Study (CFS) - *WIP*
+- PhysioNet 2023 Challenge - *WIP*
+- Human Sleep Project (HSP) - *WIP*
+- Dreem Open Dataset - *WIP*
+- CAP Sleep Database - *WIP*
+- ISRUC-Sleep - *WIP*
+
+### Vendor Formats
+- Philips Alice®
+- Somnomedics Domino®
+- Nox Medical® - *WIP*
+- Profusion Sleep Software® - *WIP*
+- Sonata® - *WIP*
+
+## Requirements
+
+SleePyPhases requires [Python 3.8+](https://www.python.org/downloads/) or [Docker](https://docs.docker.com/engine/install/).
+
+## Quick Start
+
+### 1. Clone Example Project
+
+- Clone the example project: `git clone https://gitlab.com/sleep-is-all-you-need/pyphases/spp-boilderplate.git SPP-MyProject`
+- Move to project: `cd SPP-MyProject`
+
+The example project can be customized using:
+- `src/SignalPreprocessing.py` signal preprocessing to be stored on the filesystem
+- `src/DataManipulation.py` data manipulation before passing to the ml model
+- `src/models/SimpleCRNN/SimpleCRNN.py` very basic cnn/lstm pytorch model
+- `config/config.yml` workflow configuration
+
+The example project also provides:
+- basic pyPhases structure
+- `Dockerfile` defining the docker image
+- `docker-compose.yml` to build and run the docker container
+
+
+The example project can be extended by:
+- `Init`-Phase to inject data manipulation and preprocessing custom code to the project
+- `project.yaml` basic project configuration to add additional phases
+
+### Setup (docker compose)
+
+
+- update the volumes in `docker-compose.yml`
+- remove nvidia GPU `deploy` section in `docker-compose.yml` if no nvida GPU is available
+- `data`, `logs` and `eval` folder will be created and require write-access
+- phase can be executed using: `docker compose run phases run Training`
+
+### Setup (Python)
+
+- install requirement: `pip install -r requirements.txt`
+- `data`, `logs` and `eval` folder will be created and require write-access
+- phase can be executed using
+  - `phases run Training` (if installed in environment)
+  - `python -m phases run Training` (if python is installed)
+
+### Change Configuration
+
+Changes can be made using the `configs/config.yml` or creating a new config file and loading it with the `-c` paramater:  `phases run -c myconfig1.yml,myconfig2.yml Training`.
+
+```yaml
+useLoader: shhs
+shhs-path: /path/to/shhs/dataset
+
+preprocessing:
+  targetFrequency: 64
+  labelFrequency: 64
+  stepsPerType:
+    eeg: [filter, resample, standardize]
+  targetChannels:
+    - [EEG]
+
+labelChannels:
+  - SleepStagesAASM
+
+dataversion:
+  version: my-experiment
+  seed: 2025
+  folds: 5
+  split:
+    test: "0:100"
+    trainval: "100:500"
+```
+
+The shhs dataset needs to be downloaded to the `shhs-path` location.
+
+### Train and Evaluate a Model
+
+- run the training `phases run Training`
+
+- evaluate a trained model: `phases run EvalReport`
+
+## Architecture
+
+SleePyPhases is built on three main components:
+
+1. **pyPhases**: Core framework for configuration-driven project management
+2. **SleepHarmonizer**: PSG data harmonization plugin with standardized interfaces
+3. **pyPhasesML**: Machine learning operations including preprocessing and training
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    SleePyPhases                         │
+├─────────────────┬─────────────────┬─────────────────────┤
+│   pyPhases      │ SleepHarmonizer │    pyPhasesML       │
+│   (Core)        │  (Data Access)  │  (ML Pipeline)      │
+├─────────────────┼─────────────────┼─────────────────────┤
+│ - Configuration │ - Record Loader │ - Preprocessing     │
+│ - Phases        │ - Channel Map   │ - Data Manipulation │
+│ - Data Storage  │ - Annotations   │ - Model Training    │
+│ - Plugins       │ - Metadata      │ - Evaluation        │
+└─────────────────┴─────────────────┴─────────────────────┘
+```
+
+## Configuration Examples
+
+### Data Filtering
+
+```yaml
+dataversion:
+  version: shhs1-ahi15
+  filterQuery: recordId.str.startswith("shhs1-") and ahi > 15
+  seed: 2025
+  folds: 4
+  split:
+    test: "0:1000"
+    trainval: "1000:2056"
+```
+
+
+### Training/Modle
+
+```yaml
+modelName: MyModel # needs to be stored in src/models/MyModel.py
+trainingParameter:
+  learningRate: 0.00025
+  learningRateDecay: 0.001
+  batchSize: 32
+  optimizer: adams
+  shuffle: True
+  shuffleSeed: 2025
+
+  # test to run longer
+  stopAfterNotImproving: 25
+  maxEpochs: 1000
+
+  validationMetrics: # for each label channel
+    - [f1, kappa]
+    - [f1, kappa]
+```
+
+### Evaluation
+
+```yaml
+
+labelChannels:
+  - SleepStagesAASM
+  - SleepArousals
+  - SleepApnea
+  - SleepLegMovements
+
+eval:
+  batchSize: 1
+  metrics:
+    - [f1, kappa]      # sleep stages
+    - [auprc, f1]      # arousal
+    - [f1, kappa]      # respiratory events
+    - [auprc, f1]      # leg movements
+  clinicalMetrics:
+    - tst              # Total Sleep Time
+    - waso             # Wake After Sleep Onset
+    - ahi              # Apnea-Hypopnea Index
+    - arousalIndex
+    - indexPLMS
+```
+
+
+### Custom PSG Loader Configuration
+
+This show a custom file structure where a recording is stored using the Alice 6® PSG software in following structure:
+
+ `/recordings/{recordId}` with three subfiles:`{recording}.edf`, `{recording}.txt` and `{recording}.rml`.
+
+```yaml
+loader:
+  my-alice:
+    dataBase: DSDS
+    dataIsFinal: False # more recordings will be stored in the future
+    dataset:
+      loaderName: RecordLoaderAlice
+      dataHandler:
+        type: folders
+        listFilter: acq
+        canReadRemote: True
+        basePath: .
+        extensions: [.edf, .rml, .txt]
+        force: False
+        idPattern: .*/(.*]).edf
+        signal-path: "{recordId}/{recordId}.edf"
+        annotation-path: "{recordId}/{recordId}.rml"
+        metadata-path: "{recordId}/{recordId}.txt"
+
+    # the channels that should be extracted from the edf files
+    sourceChannels:
+      - name: EEG F3-A2
+        type: eeg
+      - name: EEG F4-A1
+        type: eeg
+      - name: EEG C3-A2
+    # ...
+
+useLoader: my-alice
+alice-path: /recordings
+```
+
+## Validation & Reproducibility
+
+SleePyPhases has been validated through reproduction of five published sleep analysis studies:
+
+| Study | Model | Datasets | Original | SPP | Difference |
+|-------|-------|----------|----------|-----|------------|
+| Pourbabaee et al. | DRCNN | PhysioNet | 0.528 | 0.548 | +3.6% |
+| Phan et al. | Transformer | SHHS | 0.828 | 0.828 | 0.0% |
+| Kotzen et al. | CNN | MESA | 0.74 | 0.733 | -1.0% |
+| Zahid et al. | CNN | MrOS | 0.704 | 0.679 | -3.7% |
+| Lee et al. | Transformer | SleepEDF | 0.682 | 0.662 | -3.0% |
+
+## Included Projects
+
+- [pyPhases Core](https://gitlab.com/tud.ibmt.public/pyphases/pyphases/) - Core framework
+- [pyPhases Plugins](https://gitlab.com/tud.ibmt.public/pyphases/) - Recordloaders, Machine learning Plugins
+- [Sleep Harmonizer](https://gitlab.com/sleep-is-all-you-need/sleep-harmonizer) - PSG harmonization plugin
+- [Reproduction Studies](https://gitlab.com/sleep-is-all-you-need/reproduce) - All reproduction experiments
+
+## FAIR Principles
+
+SleePyPhases adheres to FAIR principles:
+
+- **Findable**: Public repositories on GitLab and Python Package Index
+- **Accessible**: Open-source MIT licensing
+- **Interoperable**: Supports multiple signal formats and vendor formats
+- **Reusable**: Modular plugin architecture with versioned releases
+
+<!-- ## Citation
+
+If you use SleePyPhases in your research, please cite:
+
+```bibtex
+@article{ehrlich2025sleepyphases,
+  title={SleePyPhases: A Workflow Framework for Harmonized Access to Public Sleep Data Repositories},
+  author={Ehrlich, Franz and Bäcker, Sara and Schmidt, Martin and Malberg, Hagen and Sedlmayr, Martin and Goldammer, Miriam},
+  journal={},
+  year={2025}
+}
+```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Merge Request
+ -->
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+This research was funded by the Federal Ministry of Research, Technology and Space under the funding code 01ZZ2324F.
+
+Computing resources were provided by the NHR Center of TU Dresden, jointly supported by the Federal Ministry of Education and Research and participating state governments.
+
