@@ -1,0 +1,107 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nkosi"
+version = "3.2"
+description = "A network tool for device discovery and communication"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "Nandhan K", email = "developer.nandhank@gmail.com" }
+]
+keywords = [
+    "Network Discovery",
+    "OSI Model Visualizer",
+    "Network Tools",
+    "TCP/UDP Communication"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: Win32 (MS Windows)",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+dependencies = [
+    "rich>=13.0.0",
+    "ipaddress>=1.0.0",
+    "netifaces>=0.11.0",
+    "python-nmap>=0.7.1",
+    "scapy>=2.5.0",
+    "psutil>=5.9.0",
+    "requests>=2.31.0"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/Nandhan-KA/nkosi"
+Documentation = "https://github.com/Nandhan-KA/nkosi#readme"
+Repository = "https://github.com/Nandhan-KA/nkosi"
+BugTracker = "https://github.com/Nandhan-KA/nkosi/issues"
+
+[project.scripts]
+nkosi-discover = "nkosi.cli:discover_devices"
+nkosi-send = "nkosi.cli:send_message"
+nkosi-ui = "nkosi.visualizer:main"
+nkosi-ping = "nkosi.scanner:ping_sweep"
+
+[project.optional-dependencies]
+# System dependencies for Linux
+linux = [
+    "arp-scan",
+    "tcpdump",
+    "nmap"
+]
+
+# Development dependencies
+dev = [
+    "pytest>=6.0",
+    "black>=21.5b2",
+    "isort>=5.8.0",
+    "mypy>=0.812",
+    "pylint>=2.8.2"
+]
+
+[tool.setuptools.packages.find]
+include = ["nkosi*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+
+[tool.pylint]
+max-line-length = 88
+indent-string = '    '
+
+[tool.pylint.messages_control]
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    "R0903",  # too-few-public-methods
+    "R0902",  # too-many-instance-attributes
+    "R0913",  # too-many-arguments
+    "R0914",  # too-many-locals
+    "W0212",  # protected-access
+    "W0621",  # redefined-outer-name
+    "W1203"   # f-string-without-interpolation
+]
