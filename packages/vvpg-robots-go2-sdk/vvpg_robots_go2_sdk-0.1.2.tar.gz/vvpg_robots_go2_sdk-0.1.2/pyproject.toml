@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.25.0", "hatch-vcs>=0.4.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vvpg_robots_go2_sdk"
+dynamic = ["version"]
+description = "VVPGRobots Go2 Python SDK (ROS2 Humble runtime; Unitree Sport helpers)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "VVPGRobots" }
+]
+keywords = ["robotics", "ros2", "unitree", "go2", "sdk"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Operating System :: POSIX :: Linux",
+  "Topic :: Software Development :: Libraries",
+]
+
+# ВАЖНО:
+# Не добавляем rclpy/unitree_api в dependencies: они обычно ставятся через ROS (apt/overlay).
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/<OWNER>/vvpg_robots_go2_sdk"
+Repository = "https://github.com/<OWNER>/vvpg_robots_go2_sdk"
+
+[tool.hatch.version]
+source = "vcs"
+tag-pattern = "v(?P<version>\\d+\\.\\d+\\.\\d+)"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vvpg_robots_go2_sdk"]
+
+[tool.hatch.build]
+include = [
+  "src/vvpg_robots_go2_sdk/py.typed",
+]
