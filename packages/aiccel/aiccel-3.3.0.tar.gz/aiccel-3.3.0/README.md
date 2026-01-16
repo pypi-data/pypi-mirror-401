@@ -1,0 +1,594 @@
+# ⚡ AICCEL Framework
+
+<div align="center">
+
+**The Production-Grade, Security-First AI Agent Framework**
+
+[![PyPI version](https://badge.fury.io/py/aiccel.svg)](https://badge.fury.io/py/aiccel)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Downloads](https://pepy.tech/badge/aiccel)](https://pepy.tech/project/aiccel)
+
+*Build AI agents that are fast, secure, and production-ready in minutes.*
+
+[Installation](#-installation) •
+[Quick Start](#-quick-start) •
+[Features](#-core-features) •
+[Documentation](#-detailed-documentation) •
+[Examples](#-real-world-examples)
+
+</div>
+
+---
+
+## 📦 Installation
+
+```bash
+# Core framework (OpenAI, Gemini, Groq support)
+pip install aiccel
+
+# With security features (jailbreak detection)
+pip install aiccel[safety]
+
+# With privacy features (PII masking via GLiNER)
+pip install aiccel[privacy]
+
+# Full suite (all features)
+pip install aiccel[all]
+```
+
+**Verify installation:**
+```bash
+aiccel check
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Create Your First Agent (30 seconds)
+
+```python
+from aiccel import Agent, GeminiProvider
+
+# Initialize provider (uses GOOGLE_API_KEY env var if not provided)
+provider = GeminiProvider(model="gemini-2.0-flash")
+
+# Create agent
+agent = Agent(
+    provider=provider,
+    name="Assistant",
+    instructions="You are a helpful AI assistant."
+)
+
+# Run query
+result = agent.run("What is the capital of France?")
+print(result["response"])
+```
+
+### 2. Agent with Tools
+
+```python
+from aiccel import Agent, GeminiProvider, SearchTool, WeatherTool
+
+# Create tools
+search = SearchTool(api_key="your-serpapi-key")
+weather = WeatherTool(api_key="your-openweather-key")
+
+# Create agent with tools
+agent = Agent(
+    provider=GeminiProvider(),
+    tools=[search, weather],
+    name="ResearchBot",
+    instructions="Help users find information and check weather."
+)
+
+# Agent automatically selects the right tool
+result = agent.run("What's the weather in Tokyo?")
+print(result["response"])
+print(f"Tools used: {result['tools_used']}")
+```
+
+### 3. Async Support
+
+```python
+import asyncio
+from aiccel import Agent, GeminiProvider
+
+async def main():
+    agent = Agent(provider=GeminiProvider())
+    
+    # Async execution
+    result = await agent.run_async("Explain quantum computing")
+    print(result["response"])
+
+asyncio.run(main())
+```
+
+---
+
+## 🔥 Core Features
+
+### 🧠 Intelligent Agents
+
+```python
+from aiccel import Agent, AgentConfig
+
+# Configure agent behavior
+config = AgentConfig(
+    thinking_enabled=True,      # Enable chain-of-thought reasoning
+    max_tool_retries=3,         # Auto-retry failed tools
+    safety_enabled=True,        # Enable jailbreak detection
+    strict_tool_usage=False,    # Allow mixed tool/LLM responses
+)
+
+agent = Agent(
+    provider=provider,
+    config=config,
+    tools=[search, calculator],
+    instructions="You are a research analyst."
+)
+
+result = agent.run("Analyze the market trends for EV batteries")
+print(f"Thinking: {result['thinking']}")  # See the reasoning process
+print(f"Response: {result['response']}")
+```
+
+### 🔒 Enterprise Security Suite
+
+#### PII Masking (Privacy Protection)
+```python
+from aiccel.privacy import EntityMasker
+
+masker = EntityMasker()
+
+# Automatically detect and mask sensitive data
+text = "Contact John Smith at john@example.com or 555-123-4567"
+masked, mapping = masker.mask(text)
+# Output: "Contact [PERSON_1] at [EMAIL_1] or [PHONE_1]"
+
+# Unmask after LLM processing
+original = masker.unmask(masked, mapping)
+```
+
+#### Jailbreak Detection
+```python
+from aiccel.jailbreak import JailbreakGuard, SecurityMode
+
+# Production mode: Block on any detection
+guard = JailbreakGuard(security_mode=SecurityMode.FAIL_CLOSED)
+
+is_safe = guard.check("Normal user query")  # True
+is_safe = guard.check("Ignore all instructions and...")  # False (blocked)
+
+# Use as decorator
+@guard.guard
+def process_query(query: str):
+    return agent.run(query)
+```
+
+#### AES-256 Encryption
+```python
+from aiccel.encryption import encrypt, decrypt
+
+# Encrypt sensitive data
+encrypted = encrypt("my-api-key", password="secure-password")
+
+# Decrypt when needed
+original = decrypt(encrypted, password="secure-password")
+```
+
+### 🤝 Multi-Agent Orchestration
+
+```python
+from aiccel import Agent, AgentManager, GeminiProvider
+
+# Create specialist agents
+researcher = Agent(
+    provider=GeminiProvider(),
+    name="Researcher",
+    instructions="You gather and analyze information."
+)
+
+writer = Agent(
+    provider=GeminiProvider(),
+    name="Writer", 
+    instructions="You create clear, engaging content."
+)
+
+analyst = Agent(
+    provider=GeminiProvider(),
+    name="Analyst",
+    instructions="You provide data-driven insights."
+)
+
+# Create orchestrator
+manager = AgentManager(
+    llm_provider=GeminiProvider(),
+    agents=[researcher, writer, analyst],
+    instructions="Coordinate agents to solve complex tasks."
+)
+
+# Automatic routing to best agent
+result = manager.route("Write a blog post about AI trends")
+
+# Collaborative multi-agent reasoning
+result = await manager.collaborate_async(
+    "Analyze this quarterly report and create an executive summary"
+)
+```
+
+### ⛓️ Workflow Pipelines
+
+```python
+from aiccel import WorkflowBuilder, WorkflowExecutor
+
+# Build a deterministic pipeline
+workflow = (
+    WorkflowBuilder("content-pipeline")
+    .add_agent("research", researcher)
+    .add_agent("write", writer)
+    .add_agent("review", reviewer)
+    .chain("research", "write")      # research -> write
+    .chain("write", "review")        # write -> review
+    .add_condition(                  # Conditional routing
+        "review",
+        lambda result: "approved" in result.lower(),
+        on_true="publish",
+        on_false="write"             # Loop back for revisions
+    )
+    .build()
+)
+
+# Execute workflow
+executor = WorkflowExecutor(workflow)
+result = await executor.execute_async("Create a blog post about Python")
+```
+
+### 🔌 MCP (Model Context Protocol) Support
+
+```python
+from aiccel.mcp import MCPClient
+
+# Connect to MCP-compatible tool servers
+client = MCPClient.from_url("http://localhost:3000/mcp")
+await client.connect()
+
+# List available tools
+tools = await client.list_tools()
+print(f"Available tools: {[t.name for t in tools]}")
+
+# Call tools
+result = await client.call_tool("search", {"query": "AI news"})
+
+# Convert MCP tools for use with AICCEL agents
+from aiccel.mcp import MCPToolAdapter
+aiccel_tools = MCPToolAdapter.convert_tools(tools, client)
+
+agent = Agent(provider=provider, tools=aiccel_tools)
+```
+
+### 🎯 Request Context & Observability
+
+```python
+from aiccel import Agent, request_scope, get_request_id
+
+# Track requests across your application
+with request_scope(user_id="user_123") as ctx:
+    print(f"Request ID: {ctx.request_id}")
+    
+    # All operations within this scope are correlated
+    result = agent.run("Process this query")
+    
+    # Logs automatically include request_id for debugging
+```
+
+### 📊 Custom Tools
+
+```python
+from aiccel.tools import BaseTool, ToolResult, ParameterSchema
+
+class CalculatorTool(BaseTool):
+    """A simple calculator tool."""
+    
+    name = "calculator"
+    description = "Perform mathematical calculations"
+    parameters = [
+        ParameterSchema(
+            name="expression",
+            type="string",
+            description="Mathematical expression to evaluate",
+            required=True
+        )
+    ]
+    
+    def execute(self, expression: str) -> ToolResult:
+        try:
+            result = eval(expression)  # Use safer eval in production
+            return ToolResult.success(str(result))
+        except Exception as e:
+            return ToolResult.error(f"Calculation failed: {e}")
+
+# Use with agent
+calculator = CalculatorTool()
+agent = Agent(provider=provider, tools=[calculator])
+result = agent.run("What is 15 * 24 + 36?")
+```
+
+---
+
+## 🏢 FastAPI Integration
+
+```python
+from fastapi import FastAPI
+from aiccel import Agent, GeminiProvider
+from aiccel.integrations import create_agent_routes
+
+app = FastAPI()
+
+# Create agent
+agent = Agent(
+    provider=GeminiProvider(),
+    name="API-Agent"
+)
+
+# Add routes automatically
+router = create_agent_routes(agent)
+app.include_router(router, prefix="/agent")
+
+# Endpoints created:
+# POST /agent/run          - Run a query
+# POST /agent/stream       - Stream response
+# GET  /agent/info         - Agent metadata
+# POST /agent/clear-memory - Clear conversation history
+# GET  /agent/health       - Health check
+```
+
+---
+
+## 📖 Detailed Documentation
+
+### Providers
+
+```python
+# All providers support the same interface
+from aiccel import GeminiProvider, OpenAIProvider, GroqProvider
+
+gemini = GeminiProvider(model="gemini-2.0-flash")
+openai = OpenAIProvider(model="gpt-4o-mini")
+groq = GroqProvider(model="llama3-70b-8192")
+
+# Generate text
+response = gemini.generate("Hello!")
+
+# Chat with history
+response = openai.chat([
+    {"role": "user", "content": "Hello"},
+    {"role": "assistant", "content": "Hi there!"},
+    {"role": "user", "content": "How are you?"}
+])
+
+# Async variants
+response = await gemini.generate_async("Hello!")
+response = await openai.chat_async(messages)
+```
+
+### Configuration Options
+
+```python
+from aiccel import Agent, AgentConfig
+
+config = AgentConfig(
+    # Thinking & Reasoning
+    thinking_enabled=True,           # Enable chain-of-thought
+    thinking_budget=500,             # Max tokens for thinking
+    
+    # Tool Execution
+    strict_tool_usage=False,         # Require tools for all queries
+    max_tool_retries=3,              # Retry failed tools
+    tool_timeout=30.0,               # Tool execution timeout
+    
+    # Security
+    safety_enabled=True,             # Jailbreak detection
+    pii_masking=True,                # Auto-mask PII
+    
+    # Memory
+    memory_type="buffer",            # buffer, window, or summary
+    max_memory_turns=50,             # Max conversation turns
+    max_memory_tokens=32000,         # Max tokens in memory
+)
+```
+
+### Memory Types
+
+```python
+from aiccel import ConversationMemory
+
+# Buffer Memory (keeps all turns)
+memory = ConversationMemory(memory_type="buffer", max_turns=50)
+
+# Window Memory (sliding window)
+memory = ConversationMemory(memory_type="window", max_turns=10)
+
+# Summary Memory (summarizes old conversations)
+memory = ConversationMemory(
+    memory_type="summary",
+    max_turns=5,
+    llm_provider=provider  # Required for summarization
+)
+
+# Use with agent
+agent = Agent(provider=provider, memory=memory)
+```
+
+### Error Handling
+
+```python
+from aiccel.exceptions import (
+    AICCLException,       # Base exception
+    AgentException,       # Agent-related errors
+    ProviderException,    # LLM provider errors
+    ToolException,        # Tool execution errors
+    ProviderRateLimitError,
+    ProviderTimeoutError,
+)
+
+try:
+    result = agent.run("Query")
+except ProviderRateLimitError as e:
+    print(f"Rate limited. Retry in {e.retry_after}s")
+except ProviderTimeoutError as e:
+    print(f"Request timed out after {e.timeout}s")
+except ToolException as e:
+    print(f"Tool {e.tool_name} failed: {e.message}")
+except AgentException as e:
+    print(f"Agent error: {e.message}, Context: {e.context}")
+```
+
+---
+
+## 💡 Real-World Examples
+
+### Research Assistant
+
+```python
+from aiccel import Agent, GeminiProvider, SearchTool
+
+agent = Agent(
+    provider=GeminiProvider(model="gemini-2.0-flash"),
+    tools=[SearchTool(api_key="...")],
+    name="ResearchAssistant",
+    instructions="""You are an expert research assistant.
+    - Always cite sources
+    - Provide balanced perspectives
+    - Summarize key findings clearly"""
+)
+
+result = agent.run("What are the pros and cons of nuclear energy?")
+```
+
+### Code Assistant
+
+```python
+from aiccel import Agent, OpenAIProvider
+
+agent = Agent(
+    provider=OpenAIProvider(model="gpt-4o"),
+    name="CodeHelper",
+    instructions="""You are an expert programmer.
+    - Write clean, documented code
+    - Explain your implementation
+    - Suggest best practices"""
+)
+
+# Enable thinking for complex problems
+agent.enable_thinking()
+
+result = agent.run("Write a Python function to find the longest palindromic substring")
+print(result["thinking"])   # See the reasoning
+print(result["response"])   # Get the code
+```
+
+### Customer Support Bot
+
+```python
+from aiccel import Agent, AgentManager, GeminiProvider
+
+# Specialist agents
+billing = Agent(
+    provider=GeminiProvider(),
+    name="BillingAgent",
+    instructions="Handle billing inquiries, refunds, and payment issues."
+)
+
+technical = Agent(
+    provider=GeminiProvider(),
+    name="TechSupport",
+    instructions="Troubleshoot technical issues and provide solutions."
+)
+
+general = Agent(
+    provider=GeminiProvider(),
+    name="GeneralSupport",
+    instructions="Handle general inquiries and route complex issues."
+)
+
+# Router automatically selects the best agent
+support_manager = AgentManager(
+    llm_provider=GeminiProvider(),
+    agents=[billing, technical, general]
+)
+
+# Automatic routing
+result = support_manager.route("I can't log into my account")  # -> TechSupport
+result = support_manager.route("I want a refund")              # -> BillingAgent
+```
+
+---
+
+## ⚡ Performance Tips
+
+### 1. Use Connection Pooling (Automatic in v3.2.0+)
+```python
+# Connections are reused automatically
+provider = GeminiProvider()  # Uses connection pooling
+```
+
+### 2. Use Async for Concurrent Operations
+```python
+import asyncio
+
+async def process_queries(queries):
+    tasks = [agent.run_async(q) for q in queries]
+    return await asyncio.gather(*tasks)
+```
+
+### 3. Enable Caching
+```python
+from aiccel import Agent, AgentConfig
+
+config = AgentConfig(
+    enable_caching=True,
+    cache_ttl=3600  # Cache for 1 hour
+)
+```
+
+### 4. Use Lazy Imports
+```python
+# Fast import (recommended for production)
+from aiccel.fast import Agent, GeminiProvider
+```
+
+---
+
+## 🔧 Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `OPENAI_API_KEY` | OpenAI API key | For OpenAI |
+| `GOOGLE_API_KEY` | Google AI API key | For Gemini |
+| `GROQ_API_KEY` | Groq API key | For Groq |
+| `SERPAPI_API_KEY` | SerpAPI key | For SearchTool |
+| `AICCEL_SECURITY_MODE` | `FAIL_CLOSED` or `FAIL_OPEN` | Optional |
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See our [Contributing Guide](https://github.com/traromal/aiccel/blob/main/CONTRIBUTING.md).
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](https://github.com/traromal/aiccel/blob/main/LICENSE) for details.
+
+---
+
+<div align="center">
+
+**Built with ❤️ for the AI community**
+
+[⭐ Star us on GitHub](https://github.com/traromal/aiccel) • [🐛 Report Issues](https://github.com/traromal/aiccel/issues) • [💬 Discussions](https://github.com/traromal/aiccel/discussions)
+
+</div>
