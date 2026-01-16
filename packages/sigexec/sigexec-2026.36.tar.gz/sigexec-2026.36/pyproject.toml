@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=45"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sigexec"
+version = "2026.36"
+description = "Signal processing execution graph using DAG and data classes"
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+    {name = "Signal Processing Team"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "matplotlib>=3.3.0",
+    "plotly>=5.0.0",
+]
+
+[project.optional-dependencies]
+visualization = [
+    "staticdash>=2025.1",
+    "kaleido>=0.2.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+]
