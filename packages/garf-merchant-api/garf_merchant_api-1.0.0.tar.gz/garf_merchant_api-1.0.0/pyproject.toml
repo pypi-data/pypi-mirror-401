@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "garf-merchant-api"
+dependencies = [
+  "garf-core",
+  "garf-io",
+  "google-shopping-merchant-reports",
+]
+authors = [
+  {name = "Google Inc. (gTech gPS CSE team)", email = "no-reply@google.com"},
+]
+license = {text = "Apache 2.0"}
+requires-python = ">=3.8"
+description = "Garf implementation for Google Merchant API"
+readme = "README.md"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+dynamic=["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "garf.community.google.merchant.__version__"}
+
+[project.entry-points.garf]
+merchant-api = "garf.community.google.merchant.report_fetcher"
+
+[options.extras_require]
+test =  [
+  "pytest",
+  "pytest-cov",
+  "python-dotenv",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include=["garf_google_ads*", "garf.*"]
