@@ -1,0 +1,80 @@
+{
+  "name": "@isiahw1/mcp-server-bing-webmaster",
+  "version": "1.0.1",
+  "description": "MCP server for Bing Webmaster Tools integration",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "bing",
+    "bing-webmaster",
+    "webmaster-tools",
+    "seo",
+    "api",
+    "search-console"
+  ],
+  "author": "Isiah Wheeler <github@isiahwheeler.com> (https://github.com/isiahw1)",
+  "license": "MIT",
+  "homepage": "https://github.com/isiahw1/mcp-server-bing-webmaster#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isiahw1/mcp-server-bing-webmaster.git"
+  },
+  "bugs": {
+    "url": "https://github.com/isiahw1/mcp-server-bing-webmaster/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/isiahw1"
+  },
+  "main": "run.js",
+  "bin": {
+    "mcp-server-bing-webmaster": "run.js"
+  },
+  "files": [
+    "mcp_server_bwt/",
+    "pyproject.toml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "run.js",
+    ".env.example",
+    "scripts/"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "echo \"Tests require Python environment\" && exit 0",
+    "prepublishOnly": "npm run validate",
+    "validate": "node scripts/validate.js",
+    "postinstall": "node scripts/postinstall.js || true",
+    "check-publish": "npm pack --dry-run",
+    "view-package": "npm pack && tar -tf *.tgz && rm *.tgz",
+    "sync-version": "node scripts/sync-version.js",
+    "preversion": "npm run sync-version",
+    "postversion": "npm run sync-version && git add mcp_server_bwt/version.py",
+    "setup": "npm install && ./scripts/setup-pre-commit.sh",
+    "security-scan": "pre-commit run --all-files"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "packageManager": "npm@10.0.0",
+  "dependencies": {
+    "@isiahw1/mcp-server-bing-webmaster": "^1.0.1"
+  }
+}
