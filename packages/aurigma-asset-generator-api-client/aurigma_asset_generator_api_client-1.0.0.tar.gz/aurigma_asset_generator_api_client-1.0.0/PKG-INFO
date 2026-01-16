@@ -1,0 +1,182 @@
+Metadata-Version: 2.4
+Name: aurigma-asset-generator-api-client
+Version: 1.0.0
+Summary: Aurigma Asset Generator API client
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: python-dateutil>=2.8.2
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: pydantic<3,>=2
+Requires-Dist: typing-extensions>=4.7.1; python_version < "3.11"
+
+# aurigma-asset-generator-api-client
+
+Python client library for [Aurigma Asset Generator API](https://customerscanvas.com/dev/backoffice/api/asset-generator/overview.html).
+
+## Requirements.
+
+- Python 3.9+
+- Dependencies:
+  - python-dateutil>=2.8.2
+  - httpx>=0.28.1
+  - pydantic>=2
+  - typing-extensions>=4.7.1
+
+## Installation & Usage
+### pip install
+
+```sh
+pip install aurigma-asset-generator-api-client
+```
+
+Then import the package:
+```python
+import aurigma.asset_generator
+```
+
+## Getting Started
+
+Please follow the [installation procedure](#installation--usage) and then run the following:
+
+```python
+
+import aurigma.asset_generator
+from aurigma.asset_generator.rest import ApiException
+from pprint import pprint
+
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aurigma.asset_generator.Configuration(
+    host = "http://api.customerscanvashub.com/"
+)
+
+
+
+# Enter a context with an instance of the API client
+async with aurigma.asset_generator.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aurigma.asset_generator.BuildInfoApi(api_client)
+
+    try:
+        # Returns build info.
+        api_response = await api_instance.build_info_get_info()
+        print("The response of BuildInfoApi->build_info_get_info:\n")
+        pprint(api_response)
+    except ApiException as e:
+        print("Exception when calling BuildInfoApi->build_info_get_info: %s\n" % e)
+
+```
+
+## Documentation for API Endpoints
+
+Depending on the geographical location of your Customer's Canvas Hub instance, the API gateway address may vary: 
+ 
+https://api.customerscanvashub.com/ - United States instance
+https://api.eu.customerscanvashub.com/ - European instance
+https://api.au.customerscanvashub.com/ - Australian instance
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+*BuildInfoApi* | [**build_info_get_info**](docs/BuildInfoApi.md#build_info_get_info) | **GET** /api/asset-generator/v1/info | Returns build info.
+*BuildInfoApi* | [**build_info_head_info**](docs/BuildInfoApi.md#build_info_head_info) | **HEAD** /api/asset-generator/v1/info | Returns build info.
+*MockupGeneratorApi* | [**mockup_generator_generate**](docs/MockupGeneratorApi.md#mockup_generator_generate) | **POST** /api/asset-generator/v1/mockups/generate | Generates a mockup file and saves it to the storage.
+*MockupGeneratorApi* | [**mockup_generator_get_all_specifications**](docs/MockupGeneratorApi.md#mockup_generator_get_all_specifications) | **GET** /api/asset-generator/v1/mockups/specifications | Returns a list of all mockup specifications.
+*MockupGeneratorApi* | [**mockup_generator_get_specification**](docs/MockupGeneratorApi.md#mockup_generator_get_specification) | **GET** /api/asset-generator/v1/mockups/specifications/{name} | Returns the mockup specification by name.
+*MockupGeneratorApi* | [**mockup_generator_get_specification_image**](docs/MockupGeneratorApi.md#mockup_generator_get_specification_image) | **GET** /api/asset-generator/v1/mockups/specifications/{name}/images/{imageName} | Returns image of mockup specification by name.
+*MockupGeneratorApi* | [**mockup_generator_get_specification_parameters**](docs/MockupGeneratorApi.md#mockup_generator_get_specification_parameters) | **GET** /api/asset-generator/v1/mockups/specifications/{name}/parameters | Returns parameters of mockup specification by name.
+*MockupGeneratorApi* | [**mockup_generator_validate_specification_parameters**](docs/MockupGeneratorApi.md#mockup_generator_validate_specification_parameters) | **POST** /api/asset-generator/v1/mockups/specifications/{name}/parameters/validate | Validates the parameters of the mockup specification.
+*TenantsApi* | [**tenants_create**](docs/TenantsApi.md#tenants_create) | **POST** /api/asset-generator/v1/tenants | Creates a new tenant.
+*TenantsApi* | [**tenants_delete**](docs/TenantsApi.md#tenants_delete) | **DELETE** /api/asset-generator/v1/tenants/{id} | Deletes a tenant by ID.
+*TenantsApi* | [**tenants_get**](docs/TenantsApi.md#tenants_get) | **GET** /api/asset-generator/v1/tenants/{id} | Returns a tenant by ID.
+*TenantsApi* | [**tenants_get_all**](docs/TenantsApi.md#tenants_get_all) | **GET** /api/asset-generator/v1/tenants | Returns a list of all tenants.
+*TenantsApi* | [**tenants_update**](docs/TenantsApi.md#tenants_update) | **PUT** /api/asset-generator/v1/tenants/{id} | Updates a tenant by ID.
+
+
+## Documentation For Models
+
+ - [BadRequestDto](docs/BadRequestDto.md)
+ - [BuildInfoModel](docs/BuildInfoModel.md)
+ - [ConflictDto](docs/ConflictDto.md)
+ - [MockupCreationModel](docs/MockupCreationModel.md)
+ - [MockupGenerationResult](docs/MockupGenerationResult.md)
+ - [MockupSpecDto](docs/MockupSpecDto.md)
+ - [MockupSpecParamDto](docs/MockupSpecParamDto.md)
+ - [MockupSpecParamRulesDto](docs/MockupSpecParamRulesDto.md)
+ - [MockupSpecParamsValidationResultDto](docs/MockupSpecParamsValidationResultDto.md)
+ - [ProblemDetails](docs/ProblemDetails.md)
+ - [SpecGroupType](docs/SpecGroupType.md)
+ - [TenantCreationModel](docs/TenantCreationModel.md)
+ - [TenantDto](docs/TenantDto.md)
+ - [TenantUpdateModel](docs/TenantUpdateModel.md)
+
+
+<a id="documentation-for-authorization"></a>
+## Documentation For Authorization
+
+
+Authentication schemes defined for the API:
+<a id="ApiKey"></a>
+### ApiKey
+
+- **Type**: API key
+- **API key parameter name**: X-API-Key
+- **Location**: HTTP header
+
+<a id="Bearer"></a>
+### Bearer
+
+- **Type**: API key
+- **API key parameter name**: Authorization
+- **Location**: HTTP header
+
+<a id="OAuth2Code"></a>
+### OAuth2Code
+
+- **Type**: OAuth
+- **Flow**: accessCode
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+<a id="OAuth2Implicit"></a>
+### OAuth2Implicit
+
+- **Type**: OAuth
+- **Flow**: implicit
+- **Authorization URL**: https://customerscanvashub.com/connect/authorize
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+<a id="OAuth2ClientCredentials"></a>
+### OAuth2ClientCredentials
+
+- **Type**: OAuth
+- **Flow**: application
+- **Authorization URL**: 
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+
+
+
+
