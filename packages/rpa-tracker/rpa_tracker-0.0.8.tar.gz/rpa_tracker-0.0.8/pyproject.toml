@@ -1,0 +1,65 @@
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry]
+name = "rpa-tracker"
+version = "0.0.8"  # Placeholder
+description = "Transaction tracking, deduplication, retry handling and audit trail for Python-based RPA and backend automation."
+readme = "README.md"
+license = "GPL-3.0-only"
+authors = ["Jonathan Bolo <jbolo.des@gmail.com>"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Utilities",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+]
+packages = [
+    { include = "rpa_tracker" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+pydantic = ">=2.5,<3.0"
+sqlalchemy = "^2.0.45"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7,<9"
+pytest-cov = "*"
+flake8 = "*"
+flake8-docstrings = ">=1.6.0,<2.0"
+autopep8 = ">=2.3.2"
+mypy = ">=1.18.2"
+twine = ">=4.0.2"
+python-dotenv = ">=1.0"
+build = ">=1.4.0"
+sqlalchemy = {extras = ["mypy"], version = "^2.0.45"}
+types-python-dateutil = "^2.9.0.20251115"
+
+[tool.poetry-dynamic-versioning]
+enable = false
+vcs = "git"
+style = "semver"
+pattern = "^v(?P<base>\\d+\\.\\d+\\.\\d+)"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["rpa_tracker/__init__.py"]
+
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true
+disallow_untyped_defs = false
+warn_return_any = false
+warn_unused_configs = true
+no_implicit_optional = false
+
+# Ignorar módulos específicos
+[[tool.mypy.overrides]]
+module = [
+    "sqlalchemy.*",
+    "rpa_tracker.models.*",
+    "rpa_tracker.tracking.*",
+]
+ignore_errors = true
