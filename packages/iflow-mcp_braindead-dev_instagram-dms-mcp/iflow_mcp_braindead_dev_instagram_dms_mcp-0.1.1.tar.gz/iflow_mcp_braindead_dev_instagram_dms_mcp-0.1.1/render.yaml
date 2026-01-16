@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: instagram-dms-mcp
+    runtime: docker
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: IG_GATEWAY_ADDR
+        sync: false
+      - key: IG_COOKIES
+        sync: false
+      - key: POKE_API_KEY
+        sync: false
