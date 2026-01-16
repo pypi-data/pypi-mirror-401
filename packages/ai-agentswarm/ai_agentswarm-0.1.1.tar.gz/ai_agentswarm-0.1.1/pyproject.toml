@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-agentswarm"
+version = "0.1.1"
+description = "A recursive, functional, and state-isolated Multi-Agent Framework."
+readme = "README.md"
+authors = [
+  { name = "Lucas Roverelli", email = "lucas.roverelli@gmail.com" },
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "pydantic>=2.12.4",
+    "google-genai>=1.50.1",
+    "mcp"
+]
+keywords = ["ai", "agents", "llm", "framework", "recursive", "react"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "twine",       
+    "build",       
+    "black",
+    "isort"
+]
+examples = [
+    "httpx",
+    "python-dotenv"
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ai-agentswarm/agentswarm"
+"Bug Tracker" = "https://github.com/ai-agentswarm/agentswarm/issues"
+"Documentation" = "https://github.com/ai-agentswarm/agentswarm#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
