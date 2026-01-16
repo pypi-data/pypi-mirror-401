@@ -1,0 +1,159 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "odibi"
+version = "2.6.4"
+description = "A declarative data engineering framework - Explicit over implicit, Stories over magic"
+authors = [
+    {name = "Henry Odibi", email = "odibiengineering@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+keywords = ["data-engineering", "pipeline", "etl", "workflow", "orchestration"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "pydantic>=2.0.0,<3.0.0",
+    "pyyaml>=6.0,<7.0",
+    "pandas>=2.0.0,<2.2.0",
+    "numpy>=1.24.0,<2.0.0",
+    "bottleneck>=1.3.6,<2.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "markdown2>=2.4.0,<3.0.0",
+    "Jinja2>=3.1.0,<4.0.0",
+    "portalocker>=2.7.0,<3.0.0",
+    "pyarrow>=14.0.0,<17.0.0",
+    "fastapi>=0.100.0,<1.0.0",
+    "uvicorn>=0.20.0,<1.0.0",
+    "deltalake>=0.18.0,<0.30.0",
+    "rich>=13.0.0,<14.0.0",
+    "requests>=2.28.0,<3.0.0",
+    "importlib_metadata>=4.0.0",
+    "duckdb>=0.9.0,<1.1.0",
+]
+
+[project.optional-dependencies]
+cli = [
+    "rich>=13.0.0",
+]
+lineage = [
+    "openlineage-python>=1.0.0",
+]
+telemetry = [
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+    "opentelemetry-exporter-otlp>=1.20.0",
+]
+spark = [
+    "pyspark>=3.4.0",
+    "delta-spark>=2.3.0",
+]
+pandas = [
+    "duckdb>=0.9.0",
+    "pandasql>=0.7.3",
+    "fastavro>=1.8.0",
+]
+azure = [
+    "azure-storage-blob>=12.0.0",
+    "azure-identity>=1.14.0",
+    "azure-keyvault-secrets>=4.7.0",
+    "adlfs>=2023.1.0",
+]
+sql = [
+    "pyodbc>=5.0.0",
+    "sqlalchemy>=2.0.0",
+]
+polars = [
+    "polars>=0.20.0",
+]
+
+all = [
+    "pyspark>=3.4.0",
+    "delta-spark>=2.3.0",
+    "duckdb>=0.9.0",
+    "pandasql>=0.7.3",
+    "deltalake>=0.13.0",
+    "fastavro>=1.8.0",
+    "pyarrow>=10.0.0",
+    "azure-storage-blob>=12.0.0",
+    "azure-identity>=1.14.0",
+    "azure-keyvault-secrets>=4.7.0",
+    "adlfs>=2023.1.0",
+    "pyodbc>=5.0.0",
+    "sqlalchemy>=2.0.0",
+    "polars>=0.20.0",
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+    "opentelemetry-exporter-otlp>=1.20.0",
+    "openlineage-python>=1.0.0",
+    "rich>=13.0.0",
+    "gradio>=4.0.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+    "pyspark>=3.4.0",
+    "delta-spark>=2.3.0",
+    "pyarrow>=10.0.0",
+    "azure-identity>=1.14.0",
+    "azure-keyvault-secrets>=4.7.0",
+    "deltalake>=0.13.0",
+    "duckdb>=0.9.0",
+    "pandasql>=0.7.3",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.20.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+odibi = "odibi.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/henryodibi11/Odibi"
+Documentation = "https://github.com/henryodibi11/Odibi/tree/main/docs"
+Repository = "https://github.com/henryodibi11/Odibi"
+Issues = "https://github.com/henryodibi11/Odibi/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["odibi*"]
+exclude = ["tests*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
