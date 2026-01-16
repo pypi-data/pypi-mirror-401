@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="static/bootstrap.js?v=__CAR_ASSET_VERSION__" data-car-bootstrap></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0a0c12" />
+    <title>Codex Autorunner</title>
+  </head>
+  <body>
+    <div id="hub-shell" class="hub-shell hidden">
+      <header class="hub-hero">
+        <div class="hub-hero-text">
+          <h1>CAR Hub</h1>
+          <span id="hub-last-scan" class="pill pill-small pill-idle">–</span>
+          <span id="hub-version" class="hub-version">v–</span>
+        </div>
+        <div class="hub-hero-actions">
+          <button id="hub-new-repo" class="primary sm">+ New</button>
+          <button id="hub-scan" class="sm">Scan</button>
+          <button id="hub-refresh" class="ghost sm">Refresh</button>
+          <button id="hub-settings" class="ghost sm icon-btn" title="Settings">⚙</button>
+        </div>
+      </header>
+
+      <section class="hub-stats">
+        <div class="hub-stat">
+          <div id="hub-count-total" class="hub-stat-value">–</div>
+          <p class="muted small">repos</p>
+        </div>
+        <div class="hub-stat">
+          <div id="hub-count-running" class="hub-stat-value">–</div>
+          <p class="muted small">running</p>
+        </div>
+        <div class="hub-stat">
+          <div id="hub-count-missing" class="hub-stat-value">–</div>
+          <p class="muted small">missing</p>
+        </div>
+      </section>
+
+      <section class="hub-usage-compact">
+        <div class="hub-usage-header">
+          <span class="label">Usage</span>
+          <span id="hub-usage-meta" class="hub-usage-path">–</span>
+          <button id="hub-usage-refresh" class="ghost sm icon-btn" title="Refresh usage">↻</button>
+        </div>
+        <div id="hub-usage-list" class="hub-usage-grid">Loading…</div>
+      </section>
+
+      <section class="hub-usage-chart">
+        <div class="hub-usage-chart-header">
+          <span class="label">Usage Trend</span>
+          <div class="usage-chart-controls">
+            <select id="hub-usage-chart-range" class="usage-chart-select" title="Range" aria-label="Range">
+              <option value="7">1w</option>
+              <option value="30" selected>1m</option>
+              <option value="90">3m</option>
+              <option value="180">6m</option>
+              <option value="365">1y</option>
+            </select>
+            <select id="hub-usage-chart-segment" class="usage-chart-select" title="Group" aria-label="Group">
+              <option value="none">Total</option>
+              <option value="repo">By repo</option>
+            </select>
+          </div>
+        </div>
+        <div id="hub-usage-chart-canvas" class="usage-chart-canvas hub-usage-chart-canvas"></div>
+      </section>
+
+      <section class="hub-repo-panel">
+        <div class="hub-panel-header">
+          <span class="label">Repositories</span>
+          <div class="hub-panel-actions">
+            <button id="hub-quick-scan" class="ghost sm">Rescan</button>
+          </div>
+        </div>
+        <div id="hub-repo-list" class="hub-repo-list">
+          <div class="muted small">Loading…</div>
+        </div>
+      </section>
+    </div>
+
+    <div id="repo-shell" class="app-shell">
+      <nav class="nav-bar">
+        <span class="nav-brand">CAR</span>
+        <div class="tabs">
+          <!-- Tabs will be injected here by tabs.js -->
+        </div>
+        <div class="nav-actions">
+          <button id="repo-settings" class="ghost sm icon-btn" title="Settings">⚙</button>
+        </div>
+      </nav>
+
+      <main>
+        <section id="dashboard" class="panel active">
+          <div class="cards">
+            <div class="card status-card">
+              <div class="card-header">
+                <div class="card-header-left">
+                  <span class="label">Runner Status</span>
+                  <span id="repo-version" class="version-label">v–</span>
+                </div>
+                <span id="runner-status" class="pill pill-idle">idle</span>
+              </div>
+              <div class="grid-two">
+                <div>
+                  <p class="muted">Run ID</p>
+                  <p id="last-run-id" class="metric">–</p>
+                </div>
+                <div>
+                  <p class="muted">Exit</p>
+                  <p id="last-exit-code" class="metric">–</p>
+                </div>
+                <div>
+                  <p class="muted">Started</p>
+                  <p id="last-start" class="metric">–</p>
+                </div>
+                <div>
+                  <p class="muted">Finished</p>
+                  <p id="last-finish" class="metric">–</p>
+                </div>
+                <div>
+                  <p class="muted">TODO</p>
+                  <p id="todo-count" class="metric">–</p>
+                </div>
+                <div>
+                  <p class="muted">Done</p>
+                  <p id="done-count" class="metric">–</p>
+                </div>
+              </div>
+              <div class="runner-config">
+                <span class="runner-config-label">Model</span>
+                <span id="runner-model" class="runner-config-value">auto</span>
+              </div>
+              <div class="actions">
+                <button id="start-run" class="primary">Start</button>
+                <button id="start-once">Once</button>
+                <button id="stop-run" class="ghost">Stop</button>
+                <button id="resume-run" class="ghost">Resume</button>
+                <button id="kill-run" class="danger">Kill</button>
+                <button id="reset-runner" class="ghost" title="Reset run ID, clear logs">Reset</button>
+                <button id="refresh-state" class="ghost icon-btn" title="Refresh state">↻</button>
+              </div>
+              <p class="muted small" id="runner-pid">PID: –</p>
+            </div>
+
+            <div class="card usage-card-compact">
+              <div class="usage-header">
+                <span class="label">Usage</span>
+                <span class="usage-total-badge" id="usage-total">–</span>
+                <span class="usage-events-badge" id="usage-events">–</span>
+                <button id="usage-refresh" class="ghost sm icon-btn" title="Refresh usage">↻</button>
+              </div>
+              <div class="usage-breakdown">
+                <div class="usage-stat">
+                  <span class="usage-stat-val" id="usage-input">–</span>
+                  <span class="usage-stat-lbl">in</span>
+                </div>
+                <div class="usage-stat usage-stat-cached">
+                  <span class="usage-stat-val" id="usage-cached">–</span>
+                  <span class="usage-stat-lbl">cached</span>
+                </div>
+                <div class="usage-stat">
+                  <span class="usage-stat-val" id="usage-output">–</span>
+                  <span class="usage-stat-lbl">out</span>
+                </div>
+                <div class="usage-stat">
+                  <span class="usage-stat-val" id="usage-reasoning">–</span>
+                  <span class="usage-stat-lbl">reason</span>
+                </div>
+              </div>
+              <div class="usage-chart">
+                <div class="usage-chart-header">
+                  <span class="usage-chart-title">Trend</span>
+                  <div class="usage-chart-controls">
+                    <select id="usage-chart-range" class="usage-chart-select" title="Range" aria-label="Range">
+                      <option value="7">1w</option>
+                      <option value="30" selected>1m</option>
+                      <option value="90">3m</option>
+                      <option value="180">6m</option>
+                      <option value="365">1y</option>
+                    </select>
+                    <select id="usage-chart-segment" class="usage-chart-select" title="Group" aria-label="Group">
+                      <option value="none">Total</option>
+                      <option value="model">Model</option>
+                      <option value="token_type">Token type</option>
+                      <option value="model_token">Model + type</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="usage-chart-canvas" class="usage-chart-canvas"></div>
+              </div>
+              <div class="usage-rates-visual">
+                <div class="usage-rate-row">
+                  <span class="usage-rate-label">Primary</span>
+                  <div id="usage-rate-primary" class="usage-rate-bar-container"></div>
+                </div>
+                <div class="usage-rate-row">
+                  <span class="usage-rate-label">Secondary</span>
+                  <div id="usage-rate-secondary" class="usage-rate-bar-container"></div>
+                </div>
+              </div>
+              <div class="usage-footer">
+                <span id="usage-rates" class="hidden">–</span>
+                <span id="usage-meta">–</span>
+              </div>
+            </div>
+
+            <div class="card todo-preview">
+              <div class="card-header">
+                <span class="label">TODO</span>
+                <button id="open-summary" class="primary sm hidden" title="Open final report (SUMMARY)">Summary</button>
+                <button id="refresh-preview" class="ghost sm icon-btn" title="Refresh TODO preview">↻</button>
+              </div>
+              <ul id="todo-preview-list" class="checklist"></ul>
+            </div>
+
+            <div class="card github-card" id="github-card">
+              <div class="card-header">
+                <span class="label">GitHub</span>
+                <span id="github-status-pill" class="pill pill-idle">–</span>
+              </div>
+              <div class="github-grid">
+                <div class="github-row">
+                  <span class="muted">Repo</span>
+                  <a id="github-repo-link" class="github-link muted">–</a>
+                </div>
+                <div class="github-row">
+                  <span class="muted">Branch</span>
+                  <span id="github-branch" class="github-mono">–</span>
+                </div>
+                <div class="github-row">
+                  <span class="muted">Issue</span>
+                  <a id="github-issue-link" class="github-link muted">–</a>
+                </div>
+                <div class="github-row">
+                  <span class="muted">PR</span>
+                  <span class="github-pr-group">
+                    <a id="github-pr-link" class="github-link muted">–</a>
+                    <button id="github-open-pr-files" class="ghost icon-btn-inline" disabled title="View changed files">📄</button>
+                    <button id="github-copy-pr" class="ghost icon-btn-inline" disabled title="Copy PR link">📋</button>
+                  </span>
+                </div>
+              </div>
+              <div class="actions github-actions">
+                <button id="github-sync-pr" class="primary sm">Sync PR</button>
+              </div>
+              <p id="github-note" class="muted small">–</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="docs" class="panel">
+          <div class="doc-nav">
+            <button class="chip active" data-doc="todo">TODO</button>
+            <button class="chip" data-doc="progress">PROGRESS</button>
+            <button class="chip" data-doc="opinions">OPINIONS</button>
+            <button class="chip" data-doc="spec">SPEC</button>
+            <button class="chip" data-doc="summary">SUMMARY</button>
+            <button class="chip" data-doc="snapshot">SNAPSHOT</button>
+            <span class="muted" id="doc-status"></span>
+          </div>
+          <div id="spec-issue-import" class="spec-issue-import hidden">
+            <button id="spec-issue-import-toggle" class="ghost sm">Import Issue → SPEC</button>
+            <div id="spec-issue-input-row" class="spec-issue-input-row hidden">
+              <input
+                id="spec-issue-input"
+                type="text"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="Issue number or URL (e.g. 123 or https://github.com/org/repo/issues/123)"
+              />
+              <button id="spec-issue-import-btn" class="primary sm">Import</button>
+            </div>
+          </div>
+          <div class="doc-editor">
+            <div id="doc-patch-main" class="doc-patch-main hidden">
+              <div class="doc-patch-header">
+                <div class="doc-patch-info">
+                  <div class="muted small">Pending patch</div>
+                  <div id="doc-patch-summary" class="doc-patch-summary"></div>
+                  <div class="doc-patch-legend">
+                    <span class="doc-patch-legend-item doc-patch-legend-add">Added</span>
+                    <span class="doc-patch-legend-item doc-patch-legend-del">Removed</span>
+                  </div>
+                </div>
+                <div class="doc-patch-actions">
+                  <button id="doc-patch-apply" class="primary sm">Apply Patch</button>
+                  <button id="doc-patch-reload" class="ghost sm">Reload</button>
+                  <button id="doc-patch-discard" class="danger sm">Discard</button>
+                </div>
+              </div>
+              <div id="doc-patch-body" class="doc-patch-body">(no patch)</div>
+            </div>
+            <textarea id="doc-content" spellcheck="false"></textarea>
+            <div class="doc-actions" id="doc-actions-standard">
+              <button id="save-doc" class="primary" data-short="Save">Save</button>
+              <button id="reload-doc" class="ghost" data-short="Reload">Reload</button>
+              <button id="doc-copy" class="ghost hidden" data-short="Copy">Copy</button>
+              <button id="spec-paste" class="ghost hidden" data-short="Paste">Paste</button>
+              <button id="ingest-spec" class="ghost hidden" data-short="Ingest">Ingest SPEC → Docs</button>
+              <button id="clear-docs" class="danger hidden" data-short="Clear">Clear TODO/PROGRESS/OPINIONS</button>
+            </div>
+            <div class="doc-actions hidden" id="doc-actions-snapshot">
+              <button id="snapshot-generate" class="primary" data-short="Run">Run snapshot</button>
+              <button id="snapshot-copy" class="ghost" data-short="Copy">Copy</button>
+              <button id="snapshot-refresh" class="ghost" data-short="Reload">Reload</button>
+            </div>
+            <div class="doc-chat-panel compose-panel">
+              <div class="doc-chat-compose">
+                <div class="doc-chat-input-row compose-row">
+                  <textarea
+                    id="doc-chat-input"
+                    rows="1"
+                    placeholder="Chat with this doc..."
+                    spellcheck="false"
+                    enterkeyhint="enter"
+                  ></textarea>
+                  <div class="doc-chat-input-buttons compose-buttons">
+                    <button id="doc-chat-voice" class="ghost sm voice-button" title="Hold to talk"></button>
+                    <button id="doc-chat-send" class="primary sm" title="Send">↑</button>
+                    <button id="doc-chat-cancel" class="ghost sm hidden" title="Cancel">✕</button>
+                  </div>
+                </div>
+                <div class="doc-chat-meta">
+                  <span class="muted small" id="doc-chat-hint">Cmd+Enter/Ctrl+Enter to send · Enter for newline</span>
+                  <span class="muted small hidden voice-status" id="doc-chat-voice-status"></span>
+                  <span id="doc-chat-status" class="pill pill-idle">idle</span>
+                </div>
+              </div>
+              <div id="doc-chat-response-wrapper" class="doc-chat-response-wrapper hidden">
+                <div id="doc-chat-response" class="doc-chat-response"></div>
+                <div id="doc-chat-error" class="doc-chat-error hidden"></div>
+              </div>
+              <details class="doc-chat-history-details" id="doc-chat-history-details">
+                <summary class="doc-chat-history-toggle">
+                  <span>History</span>
+                  <span class="doc-chat-history-count" id="doc-chat-history-count">0</span>
+                </summary>
+                <div class="doc-chat-history" id="doc-chat-history"></div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <section id="logs" class="panel">
+          <div class="inline-toolbar">
+            <label>Run <input id="log-run-id" type="number" min="1" placeholder="latest" /></label>
+            <label>Tail <input id="log-tail" type="number" min="10" value="200" /></label>
+            <button id="load-logs" class="primary sm">Load</button>
+            <button id="toggle-log-stream" class="ghost sm">Stream</button>
+            <label class="chip" data-short="TS">
+              <input id="log-show-timestamp" type="checkbox" checked />
+              <span>Timestamp</span>
+            </label>
+            <label class="chip" data-short="Run">
+              <input id="log-show-run" type="checkbox" />
+              <span>Run</span>
+            </label>
+          </div>
+          <div class="log-legend">
+            <span class="log-legend-item"><span class="log-legend-dot thinking"></span>Thinking</span>
+            <span class="log-legend-item"><span class="log-legend-dot exec"></span>Tool calls</span>
+            <span class="log-legend-item"><span class="log-legend-dot file"></span>File updates</span>
+            <span class="log-legend-item"><span class="log-legend-dot diff-add"></span>Added</span>
+            <span class="log-legend-item"><span class="log-legend-dot diff-del"></span>Removed</span>
+            <span class="log-legend-item"><span class="log-legend-dot output"></span>Agent output</span>
+            <span class="log-legend-item"><span class="log-legend-dot context"></span>Context</span>
+          </div>
+          <div class="log-container">
+            <button id="log-load-older" class="log-load-btn hidden" title="Load older logs">Load older</button>
+            <pre id="log-output" class="log-viewer">(no log loaded)</pre>
+            <button id="log-jump-bottom" class="log-jump-btn hidden" title="Jump to latest">↓ Latest</button>
+          </div>
+        </section>
+
+        <section id="terminal" class="panel">
+          <div class="inline-toolbar">
+            <span id="terminal-status" class="muted">Disconnected</span>
+            <button id="terminal-connect" class="primary sm">New</button>
+            <button id="terminal-resume" class="ghost sm">Resume</button>
+            <button id="terminal-disconnect" class="ghost sm">Disconnect</button>
+            <button
+              id="terminal-text-input-toggle"
+              class="ghost sm"
+              type="button"
+              aria-controls="terminal-text-input"
+              aria-expanded="false"
+            >
+              Text input
+            </button>
+            <div class="terminal-voice">
+              <button id="terminal-voice" class="ghost sm voice-button" title="Hold to talk"></button>
+              <span class="muted small hidden voice-status" id="terminal-voice-status"></span>
+            </div>
+          </div>
+          <div id="terminal-container" class="terminal-container">
+            <div class="terminal-overlay" id="terminal-overlay">
+              <p class="muted">Press New or Resume to launch Codex TUI</p>
+            </div>
+            <button id="terminal-jump-bottom" class="terminal-jump-btn hidden" title="Jump to latest">
+              ↓ Latest
+            </button>
+          </div>
+          <!-- Mobile control bar - touch-friendly special keys (above text input) -->
+          <div id="terminal-mobile-controls" class="terminal-mobile-controls">
+            <div class="tmb-row">
+              <button class="tmb-key tmb-mod" data-key="ctrl" id="tmb-ctrl">Ctrl</button>
+              <button class="tmb-key tmb-mod" data-key="alt" id="tmb-alt">Alt</button>
+              <button class="tmb-key" data-seq="&#x1b;">Esc</button>
+              <button class="tmb-key" data-seq="&#x09;">Tab</button>
+              <button class="tmb-key tmb-primary" data-seq="&#x0d;">Enter</button>
+            </div>
+            <div class="tmb-row">
+              <button class="tmb-key tmb-ctrl-combo" data-ctrl="c">^C</button>
+              <button class="tmb-key tmb-ctrl-combo" data-ctrl="d">^D</button>
+              <button class="tmb-key tmb-ctrl-combo" data-ctrl="z">^Z</button>
+              <button class="tmb-key tmb-bksp" data-seq="&#x7f;">Bksp</button>
+              <button class="tmb-key tmb-arrow" data-seq="&#x1b;[D">←</button>
+              <button class="tmb-key tmb-arrow" data-seq="&#x1b;[A">↑</button>
+              <button class="tmb-key tmb-arrow" data-seq="&#x1b;[B">↓</button>
+              <button class="tmb-key tmb-arrow" data-seq="&#x1b;[C">→</button>
+            </div>
+          </div>
+          <div id="terminal-text-input" class="terminal-text-input compose-panel hidden" aria-hidden="true">
+            <label class="terminal-text-input-title" for="terminal-textarea">Text input</label>
+            <div class="terminal-text-input-row compose-row">
+              <textarea
+                id="terminal-textarea"
+                rows="2"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                enterkeyhint="enter"
+                placeholder="Type or paste text/images to send to the terminal…"
+              ></textarea>
+              <div class="terminal-text-input-buttons compose-buttons">
+                <button
+                  id="terminal-text-image"
+                  class="ghost sm terminal-text-image"
+                  type="button"
+                  title="Attach image"
+                  aria-label="Attach image"
+                >Img</button>
+                <input
+                  id="terminal-text-image-input"
+                  class="hidden"
+                  type="file"
+                  accept="image/*"
+                />
+                <button
+                  id="terminal-text-voice"
+                  class="ghost sm voice-button terminal-text-voice"
+                  type="button"
+                  title="Hold to talk"
+                  data-voice-mode="waveform"
+                ></button>
+                <button
+                  id="terminal-text-send"
+                  class="primary terminal-text-send-icon"
+                  type="button"
+                  aria-label="Send"
+                >→</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div id="toast" class="toast"></div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay" hidden>
+      <div
+        class="modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+        aria-describedby="confirm-modal-message"
+        tabindex="-1"
+      >
+        <span id="confirm-modal-title" class="sr-only">Confirmation</span>
+        <p id="confirm-modal-message"></p>
+        <div class="modal-actions">
+          <button id="confirm-modal-cancel" class="ghost">Cancel</button>
+          <button id="confirm-modal-ok" class="danger">Confirm</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Input Modal -->
+    <div id="input-modal" class="modal-overlay" hidden>
+      <div
+        class="modal-dialog modal-input"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="input-modal-title"
+        aria-describedby="input-modal-message"
+        tabindex="-1"
+      >
+        <span id="input-modal-title" class="sr-only">Input</span>
+        <p id="input-modal-message"></p>
+        <input type="text" id="input-modal-input" autocomplete="off" spellcheck="false" />
+        <div class="modal-actions">
+          <button id="input-modal-cancel" class="ghost">Cancel</button>
+          <button id="input-modal-ok" class="primary">OK</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Create Repo Modal -->
+    <div id="create-repo-modal" class="modal-overlay" hidden>
+      <div
+        class="modal-dialog modal-create-repo"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-repo-modal-title"
+        aria-describedby="create-repo-modal-body"
+        tabindex="-1"
+      >
+        <div class="modal-header">
+          <span class="label" id="create-repo-modal-title">Create New Repository</span>
+        </div>
+        <div class="modal-body" id="create-repo-modal-body">
+          <div class="form-group">
+            <label for="create-repo-id">Repo ID <span class="required">*</span></label>
+            <input type="text" id="create-repo-id" placeholder="my-project" autocomplete="off" spellcheck="false" />
+            <span class="form-hint">Used as directory name if path not specified</span>
+          </div>
+          <div class="form-group">
+            <label for="create-repo-path">Path <span class="optional">(optional)</span></label>
+            <input type="text" id="create-repo-path" placeholder="relative/path/to/repo" autocomplete="off" spellcheck="false" />
+            <span class="form-hint">Leave empty to use repo ID as path</span>
+          </div>
+          <div class="form-group">
+            <label for="create-repo-url">Git URL <span class="optional">(optional)</span></label>
+            <input type="text" id="create-repo-url" placeholder="https://github.com/org/repo.git" autocomplete="off" spellcheck="false" />
+            <span class="form-hint">If provided, the repo will be cloned automatically</span>
+          </div>
+          <div class="form-group form-checkbox">
+            <label>
+              <input type="checkbox" id="create-repo-git" checked />
+              <span>Initialize git repository</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="create-repo-cancel" class="ghost">Cancel</button>
+          <button id="create-repo-submit" class="primary">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hub Settings Modal -->
+    <div id="hub-settings-modal" class="modal-overlay" hidden>
+      <div
+        class="modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hub-settings-modal-title"
+        aria-describedby="hub-settings-modal-body"
+        tabindex="-1"
+      >
+        <div class="modal-header">
+          <span class="label" id="hub-settings-modal-title">Hub Settings</span>
+        </div>
+        <div class="modal-body" id="hub-settings-modal-body">
+          <p class="muted small">System-wide settings for Codex Autorunner.</p>
+          <div class="form-group">
+            <label>System Update</label>
+            <select id="hub-update-target">
+              <option value="both">Web + Telegram</option>
+              <option value="web">Web only</option>
+              <option value="telegram">Telegram only</option>
+            </select>
+            <button id="hub-update-btn" class="primary sm">Update CAR</button>
+            <span class="form-hint">Pull latest code and restart selected services</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="hub-settings-close" class="ghost">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Repo Settings Modal -->
+    <div id="repo-settings-modal" class="modal-overlay" hidden>
+      <div
+        class="modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="repo-settings-modal-title"
+        aria-describedby="repo-settings-modal-body"
+        tabindex="-1"
+      >
+        <div class="modal-header">
+          <span class="label" id="repo-settings-modal-title">Repo Settings</span>
+        </div>
+        <div class="modal-body" id="repo-settings-modal-body">
+          <p class="muted small">Settings for the current repository session.</p>
+          <div class="form-group">
+            <label>System Update</label>
+            <select id="repo-update-target">
+              <option value="both">Web + Telegram</option>
+              <option value="web">Web only</option>
+              <option value="telegram">Telegram only</option>
+            </select>
+            <button id="repo-update-btn" class="primary sm">Update CAR</button>
+            <span class="form-hint">Pull latest code and restart selected services</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="repo-settings-close" class="ghost">Close</button>
+        </div>
+      </div>
+    </div>
+    
+    <script src="static/loader.js?v=__CAR_ASSET_VERSION__" data-car-loader></script>
+  </body>
+</html>
