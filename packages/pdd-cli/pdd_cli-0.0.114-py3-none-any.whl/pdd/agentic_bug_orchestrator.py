@@ -1,0 +1,458 @@
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+from pathlib import Path
+from typing import List, Tuple, Optional, Dict, Any
+
+from rich.console import Console
+
+from .agentic_common import run_agentic_task, STEP_TIMEOUTS
+from .load_prompt_template import load_prompt_template
+
+# Initialize console
+console = Console()
+
+# State management for resume functionality
+STATE_DIR = Path(".pdd/bug-state")
+
+
+def _json_serializer(obj):
+    """Handle Path objects in JSON serialization."""
+    if isinstance(obj, Path):
+        return str(obj)
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
+def _get_state_file_path(cwd: Path, issue_number: int) -> Path:
+    """Return path to state file for issue."""
+    return cwd / STATE_DIR / f"issue-{issue_number}.json"
+
+
+def _load_state(cwd: Path, issue_number: int) -> Optional[Dict[str, Any]]:
+    """Load saved state for issue, or None if not found."""
+    path = _get_state_file_path(cwd, issue_number)
+    if path.exists():
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            console.print(f"[yellow]Warning: Failed to load state: {e}[/yellow]")
+    return None
+
+
+def _save_state(cwd: Path, issue_number: int, state: Dict[str, Any]) -> None:
+    """Save state for issue to disk."""
+    path = _get_state_file_path(cwd, issue_number)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2, default=_json_serializer)
+    except Exception as e:
+        console.print(f"[yellow]Warning: Failed to save state: {e}[/yellow]")
+
+
+def _clear_state(cwd: Path, issue_number: int) -> None:
+    """Remove state file on successful completion."""
+    path = _get_state_file_path(cwd, issue_number)
+    try:
+        if path.exists():
+            path.unlink()
+    except Exception:
+        pass
+
+def _get_git_root(cwd: Path) -> Optional[Path]:
+    """Get the root directory of the git repository."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return Path(result.stdout.strip())
+    except subprocess.CalledProcessError:
+        return None
+
+def _worktree_exists(cwd: Path, worktree_path: Path) -> bool:
+    """Check if a path is a registered git worktree."""
+    try:
+        result = subprocess.run(
+            ["git", "worktree", "list", "--porcelain"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        # The porcelain output lists 'worktree /path/to/worktree'
+        # We check if our specific path appears in the output
+        return str(worktree_path.resolve()) in result.stdout
+    except subprocess.CalledProcessError:
+        return False
+
+def _branch_exists(cwd: Path, branch: str) -> bool:
+    """Check if a local git branch exists."""
+    try:
+        subprocess.run(
+            ["git", "show-ref", "--verify", f"refs/heads/{branch}"],
+            cwd=cwd,
+            capture_output=True,
+            check=True
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def _remove_worktree(cwd: Path, worktree_path: Path) -> Tuple[bool, str]:
+    """Remove a git worktree."""
+    try:
+        subprocess.run(
+            ["git", "worktree", "remove", "--force", str(worktree_path)],
+            cwd=cwd,
+            capture_output=True,
+            check=True
+        )
+        return True, ""
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.decode('utf-8')
+
+def _delete_branch(cwd: Path, branch: str) -> Tuple[bool, str]:
+    """Force delete a git branch."""
+    try:
+        subprocess.run(
+            ["git", "branch", "-D", branch],
+            cwd=cwd,
+            capture_output=True,
+            check=True
+        )
+        return True, ""
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.decode('utf-8')
+
+def _setup_worktree(cwd: Path, issue_number: int, quiet: bool, resume_existing: bool = False) -> Tuple[Optional[Path], Optional[str]]:
+    """
+    Sets up an isolated git worktree for the issue fix.
+
+    Args:
+        cwd: Current working directory
+        issue_number: GitHub issue number
+        quiet: Suppress output
+        resume_existing: If True, keep existing branch with accumulated work
+
+    Returns (worktree_path, error_message).
+    """
+    git_root = _get_git_root(cwd)
+    if not git_root:
+        return None, "Current directory is not a git repository."
+
+    worktree_rel_path = Path(".pdd") / "worktrees" / f"fix-issue-{issue_number}"
+    worktree_path = git_root / worktree_rel_path
+    branch_name = f"fix/issue-{issue_number}"
+
+    # 1. Clean up existing worktree at path (always needed to create fresh worktree)
+    if worktree_path.exists():
+        if _worktree_exists(git_root, worktree_path):
+            if not quiet:
+                console.print(f"[yellow]Removing existing worktree at {worktree_path}[/yellow]")
+            success, err = _remove_worktree(git_root, worktree_path)
+            if not success:
+                return None, f"Failed to remove existing worktree: {err}"
+        else:
+            # It's just a directory, not a registered worktree
+            if not quiet:
+                console.print(f"[yellow]Removing stale directory at {worktree_path}[/yellow]")
+            shutil.rmtree(worktree_path)
+
+    # 2. Handle existing branch based on resume_existing
+    branch_exists = _branch_exists(git_root, branch_name)
+
+    if branch_exists:
+        if resume_existing:
+            # Keep existing branch with our accumulated work
+            if not quiet:
+                console.print(f"[blue]Resuming with existing branch: {branch_name}[/blue]")
+        else:
+            # Delete for fresh start
+            if not quiet:
+                console.print(f"[yellow]Removing existing branch {branch_name}[/yellow]")
+            success, err = _delete_branch(git_root, branch_name)
+            if not success:
+                return None, f"Failed to delete existing branch: {err}"
+
+    # 3. Create worktree
+    try:
+        worktree_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if branch_exists and resume_existing:
+            # Checkout existing branch into new worktree
+            subprocess.run(
+                ["git", "worktree", "add", str(worktree_path), branch_name],
+                cwd=git_root,
+                capture_output=True,
+                check=True
+            )
+        else:
+            # Create new branch from HEAD
+            subprocess.run(
+                ["git", "worktree", "add", "-b", branch_name, str(worktree_path), "HEAD"],
+                cwd=git_root,
+                capture_output=True,
+                check=True
+            )
+        return worktree_path, None
+    except subprocess.CalledProcessError as e:
+        return None, f"Failed to create worktree: {e.stderr.decode('utf-8')}"
+
+
+def run_agentic_bug_orchestrator(
+    issue_url: str,
+    issue_content: str,
+    repo_owner: str,
+    repo_name: str,
+    issue_number: int,
+    issue_author: str,
+    issue_title: str,
+    *,
+    cwd: Path,
+    verbose: bool = False,
+    quiet: bool = False
+) -> Tuple[bool, str, float, str, List[str]]:
+    """
+    Orchestrates the 10-step agentic bug investigation workflow.
+    
+    Returns:
+        (success, final_message, total_cost, model_used, changed_files)
+    """
+    
+    if not quiet:
+        console.print(f"🔍 Investigating issue #{issue_number}: \"{issue_title}\"")
+
+    # Context accumulation
+    context: Dict[str, Any] = {
+        "issue_url": issue_url,
+        "issue_content": issue_content,
+        "repo_owner": repo_owner,
+        "repo_name": repo_name,
+        "issue_number": issue_number,
+        "issue_author": issue_author,
+        "issue_title": issue_title,
+    }
+
+    total_cost = 0.0
+    last_model_used = "unknown"
+    changed_files: List[str] = []
+    current_cwd = cwd
+    worktree_path: Optional[Path] = None
+
+    # Resume: Load existing state if available
+    state = _load_state(cwd, issue_number)
+    step_outputs: Dict[str, str] = {}
+    last_completed_step = 0
+
+    if state:
+        if not quiet:
+            console.print(f"[yellow]Resuming from step {state.get('last_completed_step', 0) + 1}...[/yellow]")
+
+        total_cost = state.get("total_cost", 0.0)
+        last_model_used = state.get("model_used", "unknown")
+        step_outputs = state.get("step_outputs", {})
+        last_completed_step = state.get("last_completed_step", 0)
+        changed_files = state.get("changed_files", [])
+
+        # Restore worktree path
+        wt_path_str = state.get("worktree_path")
+        if wt_path_str:
+            worktree_path = Path(wt_path_str)
+            if worktree_path.exists():
+                current_cwd = worktree_path
+            else:
+                # Recreate worktree with existing branch
+                wt_path, err = _setup_worktree(cwd, issue_number, quiet, resume_existing=True)
+                if err:
+                    return False, f"Failed to recreate worktree on resume: {err}", total_cost, last_model_used, []
+                worktree_path = wt_path
+                current_cwd = worktree_path
+            context["worktree_path"] = str(worktree_path)
+
+        # Restore context from step outputs
+        for step_key, output in step_outputs.items():
+            context[f"step{step_key}_output"] = output
+
+        # Restore files_to_stage if available
+        if changed_files:
+            context["files_to_stage"] = ", ".join(changed_files)
+
+    # Step Definitions
+    steps = [
+        (1, "duplicate", "Searching for duplicate issues"),
+        (2, "docs", "Checking documentation for user error"),
+        (3, "triage", "Assessing information completeness"),
+        (4, "reproduce", "Attempting to reproduce the bug"),
+        (5, "root_cause", "Analyzing root cause"),
+        (6, "test_plan", "Designing test strategy"),
+        (7, "generate", "Generating failing unit test"),
+        (8, "verify", "Verifying test catches the bug"),
+        (9, "e2e_test", "Generating and running E2E tests"),
+        (10, "pr", "Creating draft PR"),
+    ]
+
+    for step_num, name, description in steps:
+
+        # Skip already completed steps (resume support)
+        if step_num <= last_completed_step:
+            continue
+
+        # --- Pre-Step Logic: Worktree Creation ---
+        if step_num == 7:
+            # Only create worktree if not already set (from resume)
+            if worktree_path is None:
+                wt_path, err = _setup_worktree(cwd, issue_number, quiet, resume_existing=False)
+                if not wt_path:
+                    return False, f"Failed to create worktree: {err}", total_cost, last_model_used, changed_files
+
+                worktree_path = wt_path
+                current_cwd = worktree_path
+                context["worktree_path"] = str(worktree_path)
+
+                if not quiet:
+                    console.print(f"[blue]Working in worktree: {worktree_path}[/blue]")
+
+        # --- Step Execution ---
+        if not quiet:
+            console.print(f"[bold][Step {step_num}/10][/bold] {description}...")
+
+        template_name = f"agentic_bug_step{step_num}_{name}_LLM"
+        prompt_template = load_prompt_template(template_name)
+        
+        if not prompt_template:
+            return False, f"Missing prompt template: {template_name}", total_cost, last_model_used, changed_files
+
+        # Format prompt with accumulated context
+        try:
+            formatted_prompt = prompt_template.format(**context)
+        except KeyError as e:
+            return False, f"Prompt formatting error in step {step_num}: missing {e}", total_cost, last_model_used, changed_files
+
+        # Run the task
+        success, output, cost, model = run_agentic_task(
+            instruction=formatted_prompt,
+            cwd=current_cwd,
+            verbose=verbose,
+            quiet=quiet,
+            label=f"step{step_num}",
+            timeout=STEP_TIMEOUTS.get(step_num),
+        )
+
+        # Update tracking
+        total_cost += cost
+        last_model_used = model
+        context[f"step{step_num}_output"] = output
+
+        # --- Post-Step Logic: Hard Stops & Parsing ---
+
+        # Step 1: Duplicate Check
+        if step_num == 1 and "Duplicate of #" in output:
+            msg = f"Stopped at Step 1: Issue is a duplicate. {output.strip()}"
+            if not quiet:
+                console.print(f"⏹️  {msg}")
+            return False, msg, total_cost, last_model_used, changed_files
+
+        # Step 2: User Error / Feature Request
+        if step_num == 2:
+            if "Feature Request (Not a Bug)" in output:
+                msg = "Stopped at Step 2: Identified as Feature Request."
+                if not quiet: console.print(f"⏹️  {msg}")
+                return False, msg, total_cost, last_model_used, changed_files
+            if "User Error (Not a Bug)" in output:
+                msg = "Stopped at Step 2: Identified as User Error."
+                if not quiet: console.print(f"⏹️  {msg}")
+                return False, msg, total_cost, last_model_used, changed_files
+
+        # Step 3: Needs Info
+        if step_num == 3 and "Needs More Info" in output:
+            msg = "Stopped at Step 3: Insufficient information provided."
+            if not quiet: console.print(f"⏹️  {msg}")
+            return False, msg, total_cost, last_model_used, changed_files
+
+        # Step 7: File Extraction
+        if step_num == 7:
+            # Parse output for FILES_CREATED or FILES_MODIFIED
+            extracted_files = []
+            for line in output.splitlines():
+                if line.startswith("FILES_CREATED:") or line.startswith("FILES_MODIFIED:"):
+                    file_list = line.split(":", 1)[1].strip()
+                    extracted_files.extend([f.strip() for f in file_list.split(",") if f.strip()])
+            
+            changed_files = extracted_files
+            # Pass explicit file list to Step 9 and 10 for precise git staging
+            context["files_to_stage"] = ", ".join(changed_files)
+
+            if not changed_files:
+                msg = "Stopped at Step 7: No test file generated."
+                if not quiet: console.print(f"⏹️  {msg}")
+                return False, msg, total_cost, last_model_used, changed_files
+
+        # Step 8: Verification Failure
+        if step_num == 8 and "FAIL: Test does not work as expected" in output:
+            msg = "Stopped at Step 8: Generated test does not fail correctly (verification failed)."
+            if not quiet: console.print(f"⏹️  {msg}")
+            return False, msg, total_cost, last_model_used, changed_files
+
+        # Step 9: E2E Test Failure & File Extraction
+        if step_num == 9:
+            if "E2E_FAIL: Test does not catch bug correctly" in output:
+                msg = "Stopped at Step 9: E2E test does not catch bug correctly."
+                if not quiet: console.print(f"⏹️  {msg}")
+                return False, msg, total_cost, last_model_used, changed_files
+            
+            # Parse output for E2E_FILES_CREATED to extend changed_files
+            e2e_files = []
+            for line in output.splitlines():
+                if line.startswith("E2E_FILES_CREATED:"):
+                    file_list = line.split(":", 1)[1].strip()
+                    e2e_files.extend([f.strip() for f in file_list.split(",") if f.strip()])
+            
+            if e2e_files:
+                changed_files.extend(e2e_files)
+                # Update files_to_stage so Step 10 (PR) includes E2E files
+                context["files_to_stage"] = ", ".join(changed_files)
+
+        # Soft Failure Logging (if not a hard stop)
+        if not success and not quiet:
+            console.print(f"[yellow]Warning: Step {step_num} reported failure, but proceeding as no hard stop condition met.[/yellow]")
+        elif not quiet:
+            # Extract a brief result for display if possible, otherwise generic
+            console.print(f"  → Step {step_num} complete.")
+
+        # Save state after each step (for resume support)
+        step_outputs[str(step_num)] = output
+        _save_state(cwd, issue_number, {
+            "issue_number": issue_number,
+            "issue_url": issue_url,
+            "last_completed_step": step_num,
+            "step_outputs": step_outputs,
+            "total_cost": total_cost,
+            "model_used": last_model_used,
+            "changed_files": changed_files,
+            "worktree_path": str(worktree_path) if worktree_path else None,
+        })
+
+    # --- Final Summary ---
+    # Clear state file on successful completion
+    _clear_state(cwd, issue_number)
+
+    final_msg = "Investigation complete"
+    if not quiet:
+        console.print(f"✅ {final_msg}")
+        console.print(f"   Total cost: ${total_cost:.4f}")
+        console.print(f"   Files changed: {', '.join(changed_files)}")
+        if worktree_path:
+            console.print(f"   Worktree: {worktree_path}")
+
+    return True, final_msg, total_cost, last_model_used, changed_files
+
+if __name__ == "__main__":
+    # Example usage logic could go here if needed for testing
+    pass
