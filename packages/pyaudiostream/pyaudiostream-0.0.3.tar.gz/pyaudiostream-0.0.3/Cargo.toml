@@ -1,0 +1,31 @@
+[package]
+name = "audiostream"
+version = "0.0.1"
+edition = "2024"
+readme = "README.md"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "audiostream"
+path = "src/cmd/main.rs"
+
+[dependencies]
+ffmpeg-sys-next = { version = "6", optional = true }
+libc = "0.2"
+pyo3 = { version = "0.22", optional = true, features = ["extension-module"] }
+numpy = { version = "0.22", optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3", optional = true }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
+async-trait = "0.1"
+
+[features]
+default = ["ffmpeg"]
+ffmpeg = ["dep:ffmpeg-sys-next"]
+python = ["dep:pyo3", "dep:numpy"]
+wasm = ["dep:wasm-bindgen", "dep:js-sys"]
+
+
