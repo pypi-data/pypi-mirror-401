@@ -1,0 +1,159 @@
+# agentjoy-bridge
+
+**AgentJoy Bridge** is a tiny, dependency-free CLI that converts agent/tool activity into **AgentJoy Run events**.
+
+It supports:
+
+- OpenAI Codex CLI (`codex exec --json`)
+- Claude Code hooks / plugin hooks
+- (Template included) ChatGPT Apps SDK viewer (MCP)
+
+---
+
+## Install
+
+```bash
+pipx install agentjoy-bridge
+# or: pip install agentjoy-bridge
+```
+> Windows (PATH): if `agentjoy` command is not found, run via module:
+>
+> ```bat
+> python -m agentjoy_bridge init --api http://127.0.0.1:8000 --open
+> ```
+>
+> 補足：`python` が見つからない場合は `py -m agentjoy_bridge ...` を試してください。
+
+---
+
+## Doctor (diagnostics)
+
+If setup is confusing (PATH, backend, config), run:
+
+```bash
+agentjoy doctor
+```
+
+It prints:
+
+- backend reachability (`/health`)
+- config/profile status
+- whether your API key / user token work
+
+Optional (creates a small run):
+
+```bash
+agentjoy doctor --write-test
+```
+
+Secrets are redacted in the output.
+
+
+---
+
+## Profiles (multiple environments)
+
+You can keep multiple connection settings (local/staging/prod) and switch:
+
+```bash
+agentjoy profile set local --api http://127.0.0.1:8000 --use
+agentjoy profile set staging --api https://staging.example.com --api-key ... --user-token ...
+
+agentjoy profile list
+agentjoy profile use staging
+agentjoy profile show staging
+```
+
+For one-off commands without switching the current profile:
+
+```bash
+agentjoy demo --profile local --open
+agentjoy health --profile staging
+```
+
+
+---
+
+## 3-minute Quickstart (no Codex required)
+
+### Fastest: one command onboarding
+
+If you're running from the AgentJoy repo (so `./backend` exists), this command can:
+
+- start backend (if needed)
+- create a workspace + save config
+- create a demo run + open the share URL
+
+```bash
+agentjoy quickstart --api http://127.0.0.1:8000 --open
+```
+
+Windows (PATH):
+
+```bat
+python -m agentjoy_bridge quickstart --api http://127.0.0.1:8000 --open
+```
+
+> 補足：`python` が見つからない場合は `py -m agentjoy_bridge ...` を試してください。
+
+### 1) Start AgentJoy backend
+
+```bash
+cd backend
+python -m uvicorn agentjoy.main:app --reload --port 8000
+```
+
+### 2) Bootstrap a Workspace + save config
+
+This creates a workspace and stores config at `~/.agentjoy/config.json`.
+
+```bash
+agentjoy init --api http://127.0.0.1:8000 --open
+# (alias: --api-base)
+```
+
+### 3) Create a demo run + open the share URL
+
+```bash
+agentjoy demo --open
+```
+
+---
+
+## Codex (recommended)
+
+```bash
+agentjoy codex-run "Fix failing tests"
+```
+
+It will print a **share URL** you can open in a browser.
+
+---
+
+## Claude Code
+
+See `integrations/claude-plugin/agentjoy/` for hook configs and examples.
+
+---
+
+## Compatibility: upstream JSON changes
+
+LLM tools evolve quickly. If a new Claude/Codex version changes the JSON field names that the Bridge reads,
+you can adjust the extraction paths without waiting for a package release.
+
+1) Create a template overrides file:
+
+```bash
+agentjoy adapters --init
+agentjoy adapters
+```
+
+2) Edit the file shown (typically `~/.agentjoy/bridge_adapters.json`) and add new dot-paths.
+
+This feature is intentionally lightweight: unknown fields are ignored, and the Bridge keeps running.
+
+---
+
+## License
+
+MIT
