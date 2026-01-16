@@ -1,0 +1,379 @@
+"""Penalized Trust Region (PTR) successive convexification algorithm.
+
+This module implements the PTR algorithm for solving non-convex trajectory
+optimization problems through iterative convex approximation.
+"""
+
+import time
+import warnings
+from typing import TYPE_CHECKING, List
+
+import numpy as np
+import numpy.linalg as la
+
+from openscvx.config import Config
+
+from .autotuning import update_scp_weights
+from .base import Algorithm, AlgorithmState
+
+if TYPE_CHECKING:
+    from openscvx.lowered import LoweredJaxConstraints
+    from openscvx.solvers import ConvexSolver
+
+warnings.filterwarnings("ignore")
+
+
+class PenalizedTrustRegion(Algorithm):
+    """Penalized Trust Region (PTR) successive convexification algorithm.
+
+    PTR solves non-convex trajectory optimization problems through iterative
+    convex approximation. Each subproblem balances competing cost terms:
+
+    - **Trust region penalty**: Discourages large deviations from the previous
+      iterate, keeping the solution within the region where linearization is valid.
+    - **Virtual control**: Relaxes dynamics constraints, penalized to drive
+      defects toward zero as the algorithm converges.
+    - **Virtual buffer**: Relaxes non-convex constraints, similarly penalized
+      to enforce feasibility at convergence.
+    - **Problem objective and other terms**: The user-defined cost (e.g., minimum
+      fuel, minimum time) and any additional penalty terms.
+
+    The interplay between these terms guides the optimization: the trust region
+    anchors the solution near the linearization point while virtual terms allow
+    temporary constraint violations that shrink over iterations.
+
+    Example:
+        Using PTR with a Problem::
+
+            from openscvx.algorithms import PenalizedTrustRegion
+
+            problem = Problem(dynamics, constraints, states, controls, N, time)
+            problem.initialize()
+            result = problem.solve()
+    """
+
+    def __init__(self):
+        """Initialize PTR with unset infrastructure.
+
+        Call initialize() before step() to set up compiled components.
+        """
+        self._solver: "ConvexSolver" = None
+        self._discretization_solver: callable = None
+        self._jax_constraints: "LoweredJaxConstraints" = None
+        self._emitter: callable = None
+
+    def initialize(
+        self,
+        solver: "ConvexSolver",
+        discretization_solver: callable,
+        jax_constraints: "LoweredJaxConstraints",
+        emitter: callable,
+        params: dict,
+        settings: Config,
+    ) -> None:
+        """Initialize PTR algorithm.
+
+        Stores compiled infrastructure and performs a warm-start solve to
+        initialize DPP and JAX jacobians.
+
+        Args:
+            solver: Convex subproblem solver (e.g., CVXPySolver)
+            discretization_solver: Compiled discretization solver
+            jax_constraints: JIT-compiled constraint functions
+            emitter: Callback for emitting iteration progress
+            params: Problem parameters dictionary (for warm-start)
+            settings: Configuration object (for warm-start)
+        """
+        # Store immutable infrastructure
+        self._solver = solver
+        self._discretization_solver = discretization_solver
+        self._jax_constraints = jax_constraints
+        self._emitter = emitter
+
+        # Set boundary conditions
+        self._solver.update_boundary_conditions(
+            x_init=settings.sim.x.initial,
+            x_term=settings.sim.x.final,
+        )
+
+        # Create temporary state for initialization solve
+        init_state = AlgorithmState.from_settings(settings)
+
+        # Solve a dumb problem to initialize DPP and JAX jacobians
+        _ = self._subproblem(params, init_state, settings)
+
+    def step(
+        self,
+        state: AlgorithmState,
+        params: dict,
+        settings: Config,
+    ) -> bool:
+        """Execute one PTR iteration.
+
+        Solves the convex subproblem, updates state in place, and checks
+        convergence based on trust region, virtual buffer, and virtual
+        control costs.
+
+        Args:
+            state: Mutable solver state (modified in place)
+            params: Problem parameters dictionary (may change between steps)
+            settings: Configuration object (may change between steps)
+
+        Returns:
+            True if J_tr, J_vb, and J_vc are all below their thresholds.
+
+        Raises:
+            RuntimeError: If initialize() has not been called.
+        """
+        if self._solver is None:
+            raise RuntimeError(
+                "PenalizedTrustRegion.step() called before initialize(). "
+                "Call initialize() first to set up compiled infrastructure."
+            )
+
+        # Run the subproblem
+        (
+            x_sol,
+            u_sol,
+            cost,
+            J_total,
+            J_vb_vec,
+            J_vc_vec,
+            J_tr_vec,
+            prob_stat,
+            V_multi_shoot,
+            subprop_time,
+            dis_time,
+            vc_mat,
+            tr_mat,
+        ) = self._subproblem(params, state, settings)
+
+        # Update state in place by appending to history
+        # The x_guess/u_guess properties will automatically return the latest entry
+        state.V_history.append(V_multi_shoot)
+        state.X.append(x_sol)
+        state.U.append(u_sol)
+        state.VC_history.append(vc_mat)
+        state.TR_history.append(tr_mat)
+
+        state.J_tr = np.sum(np.array(J_tr_vec))
+        state.J_vb = np.sum(np.array(J_vb_vec))
+        state.J_vc = np.sum(np.array(J_vc_vec))
+
+        # Update weights in state
+        update_scp_weights(state, settings, state.k)
+
+        # Emit data
+        self._emitter(
+            {
+                "iter": state.k,
+                "dis_time": dis_time * 1000.0,
+                "subprop_time": subprop_time * 1000.0,
+                "J_total": J_total,
+                "J_tr": state.J_tr,
+                "J_vb": state.J_vb,
+                "J_vc": state.J_vc,
+                "cost": cost[-1],
+                "prob_stat": prob_stat,
+            }
+        )
+
+        # Increment iteration counter
+        state.k += 1
+
+        # Return convergence status
+        return (
+            (state.J_tr < settings.scp.ep_tr)
+            and (state.J_vb < settings.scp.ep_vb)
+            and (state.J_vc < settings.scp.ep_vc)
+        )
+
+    def _subproblem(
+        self,
+        params: dict,
+        state: AlgorithmState,
+        settings: Config,
+    ):
+        """Solve a single convex subproblem.
+
+        Uses stored infrastructure (solver, discretization_solver, jax_constraints)
+        with per-step params and settings.
+
+        Args:
+            params: Problem parameters dictionary
+            state: Current solver state
+            settings: Configuration object
+
+        Returns:
+            Tuple containing solution data, costs, and timing information.
+        """
+        param_dict = params
+
+        # Compute discretization
+        t0 = time.time()
+        A_bar, B_bar, C_bar, x_prop, V_multi_shoot = self._discretization_solver.call(
+            state.x, state.u.astype(float), param_dict
+        )
+        dis_time = time.time() - t0
+
+        # Update solver with dynamics linearization
+        self._solver.update_dynamics_linearization(
+            x_bar=state.x,
+            u_bar=state.u,
+            A_d=A_bar.__array__(),
+            B_d=B_bar.__array__(),
+            C_d=C_bar.__array__(),
+            x_prop=x_prop.__array__(),
+        )
+
+        # Build constraint linearization data
+        # TODO: (norrisg) investigate why we are passing `0` for the node here
+        nodal_linearizations = []
+        if self._jax_constraints.nodal:
+            for constraint in self._jax_constraints.nodal:
+                nodal_linearizations.append(
+                    {
+                        "g": np.asarray(constraint.func(state.x, state.u, 0, param_dict)),
+                        "grad_g_x": np.asarray(
+                            constraint.grad_g_x(state.x, state.u, 0, param_dict)
+                        ),
+                        "grad_g_u": np.asarray(
+                            constraint.grad_g_u(state.x, state.u, 0, param_dict)
+                        ),
+                    }
+                )
+
+        cross_node_linearizations = []
+        if self._jax_constraints.cross_node:
+            for constraint in self._jax_constraints.cross_node:
+                cross_node_linearizations.append(
+                    {
+                        "g": np.asarray(constraint.func(state.x, state.u, param_dict)),
+                        "grad_g_X": np.asarray(constraint.grad_g_X(state.x, state.u, param_dict)),
+                        "grad_g_U": np.asarray(constraint.grad_g_U(state.x, state.u, param_dict)),
+                    }
+                )
+
+        # Update solver with constraint linearizations
+        self._solver.update_constraint_linearizations(
+            nodal=nodal_linearizations if nodal_linearizations else None,
+            cross_node=cross_node_linearizations if cross_node_linearizations else None,
+        )
+
+        # Initialize lam_vc as matrix if it's still a scalar in state
+        if isinstance(state.lam_vc, (int, float)):
+            state.lam_vc = np.ones((settings.scp.n - 1, settings.sim.n_states)) * state.lam_vc
+
+        # Update solver with penalty weights
+        self._solver.update_penalties(
+            w_tr=state.w_tr,
+            lam_cost=state.lam_cost,
+            lam_vc=state.lam_vc,
+            lam_vb=state.lam_vb,
+        )
+
+        # Solve the convex subproblem
+        t0 = time.time()
+        result = self._solver.solve()
+        subprop_time = time.time() - t0
+
+        # Extract unscaled trajectories from result
+        x_new_guess = result.x
+        u_new_guess = result.u
+
+        # Calculate costs from boundary conditions using utility function
+        # Note: The original code only considered final_type, but the utility handles both
+        # Here we maintain backward compatibility by only using final_type
+        costs = [0]
+        for i, bc_type in enumerate(settings.sim.x.final_type):
+            if bc_type == "Minimize":
+                costs += x_new_guess[:, i]
+            elif bc_type == "Maximize":
+                costs -= x_new_guess[:, i]
+
+        # Create the block diagonal matrix using jax.numpy.block
+        inv_block_diag = np.block(
+            [
+                [
+                    settings.sim.inv_S_x,
+                    np.zeros((settings.sim.inv_S_x.shape[0], settings.sim.inv_S_u.shape[1])),
+                ],
+                [
+                    np.zeros((settings.sim.inv_S_u.shape[0], settings.sim.inv_S_x.shape[1])),
+                    settings.sim.inv_S_u,
+                ],
+            ]
+        )
+
+        # Calculate J_tr_vec using the JAX-compatible block diagonal matrix
+        tr_mat = inv_block_diag @ np.hstack((x_new_guess - state.x, u_new_guess - state.u)).T
+        J_tr_vec = la.norm(tr_mat, axis=0) ** 2
+        vc_mat = np.abs(result.nu)
+        J_vc_vec = np.sum(vc_mat, axis=1)
+
+        # Sum nodal constraint violations
+        J_vb_vec = 0
+        for nu_vb_arr in result.nu_vb:
+            J_vb_vec += np.maximum(0, nu_vb_arr)
+
+        # Add cross-node constraint violations
+        for nu_vb_cross_val in result.nu_vb_cross:
+            J_vb_vec += np.maximum(0, nu_vb_cross_val)
+
+        # Convex constraints are already handled in the OCP, no processing needed here
+        return (
+            x_new_guess,
+            u_new_guess,
+            costs,
+            result.cost,
+            J_vb_vec,
+            J_vc_vec,
+            J_tr_vec,
+            result.status,
+            V_multi_shoot,
+            subprop_time,
+            dis_time,
+            vc_mat,
+            abs(tr_mat),
+        )
+
+    def citation(self) -> List[str]:
+        """Return BibTeX citations for the PTR algorithm.
+
+        Returns:
+            List containing the BibTeX entry for the PTR paper.
+        """
+        return [
+            r"""@article{drusvyatskiy2018error,
+  title={Error bounds, quadratic growth, and linear convergence of proximal methods},
+  author={Drusvyatskiy, Dmitriy and Lewis, Adrian S},
+  journal={Mathematics of operations research},
+  volume={43},
+  number={3},
+  pages={919--948},
+  year={2018},
+  publisher={INFORMS}
+}""",
+            r"""@article{szmuk2020successive,
+  title={Successive convexification for real-time six-degree-of-freedom powered descent guidance
+    with state-triggered constraints},
+  author={Szmuk, Michael and Reynolds, Taylor P and A{\c{c}}{\i}kme{\c{s}}e, Beh{\c{c}}et},
+  journal={Journal of Guidance, Control, and Dynamics},
+  volume={43},
+  number={8},
+  pages={1399--1413},
+  year={2020},
+  publisher={American Institute of Aeronautics and Astronautics}
+}""",
+            r"""@article{reynolds2020dual,
+  title={Dual quaternion-based powered descent guidance with state-triggered constraints},
+  author={Reynolds, Taylor P and Szmuk, Michael and Malyuta, Danylo and Mesbahi, Mehran and
+    A{\c{c}}{\i}kme{\c{s}}e, Beh{\c{c}}et and Carson III, John M},
+  journal={Journal of Guidance, Control, and Dynamics},
+  volume={43},
+  number={9},
+  pages={1584--1599},
+  year={2020},
+  publisher={American Institute of Aeronautics and Astronautics}
+}""",
+        ]
