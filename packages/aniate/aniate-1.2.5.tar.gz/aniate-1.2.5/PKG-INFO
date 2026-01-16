@@ -1,0 +1,157 @@
+Metadata-Version: 2.4
+Name: aniate
+Version: 1.2.5
+Summary: Terminal-first AI intelligence layer
+Project-URL: Homepage, https://aniate.com
+Project-URL: Documentation, https://docs.aniate.com
+Project-URL: Repository, https://github.com/aniate/aniate
+Project-URL: Issues, https://github.com/aniate/aniate/issues
+Author-email: Kabir Murjani <kabirmurjani@gmail.com>
+License-Expression: MIT
+Keywords: ai,assistant,cli,copilot,llm,terminal
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development
+Classifier: Topic :: Utilities
+Requires-Python: >=3.10
+Requires-Dist: groq>=0.4.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: requests>=2.28.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: supabase>=2.0.0
+Requires-Dist: typer>=0.9.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: build>=1.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Requires-Dist: twine>=4.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Aniate
+
+> Terminal-first AI intelligence layer.
+
+```
+                    _       _       
+   __ _ _ __  (_) __ _| |_ ___
+  / _` | '_ \| |/ _` | __/ _ \
+ | (_| | | | | | (_| | ||  __/
+  \__,_|_| |_|_|\__,_|\__\___|
+                              
+  Terminal Intelligence Layer
+```
+
+## Installation
+
+```bash
+pip install aniate
+```
+
+## Quick Start
+
+```bash
+# Create account
+ant signup
+
+# Login
+ant login
+
+# Create your first AI assistant
+ant brew.chat coder
+
+# Use it
+ant coder help me debug this function
+```
+
+## Features
+
+### Brew Custom AI Assistants
+
+```bash
+ant brew.chat writer      # Create a writing assistant
+ant brew.cmd "security scanner"  # AI generates the code
+```
+
+### AI-Powered Tools
+
+```bash
+ant fix main.py           # Debug and fix code
+ant review config.py      # Code review
+ant shell find large files # Natural language to shell
+ant what error.log        # Explain errors
+```
+
+### Cloud Sync
+
+```bash
+ant save report.pdf       # Upload to cloud
+ant fetch report.pdf      # Download anywhere
+ant files                 # List cloud files
+```
+
+### Encrypted Secrets
+
+```bash
+ant secrets.add openai_key  # Store encrypted
+ant secret openai_key       # Retrieve
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `ant signup` | Create account |
+| `ant login` | Authenticate |
+| `ant logout` | Clear session |
+| `ant whoami` | Current user |
+| `ant brew.chat <name>` | Create chat assistant |
+| `ant brew.cmd <prompt>` | AI generates command |
+| `ant list` | Show all brews |
+| `ant fix <file>` | Debug and fix code |
+| `ant review <file>` | Code review |
+| `ant shell <query>` | NL to shell |
+| `ant what <error>` | Explain errors |
+| `ant net <query>` | Web intelligence |
+| `ant save <file>` | Upload to cloud |
+| `ant fetch <file>` | Download |
+| `ant files` | List cloud files |
+| `ant help` | Show all commands |
+
+## Execution Modes
+
+```bash
+# Interactive mode
+ant coder
+
+# One-shot (no quotes needed)
+ant coder fix the authentication bug
+
+# Resume saved session
+ant coder my-debug-session
+```
+
+## Inside Chat
+
+```
+save <name>    # Save conversation to cloud
+@filename      # Inject file content
+exit           # Quit
+```
+
+## Links
+
+- Website: [aniate.com](https://aniate.com)
+- Documentation: [docs.aniate.com](https://docs.aniate.com)
+- Twitter: [@ktbir](https://twitter.com/aniateai)
+
+## License
+
+MIT License - Kabir Murjani
