@@ -1,0 +1,180 @@
+Metadata-Version: 2.4
+Name: dotcode
+Version: 1.0.1
+Summary: DotCode: Dot and NumDot esoteric programming languages
+Author-email: Edwin Sam K Reju <projectcarbonit@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/CarbonIt-Labs/dotcode
+Project-URL: Repository, https://github.com/CarbonIt-Labs/dotcode
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Dynamic: license-file
+
+# DotCode
+
+DotCode is a family of dot-based esoteric programming languages with reversible,
+Python-interoperable tooling.
+
+This project provides two languages:
+
+- **Dot** — unary dot-length encoding  
+  (each character → `.` repeated `ASCII` times; groups separated by spaces)  
+  **File extension:** `*.dcode`
+
+- **NumDot** — numeric dot-terminated encoding  
+  (each character → `<ASCII>.`)  
+  **File extension:** `*.nd`
+
+DotCode includes:
+- A clean compiler (Python → Dot / NumDot)
+- A runtime and decoder (Dot / NumDot → Python + execution)
+- Two command-line tools: `dot` and `numdot`
+- Fully reversible, lossless translation
+
+---
+
+## Installation
+
+### For users (recommended)
+
+Install directly from PyPI:
+
+```bash
+pip install dotcode
+```
+
+This installs the `dot` and `numdot` commands system-wide.
+
+---
+
+### For development / contributors
+
+If you want to modify DotCode or run it from source:
+
+```bash
+git clone https://github.com/CarbonIt-Labs/dotcode.git
+cd dotcode
+pip install -e .
+```
+
+---
+
+## Quick start
+
+### Dot language
+
+```bash
+dot compile hello.py -o hello.dcode
+dot run hello.dcode
+```
+
+### NumDot language
+
+```bash
+numdot compile hello.py -o hello.nd
+numdot run hello.nd
+numdot decode hello.nd -o hello.py
+```
+
+Example `hello.py`:
+
+```py
+print("Hello from DotCode")
+```
+
+---
+
+## File extensions & conventions
+
+- Dot language files: `*.dcode`  
+  (chosen to avoid collision with Microsoft Word `.dot` files)
+- NumDot language files: `*.nd`
+- Python source input: `*.py` (recommended)
+
+---
+
+## Language summaries
+
+### Dot (DotCode)
+
+- Encoding: each character encoded as `.` repeated `ord(character)` times
+- Character groups separated by a single space
+
+### NumDot
+
+- Encoding: each character encoded as `<decimal ASCII value>.`
+
+Both languages are fully reversible. The runtime decodes the source back to
+Python and executes it.
+
+---
+
+## CLI reference
+
+### `dot`
+
+```
+dot compile <input.py> [-o output.dcode]
+dot run <input.dcode>
+```
+
+### `numdot`
+
+```
+numdot compile <input.py> [-o output.nd]
+numdot run <input.nd>
+numdot decode <input.nd> [-o output.py]
+```
+
+---
+
+## Security notice
+
+DotCode executes decoded Python source using `exec`.
+
+**Do NOT run untrusted `.dcode` or `.nd` files.**
+
+Running encoded programs can execute arbitrary Python code. Always inspect
+source or use a sandboxed environment when handling third-party files.
+
+---
+
+## Project structure
+
+```
+dotcode/
+├─ pyproject.toml
+├─ README.md
+├─ CHANGELOG.md
+├─ LICENSE
+├─ dotcode/
+│  ├─ dot/
+│  ├─ numdot/
+│  └─ common/
+└─ tests/
+```
+
+## Repository
+
+GitHub: https://github.com/CarbonIt-Labs/dotcode
+
+---
+
+## Contact
+
+For questions, issues, or collaboration:
+- Email: projectcarbonit@gmail.com
+- GitHub Issues are preferred for bugs and feature requests
+
+---
+
+## License
+
+MIT License.
+
+---
+
+## Author
+
+**Edwin Sam K Reju**

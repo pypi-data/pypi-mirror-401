@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dotcode"
+version = "1.0.1"
+description = "DotCode: Dot and NumDot esoteric programming languages"
+authors = [
+  { name = "Edwin Sam K Reju", email = "projectcarbonit@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+[project.urls]
+Homepage = "https://github.com/CarbonIt-Labs/dotcode"
+Repository = "https://github.com/CarbonIt-Labs/dotcode"
+
+[project.scripts]
+dot = "dotcode.dot.cli:main"
+numdot = "dotcode.numdot.cli:main"
