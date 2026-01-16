@@ -1,0 +1,197 @@
+{%- import 'syntax.sql.jinja' as syntax -%}
+
+{%- macro cols_delineated_list(table_cols)-%}
+            {% for col in table_cols %}
+            {{ name_column(col) }}
+            {{- syntax.comma_delineate(loop) }}
+            {%- endfor %}
+{%- endmacro -%}
+
+{%- macro prefixed_cols_delineated_list(table_cols, prefix)-%}
+            {% for col in table_cols %}
+            {{prefix}}."{{ column_or_alias(col) }}"
+            {{- syntax.comma_delineate(loop) }}
+            {%- endfor %}
+{%- endmacro -%}
+
+{#- This macro handles making sure that we don't pass a null to concat_ws,
+which will drop nulls, resulting in potentially non-unique keys -#}
+{%- macro cols_coalesced_list(table_cols)-%}
+                {% for col in table_cols %}
+                COALESCE("{{ column_or_alias(col) }}",'')
+                {{- syntax.comma_delineate(loop) }}
+                {%- endfor %}
+{%- endmacro -%}
+
+{%- set col_list = table_cols + secondary_cols -%}
+
+{%- macro name_column(col) %}
+{%- if col.alias is defined -%}
+{%- if col.alias is not none -%}
+"{{ col.name }}" AS {{ col.alias }}
+{%- else -%}
+"{{ col.name }}"
+{%- endif -%}
+{%- else -%}
+"{{ col.name }}"
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro column_or_alias(col) %}
+{%- if col.alias is defined -%}
+{%- if col.alias is not none -%}
+{{ col.alias }}
+{%- else -%}
+{{ col.name }}
+{%- endif -%}
+{%- else -%}
+{{ col.name }}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- set missing_null = 'cumulus__none' -%}
+{#- LT02 is a indentation rule that overfires in the where
+clause construction; it simultaneously asks for indentation of 4 and 8 spaces. -#}
+-- noqa: disable=LT02
+CREATE TABLE {{ table_name }} AS (
+    WITH 
+    {%- if filter_status == True %}
+    filtered_table AS (
+        SELECT
+            p.{{ primary_id }},
+            {%- if secondary_id is not none %}
+            p.{{ secondary_id }},
+            {%- endif -%}
+            {#- these exceptions deal with table aliasing related to
+            single table queries, where this may be a multitable query
+            depending on context #}
+            --noqa: disable=RF03, AL02
+            {{- prefixed_cols_delineated_list(table_cols, 'p') }}
+            {%- if secondary_cols|length != 0 -%},
+            {{- prefixed_cols_delineated_list(secondary_cols, 's') }}
+            {%- endif -%}
+            --noqa: enable=RF03, AL02
+        FROM {{ primary_table }} AS p
+        {%- if secondary_table is not none %}
+        INNER JOIN {{ secondary_table }} AS s
+            {%- if alt_secondary_join_id  is not none%}
+            ON s.{{ alt_secondary_join_id }} = p.{{ alt_secondary_join_id }}
+            {%- else  %}
+            ON s.{{ secondary_id }} = p.{{ secondary_id }}
+            {%- endif %}
+        {%- endif %}
+        WHERE 
+        {%- for filter_col in filter_cols %} {{ syntax.and_delineate(loop) }}
+        (
+            {%- if filter_col.include_nulls  %}
+            p.{{ filter_col.name }} IS null OR 
+            {%- endif  %} 
+            p.{{ filter_col.name }} IN (
+            {%- for val in filter_col.values %}
+                '{{val}}'
+                {{- syntax.comma_delineate(loop) }}
+            {%- endfor %}
+            )
+        )
+        {%- endfor %}
+    ),
+    {% endif %}
+    null_replacement AS (
+        SELECT
+            {{ primary_id }},
+            {%- if secondary_id is not none %}
+            {{ secondary_id }},
+            {%- endif -%}
+            {%- for col in col_list %}
+            coalesce(
+                cast({{ column_or_alias(col) }} AS varchar),
+                '{{ missing_null }}'
+            ) AS {{ column_or_alias(col) }}
+            {{- syntax.comma_delineate(loop) }}
+            {%- endfor -%}
+        {%- if filter_status == True %}
+        FROM filtered_table
+        {%- else  %}
+        FROM {{ primary_table }}
+        {% endif %}
+    ),
+
+    {%- if secondary_id is not none %}
+    secondary_powerset AS (
+        SELECT
+            count(DISTINCT {{secondary_id}}) AS cnt_{{secondary_id}},
+            {{- cols_delineated_list(col_list) }},
+            concat_ws(
+                '-',
+                {{- cols_coalesced_list(col_list) }}
+            ) AS id
+        FROM null_replacement
+        WHERE {{ secondary_id }} IS NOT NULL
+        GROUP BY
+            cube(
+                {{- cols_delineated_list(col_list) }}
+            )
+    ),
+    {%- endif %}
+
+    powerset AS (
+        SELECT
+            count(DISTINCT {{ primary_id }}) AS cnt_{{ primary_id }},
+            {{- cols_delineated_list(col_list) }},
+            concat_ws(
+                '-',
+                {{- cols_coalesced_list(col_list) }}
+            ) AS id
+        FROM null_replacement
+        GROUP BY
+            cube(
+                {{- cols_delineated_list(col_list) }}
+            )
+    )
+
+    SELECT
+    {%- if annotation is not none and annotation.alt_target is not none %}
+        {%- if secondary_id is not none %}
+        sum(s.cnt_{{ secondary_id }}) AS cnt
+        {%- else %}
+        sum(p.cnt_{{ primary_id }}) AS cnt
+        {%- endif %}
+    {%- else %}   
+        {%- if secondary_id is not none %}
+        s.cnt_{{ secondary_id }} AS cnt,
+        {%- else %}
+        p.cnt_{{ primary_id }} AS cnt,
+        {%- endif %}
+        {{- prefixed_cols_delineated_list(table_cols, 'p') }}
+        {%- if secondary_cols|length != 0 %},
+        {{- prefixed_cols_delineated_list(secondary_cols, 's') }}
+        {%- endif -%}
+    {%- endif %}
+    {%- if annotation is not none %},
+        {{- prefixed_cols_delineated_list(annotation.columns, 'j') }}
+    {%- endif %}
+    FROM powerset AS p
+    {%- if secondary_id is not none %}
+    JOIN secondary_powerset AS s on s.id = p.id 
+    {%- endif %}
+    {%- if annotation is not none %}
+        JOIN {{ annotation.join_table }} j ON p.{{ annotation.field }} = j.{{ annotation.join_field }}
+    {%- endif -%}
+    {%- if where_clauses is not none %}
+    WHERE
+        {% for clause in where_clauses %}{{ clause }}
+        {% if not loop.last %}AND {% endif %}
+        {%- endfor -%}
+    {%- else %}
+    WHERE 
+        p.cnt_{{ primary_id }} >= {{ min_subject }}
+    {%- if secondary_id is not none %}
+        AND s.cnt_{{ secondary_id }} >= {{ min_subject }}
+    {%- endif %}
+    {%- endif %}
+    {%- if annotation is not none and annotation.alt_target is not none %}
+    GROUP BY
+        {{- prefixed_cols_delineated_list(annotation.columns, 'j') }}
+    ORDER BY {{ annotation.alt_target }} ASC
+    {%- endif %}
+);
