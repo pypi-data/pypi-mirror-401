@@ -1,0 +1,19 @@
+# This file is part of ihist
+# Copyright 2025 Board of Regents of the University of Wisconsin System
+# SPDX-License-Identifier: MIT
+
+packagecache/
+
+# Subprojects installed via wrap
+*-*/
+
+# Transitive dependency wraps
+*.wrap
+
+# Our wraps
+!catch2.wrap
+!google-benchmark.wrap
+!nanobind.wrap
+!robin-map.wrap
+
+!/.gitignore
