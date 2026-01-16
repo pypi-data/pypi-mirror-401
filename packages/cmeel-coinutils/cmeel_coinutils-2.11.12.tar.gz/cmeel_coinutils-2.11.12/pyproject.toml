@@ -1,0 +1,22 @@
+[build-system]
+build-backend = "cmeel"
+requires = ["cmeel[build]"]
+
+[project]
+description = "cmeel distribution for coinutils"
+license = "EPL-2.0"
+name = "cmeel-coinutils"
+requires-python = ">= 3.8"
+version = "2.11.12"
+
+[project.urls]
+homepage = "https://github.com/cmake-wheel/cmeel-coinutils"
+upstream = "https://github.com/coin-or/CoinUtils"
+
+[tool.cmeel]
+build-number = 2
+has-sitelib = false
+run-tests = false
+
+[tool.tomlsort]
+all = true
