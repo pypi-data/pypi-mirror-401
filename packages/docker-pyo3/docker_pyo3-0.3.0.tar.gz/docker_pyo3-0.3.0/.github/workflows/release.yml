@@ -1,0 +1,157 @@
+name: "Build + Release"
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - '*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos-x86_64:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build wheels - x86_64
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x86_64
+          args: --release --out dist --sdist -i 3.10 3.11 3.12 3.13 3.14
+      - name: Install built wheel - x86_64
+        run: |
+          pip install docker-pyo3 --find-links dist --force-reinstall
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-x86_64
+          path: dist
+          overwrite: true
+
+  macos-universal:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build wheels - universal2
+        uses: PyO3/maturin-action@v1
+        with:
+          target: universal2-apple-darwin
+          args: --release --out dist -i 3.10 3.11 3.12 3.13 3.14
+      - name: Install built wheel - universal2
+        run: |
+          pip install docker-pyo3 --find-links dist --force-reinstall
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-universal
+          path: dist
+          overwrite: true
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x64
+          args: --release --out dist -i 3.10 3.11 3.12 3.13 3.14
+      - name: Install built wheel
+        run: |
+          pip install docker-pyo3 --find-links dist --force-reinstall
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-x64
+          path: dist
+          overwrite: true
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          rust-toolchain: stable
+          target: x86_64
+          manylinux: auto
+          args: --release --out dist -i 3.10 3.11 3.12 3.13 3.14
+      - name: Install built wheel
+        run: |
+          pip install docker-pyo3 --find-links dist --force-reinstall
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-x86_64
+          path: dist
+          overwrite: true
+
+  release-pypi:
+    name: Release to PyPI
+    runs-on: ubuntu-latest
+    needs:
+      - macos-universal
+      - macos-x86_64
+      - windows
+      - linux
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: wheels-*
+          merge-multiple: true
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          pip install --upgrade twine
+          twine upload --skip-existing dist/*
+
+  release-cargo:
+    name: Release to Cargo
+    runs-on: ubuntu-latest
+    needs:
+      - macos-universal
+      - macos-x86_64
+      - windows
+      - linux
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
