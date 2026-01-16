@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "100_claude_agent_sdk"
+version = "0.1.0"
+description = "An Sb0 agent demonstrating Claude Agent SDK integration"
+requires-python = ">=3.12"
+dependencies = [
+    "terminaluse",
+    "claude-agent-sdk",
+    "temporalio>=1.20.0",
+    "openai-agents",
+    "ipython>=9.8.0",
+    "ipykernel>=7.1.0",
+]
+
+[tool.uv.sources]
+terminaluse = { path = "../..", editable = true }
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "flake8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["project"]
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+line_length = 88
