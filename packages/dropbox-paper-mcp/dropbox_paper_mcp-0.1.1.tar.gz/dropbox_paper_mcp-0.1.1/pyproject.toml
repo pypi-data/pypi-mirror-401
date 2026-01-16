@@ -1,0 +1,18 @@
+[project]
+name = "dropbox-paper-mcp"
+version = "0.1.1"
+description = "Dropbox Paper MCP Server"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dropbox>=12.0.2",
+    "fastmcp>=2.14.3",
+    "python-dotenv>=1.2.1",
+]
+
+[project.scripts]
+dropbox-paper-mcp = "dropbox_paper_mcp.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
