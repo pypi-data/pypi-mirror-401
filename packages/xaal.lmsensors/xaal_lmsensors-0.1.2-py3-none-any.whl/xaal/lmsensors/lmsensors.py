@@ -1,0 +1,69 @@
+
+from __future__ import print_function
+
+from xaal.lib import Device,tools
+import logging
+import sensors
+import platform
+import time
+
+PACKAGE_NAME = "xaal.lmsensors"
+
+REFRESH_RATE = 30  # default rate : every 30 sec
+
+logger = logging.getLogger(PACKAGE_NAME)
+
+
+class LMSensors:
+    def __init__(self,engine):
+        self.engine = engine
+        self.data = {}
+        self.load_config()
+        self.load_sensors()
+        self.process()
+        
+    def load_config(self):
+        cfg = tools.load_cfg_or_die(PACKAGE_NAME)
+        rate = REFRESH_RATE
+        #if cfg['config'].has_key('refresh'):
+        #    rate = int(cfg['config']['refresh'])
+
+        rate = int(cfg.get('config',{}).get('refresh',REFRESH_RATE))
+
+        self.engine.add_timer(self.process,rate)
+        self.cfg = cfg
+
+    def load_sensors(self):
+        # build a temp hashmap to collect sensors id & address
+        sensors.init()
+        for chip in sensors.iter_detected_chips():
+            for feature in chip:
+                if feature.label in self.cfg['sensors'].keys():
+                    dev = Device("thermometer.basic")
+                    addr = self.cfg['sensors'][feature.label]['addr']
+                    dev.address    = tools.get_uuid(addr)
+                    dev.vendor_id  = "IHSEV"
+                    dev.product_id = "LM_SENSOR"
+                    dev.url        = "https://wiki.archlinux.org/index.php/Lm_sensors"
+                    dev.info       = "%s/%s/%s" % (platform.node(),chip.adapter_name,feature.label)
+                    dev.version    = 0.2
+                    temp = dev.new_attribute("temperature")
+                    name = "%s:%s" % (chip,feature.label)
+                    self.data.update({name:temp})
+                    self.engine.add_device(dev)
+                    logger.info(f'{name} found')
+                else:
+                    logger.debug(f'{feature.label} disabled in config')
+
+    def process(self):
+        """ loop of lmsensors and update the devices attributes"""
+        for chip in sensors.iter_detected_chips():
+            for feature in chip:
+                name = "%s:%s" % (chip,feature.label)
+                if name in self.data.keys():
+                    self.data[name].value = feature.get_value()
+    
+    
+def setup(eng):
+    LMSensors(eng)
+    return True
