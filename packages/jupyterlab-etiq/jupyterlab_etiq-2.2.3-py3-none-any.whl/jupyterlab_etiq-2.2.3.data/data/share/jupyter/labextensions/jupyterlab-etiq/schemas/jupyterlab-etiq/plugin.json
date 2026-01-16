@@ -1,0 +1,25 @@
+{
+  "title": "Etiq Copilot",
+  "description": "Settings for Etiq Copilot.",
+  "properties": {
+    "checkPackageInstalled": {
+      "type": "boolean",
+      "title": "Check Package Installed",
+      "default": true,
+      "description": "Check to see whether the etiq_copilot package is installed when the extension starts."
+    },
+    "installerTool": {
+      "type": "string",
+      "title": "Installer Tool",
+      "enum": [
+        "pip",
+        "conda",
+        "uv"
+      ],
+      "default": "pip",
+      "description": "Select the tool to use for installing Python packages."
+    }
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
