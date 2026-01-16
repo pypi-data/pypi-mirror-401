@@ -1,0 +1,203 @@
+[project]
+name = "ekg-lib"
+dynamic = ["version"]
+description = "A Python Library for various tasks in an EKG DataOps operation."
+readme = "README.md"
+authors = [{ name = "Jacobus Geluk", email = "jacobus.geluk@ekgf.org" }]
+license = { file = "LICENSE" }
+keywords = [
+    "knowledge-graph",
+    "enterprise-knowledge-graph",
+    "ekg",
+    "rdf",
+    "sparql",
+    "dataops",
+    "ontology",
+    "semantic-web",
+    "linked-data",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Operating System :: OS Independent",
+    "Natural Language :: English",
+]
+requires-python = ">=3.14"
+dependencies = [
+    "boto3-stubs",
+    "boto3",
+    "botocore",
+    "data-science-types",
+    "humps",
+    "inflection",
+    "ldap3",
+    "mdutils",
+    "mkdocs-gen-files",
+    "numpy",
+    "openpyxl",
+    "option",
+    "owlrl",
+    "pandas-stubs",
+    "pandas",
+    "python-dateutil",
+    "rdflib",
+    "requests",
+    "SPARQLWrapper",
+    "stringcase",
+    "toml",
+]
+
+[dependency-groups]
+dev = [
+    "hatch",
+    "mdutils",
+    "mkdocs-gen-files",
+    "mkdocs-material",
+    "mkdocs",
+    "mypy",
+    "pytest-cov",
+    "pytest-html",
+    "pytest-timeout>=2.4.0",
+    "pytest",
+    "ruff",
+    "tox",
+    "uv",
+]
+
+# See https://packaging.python.org/en/latest/specifications/declaring-project-metadata/#urls
+# See https://peps.python.org/pep-0753/#well-known-labels
+[project.urls]
+homepage = "https://github.com/EKGF/ekg-lib"
+documentation = "https://ekgf.github.io/ekg-lib/"
+repository = "https://github.com/EKGF/ekg-lib.git"
+
+[project.scripts]
+xlsx-parser = "ekg_lib.xlsx_parser:main"
+user-story-parser = "ekg_lib.user_story_parser:user_story_processor"
+pipeline-example = "ekg_lib.pipeline.example:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+# See https://docs.astral.sh/uv/concepts/projects/#configuring-project-packaging
+package = true
+default-groups = ["dev"]
+link-mode = "copy"
+
+[tool.mypy]
+files = ["src"]
+mypy_path = "src"
+explicit_package_bases = true
+warn_unused_ignores = false
+strict = true
+
+# [[tool.mypy.overrides]]
+# module = []
+# ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+pythonpath = [".", "src"]
+addopts = "-rA --doctest-modules --strict-markers --verbose --junitxml=junit/test-results.xml --cov-report=html --maxfail=2 --showlocals --tb=short --durations=5"
+norecursedirs = ["build", "dist", "docs", "htmlcov", ".tox", ".vscode", ".idea", ".git", ".github", ".venv", ".mypy_cache", ".pytest_cache", ".ruff_cache", "junit"]
+log_cli_level = "DEBUG"
+log_cli = true
+junit_family = "xunit1"
+timeout = 10
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "if TYPE_CHECKING"
+]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+
+    # Don't complain about abstract methods, they're not supposed to be run:"
+    "@(abc\\.)?abstractmethod"
+]
+
+# Suppress import-untyped errors for third-party libraries without stubs
+[[tool.mypy.overrides]]
+module = [
+    "six.*",
+    "humps.*",
+    "mdutils.*",
+    "requests.*",
+    "stringcase.*",
+    "dateutil.*",
+    "owlrl.*",
+    "ldap3.*",
+    "pyasn1.*",
+]
+ignore_missing_imports = true
+
+[tool.ruff.lint]
+preview = true
+extend-select = ["C901"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"docs/.hooks/*" = ["INP001", "T201"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ekg_lib"]
+
+[tool.ruff.format]
+preview = true
+quote-style = "single"
+
+[tool.hatch.version]
+path = "src/ekg_lib/__about__.py"
+
+[tool.hatch.build]
+skip-excluded-dirs = true
+sources = ["src"]
+directory = "dist"
+
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff_defaults.toml"
+
+[tool.hatch.envs.default]
+# See https://hatch.pypa.io/1.12/how-to/environment/select-installer/
+installer = "uv"
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ekg_lib"]
+only-packages = true
+
+[tool.hatch.build.targets.sdist]
+packages = ["src/ekg_lib"]
+include = ["src/ekg_lib/*.py", "tests/*.py", "typings/*.py"]
+exclude = [".editorconfig"]
+only-packages = true
+
+
+
