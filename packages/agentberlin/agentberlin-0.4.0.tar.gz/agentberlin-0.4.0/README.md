@@ -1,0 +1,149 @@
+# Agent Berlin Python SDK
+
+Official Python SDK for Agent Berlin - AI-powered SEO and AEO automation.
+
+## Installation
+
+```bash
+pip install agentberlin
+```
+
+## Quick Start
+
+```python
+from agentberlin import AgentBerlin
+
+# Set your API token as an environment variable
+# export AGENTBERLIN_TOKEN="your-token-here"
+
+client = AgentBerlin()
+
+# Get analytics for your project
+analytics = client.analytics.get(project_domain="example.com")
+print(f"Visibility: {analytics.visibility.current_percentage}%")
+print(f"LLM Sessions: {analytics.traffic.llm_sessions}")
+
+# Search for pages
+pages = client.pages.search(
+    project_domain="example.com",
+    query="SEO best practices",
+    limit=10
+)
+for page in pages.pages:
+    print(f"  - {page.title}: {page.url}")
+
+# Search for keywords
+keywords = client.keywords.search(
+    project_domain="example.com",
+    query="digital marketing"
+)
+for kw in keywords.keywords:
+    print(f"  - {kw.keyword} (volume: {kw.volume})")
+
+# Get page details
+page = client.pages.get(
+    project_domain="example.com",
+    url="https://example.com/blog/seo-tips"
+)
+print(f"Title: {page.title}")
+print(f"H1: {page.h1}")
+
+# Get brand profile
+profile = client.brand.get_profile(project_domain="example.com")
+print(f"Domain Authority: {profile.domain_authority}")
+
+# Update brand profile
+client.brand.update_profile(
+    project_domain="example.com",
+    field="competitors",
+    value="competitor.com",
+    mode="add"
+)
+
+# Fetch SERP results
+serp = client.serp.fetch(query="best seo tools", max_results=5)
+for result in serp.results:
+    print(f"  - {result.title}: {result.url}")
+```
+
+## Authentication
+
+The SDK requires an API token. Set it as an environment variable:
+
+```bash
+export AGENTBERLIN_TOKEN="your-token-here"
+```
+
+Or pass it directly:
+
+```python
+client = AgentBerlin(token="your-token-here")
+```
+
+## Configuration
+
+```python
+client = AgentBerlin(
+    token="your-token",           # Optional if AGENTBERLIN_TOKEN env var is set
+    base_url="https://...",       # Optional, defaults to production API
+    timeout=30,                   # Request timeout in seconds
+)
+```
+
+## Resources
+
+### Analytics
+```python
+client.analytics.get(project_domain="example.com")
+```
+
+### Pages
+```python
+client.pages.search(project_domain, query, domain=None, limit=10, status_code=None, topic=None, page_type=None)
+client.pages.get(project_domain, url, content_length=0)
+```
+
+### Keywords
+```python
+client.keywords.search(project_domain, query, limit=10)
+```
+
+### Brand
+```python
+client.brand.get_profile(project_domain)
+client.brand.update_profile(project_domain, field, value, mode="add")
+```
+
+### SERP
+```python
+client.serp.fetch(query, max_results=10, country=None, language=None)
+```
+
+## Error Handling
+
+```python
+from agentberlin import AgentBerlin
+from agentberlin.exceptions import (
+    AgentBerlinError,
+    AgentBerlinAuthenticationError,
+    AgentBerlinNotFoundError,
+    AgentBerlinRateLimitError,
+)
+
+client = AgentBerlin()
+
+try:
+    analytics = client.analytics.get(project_domain="example.com")
+except AgentBerlinAuthenticationError:
+    print("Invalid or missing API token")
+except AgentBerlinNotFoundError:
+    print("Domain not found")
+except AgentBerlinRateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after} seconds")
+except AgentBerlinError as e:
+    print(f"API error: {e.message}")
+```
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
