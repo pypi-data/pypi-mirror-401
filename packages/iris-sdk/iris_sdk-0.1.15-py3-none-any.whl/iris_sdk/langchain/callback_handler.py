@@ -1,0 +1,69 @@
+# iris_langchain_callback.py
+import time
+from typing import Any, Dict, Optional, List
+
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.outputs import LLMResult
+
+from iris_sdk import context
+from iris_sdk.task_context import TaskContext
+from iris_sdk.shared_dataclasses import ProviderMetrics
+from iris_sdk.cost_table import COST_TABLE
+
+
+class IrisCallbackHandler(BaseCallbackHandler):
+    def __init__(self, provider: str, model: str) -> None:
+        self.provider = provider
+        self.model = model
+        self._start_ts: Optional[float] = None
+        self._input_chars: Optional[int] = None
+        self._input_str: Optional[str] = None
+
+    def _get_active_task(self) -> TaskContext:
+        run_stack: List[TaskContext] = context.run_stack.get()
+        if not run_stack:
+            raise RuntimeError("No active TaskContext. Wrap your step with @sdk_task or run.step().")
+        return run_stack[-1]
+
+    def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None:
+        self._start_ts = time.time()
+        self._input_chars = len(prompts[0]) if len(prompts) > 0 else None
+        self._input = prompts[0] if len(prompts) > 0 else None
+
+    def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
+        latency = (time.time() - self._start_ts) if self._start_ts else None
+
+        # LangChain normalizes token usage on the response
+        usage = {}
+        if response.llm_output and isinstance(response.llm_output, dict):
+            usage = response.llm_output.get("token_usage", {}) or {}
+
+        input_tokens = usage.get("prompt_tokens", 0)
+        output_tokens = usage.get("completion_tokens", 0)
+
+        cost_usd = 0.0
+        input_cost_per_token_usd = COST_TABLE.get(self.provider, {}).get(self.model, {}).get("input", 0.0)
+        output_cost_per_token_usd = COST_TABLE.get(self.provider, {}).get(self.model, {}).get("output", 0.0)
+        cost_usd += input_cost_per_token_usd * input_tokens + output_cost_per_token_usd * output_tokens
+
+        # Best-effort text length (optional)
+        output_text = ""
+        if response.generations and response.generations[0]:
+            output_text = response.generations[0][0].text or ""
+
+        provider_metrics = ProviderMetrics(
+            run_id=context.current_run.get(),
+            provider=self.provider,
+            model=self.model,
+            input_chars=self._input_chars,
+            output_chars=len(output_text) if output_text else None,
+            latency_sec=latency,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            cost_usd=cost_usd if cost_usd != 0.0 else None,
+            raw_input=self._input_str,
+            raw_response=response,
+        )
+
+        task_ctx = self._get_active_task()
+        task_ctx.log_llm_usage(provider_metrics)
