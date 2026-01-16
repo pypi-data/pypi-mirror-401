@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}Log Viewer - aiosyslogd{% endblock %}
+
+{% block content %}
+<style>
+    .hl-0 { background-color: #dcfce7; color: #166534; }
+    .hl-1 { background-color: #fef9c3; color: #854d0e; }
+    .hl-2 { background-color: #dbeafe; color: #1e40af; }
+    .hl-3 { background-color: #f3e8ff; color: #6b21a8; }
+    .hl-4 { background-color: #fce7f3; color: #9d174d; }
+    .hl-5 { background-color: #e0e7ff; color: #3730a3; }
+    .highlight-span {
+        padding: 1px 4px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+</style>
+<header class="text-center mb-4">
+    <h1 class="text-4xl font-bold text-gray-700">aiosyslogd Log Viewer</h1>
+    <p class="text-gray-500">SQLite Log Search Interface</p>
+</header>
+
+<!-- Search and Filter Form -->
+<form action="{{ url_for('index') }}" method="get" class="bg-white p-4 rounded-lg shadow-sm mb-4">
+    <!-- Database Selector -->
+    <div class="mb-3">
+        <label for="db_file" class="form-label">Database File</label>
+        <select name="db_file" id="db_file" class="form-select" onchange="this.form.submit()">
+            {% for db in available_dbs %}
+            <option value="{{ db }}" {% if db == selected_db %}selected{% endif %}>{{ db }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Main Search Bar -->
+    <div class="input-group mb-3">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Enter FTS5 query for Message (e.g., 'error* OR failure')" class="form-control form-control-lg">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="{{ url_for('index', db_file=selected_db) }}" class="btn btn-outline-secondary" title="Reset Search and Filters">Reset</a>
+    </div>
+
+    <!-- Advanced Filters -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h5">Advanced Filters</h3>
+        <button type="button" id="toggle-sql-btn" class="btn btn-sm btn-link">Show Executed SQL</button>
+    </div>
+
+    <div class="row g-3 border-top pt-3">
+        <div class="col-md-4">
+            <label for="from_host" class="form-label">FromHost</label>
+            <input type="text" name="from_host" id="from_host" value="{{ filters.from_host or '' }}" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label for="received_at_min" class="form-label">Received At (Start)</label>
+            <input type="datetime-local" name="received_at_min" id="received_at_min" value="{{ filters.received_at_min or '' }}" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label for="received_at_max" class="form-label">Received At (End)</label>
+            <input type="datetime-local" name="received_at_max" id="received_at_max" value="{{ filters.received_at_max or '' }}" class="form-control">
+        </div>
+    </div>
+
+    <!-- Debug SQL Query -->
+    {% if debug_query %}
+    <div id="sql-query-box" class="bg-dark text-white p-3 rounded mt-3" style="display: none;">
+        <h4 class="h6">Executed SQL Query</h4>
+        <pre><code>{{ debug_query }}</code></pre>
+    </div>
+    {% endif %}
+</form>
+
+<!-- Key Highlighter UI -->
+<div class="bg-white p-3 rounded-lg shadow-sm mb-4 border">
+    <h3 class="h5 mb-2 text-gray-800">Dynamic Highlighter</h3>
+    <div class="d-flex align-items-center gap-2">
+        <input type="text" id="key-extractor-input" placeholder="Enter key to highlight" class="form-control">
+        <button type="button" id="add-highlight-btn" class="btn btn-primary text-nowrap">
+            Highlight Key
+        </button>
+        <button type="button" id="remove-highlights-btn" class="btn btn-outline-secondary text-nowrap" style="display: none;">
+            Remove All
+        </button>
+    </div>
+    <div class="mt-2 small text-muted">
+        <strong>Highlighted Keys:</strong> <span id="highlighted-keys-list">None</span>
+    </div>
+</div>
+
+<!-- Results Count -->
+{% if total_logs is not none %}
+<div class="mb-3 text-muted">
+    Found <span class="fw-bold">{{ "{:,}".format(total_logs) }}</span> matching logs
+    {% if query_time is not none %}
+    in <span class="fw-bold">{{ "%.3f"|format(query_time) }}s</span>.
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Results -->
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    <strong class="fw-bold">Query Error:</strong> {{ error }}
+</div>
+{% elif logs %}
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Received At</th>
+                <th>From Host</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.ID }}</td>
+                <td>{{ log.ReceivedAt.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+                <td>{{ log.FromHost }}</td>
+                <td class="log-message-cell" style="word-break: break-all;">{{ log.Message }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5 bg-light rounded">
+    <p class="text-muted">No logs found. Try adjusting your search.</p>
+</div>
+{% endif %}
+
+<!-- Pagination -->
+<div class="d-flex justify-content-between mt-4">
+    <div>
+        {% if page_info.has_prev_page %}
+        {% set prev_args = request.args.to_dict() %}
+        {% do prev_args.update({'last_id': page_info.prev_last_id, 'direction': 'prev'}) %}
+        <a href="{{ url_for('index', **prev_args) }}" class="btn btn-outline-primary">
+            Previous
+        </a>
+        {% endif %}
+    </div>
+    <div>
+        {% if page_info.has_next_page %}
+        {% set next_args = request.args.to_dict() %}
+        {% do next_args.update({'last_id': page_info.next_last_id, 'direction': 'next'}) %}
+        <a href="{{ url_for('index', **next_args) }}" class="btn btn-outline-primary">
+            Next
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleSqlButton = document.getElementById('toggle-sql-btn');
+    const sqlQueryBox = document.getElementById('sql-query-box');
+
+    if (toggleSqlButton) {
+        toggleSqlButton.addEventListener('click', () => {
+            if (sqlQueryBox) {
+                const isHidden = sqlQueryBox.style.display === 'none';
+                sqlQueryBox.style.display = isHidden ? 'block' : 'none';
+                toggleSqlButton.textContent = isHidden ? 'Hide Executed SQL' : 'Show Executed SQL';
+            }
+        });
+    }
+
+    // --- Dynamic Highlighter State ---
+    let originalCasingKeys = [];
+    const keyInput = document.getElementById('key-extractor-input');
+    const addHighlightButton = document.getElementById('add-highlight-btn');
+    const removeHighlightsButton = document.getElementById('remove-highlights-btn');
+    const highlightedKeysList = document.getElementById('highlighted-keys-list');
+
+    const highlightColors = ['hl-0', 'hl-1', 'hl-2', 'hl-3', 'hl-4', 'hl-5'];
+    let keyColorMap = {};
+
+    function applyAllHighlights() {
+        const messageCells = document.querySelectorAll('.log-message-cell');
+        messageCells.forEach(cell => {
+            if (!cell.dataset.originalText) {
+                cell.dataset.originalText = cell.textContent;
+            }
+            const originalText = cell.dataset.originalText;
+            cell.innerHTML = '';
+
+            if (originalCasingKeys.length === 0) {
+                cell.textContent = originalText;
+                return;
+            }
+
+            const allKeysRegexParts = originalCasingKeys.map(key => {
+                const sanitizedKey = key.replace(/[^a-zA-Z0-9_-]/g, '');
+                return `(${sanitizedKey}(?:\\s*=\\s*|\\s+)(?:'[^']+'|"[^"]+"|[\\S]+))`;
+            });
+            const combinedRegex = new RegExp(allKeysRegexParts.join('|'), 'gi');
+
+            let lastIndex = 0;
+            let match;
+
+            while ((match = combinedRegex.exec(originalText)) !== null) {
+                if (match.index > lastIndex) {
+                    cell.appendChild(document.createTextNode(originalText.substring(lastIndex, match.index)));
+                }
+
+                const matchedValue = match[0];
+                const matchedKey = originalCasingKeys.find(k => matchedValue.toLowerCase().startsWith(k.toLowerCase()));
+                const lowerCaseKey = matchedKey ? matchedKey.toLowerCase() : '';
+                const colorClass = keyColorMap[lowerCaseKey] || highlightColors[0];
+
+                const span = document.createElement('span');
+                span.className = `highlight-span ${colorClass}`;
+                span.textContent = matchedValue;
+                cell.appendChild(span);
+
+                lastIndex = combinedRegex.lastIndex;
+            }
+
+            if (lastIndex < originalText.length) {
+                cell.appendChild(document.createTextNode(originalText.substring(lastIndex)));
+            }
+        });
+    }
+
+    function addHighlightKey(key) {
+        const sanitizedKey = key.replace(/[^a-zA-Z0-9_-]/g, '');
+        const lowerCaseKey = sanitizedKey.toLowerCase();
+
+        const alreadyExists = originalCasingKeys.some(k => k.toLowerCase() === lowerCaseKey);
+        if (!sanitizedKey || alreadyExists) return;
+
+        originalCasingKeys.push(sanitizedKey);
+        keyColorMap[lowerCaseKey] = highlightColors[(originalCasingKeys.length - 1) % highlightColors.length];
+
+        updatePaginationLinks();
+        updateKeyListUI();
+        applyAllHighlights();
+    }
+
+    function resetHighlights() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('extract');
+        window.location.href = url.toString();
+    }
+
+    function updateKeyListUI() {
+        if (originalCasingKeys.length > 0) {
+            highlightedKeysList.innerHTML = '';
+            originalCasingKeys.forEach(key => {
+                const lowerCaseKey = key.toLowerCase();
+                const colorClass = keyColorMap[lowerCaseKey];
+                const span = document.createElement('span');
+                span.className = `highlight-span me-2 ${colorClass}`;
+                span.textContent = key;
+                highlightedKeysList.appendChild(span);
+            });
+            removeHighlightsButton.style.display = 'inline-block';
+        } else {
+            highlightedKeysList.textContent = 'None';
+            removeHighlightsButton.style.display = 'none';
+        }
+    }
+
+    function updatePaginationLinks() {
+        const paginationLinks = document.querySelectorAll('div.d-flex.justify-content-between a');
+        paginationLinks.forEach(link => {
+            let href = new URL(link.href, window.location.origin);
+            href.searchParams.delete('extract');
+            if (originalCasingKeys.length > 0) {
+                href.searchParams.set('extract', originalCasingKeys.join(','));
+            }
+            link.href = href.toString();
+        });
+    }
+
+    addHighlightButton.addEventListener('click', () => {
+        const newKey = keyInput.value.trim();
+        if (newKey) {
+            addHighlightKey(newKey);
+            keyInput.value = '';
+        }
+    });
+
+    removeHighlightsButton.addEventListener('click', resetHighlights);
+
+    keyInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addHighlightButton.click();
+        }
+    });
+
+    function initialize() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const keysToExtract = urlParams.get('extract');
+        if (keysToExtract) {
+            const keys = keysToExtract.split(',');
+            keys.forEach(key => {
+                addHighlightKey(key.trim());
+            });
+        } else {
+            updateKeyListUI();
+            updatePaginationLinks();
+        }
+    }
+
+    initialize();
+});
+</script>
+{% endblock %}
