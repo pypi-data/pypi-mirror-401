@@ -1,0 +1,124 @@
+Metadata-Version: 2.4
+Name: fw-curation
+Version: 1.0.2
+Summary: Flywheel Curation tools
+Project-URL: Homepage, https://flywheel-io.gitlab.io/tools/lib/fw-curation
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-curation.git
+Project-URL: Documentation, https://flywheel-io.gitlab.io/tools/lib/fw-curation
+Author-email: Flywheel <support@flywheel.io>
+License-Expression: MIT
+License-File: LICENSE
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: ~=3.10
+Requires-Dist: flywheel-sdk>=21.0.0
+Requires-Dist: fw-client>=2.1.4
+Requires-Dist: pydantic-settings>=2.11.0
+Requires-Dist: pydantic<3.0,>=2.12.3
+Provides-Extra: sdk
+Requires-Dist: flywheel-sdk>=21.0.0; extra == 'sdk'
+Description-Content-Type: text/markdown
+
+# fw-curation
+
+`fw-curation` is a python package maintained by [Flywheel](https://flywheel.io)
+It provides a set of utilities for writing SDK scripts to perform curation.
+
+## Features
+
+- **Validation and Curation**: Perform highly configurable curation tasks on a given
+container or file
+- **Traversal Control**: Walk the Flywheel Hierarchy depth-first or breadth-first,
+with configurable stop levels, custom callback functions, and the ability to exclude
+analyses and/or files
+- **Multiprocessing Support**: Parallel processing with configurable worker count and
+shared data between workers
+- **Aggregated Logging**: Customizable output logging in CSV or JSON format
+
+## Installation
+
+### Basic Installation
+
+    pip install fw-curation
+
+### With Optional Dependencies
+
+Install specific extras for additional functionality:
+
+    # Install with SDK support
+    pip install fw-curation[sdk]
+
+**Available extras:**
+
+- `sdk`: Flywheel SDK integration
+
+## Quick Start
+
+Create a simple `HierarchyCurator` script:
+
+    from fw_curation.curator import HierarchyCurator
+    from fw_curation.walker import Walker
+    import flywheel
+    import logging
+
+    log = logging.getLogger(__name__)
+
+    class Curator(HierarchyCurator):
+        def curate_acquisition(self, acq):
+            log.info(f'Processing acquisition: {acq.label}')
+
+    if __name__ == '__main__':
+        # Connect to Flywheel
+        fw = flywheel.Client(<YOUR_API_KEY>)
+
+        # Get your project
+        project = fw.lookup('example/test')
+
+        # Create a walker starting from the project
+        walker = Walker.from_container(project)
+
+        # Create and run the curator
+        curator = Curator()
+        curator.curate(walker)
+
+## Documentation
+
+Comprehensive documentation is available at:
+[https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/](https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/)
+
+- **[Getting Started][getting-started]** - Tutorial with practical examples
+- **[Curator][curator]** - Curating Flywheel containers and files
+- **[Walker][walker]** - Traversing the Flywheel Hierarchy
+- **[Reporters][reporters]** - Logging to CSV or JSON output
+- **[Config][config]** - Configuring the Curator, Walker, and Reporters
+- **[Multiprocessing][multiprocessing]** - Running in multi-processing mode
+- **[Examples][examples]** - Additional practical examples
+- **[API Reference][api]** - Complete API documentation
+- **[Migration Guide][migration]** - Migrating from flywheel-gear-toolkit
+
+[getting-started]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/getting_started/
+[curator]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/curator/
+[walker]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/walker/
+[reporters]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/reporters/
+[config]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/config/
+[multiprocessing]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/multiprocessing/
+[examples]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation//fw_curation/examples/
+[api]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/reference/
+[migration]: https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/fw_curation/migration_guide/
+
+## Contributing
+
+We welcome contributions! Please see
+[CONTRIBUTING.md](https://gitlab.com/flywheel-io/scientific-solutions/lib/fw-curation/-/blob/main/CONTRIBUTING.md)
+for guidelines on contributing.
+
+## License
+
+`fw-curation` is released under the
+[MIT License](https://gitlab.com/flywheel-io/scientific-solutions/lib/fw-curation/-/blob/main/LICENSE).
+
+## Support
+
+- **Documentation**: [https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/](https://flywheel-io.gitlab.io/scientific-solutions/lib/fw-curation/)
+- **Issues**: [GitLab Issue Tracker](https://gitlab.com/flywheel-io/scientific-solutions/lib/fw-curation/-/issues)
+- **Flywheel Docs**: [https://docs.flywheel.io/](https://docs.flywheel.io/)
