@@ -1,0 +1,60 @@
+[project]
+name = "suzerain"
+version = "0.3.0"
+description = "What kind of AI ruler are you? Analyze your Claude Code governance patterns."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Amadeus Woo"}
+]
+keywords = ["ai", "governance", "claude", "analytics", "behavior", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+]
+
+# No external dependencies - stdlib only
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "black>=24.0",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+suzerain = "suzerain.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/amadeuswoo/suzerain"
+Documentation = "https://github.com/amadeuswoo/suzerain#readme"
+Repository = "https://github.com/amadeuswoo/suzerain"
+Issues = "https://github.com/amadeuswoo/suzerain/issues"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
