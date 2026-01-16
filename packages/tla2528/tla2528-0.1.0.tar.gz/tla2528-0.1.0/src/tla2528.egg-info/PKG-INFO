@@ -1,0 +1,113 @@
+Metadata-Version: 2.4
+Name: tla2528
+Version: 0.1.0
+Summary: Python library for TLA2528 ADC on Raspberry Pi and Linux
+Author: ElectroNick_co
+License: MIT
+Project-URL: Homepage, https://github.com/electronick-co/tla2528-raspberry
+Project-URL: Documentation, https://github.com/electronick-co/tla2528-raspberry#readme
+Project-URL: Repository, https://github.com/electronick-co/tla2528-raspberry
+Project-URL: Bug Tracker, https://github.com/electronick-co/tla2528-raspberry/issues
+Keywords: tla2528,adc,i2c,raspberry-pi,sensor,analog
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Hardware
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: smbus2>=0.4.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=3.0; extra == "dev"
+Requires-Dist: black>=22.0; extra == "dev"
+Requires-Dist: flake8>=4.0; extra == "dev"
+Requires-Dist: mypy>=0.950; extra == "dev"
+Dynamic: license-file
+
+# TLA2528 Python Library
+
+Python library for interfacing with the TLA2528 family of ADC chips on Linux (Raspberry Pi).
+
+## Overview
+
+The TLA2528 is a 12/16-bit, 8-channel ADC with 8 digital I/O pins. It supports:
+- Manual and auto-sequence sampling modes
+- Oversampling ratios (2x, 4x, 8x, 16x, 32x, 64x, 128x)
+- Configurable analog and digital I/O
+- Alert triggers based on voltage thresholds
+
+**Datasheet**: https://www.ti.com/lit/ds/symlink/tla2528.pdf
+
+## Installation
+
+```bash
+pip install tla2528
+```
+
+## Quick Start
+
+```python
+from tla2528 import TLA2528, Channel, OversamplingRatio
+
+# Initialize the ADC
+adc = TLA2528(
+    bus=1,  # I2C bus number
+    address=0x10,  # Default I2C address
+    avdd_volts=3.3,
+    analog_inputs=[Channel.CH0, Channel.CH1, Channel.CH2],
+    oversampling_ratio=OversamplingRatio.OSR_16
+)
+
+# Read single channel
+voltage_mv = adc.get_mv(Channel.CH0)
+print(f"Channel 0: {voltage_mv:.2f} mV")
+
+# Read all configured channels
+voltages = adc.get_all_mv()
+for i, voltage in enumerate(voltages):
+    print(f"Channel {i}: {voltage:.2f} mV")
+```
+
+## Features
+
+- ✅ Manual and Auto-Sequence ADC reading modes
+- ✅ Oversampling for increased precision
+- ✅ Digital input/output configuration
+- ✅ Automatic calibration support
+- ✅ Thread-safe operations
+- ✅ Comprehensive error handling
+
+## Requirements
+
+- Python 3.8+
+- Linux with I2C support (Raspberry Pi, etc.)
+- `smbus2` library
+
+## Hardware Connection
+
+Connect the TLA2528 to your Raspberry Pi I2C bus:
+- VDD → 3.3V
+- GND → Ground
+- SDA → I2C SDA (GPIO 2)
+- SCL → I2C SCL (GPIO 3)
+
+Enable I2C on Raspberry Pi:
+```bash
+sudo raspi-config
+# Interface Options → I2C → Enable
+```
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
