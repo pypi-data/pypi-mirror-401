@@ -1,0 +1,32 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+version: 2
+
+# Build documentation in the docs/sphinx directory
+sphinx:
+  configuration: docs/sphinx/conf.py
+  fail_on_warning: false
+
+# Build formats
+formats:
+  - pdf
+  - epub
+
+# Build configuration
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.13"
+  jobs:
+    pre_create_environment:
+      # Fetch full git history for setuptools-scm
+      - git fetch --unshallow || true
+      # Install uv via asdf
+      - asdf plugin add uv
+      - asdf install uv latest
+      - asdf global uv latest
+    create_environment:
+      - uv venv "${READTHEDOCS_VIRTUALENV_PATH}"
+    install:
+      - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --frozen --extra docs
