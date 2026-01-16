@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "cft-zarr"
+version = "0.0.2"
+description = "CFT Zarr codecs for 12-bit fluorescence and RGB compression"
+authors = ["Eli White <eliwhite@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+zarr = ">=3.0.0"
+imagecodecs = ">=2024.1.1"
+python = ">=3.11,<=3.14"
+numpy = "^1.26.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry-monorepo-dependency-plugin]
+enable = true
