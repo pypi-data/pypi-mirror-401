@@ -1,0 +1,53 @@
+Metadata-Version: 2.1
+Name: podenv
+Version: 0.1.2
+Summary: TPU Cluster Interactive Initialization Tool
+Author-email: eagle-cyber <hainuo.cv.wang@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/podenv
+Keywords: tpu,cluster,initialization,ssh
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+
+# podenv
+
+TPU Cluster Interactive Initialization Tool.
+
+## Installation
+
+```bash
+pip install podenv
+```
+
+## Usage
+
+```bash
+# Full initialization mode
+podenv
+
+# IP only mode
+podenv --iponly
+```
+
+## Features
+
+- Configure TPU node IP list
+- Auto-configure SSH passwordless login
+- Optional GitHub SSH key configuration
+- Auto-install fabric and related tools
+
+## Requirements
+
+- Linux system
+- Bash shell
+- Python 3.7+
