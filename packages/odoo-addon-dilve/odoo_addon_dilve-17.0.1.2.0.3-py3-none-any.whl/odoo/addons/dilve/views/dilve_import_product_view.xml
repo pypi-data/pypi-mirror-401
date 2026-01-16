@@ -1,0 +1,141 @@
+<odoo>
+    <record id="dilve_import_product_wizard" model="ir.ui.view">
+        <field name="model">dilve.import.product.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Obtener datos de DILVE">
+                <field name="product" invisible="True"/>
+
+                <group col="3">
+                    <group colspan="2">
+                        <div class="oe_title" colspan="2">
+                            <field name="product_name_selector"/>
+                            <label for="product_name"/>
+                            <h1><field name="product_name"/></h1>
+                        </div>
+                        <notebook colspan="2">
+                            <page string="Información general" name="general_information">
+                                <group>
+                                    <field name="type" invisible="1"/>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="tags_selector" nolabel="1"/>
+                                        <label for="tags"/>
+                                        <field name="tags" widget="many2many_tags" />
+                                    </span>
+                                    <field name="currency_id" invisible="1"/>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="pvp_selector" nolabel="1"/>
+                                        <label for="pvp"/>
+                                        <field name="pvp" class="oe_inline" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </span>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="category_selector" nolabel="1"/>
+                                        <label for="category"/>
+                                        <field name="category"/>
+                                    </span>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="collections_selector" nolabel="1"/>
+                                        <label for="collections"/>
+                                        <field name="collections" widget="many2many_tags"/>
+                                    </span>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="taxes_selector" nolabel="1"/>
+                                        <label for="taxes"/>
+                                        <field name="taxes" widget="many2many_tags"/>
+                                    </span>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="page_count_selector" nolabel="1"/>
+                                        <label for="page_count"/>
+                                        <field name="page_count" class="oe_inline"/>
+                                    </span>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="total_copies_selector" nolabel="1"/>
+                                        <label for="total_copies"/>
+                                        <field name="total_copies" class="oe_inline"/>
+                                    </span>
+                                </group>
+                            </page>
+                            <page string="Autoría" name="authorship">
+                                <group>
+                                    <field name="authorship_selector" nolabel="1"/>
+                                    <field name="authorship" nolabel="1">
+                                        <tree editable="bottom" delete="True">
+                                            <field name="product_id" column_invisible="True"/>
+                                            <field name="author_id" string="Nombre"/>
+                                            <field name="contact_type" string="Rol"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Logística" name="logistics">
+                                <group>
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="weight_selector" nolabel="1"/>
+                                        <label for="weight"/>
+                                        <field name="weight"/>
+                                        <field name="weight_uom_id" nolabel="1" readonly="1" force_save="1" options="{'no_open': True, 'no_create': True}"/>
+                                    </span>
+
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="length_selector" nolabel="1"/>
+                                        <label for="length"/>
+                                        <field name="length"/>
+                                        <field name="dimensional_uom_id" nolabel="1" readonly="1" force_save="1" options="{'no_open': True, 'no_create': True}"/>
+                                    </span>
+
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="width_selector" nolabel="1"/>
+                                        <label for="width"/>
+                                        <field name="width"/>
+                                        <field name="dimensional_uom_id" nolabel="1" readonly="1" force_save="1" options="{'no_open': True, 'no_create': True}"/>
+                                    </span>
+
+                                    <span class="d-inline-flex" colspan="2">
+                                        <field name="height_selector" nolabel="1"/>
+                                        <label for="height"/>
+                                        <field name="height"/>
+                                        <field name="dimensional_uom_id" nolabel="1" readonly="1" force_save="1" options="{'no_open': True, 'no_create': True}"/>
+                                    </span>
+                                </group>
+                            </page>
+                        </notebook>
+                    </group>
+                    <group colspan="1">
+                        <div class="oe_title" colspan="2">
+                            <field name="product_cover_selector"/>
+                            <label for="product_cover"/>
+                            <field name='product_cover' nolabel="1" widget="image" style="border: 1px solid #000; width: 200px;"/>
+                        </div>
+                    </group>
+                </group>
+
+                <footer>
+                    <button string="Importar" type="object" name="import_product" class="oe_highlight" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="get_from_dilve_action" model="ir.actions.act_window">
+        <field name="name">Obtener datos de DILVE</field>
+        <field name="res_model">dilve.import.product.wizard</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="dilve_import_product_wizard"/>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_product': active_id}</field>
+    </record>
+
+    <record id="product_detail_dilve" model="ir.ui.view">
+        <field name="name">product.detail.dilve</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <header>
+                <button name="%(get_from_dilve_action)d"
+                    string="Obtener datos de DILVE"
+                    context="{'default_product_id': active_id}"
+                    type="action"
+                    class="btn-primary"/>
+            </header>
+        </field>
+    </record>
+</odoo>

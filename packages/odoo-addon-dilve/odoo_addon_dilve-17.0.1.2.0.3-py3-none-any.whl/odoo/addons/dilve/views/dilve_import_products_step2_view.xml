@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="dilve_import_products_step2_wizard" model="ir.ui.view">
+        <field name="name">Obtener datos de DILVE</field>
+        <field name="model">dilve.import.products.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Obtener datos de DILVE">
+                <group>
+                    <field name="select_all_fields"/>
+                </group>
+                <notebook colspan="2">
+                    <page string="Información general" name="general_information">
+                        <group>
+                            <field name="product_name_selector"/>
+                            <field name="product_cover_selector"/>
+                            <field name="tags_selector"/>
+                            <field name="pvp_selector"/>
+                            <field name="category_selector"/>
+                            <field name="collections_selector"/>
+                            <field name="page_count_selector"/>
+                            <field name="total_copies_selector"/>
+                            <field name="taxes_selector"/>
+                        </group>
+                    </page>
+                    <page string="Autoría" name="authorship">
+                        <group>
+                            <field name="authorship_selector"/>
+                        </group>
+                    </page>
+                    <page string="Logística" name="logistics">
+                        <group>
+                            <field name="weight_selector"/>
+                            <field name="length_selector"/>
+                            <field name="width_selector"/>
+                            <field name="height_selector"/>
+                        </group>
+                    </page>
+                </notebook>
+
+                <footer>
+                    <button string="Anterior" name="previous_page" class="oe_link" type="object"/>
+                    <button string="Importar" name="import_selected" class="oe_highlight" type="object"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="dilve_import_products_step2_action" model="ir.actions.act_window">
+        <field name="name">Selecciona que campos importar</field>
+        <field name="res_model">dilve.import.products.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="dilve_import_products_step2_wizard"/>
+        <field name="target">new</field>
+    </record>
+</odoo>
