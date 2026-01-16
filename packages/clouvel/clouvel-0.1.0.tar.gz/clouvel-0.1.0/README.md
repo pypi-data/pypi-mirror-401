@@ -1,0 +1,61 @@
+# Clouvel
+
+바이브코딩 프로세스를 강제하는 MCP 서버.
+
+코딩 전에 PRD 검증부터.
+
+## 설치
+
+Claude Desktop 설정 (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "clouvel": {
+      "command": "uvx",
+      "args": ["clouvel"]
+    }
+  }
+}
+```
+
+끝. pip install 필요 없음.
+
+## 제공 도구
+
+| 도구 | 설명 |
+|------|------|
+| `scan_docs` | docs 폴더 파일 목록 |
+| `analyze_docs` | 필수 문서 체크. 빠진 거 알려줌 |
+| `get_prd_guide` | PRD 작성 가이드 |
+| `get_verify_checklist` | 검증 체크리스트 |
+
+## 사용법
+
+Claude한테:
+- "이 프로젝트 docs 검증해줘"
+- "PRD 어떻게 써야 해?"
+- "검증 체크리스트 보여줘"
+
+## 필수 문서
+
+`analyze_docs`가 체크하는 것들:
+
+- PRD (제품 요구사항)
+- 아키텍처 문서
+- API 스펙
+- DB 스키마
+- 검증 계획
+
+다 있어야 "바이브코딩 시작해도 됨" 나옴.
+
+## 왜?
+
+바이브코딩 = AI가 코드 짬.
+근데 PRD 없이 시작하면 = 나중에 다 뜯어고침.
+
+Clouvel = 문서 없으면 코딩 못 하게 강제.
+
+## License
+
+MIT
