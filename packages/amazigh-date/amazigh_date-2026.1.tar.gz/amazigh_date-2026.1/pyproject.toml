@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amazigh-date"
+version = "2026.1"
+description = "Amazigh (Berber) calendar library and CLI"
+readme = "README.md"
+license = "CC0-1.0"
+authors = [{ name = "bof", email = "butterflyoffire+pypi@protonmail.com" }]
+requires-python = ">=3.8"
+
+keywords = ["amazigh", "berber", "calendar", "date", "yennayer"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Intended Audience :: Developers",
+]
+
+[project.scripts]
+amazigh-date = "amazigh_date.cli:main"

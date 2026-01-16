@@ -1,0 +1,37 @@
+Metadata-Version: 2.4
+Name: amazigh-date
+Version: 2026.1
+Summary: Amazigh (Berber) calendar library and CLI
+Author-email: bof <butterflyoffire+pypi@protonmail.com>
+License-Expression: CC0-1.0
+Keywords: amazigh,berber,calendar,date,yennayer
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# amazigh-date
+
+Lightweight Python library and CLI that converts Gregorian dates to the Amazigh (Berber) calendar.
+
+## Install
+
+    python -m pip install amazigh-date
+
+## CLI
+
+    amazigh-date
+    amazigh-date --short
+    amazigh-date --era
+    amazigh-date --countdown
+    amazigh-date --gui
+
+## Library
+
+    from amazigh_date import amazigh_date, MONTHS
+    y, m, d, wd = amazigh_date()
+    print(f"{d} {MONTHS[m-1]} {y}")
