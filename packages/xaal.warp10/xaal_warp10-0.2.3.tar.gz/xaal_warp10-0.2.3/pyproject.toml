@@ -1,0 +1,32 @@
+[project]
+name = "xaal.warp10"
+version = "0.2.3"
+description = "xAAL logger for warp10"
+readme = "README.rst"
+authors = [
+    { name = "Jerome Kerdreux", email = "Jerome.Kerdreux@imt-atlantique.fr" },
+]
+license = "GPL-3.0-or-later"
+classifiers = ["Programming Language :: Python", "Topic :: Home Automation"]
+keywords = ["xaal", "warp10"]
+dependencies = ["xaal.lib", "urllib3"]
+
+[tool.setuptools.packages.find]
+include = ["xaal*"]
+namespaces = true
+
+[project.urls]
+Homepage = "https://recherche.imt-atlantique.fr/xaal/"
+Documentation = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/loggers/warp10/README.rst"
+Source = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/loggers/warp10"
+
+[tool.ruff]
+line-length = 122
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 122
+skip-string-normalization = true
+
