@@ -1,0 +1,11 @@
+schema_version: "0.1"
+entrypoint: "adapters.ledger_adapter.adapter.LedgerAdapter"
+capabilities:
+  - "ledger.read"
+  - "ledger.write"
+  - "strategy.transactions"
+  - "strategy.deposits"
+  - "strategy.withdrawals"
+  - "strategy.operations"
+dependencies:
+  - "LedgerClient"
