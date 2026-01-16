@@ -1,0 +1,60 @@
+[project]
+name = "pytest-nb-as-test"
+version = "0.1.6"
+description = "Use notebooks as pytests. Keep your notebooks working."
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Bryce Henson", email = "pytest-nb-as-test+bryce.m.henson@gmail.com" },
+]
+classifiers = [
+]
+urls = { Homepage = "https://github.com/brycehenson/pytest-nb-as-test" }
+dependencies = [
+    "pytest>=2.1.0,<9.0.2",
+    "pytest-timeout>=2.0.0",
+    "nbformat"
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipykernel>=7.0.1,<8.0.0",
+    "ipywidgets==8.1.7",
+    "jupyterlab-widgets==3.0.15",
+    "black[jupyter]==25.9.0",
+    "isort==7.0.0",
+    "pylint==4.0.4",
+    "pytest-cov==4.1.0",
+    "pytest-asyncio>=0.23.0,<1.0.0",
+    "pytest-timeout>=2.3.1,<3.0.0",
+    "pytest-xdist>=3.8.0,<4.0.0",
+    "pyinstrument>=5.1.1,<6.0.0",
+    "nbformat>=5.10.4,<6.0.0",
+    "nbconvert>=7.16.6,<8.0.0",
+    "pyright==1.1.408",
+    "numpy",
+    "matplotlib",
+    "plotly",
+]
+
+[project.entry-points.pytest11]
+pytest_nb_as_test = "pytest_nb_as_test.plugin"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pytest_nb_as_test"]
+
+[tool.isort]
+profile = "black"
+
+[tool.coverage.run]
+source = ["livecov"]
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report=lcov:lcov.info --cov-report=term"
