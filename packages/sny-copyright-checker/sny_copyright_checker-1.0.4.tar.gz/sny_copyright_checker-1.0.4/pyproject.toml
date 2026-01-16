@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sny-copyright-checker"
+dynamic = ["version"]
+description = "Pre-commit hook to check and auto-add copyright notices with multi-format and regex support"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "SNY Group Corporation"}
+]
+keywords = ["pre-commit", "copyright", "license", "sny"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+    "pathspec>=0.11.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0"
+]
+
+[project.scripts]
+sny-copyright-checker = "scripts.main:main"
+
+[project.urls]
+Homepage = "https://github.com/mu-triv/sny-copyright-checker"
+Repository = "https://github.com/mu-triv/sny-copyright-checker"
+Issues = "https://github.com/mu-triv/sny-copyright-checker/issues"
+
+[tool.setuptools]
+packages = ["scripts"]
+
+[tool.setuptools.dynamic]
+version = {attr = "scripts.__version__"}
+
+[tool.setuptools.package-data]
+scripts = ["*.py"]
