@@ -1,0 +1,79 @@
+[package]
+name = "minot"
+description = "A versatile toolset for debugging and verifying stateful robot perception software."
+version.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+edition.workspace = true
+authors.workspace = true
+categories.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+exclude.workspace = true
+readme = "README.md"
+
+[dependencies]
+mt_sea.workspace = true
+env_logger.workspace = true
+log.workspace = true
+nalgebra.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+mt_net.workspace = true
+mt_mtc.workspace = true
+mt_bagread.workspace = true
+anyhow.workspace = true
+crossterm = { version = "0.28.1", features = ["event-stream"] }
+futures = "0.3.31"
+ratatui = "0.29.0"
+rosbag2-rs = "0.2.1"
+chrono = "0.4.40"
+tui-logger = "0.16.0" # out of date but needed for 1.85 compatibility
+clap = { version = "4.5.28", features = ["derive"] }
+regex = "1"
+once_cell = "1"
+
+mt_wind = { optional = true, workspace = true }
+rust_decimal = "1.37.1"
+
+[[bin]]
+name = "minot"
+path = "src/minot.rs"
+
+[[bin]]
+name = "minot-coord"
+path = "src/coord.rs"
+
+# Note: All following features only embed existing nodes that can be built and run separately through the network.
+[features]
+default = ["embed-coord"]
+
+# Use the official C API for ROS2 publishing (r2r crate). Enable for maximum compatibility at the cost of needing an actively sourced ROS2 installation.
+embed-ros2-c = ["embed-ros2-c-turbine"]
+
+# Same as above but removing BestAvailable QoS to be compatible with Humble
+embed-ros2-c-humble = ["embed-ros2-c-turbine", "mt_wind/humble"]
+
+# Use a native Rust implementation of ROS2 (ros2-client crate). Not stable for publishing the "any" type.
+embed-ros2-native = ["embed-ros2-turbine"]
+
+# Use a native Rust ROS implementation so no ROS installation needed. Can only publish non-any typed topics.
+embed-ros1-native = ["embed-ros1-turbine"]
+
+# Publishing through a pub-sub implementation on top of the existing network stack from Minot.
+embed-ratpub = ["embed-ratpub-turbine"]
+
+# Run the coordinator in the background.
+embed-coord = []
+embed-ros2-turbine = ["dep:mt_wind", "mt_wind/ros2-native"]
+embed-ros2-c-turbine = ["dep:mt_wind", "mt_wind/ros2-c"]
+embed-ros1-turbine = ["dep:mt_wind", "mt_wind/ros1-native"]
+embed-ratpub-turbine = ["dep:mt_wind", "mt_wind/ratpub"]
+
+[package.metadata.docs.rs]
+features = ["embed-coord", "embed-ratpub", "embed-ros1-native", "embed-ros2-c", "embed-ros2-c-humble", "embed-ros2-native"]
+default-target = "x86_64-unknown-linux-gnu"
+rustdoc-args = ["--cfg", "docsrs"]

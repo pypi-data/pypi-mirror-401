@@ -1,0 +1,36 @@
+[package]
+name = "ratpub"
+description = "A simple and deterministic Pub/Sub implementation with Minot primitives."
+version.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+edition.workspace = true
+authors.workspace = true
+categories.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+exclude.workspace = true
+readme = "README.md"
+
+[dependencies]
+mt_sea.workspace = true
+mt_net.workspace = true
+env_logger.workspace = true
+log.workspace = true
+nalgebra.workspace = true
+tokio.workspace = true
+rkyv.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+ros2-interfaces-jazzy-rkyv.workspace = true
+futures-lite = { version = "2", optional = true }
+
+[features]
+smol = ["dep:futures-lite"]
+
+[[example]]
+name = "smol"
+path = "examples/smol.rs"
+required-features = ["smol"]

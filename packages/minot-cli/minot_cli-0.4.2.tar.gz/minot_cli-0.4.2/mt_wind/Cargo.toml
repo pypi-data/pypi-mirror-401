@@ -1,0 +1,63 @@
+[package]
+name = "mt_wind"
+description = "Proxy nodes to publish Bagfile data from Minot to other publishing services."
+version.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+edition.workspace = true
+authors.workspace = true
+categories.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+exclude.workspace = true
+readme = "README.md"
+
+[dependencies]
+mt_sea.workspace = true
+mt_bagread.workspace = true
+env_logger.workspace = true
+log.workspace = true
+nalgebra.workspace = true
+tokio.workspace = true
+rkyv.workspace = true
+mt_net.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+
+roslibrust = { workspace = true, optional = true }
+r2r = { workspace = true, optional = true }
+ros2-client = { workspace = true, optional = true }
+ros2-interfaces-jazzy-serde = { workspace = true, optional = true }
+ros2-interfaces-jazzy-rkyv.workspace = true
+cdr-encoding = { version = "0.10" }
+ratpub = { workspace = true, optional = true }
+
+[features]
+default = ["ratpub"]
+humble = ["mt_bagread/humble"]
+ros2-c = ["dep:r2r", "dep:ros2-interfaces-jazzy-serde"]
+ros2-native = ["dep:ros2-client", "dep:ros2-interfaces-jazzy-serde"]
+ros1-native = ["dep:roslibrust"]
+ratpub = ["dep:ratpub"]
+
+[[bin]]
+name = "wind-ros1-native"
+path = "src/ros1.rs"
+required-features = ["ros1-native"]
+
+[[bin]]
+name = "wind-ros2-native"
+path = "src/ros2.rs"
+required-features = ["ros2-native"]
+
+[[bin]]
+name = "wind-ros2-c"
+path = "src/ros2_r2r.rs"
+required-features = ["ros2-c"]
+
+[[bin]]
+name = "wind-rat"
+path = "src/ratpub.rs"
+required-features = ["ratpub"]
