@@ -1,0 +1,120 @@
+# Turkishgraphy
+
+Turkishgraphy, Türkçe karakterler için özel olarak tasarlanmış,
+**yerel alfabe tabanlı**, çok‑karakterli blok dönüşümüne dayanan
+bir şifreleme şemasıdır.
+
+Proje; klasik tek‑karakterli substitution şifrelerinden farklı olarak,
+Türkçe F dizilimini, UTF‑8 karakterleri ve değişken uzunluklu blokları
+merkeze alır.
+
+---
+
+## ✨ Temel Özellikler
+
+- Türkçe F klavye dizilimi baz alınır
+- 29 harflik Türkçe alfabe desteği
+- Her harf için **benzersiz çok‑karakterli blok**
+- UTF‑8 uyumlu (Türkçe ve özel semboller korunur)
+- Deterministik ve geri çözülebilir yapı
+- Streaming (buffer‑based) çözümleme
+
+---
+
+## 🧠 Tasarım Felsefesi
+
+Bu sistemin amacı:
+
+- İngilizce‑merkezli analiz araçlarını zorlamak
+- Frekans analizini bulanıklaştırmak
+- Tek byte = tek harf varsayımını bozmak
+- Öğretici ama genişletilebilir bir şifreleme çekirdeği sunmak
+
+Turkishgraphy, **modern blok şifrelerin yerine geçme iddiasında değildir**;
+ancak **yerel alfabe odaklı özgün bir şifreleme yaklaşımı** ortaya koyar.
+
+---
+
+## 🔐 Güvenlik İddiası
+
+Turkishgraphy aşağıdaki iddiaya sahiptir:
+
+> Bu sistem, klasik mono‑alfabetik substitution şifrelerine kıyasla
+> daha yüksek karmaşıklık sunar ve basit frekans analizlerine karşı
+> dirençlidir.
+
+Aşağıdakileri **iddia etmez**:
+- Askerî seviye güvenlik
+- AES / ChaCha20 eşdeğeri koruma
+- Anahtarsız mutlak gizlilik
+
+Bu iddia; tasarımın sınırları içinde **dürüst, savunulabilir ve teknik olarak doğrudur**.
+
+---
+
+## ⚙️ Nasıl Çalışır? (Yüksek Seviye)
+
+### Şifreleme
+1. Girdi metni büyük harfe çevrilir
+2. Her harf, yerel alfabe tablosundaki blok ile değiştirilir
+3. Tanımsız karakterler aynen bırakılır
+4. Çıktı, blokların birleşimidir
+
+### Çözme
+1. Şifreli metin karakter karakter okunur
+2. Bir buffer içinde blok eşleşmesi aranır
+3. Eşleşme bulunduğunda ilgili harf üretilir
+4. Akış sonuna kadar devam edilir
+
+> Detaylı eşleme tablosu ve iç yapı bilinçli olarak paylaşılmamıştır.
+
+---
+
+## 🧪 Saldırı Modeli (Threat Model)
+
+### Dayanıklı Olduğu Durumlar
+- Basit frekans analizi
+- Tek karakter varsayımına dayalı çözümler
+- İngilizce odaklı kripto analiz araçları
+- Regex‑tabanlı otomatik ayrıştırmalar
+
+### Dayanıklı Olmadığı Durumlar
+- Alfabe tablosunun tamamen ele geçirilmesi
+- Uzun miktarda bilinen düz metin (known‑plaintext)
+- Anahtar eklenmemiş deterministik kullanım
+- İleri seviye istatistiksel analizler
+
+Bu zayıflıklar **bilinçlidir** ve tasarım gereği kabul edilmiştir.
+
+---
+
+## 🔧 Genişletilebilirlik
+
+Turkishgraphy çekirdeği aşağıdaki katmanlarla güçlendirilebilir:
+
+- Anahtar tabanlı alfabe permütasyonu
+- Deterministik shuffle
+- Anahtara bağlı noise/padding
+- Runtime alfabe üretimi
+
+Bu özellikler, çekirdek tasarımı bozmadan eklenebilir.
+
+---
+
+## ⚠️ Uyarı
+
+Bu proje:
+- Eğitsel
+- Deneysel
+- Tasarım odaklıdır
+
+Gerçek dünyada hassas veriler için
+**modern kriptografik standartlar kullanılmalıdır**.
+
+---
+
+## 👤 Yazar
+
+**dreamtech.dev**
+
+Bu proje, öğrenme ve sistem tasarımı amacıyla geliştirilmiştir.
