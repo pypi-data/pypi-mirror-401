@@ -1,0 +1,438 @@
+Metadata-Version: 2.4
+Name: gramax-sync
+Version: 0.1.1
+Summary: CLI инструмент для управления репозиториями РИТМ (Gramax)
+Author: Gramax Team
+License: MIT
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.1.0
+Requires-Dist: gitpython>=3.1.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: python-gitlab>=4.0.0
+Requires-Dist: keyring>=24.0.0
+Requires-Dist: fastmcp>=0.9.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.11.0; extra == "dev"
+Requires-Dist: pytest-click>=0.3.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: types-pyyaml>=6.0.0; extra == "dev"
+
+# gramax-sync
+
+CLI инструмент для синхронизации и управления множеством Git-репозиториев проекта РИТМ (Gramax).
+
+## Описание
+
+**gramax-sync** — консольный инструмент для работы с множеством Git-репозиториев, определённых в конфигурационном файле `workspace.yaml`. Инструмент позволяет выполнять массовые операции clone, pull, commit, push для всех репозиториев проекта.
+
+## Требования
+
+- **Python:** 3.10 или выше
+- **Git:** установленный и настроенный
+- **macOS/Linux/Windows:** поддерживаются все платформы
+
+### Проверка требований
+
+```bash
+# Проверка версии Python
+python3 --version  # Должно быть 3.10+
+
+# Проверка Git
+git --version
+```
+
+## Установка
+
+### Вариант 1: Установка через uv (рекомендуется)
+
+[uv](https://github.com/astral-sh/uv) — современный, быстрый менеджер пакетов Python.
+
+#### Шаг 1: Установка uv
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Или через Homebrew (macOS)
+brew install uv
+
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+После установки перезапустите терминал или выполните:
+```bash
+source ~/.bashrc  # или ~/.zshrc для zsh
+```
+
+#### Шаг 2: Клонирование и установка проекта
+
+```bash
+# Клонировать репозиторий
+git clone https://github.com/your-org/gramax-sync.git
+cd gramax-sync
+
+# Создать виртуальное окружение и установить зависимости
+uv venv
+source .venv/bin/activate  # macOS/Linux
+# или .venv\Scripts\activate  # Windows
+
+# Установить проект
+uv pip install -e .
+```
+
+#### Шаг 3: Проверка установки
+
+```bash
+# Проверить, что команда доступна
+gramax-sync --version
+
+# Проверить справку
+gramax-sync --help
+```
+
+### Вариант 2: Установка через pip
+
+```bash
+# Клонировать репозиторий
+git clone https://github.com/your-org/gramax-sync.git
+cd gramax-sync
+
+# Создать виртуальное окружение
+python3 -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+# или .venv\Scripts\activate  # Windows
+
+# Установить проект
+pip install -e .
+```
+
+### Вариант 3: Установка для разработки
+
+```bash
+# Автоматическая настройка (рекомендуется)
+make setup
+source .venv/bin/activate
+
+# Или вручную через uv:
+uv venv
+source .venv/bin/activate
+uv pip install -e ".[dev]"
+pre-commit install
+
+# Или вручную через pip:
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install -e ".[dev]"
+pre-commit install
+```
+
+Подробнее см. [DEVELOPMENT.md](DEVELOPMENT.md)
+
+### Проверка установки
+
+После установки выполните следующие команды для проверки:
+
+```bash
+# 1. Проверка версии
+gramax-sync --version
+# Ожидаемый вывод: gramax-sync, version 0.1.0
+
+# 2. Проверка справки
+gramax-sync --help
+# Должен отобразиться список команд
+
+# 3. Проверка доступности всех команд
+gramax-sync auth --help
+gramax-sync clone --help
+gramax-sync status --help
+```
+
+### Устранение проблем установки
+
+#### Команда не найдена после установки
+
+```bash
+# Убедитесь, что виртуальное окружение активировано
+source .venv/bin/activate
+
+# Проверьте, что пакет установлен
+pip list | grep gramax-sync
+
+# Переустановите если нужно
+pip install -e .
+```
+
+#### Ошибка "Python version not supported"
+
+```bash
+# Проверьте версию Python
+python3 --version
+
+# Если версия < 3.10, установите новую версию:
+# macOS
+brew install python@3.11
+
+# Ubuntu/Debian
+sudo apt install python3.11
+```
+
+#### Проблемы с keyring на Linux
+
+```bash
+# Установите необходимые библиотеки
+sudo apt install libsecret-1-dev  # Ubuntu/Debian
+sudo dnf install libsecret-devel  # Fedora
+```
+
+## Использование
+
+### Первоначальная настройка
+
+Перед использованием необходимо выполнить первоначальную настройку:
+
+```bash
+# Интерактивная настройка
+gramax-sync init
+
+# Или с параметрами
+gramax-sync init \
+  --repo-url https://itsmf.gitlab.yandexcloud.net/ritm-authors/gramax-yaml-manager \
+  --branch master \
+  --catalog-branch private
+```
+
+Команда `init` выполняет:
+1. Подключение к репозиторию с конфигурациями
+2. Проверку доступа и наличия `workspace.yaml`
+3. Авторизацию в GitLab при необходимости
+4. Загрузку и отображение структуры секций и каталогов
+5. Интерактивный выбор секций/каталогов для работы
+
+**Важно:** Для репозитория конфигураций используется ветка `master` (по умолчанию), а для каталогов (репозиториев с кодом) — ветка `private`.
+
+### Работа с репозиториями
+
+```bash
+# Клонирование всех репозиториев
+gramax-sync clone
+
+# Статус всех репозиториев
+gramax-sync status
+
+# Обновление всех репозиториев
+gramax-sync pull
+
+# Коммит изменений (с автогенерацией сообщения)
+gramax-sync commit
+
+# Коммит с кастомным сообщением
+gramax-sync commit -m "Update documentation"
+
+# Отправка изменений
+gramax-sync push
+
+# Полная синхронизация (pull + commit + push)
+gramax-sync sync
+
+# Синхронизация с предварительным просмотром
+gramax-sync sync --dry-run
+```
+
+### Фильтрация по секциям и каталогам
+
+Все команды поддерживают glob-паттерны для фильтрации:
+
+```bash
+# Работа только с секциями, начинающимися на "1-"
+gramax-sync status --section "1-*"
+gramax-sync clone --section "1-методология"
+
+# Работа только с определёнными каталогами
+gramax-sync commit --catalog "ritm-*" -m "Fix typos"
+
+# Комбинация фильтров
+gramax-sync pull --section "1-*" --catalog "ritm-methodology"
+```
+
+### Управление конфигурацией
+
+```bash
+# Просмотр текущей конфигурации
+gramax-sync edit show
+
+# Изменение директории для репозиториев
+gramax-sync edit set-workspace-dir --workspace-dir ~/my-workspace
+# или интерактивно
+gramax-sync edit set-workspace-dir
+
+# Добавление секции или каталога
+gramax-sync edit add --section "1-методология" --catalog "ritm-methodology"
+# или интерактивно
+gramax-sync edit add
+
+# Удаление секции или каталога
+gramax-sync edit remove --section "1-методология" --catalog "ritm-methodology"
+
+# Обновление конфигурации с сервера
+gramax-sync update
+```
+
+### Аутентификация
+
+**📖 Подробная информация о правах токена:** [TOKEN_PERMISSIONS.md](TOKEN_PERMISSIONS.md)
+
+#### OAuth (рекомендуется)
+
+**⚠️ Перед использованием OAuth необходимо создать OAuth Application в GitLab!**
+
+1. **Создайте OAuth Application:**
+   - Откройте: https://itsmf.gitlab.yandexcloud.net/-/profile/applications
+   - Нажмите "Add new application"
+   - Name: `gramax-sync`
+   - Redirect URI: `http://localhost:8765/callback`
+   - Scopes: `read_api`, `read_repository`, `read_user`
+   - Скопируйте Application ID
+
+2. **Установите Application ID:**
+   ```bash
+   export GRAMAX_OAUTH_APPLICATION_ID="ваш_application_id"
+   ```
+   Или используйте автоматическую настройку: `./scripts/setup_oauth.sh`
+
+3. **Выполните аутентификацию:**
+   ```bash
+   gramax-sync auth login --oauth --url https://itsmf.gitlab.yandexcloud.net
+   ```
+
+Подробная инструкция: [OAUTH_SETUP.md](OAUTH_SETUP.md)
+
+#### Personal Access Token (альтернатива)
+
+**Необходимые права токена:**
+- `read_api` - чтение данных через API
+- `read_repository` - чтение содержимого репозиториев
+- `read_user` - получение информации о пользователе
+
+```bash
+# Войти через Personal Access Token
+gramax-sync auth login --pat --url https://itsmf.gitlab.yandexcloud.net
+```
+
+**💡 Подробнее:** См. [TOKEN_PERMISSIONS.md](TOKEN_PERMISSIONS.md) для полной информации о настройке прав токена.
+
+#### Управление аутентификацией
+
+```bash
+# Показать статус аутентификации
+gramax-sync auth status
+
+# Обновить токен
+gramax-sync auth refresh
+
+# Выйти из системы
+gramax-sync auth logout --url https://itsmf.gitlab.yandexcloud.net
+```
+
+## Конфигурация
+
+Конфигурация хранится в `~/.config/gramax-sync/config.yaml` и создаётся автоматически при выполнении команды `init`.
+
+Репозиторий с конфигурациями должен содержать файл `workspace.yaml`:
+
+```yaml
+workspace_dir: ~/ritm-workspace
+
+sections:
+  - name: "1-методология"
+    catalogs:
+      - name: "ritm-methodology"
+        source:
+          url: "https://gitlab.example.com"
+```
+
+**Ветки:**
+- Репозиторий конфигураций: ветка `master` (по умолчанию)
+- Каталоги (репозитории с кодом): ветка `private` (по умолчанию)
+
+**Директория для репозиториев:**
+- По умолчанию: `~/{name}-workspace` (где `name` — имя проекта из workspace.yaml)
+- Можно изменить: `gramax-sync edit set-workspace-dir`
+- Структура: `{workspace_dir}/{section}/{catalog}/`
+
+## Разработка
+
+### Быстрый старт
+
+```bash
+# Настроить окружение
+make setup
+source .venv/bin/activate
+
+# Запустить тесты
+make test
+
+# Проверить код
+make check
+
+# Отформатировать код
+make format
+```
+
+### Полезные команды
+
+```bash
+make help          # Показать все команды
+make test          # Запустить тесты
+make test-cov      # Тесты с покрытием
+make lint          # Проверить линтерами
+make format        # Отформатировать код
+make type-check    # Проверить типы
+make check         # Проверить всё
+make clean         # Очистить временные файлы
+```
+
+## Документация
+
+- [DEVELOPMENT.md](DEVELOPMENT.md) — Руководство по разработке
+- [ARCHITECTURE_PRINCIPLES.md](ARCHITECTURE_PRINCIPLES.md) — Принципы архитектуры
+- [ROADMAP.md](ROADMAP.md) — Дорожная карта развития
+- [OAUTH_SETUP.md](OAUTH_SETUP.md) — Настройка OAuth
+- [MCP_SETUP.md](MCP_SETUP.md) — MCP Server для Claude Desktop
+- [TOKEN_PERMISSIONS.md](TOKEN_PERMISSIONS.md) — Права токенов GitLab
+- [CLAUDE.md](CLAUDE.md) — Контекст для Claude Code
+
+## MCP Server для Claude Desktop
+
+**gramax-sync** включает MCP Server для интеграции с Claude Desktop.
+
+**Доступные инструменты:**
+- `list_repositories` — список секций и каталогов
+- `get_repository_status` — статус репозиториев
+- `clone_repositories` — клонирование
+- `pull_repositories` — обновление
+- `commit_changes` — коммит изменений
+- `push_changes` — отправка изменений
+- `sync_repositories` — полная синхронизация
+
+Подробнее см. [MCP_SETUP.md](MCP_SETUP.md)
+
+## Лицензия
+
+MIT
