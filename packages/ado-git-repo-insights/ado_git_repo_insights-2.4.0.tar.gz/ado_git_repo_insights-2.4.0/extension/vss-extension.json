@@ -1,0 +1,61 @@
+{
+    "manifestVersion": 1,
+    "id": "ado-git-repo-insights",
+    "name": "Git Repo Insights",
+    "version": "2.4.0",
+    "publisher": "OddEssentials",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "description": "Extract Azure DevOps Pull Request metrics and generate PowerBI-compatible CSVs.",
+    "categories": [
+        "Azure Pipelines"
+    ],
+    "icons": {
+        "default": "images/icon.png"
+    },
+    "content": {
+        "details": {
+            "path": "overview.md"
+        }
+    },
+    "files": [
+        {
+            "path": "tasks/extract-prs"
+        },
+        {
+            "path": "ui",
+            "addressable": true
+        }
+    ],
+    "contributions": [
+        {
+            "id": "extract-prs-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/extract-prs"
+            }
+        },
+        {
+            "id": "pr-insights-hub",
+            "type": "ms.vss-web.hub",
+            "targets": [
+                "ms.vss-build-web.build-results-hub-group"
+            ],
+            "properties": {
+                "name": "PR Insights",
+                "uri": "ui/index.html",
+                "iconName": "Chart"
+            }
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/oddessentials/ado-git-repo-insights.git"
+    }
+}
