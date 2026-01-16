@@ -1,0 +1,43 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "hep-flare"
+version = "0.1.12"
+description = "Framework for streamlining the FCC framework powered by b2luigi"
+authors = ["Cameron Harris <cameron.harris@adelaide.edu.au>"]
+readme = "README.md"
+packages = [{ include = "flare" }]
+include = [
+    "flare/**/*.yaml",
+    "flare/**/*.json",
+    "flare/**/*.jinja2",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+b2luigi = ">=1.2.0"
+PyYAML = ">=6.0"
+pydantic = "<2"
+
+[tool.poetry.urls]
+Homepage = "https://github.com/CamCoop1/FLARE"
+
+[tool.poetry.scripts]
+flare = "flare.cli.main:main"
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+max-complexity = 10
+
+[tool.isort]
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+known_first_party = ["util", "exe", "test"]
+known_third_party = ["yaml", "b2luigi"]
+
+[tool.pydocstyle]
+ignore = ["D203", "D212", "D406", "D407", "D408", "D409", "D413"]
