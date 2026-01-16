@@ -1,0 +1,52 @@
+# ralph-loop
+
+A minimal, opinionated tool for running agent loops.
+
+```bash
+while true; do cat PROMPT.md | claude --print; done
+```
+
+This is the "Ralph Wiggum loop" - the simplest possible agent loop. ralph-loop adds just enough guardrails to make it practical.
+
+## Philosophy
+
+- **Simple** - prefer simplicity whenever possible
+- **Minimal** - does one thing well: run a prompt in a loop until tasks are done
+- **Opinionated** - sensible defaults, few options
+- **Unobtrusive** - infer what you can, don't ask obvious questions
+- **Task-driven** - stops when TASKS.md has no unchecked items
+- **Test-driven** - write tests first, implement after
+
+## Quick Start
+
+```bash
+uv add ralph-loop
+
+# Set up (Claude helps plan your tasks)
+ralph-loop init
+
+# Run the loop
+ralph-loop run
+```
+
+## How It Works
+
+1. `init` creates `LOOP-PROMPT.md` (workflow) and `TASKS.md` (task list)
+2. `run` executes Claude with the prompt, checks TASKS.md after each iteration
+3. Loop stops when all tasks are checked off (`- [x]`)
+
+## Options
+
+```bash
+ralph-loop run                    # Run (skips permission prompts by default)
+ralph-loop run --no-yolo          # Ask for permissions
+ralph-loop run -n 5               # Max 5 iterations
+ralph-loop run --continue         # Keep context between iterations
+ralph-loop run --keep-running     # Continue even when tasks complete (agent can add new tasks)
+ralph-loop run --identify-tasks   # Analyze codebase and add refactoring tasks to TASKS.md
+ralph-loop run --agent codex      # Use a different agent (codex, gemini, etc.)
+```
+
+## License
+
+MIT
