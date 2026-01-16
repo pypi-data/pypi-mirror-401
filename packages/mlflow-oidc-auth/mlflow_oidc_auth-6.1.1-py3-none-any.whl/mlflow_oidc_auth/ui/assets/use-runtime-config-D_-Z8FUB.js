@@ -1,0 +1,1 @@
+import{r as e}from"./jsx-runtime-DAs1UGHr.js";import{t}from"./react-DxF41JXl.js";var n=e(t(),1);const r=(0,n.createContext)(null);function i(){let e=(0,n.use)(r);if(!e)throw Error(`useRuntimeConfig must be used within a RuntimeConfigProvider`);return e}export{i as n,r as t};

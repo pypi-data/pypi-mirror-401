@@ -1,0 +1,1 @@
+import{r as e,t}from"./jsx-runtime-DAs1UGHr.js";var n=e(t(),1);function r({title:e,children:t}){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`h2`,{className:`flex-shrink-0 text-2xl font-semibold mb-3`,children:e}),(0,n.jsx)(n.Fragment,{children:t})]})}export{r as t};

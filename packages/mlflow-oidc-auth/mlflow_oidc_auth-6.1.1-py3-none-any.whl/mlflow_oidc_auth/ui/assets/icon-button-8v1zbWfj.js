@@ -1,0 +1,1 @@
+import{r as e,t}from"./jsx-runtime-DAs1UGHr.js";import{t as n}from"./react-DxF41JXl.js";import{j as r}from"./use-api-BAbm8GVs.js";n();var i=e(t(),1);function a({icon:e,onClick:t,title:n,disabled:a}){return(0,i.jsx)(r,{onClick:e=>{e.stopPropagation(),a||t(e)},title:n,icon:e,className:`w-8 h-8`,disabled:a})}export{a as t};

@@ -1,0 +1,1 @@
+import{r as e,t}from"./jsx-runtime-DAs1UGHr.js";var n=e(t(),1);function r(){return(0,n.jsx)(n.Fragment,{children:(0,n.jsx)(`h2`,{className:`text-3xl font-semibold mb-6 text-center`,children:`Placeholder for Webhooks Page`})})}export{r as default};

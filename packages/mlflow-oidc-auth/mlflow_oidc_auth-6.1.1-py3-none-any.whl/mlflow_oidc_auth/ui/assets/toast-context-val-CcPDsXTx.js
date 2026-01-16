@@ -1,0 +1,1 @@
+import{r as e}from"./jsx-runtime-DAs1UGHr.js";import{t}from"./react-DxF41JXl.js";const n=(0,e(t(),1).createContext)(void 0);export{n as t};
