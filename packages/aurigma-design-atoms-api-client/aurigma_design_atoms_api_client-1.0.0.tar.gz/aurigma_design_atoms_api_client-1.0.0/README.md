@@ -1,0 +1,360 @@
+# aurigma-design-atoms-api-client
+
+Python client library for [Aurigma Design Atoms API](https://customerscanvas.com/dev/backoffice/api/design-atoms/overview.html).
+
+## Requirements.
+
+- Python 3.9+
+- Dependencies:
+  - python-dateutil>=2.8.2
+  - httpx>=0.28.1
+  - pydantic>=2
+  - typing-extensions>=4.7.1
+
+## Installation & Usage
+### pip install
+
+```sh
+pip install aurigma-design-atoms-api-client
+```
+
+Then import the package:
+```python
+import aurigma.design_atoms
+```
+
+## Getting Started
+
+Please follow the [installation procedure](#installation--usage) and then run the following:
+
+```python
+
+import aurigma.design_atoms
+from aurigma.design_atoms.rest import ApiException
+from pprint import pprint
+
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aurigma.storefront.Configuration(
+    host = "http://api.customerscanvashub.com/"
+)
+
+
+
+# Enter a context with an instance of the API client
+async with aurigma.design_atoms.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aurigma.design_atoms.BuildInfoApi(api_client)
+
+    try:
+        # Get assembly build info.
+        api_response = await api_instance.build_info_get_info()
+        print("The response of BuildInfoApi->build_info_get_info:\n")
+        pprint(api_response)
+    except ApiException as e:
+        print("Exception when calling BuildInfoApi->build_info_get_info: %s\n" % e)
+
+```
+
+## Documentation for API Endpoints
+
+Depending on the geographical location of your Customer's Canvas Hub instance, the API gateway address may vary: 
+ 
+https://api.customerscanvashub.com/ - United States instance
+https://api.eu.customerscanvashub.com/ - European instance
+https://api.au.customerscanvashub.com/ - Australian instance
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+*BuildInfoApi* | [**build_info_get_info**](docs/BuildInfoApi.md#build_info_get_info) | **GET** /api/atoms/v1/info | Get assembly build info.
+*BuildInfoApi* | [**build_info_head_info**](docs/BuildInfoApi.md#build_info_head_info) | **HEAD** /api/atoms/v1/info | Get assembly build info.
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_css_fonts**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_css_fonts) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/cssfonts | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_fonts**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_fonts) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/fonts/{psName} | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_color_preview**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_color_preview) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetColorPreview | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_color_previews**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_color_previews) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetColorPreviews | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_css_font**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_css_font) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetCssFont | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_fallback_fonts**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_fallback_fonts) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetFallbackFonts | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_image_size**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_image_size) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetImageSize | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_license**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_license) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/license | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_shape_bounds**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_shape_bounds) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetShapeBounds | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_get_watermark_items**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_get_watermark_items) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/GetWatermarkItems | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_img**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_img) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/img | Retrieves an image with resized dimensions and additional visual effects based on the provided parameters.
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_pth**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_pth) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/pth | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_resource**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_resource) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/resource | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_svg**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_svg) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/svg | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_txt**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_txt) | **GET** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/txt | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_arched_text_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_arched_text_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateArchedTextItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_auto_scaled_text_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_auto_scaled_text_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateAutoScaledTextItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_barcode_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_barcode_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateBarcodeItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_bounded_text_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_bounded_text_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateBoundedTextItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_by_color_data**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_by_color_data) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateByColorData | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_by_multi_call_request**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_by_multi_call_request) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateByMultiCallRequest | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_curved_text_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_curved_text_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateCurvedTextItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_image_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_image_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateImageItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_path_bounded_text_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_path_bounded_text_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdatePathBoundedTextItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_plain_text_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_plain_text_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdatePlainTextItemHandler | 
+*DesignAtomsCompatibilityApi* | [**design_atoms_compatibility_update_shape_item_handler**](docs/DesignAtomsCompatibilityApi.md#design_atoms_compatibility_update_shape_item_handler) | **POST** /api/atoms/v1/tenants/{tenantId}/api/ccviewer/UpdateShapeItemHandler | 
+*DesignAtomsImagesApi* | [**design_atoms_images_render_image_preview**](docs/DesignAtomsImagesApi.md#design_atoms_images_render_image_preview) | **POST** /api/atoms/v1/images/render-preview | Renders a preview of an image with the specified parameters.
+*DesignAtomsImagesApi* | [**design_atoms_images_render_image_preview_from_file**](docs/DesignAtomsImagesApi.md#design_atoms_images_render_image_preview_from_file) | **POST** /api/atoms/v1/images/render-preview/from-file | Renders a preview of an uploaded image with the specified parameters.
+*DesignAtomsImagesApi* | [**design_atoms_images_render_image_preview_from_file_to_resource**](docs/DesignAtomsImagesApi.md#design_atoms_images_render_image_preview_from_file_to_resource) | **POST** /api/atoms/v1/images/render-preview/from-file/to-resource | Renders a preview of an uploaded image with the specified parameters and saves rendering result as resource.
+*DesignAtomsImagesApi* | [**design_atoms_images_render_image_preview_from_url**](docs/DesignAtomsImagesApi.md#design_atoms_images_render_image_preview_from_url) | **POST** /api/atoms/v1/images/render-preview/from-url | Renders a preview of a web image with the specified parameters.
+*DesignAtomsImagesApi* | [**design_atoms_images_render_image_preview_from_url_to_resource**](docs/DesignAtomsImagesApi.md#design_atoms_images_render_image_preview_from_url_to_resource) | **POST** /api/atoms/v1/images/render-preview/from-url/to-resource | Renders a preview of a web image with the specified parameters and saves rendering result as resource.
+*DesignAtomsImagesApi* | [**design_atoms_images_render_image_preview_to_resource**](docs/DesignAtomsImagesApi.md#design_atoms_images_render_image_preview_to_resource) | **POST** /api/atoms/v1/images/render-preview/to-resource | Renders a preview of an image with the specified parameters and saves rendering result as resource.
+*DesignAtomsMockups2dApi* | [**design_atoms_mockups2d_render_mockup_preview**](docs/DesignAtomsMockups2dApi.md#design_atoms_mockups2d_render_mockup_preview) | **POST** /api/atoms/v1/mockups-2d/render-preview | Renders a mockup preview with the specified parameters.
+*DesignAtomsMockups3dApi* | [**design_atoms_mockups3d_get_attributes**](docs/DesignAtomsMockups3dApi.md#design_atoms_mockups3d_get_attributes) | **GET** /api/atoms/v1/mockups-3d/{id}/attributes | Returns a 3D-Mockup attributes.
+*DesignAtomsMockups3dApi* | [**design_atoms_mockups3d_get_content_as_protobuf**](docs/DesignAtomsMockups3dApi.md#design_atoms_mockups3d_get_content_as_protobuf) | **GET** /api/atoms/v1/mockups-3d/{id}/content/as-protobuf | Returns a 3D-Mockup content as protobuf binary stream.
+*DesignAtomsMockups3dApi* | [**design_atoms_mockups3d_get_geometry_file**](docs/DesignAtomsMockups3dApi.md#design_atoms_mockups3d_get_geometry_file) | **GET** /api/atoms/v1/mockups-3d/{id}/geometry/file | Returns a 3D-Mockup geometry as binary stream.
+*DesignAtomsPalettesApi* | [**design_atoms_palettes_find_palette_color**](docs/DesignAtomsPalettesApi.md#design_atoms_palettes_find_palette_color) | **POST** /api/atoms/v1/palettes/find-color | Returns a closest color to provided color in a specified palette.
+*DesignAtomsPalettesApi* | [**design_atoms_palettes_get_palette_model**](docs/DesignAtomsPalettesApi.md#design_atoms_palettes_get_palette_model) | **GET** /api/atoms/v1/palettes/model | Returns a serialized palette model by its identifier or UID.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_add_design_print_area**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_add_design_print_area) | **POST** /api/atoms/v1/designs/{id}/print-product/print-areas | Inserts a new print-area created by the description at the specified position in an existing design file.  Print-area identifier will be reset by auto-generated value to prevent identifiers collisions.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_add_design_print_area_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_add_design_print_area_model) | **POST** /api/atoms/v1/designs/{id}/print-product/print-areas/model | Inserts a new print-area provided as a json-serialized model at the specified position in an existing design file.  Print-area identifier will be reset by auto-generated value to prevent identifiers collisions.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_add_design_surface_container_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_add_design_surface_container_model) | **POST** /api/atoms/v1/designs/{id}/print-product/containers/model | Inserts a new print-product container provided as a json-serialized model to the certain surface in an existing design file.  Print-product container identifier will be reset by auto-generated value to prevent identifiers collisions.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_add_design_surface_item_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_add_design_surface_item_model) | **POST** /api/atoms/v1/designs/{id}/print-product/items/model | Inserts a new print-product item provided as a json-serialized model to the specified surface in an existing design file.  Item identifier will be reset by auto-generated value to prevent identifiers collisions.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_add_design_surface_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_add_design_surface_model) | **POST** /api/atoms/v1/designs/{id}/print-product/surfaces/model | Inserts a new surface provided as a json-serialized model at the specified position in an existing design file.  All design elements identifiers within the surface (including surface identifier) will be reset by auto-generated values to prevent identifiers collisions.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_delete_design_print_area**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_delete_design_print_area) | **DELETE** /api/atoms/v1/designs/{id}/print-product/print-areas/{printAreaId} | Deletes a specified print-area in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_delete_design_surface**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_delete_design_surface) | **DELETE** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId} | Deletes a specified print-product surface in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_delete_design_surface_container**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_delete_design_surface_container) | **DELETE** /api/atoms/v1/designs/{id}/print-product/containers/{containerId} | Deletes a specified print-product container in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_delete_design_surface_item**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_delete_design_surface_item) | **DELETE** /api/atoms/v1/designs/{id}/print-product/items/{itemId} | Deletes a specified print-product item in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_print_area_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_print_area_model) | **GET** /api/atoms/v1/designs/{id}/print-product/print-areas/{printAreaId}/model | Returns a print-area of the specified design file as a json-serialized model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_print_areas**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_print_areas) | **GET** /api/atoms/v1/designs/{id}/print-product/print-areas | Returns a list of print-area descriptions of the specified design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_product_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_product_model) | **GET** /api/atoms/v1/designs/{id}/print-product/model | Returns a print-product of the specified design file as a json-serialized model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_container_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_container_model) | **GET** /api/atoms/v1/designs/{id}/print-product/containers/{containerId}/model | Returns a print-product container of the specified design file as a json-serialized model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_containers**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_containers) | **GET** /api/atoms/v1/designs/{id}/print-product/containers | Returns a list of print-product container descriptions of the specified design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_down_mockup**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_down_mockup) | **GET** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/mockup-down | Returns a down-mockup description of the specified print-product surface in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_down_mockup_content**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_down_mockup_content) | **GET** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/mockup-down/file | Returns a content file for down-mockup of the specified print-product surface in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_item_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_item_model) | **GET** /api/atoms/v1/designs/{id}/print-product/items/{itemId}/model | Returns a print-product item of the specified design file as a json-serialized model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_items**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_items) | **GET** /api/atoms/v1/designs/{id}/print-product/items | Returns a list of print-product items descriptions of the specified design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_model) | **GET** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/model | Returns a print-product surface of the specified design file as a json-serialized model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_up_mockup**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_up_mockup) | **GET** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/mockup-up | Returns an up-mockup description of the specified print-product surface in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surface_up_mockup_content**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surface_up_mockup_content) | **GET** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/mockup-up/file | Returns a content file for up-mockup of the specified print-product surface in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_get_design_surfaces**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_get_design_surfaces) | **GET** /api/atoms/v1/designs/{id}/print-product/surfaces | Returns a list of print-product surfaces descriptions of the specified design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_patch_design_product**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_patch_design_product) | **PATCH** /api/atoms/v1/designs/{id}/print-product | Patches a print-product of the specified design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_replace_design_surface_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_replace_design_surface_model) | **PUT** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/model | Replaces a specified print-product surface in an existing design file with the data provided as a json-serialized surface model.  All design elements identifiers within the surface (including surface identifier) will be reset by auto-generated values to prevent identifiers collisions.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_print_area**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_print_area) | **PUT** /api/atoms/v1/designs/{id}/print-product/print-areas/{printAreaId} | Updates a specified print-area using a description in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_print_area_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_print_area_model) | **PUT** /api/atoms/v1/designs/{id}/print-product/print-areas/{printAreaId}/model | Updates a specified print-area in an existing design file with the data provided as a json-serialized print-area model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_product_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_product_model) | **PUT** /api/atoms/v1/designs/{id}/print-product/model | Updates a print-product provided as a json-serialized model is the specified design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_surface_container_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_surface_container_model) | **PUT** /api/atoms/v1/designs/{id}/print-product/containers/{containerId}/model | Updates a specified print-product container in an existing design file with the data provided as a json-serialized model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_surface_down_mockup**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_surface_down_mockup) | **PATCH** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/mockup-down | Updates a content file of down-mockup for the specified print-product surface in an existing design file.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_surface_item_model**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_surface_item_model) | **PUT** /api/atoms/v1/designs/{id}/print-product/items/{itemId}/model | Updates a specified print-product surface item in an existing design file with the data provided as a json-serialized item model.
+*DesignAtomsPrintProductApi* | [**design_atoms_print_product_update_design_surface_up_mockup**](docs/DesignAtomsPrintProductApi.md#design_atoms_print_product_update_design_surface_up_mockup) | **PATCH** /api/atoms/v1/designs/{id}/print-product/surfaces/{surfaceId}/mockup-up | Updates a content file of up-mockup for the specified print-product surface in an existing design.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_apply_item_effects**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_apply_item_effects) | **POST** /api/atoms/v1/designs/print-product/items/apply-effects | Apply effects to print-product item image.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_batch_create_items_from_file**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_batch_create_items_from_file) | **POST** /api/atoms/v1/designs/print-product/items/from-file/batch-create | Creates multiple print-product items from input image files.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_batch_create_items_from_storage**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_batch_create_items_from_storage) | **POST** /api/atoms/v1/designs/print-product/items/from-storage/batch-create | Creates multiple print-product items from the specified image files in storage.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_batch_create_items_from_url**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_batch_create_items_from_url) | **POST** /api/atoms/v1/designs/print-product/items/from-url/batch-create | Creates multiple print-product items from remote web images provided by URLs list.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_create_item_from_file**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_create_item_from_file) | **POST** /api/atoms/v1/designs/print-product/items/from-file | Creates print-product item from input image file.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_create_item_from_storage**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_create_item_from_storage) | **POST** /api/atoms/v1/designs/print-product/items/from-storage | Creates print-product item from image file taken from storage.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_create_item_from_url**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_create_item_from_url) | **POST** /api/atoms/v1/designs/print-product/items/from-url | Creates print-product item from remote web image provided by URL.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_extract_item_image**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_extract_item_image) | **POST** /api/atoms/v1/designs/print-product/items/extract-image | Extracts print-product item image.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_extract_item_image_to_resource**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_extract_item_image_to_resource) | **POST** /api/atoms/v1/designs/print-product/items/extract-image/to-resource | Extracts print-product item image.
+*DesignAtomsPrintProductItemsApi* | [**design_atoms_print_product_items_flatten_items**](docs/DesignAtomsPrintProductItemsApi.md#design_atoms_print_product_items_flatten_items) | **POST** /api/atoms/v1/designs/print-product/items/flatten | Flattens print-product items.
+*DesignAtomsServiceApi* | [**design_atoms_service_apply_items_data**](docs/DesignAtomsServiceApi.md#design_atoms_service_apply_items_data) | **POST** /api/atoms/v1/designs/{id}/apply-items-data | Applies item data for a specified design file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_convert_colors**](docs/DesignAtomsServiceApi.md#design_atoms_service_convert_colors) | **POST** /api/atoms/v1/designs/print-product/convert-colors | Converts colors for print-product item manipulations.
+*DesignAtomsServiceApi* | [**design_atoms_service_create_design**](docs/DesignAtomsServiceApi.md#design_atoms_service_create_design) | **POST** /api/atoms/v1/designs | Creates new design file with specified parameters and saves it in storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_create_item**](docs/DesignAtomsServiceApi.md#design_atoms_service_create_item) | **POST** /api/atoms/v1/designs/model/items | Creates print-product item.
+*DesignAtomsServiceApi* | [**design_atoms_service_create_private_design_from_design**](docs/DesignAtomsServiceApi.md#design_atoms_service_create_private_design_from_design) | **POST** /api/atoms/v1/private-designs/from-design | Creates a private design from a public design.
+*DesignAtomsServiceApi* | [**design_atoms_service_create_private_design_from_resource**](docs/DesignAtomsServiceApi.md#design_atoms_service_create_private_design_from_resource) | **POST** /api/atoms/v1/private-designs/from-resource | Creates a private design from a public resource.
+*DesignAtomsServiceApi* | [**design_atoms_service_delete_vdp_data**](docs/DesignAtomsServiceApi.md#design_atoms_service_delete_vdp_data) | **DELETE** /api/atoms/v1/designs/{id}/vdp-data | Deletes variable data printing information from design file and updates design file in storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_extract_background**](docs/DesignAtomsServiceApi.md#design_atoms_service_extract_background) | **GET** /api/atoms/v1/designs/{id}/background | Returns image content of the background.
+*DesignAtomsServiceApi* | [**design_atoms_service_extract_item_image**](docs/DesignAtomsServiceApi.md#design_atoms_service_extract_item_image) | **POST** /api/atoms/v1/designs/model/items/extract-image | Extracts print-product item image.
+*DesignAtomsServiceApi* | [**design_atoms_service_flatten_items**](docs/DesignAtomsServiceApi.md#design_atoms_service_flatten_items) | **POST** /api/atoms/v1/designs/model/items/flatten | Flattens print-product items.
+*DesignAtomsServiceApi* | [**design_atoms_service_get_design_parameters**](docs/DesignAtomsServiceApi.md#design_atoms_service_get_design_parameters) | **GET** /api/atoms/v1/designs/{id}/parameters | Returns design parameters stored in product model.
+*DesignAtomsServiceApi* | [**design_atoms_service_get_variables**](docs/DesignAtomsServiceApi.md#design_atoms_service_get_variables) | **GET** /api/atoms/v1/designs/{id}/variables | Returns variable items information for design file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_load_data_schema**](docs/DesignAtomsServiceApi.md#design_atoms_service_load_data_schema) | **GET** /api/atoms/v1/designs/{id}/schema | Loads a data schema from design file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_load_product**](docs/DesignAtomsServiceApi.md#design_atoms_service_load_product) | **GET** /api/atoms/v1/designs/{id}/model | Loads print-product from design file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_load_product_from_resource**](docs/DesignAtomsServiceApi.md#design_atoms_service_load_product_from_resource) | **GET** /api/atoms/v1/designs/print-product/from-resource/model | Loads print-product from resource file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_load_toggle_set**](docs/DesignAtomsServiceApi.md#design_atoms_service_load_toggle_set) | **GET** /api/atoms/v1/designs/{id}/toggle-set | Loads a toggle set from design file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_load_vdp_data**](docs/DesignAtomsServiceApi.md#design_atoms_service_load_vdp_data) | **GET** /api/atoms/v1/designs/{id}/vdp-data | Loads variable data printing information from design file taken from storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_patch_product**](docs/DesignAtomsServiceApi.md#design_atoms_service_patch_product) | **PATCH** /api/atoms/v1/designs/{id}/model | Patches print-product in design file.
+*DesignAtomsServiceApi* | [**design_atoms_service_render_design_preview**](docs/DesignAtomsServiceApi.md#design_atoms_service_render_design_preview) | **POST** /api/atoms/v1/designs/render-preview | Renders a design preview with the specified parameters.
+*DesignAtomsServiceApi* | [**design_atoms_service_render_design_preview_to_resource**](docs/DesignAtomsServiceApi.md#design_atoms_service_render_design_preview_to_resource) | **POST** /api/atoms/v1/designs/render-preview/to-resource | Renders a design preview with the specified parameters and saves rendering result as resource.
+*DesignAtomsServiceApi* | [**design_atoms_service_render_design_proof**](docs/DesignAtomsServiceApi.md#design_atoms_service_render_design_proof) | **POST** /api/atoms/v1/designs/render-proof | Renders a design proof with the specified parameters.
+*DesignAtomsServiceApi* | [**design_atoms_service_render_design_proof_to_resource**](docs/DesignAtomsServiceApi.md#design_atoms_service_render_design_proof_to_resource) | **POST** /api/atoms/v1/designs/render-proof/to-resource | Renders a design proof with the specified parameters and saves rendering result as resource.
+*DesignAtomsServiceApi* | [**design_atoms_service_render_product**](docs/DesignAtomsServiceApi.md#design_atoms_service_render_product) | **POST** /api/atoms/v1/designs/print-product/render-proof | Renders a product proof image with specified parameters.
+*DesignAtomsServiceApi* | [**design_atoms_service_save_product**](docs/DesignAtomsServiceApi.md#design_atoms_service_save_product) | **PUT** /api/atoms/v1/designs/{id}/model | Saves print-product to design file and updates design file in storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_save_vdp_data**](docs/DesignAtomsServiceApi.md#design_atoms_service_save_vdp_data) | **PUT** /api/atoms/v1/designs/{id}/vdp-data | Saves variable data printing information to design file and updates design in storage.
+*DesignAtomsServiceApi* | [**design_atoms_service_set_editor_mockups**](docs/DesignAtomsServiceApi.md#design_atoms_service_set_editor_mockups) | **PUT** /api/atoms/v1/designs/{id}/editor-mockups | Sets specified editor-mockups for selected design surfaces.
+*DesignAtomsServiceApi* | [**design_atoms_service_set_variables**](docs/DesignAtomsServiceApi.md#design_atoms_service_set_variables) | **PUT** /api/atoms/v1/designs/{id}/variables | Saves variable items values for design file taken from storage.
+*DesignAtomsViewerApi* | [**design_atoms_viewer_css_fonts**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_css_fonts) | **POST** /api/atoms/v1/ccviewer/cssfonts | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_fonts**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_fonts) | **GET** /api/atoms/v1/ccviewer/fonts/{psName} | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_color_preview**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_color_preview) | **POST** /api/atoms/v1/ccviewer/GetColorPreview | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_color_previews**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_color_previews) | **POST** /api/atoms/v1/ccviewer/GetColorPreviews | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_css_font**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_css_font) | **GET** /api/atoms/v1/ccviewer/GetCssFont | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_fallback_fonts**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_fallback_fonts) | **GET** /api/atoms/v1/ccviewer/GetFallbackFonts | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_image_size**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_image_size) | **POST** /api/atoms/v1/ccviewer/GetImageSize | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_license**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_license) | **GET** /api/atoms/v1/ccviewer/license | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_shape_bounds**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_shape_bounds) | **POST** /api/atoms/v1/ccviewer/GetShapeBounds | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_get_watermark_items**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_get_watermark_items) | **POST** /api/atoms/v1/ccviewer/GetWatermarkItems | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_img**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_img) | **GET** /api/atoms/v1/ccviewer/img | Retrieves an image with resized dimensions and additional visual effects based on the provided parameters.
+*DesignAtomsViewerApi* | [**design_atoms_viewer_pth**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_pth) | **GET** /api/atoms/v1/ccviewer/pth | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_resource**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_resource) | **GET** /api/atoms/v1/ccviewer/resource | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_svg**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_svg) | **GET** /api/atoms/v1/ccviewer/svg | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_txt**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_txt) | **GET** /api/atoms/v1/ccviewer/txt | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_arched_text_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_arched_text_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateArchedTextItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_auto_scaled_text_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_auto_scaled_text_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateAutoScaledTextItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_barcode_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_barcode_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateBarcodeItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_bounded_text_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_bounded_text_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateBoundedTextItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_by_color_data**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_by_color_data) | **POST** /api/atoms/v1/ccviewer/UpdateByColorData | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_by_multi_call_request**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_by_multi_call_request) | **POST** /api/atoms/v1/ccviewer/UpdateByMultiCallRequest | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_curved_text_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_curved_text_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateCurvedTextItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_image_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_image_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateImageItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_path_bounded_text_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_path_bounded_text_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdatePathBoundedTextItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_plain_text_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_plain_text_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdatePlainTextItemHandler | 
+*DesignAtomsViewerApi* | [**design_atoms_viewer_update_shape_item_handler**](docs/DesignAtomsViewerApi.md#design_atoms_viewer_update_shape_item_handler) | **POST** /api/atoms/v1/ccviewer/UpdateShapeItemHandler | 
+
+
+## Documentation For Models
+
+ - [ApplyDesignItemsDataModel](docs/ApplyDesignItemsDataModel.md)
+ - [BatchCreateItemsFromStorageModel](docs/BatchCreateItemsFromStorageModel.md)
+ - [BatchCreateItemsFromUrlModel](docs/BatchCreateItemsFromUrlModel.md)
+ - [BuildInfoModel](docs/BuildInfoModel.md)
+ - [ConflictType](docs/ConflictType.md)
+ - [ConvertColorsModel](docs/ConvertColorsModel.md)
+ - [CreateDesignModel](docs/CreateDesignModel.md)
+ - [CreateItemFromStorageModel](docs/CreateItemFromStorageModel.md)
+ - [CreateItemFromUrlModel](docs/CreateItemFromUrlModel.md)
+ - [DesignElementProcessingConflictDto](docs/DesignElementProcessingConflictDto.md)
+ - [DesignElementType](docs/DesignElementType.md)
+ - [DesignInfo](docs/DesignInfo.md)
+ - [DesignItemDataModel](docs/DesignItemDataModel.md)
+ - [DesignItemFontSettingsModel](docs/DesignItemFontSettingsModel.md)
+ - [DesignParameters](docs/DesignParameters.md)
+ - [DesignPrintAreaDto](docs/DesignPrintAreaDto.md)
+ - [DesignPrintAreaParams](docs/DesignPrintAreaParams.md)
+ - [DesignSurfaceContainerDto](docs/DesignSurfaceContainerDto.md)
+ - [DesignSurfaceDto](docs/DesignSurfaceDto.md)
+ - [DesignSurfaceItemDto](docs/DesignSurfaceItemDto.md)
+ - [DesignSurfaceMockupDto](docs/DesignSurfaceMockupDto.md)
+ - [EditorMockupBindingModel](docs/EditorMockupBindingModel.md)
+ - [ExtractItemImageModel](docs/ExtractItemImageModel.md)
+ - [ExtractItemImageToResourceModel](docs/ExtractItemImageToResourceModel.md)
+ - [FontsMethodData](docs/FontsMethodData.md)
+ - [GeneralConflictDto](docs/GeneralConflictDto.md)
+ - [GetColorPreviewRequest](docs/GetColorPreviewRequest.md)
+ - [GetColorPreviewsRequest](docs/GetColorPreviewsRequest.md)
+ - [GetImageSizeRequest](docs/GetImageSizeRequest.md)
+ - [GetShapeBoundsRequest](docs/GetShapeBoundsRequest.md)
+ - [ImageExtractionFormat](docs/ImageExtractionFormat.md)
+ - [ImagePreviewFitMode](docs/ImagePreviewFitMode.md)
+ - [ImagePreviewFormat](docs/ImagePreviewFormat.md)
+ - [ImagePreviewRenderingConfig](docs/ImagePreviewRenderingConfig.md)
+ - [ItemSourceType](docs/ItemSourceType.md)
+ - [ItemType](docs/ItemType.md)
+ - [MarginDto](docs/MarginDto.md)
+ - [MarginModel](docs/MarginModel.md)
+ - [MeasureUnitInfo](docs/MeasureUnitInfo.md)
+ - [Mockup3dAttributesDto](docs/Mockup3dAttributesDto.md)
+ - [MockupPreviewFitMode](docs/MockupPreviewFitMode.md)
+ - [MockupPreviewFormat](docs/MockupPreviewFormat.md)
+ - [MockupPreviewRenderingConfig](docs/MockupPreviewRenderingConfig.md)
+ - [MultiCallRequest](docs/MultiCallRequest.md)
+ - [MultiCallRequestItem](docs/MultiCallRequestItem.md)
+ - [NullAbleSize](docs/NullAbleSize.md)
+ - [PlaceholderItemContentType](docs/PlaceholderItemContentType.md)
+ - [PointF](docs/PointF.md)
+ - [PositionDto](docs/PositionDto.md)
+ - [PositionModel](docs/PositionModel.md)
+ - [PreviewColorSettings](docs/PreviewColorSettings.md)
+ - [ProblemDetails](docs/ProblemDetails.md)
+ - [ProductPatchType](docs/ProductPatchType.md)
+ - [ProductPreviewFormat](docs/ProductPreviewFormat.md)
+ - [ProductPreviewRenderingConfig](docs/ProductPreviewRenderingConfig.md)
+ - [ProductProofFormat](docs/ProductProofFormat.md)
+ - [ProductProofInterpolationMode](docs/ProductProofInterpolationMode.md)
+ - [ProductProofRenderingConfig](docs/ProductProofRenderingConfig.md)
+ - [RectangleF](docs/RectangleF.md)
+ - [RenderDesignPreviewModel](docs/RenderDesignPreviewModel.md)
+ - [RenderDesignPreviewToResourceModel](docs/RenderDesignPreviewToResourceModel.md)
+ - [RenderDesignProofModel](docs/RenderDesignProofModel.md)
+ - [RenderDesignProofToResourceModel](docs/RenderDesignProofToResourceModel.md)
+ - [RenderImagePreviewFromUrlModel](docs/RenderImagePreviewFromUrlModel.md)
+ - [RenderImagePreviewFromUrlToResourceModel](docs/RenderImagePreviewFromUrlToResourceModel.md)
+ - [RenderImagePreviewModel](docs/RenderImagePreviewModel.md)
+ - [RenderImagePreviewToResourceModel](docs/RenderImagePreviewToResourceModel.md)
+ - [RenderMockupPreviewModel](docs/RenderMockupPreviewModel.md)
+ - [RenderProductModel](docs/RenderProductModel.md)
+ - [ResourceInfoDto](docs/ResourceInfoDto.md)
+ - [ResourceParams](docs/ResourceParams.md)
+ - [SetEditorMockupsModel](docs/SetEditorMockupsModel.md)
+ - [SizeDto](docs/SizeDto.md)
+ - [SizeModel](docs/SizeModel.md)
+ - [TextAlignment](docs/TextAlignment.md)
+ - [TextVerticalAlignment](docs/TextVerticalAlignment.md)
+ - [UpdateColorsRequest](docs/UpdateColorsRequest.md)
+ - [UpdateHandlerRequest](docs/UpdateHandlerRequest.md)
+ - [UpdateImageHandlerRequest](docs/UpdateImageHandlerRequest.md)
+ - [VariableInfo](docs/VariableInfo.md)
+ - [VariablesModel](docs/VariablesModel.md)
+ - [VdpDataModel](docs/VdpDataModel.md)
+
+
+<a id="documentation-for-authorization"></a>
+## Documentation For Authorization
+
+
+Authentication schemes defined for the API:
+<a id="ApiKey"></a>
+### ApiKey
+
+- **Type**: API key
+- **API key parameter name**: X-API-Key
+- **Location**: HTTP header
+
+<a id="Bearer"></a>
+### Bearer
+
+- **Type**: API key
+- **API key parameter name**: Authorization
+- **Location**: HTTP header
+
+<a id="OAuth2Code"></a>
+### OAuth2Code
+
+- **Type**: OAuth
+- **Flow**: accessCode
+- **Authorization URL**: http://localhost:21021/connect/authorize
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+<a id="OAuth2Implicit"></a>
+### OAuth2Implicit
+
+- **Type**: OAuth
+- **Flow**: implicit
+- **Authorization URL**: http://localhost:21021/connect/authorize
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+<a id="OAuth2ClientCredentials"></a>
+### OAuth2ClientCredentials
+
+- **Type**: OAuth
+- **Flow**: application
+- **Authorization URL**: 
+- **Scopes**: 
+ - **Tenants_read**: Read tenants
+ - **Tenants_update**: Read and update tenants
+ - **Tenants_full**: Manipulate tenants
+ - **Assets_read**: Read assets data
+ - **Assets_full**: Manipulate assets data
+ - **Private_assets_read**: Read data of private assets
+ - **Private_assets_update**: Update data of private assets
+ - **Private_assets_full**: Manipulate data of private assets
+
+
+
+
+
