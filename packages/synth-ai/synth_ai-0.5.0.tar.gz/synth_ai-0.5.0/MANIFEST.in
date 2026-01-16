@@ -1,0 +1,44 @@
+include README.md
+include LICENSE
+recursive-include synth_ai *.py
+# Only include lightweight config/data files from core packages
+recursive-include synth_ai *.toml
+# Include examples for task app discovery
+recursive-include examples *.py
+recursive-include examples *.toml
+recursive-include examples *.md
+recursive-include examples *.sh
+
+# Prune heavy example/demo/test/data trees from the sdist (keep code)
+prune tests
+prune private_tests
+prune synth_ai/tracing_v3/tests
+recursive-exclude synth_ai **/test_*.py
+recursive-exclude synth_ai **/tests/*
+
+# Remove large data files from package
+recursive-exclude synth_ai *.json
+# But include TUI package.json and other config files
+include synth_ai/tui/app/package.json
+include synth_ai/tui/app/package.dist.json
+include synth_ai/tui/app/bunfig.toml
+include synth_ai/tui/app/tsconfig.json
+include synth_ai/tui/app/tsconfig.typecheck.json
+# Include TUI TypeScript source files
+recursive-include synth_ai/tui/app/src *.ts
+recursive-include synth_ai/tui/app/src *.tsx
+recursive-exclude synth_ai *.db
+recursive-exclude synth_ai *.duckdb
+recursive-exclude synth_ai *.sqlite
+recursive-exclude synth_ai *.parquet
+recursive-exclude synth_ai *.csv
+recursive-exclude synth_ai *.npz
+recursive-exclude synth_ai *.npy
+recursive-exclude synth_ai *.pt
+recursive-exclude synth_ai *.pth
+recursive-exclude synth_ai *.bin
+recursive-exclude synth_ai *.zip
+recursive-exclude synth_ai *.tar
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .DS_Store
