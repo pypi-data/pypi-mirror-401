@@ -1,0 +1,14 @@
+# Include native libraries
+recursive-include src/micropdf/lib *.so *.dylib *.dll *.a
+
+# Include package data
+include src/micropdf/py.typed
+
+# Include documentation
+include README.md
+include LICENSE
+
+# Exclude test files from distribution
+prune tests
+prune .pytest_cache
+prune htmlcov
