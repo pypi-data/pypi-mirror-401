@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskLab Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .card { background-color: #1e293b; border-radius: 0.5rem; padding: 1.5rem; }
+        .quadrant { border: 1px solid #334155; height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-400 tracking-tight">RiskLab <span class="text-gray-500 text-lg font-normal">| Robustness Report</span></h1>
+            </div>
+            <div class="flex gap-4">
+                 <div id="decisionBadge" class="bg-gray-700 text-white font-bold px-4 py-2 rounded">
+                    DECISION: <span id="decisionText">--</span>
+                </div>
+                <div id="scoreBadge" class="bg-gray-700 text-gray-300 px-3 py-2 rounded font-mono">
+                    Score: <span id="aggScore">--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Decision Scorecard -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-100">Decision Confidence</h2>
+                <div class="flex items-center gap-6">
+                    <div class="w-32 text-center">
+                        <div class="text-4xl font-bold text-blue-400" id="confRating">--%</div>
+                        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">Confidence</div>
+                    </div>
+                    <div class="flex-1 border-l border-gray-700 pl-6">
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-400 mb-1">Tail Amplification Ratio</div>
+                            <div class="text-lg font-mono text-gray-200" id="tailRatio">--</div>
+                            <div class="text-xs text-gray-500">vs Benchmark CVaR (Lower is better, <1.0 is superior)</div>
+                        </div>
+                        <div id="freezeTriggers">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4 text-gray-100">Fragility Gauge</h2>
+                <div class="text-center py-4">
+                     <div class="text-3xl font-bold mb-2" id="fragilityScore">--</div>
+                     <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2">
+                        <div id="fragilityBar" class="bg-red-500 h-2.5 rounded-full" style="width: 0%"></div>
+                     </div>
+                     <div class="text-sm text-gray-400">Parameter Sensitivity (0-100)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regime Map -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4 text-gray-100">Regime Dependence Map</h2>
+                <div class="grid grid-cols-2 gap-2 text-center text-sm">
+                    <div class="quadrant bg-gray-800 rounded-tl-lg">
+                        <span class="text-gray-500">Bull / Low Vol</span>
+                        <span class="text-lg font-bold text-green-400" id="sharpeBL">--</span>
+                    </div>
+                    <div class="quadrant bg-gray-800 rounded-tr-lg">
+                        <span class="text-gray-500">Bull / High Vol</span>
+                        <span class="text-lg font-bold text-yellow-400" id="sharpeBH">--</span>
+                    </div>
+                    <div class="quadrant bg-gray-800 rounded-bl-lg">
+                        <span class="text-gray-500">Bear / Low Vol</span>
+                        <span class="text-lg font-bold text-red-400" id="sharpeRL">--</span>
+                    </div>
+                    <div class="quadrant bg-gray-800 rounded-br-lg">
+                        <span class="text-gray-500">Bear / High Vol</span>
+                        <span class="text-lg font-bold text-red-500" id="sharpeRH">--</span>
+                    </div>
+                </div>
+                <div class="mt-4 text-xs text-center text-gray-500">Sharpe Ratio per Regime</div>
+            </div>
+             <div class="card h-80">
+                <h3 class="text-gray-400 mb-2 font-semibold">Scenario Stress Test</h3>
+                <div class="relative h-full w-full p-2">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Robustness Matrix -->
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4 text-gray-100">Detailed Scenario Results</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-gray-700">
+                                <th class="py-3">Scenario</th>
+                                <th class="py-3">Robustness Score</th>
+                                <th class="py-3">Max Drawdown</th>
+                                <th class="py-3">Sharpe Ratio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody" class="divide-y divide-gray-700">
+                            <!-- JS will populate -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Injection
+        const matrix = {"id": "60e1c640-6440-499d-8108-d56a5a40754f", "strategy_id": "df36ddd6-537b-4328-9254-4cb8d163f4df", "aggregate_score": 38.498270152674216, "scenario_results": [{"scenario_name": "Historical Baseline", "robustness_score": 47.958010341061126, "max_drawdown": -0.24496388340576203, "sharpe_ratio": 0.8878282838645803}, {"scenario_name": "2008 Crash Replay", "robustness_score": 18.54657319891638, "max_drawdown": -0.5363356700270905, "sharpe_ratio": -0.5858860949574338}, {"scenario_name": "Volatility Spike (2x)", "robustness_score": 39.530486729658236, "max_drawdown": -0.4556519736908342, "sharpe_ratio": 0.8878282838645803}, {"scenario_name": "Correlation Breakdown", "robustness_score": 47.958010341061126, "max_drawdown": -0.24496388340576203, "sharpe_ratio": 0.8878282838645803}], "regime_metrics": {"sharpe_bull": 2.0272450547198955, "sharpe_bear": -0.18769099308246362, "sharpe_high_vol": 0.8616988997469467, "sharpe_low_vol": 1.0558384981266864, "regime_dependence_score": 2.214936047802359}, "fragility_metrics": {"sharpe_variance": 0.0, "min_perturbed_sharpe": 0.8878282838645803, "fragility_score": 0.0}, "decision_scorecard": {"confidence_rating": 85.0, "tail_amplification_ratio": 1.0, "assumption_sensitivity_rank": [], "freeze_triggers": ["Strong Dependence on Bull Markets"], "recommendation": "APPROVE"}, "created_at": "2026-01-14"};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable(matrix);
+            renderChart(matrix);
+            renderDecision(matrix);
+            renderRegimes(matrix);
+            
+            document.getElementById('aggScore').innerText = matrix.aggregate_score.toFixed(1);
+        });
+
+        function renderDecision(matrix) {
+            const d = matrix.decision_scorecard;
+            const f = matrix.fragility_metrics;
+            
+            // Confidence
+            document.getElementById('confRating').innerText = d.confidence_rating.toFixed(0) + '%';
+            document.getElementById('tailRatio').innerText = d.tail_amplification_ratio.toFixed(2) + 'x';
+            
+            // Decision Badge
+            const badge = document.getElementById('decisionBadge');
+            const text = document.getElementById('decisionText');
+            text.innerText = d.recommendation;
+            
+            if(d.recommendation === 'APPROVE') badge.classList.add('bg-green-600');
+            else if(d.recommendation === 'REJECT') badge.classList.add('bg-red-600');
+            else badge.classList.add('bg-yellow-600');
+            
+            // Triggers
+            const trigDiv = document.getElementById('freezeTriggers');
+            if(d.freeze_triggers && d.freeze_triggers.length > 0) {
+                 d.freeze_triggers.forEach(t => {
+                     const el = document.createElement('div');
+                     el.className = 'text-red-400 text-sm font-semibold flex items-center gap-2';
+                     el.innerHTML = '<span>⚠️</span> ' + t;
+                     trigDiv.appendChild(el);
+                 });
+            } else {
+                trigDiv.innerHTML = '<div class="text-green-400 text-sm">No Freeze Triggers Detected</div>';
+            }
+            
+            // Fragility
+            document.getElementById('fragilityScore').innerText = f.fragility_score.toFixed(1);
+            document.getElementById('fragilityBar').style.width = f.fragility_score + '%';
+        }
+
+        function renderRegimes(matrix) {
+            const r = matrix.regime_metrics;
+            document.getElementById('sharpeBL').innerText = r.sharpe_bull.toFixed(2);
+            document.getElementById('sharpeBH').innerText = r.sharpe_high_vol.toFixed(2);
+            document.getElementById('sharpeRL').innerText = r.sharpe_low_vol.toFixed(2); // Using low vol as proxy for bear low? Mapped loosely for now
+            document.getElementById('sharpeRH').innerText = r.sharpe_bear.toFixed(2);
+        }
+
+        function renderTable(matrix) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            
+            matrix.scenario_results.forEach(res => {
+                const tr = document.createElement('tr');
+                const scoreColor = res.robustness_score < 30 ? 'text-red-400' : 'text-green-400';
+                
+                tr.innerHTML = `
+                    <td class="py-3 font-medium text-gray-200">${res.scenario_name}</td>
+                    <td class="py-3 ${scoreColor} font-bold">${res.robustness_score.toFixed(1)}</td>
+                    <td class="py-3 text-red-300">${(res.max_drawdown * 100).toFixed(1)}%</td>
+                    <td class="py-3 text-blue-300">${res.sharpe_ratio.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChart(matrix) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            const labels = matrix.scenario_results.map(r => r.scenario_name);
+            const data = matrix.scenario_results.map(r => r.robustness_score);
+            const colors = data.map(v => v < 30 ? 'rgba(239, 68, 68, 0.7)' : 'rgba(34, 197, 94, 0.7)');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Robustness Score',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

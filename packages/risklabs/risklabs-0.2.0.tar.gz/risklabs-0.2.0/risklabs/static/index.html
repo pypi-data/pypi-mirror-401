@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskLab | Robustness Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased">
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-400 tracking-tight">RiskLab <span
+                    class="text-gray-500 text-lg font-normal">| Decision-Risk Simulator</span></h1>
+            <button onclick="runAnalysis()" id="runBtn"
+                class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded shadow transition">
+                Run Stress Test
+            </button>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Strategy Input -->
+            <div class="card md:col-span-1">
+                <h2 class="text-xl font-semibold mb-4 text-gray-100">Strategy Composition</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                        <span class="font-mono text-blue-300">SPY (Equity)</span>
+                        <span class="font-bold">60%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                        <span class="font-mono text-purple-300">AGG (Bonds)</span>
+                        <span class="font-bold">40%</span>
+                    </div>
+                </div>
+                <div class="mt-6 text-sm text-gray-400">
+                    <p>Currently simulated using real Yahoo Finance data.</p>
+                </div>
+            </div>
+
+            <!-- Robustness Matrix -->
+            <div class="card md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-100 flex justify-between">
+                    Robustness Matrix
+                    <span id="scoreBadge" class="hidden bg-gray-700 text-gray-300 text-sm px-2 py-1 rounded">Score:
+                        --</span>
+                </h2>
+
+                <div id="loading" class="hidden text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500">
+                    </div>
+                    <p class="mt-2 text-gray-400">Running Monte Carlo & Stress Tests...</p>
+                </div>
+
+                <div id="results" class="hidden overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-gray-700">
+                                <th class="py-3">Scenario</th>
+                                <th class="py-3">Robustness Score</th>
+                                <th class="py-3">Max Drawdown</th>
+                                <th class="py-3">Sharpe Ratio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody" class="divide-y divide-gray-700">
+                            <!-- JS will populate -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Area -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card h-80">
+                <h3 class="text-gray-400 mb-2 font-semibold">Scenario Scores</h3>
+                <div class="relative h-full w-full p-2">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+            </div>
+            <!-- Future Expansion -->
+            <div class="card h-80 flex items-center justify-center text-gray-500 border border-dashed border-gray-700">
+                <p>Future: Correlation Heatmap</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function runAnalysis() {
+            const runBtn = document.getElementById('runBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const badge = document.getElementById('scoreBadge');
+
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50');
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+
+            try {
+                // 1. Create Strategy (Mock for now, using known ID or creating new)
+                // Ideally fetching existing strategies. For MVP we verify flow.
+                const stratRes = await fetch('/strategies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: "Web 60/40",
+                        allocation: [
+                            { ticker: "SPY", weight: 0.6, asset_class: "equity" },
+                            { ticker: "AGG", weight: 0.4, asset_class: "equity" }
+                        ]
+                    })
+                });
+                const strat = await stratRes.json();
+
+                // 2. Trigger Analysis
+                const analysisRes = await fetch('/analyze_robustness', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ strategy_id: strat.id })
+                });
+                const matrix = await analysisRes.json();
+
+                // 3. Render
+                renderTable(matrix);
+                renderChart(matrix);
+
+                badge.innerText = `Agg. Score: ${matrix.aggregate_score.toFixed(1)}`;
+                badge.classList.remove('hidden', 'bg-gray-700', 'text-gray-300');
+
+                if (matrix.aggregate_score > 40) {
+                    badge.classList.add('bg-green-900', 'text-green-300');
+                } else {
+                    badge.classList.add('bg-red-900', 'text-red-300');
+                }
+
+                results.classList.remove('hidden');
+            } catch (err) {
+                alert("Error running simulation: " + err);
+            } finally {
+                loading.classList.add('hidden');
+                runBtn.disabled = false;
+                runBtn.classList.remove('opacity-50');
+            }
+        }
+
+        function renderTable(matrix) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+
+            matrix.scenario_results.forEach(res => {
+                const tr = document.createElement('tr');
+                const scoreColor = res.robustness_score < 30 ? 'text-red-400' : 'text-green-400';
+
+                tr.innerHTML = `
+                    <td class="py-3 font-medium text-gray-200">${res.scenario_name}</td>
+                    <td class="py-3 ${scoreColor} font-bold">${res.robustness_score.toFixed(1)}</td>
+                    <td class="py-3 text-red-300">${(res.max_drawdown * 100).toFixed(1)}%</td>
+                    <td class="py-3 text-blue-300">${res.sharpe_ratio.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        let myChart = null;
+        function renderChart(matrix) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            const labels = matrix.scenario_results.map(r => r.scenario_name);
+            const data = matrix.scenario_results.map(r => r.robustness_score);
+            const colors = data.map(v => v < 30 ? 'rgba(239, 68, 68, 0.7)' : 'rgba(34, 197, 94, 0.7)');
+
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Robustness Score',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
