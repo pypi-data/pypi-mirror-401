@@ -1,0 +1,106 @@
+[
+    {
+        "test_name": "compare distribution (Andersen-Darling)",
+        "test_version": "1.6.0",
+        "rca_config": {
+            "tests": {
+                "nodes": {
+                    "A": [
+                        "compare distribution (Andersen-Darling)"
+                    ]
+                },
+                "config": {
+                    "A": {
+                        "compare distribution (Andersen-Darling)": {
+
+                        }
+                    }
+                },
+                "config_overrides": {
+                    "A": {
+                        "compare distribution (Andersen-Darling)": {
+                            "metric_filter": "metric_filter",
+                            "thresholds": "thresholds",
+                            "features": "features"
+                        }
+                    }
+                }
+            },
+            "rca": {
+                "graph": [
+                    [
+                        "A",
+                        "A",
+                        {"condition": "failure",
+                         "switch_to_parent_context": true,
+                         "maintain_base_comparison_linkage": true,
+                         "feature_filter": true,
+                         "lineage_transition_option": "BASE"
+                        }
+                    ],
+                    [
+                        "A",
+                        "T",
+                        {"condition": "either",
+                         "switch_to_parent_context": false,
+                         "feature_filter": true
+                        }
+                    ]
+                ],
+                "default_entrypoint": "A"
+            }
+        }
+    },
+    {
+        "test_name": "compare distribution (Kolmogorov-Smirnov)",
+        "test_version": "1.6.0",
+        "rca_config": {
+            "tests": {
+                "nodes": {
+                    "A": [
+                        "compare distribution (Kolmogorov-Smirnov)"
+                    ]
+                },
+                "config": {
+                    "A": {
+                        "compare distribution (Kolmogorov-Smirnov)": {
+
+                        }
+                    }
+                },
+                "config_overrides": {
+                    "A": {
+                        "compare distribution (Kolmogorov-Smirnov)": {
+                            "metric_filter": "metric_filter",
+                            "thresholds": "thresholds",
+                            "features": "features"
+                        }
+                    }
+                }
+            },
+            "rca": {
+                "graph": [
+                    [
+                        "A",
+                        "A",
+                        {"condition": "failure",
+                         "switch_to_parent_context": true,
+                         "maintain_base_comparison_linkage": true,
+                         "feature_filter": true,
+                         "lineage_transition_option": "BASE"
+                        }
+                    ],
+                    [
+                        "A",
+                        "T",
+                        {"condition": "either",
+                         "switch_to_parent_context": false,
+                         "feature_filter": true
+                        }
+                    ]
+                ],
+                "default_entrypoint": "A"
+            }
+        }
+    }
+]
