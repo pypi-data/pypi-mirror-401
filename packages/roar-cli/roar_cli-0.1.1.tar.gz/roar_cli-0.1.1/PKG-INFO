@@ -1,0 +1,475 @@
+Metadata-Version: 2.4
+Name: roar-cli
+Version: 0.1.1
+Summary: Reproducibility and provenance tracker for ML training pipelines
+Author-email: TReqs Team <info@treqs.ai>
+License-Expression: Apache-2.0
+Project-URL: Homepage, https://github.com/treqs/roar
+Project-URL: Repository, https://github.com/treqs/roar
+Project-URL: Documentation, https://github.com/treqs/roar#readme
+Project-URL: Issues, https://github.com/treqs/roar/issues
+Keywords: machine-learning,reproducibility,lineage,provenance,mlops,data-versioning,artifact-tracking
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Version Control
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: blake3>=0.3.0
+Requires-Dist: dependency-injector>=4.40.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: tomli>=2.0.0; python_version < "3.11"
+Provides-Extra: server
+Requires-Dist: fastapi>=0.100.0; extra == "server"
+Requires-Dist: uvicorn>=0.20.0; extra == "server"
+Provides-Extra: s3
+Requires-Dist: boto3>=1.28.0; extra == "s3"
+Provides-Extra: gcs
+Requires-Dist: google-cloud-storage>=2.10.0; extra == "gcs"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-timeout>=2.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.10.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-xdist>=3.5.0; extra == "dev"
+Requires-Dist: ruff>=0.8.0; extra == "dev"
+Requires-Dist: mypy>=1.13.0; extra == "dev"
+Dynamic: license-file
+
+# roar
+
+**Run Observation & Artifact Registration**
+
+A local front-end to TReqs' Lineage-as-a-Service (LaaS). Roar tracks data artifacts and execution steps in ML pipelines, enabling reproducibility and lineage queries.
+
+## Installation
+
+```bash
+pip install roar-cli
+# or with uv
+uv pip install roar-cli
+```
+
+For development:
+```bash
+uv pip install -e .
+# or without uv
+pip install -e .
+```
+
+Requires Python 3.10+.
+
+## Quick Start
+
+```bash
+# Initialize roar in your project
+cd my-ml-project
+roar init
+
+# Run commands with provenance tracking
+roar run python preprocess.py --input data.csv --output features.parquet
+roar run python train.py --data features.parquet --output model.pt
+roar run python evaluate.py --model model.pt --output metrics.json
+
+# View the execution DAG
+roar dag
+
+# See what you've produced
+roar status
+
+# Show artifact or job details
+roar show <hash>
+roar show @2          # DAG node 2
+```
+
+## Commands
+
+### `roar init`
+
+Initialize roar in the current directory. Creates a `.roar/` directory to store the local database.
+
+```bash
+roar init
+```
+
+### `roar run <command>`
+
+Run a command with provenance tracking. Roar captures:
+- Files read and written
+- Git commit and branch
+- Execution time and exit code
+- Command arguments
+
+```bash
+roar run python train.py --epochs 10 --lr 0.001
+roar run ./scripts/preprocess.sh
+roar run torchrun --nproc_per_node=4 train.py
+
+# Re-run a DAG node
+roar run @2                     # Re-run node 2
+roar run @2 --lr=0.001          # Re-run with parameter override
+```
+
+### `roar dag`
+
+View and manage the execution DAG. The DAG is built implicitly as you run commands.
+
+```bash
+# Show DAG nodes
+roar dag
+
+# Interactive browser (cursor nav, q to quit)
+roar dag -i
+
+# Export as shell script
+roar dag script > run_pipeline.sh
+
+# Rename a node
+roar dag rename @2 train
+
+# Clear the DAG
+roar dag clear
+```
+
+### `roar show <id>`
+
+Show details for an artifact, job, or DAG node.
+
+```bash
+roar show abc123de            # Artifact hash prefix
+roar show a1b2c3d4            # Job UID
+roar show @2                  # DAG node 2
+```
+
+### `roar reproduce <hash>`
+
+Create a DAG to reproduce an artifact by tracing its lineage.
+
+```bash
+# Show the reproduction plan
+roar reproduce abc123de
+
+# Create DAG and run immediately
+roar reproduce abc123de --run
+
+# Run without prompts
+roar reproduce abc123de --run -y
+```
+
+### `roar get <url> <dest>`
+
+Download data from cloud storage and register as an external artifact.
+
+```bash
+# Download a single file
+roar get s3://my-bucket/data.parquet ./data/
+
+# Download a directory
+roar get s3://my-bucket/dataset/ ./data/
+
+# Google Cloud Storage
+roar get gs://my-bucket/model.pt ./models/
+```
+
+Requires `aws` CLI for S3 or `gsutil` for GCS.
+
+### `roar put <src> <url>`
+
+Upload local artifacts to cloud storage and register with LaaS.
+
+```bash
+# Upload a single file
+roar put ./model.pt s3://my-bucket/models/model.pt
+
+# Upload a directory
+roar put ./outputs/ s3://my-bucket/results/
+```
+
+### `roar log`
+
+Show recent jobs.
+
+```bash
+roar log
+roar log -n 20        # Show more
+roar log -v           # Verbose (show inputs/outputs)
+```
+
+### `roar history <script>`
+
+Show job history for a specific script.
+
+```bash
+roar history train.py
+roar history pretrain -n 50
+```
+
+### `roar status`
+
+Show tracked artifacts and their status.
+
+```bash
+roar status
+roar status -a        # Show all artifacts
+```
+
+### `roar verify`
+
+Verify artifact integrity by recomputing hashes.
+
+```bash
+roar verify
+roar verify -v        # Verbose
+roar verify --fix     # Update cache for changed files
+```
+
+### `roar clean`
+
+Delete all files that were written by tracked jobs.
+
+```bash
+roar clean              # Delete with confirmation
+roar clean -y           # Skip confirmation
+roar clean --db-only    # Only remove stale database records (for missing files)
+```
+
+### `roar rm <file>`
+
+Remove specific files from disk and database.
+
+```bash
+roar rm output/model.pt           # Remove by path
+roar rm abc123de                  # Remove by hash prefix
+roar rm file1.pt file2.pt         # Remove multiple files
+roar rm output/model.pt --db-only # Only remove from database
+roar rm output/model.pt -y        # Skip confirmation
+```
+
+### `roar build <command>`
+
+Run a build step with provenance tracking. Build steps run before DAG steps during reproduction.
+
+```bash
+# Compile native extensions
+roar build maturin develop --release
+roar build make -j4
+
+# Install local packages
+roar build pip install -e .
+```
+
+Use for setup that should run before the main pipeline (compiling, installing).
+
+### `roar sync`
+
+Manage live sync to LaaS server during `roar run`.
+
+```bash
+roar sync on       # Enable live sync
+roar sync off      # Disable live sync
+roar sync status   # Show current sync status
+```
+
+When enabled, `roar run` pushes job status and I/O to LaaS every few seconds, allowing live monitoring via the web dashboard.
+
+### `roar auth`
+
+Manage LaaS (Lineage-as-a-Service) authentication.
+
+```bash
+roar auth register    # Register SSH key with LaaS server
+roar auth test        # Test authentication
+roar auth status      # Show authentication status
+```
+
+### `roar config`
+
+View or set configuration options.
+
+```bash
+roar config list
+roar config get <key>
+roar config set <key> <value>
+```
+
+Available configuration options:
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `output.track_repo_files` | false | Include repo files in provenance |
+| `output.quiet` | false | Suppress written files report |
+| `filters.ignore_system_reads` | true | Ignore /sys, /etc reads |
+| `filters.ignore_package_reads` | true | Ignore installed package reads |
+| `filters.ignore_torch_cache` | true | Ignore torch/triton cache |
+| `filters.ignore_tmp_files` | true | Ignore /tmp files |
+| `laas.url` | (none) | LaaS server URL |
+
+## Concepts
+
+### Artifacts
+
+Data files tracked by their content hash (BLAKE3). The same file content always has the same hash, regardless of filename or location.
+
+### Jobs
+
+Recorded executions that consume input artifacts and produce output artifacts. Each `roar run` creates a job record.
+
+### DAG (Directed Acyclic Graph)
+
+The execution DAG is built implicitly as you run commands. Each node represents a job with its inputs and outputs.
+
+**Node Identity**: Nodes are identified by `hash(command, sorted(input_hashes))`. This means:
+- Re-running the same command with the same inputs is the same node
+- Code changes (different git commit) don't create new nodes
+- Different inputs create different nodes
+
+### Collections
+
+Named groups of artifacts, used for downloaded datasets or upload bundles.
+
+## Workflow Example
+
+```bash
+# Record your pipeline
+roar run python preprocess.py
+roar dag rename @1 preprocess
+
+roar run python train.py --epochs 10
+roar dag rename @2 train
+
+roar run python evaluate.py
+roar dag rename @3 evaluate
+
+# View the DAG
+roar dag
+# DAG (3 nodes)
+#   ✓ @1: python preprocess.py (preprocess)
+#   ✓ @2: python train.py --epochs 10 (train)
+#   ✓ @3: python evaluate.py (evaluate)
+
+# Re-run a step with different parameters
+roar run @2 --epochs=20
+
+# Later, reproduce an artifact
+roar reproduce <model-hash> --run
+```
+
+## Git Integration
+
+Roar automatically captures git metadata:
+- Current commit hash
+- Branch name
+- Repository path
+
+If a DAG spans multiple commits, roar warns about mixed commits when viewing.
+
+## Data Storage
+
+All data is stored locally in `.roar/roar.db` (SQLite). The database includes:
+- Artifact hashes and metadata
+- Job records with inputs/outputs
+- DAG definitions
+- Hash cache for performance
+
+Add `.roar/` to your `.gitignore` (roar offers to do this during `roar init`).
+
+## LaaS Server
+
+Roar can sync artifacts and jobs to a central LaaS (Lineage-as-a-Service) server for team collaboration.
+
+### Server Setup
+
+```bash
+# Install with server dependencies
+uv pip install -e ".[server]"
+# or without uv
+pip install -e ".[server]"
+
+# Run the server
+laas-server
+
+# Or with custom host/port
+LAAS_HOST=0.0.0.0 LAAS_PORT=8080 laas-server
+```
+
+The server provides:
+- REST API for artifact and job registration
+- Web UI at `/` with artifact and job browsers
+- Search and filtering by command, GPU, file type, etc.
+
+### Client Configuration
+
+```bash
+# Set the LaaS server URL
+roar config set laas.url http://localhost:8000
+
+# Register your SSH key
+roar auth register
+
+# Test authentication
+roar auth test
+```
+
+### Syncing to LaaS
+
+When you upload artifacts with `roar put`, they are automatically registered with LaaS along with their lineage (producing jobs and input artifacts).
+
+```bash
+roar put ./model.pt s3://bucket/models/model.pt
+# Uploads to S3 and registers with LaaS
+```
+
+## Development
+
+### Install Dev Dependencies
+
+```bash
+uv pip install -e ".[dev]"
+```
+
+### Running Quality Checks
+
+```bash
+# Linting
+ruff check .
+
+# Format check
+ruff format --check
+
+# Type checking
+mypy roar
+
+# Run all checks at once
+ruff check . && ruff format --check && mypy roar
+```
+
+### Running Tests
+
+```bash
+# Run all tests (excluding those requiring a live LaaS server)
+pytest tests/ -v -m "not laas and not live_laas"
+
+# Run with coverage
+pytest tests/ -v --cov=roar --cov-report=term-missing -m "not laas and not live_laas"
+
+# Run tests in parallel
+pytest tests/ -v -n auto -m "not laas and not live_laas"
+
+# Run only unit tests (fast)
+pytest tests/ -v -m "not integration and not e2e and not laas and not live_laas"
+```
+
+## License
+
+Apache 2.0
