@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "garf-knowledge-graph-api"
+dependencies = [
+  "garf-core",
+  "garf-io",
+  "google-api-python-client",
+]
+authors = [
+  {name = "Google Inc. (gTech gPS CSE team)", email = "no-reply@google.com"},
+]
+license = {text = "Apache 2.0"}
+requires-python = ">=3.8"
+description = "description"
+readme = "README.md"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+dynamic=["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "garf.community.google.knowledge_graph.__version__"}
+
+[project.entry-points.garf]
+knowledge-graph-api = "garf.community.google.knowledge_graph.report_fetcher"
+
+[options.extras_require]
+test =  [
+  "pytest",
+  "pytest-cov",
+  "python-dotenv",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include=["garf_knowledge_graph_api*", "garf.*"]
