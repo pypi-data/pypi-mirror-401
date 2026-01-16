@@ -1,0 +1,29 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+    -   id: check-added-large-files
+    -   id: check-illegal-windows-names
+    -   id: check-case-conflict
+    -   id: check-json
+    -   id: check-symlinks
+    -   id: check-toml
+    -   id: check-yaml
+    -   id: debug-statements
+    -   id: destroyed-symlinks
+    -   id: detect-private-key
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.11.4
+  hooks:
+    # Run the linter.
+    - id: ruff
+      args: [ --select, ALL, --ignore, "ERA001,T201,S603,PERF401,S101,PLR0912,C901,COM812,D415,D400,D203,D213,TD002,TD003,TD004,FIX002" ]
+    # Run the formatter.
+    - id: ruff-format
+- repo: https://github.com/astral-sh/uv-pre-commit
+  # uv version.
+  rev: 0.6.13
+  hooks:
+    # Update the uv lockfile
+    - id: uv-lock
