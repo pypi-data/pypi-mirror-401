@@ -1,0 +1,154 @@
+Metadata-Version: 2.1
+Name: uraster
+Version: 0.1.6
+Summary: A Python package for unstructured raster processing and remapping
+Author-email: Chang Liao <changliao.climate@gmail.com>
+Maintainer-email: Chang Liao <changliao.climate@gmail.com>
+License: BSD 3-Clause License
+        
+        Copyright (c) 2022, Battelle Memorial Institute
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+        
+        3. Neither the name of the copyright holder nor the names of its
+           contributors may be used to endorse or promote products derived from
+           this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Project-URL: Homepage, https://github.com/changliao1025/uraster
+Project-URL: Documentation, https://github.com/changliao1025/uraster
+Project-URL: Repository, https://github.com/changliao1025/uraster
+Project-URL: Bug Tracker, https://github.com/changliao1025/uraster/issues
+Keywords: raster,GIS,geospatial,GDAL,unstructured
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: GIS
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.19.0
+Requires-Dist: gdal>=3.0.0
+Requires-Dist: pyearth>=0.1.29
+Requires-Dist: psutil>=5.0.0
+Requires-Dist: pooch>=1.6.0
+Requires-Dist: tqdm>=4.0.0
+Requires-Dist: trame>=2.0.0
+Requires-Dist: trame-vtk>=2.0.0
+Requires-Dist: trame-vuetify>=2.0.0
+Requires-Dist: ipywidgets>=7.0.0
+Requires-Dist: geovista>=0.3.0
+Requires-Dist: vtk==9.3.0
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: sphinx-rtd-theme; extra == "docs"
+
+[![DOI](https://zenodo.org/badge/1060295281.svg)](https://doi.org/10.5281/zenodo.17613497)
+[![PyPI version](https://badge.fury.io/py/uraster.svg)](https://badge.fury.io/py/uraster)
+[![License](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![geovista](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/bjlittle/geovista/main/docs/assets/badge/v0.json)](https://geovista.readthedocs.io/)
+
+# URaster: Structured Raster to Unstructured Mesh
+
+## Overview
+
+**URaster** is a Python package to convert structured raster datasets into unstructured mesh structure, designed to bridge the gap between structured raster datasets and unstructured mesh-based hydrologic and land surface models. It leverages GDAL/OGR for robust data handling.
+
+## ✨ Core Features
+
+- **GDAL-Native Vector Handling**: Uses the standard GDAL/OGR engine for defining unstructured mesh cells, and performing projection-aware geospatial operations. It also support mesh cells that cross the International Date Line (IDL).
+
+- **Standard Vector I/O**: Instead of directly operating on various mesh standards, it utilizes standard geographic information system vector formats (e.g., GeoJSON) for mesh operations, ensuring broad compatibility. It supports transformation APIs between existing meshes and standard vector formats.
+
+- **Projection-Aware Operations**: Handles (raster dateaset) map projection differences to ensure accurate aggregation of raster values within each polygon.
+
+- **Interactive GeoVista API**: Offers simple functions to visualize the input and the output vector layers on a 3D sphere.
+
+Static visualization of the unstructured mesh on a sphere using GeoVista:
+![Unstructured Mesh Visualization](docs/figures/mesh.jpg)
+
+Animated visualization of the unstructured raster on a sphere using GeoVista:
+![Unstructured Raster Visualization](docs/figures/global_uraster.gif)
+
+## 💻 Installation
+
+URaster requires GDAL for vector handling and GeoVista (which relies on PyVista/VTK) for 3D visualization.
+
+> ⚠️ **GDAL Note**: Installing GDAL's Python bindings can be complex via pip due to platform dependencies. We strongly recommend using Conda for a stable installation of GDAL and all dependencies.
+
+### Install via Conda (Recommended)
+```bash
+# Create a new conda environment (recommended)
+conda create -n uraster-env python=3.9
+conda activate uraster-env
+
+# Install uraster and all dependencies via conda
+conda install -c conda-forge uraster
+```
+
+## 🚀 Quick Start
+
+[Quickstart documentation](https://uraster.readthedocs.io/en/latest/quickstart.html)
+
+Example datasets are provided through the GitHub repository: [URaster Example Data on GitHub](https://github.com/changliao1025/uraster_data)
+
+
+## 📚 Documentation
+
+- [API Reference](https://uraster.readthedocs.io/en/latest/api.html)
+
+## 📊 Supported Formats
+
+- **Mesh formats**: GeoJSON, Shapefile, any OGR-supported vector format
+- **Raster formats**: GeoTIFF, NetCDF, HDF5, any GDAL-supported raster format
+- **Output formats**: Vectors (with computed statistics), PNG/JPG (visualizations), MP4/GIF (animations)
+
+## 🙏 Acknowledgments
+
+The model described in this repository was supported by the following:
+
+* the U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth System Development program as part of the Energy Exascale Earth System Model (E3SM) project.
+
+* the Earth System Model Development and Regional and Global Model Analysis program areas of the U.S. Department of Energy, Office of Science, Biological and Environmental Research program as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project.
+
+* the Earth System Model Development and Regional and Global Model Analysis program areas of the U.S. Department of Energy, Office of Science, Biological and Environmental Research program as part of the multi-program, collaborative Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
+
+A portion of this research was performed using PNNL Research Computing at Pacific Northwest National Laboratory.
+
+PNNL is operated for DOE by Battelle Memorial Institute under contract DE-AC05-76RL01830.
+
+## 🤝 Contributing & License
+
+We welcome contributions! Please open an issue or submit a pull request on the GitHub repository.
+
+**uraster** is distributed under the BSD 3-Clause License.
+
