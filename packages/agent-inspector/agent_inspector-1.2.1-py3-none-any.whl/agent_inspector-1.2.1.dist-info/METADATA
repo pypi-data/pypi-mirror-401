@@ -1,0 +1,189 @@
+Metadata-Version: 2.4
+Name: agent-inspector
+Version: 1.2.1
+Summary: CLI launcher for Cylestio Perimeter with default OpenAI and Anthropic configs
+Author: Cylestio
+License-Expression: MIT
+License-File: LICENSE
+Requires-Python: >=3.9
+Requires-Dist: cylestio-perimeter>=2.4.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: typer[all]>=0.12.3
+Description-Content-Type: text/markdown
+
+# Agent Inspector
+
+Analyze and debug AI agents in real-time. Scan your code for vulnerabilities (both statically and dynamically), trace LLM calls, and evaluate runtime behavior—all from a single command.
+
+## Install through the IDE
+
+IDE integration provides MCP query tools for inspecting sessions, risk metrics, and security findings directly in your editor. It also enables static analysis to scan your agent code for vulnerabilities before runtime.
+
+#### Claude Code
+
+Run these commands to register the marketplace and install the plugin:
+
+```
+/plugin marketplace add cylestio/agent-inspector
+/plugin install agent-inspector@cylestio
+/agent-inspector:setup
+```
+
+After installation, restart Claude Code for the MCP connection to activate.
+
+#### Cursor
+
+Copy this command to Cursor and it will set everything up for you:
+
+```
+Fetch and follow instructions from https://raw.githubusercontent.com/cylestio/agent-inspector/main/integrations/AGENT_INSPECTOR_SETUP.md
+```
+
+After setup, restart Cursor and approve the MCP server when prompted.
+
+## Install without IDE Integration
+
+Run directly with `uvx`:
+
+```bash
+uvx agent-inspector openai   # or: anthropic
+```
+
+Install via `pipx` or `pip`:
+
+```bash
+pipx install agent-inspector
+agent-inspector openai   # or: anthropic
+```
+
+This starts:
+- A proxy server on port 4000 (configurable)
+- A live trace dashboard on port 7100 (configurable)
+
+### CLI Options
+
+| Flag | Description |
+|------|-------------|
+| `--port`, `-p` | Override the proxy server port (default: 4000) |
+| `--ui-port` | Override the dashboard port (default: 7100) |
+| `--base-url` | Override the LLM provider base URL |
+| `--use-local-storage` | Enable persistent SQLite storage for traces |
+| `--local-storage-path` | Custom database path (requires `--use-local-storage`) |
+| `--log-level` | Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL) |
+| `--no-presidio` | Disable Presidio PII detection (enabled by default) |
+
+Point your agent to the proxy:
+
+```python
+# OpenAI
+client = OpenAI(base_url=f"http://localhost:4000/agent-workflow/{AGENT_WORKFLOW_ID}")
+
+# Anthropic
+client = Anthropic(base_url=f"http://localhost:4000/agent-workflow/{AGENT_WORKFLOW_ID}")
+```
+
+Replace `AGENT_WORKFLOW_ID` with your project identifier (e.g., derived from your git repo name, package name, or folder name).
+
+Open http://localhost:7100 to view the live dashboard.
+
+## Identifying and Grouping LLM Calls
+
+The proxy automatically detects and groups most identifiers. All headers below are **optional** and only needed when you want to override the automatic behavior. Add headers via your SDK's `extra_headers` or `default_headers` parameter.
+
+#### Workflow ID (required in URL)
+
+An agentic workflow composed of multiple LLM calls with different prompts should be identified using the workflow ID in the base URL:
+
+```
+http://localhost:4000/agent-workflow/{AGENT_WORKFLOW_ID}
+```
+
+This groups all calls from the same agent or application together, regardless of prompt type or conversation.
+
+#### Session Grouping (optional)
+
+When an agent executes a series of different LLM conversations as part of a single run or task, you can group them into one session:
+
+```
+x-cylestio-session-id: request-f1a1b2a8
+```
+
+This is useful for multi-step workflows where a classifier, retriever, and generator each make separate calls but belong to the same execution. No automatic detection - must be provided explicitly.
+
+#### Conversation Type (auto-detected)
+
+The proxy automatically identifies different conversation types based on the system prompt hash. Each unique system prompt creates a distinct conversation type in the dashboard.
+
+To assign a meaningful name instead of an auto-generated hash, optionally use:
+
+```
+x-cylestio-prompt-id: tool-decision-making
+```
+
+#### Conversation ID (auto-detected)
+
+Multi-turn conversations with message history are automatically inferred from the prompt content and conversation structure.
+
+To explicitly track a conversation across API calls, optionally generate your own identifier:
+
+```
+x-cylestio-conversation-id: conv-uuid-here
+```
+
+#### Custom Tags (optional)
+
+Attach arbitrary metadata to any LLM call for filtering and analysis. Use comma-separated key:value pairs:
+
+```
+x-cylestio-tags: user:alice@example.com,env:production,team:backend
+```
+
+Tags appear in the dashboard and can be used to filter sessions by user, environment, feature flag, or any custom dimension.
+
+## Features
+
+### Security Scanning & Fixes
+- Scan your agent code for OWASP LLM Top 10 vulnerabilities
+- Get AI-powered, context-aware fixes for security issues
+- Track remediation progress with recommendation lifecycle
+- Check production deployment readiness with gate status
+
+### Live Tracing & Debugging
+- Stream live traces of sessions, tool executions, and messages
+- Real-time token usage and duration tracking
+- Debug agent sessions with full event replay and timeline
+- Health badges and status indicators
+
+### Risk Analytics
+Evaluate agent risk across four categories:
+- **Resource Management**: Token usage, session duration, and tool call patterns
+- **Environment & Supply Chain**: Model versions and tool adoption
+- **Behavioral Stability**: Consistency and predictability scoring
+- **Privacy & PII**: Automated detection of sensitive data exposure
+
+### PII Detection (Microsoft Presidio)
+- Scan prompts, messages, and tool inputs for sensitive data
+- Confidence scoring on each finding
+- Session-level and aggregate reporting
+
+### Dynamic Runtime Analysis
+- Analyze runtime behavior and detect anomalies
+- Cross-reference static findings with runtime evidence
+- Identify validated issues vs theoretical risks
+- Track behavioral patterns and outliers
+
+### Compliance & Reporting
+- Generate compliance reports for stakeholders (CISO, executive, customer DD)
+- OWASP LLM Top 10 coverage tracking
+- SOC2 compliance mapping
+- Audit trail for all security fixes
+
+## Dependencies
+
+Agent Inspector is built on:
+- [cylestio-perimeter](https://pypi.org/project/cylestio-perimeter/) - Agent monitoring infrastructure
+- [Microsoft Presidio](https://microsoft.github.io/presidio/) - PII detection and analysis
+
+## License
+
+Apache License - see [LICENSE](LICENSE) for details
