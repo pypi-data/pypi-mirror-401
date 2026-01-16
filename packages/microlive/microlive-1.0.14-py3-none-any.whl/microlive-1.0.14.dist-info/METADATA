@@ -1,0 +1,361 @@
+Metadata-Version: 2.4
+Name: microlive
+Version: 1.0.14
+Summary: Live-cell microscopy image analysis and single-molecule measurements
+Project-URL: Homepage, https://github.com/ningzhaoAnschutz/microlive
+Project-URL: Documentation, https://github.com/ningzhaoAnschutz/microlive/blob/main/docs/user_guide.md
+Project-URL: Repository, https://github.com/ningzhaoAnschutz/microlive
+Project-URL: Issues, https://github.com/ningzhaoAnschutz/microlive/issues
+Project-URL: Changelog, https://github.com/ningzhaoAnschutz/microlive/releases
+Author: Luis U. Aguilera, William S. Raymond, Rhiannon M. Sears, Nathan L. Nowling, Brian Munsky, Ning Zhao
+License-Expression: GPL-3.0-or-later
+License-File: LICENSE
+Keywords: PyQt5,bioimaging,cellpose,image-analysis,live-cell,microscopy,particle-tracking,single-molecule,tracking
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: X11 Applications :: Qt
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: OS Independent
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Topic :: Scientific/Engineering :: Image Processing
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Python: >=3.10
+Requires-Dist: big-fish>=0.6
+Requires-Dist: bioio-base==3.1.0
+Requires-Dist: bioio-lif>=1.2
+Requires-Dist: bioio==3.1.0
+Requires-Dist: biopython>=1.81
+Requires-Dist: brokenaxes
+Requires-Dist: cellpose==3.1.0
+Requires-Dist: dask==2024.8.0
+Requires-Dist: distributed==2024.8.0
+Requires-Dist: dna-features-viewer>=3.1
+Requires-Dist: fpdf>=1.7
+Requires-Dist: imagecodecs
+Requires-Dist: imageio>=2.34
+Requires-Dist: ipython
+Requires-Dist: ipywidgets
+Requires-Dist: joblib>=1.3
+Requires-Dist: joypy
+Requires-Dist: llvmlite==0.43.0
+Requires-Dist: matplotlib-scalebar
+Requires-Dist: matplotlib==3.9.2
+Requires-Dist: natsort
+Requires-Dist: numba==0.60.0
+Requires-Dist: numpy==1.26.4
+Requires-Dist: opencv-python-headless>=4.9
+Requires-Dist: openpyxl>=3.1
+Requires-Dist: pandas==2.2.2
+Requires-Dist: pillow>=10.0
+Requires-Dist: psutil
+Requires-Dist: pydantic>=2.0
+Requires-Dist: pyqt5>=5.15
+Requires-Dist: pystackreg>=0.2.8
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: readlif==0.6.5
+Requires-Dist: roifile
+Requires-Dist: scikit-image==0.24.0
+Requires-Dist: scikit-learn==1.5.2
+Requires-Dist: scipy==1.13.1
+Requires-Dist: seaborn==0.13.2
+Requires-Dist: snapgene-reader>=0.1
+Requires-Dist: statsmodels==0.14.4
+Requires-Dist: tifffile>=2024.1
+Requires-Dist: tqdm>=4.66
+Requires-Dist: trackpy>=0.6
+Provides-Extra: dev
+Requires-Dist: black>=23.0; extra == 'dev'
+Requires-Dist: build; extra == 'dev'
+Requires-Dist: isort>=5.12; extra == 'dev'
+Requires-Dist: mypy>=1.5; extra == 'dev'
+Requires-Dist: pdoc; extra == 'dev'
+Requires-Dist: pytest-qt>=4.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: ruff>=0.1; extra == 'dev'
+Requires-Dist: twine; extra == 'dev'
+Provides-Extra: notebooks
+Requires-Dist: bqplot; extra == 'notebooks'
+Requires-Dist: ipympl>=0.9; extra == 'notebooks'
+Requires-Dist: ipywidgets>=8.0; extra == 'notebooks'
+Requires-Dist: jupyter>=1.0; extra == 'notebooks'
+Description-Content-Type: text/markdown
+
+# MicroLive <img src="https://raw.githubusercontent.com/ningzhaoAnschutz/microlive/main/docs/icons/icon_micro.png" alt="Micro Logo" width="150" align="right" />
+
+**Authors:** Luis U. Aguilera, William S. Raymond, Rhiannon M. Sears, Nathan L. Nowling, Brian Munsky, Ning Zhao
+
+[![PyPI version](https://img.shields.io/pypi/v/microlive.svg)](https://pypi.org/project/microlive/) [![Documentation](https://img.shields.io/badge/docs-available-brightgreen.svg)](docs/user_guide.md) [![Tutorial](https://img.shields.io/badge/tutorial-step--by--step-orange.svg)](docs/tutorial.md) [![API Reference](https://img.shields.io/badge/API-reference-blue.svg)](docs/api_reference.md) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/) [![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green.svg)](https://pypi.org/project/PyQt5/)
+
+## About
+
+**MicroLive** is a Python-based GUI application for live-cell microscopy image analysis and single-molecule measurements. It provides an end-to-end workflow from image loading through particle tracking, colocalization analysis, and statistical analysis.
+
+[![MicroLive Demo Video](https://img.youtube.com/vi/GU1ct5go-AU/maxresdefault.jpg)](https://youtu.be/GU1ct5go-AU?si=wEJWUaSYgNGj-Pi3)
+
+*Click the image above to watch the demo video on YouTube*
+
+---
+
+## Features
+
+- **Image I/O**: Load .lif, .tif, .ome.tif with metadata extraction and dimension mapping
+- **Registration**: Drift correction via phase correlation
+- **Segmentation**: Cellpose (GPU), watershed, manual ROI, or external mask import
+- **Photobleaching correction**: Exponential decay modeling
+- **Particle tracking**: 2D (TrackPy) and 3D (Big-FISH) detection with multi-channel support
+- **Automated threshold detection**: Hybrid Big-FISH/TrueSpot method
+- **Trajectory linking**: Nearest-neighbor with memory and cluster analysis
+- **Intensity quantification**: Background subtraction, PSF fitting, SNR calculation
+- **Colocalization**: CNN-based, distance-based, and manual verification
+- **MSD analysis**: Per-cell diffusion coefficient calculation
+- **Correlation**: Auto- and cross-correlation with exponential/linear fitting
+- **Export**: PNG, TIFF, CSV, MP4/GIF with full metadata logging
+
+---
+
+## Documentation
+
+- **[User Guide](docs/user_guide.md)** — Complete guide to using MicroLive
+- **[Tutorial](docs/tutorial.md)** — Step-by-step tutorials for all workflows
+- **[API Reference](docs/api_reference.md)** — Technical documentation for developers
+
+---
+
+## Installation
+
+### Quick Install (Recommended)
+
+```bash
+# Create and activate conda environment
+conda create -n microlive python=3.10 -y
+conda activate microlive
+
+# Install MicroLive
+pip install microlive
+
+# Launch the GUI
+microlive
+```
+
+That's it! MicroLive will launch with GPU acceleration automatically enabled:
+
+- **macOS (Apple Silicon)**: MPS GPU acceleration works automatically
+- **Linux/Windows (CPU)**: Works out of the box
+
+---
+
+### GPU Acceleration for NVIDIA (Windows/Linux)
+
+For NVIDIA GPU acceleration, install PyTorch with CUDA support **before** installing MicroLive:
+
+```bash
+# Create environment
+conda create -n microlive python=3.10 -y
+conda activate microlive
+
+# Install PyTorch with CUDA 12.4 (adjust version as needed)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+
+# Then install MicroLive
+pip install microlive
+
+# Launch
+microlive
+```
+
+### Using Conda Environment Files
+
+Pre-configured environment files are available:
+
+```bash
+# macOS / CPU
+conda env create -f installation/microlive.yml
+conda activate microlive
+
+# Windows/Linux with NVIDIA GPU
+conda env create -f installation/microlive_cuda.yml
+conda activate microlive
+```
+
+### Verify GPU Support
+
+```python
+from microlive.utils.device import check_gpu_status
+check_gpu_status()
+```
+
+Expected output:
+
+```
+PyTorch version: 2.x.x
+✅ CUDA available: NVIDIA GeForce RTX ...
+   Memory: 8.0 GB
+```
+
+Or for Apple Silicon:
+
+```
+PyTorch version: 2.x.x
+✅ MPS available: Apple Silicon GPU (MPS)
+```
+
+---
+
+### Development Installation
+
+For developers who want to modify the source code:
+
+```bash
+# Clone the repository
+git clone --depth 1 https://github.com/ningzhaoAnschutz/microlive.git
+cd microlive
+
+# Create environment
+conda create -n microlive python=3.10 -y
+conda activate microlive
+
+# Install in editable mode
+pip install -e .
+
+# Launch
+microlive
+```
+
+---
+
+### Troubleshooting Installation
+
+If you encounter errors during installation (especially on Python 3.12):
+
+```bash
+# Option 1: Upgrade pip and pre-install numpy
+pip install --upgrade pip setuptools wheel
+pip install numpy
+pip install microlive
+
+# Option 2: Use Python 3.10 (most compatible)
+conda create -n microlive python=3.10 -y
+conda activate microlive
+pip install microlive
+```
+
+**Common error**: `ModuleNotFoundError: No module named 'numpy'` during `pystackreg` build
+
+- This occurs when pip tries to build older package versions from source
+- Solution: Pre-install NumPy before installing MicroLive
+
+---
+
+## Usage
+
+### GUI Application
+
+```bash
+conda activate microlive
+microlive
+```
+
+### Programmatic API
+
+```python
+import microlive.microscopy as mi
+
+# Load images from a Leica .lif file
+reader = mi.ReadLif("experiment.lif")
+images = reader.get_images()
+
+# Access image data
+image = reader.list_images[0]
+print(f"Image shape: {image.shape}")  # (T, Z, Y, X, C)
+
+# Run Cellpose segmentation
+cellpose = mi.Cellpose(image_for_segmentation=image[0, 0, :, :, 0])
+masks = cellpose.calculate_masks()
+
+# Spot detection
+spots = mi.SpotDetection(
+    image=image,
+    spot_size_yx=5,
+    threshold=100
+)
+detected = spots.detect_spots()
+```
+
+---
+
+## Project Structure
+
+```text
+microlive/
+├── microlive/                    # Core package (pip installable)
+│   ├── microscopy.py             # Main analysis classes
+│   ├── imports.py                # Central import management
+│   ├── ml_spot_detection.py      # ML-based spot detection
+│   ├── gui/                      # GUI application
+│   │   ├── app.py                # Main GUI window
+│   │   └── main.py               # CLI entry point
+│   ├── utils/                    # Utility modules
+│   │   ├── device.py             # GPU detection
+│   │   └── resources.py          # Resource paths
+│   ├── data/                     # ML models and resources
+│   └── pipelines/                # Analysis pipeline modules
+├── simulations/                  # Spot simulation & validation (not in pip)
+│   ├── spot_simulator.py         # Multi-cell simulation engine
+│   ├── run_simulation.py         # CLI runner
+│   ├── visualize_results.py      # Visualization tools
+│   ├── config_*.yaml             # Configuration examples
+│   └── tests/                    # 8-test validation suite (100% pass)
+├── docs/                         # Documentation
+│   ├── user_guide.md             # User manual
+│   ├── tutorial.md               # Step-by-step tutorials
+│   └── api_reference.md          # API documentation
+├── modeling/                     # Research/development (not in pip package)
+├── notebooks/                    # Example Jupyter notebooks
+├── installation/                 # Environment files
+│   ├── microlive.yml             # Conda env (macOS / CPU)
+│   └── microlive_cuda.yml        # Conda env (NVIDIA GPU)
+├── tests/                        # Test suite
+├── pyproject.toml                # Package configuration
+└── LICENSE                       # GPL v3 License
+```
+
+---
+
+## License
+
+This project is licensed under the GNU General Public License v3 (GPLv3). See [LICENSE](LICENSE) for details.
+
+---
+
+## Citation
+
+If you use MicroLive in your research, please cite:
+
+> **Aguilera LU, Raymond WS, Sears RM, Nowling NL, Munsky B, Zhao N.** *MicroLive: An Image Processing Toolkit for Quantifying Live-cell Single-Molecule Microscopy.* bioRxiv, 2025.  
+> DOI: [10.1101/2025.09.25.678587](https://doi.org/10.1101/2025.09.25.678587)
+
+```bibtex
+@article{aguilera2025microlive,
+  title={MicroLive: An Image Processing Toolkit for Quantifying Live-cell Single-Molecule Microscopy},
+  author={Aguilera, Luis U and Raymond, William S and Sears, Rhiannon M and Nowling, Nathan L and Munsky, Brian and Zhao, Ning},
+  journal={bioRxiv},
+  pages={2025--09},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory},
+  doi={10.1101/2025.09.25.678587}
+}
+```
+
+---
+
+## Support
+
+- **Documentation**: [User Guide](docs/user_guide.md) | [Tutorial](docs/tutorial.md) | [API Reference](docs/api_reference.md)
+- **Issues & Contributions**: [GitHub](https://github.com/ningzhaoAnschutz/microlive/issues)
