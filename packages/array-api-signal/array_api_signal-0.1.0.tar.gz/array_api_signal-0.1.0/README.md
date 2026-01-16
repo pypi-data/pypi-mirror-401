@@ -1,0 +1,104 @@
+# array-api-signal
+
+**Signal processing primitives (windows, filters, integration) for the Python Array API Standard.**
+
+[![PyPI version](https://img.shields.io/pypi/v/array-api-signal.svg)](https://pypi.org/project/array-api-signal/)
+[![License](https://img.shields.io/pypi/l/array-api-signal.svg)](https://git.ligo.org/james.kennington/array-api-signal/-/blob/main/LICENSE)
+[![Pipeline Status](https://git.ligo.org/james.kennington/array-api-signal/badges/main/pipeline.svg)](https://git.ligo.org/james.kennington/array-api-signal/-/commits/main)
+
+`array-api-signal` is a lightweight extension library that brings scientific computing capabilities—similar to
+`scipy.signal` and `scipy.integrate`—to the [Python Array API](https://data-apis.org/array-api/latest/) ecosystem.
+
+It allows you to write signal processing code that runs unmodified on **NumPy**, **PyTorch**, **CuPy**, **JAX**, and *
+*Dask**.
+
+## Why?
+
+The Python Array API Standard unifies basic array operations (`sin`, `matmul`, `reshape`), and `array-api-extra`
+provides common utilities (`pad`, `kron`).
+
+However, scientific domains often need higher-level primitives like **Simpson's rule integration**, **window generation
+**, or **smoothing filters**. `array-api-signal` fills this gap, providing a single namespace that:
+
+1. **Implements missing primitives** (like `xp.simpson`) using backend-agnostic operations.
+2. **Re-exports `array-api-extra`** functions (like `xp.pad`).
+3. **Dispatches standard API calls** (like `xp.sin`) to the underlying backend.
+
+This library is designed to be the "SciPy" companion to `array-api-compat`'s "NumPy".
+
+## Installation
+
+```bash
+pip install array-api-signal
+```
+
+## Quick Start: The Unified Namespace
+
+The core philosophy is the **Unified Namespace**. You rarely need to import `numpy` or `torch` directly for your processing logic.
+
+```python
+import array_api_signal as aps
+import numpy as np
+import torch
+
+# 1. Start with any array (NumPy or Torch)
+x_np = np.linspace(0, 10, 100)
+x_torch = torch.linspace(0, 10, 100, device='cuda')
+
+# 2. Get the unified 'xp' namespace
+# This object has EVERYTHING: standard API + signal extensions + extra utils
+xp = aps.array_namespace(x_torch)
+
+# 3. Write backend-agnostic code
+y = xp.sin(x_torch)                # Calls torch.sin (Standard API)
+y = xp.pad(y, (2, 2))              # Calls array_api_extra.pad (Extra API)
+area = xp.simpson(y, dx=0.1)       # Calls array_api_signal.simpson (Signal API)
+
+print(f"Area on GPU: {area}")      # Returns a Torch tensor
+```
+
+## API Reference
+
+### 1. Integration (`xp.integrate`)
+Robust numerical integration with support for native backend optimizations (e.g., `torch.trapezoid`).
+
+* `xp.trapezoid(y, x=None, dx=1.0, axis=-1)`: Composite trapezoidal rule.
+* `xp.simpson(y, x=None, dx=1.0, axis=-1)`: Composite Simpson's rule. Matches `scipy.integrate.simpson` behavior (using the trapezoidal rule for the last interval if samples are even).
+
+### 2. Signal Processing (`xp.signal`)
+Filtering and convolution tools. Dispatches to `scipy.ndimage` (NumPy) or `torch.nn.functional` (Torch) for maximum performance.
+
+* `xp.gaussian_filter1d(input, sigma, ...)`: 1D Gaussian smoothing.
+* `xp.convolve(in1, in2, mode='full')`: General 1D convolution (via FFT).
+
+### 3. Window Functions (`xp.windows`)
+Backend-agnostic window generation. If you use the unified `xp` object, these functions automatically return arrays on the correct backend.
+
+* `xp.hann(M, sym=True)`: Hann window.
+* `xp.hamming(M, sym=True)`: Hamming window.
+* `xp.tukey(M, alpha=0.5, sym=True)`: Tukey (tapered cosine) window.
+
+### 4. Extensions from `array-api-extra`
+We re-export widely used extensions so you only need one import.
+
+* `xp.pad`
+* `xp.sinc`
+* `xp.cov`
+* `xp.kron`
+
+
+## Contributing
+
+We welcome contributions! If you have implemented a `scipy` function (like a specific filter, window, or transform) using only standard Array API primitives, please submit a PR.
+
+### Running Tests
+
+We use `pytest` to verify correctness against `scipy` (Gold Standard) across all installed backends.
+
+```bash
+# Run tests
+pytest tests/
+
+# Test specific backend
+pytest tests/ --backend=torch
+```
