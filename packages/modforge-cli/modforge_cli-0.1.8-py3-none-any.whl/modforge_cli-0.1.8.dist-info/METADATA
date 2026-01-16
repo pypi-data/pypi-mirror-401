@@ -1,0 +1,70 @@
+Metadata-Version: 2.4
+Name: modforge-cli
+Version: 0.1.8
+Summary: ModForge-CLI — a Modrinth-based Minecraft modpack builder
+License: MIT
+License-File: LICENSE
+Author: Frank1o3
+Author-email: jahdy1o3@gmail.com
+Requires-Python: >=3.10,<4.0
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Build Tools
+Requires-Dist: aiofiles (>=25.1.0,<26.0.0)
+Requires-Dist: aiohttp (>=3.13.3,<4.0.0)
+Requires-Dist: jsonschema (>=4.25.1,<5.0.0)
+Requires-Dist: pydantic (>=2.12.5,<3.0.0)
+Requires-Dist: pyfiglet (>=1.0.4,<2.0.0)
+Requires-Dist: pyzipper (>=0.3.6,<0.4.0)
+Requires-Dist: requests (>=2.32.5,<3.0.0)
+Requires-Dist: rich (>=14.2.0,<15.0.0)
+Requires-Dist: typer (>=0.21.1,<0.22.0)
+Project-URL: Homepage, https://frank1o3.github.io/ModForge-CLI/
+Project-URL: Repository, https://github.com/Frank1o3/ModForge-CLI
+Description-Content-Type: text/markdown
+
+# ModForge-CLI ⛏
+
+[![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Modrinth API v2](https://img.shields.io/badge/Modrinth-API%20v2-orange)](https://docs.modrinth.com/api-spec)
+
+**ModForge-CLI** is a powerful CLI tool for building and managing custom Minecraft modpacks using the Modrinth API v2.
+
+Search for projects, fetch versions, validate manifests, download mods with hash checks, and generate complete files — all from the terminal.
+
+Ideal for modpack developers, server admins, and automation scripts.
+
+## Terminal Banner
+
+When you run ModForge-CLI, you'll be greeted with this colorful Minecraft-themed banner
+
+## Key Features
+
+- **Modrinth API v2 Integration**: Search projects, list versions, fetch metadata in bulk.
+- **Modpack Management**: Read/validate `modrinth.index.json`, build packs from metadata.
+- **Validation**: Full JSON Schema checks + optional Pydantic models for strict typing.
+
+## Installation
+
+Requires **Python 3.13+**.
+
+**Recommended (Poetry)**:
+
+```bash
+poetry install
+```
+
+**Alternative (pip)**:
+
+```bash
+pip install -r requirements.txt
+```
+
