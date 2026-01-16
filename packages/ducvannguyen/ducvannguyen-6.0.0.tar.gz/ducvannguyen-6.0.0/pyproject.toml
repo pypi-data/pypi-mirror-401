@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ducvannguyen"
+version = "6.0.0"
+description = "Advanced Python utilities and tools by Duc Van Nguyen"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [
+    {name = "Duc Van Nguyen", email = "ducvannguyenhtml@gmail.com"}
+]
+keywords = ["ducvannguyen", "python", "package"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/vanducdev/ducvannguyen"
+Repository = "https://github.com/vanducdev/ducvannguyen"
+Issues = "https://github.com/vanducdev/ducvannguyen/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ducvannguyen*"]
