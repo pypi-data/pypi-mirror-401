@@ -1,0 +1,563 @@
+Metadata-Version: 2.4
+Name: pybrowsertestfw
+Version: 0.1.0
+Summary: Pytest browser test framework
+License:                                  Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           1. Definitions.
+        
+              "License" shall mean the terms and conditions for use, reproduction,
+              and distribution as defined by Sections 1 through 9 of this document.
+        
+              "Licensor" shall mean the copyright owner or entity authorized by
+              the copyright owner that is granting the License.
+        
+              "Legal Entity" shall mean the union of the acting entity and all
+              other entities that control, are controlled by, or are under common
+              control with that entity. For the purposes of this definition,
+              "control" means (i) the power, direct or indirect, to cause the
+              direction or management of such entity, whether by contract or
+              otherwise, or (ii) ownership of fifty percent (50%) or more of the
+              outstanding shares, or (iii) beneficial ownership of such entity.
+        
+              "You" (or "Your") shall mean an individual or Legal Entity
+              exercising permissions granted by this License.
+        
+              "Source" form shall mean the preferred form for making modifications,
+              including but not limited to software source code, documentation
+              source, and configuration files.
+        
+              "Object" form shall mean any form resulting from mechanical
+              transformation or translation of a Source form, including but
+              not limited to compiled object code, generated documentation,
+              and conversions to other media types.
+        
+              "Work" shall mean the work of authorship, whether in Source or
+              Object form, made available under the License, as indicated by a
+              copyright notice that is included in or attached to the work
+              (an example is provided in the Appendix below).
+        
+              "Derivative Works" shall mean any work, whether in Source or Object
+              form, that is based on (or derived from) the Work and for which the
+              editorial revisions, annotations, elaborations, or other modifications
+              represent, as a whole, an original work of authorship. For the purposes
+              of this License, Derivative Works shall not include works that remain
+              separable from, or merely link (or bind by name) to the interfaces of,
+              the Work and Derivative Works thereof.
+        
+              "Contribution" shall mean any work of authorship, including
+              the original version of the Work and any modifications or additions
+              to that Work or Derivative Works thereof, that is intentionally
+              submitted to Licensor for inclusion in the Work by the copyright owner
+              or by an individual or Legal Entity authorized to submit on behalf of
+              the copyright owner. For the purposes of this definition, "submitted"
+              means any form of electronic, verbal, or written communication sent
+              to the Licensor or its representatives, including but not limited to
+              communication on electronic mailing lists, source code control systems,
+              and issue tracking systems that are managed by, or on behalf of, the
+              Licensor for the purpose of discussing and improving the Work, but
+              excluding communication that is conspicuously marked or otherwise
+              designated in writing by the copyright owner as "Not a Contribution."
+        
+              "Contributor" shall mean Licensor and any individual or Legal Entity
+              on behalf of whom a Contribution has been received by Licensor and
+              subsequently incorporated within the Work.
+        
+           2. Grant of Copyright License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              copyright license to reproduce, prepare Derivative Works of,
+              publicly display, publicly perform, sublicense, and distribute the
+              Work and such Derivative Works in Source or Object form.
+        
+           3. Grant of Patent License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              (except as stated in this section) patent license to make, have made,
+              use, offer to sell, sell, import, and otherwise transfer the Work,
+              where such license applies only to those patent claims licensable
+              by such Contributor that are necessarily infringed by their
+              Contribution(s) alone or by combination of their Contribution(s)
+              with the Work to which such Contribution(s) was submitted. If You
+              institute patent litigation against any entity (including a
+              cross-claim or counterclaim in a lawsuit) alleging that the Work
+              or a Contribution incorporated within the Work constitutes direct
+              or contributory patent infringement, then any patent licenses
+              granted to You under this License for that Work shall terminate
+              as of the date such litigation is filed.
+        
+           4. Redistribution. You may reproduce and distribute copies of the
+              Work or Derivative Works thereof in any medium, with or without
+              modifications, and in Source or Object form, provided that You
+              meet the following conditions:
+        
+              (a) You must give any other recipients of the Work or
+                  Derivative Works a copy of this License; and
+        
+              (b) You must cause any modified files to carry prominent notices
+                  stating that You changed the files; and
+        
+              (c) You must retain, in the Source form of any Derivative Works
+                  that You distribute, all copyright, patent, trademark, and
+                  attribution notices from the Source form of the Work,
+                  excluding those notices that do not pertain to any part of
+                  the Derivative Works; and
+        
+              (d) If the Work includes a "NOTICE" text file as part of its
+                  distribution, then any Derivative Works that You distribute must
+                  include a readable copy of the attribution notices contained
+                  within such NOTICE file, excluding those notices that do not
+                  pertain to any part of the Derivative Works, in at least one
+                  of the following places: within a NOTICE text file distributed
+                  as part of the Derivative Works; within the Source form or
+                  documentation, if provided along with the Derivative Works; or,
+                  within a display generated by the Derivative Works, if and
+                  wherever such third-party notices normally appear. The contents
+                  of the NOTICE file are for informational purposes only and
+                  do not modify the License. You may add Your own attribution
+                  notices within Derivative Works that You distribute, alongside
+                  or as an addendum to the NOTICE text from the Work, provided
+                  that such additional attribution notices cannot be construed
+                  as modifying the License.
+        
+              You may add Your own copyright statement to Your modifications and
+              may provide additional or different license terms and conditions
+              for use, reproduction, or distribution of Your modifications, or
+              for any such Derivative Works as a whole, provided Your use,
+              reproduction, and distribution of the Work otherwise complies with
+              the conditions stated in this License.
+        
+           5. Submission of Contributions. Unless You explicitly state otherwise,
+              any Contribution intentionally submitted for inclusion in the Work
+              by You to the Licensor shall be under the terms and conditions of
+              this License, without any additional terms or conditions.
+              Notwithstanding the above, nothing herein shall supersede or modify
+              the terms of any separate license agreement you may have executed
+              with Licensor regarding such Contributions.
+        
+           6. Trademarks. This License does not grant permission to use the trade
+              names, trademarks, service marks, or product names of the Licensor,
+              except as required for reasonable and customary use in describing the
+              origin of the Work and reproducing the content of the NOTICE file.
+        
+           7. Disclaimer of Warranty. Unless required by applicable law or
+              agreed to in writing, Licensor provides the Work (and each
+              Contributor provides its Contributions) on an "AS IS" BASIS,
+              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+              implied, including, without limitation, any warranties or conditions
+              of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+              PARTICULAR PURPOSE. You are solely responsible for determining the
+              appropriateness of using or redistributing the Work and assume any
+              risks associated with Your exercise of permissions under this License.
+        
+           8. Limitation of Liability. In no event and under no legal theory,
+              whether in tort (including negligence), contract, or otherwise,
+              unless required by applicable law (such as deliberate and grossly
+              negligent acts) or agreed to in writing, shall any Contributor be
+              liable to You for damages, including any direct, indirect, special,
+              incidental, or consequential damages of any character arising as a
+              result of this License or out of the use or inability to use the
+              Work (including but not limited to damages for loss of goodwill,
+              work stoppage, computer failure or malfunction, or any and all
+              other commercial damages or losses), even if such Contributor
+              has been advised of the possibility of such damages.
+        
+           9. Accepting Warranty or Additional Liability. While redistributing
+              the Work or Derivative Works thereof, You may choose to offer,
+              and charge a fee for, acceptance of support, warranty, indemnity,
+              or other liability obligations and/or rights consistent with this
+              License. However, in accepting such obligations, You may act only
+              on Your own behalf and on Your sole responsibility, not on behalf
+              of any other Contributor, and only if You agree to indemnify,
+              defend, and hold each Contributor harmless for any liability
+              incurred by, or claims asserted against, such Contributor by reason
+              of your accepting any such warranty or additional liability.
+        
+           END OF TERMS AND CONDITIONS
+        
+           APPENDIX: How to apply the Apache License to your work.
+        
+              To apply the Apache License to your work, attach the following
+              boilerplate notice, with the fields enclosed by brackets "{}"
+              replaced with your own identifying information. (Don't include
+              the brackets!)  The text should be enclosed in the appropriate
+              comment syntax for the file format. We also recommend that a
+              file or class name and description of purpose be included on the
+              same "printed page" as the copyright notice for easier
+              identification within third-party archives.
+        
+           Copyright 2026 CarsonHuangs
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+        
+Requires-Python: <3.14,>=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pytest>=8.4.2
+Requires-Dist: selenium>=4.37.0
+Requires-Dist: appium-python-client>=5.2.4
+Requires-Dist: PyYAML==6.0.3
+Requires-Dist: pytest-html==4.1.1
+Requires-Dist: pytest-json-report==1.5.0
+Requires-Dist: reportlab==4.4.6
+Requires-Dist: screeninfo==0.8.1
+Requires-Dist: numpy==2.2.0
+Requires-Dist: opencv-python==4.12.0.88
+Requires-Dist: mss==10.1.0
+Dynamic: license-file
+
+# pybrowsertestfw Module and Sample Project
+
+## 1. pybrowsertestfw Module Overview
+
+This project provides a lightweight test automation core module based on pytest, targeting a unified usage pattern and reporting output for Web (Selenium) and mobile (Appium). It is ready to use with a “convention over configuration” style. Once installed from PyPI as `pybrowsertestfw`, it can be reused in any project.
+
+### Positioning
+- Unified: Web and mobile operations share the same abstraction, and screenshot/report paths are consistent.
+- Simple: Zero-parameter default behaviors (such as `WebActions.screenshot()`), with a minimal usable API set.
+- Visible: Built-in HTML, PDF, and JSON reports, automatically attaching screenshots and runtime logs.
+
+### Features
+- Reports and attachments
+  - Automatically generates `reports/<ts>/report_<ts>.html`, `report_<ts>.pdf`, and `report_<ts>.json`.
+  - Screenshots are uniformly named `screenshot/ss_{YYYYMMDD_HHMMSS}.png` and injected into the report.
+- Logging
+  - Root log is written to `reports/<ts>/framework_<ts>.log`.
+  - Provides `get_logger(name)` to obtain a named logger consistently.
+- Minimal APIs
+  - Direct attach: `capture_and_attach(config, rep, driver, label)`.
+  - Queue-based: `capture_and_queue_simple(driver)` plus a unified attach step in plugin hooks.
+
+### Installation and Integration
+```bash
+pip install pybrowsertestfw
+```
+Or add the dependency to your existing `pyproject.toml`:
+```toml
+[project]
+dependencies = [
+  "pybrowsertestfw>=0.1.0",
+]
+```
+After installation, pytest will automatically load the plugin `framework.pytest_plugin` via entry points, no extra parameters required.
+
+> Python version requirement: supports Python 3.9.x - 3.13.x (`requires-python = ">=3.9, <3.14"`).
+
+### Module Directory (Simplified)
+```
+├── framework/
+│   ├── config.py              # CLI/session configuration parsing
+│   ├── driver_factory.py      # WebDriver/Appium driver creation
+│   ├── logger.py              # Logging configuration and entry
+│   ├── reporting.py           # Reporting and screenshots
+│   ├── order.py               # Test ordering logic (no pytest-order required)
+│   ├── pdf_report.py          # Optional PDF report generation
+│   └── pytest_plugin.py       # Framework hooks and context
+├── operations/
+│   └── web.py                 # WebActions wrapper
+└── video/
+    └── recorder.py            # Screen recording implementation (Web/Appium)
+```
+
+This repository only contains reusable framework core code (released as the `pybrowerstestfw` package).
+
+## 2. Create a Sample Project
+
+The following uses a minimal sample project to demonstrate how to quickly set up and run locally.
+
+### Directory Layout
+```
+├── drivers/
+│   └── chromedriver.exe
+├── properties.yml
+├── pytest.ini
+├── requirements.txt
+├── test_order.yml
+├── tests/
+│   └── test_sample.py
+├── datas/         # Optional
+|   └── data.csv
+└── reports/       # Generated at runtime
+|   └── <ts>/
+|       ├── report_<ts>.html
+|       ├── report_<ts>.pdf
+|       ├── report_<ts>.json
+|       ├── framework_<ts>.log
+|       └── screenshot/
+|           └── ss_*.png
+```
+
+### Browser and Mobile Drivers
+- Path consistency: All desktop browser drivers should be placed in the `drivers/` directory under the project root (lowercase).
+- Version matching: Each browser driver’s major version must match the corresponding browser’s major version on the machine, otherwise session creation may fail.
+- Desktop examples:
+  - In `properties.yml`, point `executable_path` to the corresponding file <mark>(Safari excluded)</mark>.
+  - Chrome: example path `.\\drivers\\chromedriver.exe`.
+  - Edge: example path `.\\drivers\\msedgedriver.exe`.
+  - Firefox: example path `.\\drivers\\geckodriver.exe`.
+  - Safari (macOS): uses the system `safaridriver`. Run `safaridriver --enable` on macOS to pre-authorize; no local `executable_path` is needed.
+- Mobile examples:
+  - Android: set `'appium:chromedriverExecutable'` in capabilities to a valid ChromeDriver absolute path, for example `'C:\\Drivers\\chromedriver.exe'`, to drive mobile Chrome/WebView.
+  - iOS: connect real devices or simulators through Appium, which relies on the device’s `safaridriver` capabilities. No additional browser driver files are required in the project.
+- Remote mode: When connecting to Selenium Grid, local `executable_path` is usually unnecessary; driver versions are managed on the remote side.
+
+### Quick Start
+
+**1. Create a project directory and enter it, for example:**
+```bash
+mkdir my_sample_project
+cd my_sample_project
+```
+
+**2. Create and activate a virtual environment (recommended):**
+- Windows (PowerShell):
+  ```powershell
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+  ```
+- Windows (cmd):
+  ```bat
+  python -m venv .venv
+  .venv\Scripts\activate.bat
+  ```
+- macOS / Linux (shell):
+  ```bash
+  python -m venv .venv
+  source .venv/bin/activate
+  ```
+
+**3. Create and fill `requirements.txt`:**
+```text
+pybrowerstestfw>=0.1.0
+```
+
+**4. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+**5. Create `pytest.ini`:**
+```ini
+[pytest]
+markers =
+    smoke: 'smoke test'
+addopts = --strict
+```
+
+**6. Create `properties.yml`:**
+```yaml
+# This is an example of Chrome configuration.
+chrome:
+  browserName: 'chrome'
+  executable_path: '.\\drivers\\chromedriver.exe'
+  'goog:chromeOptions':
+    args:
+      - '--start-maximized'
+    experimentalOptions:
+      excludeSwitches:
+        - 'enable-automation'
+```
+
+**7. Create `test_order.yml` (optional, to control execution order):**
+```yaml
+- "tests/test_sample.py::test_demo_aut"
+```
+
+**8. Create a sample test `tests/test_sample.py`**
+  - Example 1:
+    - Test case without CSV:
+      ```python
+      import pytest
+      from selenium.webdriver.common.by import By
+
+
+      @pytest.mark.smoke
+      def test_demo_aut(driver, acts: WebActions):
+          driver.get("https://katalon-test.s3.amazonaws.com/aut/html/form.html")
+          driver.find_element(By.ID, "first-name").clear()
+          driver.find_element(By.ID, "first-name").send_keys("Alex")
+          driver.find_element(By.ID, "last-name").clear()
+          driver.find_element(By.ID, "last-name").send_keys("Smith")
+          acts.screenshot()
+      ```
+
+- Example 2:
+  - Test case using CSV:
+    ```python
+    import pytest
+    from selenium.webdriver.common.by import By
+
+    from operations.web import WebActions
+
+
+    @pytest.mark.smoke
+    def test_demo_aut(driver, acts: WebActions):
+        rows = acts.load_vars_from_csv("data.csv")
+        for row in rows:
+            first = row.get("first", "")
+            last = row.get("last", "")
+
+            driver.get("https://katalon-test.s3.amazonaws.com/aut/html/form.html")
+            driver.find_element(By.ID, "first-name").clear()
+            driver.find_element(By.ID, "first-name").send_keys(first)
+            driver.find_element(By.ID, "last-name").clear()
+            driver.find_element(By.ID, "last-name").send_keys(last)
+
+            acts.screenshot()
+    ```
+
+  - Create test data file `datas/data.csv`:
+    ```text
+    first,last
+    Alex,Smith
+    Steve,Rogers
+    ```
+
+**9. Run the sample test**
+```bash
+pytest --profile="chrome" -q tests/test_sample.py
+```
+
+**10. Open the reports**
+- HTML: `reports/<ts>/report_<ts>.html`
+- JSON: `reports/<ts>/report_<ts>.json`
+- PDF: `reports/<ts>/report_<ts>.pdf`
+- Log: `reports/<ts>/framework_<ts>.log`
+- Screenshots: `reports/<ts>/screenshot/ss_*.png`
+
+### Basic Usage
+- Get a named logger
+```python
+from framework.logger import get_logger
+logger = get_logger("operations.web")
+```
+- Example usage of `screenshot`
+```python
+from operations.web import WebActions
+
+web = WebActions(driver)
+web.screenshot()
+```
+- Example usage of `load_vars_from_csv`
+```python
+from operations.web import WebActions
+
+def test_sample_two(driver, acts: WebActions):
+  rows = acts.load_vars_from_csv("data.csv")
+  for row in rows:
+      first = row.get("first", "")
+      last = row.get("last", "")
+
+      driver.get("https://katalon-test.s3.amazonaws.com/aut/html/form.html")
+      driver.find_element(By.ID, "first-name").clear()
+      driver.find_element(By.ID, "first-name").send_keys(first)
+      driver.find_element(By.ID, "last-name").clear()
+      driver.find_element(By.ID, "last-name").send_keys(last)
+```
+
+### Configuration
+- `requirements.txt`: Declare project dependencies, at least `pybrowerstestfw`, `pytest`, and `selenium`.
+- `pytest.ini`: Pytest global configuration, defines markers and strict mode.
+- `properties.yml`: Stores browser/device capabilities (caps) that the framework reads to create corresponding drivers.
+- `test_order.yml`: Optional, used to specify test execution order.
+- At session start, the plugin automatically:
+  - Initializes report directories and filenames (`init_reporting`).
+  - Configures the root logger (`setup_logging`).
+
+### Reporting and Screenshot Flow
+- During test execution: `WebActions.screenshot()` → `capture_and_queue_simple(driver)` saves PNG files and enqueues them.
+- Reporting phase: The plugin triggers `drain_pending_extras`, attaching all queued images to the HTML report via `rep.extras`.
+- JSON report: Automatically injects a `screenshots` field with relative paths.
+
+### Test Ordering (Without pytest-order)
+- Supports controlling execution order via the `test_order.yml` manifest, without modifying test files, and is compatible with Katalon scripts exported in bulk or individually.
+- Usage:
+  - Create `test_order.yml` in the project root. Each item is a NodeID pattern (YAML list), matched in declared order:
+    - `tests/test_login.py::test_login`
+    - `tests/test_saucedemo_v2.py::test_*`
+    - `tests/generated/**/test_*.py::test_*`
+  - Verify collection order: `pytest --collect-only -p no:order`
+- Notes:
+  - The framework registers `pytest_collection_modifyitems` in the plugin and delegates to `framework/order.py`. If `pytest-order` is also installed, it may reorder items again after collection; it is recommended to disable it via `-p no:order` or remove it from dependencies.
+  - Items not matched in `test_order.yml` maintain default ordering and run after matched items. Parallel execution (`pytest-xdist`) may break ordering; disable parallelism or use single-test orchestration when strict ordering is required.
+
+### Extension Points
+- Custom CLI options
+  - `--profile`: Specify the capabilities key (caps) in `properties.yml`. Example: `--profile web_chrome`.
+  - `--remote-address`: Remote WebDriver/Appium address. Example (Selenium Grid): `http://localhost:4444/wd/hub`; example (Appium): `http://127.0.0.1:4723/wd/hub`.
+  - `--video`: Whether to record video (`y|n`, default `n`). Output file: `reports/<ts>/video_<ts>.mp4`.
+  - Notes: For Web (Selenium) it uses a built-in screen recorder (bundled in `video/pyscreenrec.py`) to capture the entire screen (non-headless is recommended). For mobile (Appium) it uses the driver’s built-in recording.
+  - Examples:
+    ```bash
+    # Local browser (Chrome, local driver)
+    pytest --profile="chrome" -m "smoke"
+    
+    # Remote Selenium Grid (Chrome)
+    pytest --profile="chrome" --remote-address="http://localhost:4444/wd/hub" -m "smoke"
+    
+    # Appium (mobile Web): requires remote mode + browserName
+    pytest --profile="android_chrome" --remote-address="http://127.0.0.1:4723/wd/hub" -m "smoke" --video="y"
+    
+    # Local browser (Edge)
+    pytest --profile="edge_local" -m "smoke"
+    
+    # Local browser (Firefox)
+    pytest --profile="firefox_local" -m "smoke"
+    
+    # Safari (macOS only)
+    pytest --profile="safari_mac" -m "smoke"
+    ```
+
+- Appium usage example (mobile Web)
+  - `properties.yml` example:
+    ```yaml
+    android_chrome:
+      platformName: 'Android'
+      browserName: 'chrome'
+      'appium:automationName': 'UiAutomator2'
+      'appium:deviceName': 'emulator-5554'
+      'appium:noReset': true
+      'appium:chromedriverExecutable': 'C:\\Drivers\\chromedriver.exe'
+      'goog:chromeOptions':
+        experimentalOptions:
+          w3c: false
+
+    ios_safari:
+      platformName: 'iOS'
+      browserName: 'safari'
+      'appium:automationName': 'XCUITest'
+      'appium:deviceName': 'iPhone 15'
+      'appium:udid': '000XXX20-001C35XXXE42XXXX'
+      'appium:noReset': true
+      'appium:nativeWebTap': true
+      'appium:safariAllowPopups': false
+      'appium:safariIgnoreFraudWarning': true
+    ```
+  - Run example:
+    ```bash
+    # Android Chrome (ensure Appium Server is running)
+    pytest --profile="android_chrome" --remote-address="http://127.0.0.1:4723/wd/hub" -m "smoke"
+    ```
+  - Note: The current version requires `browserName` in `capabilities` (for mobile Web/WebView).
+
+### Locator Strategy Compatibility (Mobile Web / Appium)
+- In mobile Web sessions through Appium→WebDriver, the server enforces locator strategies more strictly. Directly using `using: "id"|"name"|"class name"` may be considered invalid and return `invalid locator` (400).
+- If test cases call `driver.find_element("id", ...)` directly, mobile Web scenarios may still fail. Using CSS or XPath locators is recommended.
+
+### FAQ
+- Screenshots not visible? Ensure you are using a `pytest-html` version that supports `rep.extras` (4.1.x or above).
+- Paths too long? The framework removes `nodeid` in filenames and uses timestamps to keep them short and consistent.
