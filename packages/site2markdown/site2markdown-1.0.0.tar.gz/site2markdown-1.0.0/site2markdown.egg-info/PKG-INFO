@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: site2markdown
+Version: 1.0.0
+Summary: Convert web pages to markdown
+Author: Sumit Banik
+Author-email: Sumit Banik <sumitbanik02@gmail.com>
+Project-URL: Homepage, https://github.com/sumitbanik/site2markdown
+Project-URL: Bug Tracker, https://github.com/sumitbanik/site2markdown/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.31.0
+Requires-Dist: beautifulsoup4>=4.12.0
+Requires-Dist: lxml>=4.9.0
+Requires-Dist: html2text>=2020.1.16
+Requires-Dist: readability-lxml>=0.8.1
+Dynamic: author
+Dynamic: license-file
+Dynamic: requires-python
+
+# Site to Markdown Converter
+
+A Python package that converts web pages to clean markdown format.
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+Or install dependencies directly:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+```python
+from site2markdown import UrlToMarkdown
+
+# Create converter instance
+converter = UrlToMarkdown()
+
+# Convert a URL to markdown
+markdown = converter.convert(
+    url="https://www.example.com",
+    inline_title=True,      # Include title as H1 heading
+    ignore_links=False,     # Keep links in output
+    improve_readability=True  # Apply readability improvements
+)
+
+print(markdown)
+
+# Convert HTML directly
+html_content = "<html><body><h1>Title</h1><p>Content</p></body></html>"
+markdown = converter.convert_html(
+    html=html_content,
+    url="https://www.example.com",  # Base URL for relative links
+    inline_title=True,
+    ignore_links=False,
+    improve_readability=True
+)
+
+print(markdown)
+```
+
+## Features
+
+- Converts web pages to clean markdown format
+- Supports special handling for:
+  - Stack Overflow questions and answers
+  - Apple Developer documentation
+  - Wikipedia articles
+  - Medium articles
+- Preserves code blocks and tables
+- Removes unwanted elements (scripts, styles)
+- Applies domain-specific filters
+- Makes relative URLs absolute
+- Optional readability improvements using Mozilla's Readability algorithm
+
+## Options
+
+- `inline_title` (bool): Include page title as H1 heading (default: True)
+- `ignore_links` (bool): Remove all links from output (default: False)
+- `improve_readability` (bool): Apply readability algorithm to extract main content (default: True)
+
+## License
+
+MIT License

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "site2markdown"
+version = "1.0.0"
+authors = [
+  { name="Sumit Banik", email="sumitbanik02@gmail.com" },
+]
+description = "Convert web pages to markdown"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+    "html2text>=2020.1.16",
+    "readability-lxml>=0.8.1",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/sumitbanik/site2markdown"
+"Bug Tracker" = "https://github.com/sumitbanik/site2markdown/issues"
