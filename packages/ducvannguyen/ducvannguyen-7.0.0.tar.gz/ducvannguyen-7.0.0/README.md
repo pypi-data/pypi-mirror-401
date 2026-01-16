@@ -1,0 +1,139 @@
+# ducvannguyen v6.0.0
+
+Advanced Python utilities and tools by Duc Van Nguyen.
+
+## Installation
+
+```bash
+pip install ducvannguyen
+```
+
+## Features
+
+### 🚀 Advanced Utilities Package
+
+ Ducvannguyen v6.0.0 provides comprehensive utilities for:
+
+#### 📝 String Utilities
+```python
+import ducvannguyen
+
+utils = ducvannguyen.string_utils()
+print(utils["reverse"]("hello"))  # "olleh"
+print(utils["is_palindrome"]("racecar"))  # True
+print(utils["word_count"]("Hello world"))  # 2
+```
+
+#### 🔢 Math Utilities
+```python
+utils = ducvannguyen.math_utils()
+print(utils["factorial"](5))  # 120
+print(utils["is_prime"](17))  # True
+print(utils["gcd"](48, 18))  # 6
+```
+
+#### 📋 List Utilities
+```python
+utils = ducvannguyen.list_utils()
+print(utils["unique"]([1, 2, 2, 3, 3, 4]))  # [1, 2, 3, 4]
+print(utils["chunk"]([1, 2, 3, 4, 5], 2))  # [[1, 2], [3, 4], [5]]
+```
+
+#### 📁 File Utilities
+```python
+utils = ducvannguyen.file_utils()
+print(utils["get_extension"]("test.txt"))  # ".txt"
+print(utils["is_file"]("test.txt"))  # True/False
+```
+
+#### 📅 DateTime Utilities
+```python
+utils = ducvannguyen.datetime_utils()
+print(utils["now"]())  # "2024-01-15 14:30:00"
+print(utils["add_days"](7))  # "2024-01-22"
+```
+
+#### 🌐 Web Utilities
+```python
+utils = ducvannguyen.web_utils()
+print(utils["get_domain"]("https://example.com/path"))  # "example.com"
+print(utils["is_valid_url"]("https://example.com"))  # True
+```
+
+#### 🎲 Random Utilities
+```python
+utils = ducvannguyen.random_utils()
+print(utils["random_string"](10))  # "aB3dE7fG9h"
+print(utils["uuid4"]())  # "550e8400-e29b-41d4-a716-446655440000"
+```
+
+#### ✅ Validation Utilities
+```python
+utils = ducvannguyen.validate_utils()
+print(utils["is_email"]("user@example.com"))  # True
+print(utils["is_strong_password"]("Passw0rd!"))  # True
+```
+
+### 🎯 All-in-One Access
+
+```python
+# Get all utilities at once
+all_utils = ducvannguyen.all_utils()
+
+# Access any utility
+print(all_utils["string"]["reverse"]("hello"))
+print(all_utils["math"]["factorial"](5))
+print(all_utils["validate"]["is_email"]("test@example.com"))
+```
+
+### 📊 Package Information
+
+```python
+import ducvannguyen
+
+print(ducvannguyen.hello())  # "Hello from ducvannguyen package v6.0.0!"
+print(ducvannguyen.get_info())  # Package details
+```
+
+## 🚀 Quick Start
+
+```python
+import ducvannguyen
+
+# String operations
+string_utils = ducvannguyen.string_utils()
+text = "Hello World"
+print(f"Original: {text}")
+print(f"Reversed: {string_utils['reverse'](text)}")
+print(f"Uppercase: {string_utils['uppercase'](text)}")
+print(f"Word count: {string_utils['word_count'](text)}")
+
+# Math operations
+math_utils = ducvannguyen.math_utils()
+print(f"Is 17 prime? {math_utils['is_prime'](17)}")
+print(f"GCD of 48 and 18: {math_utils['gcd'](48, 18)}")
+
+# Validation
+validate_utils = ducvannguyen.validate_utils()
+email = "user@example.com"
+print(f"Is '{email}' valid? {validate_utils['is_email'](email)}")
+```
+
+## 🛠️ Installation Requirements
+
+- Python 3.7+
+- No external dependencies (uses only Python standard library)
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🔗 Links
+
+- **PyPI**: https://pypi.org/project/ducvannguyen/
+- **GitHub**: https://github.com/vanducdev/ducvannguyen
+- **Issues**: https://github.com/vanducdev/ducvannguyen/issues
+
+---
+
+**Made with ❤️ by Duc Van Nguyen**
