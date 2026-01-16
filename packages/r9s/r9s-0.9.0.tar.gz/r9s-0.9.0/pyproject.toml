@@ -1,0 +1,122 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "r9s"
+version = "0.9.0"
+description = "The official Python library for the r9s API"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    {name = "routertokens"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "httpcore >=1.0.9",
+    "httpx >=0.28.1",
+    "prompt-toolkit >=3.0.0",
+    "pydantic >=2.11.2",
+    "pyyaml >=6.0",
+    "python-dotenv >=1.0.1",
+    "tomli-w >=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/r9s-ai/r9s-python"
+Repository = "https://github.com/r9s-ai/r9s-python"
+Issues = "https://github.com/r9s-ai/r9s-python/issues"
+
+[project.scripts]
+r9s = "r9s.cli_tools.cli:main"
+
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-asyncio",
+]
+dev = [
+    "mypy ==1.15.0",
+    "pre-commit >=3.7.0",
+    "pylint ==3.2.3",
+    "pyright ==1.1.398",
+    "ruff >=0.14.10",
+]
+rich = [
+    "rich >=13.0",
+]
+
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+
+[tool.mypy]
+disable_error_code = "misc"
+explicit_package_bases = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = "typing_inspect"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "jsonpath"
+ignore_missing_imports = true
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["src", "example", "main.py"]
+exclude = [
+    "build",
+    "dist",
+    "**/__pycache__",
+    "**/*.egg-info",
+    # Speakeasy-generated (skip type checking; DO NOT EDIT)
+    "src/r9s/*.py",
+    "src/r9s/errors/**",
+    "src/r9s/utils/**",
+    "src/r9s/models/**",
+    "src/r9s/_hooks/**",
+]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+exclude = [
+    # Speakeasy-generated (skip lint/format; DO NOT EDIT)
+    "src/r9s/*.py",
+    "src/r9s/errors/**",
+    "src/r9s/utils/**",
+    "src/r9s/models/**",
+    "src/r9s/_hooks/**",
+    "src/r9s/sdk.py",
+    "src/r9s/httpclient.py",
+    "src/r9s/basesdk.py",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
