@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "mysql_mcp_server": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://git.garena.com/shopee/loan-service/credit_backend/credit-core/mysql_mcp_server.git",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_CONFIG_FILE": "/path/to/your/mysql_mcp_config.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,430 @@
+Metadata-Version: 2.4
+Name: mcp-mysql-server
+Version: 1.0.0
+Summary: A Model Context Protocol (MCP) server for MySQL databases with multi-database support and read-only mode. Enables AI assistants to securely query multiple MySQL databases.
+Project-URL: Homepage, https://github.com/anthropics/mysql-mcp-server
+Project-URL: Repository, https://github.com/anthropics/mysql-mcp-server
+Project-URL: Documentation, https://github.com/anthropics/mysql-mcp-server#readme
+Author-email: Hao Wang <wanghao@shopee.com>
+License: MIT
+License-File: LICENSE
+Keywords: ai,claude,cursor,database,llm,mcp,model-context-protocol,mysql
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Database
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.11
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: mysql-connector-python>=9.1.0
+Description-Content-Type: text/markdown
+
+![Tests](https://github.com/designcomputer/mysql_mcp_server/actions/workflows/test.yml/badge.svg)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/mysql-mcp-server)
+[![smithery badge](https://smithery.ai/badge/mysql-mcp-server)](https://smithery.ai/server/mysql-mcp-server)
+[![MseeP.ai Security Assessment Badge](https://mseep.net/mseep-audited.png)](https://mseep.ai/app/designcomputer-mysql-mcp-server)
+# MySQL MCP Server
+MySQL 数据库模型上下文协议 (MCP) 实现，支持与 MySQL 数据库的安全交互。该服务器组件促进 AI 应用程序（主机/客户端）与 MySQL 数据库之间的通信，使数据库探索和分析更加安全和结构化。
+
+> **注意**: MySQL MCP Server 不是设计为独立服务器，而是作为 AI 应用程序和 MySQL 数据库之间的通信协议实现。
+
+## 功能特性
+- **多数据库支持**: 配置多个 MySQL 连接，每个连接作为独立的工具
+- **只读模式**: 将连接限制为仅执行 SELECT/SHOW/DESCRIBE 查询
+- 列出可用的 MySQL 表作为资源（按连接分组）
+- 读取表内容
+- 执行 SQL 查询，具有适当的错误处理
+- 通过环境变量或配置文件实现安全的数据库访问
+- 全面的日志记录
+
+## 安装
+### 手动安装
+```bash
+pip install mysql-mcp-server
+```
+
+### 通过 Smithery 安装
+通过 [Smithery](https://smithery.ai/server/mysql-mcp-server) 自动为 Claude Desktop 安装 MySQL MCP Server：
+```bash
+npx -y @smithery/cli install mysql-mcp-server --client claude
+```
+
+## 配置
+
+### 多数据库配置（推荐）
+
+您可以使用 JSON 配置文件或环境变量来配置多个 MySQL 连接。
+
+#### 选项 1：JSON 配置文件
+
+创建 JSON 配置文件并设置 `MYSQL_CONFIG_FILE` 环境变量：
+
+**单数据库模式**（每个连接一个默认数据库）：
+
+```json
+{
+  "connections": {
+    "config_manage": {
+      "host": "localhost",
+      "port": 3306,
+      "user": "your_username",
+      "password": "your_password",
+      "database": "mysql-config-manage"
+    },
+    "product_staging": {
+      "host": "localhost",
+      "port": 3306,
+      "user": "your_username",
+      "password": "your_password",
+      "database": "mysql-product-sg-staging"
+    }
+  }
+}
+```
+
+**多数据库模式**（一个连接可访问多个数据库，推荐用于大量数据库场景）：
+
+当同一个 MySQL 服务器上有多个数据库需要访问时，使用 `databases` 数组指定允许访问的数据库列表。**每个连接只生成一个工具**，通过 `database` 参数指定要操作的数据库：
+
+```json
+{
+  "connections": {
+    "local_server": {
+      "host": "localhost",
+      "port": 3306,
+      "user": "your_username",
+      "password": "your_password",
+      "databases": ["config_manage", "product_staging", "user_center", "orders", "inventory"],
+      "readonly": true
+    },
+    "production": {
+      "host": "prod-db.example.com",
+      "port": 3306,
+      "user": "prod_user",
+      "password": "prod_password",
+      "databases": ["orders", "inventory", "analytics", "users", "logs"],
+      "readonly": true
+    }
+  }
+}
+```
+
+这将创建 **2 个工具**（而不是 10 个）：
+- `execute_sql_local_server` - 可访问 5 个数据库
+- `execute_sql_production` - 可访问 5 个数据库
+
+调用时通过 `database` 参数指定目标数据库：
+```json
+{
+  "query": "SELECT * FROM users LIMIT 10",
+  "database": "config_manage"
+}
+```
+
+> **优势**：当您有几十个数据库时，这种方式可以大大减少工具数量，避免工具列表过长。
+
+#### 选项 2：环境变量 JSON
+
+设置 `MYSQL_CONNECTIONS` 环境变量为 JSON 字符串：
+
+```bash
+# 单数据库模式
+MYSQL_CONNECTIONS='{"connections":{"config_manage":{"host":"localhost","port":3306,"user":"user","password":"pass","database":"db1"}}}'
+
+# 多数据库模式（推荐）
+MYSQL_CONNECTIONS='{"connections":{"server":{"host":"localhost","port":3306,"user":"user","password":"pass","databases":["db1","db2","db3","db4","db5"]}}}'
+```
+
+### 只读模式
+
+您可以为任何连接启用只读模式，将其限制为仅执行 SELECT、SHOW、DESCRIBE 和 EXPLAIN 查询。当您希望防止意外的数据修改时，即使数据库用户具有写权限，这也很有用。
+
+#### 在 JSON 配置文件中
+
+```json
+{
+  "connections": {
+    "production_readonly": {
+      "host": "prod-db.example.com",
+      "port": 3306,
+      "user": "readonly_user",
+      "password": "password",
+      "database": "production",
+      "readonly": true
+    },
+    "staging_full_access": {
+      "host": "staging-db.example.com",
+      "port": 3306,
+      "user": "admin_user",
+      "password": "password",
+      "database": "staging",
+      "readonly": false
+    }
+  }
+}
+```
+
+#### 使用传统环境变量
+
+```bash
+MYSQL_HOST=localhost
+MYSQL_USER=your_username
+MYSQL_PASSWORD=your_password
+MYSQL_DATABASE=your_database
+MYSQL_READONLY=true  # 启用只读模式（接受: true, 1, yes）
+```
+
+#### 只读模式下允许的查询
+
+- `SELECT` - 读取数据
+- `SHOW` - 显示表、数据库等
+- `DESCRIBE` / `DESC` - 描述表结构
+- `EXPLAIN` - 解释查询执行计划
+- `USE` - 切换数据库
+
+#### 只读模式下被阻止的查询
+
+- `INSERT`, `UPDATE`, `DELETE` - 数据修改
+- `CREATE`, `ALTER`, `DROP`, `TRUNCATE` - 结构变更
+- `GRANT`, `REVOKE` - 权限变更
+- `CALL` - 存储过程（可能修改数据）
+- 事务语句 (`BEGIN`, `COMMIT`, `ROLLBACK`)
+
+### 单数据库配置（传统）
+
+为了向后兼容，您仍然可以使用单数据库环境变量：
+
+```bash
+MYSQL_HOST=localhost     # 数据库主机
+MYSQL_PORT=3306         # 可选：数据库端口（未指定时默认为 3306）
+MYSQL_USER=your_username
+MYSQL_PASSWORD=your_password
+MYSQL_DATABASE=your_database
+```
+
+## 使用方法
+### 与 Claude Desktop 一起使用
+
+#### 多数据库配置
+将以下内容添加到您的 `claude_desktop_config.json`：
+```json
+{
+  "mcpServers": {
+    "mysql": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "path/to/mysql_mcp_server",
+        "run",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_CONFIG_FILE": "/path/to/mysql_config.json"
+      }
+    }
+  }
+}
+```
+
+或者使用内联 JSON 配置：
+```json
+{
+  "mcpServers": {
+    "mysql": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "path/to/mysql_mcp_server",
+        "run",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_CONNECTIONS": "{\"connections\":{\"config_manage\":{\"host\":\"localhost\",\"port\":3306,\"user\":\"user\",\"password\":\"pass\",\"database\":\"config_db\"},\"product_staging\":{\"host\":\"localhost\",\"port\":3306,\"user\":\"user\",\"password\":\"pass\",\"database\":\"product_db\"}}}"
+      }
+    }
+  }
+}
+```
+
+这将创建：
+- 工具: `execute_sql_config_manage`, `execute_sql_product_staging`
+- 资源: `[config_manage] table_name`, `[product_staging] table_name`
+
+#### 单数据库配置（传统）
+```json
+{
+  "mcpServers": {
+    "mysql": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "path/to/mysql_mcp_server",
+        "run",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "your_username",
+        "MYSQL_PASSWORD": "your_password",
+        "MYSQL_DATABASE": "your_database"
+      }
+    }
+  }
+}
+```
+
+### 与 Visual Studio Code / Cursor 一起使用
+
+#### 多数据库配置
+将以下内容添加到您的 `mcp.json`：
+```json
+{
+  "servers": {
+    "mysql": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mysql-mcp-server",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_CONFIG_FILE": "/path/to/mysql_config.json"
+      }
+    }
+  }
+}
+```
+
+#### 使用本地开发版本
+
+要使用本地开发版本而不是发布的包：
+
+```json
+{
+  "servers": {
+    "mysql": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/path/to/mysql_mcp_server",
+        "run",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_CONFIG_FILE": "/path/to/mysql_config.json"
+      }
+    }
+  }
+}
+```
+
+或者从本地路径安装：
+
+```json
+{
+  "servers": {
+    "mysql": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "/path/to/mysql_mcp_server",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_CONFIG_FILE": "/path/to/mysql_config.json"
+      }
+    }
+  }
+}
+```
+
+#### 单数据库配置（传统）
+```json
+{
+  "servers": {
+    "mysql": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mysql-mcp-server",
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "your_username",
+        "MYSQL_PASSWORD": "your_password",
+        "MYSQL_DATABASE": "your_database"
+      }
+    }
+  }
+}
+```
+注意：需要安装 uv 才能使用
+
+### 使用 MCP Inspector 调试
+虽然 MySQL MCP Server 不是设计为独立运行或直接从命令行使用 Python 运行，但您可以使用 MCP Inspector 来调试它。
+
+MCP Inspector 提供了测试和调试 MCP 实现的便捷方式：
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+# 使用 MCP Inspector 进行调试（不要直接使用 Python 运行）
+```
+
+MySQL MCP Server 设计为与 Claude Desktop 等 AI 应用程序集成，不应作为独立 Python 程序直接运行。
+
+## 开发
+```bash
+# 克隆仓库
+git clone https://github.com/designcomputer/mysql_mcp_server.git
+cd mysql_mcp_server
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # 或在 Windows 上使用 `venv\Scripts\activate`
+# 安装开发依赖
+pip install -r requirements-dev.txt
+# 运行测试
+pytest
+```
+
+## 安全考虑
+- 永远不要提交环境变量或凭据
+- 使用具有最小所需权限的数据库用户
+- 考虑在生产环境中实施查询白名单
+- 监控和记录所有数据库操作
+
+## 安全最佳实践
+此 MCP 实现需要数据库访问才能运行。为了安全：
+1. **创建专用 MySQL 用户**，具有最小权限
+2. **永远不要使用 root 凭据** 或管理账户
+3. **限制数据库访问** 仅为必要的操作
+4. **启用日志记录** 以进行审计
+5. **定期安全审查** 数据库访问
+
+请参阅 [MySQL 安全配置指南](https://github.com/designcomputer/mysql_mcp_server/blob/main/SECURITY.md) 以获取详细说明：
+- 创建受限的 MySQL 用户
+- 设置适当的权限
+- 监控数据库访问
+- 安全最佳实践
+
+⚠️ 重要：配置数据库访问时始终遵循最小权限原则。
+
+## 许可证
+MIT 许可证 - 请参阅 LICENSE 文件以获取详细信息。
+
+## 贡献
+1. Fork 此仓库
+2. 创建您的功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交您的更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 开启 Pull Request
