@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agenwatch"
+
+description = "Runtime-enforced governance kernel for AI agents"
+requires-python = ">=3.10"
+
+authors = [
+  { name = "AgenWatch Team", email = "agenwatch.dev@gmail.com" }
+]
+
+license = { text = "MIT" }
+
+readme = "README.md"
+
+keywords = ["ai", "agents", "governance", "security", "llm"]
+
+dynamic = ["version"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+  "pydantic",
+  "psutil",
+  "python-dotenv",
+  "tiktoken",
+  "litellm",
+  "openai",
+  "groq"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/agenwatch/agenwatch"
+"Repository" = "https://github.com/agenwatch/agenwatch"
+"Bug Tracker" = "https://github.com/agenwatch/agenwatch/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agenwatch*"]
+exclude = ["tests*", "demos*", "backend*", "alembic*", "sdk_legacy_experiment*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "agenwatch.__version__" }
