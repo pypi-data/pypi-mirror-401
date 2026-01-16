@@ -1,0 +1,34 @@
+# Morse Lang
+
+A programming language written entirely in Morse code.
+
+## Installation
+
+### macOS
+```bash
+python3 -m pip install -e .
+export PATH="/Users/blaz/Library/Python/3.9/bin:$PATH"
+```
+
+### Windows
+```bash
+pip install -e .
+```
+
+## Usage
+
+Run a Morse code file:
+```bash
+morse examples/hello.mc
+```
+
+## Frontend
+
+A web interface is available for translating text to/from Morse code. See [FRONTEND_README.md](FRONTEND_README.md) for details.
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+Then open `http://localhost:5000` in your browser.
