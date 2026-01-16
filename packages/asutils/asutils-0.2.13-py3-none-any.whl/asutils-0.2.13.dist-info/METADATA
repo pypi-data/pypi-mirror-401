@@ -1,0 +1,59 @@
+Metadata-Version: 2.4
+Name: asutils
+Version: 0.2.13
+Summary: Personal CLI utilities
+Project-URL: Repository, https://github.com/afspies/asutils
+Author-email: Alex Spies <alex@afspies.com>
+License: MIT
+License-File: LICENSE
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: typer>=0.9.0
+Provides-Extra: dev
+Requires-Dist: build>=1.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Requires-Dist: twine>=4.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# asutils
+
+Personal CLI utilities.
+
+## Install
+
+```bash
+pip install asutils
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `asutils repo init [name]` | Scaffold new Python project |
+| `asutils git sync` | Quick add, commit, push |
+| `asutils publish release` | Publish to PyPI |
+| `asutils claude skill list` | List bundled & installed Claude Code skills |
+| `asutils claude skill add <name>` | Add a skill to `~/.claude/skills/` |
+| `asutils claude skill add --profile=all` | Add all bundled skills |
+| `asutils claude skill remove <name>` | Remove a skill |
+
+## Dev Install
+
+```bash
+git clone https://github.com/afspies/asutils
+cd asutils
+uv pip install -e ".[dev]"
+```
+
+## License
+MIT
