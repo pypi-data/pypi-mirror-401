@@ -1,0 +1,54 @@
+[project]
+name = "sqla-dataset"
+authors = [
+  { name = "hharzer", email = "hharzer@live.com" }
+]
+
+license = "MIT"
+version = "1.0.0"
+description = "Toolkit for Python-based database access."
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+  "alembic>=1.18.1",
+  "banal>=1.0.6",
+  "sqlalchemy>=2.0.45",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.5",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+]
+keywords = ["sql", "sqlalchemy", "etl", "loading", "utility"]
+[project.urls]
+Repository = "https://github.com/hharzer/py-sqla-dataset.git"
+[dependency-groups]
+dev = [
+  "cryptography>=46.0.3",
+  "flake8>=7.3.0",
+  "pip>=25.3",
+  "psycopg2-binary>=2.9.11",
+  "pymysql>=1.1.2",
+  "pytest>=9.0.2",
+  "twine>=6.2.0",
+  "wheel>=0.45.1",
+]
+[tool.flake8]
+ignore = [
+  "E501",
+  "E123",
+  "E124",
+  "E126",
+  "E127",
+  "E128",
+  "E722",
+  "E741"
+]
+
+[tool.bdist_wheel]

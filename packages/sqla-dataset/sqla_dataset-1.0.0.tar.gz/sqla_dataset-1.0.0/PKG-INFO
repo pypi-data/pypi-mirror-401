@@ -1,0 +1,42 @@
+Metadata-Version: 2.4
+Name: sqla-dataset
+Version: 1.0.0
+Summary: Toolkit for Python-based database access.
+Author-email: hharzer <hharzer@live.com>
+License-Expression: MIT
+Project-URL: Repository, https://github.com/hharzer/py-sqla-dataset.git
+Keywords: sql,sqlalchemy,etl,loading,utility
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: alembic>=1.18.1
+Requires-Dist: banal>=1.0.6
+Requires-Dist: sqlalchemy>=2.0.45
+Dynamic: license-file
+
+dataset: databases for lazy people
+==================================
+
+![build](https://github.com/pudo/dataset/workflows/build/badge.svg)
+
+In short, **dataset** makes reading and writing data in databases as simple as reading and writing JSON files.
+
+[Read the docs](https://dataset.readthedocs.io/)
+
+To install dataset, fetch it with ``pip``:
+
+```bash
+$ pip install dataset
+```
+
+**Note:** as of version 1.0, **dataset** is split into two packages, with the
+data export features now extracted into a stand-alone package, **datafreeze**.
+See the relevant repository [here](https://github.com/pudo/datafreeze).
