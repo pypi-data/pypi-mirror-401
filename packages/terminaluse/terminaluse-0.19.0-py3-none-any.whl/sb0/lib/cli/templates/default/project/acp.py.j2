@@ -1,0 +1,52 @@
+from sb0.lib.sdk.agent_server import AgentServer
+from sb0.lib.types.acp import SendEventParams, CancelTaskParams, CreateTaskParams
+from sb0.lib.utils.logging import make_logger
+from sb0.types.text_content import TextContent
+from sb0.lib import adk
+
+
+logger = make_logger(__name__)
+
+
+# Create an agent server
+# This sets up the core server that handles task creation, events, and cancellation
+server = AgentServer()
+
+
+@server.on_task_event_send
+async def handle_task_event_send(params: SendEventParams):
+    """Handle incoming messages from users.
+
+    This is where you implement your main agent logic.
+    """
+    logger.info(f"Received message: {params}")
+
+    # Echo back the user's message
+    await adk.messages.create(task_id=params.task.id, content=params.event.content)
+
+    # Send a response
+    await adk.messages.create(
+        task_id=params.task.id,
+        content=TextContent(
+            author="agent",
+            content="Hello! I've received your message. Edit this handler to add your agent logic.",
+        ),
+    )
+
+
+@server.on_task_cancel
+async def handle_task_canceled(params: CancelTaskParams):
+    """Handle task cancellation.
+
+    Clean up any resources or state when a task is cancelled.
+    """
+    logger.info(f"Task cancelled: {params.task.id}")
+
+
+@server.on_task_create
+async def handle_task_create(params: CreateTaskParams):
+    """Handle task creation.
+
+    Initialize any state or resources needed for the task.
+    """
+    logger.info(f"Task created: {params.task.id}")

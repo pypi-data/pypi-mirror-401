@@ -1,0 +1,35 @@
+# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+from __future__ import annotations
+
+from typing import Union
+from typing_extensions import Literal, Required, TypeAlias, TypedDict
+
+from .agent_rpc_method import AgentRpcMethod
+from .send_event_request_param import SendEventRequestParam
+from .cancel_task_request_param import CancelTaskRequestParam
+from .create_task_request_param import CreateTaskRequestParam
+from .send_message_request_param import SendMessageRequestParam
+
+__all__ = ["AgentRpcByNameParams", "Params"]
+
+
+class AgentRpcByNameParams(TypedDict, total=False):
+    namespace_slug: Required[str]
+
+    namespace_id: Required[str]
+    """Namespace ID for workspace operations"""
+
+    method: Required[AgentRpcMethod]
+
+    params: Required[Params]
+    """The parameters for the agent RPC request"""
+
+    id: Union[int, str, None]
+
+    jsonrpc: Literal["2.0"]
+
+
+Params: TypeAlias = Union[
+    CreateTaskRequestParam, CancelTaskRequestParam, SendMessageRequestParam, SendEventRequestParam
+]

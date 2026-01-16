@@ -1,0 +1,22 @@
+from abc import ABC, abstractmethod
+from collections.abc import Generator, AsyncGenerator
+
+from sb0.lib.types.llm_messages import Completion
+
+
+class LLMGateway(ABC):
+    @abstractmethod
+    def completion(self, *args, **kwargs) -> Completion:
+        raise NotImplementedError
+
+    @abstractmethod
+    def completion_stream(self, *args, **kwargs) -> Generator[Completion, None, None]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def acompletion(self, *args, **kwargs) -> Completion:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def acompletion_stream(self, *args, **kwargs) -> AsyncGenerator[Completion, None]:
+        raise NotImplementedError
