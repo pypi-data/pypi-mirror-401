@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inkpython"
+version = "0.1.0"
+description = "Python runtime for Ink stories."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+authors = [{name = "Pete Garcin"}]
+keywords = ["ink", "interactive-fiction", "narrative"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+[project.scripts]
+inkpython = "inkpython.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/rawktron/inkpython"
+
+[tool.setuptools.packages.find]
+include = ["inkpython*"]
