@@ -1,0 +1,38 @@
+Metadata-Version: 2.4
+Name: scaliger
+Version: 0.0.1
+Summary: Semantic Codegen for BEDA and TEI P5 archives.
+Author-email: Andrea Marruzzo <amarruzzo@gmail.com>
+License: Copyright © 2026 Andrea Marruzzo
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: colorama>=0.4.6
+Dynamic: license-file
+
+# SCALIGER
+
+**A multi-target boilerplate generator for strictly-typed datasets.**
+
+SCALIGER is a utility for converting Python dictionaries and lists into type-safe code structures (Enums, Structs, and Implementation blocks) across multiple programming languages.
+
+## Technical Scope
+
+* **Code Generation:** Automates the creation of Enums with complex `impl` blocks in Rust and class-based Enums in Python.
+* **Metadata Support:** Handles automatic generation of Rust `derives`, `macros`, and required `imports`.
+* **Standardisation:** Ensures that data defined in one place (like an archaeological database) remains consistent across an Actix-web server (Rust) and data-processing scripts (Python).
+
+## Status
+
+**SCALIGER is currently in a private Alpha stage.** Version 0.0.1 is a placeholder release to secure the namespace. The core generator logic is currently maintained in a private repository to protect ongoing research and intellectual property.
+
+## License
+
+This project is licensed under the MIT Licence.

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scaliger"
+version = "0.0.1"
+description = "Semantic Codegen for BEDA and TEI P5 archives."
+readme = "README.md"
+authors = [
+    { name = "Andrea Marruzzo", email = "amarruzzo@gmail.com" }
+]
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML>=6.0",
+    "colorama>=0.4.6"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["scaliger"]
+exclude = [
+    "scaliger.codegen*",
+    "scaliger.io*",
+    "scaliger.jsonc*",
+    "scaliger.text*"
+]
