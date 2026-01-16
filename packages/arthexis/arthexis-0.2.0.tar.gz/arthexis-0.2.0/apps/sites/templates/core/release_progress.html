@@ -1,0 +1,303 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .release-progress-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+  .progress-column,
+  .log-column {
+    flex: 1 1 320px;
+    min-width: 280px;
+  }
+  .progress-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+  }
+  .progress-actions button {
+    padding-inline: 1.1rem;
+    padding-block: 0.45rem 0.6rem;
+  }
+  .progress-actions form {
+    display: inline;
+  }
+  .progress-actions button {
+    min-width: 8rem;
+  }
+  .progress-steps {
+    margin: 0 0 1.5rem;
+    padding-left: 1.5rem;
+  }
+  .progress-steps li {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .progress-steps li .progress-icon {
+    font-size: 1.1em;
+  }
+  .progress-steps li.status-active .progress-name,
+  .progress-steps li.status-paused .progress-name,
+  .progress-steps li.status-complete .progress-name {
+    font-weight: 600;
+  }
+  .progress-steps li.status-error .progress-name {
+    color: var(--error-fg, #ba2121);
+  }
+  .progress-steps li.status-blocked .progress-name {
+    color: var(--warning-fg, #c09853);
+  }
+  .log-column {
+    background: var(--darkened-bg, rgba(0, 0, 0, 0.05));
+    padding: 1rem;
+    border-radius: 6px;
+  }
+  .log-column h2 {
+    margin-top: 0;
+  }
+  .progress-steps li.status-awaiting-approval .progress-name {
+    color: var(--link-fg);
+  }
+  .progress-steps li.status-missing-credentials .progress-name {
+    color: var(--warning-fg, #c09853);
+  }
+  .approval-actions {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid var(--hairline-color);
+    border-radius: 6px;
+    background: var(--body-bg);
+  }
+  .approval-actions h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  .approval-actions p {
+    margin: 0;
+  }
+  .approval-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+  .approval-buttons form {
+    display: inline;
+  }
+  .approval-buttons button {
+    min-width: 7rem;
+    padding-inline: 1rem;
+    padding-block: 0.45rem 0.6rem;
+  }
+  .approval-requirements {
+    margin: 0.75rem 0 0;
+    padding-left: 1.2rem;
+  }
+  .approval-requirements li {
+    margin-bottom: 0.25rem;
+  }
+  .approval-buttons .reject-btn {
+    border-color: var(--error-fg, #ba2121);
+    color: var(--error-fg, #ba2121);
+    background: rgba(186, 33, 33, 0.15);
+  }
+  .approval-buttons .reject-btn:hover {
+    background: rgba(186, 33, 33, 0.25);
+  }
+  .log-text {
+    background: var(--body-bg);
+    padding: 0.75rem;
+    border: 1px solid var(--hairline-color);
+    border-radius: 4px;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow: auto;
+  }
+  .log-empty {
+    color: var(--body-quiet-color);
+    font-style: italic;
+  }
+  .status-message {
+    margin: 1rem 0;
+  }
+  .status-message.paused {
+    color: var(--link-fg);
+    font-weight: 600;
+  }
+</style>
+{% endblock %}
+
+{% block nav-breadcrumbs %}
+<nav aria-label="{% translate 'Breadcrumbs' %}">
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a> ›
+    {% url 'admin:app_list' 'release' as core_admin_url %}
+    <a href="{{ core_admin_url }}">{% trans '2. Business' %}</a> ›
+    <a href="{% url 'admin:release_packagerelease_changelist' %}">{% trans 'Package Releases' %}</a> ›
+    <a href="{% url 'admin:release_packagerelease_change' release.pk %}">{{ release }}</a> ›
+    {{ action|capfirst }}
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h1>{{ action|capfirst }} {{ release.package.name }} {{ release.version }}</h1>
+<div class="release-progress-layout">
+  <div class="progress-column">
+    <div class="progress-actions">
+      <form method="get">
+        <input type="hidden" name="step" value="{{ current_step }}">
+        <button type="submit" name="start" value="1" {% if is_running or done or error %}disabled{% endif %}>
+          {% if can_resume %}
+          ▶️ {% trans 'Continue Publish' %}
+          {% else %}
+          ▶️ {% trans 'Start Publish' %}
+          {% endif %}
+        </button>
+      </form>
+      <form method="get">
+        <button type="submit" name="pause" value="1" {% if not is_running %}disabled{% endif %}>⏸️ {% trans 'Pause Publish' %}</button>
+      </form>
+      {% if resume_available %}
+      <form method="get">
+        <input type="hidden" name="step" value="{{ current_step }}">
+        <button type="submit" name="resume" value="1">⏯️ {% trans 'Resume Publish' %}</button>
+      </form>
+      {% endif %}
+      {% if started %}
+      <form method="get">
+        <button type="submit" name="restart" value="1">🔄 {% trans 'Restart Publish' %}</button>
+      </form>
+      {% endif %}
+    </div>
+    <ol class="progress-steps">
+    {% for step in step_states %}
+      <li class="status-{{ step.status }}">
+        <span class="progress-icon">{{ step.icon }}</span>
+        <span class="progress-name">{{ step.name }}</span>
+      </li>
+    {% endfor %}
+    </ol>
+    {% if paused and started and not done and not error %}
+    <p class="status-message paused">{% trans 'Publishing paused. Press Continue to resume.' %}</p>
+    {% endif %}
+    {% if fixtures %}
+    <h2>{% trans 'Fixture changes' %}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>{% trans 'Fixture' %}</th>
+          <th>{% trans 'Entries' %}</th>
+          <th>{% trans 'Models' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for fx in fixtures %}
+        <tr>
+          <td>{{ fx.path }}</td>
+          <td>{{ fx.count }}</td>
+          <td>{{ fx.models|join:', ' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    {% if awaiting_approval %}
+    <div class="approval-actions">
+      {% if approval_credentials_ready %}
+      <h2>{% trans 'Release manager approval required' %}</h2>
+      <p>{% trans 'A release manager must approve before publishing can continue.' %}</p>
+      <div class="approval-buttons">
+        <form method="get">
+          <input type="hidden" name="step" value="{{ current_step }}">
+          <button type="submit" name="approve" value="1">{% trans 'Approve' %}</button>
+        </form>
+        <form method="get">
+          <input type="hidden" name="step" value="{{ current_step }}">
+          <button type="submit" name="reject" value="1" class="reject-btn">{% trans 'Reject' %}</button>
+        </form>
+      </div>
+      {% else %}
+      {% include "core/includes/release_credentials_required.html" %}
+      {% endif %}
+    </div>
+    {% endif %}
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% elif not done %}
+    {% if started and next_step is not None %}
+    <meta http-equiv="refresh" content="1; url={{ request.path }}?step={{ next_step }}">
+    {% endif %}
+    {% if started %}
+      {% if awaiting_approval %}
+        {% if approval_credentials_ready %}
+        <p class="status-message">{% trans 'Waiting for release manager approval' %}</p>
+        {% else %}
+        <p class="status-message">{% trans 'Waiting for release manager credentials' %}</p>
+        {% endif %}
+      {% elif paused %}
+      {# Paused message shown above #}
+      {% else %}
+      <p class="status-message">{% trans 'Running…' %}</p>
+      {% endif %}
+    {% else %}
+    <p class="status-message">{% trans 'Waiting to start' %}</p>
+    {% endif %}
+    {% else %}
+    <p>{% trans 'All steps completed.' %}</p>
+    {% if release.pypi_url %}
+    <p><a href="{{ release.pypi_url }}" target="_blank" rel="noopener">{{ release.pypi_url }}</a></p>
+    {% endif %}
+    {% if release.github_url %}
+    <p><a href="{{ release.github_url }}" target="_blank" rel="noopener">{{ release.github_url }}</a></p>
+    {% endif %}
+    <div>
+      <input type="text" id="logpath" value="{{ log_path }}" readonly>
+      <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('logpath').value)">{% trans 'Copy log path' %}</button>
+    </div>
+    {% if cert_log %}
+    <p>{% blocktrans %}Certification logged in {{ cert_log }}{% endblocktrans %}</p>
+    {% endif %}
+    {% endif %}
+    <p>{% trans 'Restarts' %}: {{ restart_count }}</p>
+  </div>
+  <div class="log-column">
+    <h2>{% trans 'Logs' %}</h2>
+    {% if show_log %}
+      {% if log_content %}
+      <pre class="log-text" id="release-log">{{ log_content }}</pre>
+      {% else %}
+      <p class="log-empty">{% trans 'Logs will appear here as steps progress.' %}</p>
+      {% endif %}
+    {% else %}
+    <p class="log-empty">{% trans 'Logs will appear here after publishing starts.' %}</p>
+    {% endif %}
+  </div>
+</div>
+<script>
+  (function () {
+    const logEl = document.getElementById('release-log');
+    if (!logEl) {
+      return;
+    }
+
+    const scrollToBottom = () => {
+      logEl.scrollTop = logEl.scrollHeight;
+    };
+
+    scrollToBottom();
+
+    const observer = new MutationObserver(scrollToBottom);
+    observer.observe(logEl, { childList: true, characterData: true, subtree: true });
+  })();
+</script>
+{% endblock %}

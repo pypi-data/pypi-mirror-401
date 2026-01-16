@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block coltype %}colSM{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; {% translate 'Models' %}
+</div>
+{% endblock %}
+
+{% block title %}{% translate 'Models' %}{% endblock %}
+
+{% block content %}
+
+<h1>{% translate 'Model documentation' %}</h1>
+
+<div id="content-main">
+{% for group in grouped_models %}
+<div class="module">
+<h2 id="app-{{ group.label }}">{{ group.name }} ({{ group.app_name }})</h2>
+
+<table class="xfull">
+  <thead>
+    <tr>
+      <th scope="col">{% translate 'Model name' %}</th>
+      <th scope="col">{% translate 'Description' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for model in group.models %}
+  <tr>
+    <th scope="row"><a href="{% url 'django-admindocs-models-detail' app_label=model.app_label model_name=model.model_name %}">{{ model.object_name }}</a></th>
+    <td>{{ model.docstring|default_if_none:""|linebreaksbr }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related" class="sidebar">
+<div class="module">
+<h2>{% translate 'Model groups' %}</h2>
+<ul>
+{% for group in grouped_models %}
+    <li><a href="#app-{{ group.label }}">{{ group.name }}</a></li>
+{% endfor %}
+</ul>
+</div>
+</div>
+{% endblock %}
+

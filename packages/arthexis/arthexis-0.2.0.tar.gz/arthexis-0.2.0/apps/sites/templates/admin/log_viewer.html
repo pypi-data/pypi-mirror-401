@@ -1,0 +1,140 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Log viewer" %}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .log-viewer-module {
+      background: var(--body-bg);
+      border: 1px solid var(--hairline-color);
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .log-viewer-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .log-viewer-form label {
+      font-weight: 600;
+    }
+    .log-viewer-form select {
+      min-width: 220px;
+    }
+    .log-viewer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .log-viewer-heading {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .log-viewer-heading h2 {
+      margin: 0;
+    }
+    .log-viewer-slider {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 200px;
+    }
+    .log-viewer-slider label {
+      font-weight: 600;
+    }
+    .log-viewer-slider input[type="range"] {
+      min-width: 200px;
+    }
+    .log-viewer-content {
+      max-height: 60vh;
+      overflow: auto;
+      background: var(--darkened-bg);
+      border: 1px solid var(--hairline-color);
+      border-radius: 4px;
+      padding: 16px;
+      white-space: pre-wrap;
+      font-family: var(--font-monospace, monospace);
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    .log-viewer-status {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+    .log-viewer-status.error {
+      color: var(--error-fg, #ba2121);
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate "Home" %}</a>
+    &rsaquo; {% translate "Log viewer" %}
+  </div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module log-viewer-module">
+    <form method="get" class="log-viewer-form" aria-label="{% translate 'Select log file' %}">
+      <label for="id_log">{% translate "Log file" %}</label>
+      <select id="id_log" name="log">
+        <option value=""{% if not selected_log %} selected{% endif %} disabled>{% translate "Choose a log file" %}</option>
+        {% for filename in available_logs %}
+          <option value="{{ filename }}"{% if filename == selected_log %} selected{% endif %}>{{ filename }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="button">{% translate "View" %}</button>
+    </form>
+
+    {% if log_notice %}
+      <p class="help">{{ log_notice }}</p>
+    {% endif %}
+
+    {% if log_error %}
+      <p class="errornote">{{ log_error }}</p>
+    {% endif %}
+
+    {% if selected_log and not log_error %}
+      {% blocktranslate with name=selected_log asvar viewer_heading %}Viewing {{ name }}{% endblocktranslate %}
+      {% translate 'Log copied to your clipboard.' as copy_success %}
+      {% translate 'Copy failed. Use your browser copy command instead.' as copy_error %}
+      {% translate 'Copy to clipboard' as copy_label %}
+      {% with encoded_log=selected_log|urlencode %}
+        {% with download_url="?log="|add:encoded_log|add:"&limit="|add:log_limit_choice|add:"&download=1" %}
+          {% with
+            viewer_prefix="system-log"
+            viewer_wrapper_class=""
+            viewer_heading=viewer_heading
+            log_filename=selected_log
+            log_download_url=download_url
+            log_limit_options=log_limit_options
+            log_limit_index=log_limit_index
+            log_limit_label=log_limit_label
+            log_content=log_content
+            copy_label=copy_label
+            copy_success=copy_success
+            copy_error=copy_error
+            copy_status_class="log-viewer-status"
+            content_class="log-viewer-content"
+            limit_slider_class="log-viewer-limit"
+            limit_slider_log=selected_log
+          %}
+            {% include "includes/log_viewer.html" %}
+          {% endwith %}
+        {% endwith %}
+      {% endwith %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

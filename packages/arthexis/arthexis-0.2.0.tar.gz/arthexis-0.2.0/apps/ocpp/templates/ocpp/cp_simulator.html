@@ -1,0 +1,23 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}CP Simulator{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'ocpp/evcs/cp_simulator.css' %}">
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'htmx/htmx.min.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<h1>OCPP Charge Point Simulator</h1>
+<div class="mt-3"
+     hx-get="{% url 'ocpp:cp-simulator' %}"
+     hx-trigger="load, every 5s"
+     hx-target="#cp-simulator-panel"
+     hx-swap="outerHTML">
+  {% include "ocpp/includes/cp_simulator_panel.html" %}
+</div>
+{% endblock %}

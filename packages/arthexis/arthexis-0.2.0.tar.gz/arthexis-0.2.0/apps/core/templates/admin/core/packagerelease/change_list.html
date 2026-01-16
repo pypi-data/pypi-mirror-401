@@ -1,0 +1,21 @@
+{% extends "django_object_actions/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+    {% if soft_deleted_url %}
+        <li>
+            <a href="{{ soft_deleted_url }}" class="historylink">
+                {% if soft_deleted_count %}
+                    {% blocktrans count count=soft_deleted_count %}
+                        View deleted ({{ count }})
+                    {% plural %}
+                        View deleted ({{ count }})
+                    {% endblocktrans %}
+                {% else %}
+                    {% trans "View deleted" %}
+                {% endif %}
+            </a>
+        </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

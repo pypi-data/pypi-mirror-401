@@ -1,0 +1,132 @@
+<div class="card simulator-card mb-3">
+  <div class="card-body">
+    <form method="post" class="simulator-form"
+          hx-post="{% url 'ocpp:cp-simulator' %}"
+          hx-target="#cp-simulator-panel"
+          hx-swap="outerHTML">
+      {% csrf_token %}
+      <input type="hidden" name="simulator_slot" value="{{ idx }}">
+      <div class="row g-3 align-items-start simulator-layout">
+        <div class="col-12 col-xl-6">
+          <div class="row g-2">
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="host{{ idx }}">Host</label>
+                <input id="host{{ idx }}" name="host" value="{{ form_params.host|default:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="ws_port{{ idx }}">Port</label>
+                <input id="ws_port{{ idx }}" name="ws_port" value="{{ form_params.ws_port|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="cp_path{{ idx }}">Serial Number</label>
+                <input id="cp_path{{ idx }}" name="cp_path" value="{{ form_params.cp_path|default:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="serial_number{{ idx }}">Serial Number</label>
+                <input id="serial_number{{ idx }}" name="serial_number" value="{{ form_params.serial_number|default:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="connector_id{{ idx }}">Connector ID</label>
+                <input id="connector_id{{ idx }}" name="connector_id" value="{{ form_params.connector_id|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="rfid{{ idx }}">RFID</label>
+                <input id="rfid{{ idx }}" name="rfid" value="{{ form_params.rfid|default:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="vin{{ idx }}">VIN</label>
+                <input id="vin{{ idx }}" name="vin" value="{{ form_params.vin|default:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="duration{{ idx }}">Duration (s)</label>
+                <input id="duration{{ idx }}" name="duration" value="{{ form_params.duration|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="interval{{ idx }}">Interval (s)</label>
+                <input id="interval{{ idx }}" name="interval" value="{{ form_params.interval|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="pre_charge_delay{{ idx }}">Pre-charge Delay (s)</label>
+                <input id="pre_charge_delay{{ idx }}" name="pre_charge_delay" value="{{ form_params.pre_charge_delay|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="average_kwh{{ idx }}">Average kWh</label>
+                <input id="average_kwh{{ idx }}" name="average_kwh" value="{{ form_params.average_kwh|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="amperage{{ idx }}">Amperage (A)</label>
+                <input id="amperage{{ idx }}" name="amperage" value="{{ form_params.amperage|default_if_none:'' }}" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="repeat{{ idx }}">Repeat</label>
+                {% with repeat_value=form_params.repeat %}
+                <select id="repeat{{ idx }}" name="repeat" class="form-select form-select-sm">
+                  <option value="False" {% if not repeat_value %}selected{% endif %}>No</option>
+                  <option value="True" {% if repeat_value %}selected{% endif %}>Yes</option>
+                </select>
+                {% endwith %}
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="username{{ idx }}">User</label>
+                <input id="username{{ idx }}" name="username" value="{{ form_params.username|default:'' }}" class="form-control form-control-sm" hx-preserve>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="mb-2">
+                <label class="form-label" for="password{{ idx }}">Pass</label>
+                <input id="password{{ idx }}" name="password" type="password" value="" class="form-control form-control-sm" hx-preserve>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-xl-6">
+          <div class="d-flex flex-column gap-3">
+            <div class="d-grid gap-2">
+              <button type="submit" name="action" value="start" class="btn btn-primary" {% if cp.running %}disabled{% endif %}>Start</button>
+              <button type="submit" name="action" value="stop" class="btn btn-secondary" {% if not cp.running %}disabled{% endif %}>Stop</button>
+            </div>
+            <div class="simulator-status"><span class="state-dot {% if cp.running %}online{% else %}stopped{% endif %}"></span><span>{% if cp.running %}Running{% else %}Stopped{% endif %}</span></div>
+            <div class="simulator-details">
+              <label>Last Status:</label> <span class="stat">{{ cp.last_status|default:"-" }}</span>
+              <label>Phase:</label> <span class="stat">{{ cp.phase|default:"-" }}</span>
+              <label>Last Message:</label> <span class="stat">{{ cp.last_message|default:"-" }}</span>
+              <label>Last Command:</label> <span class="stat">{{ cp.last_command|default:"-" }}</span>
+              <label>Started:</label> <span class="stat">{{ cp.start_time|default:"-" }}</span>
+              <label>Stopped:</label> <span class="stat">{{ cp.stop_time|default:"-" }}</span>
+            </div>
+            {% if cp.last_error %}
+            <div class="error"><b>Error:</b><pre>{{ cp.last_error }}</pre></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

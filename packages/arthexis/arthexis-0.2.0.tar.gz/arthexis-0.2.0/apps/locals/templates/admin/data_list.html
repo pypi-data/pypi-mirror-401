@@ -1,0 +1,86 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  #content-main table {
+    width: 100%;
+    clear: both;
+  }
+  #content-main .actions {
+    float: right;
+    margin-bottom: 1rem;
+  }
+  #content-main .actions form {
+    display: inline;
+    margin-left: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  {% if import_export %}
+    <div class="actions">
+      <a href="{% url 'admin:user_data_export' %}">{% trans "Export" %}</a>
+      <form action="{% url 'admin:user_data_import' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="data_zip" accept=".zip" />
+        <a href="#" onclick="this.closest('form').submit(); return false;">{% trans 'Import' %}</a>
+      </form>
+    </div>
+  {% endif %}
+  {% if sections %}
+    <input type="text" id="data-filter" placeholder="{% trans 'Filter' %}" />
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>{% trans "App" %}</th>
+          <th>{% trans "Model" %}</th>
+          <th>{% trans "Custom" %}</th>
+          <th>{% trans "Entity" %}</th>
+          <th>{% trans "Fixture" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for section in sections %}
+          {% for item in section.items %}
+          <tr>
+            <td>{{ section.opts.app_config.verbose_name|capfirst }}</td>
+            <td>{{ section.opts.verbose_name|capfirst }}</td>
+            <td aria-label="{% trans 'Custom' %}">
+              {% if item.custom %}
+                ✓
+              {% else %}
+                ✗
+              {% endif %}
+            </td>
+            <td><a href="{{ item.url }}">{{ item.label }}</a></td>
+            <td>{{ item.fixture.name }}</td>
+          </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{% trans 'None available' %}</p>
+  {% endif %}
+</div>
+<script>
+  function setupFilter(inputId, tableId) {
+    const input = document.getElementById(inputId);
+    const table = document.getElementById(tableId);
+    if (!input || !table) return;
+    input.addEventListener('input', function () {
+      const term = this.value.toLowerCase();
+      for (const row of table.tBodies[0].rows) {
+        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    setupFilter('data-filter', 'data-table');
+  });
+</script>
+{% endblock %}

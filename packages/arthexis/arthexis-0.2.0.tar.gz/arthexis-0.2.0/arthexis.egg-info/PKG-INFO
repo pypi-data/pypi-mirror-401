@@ -1,0 +1,268 @@
+Metadata-Version: 2.4
+Name: arthexis
+Version: 0.2.0
+Summary: Power & Energy Infrastructure
+Author-email: "Rafael J. Guillén-Osorio" <tecnologia@gelectriic.com>
+License-Expression: GPL-3.0-only
+Project-URL: Repository, https://github.com/arthexis/arthexis
+Project-URL: Homepage, https://arthexis.com
+Classifier: Programming Language :: Python :: 3
+Classifier: Framework :: Django
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: amqp==5.3.1
+Requires-Dist: anyio==4.12.1
+Requires-Dist: asgiref==3.11.0
+Requires-Dist: attrs==25.3.0
+Requires-Dist: autobahn==24.4.2
+Requires-Dist: Automat==25.4.16
+Requires-Dist: billiard==4.2.4
+Requires-Dist: bleach==6.3.0
+Requires-Dist: black==25.12.0
+Requires-Dist: botocore==1.36.23
+Requires-Dist: boto3==1.36.23
+Requires-Dist: celery==5.5.3
+Requires-Dist: certifi==2026.1.4
+Requires-Dist: cffi==2.0.0
+Requires-Dist: channels==4.3.2
+Requires-Dist: channels-redis==4.3.0
+Requires-Dist: charset-normalizer==3.4.4
+Requires-Dist: click==8.3.1
+Requires-Dist: click-didyoumean==0.3.1
+Requires-Dist: click-plugins==1.1.1.2
+Requires-Dist: click-repl==0.3.0
+Requires-Dist: colorama==0.4.6
+Requires-Dist: constantly==23.10.4
+Requires-Dist: cron-descriptor==2.0.6
+Requires-Dist: cryptography==45.0.5
+Requires-Dist: daphne==4.2.1
+Requires-Dist: diff-match-patch==20241021
+Requires-Dist: defusedxml==0.7.1
+Requires-Dist: Django==5.2.10
+Requires-Dist: django-celery-beat==2.8.1
+Requires-Dist: django-debug-toolbar==6.1.0
+Requires-Dist: django-mermaid==0.1.0
+Requires-Dist: django-import-export==4.4.0
+Requires-Dist: django-object-actions==5.0.0
+Requires-Dist: django-otp==1.7.0
+Requires-Dist: django-timezone-field==7.2.1
+Requires-Dist: dnspython==2.7.0
+Requires-Dist: docutils==0.22.4
+Requires-Dist: gpiozero==2.0.1; sys_platform == "linux"
+Requires-Dist: graphviz==0.21
+Requires-Dist: geckodriver-autoinstaller==0.1.0
+Requires-Dist: h11==0.16.0
+Requires-Dist: httpcore==1.0.9
+Requires-Dist: httpx==0.28.1
+Requires-Dist: pytest==9.0.2
+Requires-Dist: pytest-timeout==2.4.0
+Requires-Dist: pytest-django==4.11.1
+Requires-Dist: hyperlink==21.0.0
+Requires-Dist: idna==3.11
+Requires-Dist: incremental==24.11.0
+Requires-Dist: jmespath==1.0.1
+Requires-Dist: kombu==5.5.4
+Requires-Dist: Markdown==3.10
+Requires-Dist: mdx_truly_sane_lists==1.3
+Requires-Dist: mkdocs==1.6.1
+Requires-Dist: mfrc522==0.0.7; sys_platform == "linux"
+Requires-Dist: outcome==1.3.0.post0
+Requires-Dist: packaging==25.0
+Requires-Dist: pillow==12.1.0
+Requires-Dist: pyxel==2.5.12
+Requires-Dist: prompt_toolkit==3.0.52
+Requires-Dist: psutil==7.2.1
+Requires-Dist: psycopg==3.3.2
+Requires-Dist: psycopg-binary==3.3.2
+Requires-Dist: pyasn1==0.6.1
+Requires-Dist: pyasn1_modules==0.4.2
+Requires-Dist: pycparser==2.23
+Requires-Dist: pyOpenSSL==25.1.0
+Requires-Dist: pyftpdlib==2.1.0
+Requires-Dist: PySocks==1.7.1
+Requires-Dist: python-crontab==3.3.0
+Requires-Dist: python-dateutil==2.9.0.post0
+Requires-Dist: python-dotenv==1.2.1
+Requires-Dist: qrcode==8.2
+Requires-Dist: redis==7.1.0
+Requires-Dist: reportlab==4.4.7
+Requires-Dist: requests==2.32.5
+Requires-Dist: selenium==4.34.2
+Requires-Dist: service-identity==24.2.0
+Requires-Dist: setuptools==80.9.0
+Requires-Dist: six==1.17.0
+Requires-Dist: s3transfer==0.11.1
+Requires-Dist: smbus2==0.6.0
+Requires-Dist: sniffio==1.3.1
+Requires-Dist: sortedcontainers==2.4.0
+Requires-Dist: sqlparse==0.5.5
+Requires-Dist: tablib==3.9.0
+Requires-Dist: tinycss2==1.5.1
+Requires-Dist: toml==0.10.2
+Requires-Dist: trio==0.30.0
+Requires-Dist: trio-websocket==0.12.2
+Requires-Dist: Twisted==25.5.0
+Requires-Dist: twine==6.1.0
+Requires-Dist: txaio==25.9.2
+Requires-Dist: typing_extensions==4.14.1
+Requires-Dist: tzdata==2025.3
+Requires-Dist: urllib3==2.5.0
+Requires-Dist: vine==5.1.0
+Requires-Dist: wcwidth==0.2.14
+Requires-Dist: webencodings==0.5.1
+Requires-Dist: websocket-client==1.8.0
+Requires-Dist: websockets<17,>=15
+Requires-Dist: webauthn==2.7.0
+Requires-Dist: whitenoise==6.11.0
+Requires-Dist: plyer==2.1.0; sys_platform == "win32"
+Requires-Dist: wsproto==1.3.2
+Requires-Dist: zope.interface==8.2
+Dynamic: license-file
+
+# Constellation
+
+[![CI](https://img.shields.io/github/actions/workflow/status/arthexis/arthexis/ci.yml?branch=main&label=CI&cacheSeconds=300)](https://github.com/arthexis/arthexis/actions/workflows/ci.yml) [![PyPI](https://img.shields.io/pypi/v/arthexis?label=PyPI)](https://pypi.org/project/arthexis/) [![OCPP 1.6 Coverage](https://raw.githubusercontent.com/arthexis/arthexis/main/media/ocpp_coverage.svg)](https://github.com/arthexis/arthexis/blob/main/docs/development/ocpp-user-manual.md) [![OCPP 2.0.1 Coverage](https://raw.githubusercontent.com/arthexis/arthexis/main/media/ocpp201_coverage.svg)](https://github.com/arthexis/arthexis/blob/main/docs/development/ocpp-user-manual.md) [![OCPP 2.1 Coverage](https://raw.githubusercontent.com/arthexis/arthexis/main/media/ocpp21_coverage.svg)](https://github.com/arthexis/arthexis/blob/main/docs/development/ocpp-user-manual.md) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE) ![Watchtowers](https://raw.githubusercontent.com/arthexis/arthexis/main/media/watchtowers.svg)
+
+
+## Purpose
+
+Arthexis Constellation is a [Django](https://www.djangoproject.com/)-based [software suite](https://en.wikipedia.org/wiki/Software_suite) that centralizes tools for managing [electric vehicle charging infrastructure](https://en.wikipedia.org/wiki/Charging_station) and orchestrating [energy](https://en.wikipedia.org/wiki/Energy)-related [products](https://en.wikipedia.org/wiki/Product_(business)) and [services](https://en.wikipedia.org/wiki/Service_(economics)).
+
+Visit our [Changelog Report](https://arthexis.com/changelog/) to browse past and future features and other updates.
+
+## Suite Features
+
+- Compatible with the [Open Charge Point Protocol (OCPP) 1.6](https://www.openchargealliance.org/protocols/ocpp-16/) by default, while allowing Charging Stations to upgrade to newer protocols if they support them.
+
+  **Charge point → CSMS**
+
+  | Action | 1.6 | 2.0.1 | 2.1 | What we do |
+  | --- | --- | --- | --- | --- |
+  | `Authorize` | ✅ | ✅ | ✅ | Validate RFID or token authorization requests before a session starts. |
+  | `BootNotification` | ✅ | ✅ | ✅ | Register the charge point and update identity, firmware, and status details. |
+  | `DataTransfer` | ✅ | ✅ | ✅ | Accept vendor-specific payloads and record the results. |
+  | `DiagnosticsStatusNotification` | ✅ | — | — | Track the progress of diagnostic uploads kicked off from the back office. |
+  | `FirmwareStatusNotification` | ✅ | ✅ | ✅ | Track firmware update lifecycle events from charge points. |
+  | `Heartbeat` | ✅ | ✅ | ✅ | Keep the websocket session alive and update last-seen timestamps. |
+  | `LogStatusNotification` | — | ✅ | ✅ | Report log upload progress from the charge point for diagnostics oversight. |
+  | `MeterValues` | ✅ | ✅ | ✅ | Persist periodic energy and power readings while a transaction is active. |
+  | `SecurityEventNotification` | — | ✅ | ✅ | Record charge point security events for audit trails. |
+  | `StartTransaction` | ✅ | — | — | Create charging sessions with initial meter values and identification data. |
+  | `StatusNotification` | ✅ | ✅ | ✅ | Reflect connector availability and fault states in real time. |
+  | `StopTransaction` | ✅ | — | — | Close charging sessions, capturing closing meter values and stop reasons. |
+
+  **CSMS → Charge point**
+
+  | Action | 1.6 | 2.0.1 | 2.1 | What we do |
+  | --- | --- | --- | --- | --- |
+  | `CancelReservation` | ✅ | ✅ | ✅ | Withdraw pending reservations and release connectors directly from the control center. |
+  | `ChangeAvailability` | ✅ | ✅ | ✅ | Switch connectors or the whole station between operative and inoperative states. |
+  | `ChangeConfiguration` | ✅ | — | — | Update supported charger settings and persist applied values in the control center. |
+  | `ClearCache` | ✅ | ✅ | ✅ | Flush local authorization caches to force fresh lookups from the CSMS. |
+  | `DataTransfer` | ✅ | ✅ | ✅ | Send vendor-specific commands and log the charge point response. |
+  | `GetConfiguration` | ✅ | — | — | Poll the device for the current values of tracked configuration keys. |
+  | `GetDiagnostics` | ✅ | — | — | Request a diagnostics archive upload to a signed URL for troubleshooting. |
+  | `GetLocalListVersion` | ✅ | ✅ | ✅ | Retrieve the current RFID whitelist version and synchronize entries reported by the charge point. |
+  | `RemoteStartTransaction` | ✅ | — | — | Initiate a charging session remotely for an identified customer or token. |
+  | `RemoteStopTransaction` | ✅ | — | — | Terminate active charging sessions from the control center. |
+  | `ReserveNow` | ✅ | ✅ | ✅ | Reserve connectors for upcoming sessions with automatic connector selection and confirmation tracking. |
+  | `Reset` | ✅ | ✅ | ✅ | Request a soft or hard reboot to recover from faults. |
+  | `SendLocalList` | ✅ | ✅ | ✅ | Publish released and approved RFIDs as the charge point's local authorization list. |
+  | `TriggerMessage` | ✅ | ✅ | ✅ | Ask the device to send an immediate update (for example status or diagnostics). |
+  | `UnlockConnector` | ✅ | ✅ | ✅ | Release stuck connectors without on-site intervention. |
+  | `UpdateFirmware` | ✅ | ✅ | ✅ | Deliver firmware packages to chargers with secure download tokens and track installation responses. |
+
+## Role Architecture
+
+Arthexis Constellation ships in four node roles tailored to different deployment scenarios.
+
+<table border="1" cellpadding="8" cellspacing="0">
+  <thead>
+    <tr>
+      <th align="left">Role</th>
+      <th align="left">Description &amp; Common Features</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top"><strong>Terminal</strong></td>
+      <td valign="top"><strong>Single-User Research &amp; Development</strong><br />Features: GUI Toast</td>
+    </tr>
+    <tr>
+      <td valign="top"><strong>Control</strong></td>
+      <td valign="top"><strong>Single-Device Testing &amp; Special Task Appliances</strong><br />Features: AP Public Wi-Fi, Celery Queue, GUI Toast, LCD Screen, NGINX Server, RFID Scanner</td>
+    </tr>
+    <tr>
+      <td valign="top"><strong>Satellite</strong></td>
+      <td valign="top"><strong>Multi-Device Edge, Network &amp; Data Acquisition</strong><br />Features: AP Router, Celery Queue, NGINX Server, RFID Scanner</td>
+    </tr>
+    <tr>
+      <td valign="top"><strong>Watchtower</strong></td>
+      <td valign="top"><strong>Multi-User Cloud &amp; Orchestration</strong><br />Features: Celery Queue, NGINX Server</td>
+    </tr>
+  </tbody>
+</table>
+
+## Quick Guide
+
+### 1. Clone
+- **[Linux](https://en.wikipedia.org/wiki/Linux)**: open a [terminal](https://en.wikipedia.org/wiki/Command-line_interface) and run `git clone https://github.com/arthexis/arthexis.git`.
+- **[Windows](https://en.wikipedia.org/wiki/Microsoft_Windows)**: open [PowerShell](https://learn.microsoft.com/powershell/) or [Git Bash](https://gitforwindows.org/) and run the same command.
+
+### 2. Start and stop
+Terminal nodes can start directly with the scripts below without installing; Control, Satellite, and Watchtower roles require installation first. Both approaches listen on `localhost:8888` by default.
+
+For local bootstrapping, run `./install.sh --terminal` to install with defaults, start the server with `./start.sh` (optionally passing `--reload` or `--celery`), and execute a quick smoke test with `pytest -k smoke`. Override the role, port, reload, Celery, and test selection with the script flags when needed.
+
+- **[VS Code](https://code.visualstudio.com/)**
+   - Open the folder and go to the **Run and Debug** panel (`Ctrl+Shift+D`).
+   - Select the **Run Server** (or **Debug Server**) configuration.
+   - Press the green start button. Stop the server with the red square button (`Shift+F5`).
+
+- **[Shell](https://en.wikipedia.org/wiki/Shell_(computing))**
+   - Linux: run [`./start.sh`](start.sh) and stop with [`./stop.sh`](stop.sh).
+   - Windows: run [`start.bat`](start.bat) and stop with `Ctrl+C`.
+
+### 3. Install and upgrade
+- **Linux:**
+  - Run `./install.sh --terminal` to bootstrap a default Terminal node (pass `--control`, `--satellite`, or `--watchtower` as needed). Override the port with `--port 8888` (the default fallback) and control Celery with `--celery` or `--no-celery`. Use `./install.sh --help` to see every available option.
+  - Use [`./upgrade.sh`](upgrade.sh) with `--stable` (weekly) or `--latest`/`-l`/`--unstable` (daily) to follow the preferred release cadence.
+   - Consult the [Install & Lifecycle Scripts Manual](docs/development/install-lifecycle-scripts-manual.md) for complete flag descriptions and operational notes.
+   - Review the [Auto-Upgrade Flow](docs/auto-upgrade.md) for how delegated upgrades run and how to observe them.
+
+- **Windows:**
+   - Run [`install.bat`](install.bat) to install (Terminal role) and [`upgrade.bat`](upgrade.bat) to upgrade.
+   - Installation is not required to start in Terminal mode (the default).
+
+Upgrade channels (opt-in during install/upgrade or with `scripts/delegated-upgrade.sh`):
+
+| Channel | Check cadence | Purpose | Opt-in flag |
+| --- | --- | --- | --- |
+| Stable | Weekly (Thu before 5:00 AM) | Tracks release revisions with automated weekly checks. | `--stable` (default) |
+| Latest | Daily (same hour) | Follows the newest mainline revisions with daily checks. | `--latest` / `-l` or `--unstable` |
+| Manual | None (manual upgrades only) | Disables the automatic upgrade loop for full operator control. | _Run upgrades on demand without specifying a channel flag._ |
+
+### 4. Administration
+- Access the [Django admin](https://docs.djangoproject.com/en/stable/ref/contrib/admin/) at `localhost:8888/admin/` to review and manage live data. Use `--port` with the start scripts or installer when you need to expose a different port.
+- Browse the [admindocs](https://docs.djangoproject.com/en/stable/ref/contrib/admin/admindocs/) at `localhost:8888/admindocs/` for API documentation that is generated from your models.
+- Follow the [Install & Administration Guide](apps/docs/cookbooks/install-start-stop-upgrade-uninstall.md) for deployment, lifecycle tasks, and operational runbooks.
+- Onboard and service chargers with the [EVCS Connectivity & Maintenance Cookbook](apps/docs/cookbooks/evcs-connectivity-maintenance.md).
+- Configure payment gateways with the [Payment Processors Cookbook](apps/docs/cookbooks/payment-processors.md).
+- Reference the [Sigils Cookbook](apps/docs/cookbooks/sigils.md) when configuring tokenized settings across environments.
+- Understand seed fixtures and per-user files with [Managing Local Node Data](apps/docs/cookbooks/managing-local-node-data.md).
+- Manage exports, imports, and audit trails with the [User Data Cookbook](apps/docs/cookbooks/user-data.md).
+- Plan feature rollout strategies using the [Node Features Cookbook](apps/docs/cookbooks/node-features.md).
+- Curate shortcuts for power users through the [Favorites Cookbook](apps/docs/cookbooks/favorites.md).
+- Connect Slack workspaces through the [Slack Bot Onboarding Cookbook](apps/docs/cookbooks/slack-bot-onboarding.md).
+
+## Support
+
+Arthexis Constellation is still under very active development and new features are added every day.
+
+If you decide to use our suite for your energy projects, you may contact us at [tecnologia@gelectriic.com](mailto:tecnologia@gelectriic.com) or visit our [web page](https://www.gelectriic.com/) for [professional services](https://en.wikipedia.org/wiki/Professional_services) and [commercial support](https://en.wikipedia.org/wiki/Technical_support).
+
+## About Me
+
+> "What, you want to know about me too? Well, I enjoy [developing software](https://en.wikipedia.org/wiki/Software_development), [role-playing games](https://en.wikipedia.org/wiki/Role-playing_game), long walks on the [beach](https://en.wikipedia.org/wiki/Beach) and a fourth secret thing above all else."
+> --Arthexis

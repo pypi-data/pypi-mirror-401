@@ -1,0 +1,71 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_extras tz widgets %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+  {% include "admin/includes/dashboard_styles.html" %}
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block content_title %}
+{% last_net_message as admin_last_net_message %}
+<div id="admin-home-header">
+  <h1>Home</h1>
+  <div class="admin-home-net-message" role="status" aria-live="polite">
+    <a class="admin-home-net-message__label admin-home-net-message__link" href="{% url 'admin:nodes_netmessage_changelist' %}">{% translate 'Net message' %}</a>
+    {% if admin_last_net_message.has_content %}
+      {% if admin_last_net_message.url %}
+        <a class="admin-home-net-message__content admin-home-net-message__link" href="{{ admin_last_net_message.url }}" title="{{ admin_last_net_message.text }}">{{ admin_last_net_message.text }}</a>
+      {% else %}
+        <span class="admin-home-net-message__content" title="{{ admin_last_net_message.text }}">{{ admin_last_net_message.text }}</span>
+      {% endif %}
+    {% else %}
+      {% translate 'No net messages available' as no_message_text %}
+      <span class="admin-home-net-message__content admin-home-net-message__content--empty" title="{{ no_message_text }}">{{ no_message_text }}</span>
+    {% endif %}
+  </div>
+  <div class="admin-home-actions">
+    <a class="button" href="{% url 'admin:seed_data' %}">{% translate 'Seed Data' %}</a>
+    <a class="button" href="{% url 'admin:user_data' %}">{% translate 'User Data' %}</a>
+    <a class="button" href="{% url 'admin:system' %}">{% translate 'System Reports' %}</a>
+    <a class="button" href="{% url 'admin:environment' %}">{% translate 'Environment' %}</a>
+    <a class="button" href="{% url 'admin:config' %}">{% translate 'Django Config' %}</a>
+    <a class="button" href="{% url 'admin:sigil_builder' %}">{% translate 'Sigil Builder' %}</a>
+    <a class="button" href="{% url 'admin:log_viewer' %}">{% translate 'Log Viewer' %}</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+  <div class="dashboard" id="admin-dashboard">
+    <div id="content-main" class="dashboard-main">
+    {% include "admin/dashboard_app_list.html" with app_list=app_list %}
+    </div>
+    <div class="dashboard-side" id="recent-boxes">
+      <div
+        id="admin-dashboard-widgets"
+        hx-get="{% url 'widgets:zone' 'sidebar' %}"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+      >
+        <p>{% translate "Loading widgets..." %}</p>
+        <noscript>
+          {% render_widgets 'sidebar' %}
+        </noscript>
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+{% endblock %}

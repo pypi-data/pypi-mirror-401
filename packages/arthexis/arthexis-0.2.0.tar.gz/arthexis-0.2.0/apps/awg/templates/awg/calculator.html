@@ -1,0 +1,148 @@
+{% extends "pages/base.html" %}
+{% load static i18n %}
+{% block title %}{% trans "AWG Cable Calculator" %}{% endblock %}
+{% block content %}
+<style>
+  /* Ensure input fields match select field height for uniform columns */
+  #awg-calculator input.form-control {
+    height: calc(2.25rem + 2px);
+  }
+</style>
+<h1>{% trans "Cable & Conduit Calculator" %}</h1>
+<form method="post" id="awg-calculator">
+  {% csrf_token %}
+  <div class="row g-4 mb-3">
+    <div class="col-lg-3">
+      <div class="mb-3">
+        <label class="form-label" for="meters">{% trans "Meters:" %}</label>
+        <input id="meters" type="number" class="form-control" name="meters" required min="1" value="{{ form.meters }}" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="amps">{% trans "Amps:" %}</label>
+        <input id="amps" type="number" class="form-control" name="amps" value="{{ form.amps }}" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="volts">{% trans "Volts:" %}</label>
+        <input id="volts" type="number" class="form-control" name="volts" value="{{ form.volts }}" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="material">{% trans "Material:" %}</label>
+        <select id="material" name="material" class="form-select">
+          <option value="" {% if not form.material %}selected{% endif %}></option>
+          <option value="cu" {% if form.material == "cu" %}selected{% endif %}>{% trans "Copper (cu)" %}</option>
+          <option value="al" {% if form.material == "al" %}selected{% endif %}>{% trans "Aluminum (al)" %}</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="phases">{% trans "Phases:" %}</label>
+        <select id="phases" name="phases" class="form-select">
+          <option value="" {% if not form.phases %}selected{% endif %}></option>
+          <option value="2" {% if form.phases == "2" %}selected{% endif %}>{% trans "AC Two Phases (2)" %}</option>
+          <option value="1" {% if form.phases == "1" %}selected{% endif %}>{% trans "AC Single Phase (1)" %}</option>
+          <option value="3" {% if form.phases == "3" %}selected{% endif %}>{% trans "AC Three Phases (3)" %}</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="mb-3">
+        <label class="form-label" for="temperature">{% trans "Temperature:" %}</label>
+        <select id="temperature" name="temperature" class="form-select">
+          <option value="" {% if not form.temperature %}selected{% endif %}></option>
+          <option value="60" {% if form.temperature == "60" %}selected{% endif %}>{% trans "60C (140F)" %}</option>
+          <option value="75" {% if form.temperature == "75" %}selected{% endif %}>{% trans "75C (167F)" %}</option>
+          <option value="90" {% if form.temperature == "90" %}selected{% endif %}>{% trans "90C (194F)" %}</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="conduit">{% trans "Conduit:" %}</label>
+        <select id="conduit" name="conduit" class="form-select">
+          <option value="" {% if not form.conduit %}selected{% endif %}></option>
+          <option value="emt" {% if form.conduit == "emt" %}selected{% endif %}>{% trans "EMT (Thin-wall)" %}</option>
+          <option value="imc" {% if form.conduit == "imc" %}selected{% endif %}>{% trans "IMC (Intermediate)" %}</option>
+          <option value="rmc" {% if form.conduit == "rmc" %}selected{% endif %}>{% trans "RMC (Heavy-wall)" %}</option>
+          <option value="fmc" {% if form.conduit == "fmc" %}selected{% endif %}>{% trans "FMC (Flex)" %}</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="max_awg">{% trans "Max AWG:" %}</label>
+        <input id="max_awg" type="text" class="form-control" name="max_awg" value="{{ form.max_awg }}" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="ground">{% trans "Ground:" %}</label>
+        <select id="ground" name="ground" class="form-select">
+          <option value="" {% if not form.ground %}selected{% endif %}></option>
+          <option value="[1]" {% if form.ground == "[1]" %}selected{% endif %}>[1] ({% trans "Maybe" %})</option>
+          <option value="1" {% if form.ground == "1" %}selected{% endif %}>1 ({% trans "Yes" %})</option>
+          <option value="0" {% if form.ground == "0" %}selected{% endif %}>0 ({% trans "No" %})</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="max_lines">{% trans "Max Lines:" %}</label>
+        <select id="max_lines" name="max_lines" class="form-select">
+          <option value="" {% if not form.max_lines %}selected{% endif %}></option>
+          <option value="1" {% if form.max_lines == "1" %}selected{% endif %}>1</option>
+          <option value="2" {% if form.max_lines == "2" %}selected{% endif %}>2</option>
+          <option value="3" {% if form.max_lines == "3" %}selected{% endif %}>3</option>
+          <option value="4" {% if form.max_lines == "4" %}selected{% endif %}>4</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex flex-column{% if result or error or no_cable %} order-first order-lg-last{% endif %}">
+      {% if not result and not error and not no_cable %}
+      <div class="mb-3">
+        <div class="p-3 mb-3 rounded" style="border: 1px solid rgba(0, 0, 0, 0.15);">
+          {% blocktrans trimmed %}
+          This application will suggest a common correct sizing of cable, considering voltage drop and standard gauge sizes. Consult a professional electrician or your local electrical code before choosing the right cable for your electrical projects.
+          {% endblocktrans %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100 fs-4">{% trans "Calculate" %}</button>
+      </div>
+      {% if templates %}
+      <div class="mb-3">
+        <p>{% trans "Or try a pre-loaded template:" %}</p>
+        <ul>
+          {% for t in templates %}
+          <li>
+            <a href="{{ t.get_absolute_url }}" class="text-decoration-none">{{ t.name }}</a>
+            {% if t.description %}- {{ t.description }}{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% else %}
+      {% if error %}
+      <p class="text-danger">{% blocktrans %}Error: {{ error }}{% endblocktrans %}</p>
+      {% elif no_cable %}
+      <h2>{% trans "No Suitable Cable Found" %}</h2>
+      <p>{% blocktrans trimmed %}No cable was found that meets the requirements within a 3% voltage drop.<br>Try adjusting the <b>cable size, amps, length, or material</b> and try again.{% endblocktrans %}</p>
+      {% elif result %}
+      <div class="calc-result">
+        <h2>{% trans "Calculator Results" %}</h2>
+        <table class="table table-sm">
+          <tbody>
+            <tr><th>{% trans "AWG Size" %}</th><td>{{ result.awg_display }}</td></tr>
+            <tr><th>{% trans "Lines" %}</th><td>{{ result.lines }}</td></tr>
+            <tr><th>{% trans "Total Cables" %}</th><td>{{ result.cables }}</td></tr>
+            <tr><th>{% trans "Total Length (m)" %}</th><td>{{ result.total_meters }}</td></tr>
+            <tr><th>{% trans "Voltage Drop" %}</th><td>{{ result.vdrop|floatformat:2 }} V ({{ result.vdperc|floatformat:2 }}%)</td></tr>
+            <tr><th>{% trans "Voltage at End" %}</th><td>{{ result.vend|floatformat:2 }} V</td></tr>
+            <tr><th>{% trans "Temperature Rating" %}</th><td>{{ result.temperature }}C</td></tr>
+            {% if result.conduit %}
+            <tr><th>{% trans "Conduit" %}</th><td>{{ result.conduit_label }} {{ result.pipe_inch }}&quot;</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+        {% if result.warning %}
+        <p class="warning">{{ result.warning }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+      <div class="mt-auto mb-3">
+        <button type="submit" class="btn btn-primary w-100 fs-4">{% trans "Calculate Again" %}</button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arthexis Embed</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: #0b1420;
+        color: #f8f9fa;
+      }
+      .embed-card {
+        background: linear-gradient(135deg, #0d1b2a, #1b263b);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        max-width: 640px;
+      }
+      .embed-header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .embed-title {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .embed-card h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        letter-spacing: 0.02em;
+      }
+      .embed-subtitle {
+        margin: 0;
+        color: rgba(248, 249, 250, 0.7);
+        font-size: 0.9rem;
+        letter-spacing: 0.01em;
+      }
+      .embed-body {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        align-items: center;
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .qr-wrapper {
+        width: 120px;
+        height: 120px;
+        padding: 8px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: grid;
+        place-items: center;
+      }
+      .qr-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+      .embed-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .embed-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        background: #0dcaf0;
+        color: #0b1521;
+        box-shadow: 0 8px 22px rgba(13, 202, 240, 0.35);
+      }
+      .embed-actions a:hover,
+      .embed-actions a:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+      }
+      .embed-meta {
+        margin-top: 14px;
+        font-size: 0.8rem;
+        color: rgba(248, 249, 250, 0.7);
+        word-break: break-word;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="embed-card">
+      <div class="embed-header">
+        <div class="embed-title">
+          <h2>{{ page_title }}</h2>
+          {% if subtitle %}<p class="embed-subtitle">#{{ subtitle }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="embed-body">
+        <div class="qr-wrapper">
+          <img src="data:image/png;base64,{{ qr_code_data }}" alt="QR code for {{ share_url }}" />
+        </div>
+        <div class="embed-actions">
+          <a href="{{ share_url }}" target="_blank" rel="noopener noreferrer">
+            <span aria-hidden="true">↗</span>
+            <span>Open Full Page</span>
+          </a>
+        </div>
+      </div>
+      <div class="embed-meta">{{ share_url }}</div>
+    </div>
+  </body>
+</html>
