@@ -1,0 +1,361 @@
+# Test file for max_blank_lines option
+# Comprehensive test cases for various edge cases
+
+
+def func_a():
+    pass
+
+
+
+
+def func_b():
+    """4 blank lines before."""
+    pass
+
+
+
+
+
+
+def func_c():
+    """6 blank lines before."""
+    pass
+
+
+class ClassA:
+    pass
+
+
+
+
+class ClassB:
+    """4 blank lines before."""
+    pass
+
+
+
+
+
+
+class ClassC:
+    """6 blank lines before."""
+    pass
+
+
+def before_class():
+    pass
+
+
+
+
+class AfterFunction:
+    """4 blank lines after function."""
+    pass
+
+
+
+
+def after_class():
+    """4 blank lines after class."""
+    pass
+
+
+import os
+
+
+
+
+import sys
+
+
+
+
+from typing import List
+
+
+
+
+def after_imports():
+    """4 blank lines after imports."""
+    pass
+
+
+
+
+class ClassAfterImports:
+    """4 blank lines after function."""
+    pass
+
+
+def outer_func():
+    def inner1():
+        pass
+
+
+
+    def inner2():
+        """3 blank lines before in nested context."""
+        pass
+
+
+
+
+    def inner3():
+        """4 blank lines before in nested context."""
+        pass
+
+    x = 1
+
+
+
+    y = 2
+
+
+class OuterClass:
+    class Inner1:
+        pass
+
+
+
+    class Inner2:
+        """3 blank lines before."""
+        pass
+
+
+
+
+    class Inner3:
+        """4 blank lines before."""
+        pass
+
+
+class MethodSpacing:
+    def method1(self):
+        pass
+
+
+
+    def method2(self):
+        """3 blank lines before."""
+        pass
+
+
+
+
+    def method3(self):
+        """4 blank lines before."""
+        pass
+
+    x = 1
+
+
+
+    y = 2
+
+
+@staticmethod
+def decorated1():
+    pass
+
+
+
+
+@staticmethod
+def decorated2():
+    """4 blank lines before decorated function."""
+    pass
+
+
+
+
+class DecoratedClass:
+    @property
+    def prop1(self):
+        pass
+
+
+
+    @property
+    def prop2(self):
+        """3 blank lines before."""
+        pass
+
+
+async def async1():
+    pass
+
+
+
+
+async def async2():
+    """4 blank lines before async function."""
+    pass
+
+
+if True:
+    a = 1
+
+
+
+    b = 2
+
+
+
+
+    c = 3
+
+    def nested_in_if():
+        pass
+
+
+
+    def another_in_if():
+        pass
+
+
+for i in range(10):
+    x = 1
+
+
+
+    y = 2
+
+
+
+
+    z = 3
+
+
+while False:
+    p = 1
+
+
+
+    q = 2
+
+
+with open("file") as f:
+    m = 1
+
+
+
+    n = 2
+
+
+try:
+    risky = 1
+
+
+
+    operation = 2
+except ValueError:
+    handle = 1
+
+
+
+    error = 2
+except TypeError:
+    other = 1
+
+
+
+    handler = 2
+finally:
+    cleanup = 1
+
+
+
+    done = 2
+
+
+result = calculate_something = 42
+
+
+
+
+def after_statement():
+    """4 blank lines after statement."""
+    pass
+
+
+
+
+class ClassAfterStatement:
+    """4 blank lines after statement."""
+    pass
+
+
+class DocstringClass:
+    """Class docstring."""
+
+    x = 1
+
+
+
+    y = 2
+
+    def method(self):
+        """Method docstring."""
+
+        a = 1
+
+
+
+        b = 2
+
+
+f1 = lambda x: x + 1
+f2 = lambda y: y * 2
+f3 = lambda z: z - 3
+
+
+def multi_level():
+    class NestedClass:
+        def nested_method(self):
+            if True:
+                x = 1
+
+
+
+                y = 2
+
+            for i in range(1):
+                a = 1
+
+
+
+                b = 2
+
+
+class EmptyClass1:
+    pass
+
+
+
+
+class EmptyClass2:
+    pass
+
+
+def empty_func1():
+    pass
+
+
+
+
+def empty_func2():
+    pass
+
+
+def level1():
+    def level2():
+        def level3():
+            x = 1
+
+
+
+            y = 2
+
+
+
+            z = 3
