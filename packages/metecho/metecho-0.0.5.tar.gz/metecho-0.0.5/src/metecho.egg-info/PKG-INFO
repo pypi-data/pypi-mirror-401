@@ -1,0 +1,117 @@
+Metadata-Version: 2.4
+Name: metecho
+Version: 0.0.5
+Summary: Radar meteor analysis in Python and C
+Home-page: https://github.com/danielk333/metecho
+Author: Daniel Kastinen, Kenneth Kullbrandt
+Author-email: daniel.kastinen@irf.se
+License: MIT
+Classifier: Programming Language :: Python :: 3.7
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Science/Research
+Classifier: Development Status :: 4 - Beta
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: h5py>=3.4.0
+Requires-Dist: matplotlib>=2.2.2
+Requires-Dist: numpy>=1.14.3
+Requires-Dist: scipy>=1.1.0
+Requires-Dist: tabulate>=0.8.7
+Requires-Dist: tqdm>=4.46.0
+Requires-Dist: pyant>=0.11.0
+Requires-Dist: requests>=2.28.2
+Provides-Extra: develop
+Requires-Dist: pytest>=6.2.5; extra == "develop"
+Requires-Dist: sphinx>=4.2.0; extra == "develop"
+Requires-Dist: flake8>=4.0.1; extra == "develop"
+Requires-Dist: wheel>=0.37.0; extra == "develop"
+Requires-Dist: build>=0.7.0; extra == "develop"
+Requires-Dist: twine>=3.4.2; extra == "develop"
+Requires-Dist: coverage>=6.0.2; extra == "develop"
+Requires-Dist: sphinx-gallery>=0.3.1; extra == "develop"
+Requires-Dist: matplotlib>=3.5.1; extra == "develop"
+Requires-Dist: nbsphinx>=0.8.8; extra == "develop"
+Requires-Dist: ipykernel>=6.9.1; extra == "develop"
+Requires-Dist: radon>=5.1.0; extra == "develop"
+Requires-Dist: m2r2>=0.3.2; extra == "develop"
+Requires-Dist: setuptools>=57.4.0; extra == "develop"
+Requires-Dist: numpydoc>=1.2; extra == "develop"
+Requires-Dist: black>=23.7.0; extra == "develop"
+Provides-Extra: mpi
+Requires-Dist: mpi4py>=3.1.1; extra == "mpi"
+Provides-Extra: extra
+Requires-Dist: pandas>=1.4.0; extra == "extra"
+Requires-Dist: ablate>=0.1.0; extra == "extra"
+Provides-Extra: all
+Requires-Dist: mpi4py>=3.1.1; extra == "all"
+Requires-Dist: pandas>=1.4.0; extra == "all"
+Requires-Dist: ablate>=0.1.0; extra == "all"
+Dynamic: license-file
+
+## WORK IN PROGRESS PACKAGE
+
+This repository is a porting/refactoring work in progress: do not use any of the source code until a official release has been drafted.
+
+## Installation
+
+- Clone this repository 
+- Go to the directory where you cloned it
+- Run `pip install .`
+
+## Usage
+
+### Scripting
+
+See the `/examples` folder that is also included as package data for scripting or the examples gallery in the web-documentation.
+
+### CLI
+
+The package also has a command line interface bound to `metecho`:
+
+```
+usage: metecho [-h] [-p] [-v] {convert,event_search} ...
+
+Radar meteor echo analysis toolbox
+
+positional arguments:
+  {convert,event_search}
+                        Avalible command line interfaces
+    convert             Convert the target files to a supported backend format
+    event_search        Searches radar data to look for signs of meteor events.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p, --profiler        Run profiler
+  -v, --verbose         Increase output verbosity
+```
+
+## Contributing
+
+Please refer to the style and contribution guidelines documented in the 
+[IRF Software Contribution Guide](https://danielk.developer.irf.se/software_contribution_guide/). 
+Generally external code-contributions are made trough a "Fork-and-pull" 
+workflow, while internal contributions follow the branching strategy outlined 
+in the contribution guide.
+MIT License
+
+Copyright (c) [2021] [Daniel Kastinen]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
