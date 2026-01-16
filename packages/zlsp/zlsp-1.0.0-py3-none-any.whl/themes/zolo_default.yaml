@@ -1,0 +1,402 @@
+# ═══════════════════════════════════════════════════════════════
+# Zolo Default Theme
+# ═══════════════════════════════════════════════════════════════
+# Single source of truth for all editor color schemes
+# Version: 1.0.0
+# Author: Zolo.ai
+# ═══════════════════════════════════════════════════════════════
+
+name: "Zolo Default"
+description: "Default color scheme for .zolo files with LSP semantic tokens"
+author: "Zolo.ai"
+version: "1.0.0"
+
+# ═══════════════════════════════════════════════════════════════
+# Color Palette
+# ═══════════════════════════════════════════════════════════════
+# Define colors once in multiple formats for editor compatibility
+# All editors will use these same colors for consistency
+
+palette:
+  salmon_orange:
+    name: "Salmon Orange"
+    hex: "#ffaf87"
+    ansi: 216
+    rgb: [255, 175, 135]
+    description: "Warm orange for hierarchy markers"
+  
+  golden_yellow:
+    name: "Golden Yellow"
+    hex: "#ffd787"
+    ansi: 222
+    rgb: [255, 215, 135]
+    description: "Golden yellow for nested elements"
+  
+  light_cream:
+    name: "Light Cream"
+    hex: "#fffbcb"
+    ansi: 230
+    rgb: [255, 251, 203]
+    description: "Soft cream for text content"
+  
+  dark_orange:
+    name: "Dark Orange"
+    hex: "#FF8C00"
+    ansi: 214
+    rgb: [255, 140, 0]
+    description: "Vibrant orange for numeric values"
+  
+  cyan:
+    name: "Light Purple"
+    hex: "#af87ff"
+    ansi: 141
+    rgb: [175, 135, 255]
+    description: "Light purple for type information"
+  
+  soft_yellow:
+    name: "Soft Yellow"
+    hex: "#ffff5f"
+    ansi: 227
+    rgb: [255, 255, 95]
+    description: "Soft yellow for structural elements"
+  
+  light_pink:
+    name: "Light Cyan"
+    hex: "#afffff"
+    ansi: 159
+    rgb: [175, 255, 255]
+    description: "Light cyan for brackets and dashes"
+  
+  deep_blue:
+    name: "Deep Blue"
+    hex: "#0087ff"
+    ansi: 33
+    rgb: [0, 135, 255]
+    description: "Deep blue for boolean values"
+  
+  test_blue:
+    name: "Test Blue"
+    hex: "#0000d7"
+    ansi: 20
+    rgb: [0, 0, 215]
+    description: "Test color for ZNAVBAR nested keys"
+  
+  dark_orange_208:
+    name: "Dark Orange"
+    hex: "#ff8700"
+    ansi: 208
+    rgb: [255, 135, 0]
+    description: "Dark orange for ZNAVBAR nested keys"
+  
+  gray:
+    name: "Gray"
+    hex: "#6c6c6c"
+    ansi: 242
+    rgb: [108, 108, 108]
+    description: "Muted gray for comments"
+  
+  magenta:
+    name: "Magenta"
+    hex: "#d700ff"
+    ansi: 165
+    rgb: [215, 0, 255]
+    description: "Bright magenta for object braces"
+  
+  bright_orange:
+    name: "Bright Red"
+    hex: "#ff0000"
+    ansi: 196
+    rgb: [255, 0, 0]
+    description: "Bright red for escape sequences"
+  
+  dark_red:
+    name: "Dark Red"
+    hex: "#d70000"
+    ansi: 160
+    rgb: [215, 0, 0]
+    description: "Dark red for locked/restricted items"
+  
+  light_green:
+    name: "Light Green"
+    hex: "#87d787"
+    ansi: 114
+    rgb: [135, 215, 135]
+    description: "Light green for zSpark root key"
+  
+  dark_gray:
+    name: "Purple"
+    hex: "#875fd7"
+    ansi: 98
+    rgb: [135, 95, 215]
+    description: "Purple for zPath values"
+  
+  dark_green:
+    name: "Dark Green"
+    hex: "#00d700"
+    ansi: 40
+    rgb: [0, 215, 0]
+    description: "Dark green for zSpark special keys"
+  
+  light_purple:
+    name: "Light Purple"
+    hex: "#875fff"
+    ansi: 99
+    rgb: [135, 95, 255]
+    description: "Light purple for zSpark special values"
+  
+  dark_cyan:
+    name: "Bright Cyan"
+    hex: "#00ffff"
+    ansi: 51
+    rgb: [0, 255, 255]
+    description: "Bright cyan for zPath values"
+  
+  bright_yellow:
+    name: "Bright Yellow"
+    hex: "#ffff00"
+    ansi: 226
+    rgb: [255, 255, 0]
+    description: "Bright yellow for environment/config constants"
+  
+  orange_red:
+    name: "Orange Red"
+    hex: "#ff5f00"
+    ansi: 202
+    rgb: [255, 95, 0]
+    description: "Orange-red for UI element keys"
+
+# ═══════════════════════════════════════════════════════════════
+# Semantic Token Styles
+# ═══════════════════════════════════════════════════════════════
+# Map LSP semantic token types to colors and styles
+# These mappings are editor-agnostic
+
+tokens:
+  # Keys
+  rootKey:
+    color: salmon_orange
+    style: none
+    description: "Top-level keys (app_name, server, features)"
+  
+  nestedKey:
+    color: golden_yellow
+    style: none
+    description: "Nested keys (host, port, ssl)"
+  
+  # zKernel-specific keys
+  zmetaKey:
+    color: light_green
+    style: none
+    description: "zMeta in zUI/zSchema files, zVaF and component name in zUI files (Zolo convention root keys)"
+  
+  zkernelDataKey:
+    color: dark_gray
+    style: none
+    description: "zKernel zData keys under zMeta in zSchema.*.zolo files (Data_Type, Data_Label, Data_Source, Schema_Name, zMigration, zMigrationVersion)"
+  
+  zschemaPropertyKey:
+    color: dark_gray
+    style: none
+    description: "Field property keys in zSchema.*.zolo files (type, pk, auto_increment, unique, required, default, rules, zHash, comment, format, min_length, max_length, pattern, min, max)"
+  
+  bifrostKey:
+    color: dark_cyan
+    style: none
+    description: "Bifrost underscore keys (_zClass, _zId) in zUI.*.zolo files"
+  
+  uiElementKey:
+    color: orange_red
+    style: none
+    description: "UI element keys (zImage, zText, zURL, zH1-zH6, zNavBar, zUL) in zUI.*.zolo files"
+  
+  zsparkKey:
+    color: light_green
+    style: none
+    description: "zSpark root key in zSpark.*.zolo files"
+  
+  zenvConfigKey:
+    color: dark_gray
+    style: none
+    description: "Config root keys in zEnv.*.zolo files (DEPLOYMENT, DEBUG, LOG_LEVEL)"
+  
+  znavbarNestedKey:
+    color: dark_orange_208
+    style: none
+    description: "First-level nested keys under ZNAVBAR in zEnv files (not grandchildren)"
+  
+  zsubKey:
+    color: dark_gray
+    style: none
+    description: "zSub key in zEnv/zUI files at grandchild+ level (indent >= 4)"
+  
+  zrbacKey:
+    color: bright_orange
+    style: none
+    description: "zRBAC access control key in zEnv/zUI files (child of any key)"
+  
+  zrbacOptionKey:
+    color: dark_gray
+    style: none
+    description: "zKey modifiers (^, ~, !, *) in zEnv/zUI files"
+  
+  zconfigKey:
+    color: light_green
+    style: none
+    description: "z-prefixed root keys in zConfig.*.zolo files (e.g., zMachine)"
+  
+  zmachineEditableKey:
+    color: deep_blue
+    style: none
+    description: "User-editable nested keys under zMachine (preferences, limits)"
+  
+  zmachineLockedKey:
+    color: dark_red
+    style: none
+    description: "Auto-detected locked nested keys under zMachine (hardware, system)"
+  
+  zsparkNestedKey:
+    color: dark_gray
+    style: none
+    description: "All nested keys under zSpark root in zSpark files"
+  
+  zsparkModeValue:
+    color: bright_orange
+    style: none
+    description: "zMode value (Terminal/zBifrost) in zSpark files - tomato red"
+  
+  zsparkVaFileValue:
+    color: dark_green
+    style: none
+    description: "zVaFile value (zUI.*) in zSpark files - dark green"
+  
+  zsparkSpecialValue:
+    color: salmon_orange
+    style: none
+    description: "zBlock value in zSpark files - salmon orange"
+  
+  envConfigValue:
+    color: bright_yellow
+    style: none
+    description: "Environment/config constants (PROD, DEBUG, INFO, etc.)"
+  
+  # Values
+  string:
+    color: light_cream
+    style: none
+    description: "String values"
+  
+  versionString:
+    color: light_cream
+    style: none
+    description: "Version numbers (1.0.0, 2.1.3-beta)"
+  
+  timeString:
+    color: light_cream
+    style: none
+    description: "Time values (14:30:00, 09:15:30)"
+  
+  timestampString:
+    color: light_cream
+    style: none
+    description: "Timestamp values (2024-01-06T14:30:00)"
+  
+  ratioString:
+    color: light_cream
+    style: none
+    description: "Ratio values (16:9, 4:3, 21:9)"
+  
+  number:
+    color: dark_orange
+    style: none
+    description: "Numeric values (8080, 100, 3.14)"
+  
+  boolean:
+    color: deep_blue
+    style: none
+    description: "Boolean values (true, false)"
+  
+  "null":
+    color: deep_blue
+    style: none
+    description: "Null values (null)"
+  
+  zpathValue:
+    color: dark_cyan
+    style: none
+    description: "zPath values (@.logs, ~.config) in zKernel files"
+  
+  escapeSequence:
+    color: bright_orange
+    style: none
+    description: "Escape sequences (\\n, \\t, \\\", \\\\, \\uXXXX)"
+  
+  # Type hints
+  typeHint:
+    color: cyan
+    style: none
+    description: "Type hint text (int, bool, float, str)"
+  
+  typeHintParen:
+    color: soft_yellow
+    style: none
+    description: "Type hint parentheses ( )"
+  
+  # Structural
+  bracketStructural:
+    color: light_pink
+    style: none
+    description: "Array/list brackets [ ]"
+  
+  braceStructural:
+    color: magenta
+    style: none
+    description: "Object/dict braces { }"
+  
+  stringBracket:
+    color: light_pink
+    style: none
+    description: "Brackets [ ] inside string values"
+  
+  stringBrace:
+    color: magenta
+    style: none
+    description: "Braces { } inside string values"
+  
+  # Comments
+  comment:
+    color: gray
+    style: italic
+    description: "Comments"
+
+# ═══════════════════════════════════════════════════════════════
+# Editor-Specific Overrides (Optional)
+# ═══════════════════════════════════════════════════════════════
+# Use sparingly - only when an editor requires special handling
+
+overrides:
+  vim:
+    # Vim-specific: Clear conflicting default groups
+    clearGroups: ['Identifier', 'Keyword', 'Constant', 'Special']
+  
+  vscode:
+    # VS Code-specific overrides (if needed in future)
+    # Example: scope mappings, workbench integration
+    
+  cursor:
+    # Cursor-specific overrides (if needed in future)
+
+# ═══════════════════════════════════════════════════════════════
+# Theme Metadata
+# ═══════════════════════════════════════════════════════════════
+
+metadata:
+  compatibility:
+    terminal: true       # Works in terminal
+    gui: true           # Works in GUI
+    truecolor: true     # Supports 24-bit color
+    ansi256: true       # Supports 256-color ANSI
+    ansi16: false       # Not optimized for 16-color
+  
+  variants:
+    current: "default"
+    planned: ["high_contrast", "deuteranopia_friendly"]
