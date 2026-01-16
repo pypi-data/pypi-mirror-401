@@ -1,0 +1,36 @@
+from typing import Any, Protocol, Self, Type
+
+
+class StatelessTaskProtocol(Protocol):
+    """Protocol for tasks without state management."""
+
+    @property
+    def id(self) -> str: ...
+
+    @property
+    def type(self) -> str: ...
+
+    def __enter__(self) -> Self: ...
+
+    def __exit__(self, exc_type: Type[BaseException] | None, exc_val: BaseException | None, exc_tb: Any) -> None: ...
+
+
+class StatefulTaskProtocol[T](Protocol):
+    """Protocol for tasks with state management."""
+
+    @property
+    def id(self) -> str: ...
+
+    @property
+    def type(self) -> str: ...
+
+    @property
+    def state(self) -> T: ...
+
+    def __enter__(self) -> Self: ...
+
+    def __exit__(self, exc_type: Type[BaseException] | None, exc_val: BaseException | None, exc_tb: Any) -> None: ...
+
+    def set_state(self, state: T) -> None: ...
+
+    def update_state(self, updates: dict[str, Any]) -> None: ...
