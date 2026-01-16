@@ -1,0 +1,293 @@
+Metadata-Version: 2.4
+Name: x-api-rs
+Version: 1.0.4.dev0
+Classifier: Programming Language :: Rust
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Dist: pytest>=7.0 ; extra == 'test'
+Requires-Dist: pytest-asyncio>=0.21 ; extra == 'test'
+Provides-Extra: test
+Summary: Twitter/X API 客户端库 (Rust 实现, 提供 Python 绑定)
+Author-email: robin <robin528919@gmail.com>
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Homepage, https://github.com/Robin528919/x-api-rs
+Project-URL: Issues, https://github.com/Robin528919/x-api-rs/issues
+Project-URL: Repository, https://github.com/Robin528919/x-api-rs.git
+
+# X API - Twitter API Python 客户端
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org)
+[![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
+
+高性能的 Twitter (X) API Python 客户端，使用 Rust + PyO3 实现，提供完整的 Twitter 平台功能支持。
+
+## ✨ 特性
+
+- **🚀 高性能** - Rust 实现，提供原生性能
+- **🔒 安全可靠** - 内置 JA3/TLS 指纹模拟，增强反检测能力
+- **🐍 Python 友好** - 完整的异步 API，符合 Python 惯用风格
+- **📦 模块化设计** - 清晰的模块划分，易于使用和扩展
+- **💪 强类型** - 完整的类型提示支持
+- **📝 详细日志** - 完整的操作日志和错误追踪
+
+## 📋 功能模块
+
+| 模块 | 功能 | 状态 |
+| ------ | ------ | ------ |
+| **dm** | 私信发送（单条、批量、自定义文案） | ✅ 已完成 |
+| **upload** | 图片和视频上传 | ✅ 已完成 |
+| **posts** | 发帖、删帖、点赞、转发 | ✅ 已完成 |
+| **user** | 用户资料查询和编辑 | ✅ 已完成 |
+| **inbox** | 收件箱查询 | ✅ 已完成 |
+
+## 📥 安装
+
+### 从源码安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/Robin528919/x-api-rs.git
+cd x-api-rs
+
+# 安装 maturin（Python 打包工具）
+pip install maturin
+
+# 开发模式安装（支持修改代码后热更新）
+maturin develop --features python
+
+# 或生产构建
+maturin build --release --features python
+pip install target/wheels/x_api-*.whl
+```
+
+## 🚀 快速开始
+
+### 基础使用
+
+```python
+import asyncio
+from x_api_rs import Twitter
+
+async def main():
+    # 创建客户端（使用 cookies 认证）
+    client = Twitter(cookies="your_cookies_here")
+
+    # 发送私信
+    result = await client.dm.send_message("123456", "Hello!")
+    if result.success:
+        print(f"发送成功，事件ID: {result.event_id}")
+
+    # 上传图片
+    with open("image.jpg", "rb") as f:
+        image_bytes = f.read()
+    upload_result = await client.upload.image(image_bytes, "tweet_image")
+
+    # 发帖（带图片）
+    tweet_result = await client.posts.create_tweet(
+        text="Hello World!",
+        media_ids=[upload_result.media_id_string]
+    )
+
+    # 获取用户资料
+    user = await client.user.get_profile("elonmusk")
+    print(f"用户: {user.name}, 粉丝: {user.followers_count}")
+
+asyncio.run(main())
+```
+
+### 批量操作
+
+```python
+# 批量发送私信（相同内容）
+user_ids = ["123", "456", "789"]
+result = await client.dm.send_batch(user_ids, "批量消息")
+print(f"成功: {result.success_count}, 失败: {result.failure_count}")
+
+# 批量发送自定义文案
+user_ids = ["123", "456"]
+texts = ["你好，张三！", "你好，李四！"]
+result = await client.dm.send_batch_with_custom_texts(user_ids, texts)
+```
+
+### 使用代理
+
+```python
+# 创建客户端时指定代理
+client = Twitter(
+    cookies="your_cookies_here",
+    proxy_url="http://proxy:8080"
+)
+```
+
+### auth_token 转换
+
+```python
+# 将 auth_token 转换为完整的 cookies
+result = await Twitter.auth_token_to_cookies(
+    "your_auth_token",
+    proxy_url="http://proxy:8080"  # 可选
+)
+print(f"用户 ID: {result.user_id}")
+print(f"Cookies: {result.cookies}")
+
+# 使用转换后的 cookies 创建客户端
+client = Twitter(result.cookies)
+```
+
+## 📚 详细文档
+
+- **[模块总览](docs/modules.md)** - 了解各模块功能和架构
+- **[API 文档](docs/api/)** - 详细的 API 接口说明
+  - [DM 私信模块](docs/api/dm.md)
+  - [Upload 上传模块](docs/api/upload.md)
+  - [Posts 帖子模块](docs/api/posts.md)
+  - [User 用户模块](docs/api/user.md)
+  - [Inbox 收件箱模块](docs/api/inbox.md)
+- **[示例代码](docs/examples/)** - 各种使用场景的示例
+  - [快速开始](docs/examples/quickstart.md)
+  - [DM 示例](docs/examples/dm_demo.md)
+  - [上传示例](docs/examples/upload_demo.md)
+  - [批量操作](docs/examples/batch_operations.md)
+
+## 🏗️ 架构设计
+
+本项目采用四层架构设计：
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                   Twitter (Facade 层)                         │
+│  ┌──────┬────────┬────────┬──────────┬──────────────────┐    │
+│  │  dm  │ posts  │  user  │  inbox   │  future modules  │    │
+│  └───┬──┴────┬───┴────┬───┴────┬─────┴──────────────────┘    │
+└──────┼───────┼────────┼────────┼─────────────────────────────┘
+       │       │        │        │
+       │       │        │        │     Service 层（业务模块）
+   ┌───▼──┐ ┌──▼───┐ ┌─▼────┐ ┌▼────────┐
+   │ DM   │ │Posts │ │User  │ │ Inbox   │
+   │Client│ │Client│ │Client│ │ Client  │
+   └───┬──┘ └──┬───┘ └─┬────┘ └┬────────┘
+       │       │       │        │
+       └───┬───┴───┬───┴────┬───┘
+           │       │        │
+      ┌────▼───────▼────────▼─────┐  Capability 层（共享能力）
+      │  MediaUpload Capability   │
+      └────────────┬──────────────┘
+                   │
+         ┌─────────▼──────────────┐  Common 层（通用基础）
+         │  Auth + HttpClient     │
+         └────────────────────────┘
+```
+
+详细架构文档请参考：
+
+- [架构设计文档](docs/ARCHITECTURE_INDEX.md)
+- [迁移指南](docs/MIGRATION_GUIDE.md)
+
+## 🔧 开发
+
+### 环境准备
+
+```bash
+# 安装 Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 安装 Python 3.8+
+# 安装 maturin
+pip install maturin
+```
+
+### 本地开发
+
+```bash
+# 开发模式构建
+maturin develop --features python
+
+# 运行测试
+cargo test
+
+# 运行 Python 测试
+pytest python_tests/
+
+# 运行示例
+python examples/python/async_example.py
+```
+
+### 代码规范
+
+- Rust 代码：遵循 `rustfmt` 和 `clippy` 规范
+- Python 代码：遵循 PEP 8 规范
+- 提交信息：使用 Conventional Commits 格式
+
+详细开发指南请参考：[开发文档](docs/DEVELOPMENT.md)
+
+## 🧪 测试
+
+```bash
+# 运行 Rust 单元测试
+cargo test
+
+# 运行 Rust 集成测试（需要配置 cookies）
+cargo test -- --ignored
+
+# 运行 Python 测试
+pytest python_tests/ -v
+
+# 带日志输出
+RUST_LOG=debug cargo test -- --nocapture
+```
+
+详细测试说明请参考：[测试文档](docs/TESTING.md)
+
+## 📊 性能
+
+- 使用 Rust 实现核心逻辑，提供原生性能
+- 支持异步并发操作，充分利用多核性能
+- 批量操作使用 Tokio 并发执行
+- HTTP 连接池复用，减少连接开销
+
+## 🛡️ 安全性
+
+- 支持 JA3/TLS 指纹模拟（Chrome 136）
+- 不在日志中输出敏感信息（cookies、token）
+- 完整的参数验证和错误处理
+- 遵循 Twitter API 使用限制
+
+## 📄 许可证
+
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+在提交代码前，请确保：
+
+1. 通过所有测试
+2. 遵循代码规范
+3. 更新相关文档
+4. 编写清晰的提交信息
+
+## 📮 联系方式
+
+- 问题反馈：[GitHub Issues](https://github.com/Robin528919/x-api-rs/issues)
+- 功能建议：[GitHub Discussions](https://github.com/Robin528919/x-api-rs/discussions)
+
+## 🙏 致谢
+
+- [PyO3](https://github.com/PyO3/pyo3) - Rust 和 Python 绑定框架
+- [rquest](https://github.com/0x676e67/rquest) - 支持 JA3 指纹的 HTTP 客户端
+- [Tokio](https://tokio.rs/) - 异步运行时
+
+## ⚠️ 免责声明
+
+本项目仅供学习和研究使用。使用本项目访问 Twitter API 时，请遵守 Twitter 的服务条款和使用政策。开发者不对使用本项目造成的任何后果负责。
+
