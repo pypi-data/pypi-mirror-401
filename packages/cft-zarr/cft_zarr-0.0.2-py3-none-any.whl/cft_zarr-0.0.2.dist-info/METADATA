@@ -1,0 +1,58 @@
+Metadata-Version: 2.3
+Name: cft-zarr
+Version: 0.0.2
+Summary: CFT Zarr codecs for 12-bit fluorescence and RGB compression
+Author: Eli White
+Author-email: eliwhite@gmail.com
+Requires-Python: >=3.11,<=3.14
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: imagecodecs (>=2024.1.1)
+Requires-Dist: numpy (>=1.26.4,<2.0.0)
+Requires-Dist: zarr (>=3.0.0)
+Description-Content-Type: text/markdown
+
+# CFT Zarr Custom Codecs
+
+Custom codecs for Zarr v3 optimized for CFT (Cryo-Fluorescence Tomography) data storage.
+
+## Codecs
+
+### Chunked JPEG Codec (`cft_zarr.chunked_jpeg`)
+
+Efficient lossy compression for RGB images using chunked JPEG encoding.
+
+- **Purpose**: Compress RGB images in chunks of N slices (default: 4) with JPEG compression
+- **Chunk Shape**: Configurable, default (4, 512, 512, 3) for RGB
+- **Quality**: Configurable JPEG quality (0-100, default: 85)
+
+## Usage
+
+```python
+from cft_zarr.chunked_jpeg import ChunkedJPEGCodec
+import zarr
+
+# Create codec
+codec = ChunkedJPEGCodec(quality=85, chunk_shape=(4, 512, 512, 3))
+
+# Use with Zarr array
+arr = zarr.open_array(
+    'rgb.zarr',
+    mode='w',
+    shape=(100, 512, 512, 3),
+    chunks=(4, 512, 512, 3),
+    dtype='uint8',
+    codec=codec
+)
+```
+
+## Installation
+
+```bash
+cd src/python/public/cft_zarr
+poetry install
+```
+
+
