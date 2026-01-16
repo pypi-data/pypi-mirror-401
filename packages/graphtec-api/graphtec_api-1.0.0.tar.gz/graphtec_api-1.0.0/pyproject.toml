@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graphtec-api"
+version = "1.0.0"
+authors = [
+  { name="Miguel Chen Zheng", email="tu_email_universidad@alumnos.upm.es" },
+]
+description = "Librería en Python para el control y adquisición de datos del Datalogger GL100"
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "pyserial>=3.5",
+    "xlsxwriter>=3.2.9"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/miguel-cz/graphtec-api"
+"Bug Tracker" = "https://github.com/miguel-cz/graphtec-api/issues"
