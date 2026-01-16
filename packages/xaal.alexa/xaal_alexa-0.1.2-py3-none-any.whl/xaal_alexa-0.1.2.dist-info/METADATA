@@ -1,0 +1,43 @@
+Metadata-Version: 2.4
+Name: xaal.alexa
+Version: 0.1.2
+Summary: xAAL devices for Amazon Alexa
+Author-email: Jerome Kerdreux <Jerome.Kerdreux@imt-atlantique.fr>
+License-Expression: GPL-3.0-or-later
+Project-URL: Homepage, https://recherche.imt-atlantique.fr/xaal/
+Project-URL: Documentation, https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/assistants/Alexa/README.rst
+Project-URL: Source, https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/assistants/Alexa
+Keywords: xaal,alexa
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Description-Content-Type: text/x-rst
+Requires-Dist: xaal.lib
+Requires-Dist: xaal.schemas
+
+xaal.alexa
+==========
+This package provides a xAAL gateway for all Alexa devices associated to an account. 
+Right now, the gateway supports TTS. 
+
+
+Install
+=======
+- Download the remote script: https://github.com/thorsten-gehrig/alexa-remote-control
+- Edit / run the remote script
+- Try the gateway: python -m xaal.alexa
+- Edit the config file to add Alexa Echo devices (or Group) (find them w/ alexa-remote-control.sh -a)
+  You can omit the address.
+- re-run the gateway
+- done
+
+
+Notes
+=====
+The gateway provides a special Alexa (virtual) device called LastAlexa. This is the 
+lattest used device. 
+
+
+Usage
+=====
+You can trigger a xAAL scenario throught the xaal.fauxmo package. And use the LastAlexa
+device to answer to the user throught the scenario.
