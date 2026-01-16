@@ -1,0 +1,53 @@
+[project]
+name = "wiggum"
+version = "0.1.1"
+description = "Ralph Wiggum loop for agents"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "YY Ahn", email = "yongyeol@gmail.com" }
+]
+requires-python = ">=3.12"
+keywords = [
+    "ai-agents",
+    "automation",
+    "claude",
+    "codex",
+    "gemini",
+    "loop",
+    "task-runner",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+    "typer>=0.9.0",
+    "tomli>=2.0.0;python_version<'3.11'",
+    "tomli-w>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yy/wiggum"
+Repository = "https://github.com/yy/wiggum"
+Issues = "https://github.com/yy/wiggum/issues"
+
+[project.scripts]
+wiggum = "wiggum.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.8.12,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
