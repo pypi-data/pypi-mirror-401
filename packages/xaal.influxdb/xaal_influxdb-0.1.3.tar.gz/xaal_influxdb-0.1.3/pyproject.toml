@@ -1,0 +1,31 @@
+[project]
+name = "xaal.influxdb"
+version = "0.1.3"
+description = "xAAL device for InfluxDB logging"
+readme = "README.rst"
+authors = [ { name = "Pierre-Henri Horrein", email = "freki@frekilabs.fr" } ]
+license = "GPL-3.0-or-later"
+classifiers = ["Programming Language :: Python",
+"Topic :: Software Development :: Libraries :: Python Modules"]
+keywords = ["xaal", "influxdb"]
+dependencies = ["xaal.lib", "influxdb"]
+
+[tool.setuptools.packages.find]
+include = ["xaal*"]
+namespaces = true
+
+[project.urls]
+Homepage = "https://recherche.imt-atlantique.fr/xaal/"
+Documentation = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/blob/main/devices/loggers/influxdb/README.rst"
+Source = "https://gitlab.imt-atlantique.fr/xaal/code/python/-/tree/main/devices/loggers/influxdb"
+
+[tool.ruff]
+line-length = 122
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 122
+skip-string-normalization = true
+
