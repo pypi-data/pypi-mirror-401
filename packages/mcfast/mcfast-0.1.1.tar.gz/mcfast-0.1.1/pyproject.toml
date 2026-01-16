@@ -1,0 +1,28 @@
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "mcfast"
+version = "0.1.1"
+description = "A set of utilities and Rust-accelerated functions for the McFACTS AGN disk simulation project"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+
+authors = [{ name = "Nicolas Roman Posner", email = "nicolasposner@gmail.com" }]
+maintainers = [{ name = "Nicolas Roman Posner", email = "nicolasposner@gmail.com" }]
+keywords = ["astronomy", "physics"]
+
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+dependencies = [
+ "pandas>=2.0.3",
+ "tqdm>=4.67.1",
+]
+[tool.maturin]
+features = ["pyo3/extension-module"]
