@@ -1,0 +1,17 @@
+[project]
+name = "pylhb"
+version = "0.2.2"
+description = "Mr.Lee's Helpers"
+readme = "README.md"
+license = {file = "LICENSE"} 
+requires-python = ">=3.12"
+dependencies = [
+    "pyodbc>=5.3.0",
+]
+
+[project.scripts]
+pylhb = "pylhb:main"
+
+[build-system]
+requires = ["uv_build>=0.9.22,<0.10.0"]
+build-backend = "uv_build"
