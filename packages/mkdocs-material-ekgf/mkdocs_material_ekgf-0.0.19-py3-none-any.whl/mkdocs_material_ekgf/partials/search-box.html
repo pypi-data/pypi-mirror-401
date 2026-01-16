@@ -1,0 +1,7 @@
+{# Search button that opens Material's search modal #}
+{% if "search" in config.plugins or "material/search" in config.plugins %}
+  <label class="ekgf-search-button md-header__button md-icon" for="__search" title="Search" aria-label="Search">
+    {% set icon = config.theme.icon.search or "material/magnify" %}
+    {% include ".icons/" ~ icon ~ ".svg" %}
+  </label>
+{% endif %}
