@@ -1,0 +1,41 @@
+# LOGOWATCH PRESET: Claude MCP Logs
+# Analyzes MCP server JSONL logs from Claude Code
+# Logs location: ~/.cache/claude-cli-nodejs/*/mcp-logs-*/*.jsonl
+
+sources:
+  - name: mcp
+    path: ~/.cache/claude-cli-nodejs
+    type: directory
+    pattern: "**/*.jsonl"
+    timestamp:
+      field: "timestamp"
+
+rules:
+  - pattern: "."
+    format: jsonl
+    description: "MCP Errors"
+    severity: error
+    source: mcp
+    options:
+      json:
+        fields: [error, timestamp, sessionId]
+        filter: '.error != ""'
+        display: '{timestamp} | {error}'
+
+  - pattern: "."
+    format: jsonl
+    description: "Debug Failures"
+    severity: warning
+    source: mcp
+    options:
+      json:
+        fields: [debug, timestamp]
+        filter: '.debug contains "failed"'
+        display: '{timestamp} | {debug}'
+
+incremental: true
+output:
+  format: console
+  max_examples: 0  # no limit
+  show_summary: true
+  sort_by: timestamp

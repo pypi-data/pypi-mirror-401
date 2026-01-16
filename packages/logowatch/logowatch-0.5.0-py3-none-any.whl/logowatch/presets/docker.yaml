@@ -1,0 +1,49 @@
+# LOGOWATCH PRESET: Docker Container Logs
+# Analyzes Docker JSON log format (default json-file driver)
+# Logs location: /var/lib/docker/containers/*/*-json.log
+
+sources:
+  - name: docker
+    path: /var/lib/docker/containers
+    type: directory
+    pattern: "*-json.log"
+
+rules:
+  - pattern: "."
+    format: jsonl
+    description: "Container Errors"
+    severity: error
+    source: docker
+    options:
+      json:
+        fields: [log, time, stream]
+        filter: '.log contains "ERROR"'
+        display: '{time} [{stream}] {log}'
+
+  - pattern: "."
+    format: jsonl
+    description: "Container Warnings"
+    severity: warning
+    source: docker
+    options:
+      json:
+        fields: [log, time]
+        filter: '.log contains "WARN"'
+        display: '{time} {log}'
+
+  - pattern: "."
+    format: jsonl
+    description: "Stderr Output"
+    severity: warning
+    source: docker
+    options:
+      json:
+        fields: [log, time]
+        filter: '.stream == "stderr"'
+        display: '{time} {log}'
+
+incremental: true
+output:
+  format: console
+  max_examples: 0  # no limit
+  show_summary: true

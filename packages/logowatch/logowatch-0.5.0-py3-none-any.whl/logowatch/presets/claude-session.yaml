@@ -1,0 +1,66 @@
+# LOGOWATCH PRESET: Claude Session Chat
+# Shows conversation between user and Claude assistant
+# Logs: ~/.claude/projects/*/*.jsonl
+
+sources:
+  - name: chat
+    path: ~/.claude/projects
+    type: directory
+    pattern: "**/*.jsonl"
+    timestamp:
+      field: "timestamp"
+
+rules:
+  # User messages with string content (simple text input)
+  - pattern: "."
+    format: jsonl
+    description: "USER"
+    severity: info
+    section: "Chat"
+    source: chat
+    options:
+      json:
+        fields: [timestamp, message.content]
+        filter: '.type == "user" && .message.content not_starts_with "[" && .message.content != ""'
+        display: '{timestamp} | USER: {message.content}'
+
+  # User messages with array content (text blocks, excluding tool_result)
+  # Uses [?type=text] to find text in array content
+  - pattern: "."
+    format: jsonl
+    description: "USER"
+    severity: info
+    section: "Chat"
+    source: chat
+    options:
+      json:
+        fields:
+          - timestamp
+          - "message.content[?type=text].text"
+        filter: '.type == "user" && .message.content[?type=text].text exists && .message.content[?type=text].text != ""'
+        display: '{timestamp} | USER: {message.content[?type=text].text}'
+
+  # Assistant text responses (excluding empty/thinking-only responses)
+  # Uses [?type=text] to find text block at ANY position in content array
+  - pattern: "."
+    format: jsonl
+    description: "ASSISTANT"
+    severity: info
+    section: "Chat"
+    source: chat
+    options:
+      json:
+        fields:
+          - timestamp
+          - "message.content[?type=text].text"
+        filter: '.type == "assistant" && .message.content[?type=text].text exists && .message.content[?type=text].text != ""'
+        display: '{timestamp} | ASSISTANT: {message.content[?type=text].text}'
+
+incremental: false
+output:
+  format: console
+  mode: sequential  # chronological order (USER/ASSISTANT interleaved)
+  max_examples: 0  # no limit - show all messages
+  show_summary: false
+  truncate: 0  # no truncation - show full content
+  sort_by: timestamp
