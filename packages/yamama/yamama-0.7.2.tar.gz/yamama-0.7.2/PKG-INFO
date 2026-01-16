@@ -1,0 +1,146 @@
+Metadata-Version: 2.4
+Name: yamama
+Version: 0.7.2
+Summary: Yamama - Riyadh Artificial Intelligence Agents SDK
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: aiofiles>=24
+Requires-Dist: aiohttp~=3.10
+Requires-Dist: av>=14.0.0
+Requires-Dist: certifi>=2025.6.15
+Requires-Dist: click~=8.1
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: docstring-parser>=0.16
+Requires-Dist: eval-type-backport
+Requires-Dist: google-auth<3,>=2
+Requires-Dist: google-cloud-speech<3,>=2
+Requires-Dist: google-cloud-texttospeech<3,>=2.32
+Requires-Dist: google-genai>=1.55
+Requires-Dist: livekit-blingfire>=1.1.0
+Requires-Dist: nest-asyncio>=1.6.0
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: openai>=1.99.2
+Requires-Dist: opentelemetry-api~=1.39.0
+Requires-Dist: opentelemetry-exporter-otlp~=1.39.0
+Requires-Dist: opentelemetry-sdk~=1.39.0
+Requires-Dist: prometheus-client>=0.22
+Requires-Dist: protobuf>=3
+Requires-Dist: psutil>=7.0
+Requires-Dist: pydantic<3,>=2.0
+Requires-Dist: pyjwt>=2.0
+Requires-Dist: sounddevice>=0.5
+Requires-Dist: typer>=0.15.1
+Requires-Dist: types-protobuf>=4
+Requires-Dist: typing-extensions>=4.12
+Requires-Dist: watchfiles>=1.0
+Provides-Extra: mcp
+Requires-Dist: mcp<2,>=1.10.0; extra == "mcp"
+Provides-Extra: images
+Requires-Dist: pillow>=10.3.0; extra == "images"
+
+# Riyadh Artificial Intelligence Agents SDK
+
+Yamama is RiyadhAI’s Python SDK for building realtime AI agents.
+
+Use it to connect your apps to realtime AI, orchestration, and robotics workflows.
+
+## Version
+
+0.7.2
+
+## Install
+
+```bash
+pip install yamama
+```
+
+Optional extras:
+
+```bash
+pip install "yamama[mcp]"
+pip install "yamama[images]"
+```
+
+## What You Get
+
+- Realtime agents with LiveKit rooms
+- Built-in provider plugins (including Google)
+- Session/agent lifecycle management
+- Optional MCP and image utilities via extras
+
+## Environment (.env)
+
+Create a `.env` file (keep it private; don’t commit it):
+
+```env
+# LiveKit
+RIYADHAI_URL="wss://YOUR-RIYADHAI-HOST"
+RIYADHAI_API_KEY="YOUR_RIYADHAI_KEY"
+RIYADHAI_API_SECRET="YOUR_RIYADHAI_SECRET"
+
+# Google (pick one mode)
+# GOOGLE_API_KEY="YOUR_GOOGLE_GEMINI_API_KEY"
+# GOOGLE_GENAI_USE_VERTEXAI="1"
+# GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account.json"
+# GOOGLE_CLOUD_PROJECT="your-gcp-project"
+# GOOGLE_CLOUD_LOCATION="us-central1"
+```
+
+If you want to load `.env` automatically, install `python-dotenv`:
+
+```bash
+pip install python-dotenv
+```
+
+## Quickstart (Google Realtime)
+
+Create `agent.py`:
+
+```python
+from dotenv import load_dotenv
+
+from yamama import agents
+from yamama.agents import Agent, AgentServer, AgentSession
+from yamama.plugins import google
+
+load_dotenv()
+
+
+class Assistant(Agent):
+    def __init__(self) -> None:
+        super().__init__(instructions="You are a helpful bot.")
+
+
+server = AgentServer()
+
+
+@server.rtc_session()
+async def my_agent(ctx: agents.JobContext) -> None:
+    session = AgentSession(
+        llm=google.realtime.RealtimeModel(
+            model="gemini-live-2.5-flash-native-audio",
+            voice="Puck",
+        )
+    )
+
+    await session.start(room=ctx.room, agent=Assistant())
+    await session.generate_reply(
+        instructions="Greet the user and offer your assistance. You should start by speaking in English."
+    )
+
+
+if __name__ == "__main__":
+    agents.cli.run_app(server)
+```
+
+Run:
+
+```bash
+python agent.py dev
+# or
+python agent.py start
+```
+
+## Notes
+
+- Environment variables: Yamama reads `RIYADHAI_URL/RIYADHAI_API_KEY/RIYADHAI_API_SECRET`.
