@@ -1,0 +1,204 @@
+"""Utilities for turning local font folders into indexed glyph datasets.
+
+Notes:
+    Glyph data is cached inside the native backend for the lifetime of each
+    dataset instance. Recreate the dataset when editing font files on disk to
+    ensure changes are observed.
+
+Examples:
+    Iterate glyph samples from a directory of fonts::
+
+        from torchfont.datasets import FontFolder
+
+        dataset = FontFolder(root="~/fonts")
+        sample, target = dataset[0]
+
+"""
+
+from collections.abc import Callable, Sequence
+from pathlib import Path
+from typing import SupportsIndex
+
+import torch
+from torch import Tensor
+from torch.utils.data import Dataset
+
+from torchfont import _torchfont
+from torchfont.io.outline import COORD_DIM
+
+
+class FontFolder(Dataset[object]):
+    """Dataset that yields glyph samples from a directory of font files.
+
+    The dataset flattens every available code point and variation instance into
+    a single indexable sequence. Each item returns the loader output along with
+    style and content targets.
+
+    Attributes:
+        content_classes (list[str]): List of Unicode character strings, one per
+            content class, sorted by index. Use len(content_classes) to get
+            the total number of content classes.
+        content_class_to_idx (dict[str, int]): Mapping from characters to content
+            class indices.
+        style_classes (list[str]): List of style instance names, one per style
+            class, sorted by index. Use len(style_classes) to get the total
+            number of style classes.
+        style_class_to_idx (dict[str, int]): Mapping from style names to style
+            class indices.
+
+    See Also:
+        torchfont.datasets.repo.FontRepo: Extends the same indexing machinery
+        with Git synchronization for remote repositories.
+
+    """
+
+    def __init__(
+        self,
+        root: Path | str,
+        *,
+        codepoint_filter: Sequence[SupportsIndex] | None = None,
+        patterns: Sequence[str] | None = None,
+        transform: (Callable[[Tensor, Tensor], tuple[Tensor, Tensor]] | None) = None,
+    ) -> None:
+        """Initialize the dataset by scanning font files and indexing samples.
+
+        Args:
+            root (Path | str): Directory containing font files. Both OTF and TTF
+                files are discovered recursively.
+            codepoint_filter (Sequence[SupportsIndex] | None): Optional iterable
+                of Unicode code points used to restrict the dataset content.
+            patterns (Sequence[str] | None): Optional gitignore-style patterns
+                describing which font paths to include.
+            transform (Callable[[Tensor, Tensor], tuple[Tensor, Tensor]] | None):
+                Optional transformation applied to each loader output before the
+                item is returned.
+
+        Examples:
+            Restrict the dataset to uppercase ASCII glyphs::
+
+                dataset = FontFolder(
+                    root="~/fonts",
+                    codepoint_filter=[ord(c) for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"],
+                )
+
+        """
+        self.root = Path(root).expanduser().resolve()
+        self.transform = transform
+        self.patterns = (
+            tuple(str(pattern) for pattern in patterns)
+            if patterns is not None
+            else None
+        )
+        self.codepoint_filter = (
+            [int(cp) for cp in codepoint_filter]
+            if codepoint_filter is not None
+            else None
+        )
+
+        backend_patterns = list(self.patterns) if self.patterns is not None else None
+        self._dataset = _torchfont.FontDataset(
+            str(self.root),
+            self.codepoint_filter,
+            backend_patterns,
+        )
+
+    def __len__(self) -> int:
+        """Return the total number of glyph samples discoverable in the dataset.
+
+        Returns:
+            int: Total number of glyph samples available in the dataset.
+
+        """
+        return int(self._dataset.sample_count)
+
+    def __getitem__(self, idx: int) -> tuple[Tensor, Tensor, int, int]:
+        """Load a glyph sample and its associated targets.
+
+        Args:
+            idx (int): Zero-based index locating a sample across all fonts, code
+                points, and instances.
+
+        Returns:
+            tuple[Tensor, Tensor, int, int]: ``(types, coords,
+            style_idx, content_idx)`` where ``types`` and ``coords`` are
+            produced by the compiled backend and the labels describe the
+            variation instance and Unicode code point class.
+
+        Examples:
+            Retrieve the first glyph sample and its target labels::
+
+                types, coords, style_idx, content_idx = dataset[0]
+
+        """
+        raw_types, raw_coords, style_idx, content_idx = self._dataset.item(int(idx))
+        types = torch.as_tensor(raw_types, dtype=torch.long)
+        coords = torch.as_tensor(raw_coords, dtype=torch.float32).view(-1, COORD_DIM)
+        if self.transform is not None:
+            types, coords = self.transform(types, coords)
+
+        return types, coords, style_idx, content_idx
+
+    @property
+    def content_classes(self) -> list[str]:
+        """List of unique characters (Unicode strings) in the dataset.
+
+        Returns class names sorted by their index. Each name is a single
+        Unicode character corresponding to a codepoint in the dataset.
+
+        Returns:
+            list[str]: Character strings for each content class.
+
+        Examples:
+            >>> dataset = FontFolder(root="fonts", codepoint_filter=range(0x41, 0x44))
+            >>> dataset.content_classes
+            ['A', 'B', 'C']
+
+        """
+        codepoints = self._dataset.content_classes
+        return [chr(cp) for cp in codepoints]
+
+    @property
+    def content_class_to_idx(self) -> dict[str, int]:
+        """Mapping from character strings to content class indices.
+
+        Returns:
+            dict[str, int]: Dictionary mapping character to index.
+
+        Examples:
+            >>> dataset.content_class_to_idx['A']
+            0
+
+        """
+        return {char: idx for idx, char in enumerate(self.content_classes)}
+
+    @property
+    def style_classes(self) -> list[str]:
+        """List of style variation instance names in the dataset.
+
+        Returns class names sorted by their index. For variable fonts, names
+        come from the font's named instances. For static fonts, names are
+        derived from the font's family and subfamily names.
+
+        Returns:
+            list[str]: Descriptive names for each style class.
+
+        Examples:
+            >>> dataset.style_classes[:3]
+            ['Roboto Regular', 'Roboto Bold', 'Lato Regular']
+
+        """
+        return list(self._dataset.style_classes)
+
+    @property
+    def style_class_to_idx(self) -> dict[str, int]:
+        """Mapping from style instance names to style class indices.
+
+        Returns:
+            dict[str, int]: Dictionary mapping style name to index.
+
+        Examples:
+            >>> dataset.style_class_to_idx['Roboto Regular']
+            0
+
+        """
+        return {name: idx for idx, name in enumerate(self.style_classes)}
