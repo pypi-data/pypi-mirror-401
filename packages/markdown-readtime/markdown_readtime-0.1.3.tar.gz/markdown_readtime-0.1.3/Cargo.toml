@@ -1,0 +1,26 @@
+[package]
+name = "markdown_readtime"
+version = "0.1.1"
+edition = "2024"
+description = "A library to estimate reading time for Markdown content"
+repository = "https://github.com/hualayn/markdown-readtime"
+license = "MIT"
+keywords = ["markdown", "reading-time", "readtime"]
+categories = ["text-processing", "web-programming"]
+readme = "README.md"
+
+[lib]
+# 编译为 Python 扩展模块（name 需与 crate 名一致，无下划线）
+name = "markdown_readtime"
+crate-type = ["cdylib"]
+
+[dependencies]
+emojis = "0.8.0"
+pulldown-cmark = "0.13.0"
+pyo3 = { version = "0.27.2", features = ["extension-module"] }
+serde = { version = "1.0", features = ["derive"], optional = true }
+
+[features]
+default = []
+serde = ["dep:serde"]
+
