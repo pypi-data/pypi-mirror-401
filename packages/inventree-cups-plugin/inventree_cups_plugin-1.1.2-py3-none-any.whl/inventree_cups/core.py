@@ -1,0 +1,219 @@
+"""This package provides a cups printer driver."""
+
+import cups
+import threading
+from tempfile import NamedTemporaryFile
+
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+# InvenTree imports
+from report.models import LabelTemplate
+from plugin import InvenTreePlugin
+from plugin.mixins import MachineDriverMixin
+from plugin.machine import BaseMachineType
+from plugin.machine.machine_types import LabelPrinterBaseDriver, LabelPrinterMachine
+
+from inventree_cups import PLUGIN_VERSION
+
+# Module-level lock for thread-safe CUPS connections
+_cups_lock = threading.Lock()
+
+
+class CupsLabelPlugin(InvenTreePlugin, MachineDriverMixin):
+    """Cups label printer driver plugin for InvenTree."""
+
+    AUTHOR = "wolflu05"
+    DESCRIPTION = "Label printer plugin for CUPS server"
+    VERSION = PLUGIN_VERSION
+
+    # Machine registry was added in InvenTree 0.14.0, use inventree-cups-plugin 0.1.0 for older versions
+    # Machine driver interface was fixed with 0.16.0 to work inside of inventree workers
+    # Machine driver interface was changed in 0.18.0
+    MIN_VERSION = "0.18.0"
+
+    NAME = "InvenTree Cups Plugin"
+    SLUG = "inventree-cups-plugin"
+    TITLE = "InvenTree Cups Plugin"
+
+    def get_machine_drivers(self):
+        """Register machine drivers."""
+        return [CupsLabelPrinterDriver]
+
+
+class CupsLabelPrinterDriver(LabelPrinterBaseDriver):
+    """Cups label printing driver for InvenTree."""
+
+    SLUG = "cups-driver"
+    NAME = "Cups Driver"
+    DESCRIPTION = "Cups label printing driver for InvenTree"
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the CupsLabelPrinterDriver."""
+        self.MACHINE_SETTINGS = {
+            "SERVER": {
+                "name": _("Server"),
+                "description": _("IP/Hostname to connect to the cups server"),
+                "default": "localhost",
+                "required": True,
+            },
+            "PORT": {
+                "name": _("Port"),
+                "description": _("Port to connect to the cups server"),
+                "validator": int,
+                "default": 631,
+                "required": True,
+            },
+            "USER": {
+                "name": _("User"),
+                "description": _("User to connect to the cups server"),
+                "default": "",
+            },
+            "PASSWORD": {
+                "name": _("Password"),
+                "description": _("Password to connect to the cups server"),
+                "default": "",
+                "protected": True,
+            },
+            "ENCRYPTION": {
+                "name": _("Encryption"),
+                "description": _("Encryption mode for CUPS connection. 'Never' is required for SSH tunnels or local port forwarding."),
+                "choices": [
+                    ("always", _("Always")),
+                    ("never", _("Never")),
+                    ("if_requested", _("If Requested")),
+                ],
+                "default": "never",  # Default to never for tunnels/local which is common for this plugin usage
+            },
+            "PRINTER": {
+                "name": _("Printer"),
+                "description": _("Printer name from CUPS server. Run 'lpstat -h <SERVER>:<PORT> -p' to list available printers (e.g., 'lpstat -h localhost:631 -p')."),
+                "required": True,
+            },
+        }
+
+        super().__init__(*args, **kwargs)
+
+    def init_machine(self, machine: BaseMachineType):
+        """Machine initialize hook."""
+        conn = self.get_connection(machine)
+        if conn is None:
+            server = machine.get_setting("SERVER", "D")
+            port = machine.get_setting("PORT", "D")
+            machine.handle_error(
+                _("Cannot connect to CUPS server at %(server)s:%(port)s") % {
+                    'server': server,
+                    'port': port,
+                }
+            )
+            return
+        
+        # Validate printer exists on the server
+        printer_name = machine.get_setting("PRINTER", "D")
+        if printer_name:
+            available_printers = conn.getPrinters()
+            if printer_name not in available_printers:
+                machine.handle_error(
+                    _("Printer '%(printer)s' not found on CUPS server. Available: %(available)s") % {
+                        'printer': printer_name,
+                        'available': ', '.join(available_printers.keys()) if available_printers else _('none'),
+                    }
+                )
+
+    def get_connection(self, machine: LabelPrinterMachine):
+        """Get connection to cups server (thread-safe)."""
+        import logging
+        logger = logging.getLogger('inventree')
+        
+        server = machine.get_setting("SERVER", "D") or "localhost"
+        port = machine.get_setting("PORT", "D")
+        user = machine.get_setting("USER", "D") or ""
+        password = machine.get_setting("PASSWORD", "D") or ""
+        
+        # Get encryption setting
+        encryption_mode = machine.get_setting("ENCRYPTION", "D")
+        
+        # Map choice to pycups constants
+        encryption_map = {
+            "always": cups.HTTP_ENCRYPT_ALWAYS,
+            "never": cups.HTTP_ENCRYPT_NEVER,
+            "if_requested": cups.HTTP_ENCRYPT_IF_REQUESTED
+        }
+        
+        # Default to NEVER if not specified or invalid (common for tunnels)
+        cups_encryption = encryption_map.get(encryption_mode, cups.HTTP_ENCRYPT_NEVER)
+        
+        # Ensure port is an integer
+        try:
+            port = int(port) if port else 631
+        except (ValueError, TypeError):
+            port = 631
+        
+        logger.debug(f"CUPS: Attempting connection to {server}:{port} (enc={encryption_mode})")
+        
+        with _cups_lock:
+            try:
+                # Use constructor arguments instead of global setters for thread safety
+                conn = cups.Connection(
+                    host=server,
+                    port=port,
+                    encryption=cups_encryption
+                )
+                
+                # Set user/password if provided (setUser is still global but passwordCB is per-request in some versions,
+                # so we keep them. Ideally we'd pass them to constructor if supported, but they aren't standard args)
+                if user:
+                    cups.setUser(user)
+                if password:
+                    cups.setPasswordCB(lambda: password)
+                
+                logger.debug(f"CUPS: Successfully connected to {server}:{port}")
+                return conn
+            except Exception as e:
+                logger.warning(f"CUPS: Failed to connect to {server}:{port} - {type(e).__name__}: {e}")
+                return None
+
+    def print_label(
+        self,
+        machine: LabelPrinterMachine,
+        label: LabelTemplate,
+        item: models.Model,
+        **kwargs,
+    ) -> None:
+        """Print label using cups server."""
+        import logging
+        logger = logging.getLogger('inventree')
+        
+        printer_name = machine.get_setting("PRINTER", "D")
+        logger.info(f"CUPS: Printing label '{label.name}' to printer '{printer_name}'")
+        
+        machine.set_status(LabelPrinterMachine.MACHINE_STATUS.PRINTING)
+        conn = self.get_connection(machine)
+
+        if conn is None:
+            machine.handle_error(_("Cannot get connection to printer"))
+            machine.set_status(LabelPrinterMachine.MACHINE_STATUS.DISCONNECTED)
+            return
+
+        pdf_data = self.render_to_pdf_data(label, item)
+
+        with NamedTemporaryFile(suffix=".pdf") as f:
+            f.write(pdf_data)
+            f.flush()
+
+            try:
+                copies = kwargs.get("printing_options", {}).get("copies", 1)
+                for copy_idx in range(copies):
+                    job_id = conn.printFile(
+                        printer_name,
+                        f.name,
+                        f"{label.name}-{item.pk}-{copy_idx}.pdf",
+                        {},
+                    )
+                    logger.info(f"CUPS: Print job {job_id} submitted for '{printer_name}'")
+                machine.set_status(LabelPrinterMachine.MACHINE_STATUS.OPERATIONAL)
+            except Exception as e:
+                logger.error(f"CUPS: Print failed - {type(e).__name__}: {e}")
+                machine.set_status(LabelPrinterMachine.MACHINE_STATUS.DISCONNECTED)
+                machine.handle_error(_("Error printing label") + f": {e}")
+
