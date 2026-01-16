@@ -1,0 +1,26 @@
+[project]
+name = "roest1-pyodbc-sqlserver"
+version = "0.1.2"
+description = "Lightweight SQL Server helpers built on pyodbc"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Riley Oest" }
+]
+requires-python = ">=3.10"
+
+dependencies = [
+    "pyodbc>=5.0",
+    "python-dotenv>=1.0"
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "python" }
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
