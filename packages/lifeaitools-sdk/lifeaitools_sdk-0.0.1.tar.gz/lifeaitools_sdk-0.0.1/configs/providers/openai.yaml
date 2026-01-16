@@ -1,0 +1,187 @@
+provider: openai
+config_version: "1.1"
+api_base_url: "https://api.openai.com/v1"
+env_key: "OPENAI_API_KEY"
+
+# Capabilities matrix - which services this provider supports
+capabilities:
+  - text        # LLM text generation
+  - tts         # Text-to-speech
+  - stt         # Speech-to-text (transcription)
+  - diarization # Speaker diarization
+  - embeddings  # Text embeddings
+  - vision      # Image understanding (via text models)
+  - image       # Image generation (DALL-E)
+
+services:
+  text:
+    models:
+      gpt-4o:
+        model_id: "gpt-4o"
+        context_window: 128000
+        max_output_tokens: 16384
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 2.50
+          output_per_1m: 10.00
+          cache_write_per_1m: 1.25
+          cache_read_per_1m: 0.625
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gpt-4o-mini:
+        model_id: "gpt-4o-mini"
+        context_window: 128000
+        max_output_tokens: 16384
+        supports_streaming: true
+        supports_vision: true
+        pricing:
+          input_per_1m: 0.15
+          output_per_1m: 0.60
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gpt-4.1:
+        model_id: "gpt-4.1"
+        context_window: 1047576
+        max_output_tokens: 32768
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 2.00
+          output_per_1m: 8.00
+          cache_write_per_1m: 1.00
+          cache_read_per_1m: 0.50
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gpt-4.1-mini:
+        model_id: "gpt-4.1-mini"
+        context_window: 1047576
+        max_output_tokens: 32768
+        supports_streaming: true
+        supports_vision: true
+        pricing:
+          input_per_1m: 0.40
+          output_per_1m: 1.60
+          currency: "USD"
+          effective_date: "2026-01-01"
+      o3:
+        model_id: "o3"
+        context_window: 200000
+        max_output_tokens: 100000
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        reasoning_model: true
+        pricing:
+          input_per_1m: 10.00
+          output_per_1m: 40.00
+          currency: "USD"
+          effective_date: "2026-01-01"
+      o4-mini:
+        model_id: "o4-mini"
+        context_window: 200000
+        max_output_tokens: 100000
+        supports_streaming: true
+        supports_vision: true
+        reasoning_model: true
+        pricing:
+          input_per_1m: 1.10
+          output_per_1m: 4.40
+          currency: "USD"
+          effective_date: "2026-01-01"
+
+  tts:
+    models:
+      tts-1:
+        model_id: "tts-1"
+        voices: [alloy, echo, fable, onyx, nova, shimmer]
+        output_formats: [mp3, opus, aac, flac, wav, pcm]
+        max_chars: 4096
+        pricing:
+          per_1k_chars: 0.015
+          currency: "USD"
+          effective_date: "2026-01-01"
+      tts-1-hd:
+        model_id: "tts-1-hd"
+        voices: [alloy, echo, fable, onyx, nova, shimmer]
+        output_formats: [mp3, opus, aac, flac, wav, pcm]
+        max_chars: 4096
+        pricing:
+          per_1k_chars: 0.030
+          currency: "USD"
+          effective_date: "2026-01-01"
+
+  stt:
+    models:
+      whisper-1:
+        model_id: "whisper-1"
+        max_file_size_mb: 25
+        supported_formats: [mp3, mp4, mpeg, mpga, m4a, wav, webm]
+        pricing:
+          per_minute: 0.006
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gpt-4o-transcribe:
+        model_id: "gpt-4o-transcribe"
+        max_file_size_mb: 25
+        supported_formats: [mp3, mp4, mpeg, mpga, m4a, wav, webm]
+        supports_vad: true
+        pricing:
+          per_minute: 0.006
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gpt-4o-mini-transcribe:
+        model_id: "gpt-4o-mini-transcribe"
+        max_file_size_mb: 25
+        supported_formats: [mp3, mp4, mpeg, mpga, m4a, wav, webm]
+        supports_vad: true
+        pricing:
+          per_minute: 0.003
+          currency: "USD"
+          effective_date: "2026-01-01"
+
+  diarization:
+    models:
+      gpt-4o-transcribe-diarize:
+        model_id: "gpt-4o-transcribe"
+        max_speakers: 4
+        requires_vad_over_30s: true
+        pricing:
+          per_minute: 0.006
+          currency: "USD"
+          effective_date: "2026-01-01"
+
+  embeddings:
+    models:
+      text-embedding-3-small:
+        model_id: "text-embedding-3-small"
+        dimensions: [512, 1536]
+        max_tokens: 8191
+        pricing:
+          per_1m_tokens: 0.02
+          currency: "USD"
+          effective_date: "2026-01-01"
+      text-embedding-3-large:
+        model_id: "text-embedding-3-large"
+        dimensions: [256, 1024, 3072]
+        max_tokens: 8191
+        pricing:
+          per_1m_tokens: 0.13
+          currency: "USD"
+          effective_date: "2026-01-01"
+
+  image:
+    models:
+      dall-e-3:
+        model_id: "dall-e-3"
+        sizes: [1024x1024, 1024x1792, 1792x1024]
+        quality: [standard, hd]
+        pricing:
+          standard_1024: 0.04
+          standard_wide: 0.08
+          hd_1024: 0.08
+          hd_wide: 0.12
+          currency: "USD"
+          effective_date: "2026-01-01"

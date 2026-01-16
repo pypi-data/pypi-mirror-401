@@ -1,0 +1,200 @@
+# Unified AI SDK
+
+Multi-provider AI abstraction layer with TTS support, fallback chains, and breadcrumb observability.
+
+## Quick Start
+
+```python
+from unified_ai import UnifiedAI, Config, ProviderConfig
+
+# Configure providers
+config = Config(
+    providers={
+        "gemini": ProviderConfig(api_key="AIza..."),
+        "elevenlabs": ProviderConfig(api_key="sk_..."),
+    }
+)
+
+sdk = UnifiedAI(config)
+
+# Generate speech with preset (recommended)
+response = await sdk.generate_speech(
+    "Hello world!",
+    preset="gemini/turov_channel"
+)
+response.audio.save("output.mp3")
+
+# Or with explicit parameters
+response = await sdk.generate_speech(
+    "Hello!",
+    voice="Enceladus",
+    model="gemini/gemini-2.5-pro-preview-tts",
+    provider_params={"temperature": 1.35}
+)
+```
+
+## Available Presets
+
+```python
+from unified_ai import list_presets
+
+for name, description in list_presets().items():
+    print(f"{name}: {description}")
+```
+
+### Gemini Presets
+| Preset | Voice | Model | Temperature | Use Case |
+|--------|-------|-------|-------------|----------|
+| `gemini/turov_channel` | Enceladus | Pro | 1.35 | Business/motivational content |
+| `gemini/warm_trainer` | Enceladus | Pro | 1.35 | Educational content |
+| `gemini/narrator_fast` | Kore | Flash | 1.0 | Quick narration |
+| `gemini/long_content` | Puck | Pro | 1.2 | Audiobooks (streaming) |
+| `gemini/storyteller` | Puck | Pro | 1.2 | Expressive stories |
+| `gemini/news` | Charon | Flash | 0.8 | News reading |
+
+### ElevenLabs Presets
+| Preset | Voice | Description |
+|--------|-------|-------------|
+| `elevenlabs/turov` | Vladimir Turov | Custom cloned voice |
+| `elevenlabs/george` | George | Warm storyteller |
+
+## Custom Presets
+
+Add YAML files to `presets/configs/`:
+
+```yaml
+# presets/configs/custom/my_voice.yaml
+provider: gemini
+model: gemini-2.5-pro-preview-tts
+voice: Enceladus
+temperature: 1.35
+output_format: mp3
+streaming: false
+description: "My custom voice preset"
+```
+
+Then use: `preset="custom/my_voice"`
+
+## Provider Parameters
+
+### Gemini TTS
+```python
+provider_params={
+    "temperature": 1.35,  # 0.0-2.0, higher = more expressive
+    "streaming": True,    # For long content
+}
+```
+
+### ElevenLabs TTS
+```python
+provider_params={
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+}
+```
+
+## Fallback Chains
+
+```python
+from unified_ai import Config, FallbackConfig
+
+config = Config(
+    providers={...},
+    fallback=FallbackConfig(
+        tts=["gemini/gemini-2.5-pro-preview-tts", "elevenlabs/eleven_multilingual_v2"]
+    )
+)
+
+# Will try Gemini first, then ElevenLabs if Gemini fails
+response = await sdk.generate_speech(text)
+```
+
+## Breadcrumb Observability
+
+Every request includes breadcrumbs for debugging:
+
+```python
+response = await sdk.generate_speech(text, include_breadcrumbs=True)
+
+for bc in response.breadcrumbs:
+    print(f"[{bc['level']}] {bc['layer']}: {bc['action']}")
+```
+
+## API Reference
+
+### UnifiedAI
+
+```python
+class UnifiedAI:
+    async def generate_speech(
+        text: str,
+        voice: str = None,           # Voice name/ID
+        model: str = None,           # "provider/model"
+        output_format: str = "mp3",  # mp3, wav, ogg
+        preset: str = None,          # "provider/preset_name"
+        provider_params: dict = {},  # Provider-specific params
+    ) -> TTSResponse
+```
+
+### TTSResponse
+
+```python
+@dataclass
+class TTSResponse:
+    success: bool
+    audio: RawAudioResponse  # .data, .format, .save(path)
+    provider: str
+    model: str
+    latency_ms: float
+    breadcrumbs: List[dict]
+```
+
+### Helper Functions
+
+```python
+from unified_ai import list_presets, load_preset
+
+# List all available presets
+presets = list_presets()
+
+# Load a specific preset
+preset = load_preset("gemini/turov_channel")
+print(preset.voice, preset.temperature)
+```
+
+## File Structure
+
+```
+unified_ai/
+├── sdk.py              # Main UnifiedAI class
+├── config.py           # Config, ProviderConfig
+├── types.py            # TTSRequest, TTSResponse, AudioFormat
+├── exceptions.py       # SDKError, ProviderError
+├── breadcrumbs.py      # Observability system
+├── adapters/
+│   ├── base.py         # BaseAdapter ABC
+│   ├── gemini.py       # GeminiAdapter (TTS)
+│   └── elevenlabs.py   # ElevenLabsAdapter (TTS)
+├── clients/
+│   ├── base.py         # AdapterRegistry
+│   └── tts.py          # UnifiedTTSClient with fallback
+├── presets/
+│   ├── __init__.py     # load_preset, list_presets
+│   └── configs/        # YAML preset files
+│       ├── gemini/
+│       └── elevenlabs/
+├── utils/
+│   ├── audio.py        # PCM to MP3/WAV/OGG conversion
+│   └── retry.py        # Retry strategies
+└── tests/
+    └── audio_samples/  # Test audio files
+```
+
+## Requirements
+
+```
+aiohttp
+pydub      # For MP3/OGG conversion
+pyyaml     # For YAML presets
+google-genai  # For Gemini adapter
+```

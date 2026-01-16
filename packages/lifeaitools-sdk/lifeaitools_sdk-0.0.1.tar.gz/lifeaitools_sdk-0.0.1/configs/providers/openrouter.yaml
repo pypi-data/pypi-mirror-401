@@ -1,0 +1,71 @@
+provider: openrouter
+config_version: "1.1"
+api_base_url: "https://openrouter.ai/api/v1"
+env_key: "OPENROUTER_API_KEY"
+openai_compatible: true
+
+# Capabilities matrix - which services this provider supports
+capabilities:
+  - text        # LLM text generation (routes to multiple providers)
+
+# Note: OpenRouter pricing varies by model and changes frequently
+# Use dynamic pricing from /api/v1/models endpoint for production
+# These are reference prices as of 2026-01-01
+
+services:
+  text:
+    models:
+      openai/gpt-4o:
+        model_id: "openai/gpt-4o"
+        context_window: 128000
+        max_output_tokens: 16384
+        supports_streaming: true
+        supports_vision: true
+        pricing:
+          input_per_1m: 2.50  # OpenRouter markup ~0%
+          output_per_1m: 10.00
+          currency: "USD"
+          effective_date: "2026-01-01"
+      anthropic/claude-sonnet-4:
+        model_id: "anthropic/claude-sonnet-4"
+        context_window: 200000
+        max_output_tokens: 64000
+        supports_streaming: true
+        supports_vision: true
+        pricing:
+          input_per_1m: 3.00
+          output_per_1m: 15.00
+          currency: "USD"
+          effective_date: "2026-01-01"
+      google/gemini-2.5-flash:
+        model_id: "google/gemini-2.5-flash-preview"
+        context_window: 1048576
+        max_output_tokens: 65536
+        supports_streaming: true
+        supports_vision: true
+        pricing:
+          input_per_1m: 0.15
+          output_per_1m: 0.60
+          currency: "USD"
+          effective_date: "2026-01-01"
+      meta-llama/llama-3.3-70b-instruct:
+        model_id: "meta-llama/llama-3.3-70b-instruct"
+        context_window: 131072
+        max_output_tokens: 8192
+        supports_streaming: true
+        pricing:
+          input_per_1m: 0.12
+          output_per_1m: 0.30
+          currency: "USD"
+          effective_date: "2026-01-01"
+      deepseek/deepseek-r1:
+        model_id: "deepseek/deepseek-r1"
+        context_window: 65536
+        max_output_tokens: 8192
+        supports_streaming: true
+        reasoning_model: true
+        pricing:
+          input_per_1m: 0.55
+          output_per_1m: 2.19
+          currency: "USD"
+          effective_date: "2026-01-01"

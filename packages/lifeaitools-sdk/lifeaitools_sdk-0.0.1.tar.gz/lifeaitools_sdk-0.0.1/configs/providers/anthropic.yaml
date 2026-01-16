@@ -1,0 +1,57 @@
+provider: anthropic
+config_version: "1.1"
+api_base_url: "https://api.anthropic.com/v1"
+env_key: "ANTHROPIC_API_KEY"
+
+# Capabilities matrix - which services this provider supports
+capabilities:
+  - text        # LLM text generation (Claude models)
+
+services:
+  text:
+    models:
+      claude-opus-4-5-20251101:
+        model_id: "claude-opus-4-5-20251101"
+        aliases: ["claude-opus-4.5", "opus"]
+        context_window: 200000
+        max_output_tokens: 32000
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 15.00
+          output_per_1m: 75.00
+          cache_write_per_1m: 18.75  # 1.25x input
+          cache_read_per_1m: 1.50    # 0.1x input
+          currency: "USD"
+          effective_date: "2026-01-01"
+      claude-sonnet-4-20250514:
+        model_id: "claude-sonnet-4-20250514"
+        aliases: ["claude-sonnet-4", "sonnet"]
+        context_window: 200000
+        max_output_tokens: 64000
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 3.00
+          output_per_1m: 15.00
+          cache_write_per_1m: 3.75
+          cache_read_per_1m: 0.30
+          currency: "USD"
+          effective_date: "2026-01-01"
+      claude-3-5-haiku-20241022:
+        model_id: "claude-3-5-haiku-20241022"
+        aliases: ["claude-3.5-haiku", "haiku"]
+        context_window: 200000
+        max_output_tokens: 8192
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 0.80
+          output_per_1m: 4.00
+          cache_write_per_1m: 1.00
+          cache_read_per_1m: 0.08
+          currency: "USD"
+          effective_date: "2026-01-01"

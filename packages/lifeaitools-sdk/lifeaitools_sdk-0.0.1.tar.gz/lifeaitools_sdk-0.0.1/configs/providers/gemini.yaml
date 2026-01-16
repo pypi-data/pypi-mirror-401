@@ -1,0 +1,63 @@
+provider: gemini
+config_version: "1.1"
+api_base_url: "https://generativelanguage.googleapis.com/v1beta"
+env_key: "GEMINI_API_KEY"
+
+# Capabilities matrix - which services this provider supports
+capabilities:
+  - text        # LLM text generation
+  - tts         # Text-to-speech (native Gemini TTS)
+
+services:
+  text:
+    models:
+      gemini-2.5-pro:
+        model_id: "gemini-2.5-pro-preview-05-06"
+        context_window: 1048576
+        max_output_tokens: 65536
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 1.25  # <200k tokens
+          input_per_1m_long: 2.50  # >200k tokens
+          output_per_1m: 10.00
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gemini-2.5-flash:
+        model_id: "gemini-2.5-flash-preview-04-17"
+        context_window: 1048576
+        max_output_tokens: 65536
+        supports_streaming: true
+        supports_vision: true
+        supports_tools: true
+        pricing:
+          input_per_1m: 0.15
+          output_per_1m: 0.60
+          thinking_input_per_1m: 0.35
+          thinking_output_per_1m: 1.50
+          currency: "USD"
+          effective_date: "2026-01-01"
+
+  tts:
+    models:
+      gemini-2.5-flash-preview-tts:
+        model_id: "gemini-2.5-flash-preview-tts"
+        output_format: pcm  # 24kHz PCM only
+        sample_rate: 24000
+        voices: 30  # Prebuilt voices from Gemini docs
+        multi_speaker: true
+        pricing:
+          per_1k_chars: 0.01  # Very low, bundled with API
+          currency: "USD"
+          effective_date: "2026-01-01"
+      gemini-2.5-pro-preview-tts:
+        model_id: "gemini-2.5-pro-preview-tts"
+        output_format: pcm
+        sample_rate: 24000
+        voices: 30
+        multi_speaker: true
+        pricing:
+          per_1k_chars: 0.03
+          currency: "USD"
+          effective_date: "2026-01-01"
