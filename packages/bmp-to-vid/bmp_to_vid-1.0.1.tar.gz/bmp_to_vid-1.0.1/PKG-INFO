@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: bmp-to-vid
+Version: 1.0.1
+Summary: Convert sequential bitmap images to video
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/yourusername/bmp-to-vid
+Project-URL: Repository, https://github.com/yourusername/bmp-to-vid
+Keywords: bmp,video,converter,opencv,image-sequence
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Multimedia :: Video :: Conversion
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: opencv-python>=4.5.0
+
+# BMP to Video Converter
+
+A command-line tool to convert sequential bitmap images into a video file.
+
+## Requirements
+
+- Python 3.6+
+
+## Installation
+
+```bash
+pip install bmp-to-vid
+```
+
+## Usage
+
+After installation, use the `bmp-to-vid` command:
+
+```bash
+bmp-to-vid <input_directory> -f <fps> [-o output.mp4]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `input_directory` | Yes | Directory containing BMP files |
+| `-f`, `--fps` | Yes | Frames per second for output video |
+| `-o`, `--output` | No | Output video path (default: `output.mp4`) |
+| `-h`, `--help` | No | Show help message |
+
+### Examples
+
+```bash
+# Basic usage at 30 FPS
+bmp-to-vid ./frames -f 30
+
+# Custom output filename
+bmp-to-vid ./frames -f 24 -o my_video.mp4
+
+# High frame rate video
+bmp-to-vid ./frames -f 60 -o smooth.mp4
+
+# Show help
+bmp-to-vid --help
+```
+
+## Supported File Naming
+
+The tool automatically sorts frames using natural sorting. Any naming pattern with numbers will work:
+
+- `frame_001.bmp`, `frame_002.bmp`, `frame_010.bmp`
+- `A_001.bmp`, `A_002.bmp`, `A_010.bmp`
+- `img1.bmp`, `img2.bmp`, `img10.bmp`
+- `001.bmp`, `002.bmp`, `010.bmp`
+
+Both `.bmp` and `.BMP` extensions are supported.
+
+## Output
+
+- Format: MP4 (H.264 compatible)
+- Resolution: Same as input images
+- Audio: None
+
+## License
+
+MIT
