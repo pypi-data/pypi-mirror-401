@@ -1,0 +1,83 @@
+Metadata-Version: 2.4
+Name: respcode-mcp
+Version: 2.1.1
+Summary: MCP Server for RespCode - Multi-Architecture Code Execution
+Project-URL: Homepage, https://respcode.com
+Project-URL: Documentation, https://docs.respcode.com
+Project-URL: Repository, https://github.com/RespCodeAI/respcode-mcp
+Author-email: Noor <support@respcode.com>
+License-Expression: MIT
+Keywords: ai,anthropic,claude,code-execution,mcp
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: mcp>=1.0.0
+Description-Content-Type: text/markdown
+
+# RespCode MCP Server
+
+Multi-architecture code execution for Claude Desktop via MCP.
+
+## Installation
+```bash
+pip install respcode-mcp
+```
+
+## Setup
+
+1. Get your API key at [respcode.com](https://respcode.com)
+
+2. Configure Claude Desktop (`~/.config/claude/claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "respcode": {
+      "command": "respcode-mcp",
+      "env": {
+        "RESPCODE_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+3. Restart Claude Desktop
+
+## Available Tools
+
+| Tool | Description | Credits |
+|------|-------------|---------|
+| `generate` | AI generates & executes code | 2-6 |
+| `execute` | Run your own code | 1 |
+| `compete` | Compare 4 AI models | ~15 |
+| `collaborate` | Models refine each other | ~12 |
+| `consensus` | Best-of-4 selection | ~15 |
+| `history` | View past prompts | 0 |
+| `credits` | Check balance | 0 |
+
+## Architectures
+
+- x86_64 (Intel/AMD)
+- ARM64 (Apple Silicon, Raspberry Pi)
+- RISC-V 64
+- ARM32
+- Verilog/VHDL simulation
+
+## Example Usage in Claude
+
+> "Generate a fibonacci function in Rust and run it on ARM64"
+
+> "Compare all 4 AI models writing quicksort in C"
+
+> "Execute this code on RISC-V: print('Hello RISC-V')"
+
+## Links
+
+- Website: https://respcode.com
+- Docs: https://docs.respcode.com
+- API: https://respcode.com/api
