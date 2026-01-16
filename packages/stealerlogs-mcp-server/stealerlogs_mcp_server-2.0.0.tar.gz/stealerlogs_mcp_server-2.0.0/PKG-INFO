@@ -1,0 +1,141 @@
+Metadata-Version: 2.4
+Name: stealerlogs-mcp-server
+Version: 2.0.0
+Summary: Model Context Protocol server for Stealerlo.gs API - Integrate breach data search with AI assistants
+Home-page: https://github.com/cryphorix/stealerlo.gs
+Author: Stealerlo.gs
+Author-email: "Stealerlo.gs" <support@stealerlo.gs>
+License-Expression: MIT
+Project-URL: Homepage, https://stealerlo.gs
+Project-URL: Documentation, https://docs.stealerlo.gs/mcp
+Project-URL: Repository, https://github.com/cryphorix/stealerlo.gs
+Keywords: mcp,model-context-protocol,stealerlo,api,breach-data
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=0.9.0
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: pydantic>=2.0.0
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# Stealerlo.gs MCP Server (Python)
+
+Model Context Protocol (MCP) server that exposes Stealerlo.gs search + utility tools to AI assistants (e.g. Claude Desktop, Cursor).
+
+## Features
+
+- **12 tools** covering all major API endpoints
+- **API key authentication only** - no JWT tokens required
+- Works with Claude Desktop, Cursor, and any MCP-compatible client
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `search` | Search 12B+ records (email, username, password, domain, phone, IP, name, uuid) |
+| `osint_search` | Query external OSINT providers (Snusbase, OSINTDog, Shodan, IntelX) |
+| `hash_search` | Find hash plaintexts (MD5, SHA1, SHA256, NTLM) |
+| `ip_lookup` | IP geolocation and network info |
+| `phone_lookup` | Reverse phone lookup with caller ID |
+| `machine_info` | Get system info for a machine UUID |
+| `machine_files` | Retrieve files from a machine (passwords, txt files) |
+| `analyze` | Social media account discovery |
+| `count` | Count results without fetching |
+| `search_domain_employees` | Find employees by domain with file filtering |
+| `scan_secrets` | TruffleHog secret detection (750+ types) |
+| `health` | API health check |
+| `stats` | Database record count |
+
+## Install
+
+```bash
+pip install stealerlogs-mcp-server
+```
+
+Or install from source:
+
+```bash
+cd tools/mcp-server-python
+pip install -e .
+```
+
+## Get an API Key
+
+1. Go to https://search.stealerlo.gs
+2. Sign in and navigate to your dashboard
+3. Generate an API key (format: `slgs_...`)
+
+## Run
+
+```bash
+stealerlogs-mcp
+```
+
+The server uses stdio transport and waits for MCP protocol messages.
+
+## Claude Desktop Config
+
+Add to `~/.config/Claude/claude_desktop_config.json` (Linux) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
+
+```json
+{
+  "mcpServers": {
+    "stealerlo": {
+      "command": "stealerlogs-mcp"
+    }
+  }
+}
+```
+
+## Cursor Config
+
+Add to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "stealerlo": {
+      "command": "stealerlogs-mcp"
+    }
+  }
+}
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `STEALERLO_API_URL` | `https://api.stealerlo.gs` | API base URL |
+
+## Example Usage
+
+Once configured, you can ask your AI assistant:
+
+- "Search for credentials from user@example.com"
+- "Look up the IP address 8.8.8.8"
+- "Find social media accounts for username johndoe"
+- "Search for employees at samsung.com with password files"
+- "Scan this config file for exposed secrets"
+
+The AI will automatically use the appropriate tools with your API key.
+
+## Testing with MCP Inspector
+
+```bash
+npx @modelcontextprotocol/inspector stealerlogs-mcp
+```
+
+This opens a web UI to test tools interactively.
