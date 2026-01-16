@@ -1,0 +1,18 @@
+# Repository Layout
+
+This file documents the primary folders and their intended use.
+
+- src/: Python package code (agents, graphs, tools, config, CLI).
+- src/tests/ and src/deep_agents/tests/: pytest suites for core and deep agents.
+- lib/: TypeScript helpers used by JS/TS utilities.
+- __tests__/: vitest tests for lib/.
+- docs/: documentation, specs, and developer guides.
+- adrs/: architecture decision records.
+- scripts/: helper scripts and automation.
+- tasks/: task files and workflow scaffolding.
+- tools_sanity_check.md: lightweight repo health notes.
+
+Generated / runtime paths (not for source edits):
+- build/, dist/, cce_agent.egg-info/: packaging outputs.
+- runs/, .artifacts/, cs-artifacts/: runtime artifacts and logs.
+- .cursor/commands/: command templates (canonical command-spec location).
