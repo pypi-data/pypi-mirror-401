@@ -1,0 +1,1 @@
+"""Shortwing test suite."""
