@@ -1,0 +1,22 @@
+name: CI
+on:
+  - pull_request
+  - push
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Run linter and tests
+        run: |
+          uv run black . --check
+          uv run pytest tests/ --cov=virustotal_python
