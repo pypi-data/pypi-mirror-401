@@ -1,0 +1,43 @@
+[project]
+name = "tapback"
+version = "0.1.0"
+description = "Human-in-the-Loop Input Tool - スマホからYes/Noやテキストを返せるツール"
+requires-python = ">=3.10"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "motonarikurita" }]
+keywords = ["mcp", "human-in-the-loop", "cli", "llm"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "flask>=3.1.2",
+    "mcp>=1.25.0",
+    "requests>=2.32.5",
+]
+
+[project.scripts]
+tapback = "tapback:main"
+tapback-server = "server:main"
+tapback-mcp = "tapback_mcp:mcp.run"
+
+[project.urls]
+Homepage = "https://github.com/mk1018/tapback"
+Repository = "https://github.com/mk1018/tapback"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 88
+
+[dependency-groups]
+dev = ["ruff>=0.14.11"]
