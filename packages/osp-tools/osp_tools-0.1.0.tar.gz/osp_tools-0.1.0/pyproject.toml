@@ -1,0 +1,61 @@
+[project]
+name = "osp-tools"
+version = "0.1.0"
+description = "OpenSwim Pro Tools - Manage and download songs for your OpenSwim Pro / 2"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Ege Türker", email = "egeturker34@icloud.com"}
+]
+keywords = ["openswim", "mp3", "swimming", "music", "download"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+dependencies = [
+    "click>=8.0",
+    "yt-dlp>=2024.0",
+    "rich>=13.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/1etu/osp-tools"
+Repository = "https://github.com/1etu/osp-tools"
+Issues = "https://github.com/1etu/osp-tools/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+osp = "osp.cli.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
