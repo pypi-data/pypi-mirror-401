@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minlog-py"
+version = "0.2.1"
+description = "A concise, production-ready Python logging toolkit."
+authors = [
+  { name = "Min", email = "yuzhmin@126.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.7"
+dependencies = []
+
+[project.urls]
+"Homepage" = "https://github.com/MinBeing/MinLog"
+
+[tool.setuptools]
+packages = ["minlog"]
+package-dir = {"" = "src"}
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]  # pycodestyle, pyflakes, isort
+ignore = []
