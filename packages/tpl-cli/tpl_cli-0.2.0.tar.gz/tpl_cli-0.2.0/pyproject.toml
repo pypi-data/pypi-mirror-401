@@ -1,0 +1,84 @@
+[project]
+name = "tpl-cli"
+version = "0.2.0"
+description = "A CLI that composes single-file Cookiecutter templates via Git"
+readme = "README.md"
+requires-python = ">=3.8, <3.15"
+license = { text = "MIT" }
+authors = [
+    { name = "tpl Maintainers" }
+]
+keywords = ["cookiecutter", "templates", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "cookiecutter",
+    "tomli; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "mypy",
+    "ruff",
+    "pre-commit",
+    "tox",
+]
+
+[project.scripts]
+tpl = "tpl.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/tpl"
+Repository = "https://github.com/your-org/tpl"
+Documentation = "https://github.com/your-org/tpl#readme"
+Issues = "https://github.com/your-org/tpl/issues"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.9"
+packages = ["tpl"]
+strict = false
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 100
+src = ["tpl", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1",
+    "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
+    "ruff>=0.14.5",
+    "tox>=4.25.0",
+]
