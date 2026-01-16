@@ -1,0 +1,86 @@
+# MCP Hangar Configuration
+# Copy to config.yaml and customize
+
+providers:
+  # Subprocess
+  math:
+    mode: subprocess
+    command: [python, -m, examples.provider_math.server]
+    idle_ttl_s: 180
+    tools:
+      - name: add
+        description: "Add two numbers"
+        inputSchema:
+          type: object
+          properties:
+            a: { type: number }
+            b: { type: number }
+          required: [a, b]
+
+  # Container - SQLite
+  # Build: podman build -t localhost/mcp-sqlite -f docker/Dockerfile.sqlite .
+  # sqlite:
+  #   mode: container
+  #   image: localhost/mcp-sqlite:latest
+  #   volumes:
+  #     - "/absolute/path/to/data:/data:rw"  # Must be absolute
+  #   network: bridge
+  #   idle_ttl_s: 300
+
+  # Container - Memory
+  # Build: podman build -t localhost/mcp-memory -f docker/Dockerfile.memory .
+  # memory:
+  #   mode: container
+  #   image: localhost/mcp-memory:latest
+  #   volumes:
+  #     - "/absolute/path/to/data:/app/data:rw"
+  #   idle_ttl_s: 300
+
+  # Container - Fetch
+  # Build: podman build -t localhost/mcp-fetch -f docker/Dockerfile.fetch .
+  # fetch:
+  #   mode: container
+  #   image: localhost/mcp-fetch:latest
+  #   network: bridge
+  #   idle_ttl_s: 180
+
+  # Provider Group
+  # math-cluster:
+  #   mode: group
+  #   strategy: weighted_round_robin
+  #   min_healthy: 1
+  #   members:
+  #     - id: math-1
+  #       weight: 3
+  #       mode: subprocess
+  #       command: [python, -m, examples.provider_math.server]
+  #     - id: math-2
+  #       weight: 1
+  #       mode: subprocess
+  #       command: [python, -m, examples.provider_math.server]
+
+# Discovery (optional)
+# discovery:
+#   enabled: true
+#   refresh_interval_s: 30
+#   sources:
+#     - type: docker
+#       mode: additive
+
+# Observability - Langfuse integration (optional)
+# Provides end-to-end tracing for MCP tool invocations
+# observability:
+#   langfuse:
+#     enabled: true
+#     public_key: ${LANGFUSE_PUBLIC_KEY}   # From Langfuse dashboard
+#     secret_key: ${LANGFUSE_SECRET_KEY}   # From Langfuse dashboard
+#     host: https://cloud.langfuse.com    # Or self-hosted URL
+#     sample_rate: 1.0                    # 0.0-1.0, fraction of traces to sample
+#     scrub_inputs: false                 # Redact sensitive input data
+#     scrub_outputs: false                # Redact sensitive output data
+
+# Logging configuration
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  json_format: false  # Set to true for production (structured JSON logs)
+  # file: /var/log/mcp-hangar/server.log  # Optional file logging
