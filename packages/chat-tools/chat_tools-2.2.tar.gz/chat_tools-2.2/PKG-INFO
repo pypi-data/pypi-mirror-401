@@ -1,0 +1,120 @@
+Metadata-Version: 2.4
+Name: chat-tools
+Version: 2.2
+Summary: Tools for human-machine interaction based on large language models.
+Author-email: William Song <30965609+Freakwill@users.noreply.github.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/Freakwill/chat-tools
+Project-URL: Repository, https://github.com/Freakwill/chat-tools
+Keywords: Large Language Models,Artificial Intelligence,DeepSeek,Genimi,OpenAI
+Classifier: Environment :: MacOS X
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: openai
+Dynamic: license-file
+
+# chattools
+
+The most simple tool for AI chat, such as gemini, deepseek, ollama
+
+plz save the API keys in `.env.key` file in the current path.
+
+## Example
+
+run `python path/to/test.py` (deepseek)
+
+
+
+run `python path/to/test-mistral.py`  to utilize mistral AI.
+
+
+## Make CLI
+
+```python
+# default model is `gpt-oss:120b`
+
+from chattools import OllamaChat
+
+description="Intelligent enough to help me for anything."
+name="Asistant"
+
+with OllamaChat(description=description, name=name) as chat:
+    chat.run()
+
+if __name__ == "__main__":
+    from fire import Fire
+    Fire()
+```
+
+
+## Code
+
+
+```python
+# import YourLLM API 
+from mixin import ChatMixin
+from utils import get_api_key
+
+# api_key = get_api_key
+
+
+class YourChat(ChatMixin, YourLLM):
+
+    def __init__(self, description=None, history=[], name='Assistant', model="model-name", *args, **kwargs):
+        super().__init__(api_key=api_key, *args, **kwargs)  # init method of super class
+        self.description = description
+        self.name = name
+        self.model = model
+        self.chat_params = {}
+
+        self.history = history
+
+    def _reply(self, messages, max_retries=100):
+        """The wrapper method of the original `chat` method
+        """
+
+        k = 0
+        while True:
+            # try `max_retries` times
+            try:
+                """
+                get the response of the model. such as 
+                self.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        **self.chat_params)
+                """
+            except:
+                ...
+
+```
+
+## Commands
+
+register a command as follows
+```
+from chat_tools.commands import Commands
+
+@Commands.register("read")
+def read_history(obj, path):
+    # obj.history = read from `path`
+    pass
+```
+
+use the command in the chat as `!read path`
+
+---
+
+![](pic.jpg)
