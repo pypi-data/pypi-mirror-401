@@ -1,0 +1,77 @@
+# GitLab MR Review MCP Server
+
+A Model Context Protocol (MCP) server for reviewing GitLab merge requests using Claude Code and other MCP clients.
+
+## Overview
+
+This MCP server provides tools to interact with GitLab's API, enabling AI assistants to analyze merge requests, retrieve changed files, and inspect code diffs. It's designed to integrate seamlessly with Claude Code and other MCP-compatible clients for efficient code review workflows.
+
+## Setup
+
+### 1. Export Environment Variables
+```bash
+export GITLAB_API_URL="http[s]://your_gitlab_uri/api/v4"
+export GITLAB_PERSONAL_ACCESS_TOKEN="your-token-here"
+```
+
+**Get your GitLab token**: Settings → Access Tokens → Create token with `read_api` scope
+
+### 2. Install in Claude
+
+1. Type `/plugin` in Claude
+2. Select **Add marketplace**
+3. Paste `https://github.com/Synaps-Squad/gitlab-mr-mcp`
+4. Follow the prompts to complete the plugin installation
+
+### 3. Run Setup (Required - One Time Only)
+
+Before using the plugin, run the setup command in your terminal:
+```bash
+cd ~/.claude/plugins/marketplaces/gitlab-mr-review-marketplace/plugins/gitlab-mr-review  # or wherever the plugin was installed
+./start.sh --setup
+```
+
+This will install `uv` (if not present) and set up the Python environment with all dependencies.
+
+### 4. Verify Installation
+
+- Exit Claude completely and restart it
+- Run `/mcp` to verify the plugin is loaded
+
+## Usage
+
+### Quick Command
+
+Use the command directly:
+```
+/gitlab-mr-review:review-gitlab-mr MR_number Project_name
+```
+
+### Or Ask Claude
+
+- "List my GitLab projects"
+- "Review merge request !42 in project your_project_name"
+- "Show me the diff for the first file in MR !42"
+
+## Available Tools
+
+- **`get_projects()`** - List all accessible GitLab projects
+- **`merge_request_changes(project_id, merge_request_id)`** - List changed files in an MR
+- **`merge_request_file_diff(project_id, merge_request_id, file_index or file_path)`** - View file diff
+
+## Requirements
+
+- **uv** (will be auto-installed during setup, or install manually: https://github.com/astral-sh/uv)
+- Python 3.10+
+- Dependencies: `httpx`, `mcp`
+
+## Troubleshooting
+
+If you see an error like "Virtual environment not found", run the setup command:
+```bash
+./start.sh --setup
+```
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
