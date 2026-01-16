@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cfabric-mcp"
+version = "0.1.6"
+description = "MCP server for Context Fabric corpus operations"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Cody Kingham"},
+]
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "context-fabric>=0.2.0",
+    "mcp>=1.0,<2",
+    # uvicorn is used by FastMCP for SSE/HTTP transports
+    "uvicorn>=0.32.0",
+]
+
+[project.urls]
+Homepage = "https://context-fabric.ai"
+Repository = "https://github.com/Context-Fabric/context-fabric"
+Issues = "https://github.com/Context-Fabric/context-fabric/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio",
+]
+docs = [
+    "griffe>=1.0",
+    "griffe-typingdoc>=0.2",
+]
+
+[project.scripts]
+cfabric-mcp = "cfabric_mcp:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cfabric_mcp*"]
