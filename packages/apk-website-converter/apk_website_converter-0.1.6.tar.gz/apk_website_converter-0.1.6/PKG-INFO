@@ -1,0 +1,99 @@
+Metadata-Version: 2.4
+Name: apk-website-converter
+Version: 0.1.6
+Summary: A library to convert website URLs into Android APKs using Apktool.
+Home-page: https://github.com/shaiksadikjanu/apk-builder
+Author: SHAIKJANU
+Author-email: shaikjanu08012007@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: Pillow
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# APK Website Converter
+
+A powerful Python library that automates the conversion of any website URL into a fully functional Android App (APK).
+
+It handles decoding, manifest updates, image replacement, rebuilding, and signing automatically. Perfect for creating web-wrappers, kiosks, or testing tools.
+
+## Features
+* **Zero Configuration:** Comes with a built-in debug keystore so you can build APKs immediately.
+* **Customizable:** Supports custom App Names, Icons, Splash Screens, and Splash Duration.
+* **Secure:** Allows you to use your own production Keystore for Play Store releases.
+* **Clean Output:** Generates properly named, aligned, and signed APK files.
+
+## Prerequisites
+Before using this library, ensure you have the following installed on your system:
+1. **Java (JDK 8 or later)** - Required for `keytool` and signing.
+2. **Apktool** - [Download here](https://apktool.org/docs/install) (The `.jar` file).
+3. **Android SDK Build-Tools** - Standard Android SDK tools containing `zipalign` and `apksigner`.
+
+## Installation
+
+```bash
+pip install apk-website-converter
+Quick Start (Easy Mode)
+This method uses the internal debug keystore. Great for testing!
+
+Python
+
+from apk_builder import APKConverter
+
+# 1. Define paths to your tools
+config = {
+    "android_sdk_path": r"C:\Program Files\android13\android-14", # Path to folder with zipalign/apksigner
+    "apktool_path": r"C:\apktool\apktool.jar",                     # Path to apktool.jar
+}
+
+# 2. Initialize
+converter = APKConverter(config)
+
+# 3. Generate your App!
+try:
+    apk_path = converter.generate_apk(
+        url="[https://www.google.com](https://www.google.com)",       # The website you want to convert
+        app_name="MyGoogleApp",
+        icon_path="assets/icon.png",        # Path to your icon file (192x192 recommended)
+        splash_logo_path="assets/logo.png", # Path to splash screen logo
+        splash_bg_path="assets/bg.png",     # Path to splash background
+        output_dir="output_apks",           # Where to save the file
+        splash_time=3000                    # Splash duration in milliseconds
+    )
+    print(f"App created at: {apk_path}")
+except Exception as e:
+    print(f"Error: {e}")
+Advanced Usage (Play Store Mode)
+If you want to sign the app with your own private key for the Google Play Store, simply add your keystore details to the config.
+
+Python
+
+config = {
+    "android_sdk_path": r"C:\Program Files\android13\android-14",
+    "apktool_path": r"C:\apktool\apktool.jar",
+    
+    # Custom Keystore Details
+    "keystore_path": r"C:\my_secure_keys\production.jks",
+    "keystore_pass": "my_strong_password",
+    "key_alias": "my_key_alias"
+}
+
+converter = APKConverter(config)
+# ... run generate_apk() as normal
+Troubleshooting
+FileNotFoundError (zipalign/apksigner): Make sure your android_sdk_path points to the specific build-tools version folder (e.g., .../build-tools/34.0.0/), not just the root SDK folder.
+
+Java Error: Ensure java is in your system PATH. Open a terminal and type java -version to check.
+
+License
+MIT License
