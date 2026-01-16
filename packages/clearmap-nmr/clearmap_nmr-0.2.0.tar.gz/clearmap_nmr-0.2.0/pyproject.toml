@@ -1,0 +1,103 @@
+[build-system]
+requires = [
+    "setuptools>=61.0, <77.0", # Pin to avoid setuptools 77.0 issues with license file
+    "Cython>=0.29,<3.0", # Pin to avoid Cython 3.0 issues
+    # "Cython>=3.0", # Pin to use Cython>=3.0
+    "numpy>=1.19",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clearmap-nmr"
+version = "0.2.0"
+description = "A package for ClearMap project"
+readme = "README.md"
+license = {text = "GPL-3.0"}
+authors = [
+    {name = "Christoph Kirst"},
+    {name = "Georgi Fenton"},
+]
+maintainers = [
+    {name = "Omar Valerio"},
+    {name = "Max Planck Institute of Neurobiology"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Cython",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+keywords = ["image-processing", "neuroscience", "clearmap", "microscopy"]
+requires-python = ">=3.8"
+dependencies = [
+    "setuptools>=61.0, <77.0", # Pin to avoid setuptools 77.0 issues with license file
+    "numpy>=1.19",
+    "Cython>=0.29,<3.0",
+    # "Cython>=3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mpinb/clearmap-nmr"
+Repository = "https://github.com/mpinb/clearmap-nmr"
+"Bug Tracker" = "https://github.com/mpinb/clearmap-nmr/issues"
+Documentation = "https://github.com/mpinb/clearmap-nmr"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
+[tool.setuptools]
+packages = [
+    "ClearMap",
+    "ClearMap.Alignment",
+    "ClearMap.Alignment.Stitching",
+    "ClearMap.Analysis",
+    "ClearMap.Analysis.Curves",
+    "ClearMap.Analysis.Graphs",
+    "ClearMap.Analysis.Measurements",
+    "ClearMap.Analysis.Statistics",
+    "ClearMap.ImageProcessing",
+    "ClearMap.ImageProcessing.Binary",
+    "ClearMap.ImageProcessing.Clipping",
+    "ClearMap.ImageProcessing.Differentiation",
+    "ClearMap.ImageProcessing.Experts",
+    "ClearMap.ImageProcessing.Filter",
+    "ClearMap.ImageProcessing.Filter.Rank",
+    "ClearMap.ImageProcessing.Skeletonization",
+    "ClearMap.ImageProcessing.Thresholding",
+    "ClearMap.ImageProcessing.Topology",
+    "ClearMap.ImageProcessing.Tracing",
+    "ClearMap.IO",
+    "ClearMap.ParallelProcessing",
+    "ClearMap.ParallelProcessing.DataProcessing",
+    "ClearMap.GF_extras",
+    "ClearMap.Tests",
+    "ClearMap.Scripts",
+    "ClearMap.Utils",
+    "ClearMap.Visualization",
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+ClearMap = ["*.pyx", "*.pxd", "*.hpp", "*.ini"]
+
+[tool.setuptools.exclude-package-data]
+ClearMap = [
+    "External/*",
+    "GF_extras/clearmap1_GF/*",
+    "Alignment/Stitching/_Todo/*",
+    "Analysis/Measurements/_Todo/*",
+    "IMageProcessing/Filter/Rank/_Todo/*",
+    "ImageProcessing/MachineLearning/*",
+    "ImageProcessing/Thresholding/_Todo/*",
+    "ParalleProcessing/DataProcessing/_Old/*"]
