@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flowtask-cli"
+version = "0.1.0"
+description = "A blazing fast, AI-native task management system for developers and AI agents"
+readme = "README.md"
+license = {text = "Proprietary - All Rights Reserved"}
+authors = [
+    {name = "Andy Vandaric", email = "andyvandaric@gmail.com"}
+]
+keywords = ["task", "kanban", "cli", "ai", "productivity", "project-management"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/andyvandaric/flowtask"
+Repository = "https://github.com/andyvandaric/flowtask"
+Issues = "https://github.com/andyvandaric/flowtask/issues"
+
+[project.scripts]
+flowtask = "flowtask.cli:main"
