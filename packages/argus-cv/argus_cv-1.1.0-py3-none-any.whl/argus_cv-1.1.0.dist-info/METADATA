@@ -1,0 +1,48 @@
+Metadata-Version: 2.4
+Name: argus-cv
+Version: 1.1.0
+Summary: CLI tool for working with vision AI datasets
+Requires-Python: >=3.10
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: opencv-python>=4.8.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: typer>=0.12.0
+Description-Content-Type: text/markdown
+
+# argus-cv
+
+Vision AI dataset toolkit for working with YOLO and COCO datasets.
+
+**[Documentation](https://pirnerjonas.github.io/argus/)**
+
+## Installation
+
+```bash
+uvx argus-cv
+```
+
+## Usage
+
+```bash
+# List datasets in current directory
+uvx argus-cv list
+
+# List datasets in specific path
+uvx argus-cv list --path /path/to/datasets
+
+# Limit search depth
+uvx argus-cv list --path . --max-depth 2
+
+# Show instance statistics for a dataset
+uvx argus-cv stats --dataset-path /path/to/dataset
+
+# Short form
+uvx argus-cv stats -d /path/to/dataset
+
+# View annotations interactively
+uvx argus-cv view -d /path/to/dataset --split val
+
+# Split an unsplit dataset into train/val/test
+uvx argus-cv split -d /path/to/dataset -o /path/to/output -r 0.8,0.1,0.1
+```
