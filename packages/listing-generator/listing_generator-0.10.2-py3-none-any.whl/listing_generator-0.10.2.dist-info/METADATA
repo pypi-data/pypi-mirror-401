@@ -1,0 +1,673 @@
+Metadata-Version: 2.4
+Name: listing-generator
+Version: 0.10.2
+Summary: Plain-text source listing generator for AI context
+Author-email: Maxim Morozov <mmocentre@gmail.com>
+License: Apache License
+        Version 2.0, January 2004
+        http://www.apache.org/licenses/
+        
+        TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+        1. Definitions.
+        
+        "License" shall mean the terms and conditions for use, reproduction,
+        and distribution as defined by Sections 1 through 9 of this document.
+        
+        "Licensor" shall mean the copyright owner or entity authorized by
+        the copyright owner that is granting the License.
+        
+        "Legal Entity" shall mean the union of the acting entity and all
+        other entities that control, are controlled by, or are under common
+        control with that entity. For the purposes of this definition,
+        "control" means (i) the power, direct or indirect, to cause the
+        direction or management of such entity, whether by contract or
+        otherwise, or (ii) ownership of fifty percent (50%) or more of the
+        outstanding shares, or (iii) beneficial ownership of such entity.
+        
+        "You" (or "Your") shall mean an individual or Legal Entity
+        exercising permissions granted by this License.
+        
+        "Source" form shall mean the preferred form for making modifications,
+        including but not limited to software source code, documentation
+        source, and configuration files.
+        
+        "Object" form shall mean any form resulting from mechanical
+        transformation or translation of a Source form, including but
+        not limited to compiled object code, generated documentation,
+        and conversions to other media types.
+        
+        "Work" shall mean the work of authorship, whether in Source or
+        Object form, made available under the License, as indicated by a
+        copyright notice that is included in or attached to the work
+        (an example is provided in the Appendix below).
+        
+        "Derivative Works" shall mean any work, whether in Source or Object
+        form, that is based on (or derived from) the Work and for which the
+        editorial revisions, annotations, elaborations, or other modifications
+        represent, as a whole, an original work of authorship. For the purposes
+        of this License, Derivative Works shall not include works that remain
+        separable from, or merely link (or bind by name) to the interfaces of,
+        the Work and Derivative Works thereof.
+        
+        "Contribution" shall mean any work of authorship, including
+        the original version of the Work and any modifications or additions
+        to that Work or Derivative Works thereof, that is intentionally
+        submitted to Licensor for inclusion in the Work by the copyright owner
+        or by an individual or Legal Entity authorized to submit on behalf of
+        the copyright owner. For the purposes of this definition, "submitted"
+        means any form of electronic, verbal, or written communication sent
+        to the Licensor or its representatives, including but not limited to
+        communication on electronic mailing lists, source code control systems,
+        and issue tracking systems that are managed by, or on behalf of, the
+        Licensor for the purpose of discussing and improving the Work, but
+        excluding communication that is conspicuously marked or otherwise
+        designated in writing by the copyright owner as "Not a Contribution."
+        
+        "Contributor" shall mean Licensor and any individual or Legal Entity
+        on behalf of whom a Contribution has been received by Licensor and
+        subsequently incorporated within the Work.
+        
+        2. Grant of Copyright License.
+        
+        Subject to the terms and conditions of this License, each Contributor
+        hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,
+        royalty-free, irrevocable copyright license to reproduce, prepare
+        Derivative Works of, publicly display, publicly perform, sublicense,
+        and distribute the Work and such Derivative Works in Source or
+        Object form.
+        
+        3. Grant of Patent License.
+        
+        Subject to the terms and conditions of this License, each Contributor
+        hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,
+        royalty-free, irrevocable (except as stated in this section) patent
+        license to make, have made, use, offer to sell, sell, import, and
+        otherwise transfer the Work, where such license applies only to those
+        patent claims licensable by such Contributor that are necessarily
+        infringed by their Contribution(s) alone or by combination of their
+        Contribution(s) with the Work to which such Contribution(s) was
+        submitted. If You institute patent litigation against any entity
+        (including a cross-claim or counterclaim in a lawsuit) alleging that
+        the Work or a Contribution incorporated within the Work constitutes
+        direct or contributory patent infringement, then any patent licenses
+        granted to You under this License for that Work shall terminate
+        as of the date such litigation is filed.
+        
+        4. Redistribution.
+        
+        You may reproduce and distribute copies of the Work or Derivative
+        Works thereof in any medium, with or without modifications, and in
+        Source or Object form, provided that You meet the following conditions:
+        
+           (a) You must give any other recipients of the Work or
+               Derivative Works a copy of this License; and
+        
+           (b) You must cause any modified files to carry prominent notices
+               stating that You changed the files; and
+        
+           (c) You must retain, in the Source form of any Derivative Works
+               that You distribute, all copyright, patent, trademark, and
+               attribution notices from the Source form of the Work,
+               excluding those notices that do not pertain to any part of
+               the Derivative Works; and
+        
+           (d) If the Work includes a "NOTICE" text file as part of its
+               distribution, then any Derivative Works that You distribute must
+               include a readable copy of the attribution notices contained
+               within such NOTICE file, excluding those notices that do not
+               pertain to any part of the Derivative Works, in at least one
+               of the following places: within a NOTICE text file distributed
+               as part of the Derivative Works; within the Source form or
+               documentation, if provided along with the Derivative Works; or,
+               within a display generated by the Derivative Works, if and
+               wherever such third-party notices normally appear. The contents
+               of the NOTICE file are for informational purposes only and
+               do not modify the License. You may add Your own attribution
+               notices within Derivative Works that You distribute, alongside
+               or as an addendum to the NOTICE text from the Work, provided
+               that such additional attribution notices cannot be construed
+               as modifying the License.
+        
+        You may add Your own copyright statement to Your modifications and
+        may provide additional or different license terms and conditions
+        for use, reproduction, or distribution of Your modifications, or
+        for any such Derivative Works as a whole, provided Your use,
+        reproduction, and distribution of the Work otherwise complies with
+        the conditions stated in this License.
+        
+        5. Submission of Contributions.
+        
+        Unless You explicitly state otherwise, any Contribution intentionally
+        submitted for inclusion in the Work by You to the Licensor shall be
+        under the terms and conditions of this License, without any additional
+        terms or conditions. Notwithstanding the above, nothing herein shall
+        supersede or modify the terms of any separate license agreement you
+        may have executed with Licensor regarding such Contributions.
+        
+        6. Trademarks.
+        
+        This License does not grant permission to use the trade names,
+        trademarks, service marks, or product names of the Licensor,
+        except as required for reasonable and customary use in describing the
+        origin of the Work and reproducing the content of the NOTICE file.
+        
+        7. Disclaimer of Warranty.
+        
+        Unless required by applicable law or agreed to in writing, Licensor
+        provides the Work (and each Contributor provides its Contributions)
+        on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+        either express or implied, including, without limitation, any
+        warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+        or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+        determining the appropriateness of using or redistributing the Work
+        and assume any risks associated with Your exercise of permissions
+        under this License.
+        
+        8. Limitation of Liability.
+        
+        In no event and under no legal theory, whether in tort
+        (including negligence), contract, or otherwise, unless required
+        by applicable law (such as deliberate and grossly negligent acts)
+        or agreed to in writing, shall any Contributor be liable to You
+        for damages, including any direct, indirect, special, incidental,
+        or consequential damages of any character arising as a result of
+        this License or out of the use or inability to use the Work
+        (including but not limited to damages for loss of goodwill,
+        work stoppage, computer failure or malfunction, or any and
+        all other commercial damages or losses), even if such Contributor
+        has been advised of the possibility of such damages.
+        
+        9. Accepting Warranty or Additional Liability.
+        
+        While redistributing the Work or Derivative Works thereof, You may
+        choose to offer, and charge a fee for, acceptance of support,
+        Warranty, indemnity, or other liability obligations and/or rights
+        consistent with this License. However, in accepting such obligations,
+        You may act only on Your own behalf and on Your sole responsibility,
+        not on behalf of any other Contributor, and only if You agree to
+        indemnify, defend, and hold each Contributor harmless for any liability
+        incurred by, or claims asserted against, such Contributor by reason
+        of your accepting any such warranty or additional liability.
+        
+        END OF TERMS AND CONDITIONS
+        
+        APPENDIX: How to apply the Apache License to your work.
+        
+        To apply the Apache License to your work, attach the following
+        boilerplate notice, with the fields enclosed by brackets "[]"
+        replaced with your own identifying information. (Don't include
+        the brackets!)  The text should be enclosed in the appropriate
+        comment syntax for the file format. We also recommend that a
+        file or class name and description of purpose be included on the
+        same "printed page" as the copyright notice for easier
+        identification within third-party archives.
+        
+        Copyright [yyyy] [name of copyright owner]
+        
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+        
+            http://www.apache.org/licenses/LICENSE-2.0
+        
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+        
+        
+        
+Project-URL: Homepage, https://github.com/Max-Moro/lg-cli
+Project-URL: Source, https://github.com/Max-Moro/lg-cli
+Project-URL: Issues, https://github.com/Max-Moro/lg-cli/issues
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: ruamel.yaml>=0.18
+Requires-Dist: pathspec>=0.12
+Requires-Dist: tiktoken>=0.6
+Requires-Dist: tokenizers>=0.15
+Requires-Dist: sentencepiece>=0.2
+Requires-Dist: huggingface-hub>=0.20
+Requires-Dist: pydantic<3.0,>=2.0
+Requires-Dist: tree-sitter>=0.21
+Requires-Dist: tree-sitter-python>=0.23
+Requires-Dist: tree-sitter-typescript>=0.23
+Requires-Dist: tree-sitter-javascript>=0.25
+Requires-Dist: tree-sitter-kotlin>=1.1.0
+Requires-Dist: tree-sitter-java>=0.23
+Requires-Dist: tree-sitter-cpp>=0.23
+Requires-Dist: tree-sitter-c>=0.23
+Requires-Dist: tree-sitter-scala>=0.23
+Requires-Dist: tree-sitter-go>=0.23
+Requires-Dist: tree-sitter-rust>=0.23
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: datamodel-code-generator>=0.25; extra == "dev"
+Requires-Dist: vulture>=2.14; extra == "dev"
+Requires-Dist: tomli>=2.0; python_version < "3.11" and extra == "dev"
+Dynamic: license-file
+
+# Listing Generator
+
+A tool for building dense contexts from source code: traverses projects, filters and normalizes files, then assembles them into a single clean Markdown document — perfect for ChatGPT/Copilot/Gemini/Claude and other LLM assistants.
+
+> In short: you store selection rules in `lg-cfg/` (YAML + context templates), and LG renders "ready-to-paste" text or returns a JSON report with token statistics.
+
+---
+
+## Why and Who Is It For
+
+**Target audience:** developers, team leads, and technical writers who engage in dialogues with AI agents about real code, perform reviews, assign tasks, capture iteration context, while model window size is limited.
+
+**Why:** modern agents work noticeably better when they see **exactly the needed code** with **minimal noise**: no junk from `node_modules/`, logs, generated files, huge binaries, etc. Manual preparation of such context is painful. LG automates:
+
+* selection of relevant files (by filters and extensions),
+* light normalization (e.g., Markdown headers, "trivial" `__init__.py`),
+* assembly into a single document with **visible file markers**,
+* `.gitignore` awareness,
+* **`changes` mode** (only modified files),
+* **templates and contexts** (section insertions and nested templates),
+* size/token estimation and shares ("who's eating the prompt").
+
+There are many ways to form prompts and attach relevant code snippets: from manual copying to context embedding features in IDEs with integrated AI chats. LG differs by doing this **systematically and reproducibly**: rules are stored in the repository, not in your head or AI conversation history.
+
+You describe **what** and **how** goes into the prompt in advance (through sections and templates). This enforces discipline, allows you to "tune" density and **avoid overflowing the model window**, as well as reproduce successful queries through saved templates.
+
+---
+
+## What a "Healthy" AI Agent Workflow Looks Like
+
+1. **Describe rules in the repository**
+   Create `lg-cfg/sections.yaml` and additional `*.sec.yaml` as needed. These describe sections (file sets + filters). Use `*.tpl.md` and `*.ctx.md` for templates and contexts.
+
+2. **Build context**
+   Render: either a "section" (virtual context of one file set), or a "context" (template that can include multiple sections and other templates).
+
+3. **Iteratively compress**
+   Check token statistics (who has the "heaviest share"), move secondary content to separate sections, include on demand. For "small updates" use `--mode changes`.
+
+4. **Save successful prompts**
+   Contexts and templates (`*.ctx.md` and `*.tpl.md`) are your "well-working" query formats: reproducible, versionable, with variants for different tasks and agents.
+
+---
+
+## Quick Start
+
+### Installation and Running
+
+Requires Python ≥ 3.10.
+
+Installation:
+
+```bash
+# Install from project directory
+pip install -e .
+```
+
+Verification:
+
+```bash
+# Check via module
+python -m lg.cli --version
+
+# Or via installed command
+listing-generator --version
+```
+
+Environment and cache check:
+
+```bash
+python -m lg.cli diag
+python -m lg.cli diag --rebuild-cache
+```
+
+---
+
+## What Goes in `lg-cfg/`
+
+> Important: the configuration directory is always named **`lg-cfg/`**.
+
+Example structure:
+
+```
+lg-cfg/
+├─ sections.yaml           # sections file (can be in any directory)
+├─ additional.sec.yaml     # additional section set (can have many)
+├─ intro.tpl.md            # template (can have many, in any subfolders)
+├─ onboarding.ctx.md       # context (can have many, in any subfolders)
+└─ sub-fold/
+   ├─ sections.yaml        # another sections.yaml (sections get sub-fold/ prefix)
+   └─ extra.sec.yaml
+```
+
+### Sections
+
+* `sections.yaml` — sections file. Can be in `lg-cfg/` root and in any subdirectories.
+  - In root: sections without prefix (e.g., `docs`, `src`)
+  - In subdirectories: sections with directory prefix (e.g., `adapters/src` from `lg-cfg/adapters/sections.yaml`)
+* `*.sec.yaml` — additional section sets (fragments).
+
+A section describes:
+
+* which file extensions to consider,
+* allow/block filters over the tree,
+* policy for empty files, code-fence, and language adapters.
+
+Minimal example:
+
+```yaml
+# Section for project documentation
+docs:
+  extensions: [".md"]
+  markdown:
+    # Normalize headings to H2 (outside fenced blocks), remove single H1 at start
+    max_heading_level: 2
+  filters:
+    mode: allow            # default-deny within section
+    allow:
+      - "/README.md"
+      - "/docs/**"
+
+# Core-model submodule sources
+core-model-src:
+  extensions: [".py", ".md", ".yaml", ".json", ".toml"]
+  skip_empty: true
+  markdown:
+    max_heading_level: 3
+  filters:
+    mode: allow
+    allow:
+      - "/core-model/**"
+    children:
+      core-model:
+        mode: block
+        block:
+          - "**/.pytest_cache/**"
+          - "/ROADMAP.md"
+
+# Separate section for roadmap (as text)
+core-model-roadmap:
+  extensions: [".md"]
+  filters:
+    mode: allow
+    allow:
+      - "/core-model/ROADMAP.md"
+```
+
+### Filters: How They Work
+
+* Rule tree — **default-allow** (`mode: block`) or **default-deny** (`mode: allow`).
+* At each level: first `block`, then (if node is `allow`) — **strict** check against `allow`.
+  If `mode: allow` and path doesn't match local `allow`, it's **immediately rejected**.
+* `block` is always stronger than `allow`.
+* Project's `.gitignore` is respected.
+* LG also carefully **doesn't descend** into subtrees that won't yield anything (early pruner).
+
+### Contexts and Templates
+
+* Contexts: `*.ctx.md` (top-level documents).
+* Templates: `*.tpl.md` (fragments for insertion).
+
+Example:
+
+```markdown
+# Project Introduction
+
+${tpl:intro}
+
+## Core-model module source code
+
+${core-model-src}
+
+## Additional section
+
+${sub-fold/extra/bar}
+
+## Current task
+
+${task}
+```
+
+Sections from root `lg-cfg/sections.yaml` are accessible directly (`${docs}`).
+Sections from subdirectory `sections.yaml` files have directory prefix (e.g., `${adapters/src}` from `lg-cfg/adapters/sections.yaml`).
+Fragments use hierarchical paths: file `sub-fold/extra.sec.yaml` → section `bar` → `${sub-fold/extra/bar}`.
+
+**Context-dependent references**: From templates in subdirectories, you can use short names.
+Example: from `lg-cfg/adapters/overview.ctx.md` you can write `${src}` and it will resolve to `adapters/src`.
+
+Special placeholder `${task}` inserts text from `--task` argument:
+* `${task}` — simple insertion (empty string if not specified)
+* `${task:prompt:"default text"}` — with default value
+* `{% if task %}...{% endif %}` — conditional block insertion
+
+*More details:* [templates.md](docs/en/templates.md).
+
+---
+
+## Language Adapters
+
+Listing Generator uses adapters for different languages and formats. They help "optimize" listings: remove junk, normalize headings, filter paragraphs, or even strip function bodies leaving only signatures. Adapter settings are specified right in section YAML — globally for the section or targeted to specific paths via `targets`.
+
+### Configuration Example
+
+```yaml
+core:
+  extensions: [".py", ".md"]
+  skip_empty: true
+
+  # Global rules for entire section
+  python:
+    strip_function_bodies: false
+
+  markdown:
+    max_heading_level: 2
+
+  # Local overrides for specific folders and files
+  targets:
+    - match: "/pkg/**.py"
+      python:
+        strip_function_bodies: true      # only signatures in this folder
+
+    - match: ["/docs/**.md", "/notes/*.md"]
+      markdown:
+        drop:
+          sections:
+            - match: { kind: regex, pattern: "^(License|Changelog|Contributing)$", flags: "i" }
+```
+
+In this example, the `core` section describes two languages. For Python, stripping function bodies is globally disabled, but inside the `/pkg/` folder it's enabled. For Markdown, a general heading level is set, but in `/docs/` and `/notes/` paragraphs will additionally be filtered by specified patterns.
+
+The `match` key accepts either a string or a list of glob patterns. When multiple rules match, the more specific (longer and more concrete) one wins; if equal — the later one in the list. This allows neatly layering local "overrides" on top of section settings.
+
+Separate empty file policy (`skip_empty` at section level and `empty_policy` in adapters) works as if it's part of language options: the section sets the general strategy, and the adapter can refine it if needed. Possible values: `empty_policy: inherit|include|exclude`.
+
+---
+
+### Available Adapters
+
+#### Markdown
+
+* Normalize headings (remove lone H1, shift levels).
+* Systematically **drop entire sections** by headings (with subtree).
+* Remove **YAML front matter** at the beginning.
+* Insert **placeholders** in place of removed content (optionally).
+
+*More details:* [markdown.md](docs/en/markdown.md).
+
+#### Programming Languages
+
+*More details:* [adapters.md](docs/en/adapters.md).
+
+---
+
+## Token Statistics
+
+To facilitate the process of optimizing listings and contexts, LG provides a summary report on token usage.
+
+LG supports several open-source tokenization libraries (tiktoken, tokenizers, sentencepiece) and requires explicit specification of tokenization parameters on each run.
+
+*More details:* [tokenizers.md](docs/en/tokenizers.md).
+
+---
+
+## Adaptive Capabilities
+
+All methods for creating universal templates and section configurations are described in the [Adaptive Capabilities](docs/en/adaptability.md) section.
+<!-- lg:comment:start -->
+---
+
+## CLI Options
+
+General format:
+
+```bash
+listing-generator <command> <target> [--mode MODESET:MODE] [--tags TAG1,TAG2] [<additional_flags>]
+
+# For render/report, tokenization parameters are required:
+listing-generator render|report <target> \
+  --lib <tiktoken|tokenizers|sentencepiece> \
+  --encoder <encoder_name> \
+  --ctx-limit <tokens>
+```
+
+Where `<target>`:
+
+* `ctx:<name>` — takes file `lg-cfg/<name>.ctx.md` (subfolders supported).
+* `sec:<id>` — virtual context of a single section (canonical ID).
+* `<name>` — searches first as `ctx:<name>`, otherwise as `sec:<id>`.
+
+Commands:
+
+* `render` — output **final text only** (Markdown).
+* `report` — **JSON report** (format v5): statistics, files, context block.
+* `list contexts|sections|tokenizer-libs|encoders` — list available entities (JSON).
+* `diag` — environment/cache/config diagnostics (JSON), has `--rebuild-cache`.
+
+Tokenization parameters:
+
+* `--lib` — tokenization library (`tiktoken`, `tokenizers`, `sentencepiece`)
+* `--encoder` — encoder/model name (e.g.: `cl100k_base`, `gpt2`, `google/gemma-2-2b`)
+* `--ctx-limit` — context window size in tokens (e.g.: `128000`, `200000`)
+
+Examples:
+
+```bash
+# Render context from template with tokenization for GPT-4
+listing-generator render ctx:onboarding \
+  --lib tiktoken \
+  --encoder cl100k_base \
+  --ctx-limit 128000 > prompt.md
+
+# Render "section only" (no template)
+listing-generator render sec:core-model-src \
+  --lib tiktoken \
+  --encoder cl100k_base \
+  --ctx-limit 128000 > prompt.md
+
+# Same but only changed files in working tree
+listing-generator render ctx:onboarding \
+  --lib tiktoken \
+  --encoder cl100k_base \
+  --ctx-limit 128000 \
+  --mode vcs:branch-changes > prompt.md
+
+# JSON report with token stats for GPT-4o
+listing-generator report ctx:onboarding \
+  --lib tiktoken \
+  --encoder o200k_base \
+  --ctx-limit 200000 > report.json
+
+# Report for Gemini using sentencepiece
+listing-generator report ctx:onboarding \
+  --lib sentencepiece \
+  --encoder google/gemma-2-2b \
+  --ctx-limit 1000000 > report.json
+
+# Render context with current task description
+listing-generator render ctx:dev \
+  --lib tiktoken --encoder cl100k_base --ctx-limit 128000 \
+  --task "Implement result caching"
+
+# Multi-line task via stdin
+echo -e "Tasks:\n- Fix bug #123\n- Add tests" | \
+  listing-generator render ctx:dev --lib tiktoken --encoder cl100k_base --ctx-limit 128000 --task -
+
+# Task from file
+listing-generator render ctx:dev \
+  --lib tiktoken --encoder cl100k_base --ctx-limit 128000 \
+  --task @.current-task.txt
+
+# Diagnostics
+listing-generator diag
+listing-generator diag --rebuild-cache
+
+# Lists
+listing-generator list contexts
+listing-generator list sections
+listing-generator list tokenizer-libs
+listing-generator list encoders --lib tiktoken
+listing-generator list encoders --lib tokenizers
+```
+
+---
+
+## How LG Renders Documents
+
+* If **all files are Markdown/plain text**, LG simply concatenates their content.
+* Otherwise:
+
+  * **with code-fence** (default): blocks by languages, grouped **in order of occurrence**;
+    inside each block — file marker `# —— FILE: path ——`, then content.
+  * **without code-fence**: linear document with marker before each file.
+
+This makes the prompt **readable** for humans and convenient for agents: it's clear where each fragment comes from.
+
+---
+
+## Cache and Performance
+
+LG uses file cache `.lg-cache`:
+
+* **Processed cache** — adapter results + their metadata.
+* **Raw/Processed tokens** — saved token counts (by model/mode).
+* **Rendered tokens** — count of final document ("with glue") and "sections-only".
+
+Cache keys consider tool version, file fingerprint, adapter config, group composition, etc.
+Management: `listing-generator diag`, `listing-generator diag --rebuild-cache`. Can disable cache via `LG_CACHE=0`.
+
+---
+
+## Practical Tips for "Dense" Contexts
+
+* **Keep sections small and thematic.** Better several sections than one "everything about everything".
+* **Strict `allow` nodes** use where full content predictability is needed.
+* **Markdown templates** apply as prompt "frame": brief intro, tasks, section placeholders.
+* **`changes` mode** — best friend for patch iterations and code review via LLM.
+* **Watch shares** (`promptShare`/`ctxShare`) in `report`: helps distribute "holding cost".
+* **Normalize headings** (`max_heading_level`) — makes reading long contexts easier.
+* **Don't drag secrets.** Configure `block` for artifacts/keys/secrets/binaries.
+
+---
+
+## IDE/Plugin Integration
+
+In most cases you'll run LG **through integration** (VS Code / JetBrains, etc.).
+Nevertheless, **all selection/template logic lives in the repository** (`lg-cfg/`), so:
+
+* reviewing and evolving rules is simple (via PRs),
+* transferring successful prompts between projects — trivial,
+* same configuration works in CLI and IDE.
+<!-- lg:comment:end -->
+
+---
+
+## License
+
+Listing Generator is licensed under the Apache License, Version 2.0.  
+See the `LICENSE` file for the full license text.
