@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oscalling"
+version = "2.0.0"
+description = "A powerful, unified OS manipulation package with built-in memory and hardware management."
+readme = "README.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Rheehose (Rhee Creative)", email = "rheehose@example.com"}
+]
+keywords = ["os", "system", "memory-management", "hardware", "process", "automation", "utilities"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Operating System",
+    "Topic :: System :: Systems Administration",
+]
+dependencies = [
+    "psutil>=5.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/rheehose/oscalling"
+Repository = "https://github.com/rheehose/oscalling"
+Issues = "https://github.com/rheehose/oscalling/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
