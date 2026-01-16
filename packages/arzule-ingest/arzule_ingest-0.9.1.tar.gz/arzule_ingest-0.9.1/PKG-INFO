@@ -1,0 +1,603 @@
+Metadata-Version: 2.4
+Name: arzule-ingest
+Version: 0.9.1
+Summary: Lightweight SDK for capturing multi-agent traces with self-hosting support
+Project-URL: Homepage, https://arzule.com
+Project-URL: Documentation, https://docs.arzule.com
+Project-URL: Repository, https://github.com/arzule/arzule-ingest
+Author: Arzule
+License:                                  Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           1. Definitions.
+        
+              "License" shall mean the terms and conditions for use, reproduction,
+              and distribution as defined by Sections 1 through 9 of this document.
+        
+              "Licensor" shall mean the copyright owner or entity authorized by
+              the copyright owner that is granting the License.
+        
+              "Legal Entity" shall mean the union of the acting entity and all
+              other entities that control, are controlled by, or are under common
+              control with that entity. For the purposes of this definition,
+              "control" means (i) the power, direct or indirect, to cause the
+              direction or management of such entity, whether by contract or
+              otherwise, or (ii) ownership of fifty percent (50%) or more of the
+              outstanding shares, or (iii) beneficial ownership of such entity.
+        
+              "You" (or "Your") shall mean an individual or Legal Entity
+              exercising permissions granted by this License.
+        
+              "Source" form shall mean the preferred form for making modifications,
+              including but not limited to software source code, documentation
+              source, and configuration files.
+        
+              "Object" form shall mean any form resulting from mechanical
+              transformation or translation of a Source form, including but
+              not limited to compiled object code, generated documentation,
+              and conversions to other media types.
+        
+              "Work" shall mean the work of authorship, whether in Source or
+              Object form, made available under the License, as indicated by a
+              copyright notice that is included in or attached to the work
+              (an example is provided in the Appendix below).
+        
+              "Derivative Works" shall mean any work, whether in Source or Object
+              form, that is based on (or derived from) the Work and for which the
+              editorial revisions, annotations, elaborations, or other modifications
+              represent, as a whole, an original work of authorship. For the purposes
+              of this License, Derivative Works shall not include works that remain
+              separable from, or merely link (or bind by name) to the interfaces of,
+              the Work and Derivative Works thereof.
+        
+              "Contribution" shall mean any work of authorship, including
+              the original version of the Work and any modifications or additions
+              to that Work or Derivative Works thereof, that is intentionally
+              submitted to Licensor for inclusion in the Work by the copyright owner
+              or by an individual or Legal Entity authorized to submit on behalf of
+              the copyright owner. For the purposes of this definition, "submitted"
+              means any form of electronic, verbal, or written communication sent
+              to the Licensor or its representatives, including but not limited to
+              communication on electronic mailing lists, source code control systems,
+              and issue tracking systems that are managed by, or on behalf of, the
+              Licensor for the purpose of discussing and improving the Work, but
+              excluding communication that is conspicuously marked or otherwise
+              designated in writing by the copyright owner as "Not a Contribution."
+        
+              "Contributor" shall mean Licensor and any individual or Legal Entity
+              on behalf of whom a Contribution has been received by Licensor and
+              subsequently incorporated within the Work.
+        
+           2. Grant of Copyright License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              copyright license to reproduce, prepare Derivative Works of,
+              publicly display, publicly perform, sublicense, and distribute the
+              Work and such Derivative Works in Source or Object form.
+        
+           3. Grant of Patent License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              (except as stated in this section) patent license to make, have made,
+              use, offer to sell, sell, import, and otherwise transfer the Work,
+              where such license applies only to those patent claims licensable
+              by such Contributor that are necessarily infringed by their
+              Contribution(s) alone or by combination of their Contribution(s)
+              with the Work to which such Contribution(s) was submitted. If You
+              institute patent litigation against any entity (including a
+              cross-claim or counterclaim in a lawsuit) alleging that the Work
+              or a Contribution incorporated within the Work constitutes direct
+              or contributory patent infringement, then any patent licenses
+              granted to You under this License for that Work shall terminate
+              as of the date such litigation is filed.
+        
+           4. Redistribution. You may reproduce and distribute copies of the
+              Work or Derivative Works thereof in any medium, with or without
+              modifications, and in Source or Object form, provided that You
+              meet the following conditions:
+        
+              (a) You must give any other recipients of the Work or
+                  Derivative Works a copy of this License; and
+        
+              (b) You must cause any modified files to carry prominent notices
+                  stating that You changed the files; and
+        
+              (c) You must retain, in the Source form of any Derivative Works
+                  that You distribute, all copyright, patent, trademark, and
+                  attribution notices from the Source form of the Work,
+                  excluding those notices that do not pertain to any part of
+                  the Derivative Works; and
+        
+              (d) If the Work includes a "NOTICE" text file as part of its
+                  distribution, then any Derivative Works that You distribute must
+                  include a readable copy of the attribution notices contained
+                  within such NOTICE file, excluding those notices that do not
+                  pertain to any part of the Derivative Works, in at least one
+                  of the following places: within a NOTICE text file distributed
+                  as part of the Derivative Works; within the Source form or
+                  documentation, if provided along with the Derivative Works; or,
+                  within a display generated by the Derivative Works, if and
+                  wherever such third-party notices normally appear. The contents
+                  of the NOTICE file are for informational purposes only and
+                  do not modify the License. You may add Your own attribution
+                  notices within Derivative Works that You distribute, alongside
+                  or as an addendum to the NOTICE text from the Work, provided
+                  that such additional attribution notices cannot be construed
+                  as modifying the License.
+        
+              You may add Your own copyright statement to Your modifications and
+              may provide additional or different license terms and conditions
+              for use, reproduction, or distribution of Your modifications, or
+              for any such Derivative Works as a whole, provided Your use,
+              reproduction, and distribution of the Work otherwise complies with
+              the conditions stated in this License.
+        
+           5. Submission of Contributions. Unless You explicitly state otherwise,
+              any Contribution intentionally submitted for inclusion in the Work
+              by You to the Licensor shall be under the terms and conditions of
+              this License, without any additional terms or conditions.
+              Notwithstanding the above, nothing herein shall supersede or modify
+              the terms of any separate license agreement you may have executed
+              with Licensor regarding such Contributions.
+        
+           6. Trademarks. This License does not grant permission to use the trade
+              names, trademarks, service marks, or product names of the Licensor,
+              except as required for reasonable and customary use in describing the
+              origin of the Work and reproducing the content of the NOTICE file.
+        
+           7. Disclaimer of Warranty. Unless required by applicable law or
+              agreed to in writing, Licensor provides the Work (and each
+              Contributor provides its Contributions) on an "AS IS" BASIS,
+              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+              implied, including, without limitation, any warranties or conditions
+              of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+              PARTICULAR PURPOSE. You are solely responsible for determining the
+              appropriateness of using or redistributing the Work and assume any
+              risks associated with Your exercise of permissions under this License.
+        
+           8. Limitation of Liability. In no event and under no legal theory,
+              whether in tort (including negligence), contract, or otherwise,
+              unless required by applicable law (such as deliberate and grossly
+              negligent acts) or agreed to in writing, shall any Contributor be
+              liable to You for damages, including any direct, indirect, special,
+              incidental, or consequential damages of any character arising as a
+              result of this License or out of the use or inability to use the
+              Work (including but not limited to damages for loss of goodwill,
+              work stoppage, computer failure or malfunction, or any and all
+              other commercial damages or losses), even if such Contributor
+              has been advised of the possibility of such damages.
+        
+           9. Accepting Warranty or Additional Liability. While redistributing
+              the Work or Derivative Works thereof, You may choose to offer,
+              and charge a fee for, acceptance of support, warranty, indemnity,
+              or other liability obligations and/or rights consistent with this
+              License. However, in accepting such obligations, You may act only
+              on Your own behalf and on Your sole responsibility, not on behalf
+              of any other Contributor, and only if You agree to indemnify,
+              defend, and hold each Contributor harmless for any liability
+              incurred by, or claims asserted against, such Contributor by reason
+              of your accepting any such warranty or additional liability.
+        
+           END OF TERMS AND CONDITIONS
+        
+           APPENDIX: How to apply the Apache License to your work.
+        
+              To apply the Apache License to your work, attach the following
+              boilerplate notice, with the fields enclosed by brackets "[]"
+              replaced with your own identifying information. (Don't include
+              the brackets!)  The text should be enclosed in the appropriate
+              comment syntax for the file format. We also recommend that a
+              file or class name and description of purpose be included on the
+              same "printed page" as the copyright notice for easier
+              identification within third-party archives.
+        
+           Copyright [yyyy] [name of copyright owner]
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+License-File: LICENSE
+Keywords: agents,autogen,crewai,langchain,langgraph,llm,multi-agent,observability,tracing
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Monitoring
+Requires-Python: >=3.10
+Requires-Dist: cryptography>=42.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: pydantic>=2.0.0
+Provides-Extra: all
+Requires-Dist: crewai>=0.80.0; extra == 'all'
+Requires-Dist: langchain-core>=0.2.0; extra == 'all'
+Requires-Dist: langchain>=0.2.0; extra == 'all'
+Requires-Dist: pyautogen<0.3.0,>=0.2.0; extra == 'all'
+Provides-Extra: autogen
+Requires-Dist: pyautogen<0.3.0,>=0.2.0; extra == 'autogen'
+Provides-Extra: crewai
+Requires-Dist: crewai>=0.80.0; extra == 'crewai'
+Provides-Extra: dev
+Requires-Dist: crewai>=0.80.0; extra == 'dev'
+Requires-Dist: langchain-core>=0.2.0; extra == 'dev'
+Requires-Dist: langchain-openai>=0.1.0; extra == 'dev'
+Requires-Dist: langchain>=0.2.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.23.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Provides-Extra: langchain
+Requires-Dist: langchain-core>=0.2.0; extra == 'langchain'
+Requires-Dist: langchain>=0.2.0; extra == 'langchain'
+Provides-Extra: server
+Requires-Dist: fastapi>=0.100.0; extra == 'server'
+Requires-Dist: uvicorn>=0.30.0; extra == 'server'
+Description-Content-Type: text/markdown
+
+# arzule-ingest
+
+Lightweight SDK for capturing multi-agent traces and sending them to Arzule.
+
+**Supported Frameworks:**
+- CrewAI
+- LangChain / LangGraph
+- Microsoft AutoGen (both legacy v0.2 and new v0.7+)
+- Claude Code (via hooks + OTel)
+
+## Installation
+
+The SDK has a lightweight core with optional framework integrations. Install only what you need:
+
+```bash
+# Create a virtual environment (recommended)
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Core only (httpx, pydantic, cryptography)
+pip install arzule-ingest
+
+# With specific framework support
+pip install arzule-ingest[crewai]      # CrewAI integration
+pip install arzule-ingest[langchain]   # LangChain/LangGraph integration
+pip install arzule-ingest[autogen]     # AutoGen v0.2 integration
+
+# Multiple frameworks
+pip install arzule-ingest[crewai,langchain]
+
+# All framework integrations
+pip install arzule-ingest[all]
+```
+
+> **Note:** Framework integrations require Python versions supported by each framework. For example, CrewAI currently requires Python <3.14. The core SDK works on Python 3.10+.
+
+## Quick Start
+
+### Option 1: One-line setup (recommended)
+
+```python
+import arzule_ingest
+
+# Initialize with environment variables
+# Auto-detects and instruments CrewAI, LangChain, and AutoGen if installed
+arzule_ingest.init()
+
+# Your agent code runs as normal - traces are captured automatically
+```
+
+Required environment variables:
+- `ARZULE_API_KEY` - Your API key
+- `ARZULE_TENANT_ID` - Your tenant ID
+- `ARZULE_PROJECT_ID` - Your project ID
+
+### Option 2: Explicit configuration
+
+```python
+import os
+import arzule_ingest
+
+# Always use environment variables for credentials - NEVER hardcode API keys
+arzule_ingest.init(
+    api_key=os.environ["ARZULE_API_KEY"],
+    tenant_id=os.environ["ARZULE_TENANT_ID"],
+    project_id=os.environ["ARZULE_PROJECT_ID"],
+)
+```
+
+> **Security Note:** Never hardcode API keys in source code. Use environment variables or a secrets manager.
+
+## Framework-Specific Usage
+
+### CrewAI
+
+```python
+from arzule_ingest import ArzuleRun
+from arzule_ingest.sinks import JsonlFileSink
+from arzule_ingest.crewai import instrument_crewai
+
+# Instrument CrewAI (call once at startup)
+instrument_crewai()
+
+# Run your crew inside an ArzuleRun context
+sink = JsonlFileSink("traces/output.jsonl")
+with ArzuleRun(tenant_id="...", project_id="...", sink=sink) as run:
+    result = crew.kickoff(inputs={...})
+```
+
+### LangChain / LangGraph
+
+```python
+from arzule_ingest import ArzuleRun
+from arzule_ingest.sinks import JsonlFileSink
+from arzule_ingest.langchain import instrument_langchain
+
+# Instrument LangChain and get the callback handler
+handler = instrument_langchain()
+
+# Use the handler with your chains/agents
+sink = JsonlFileSink("traces/output.jsonl")
+with ArzuleRun(tenant_id="...", project_id="...", sink=sink) as run:
+    # Pass handler to invoke()
+    result = chain.invoke({"input": "..."}, config={"callbacks": [handler]})
+    
+    # Or use with agents
+    result = agent.invoke({"input": "..."}, config={"callbacks": [handler]})
+```
+
+### Microsoft AutoGen (Legacy v0.2)
+
+```python
+from arzule_ingest import ArzuleRun
+from arzule_ingest.sinks import JsonlFileSink
+from arzule_ingest.autogen import instrument_autogen
+from autogen import AssistantAgent, UserProxyAgent
+
+# Instrument AutoGen v0.2 (call once at startup)
+instrument_autogen()
+
+# Create your agents
+assistant = AssistantAgent("assistant", llm_config={...})
+user_proxy = UserProxyAgent("user_proxy", ...)
+
+# Run inside an ArzuleRun context
+sink = JsonlFileSink("traces/output.jsonl")
+with ArzuleRun(tenant_id="...", project_id="...", sink=sink) as run:
+    user_proxy.initiate_chat(assistant, message="Hello!")
+```
+
+### Microsoft AutoGen v0.7+ (New Architecture)
+
+```python
+import asyncio
+import arzule_ingest
+
+# Initialize (automatically detects and instruments v0.7+)
+arzule_ingest.init()
+
+from autogen_agentchat.agents import AssistantAgent
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+
+async def main():
+    model_client = OpenAIChatCompletionClient(model="gpt-4o-mini")
+    agent = AssistantAgent("assistant", model_client=model_client)
+    
+    # Run task - automatically traced
+    result = await agent.run(task="What is 2 + 2?")
+    print(result.messages[-1].to_text())
+    
+    await model_client.close()
+
+asyncio.run(main())
+```
+
+**Note:** The SDK automatically detects which version of AutoGen you have installed. For detailed AutoGen v0.7+ documentation, see [AUTOGEN_V2_INTEGRATION.md](AUTOGEN_V2_INTEGRATION.md).
+
+### Claude Code
+
+Capture traces from Claude Code CLI sessions with full observability.
+
+#### Quick Start (Recommended)
+
+Use the `arzule-claude` wrapper for complete observability (hooks + OTel metrics):
+
+```bash
+# Instead of running:
+$ claude "your prompt"
+
+# Run:
+$ arzule-claude "your prompt"
+
+# All arguments pass through:
+$ arzule-claude --model opus "your prompt"
+```
+
+This captures:
+- **Hooks data**: Session events, tool calls, user prompts, subagent activity
+- **OTel metrics**: Token usage, costs, latency, cache metrics
+
+#### Installation
+
+```bash
+# Install the SDK
+pip install arzule-ingest
+
+# Configure credentials (one-time setup)
+arzule configure
+```
+
+#### Alternative: Hooks-Only Installation
+
+If you prefer to use the regular `claude` command with just hooks (no OTel metrics):
+
+```bash
+# Install hooks into Claude Code settings
+arzule-claude-install install
+
+# Check installation status
+arzule-claude-install status
+
+# Uninstall hooks
+arzule-claude-install uninstall
+```
+
+#### What Gets Captured
+
+| Data Type | `arzule-claude` | Hooks-only |
+|-----------|-----------------|------------|
+| Session start/end | ✅ | ✅ |
+| User prompts | ✅ | ✅ |
+| Tool calls (pre/post) | ✅ | ✅ |
+| Subagent activity | ✅ | ✅ |
+| Token usage | ✅ | ❌ |
+| Costs | ✅ | ❌ |
+| Latency metrics | ✅ | ❌ |
+
+#### Configuration
+
+The wrapper reads configuration from `~/.arzule/config` (created by `arzule configure`) or environment variables:
+
+```bash
+export ARZULE_API_KEY="your-api-key"
+export ARZULE_TENANT_ID="your-tenant-id"
+export ARZULE_PROJECT_ID="your-project-id"
+```
+
+## What Gets Captured
+
+The SDK automatically captures framework-specific events:
+
+### All Frameworks
+- **Run lifecycle** - `run.start`, `run.end`
+- **LLM calls** - `llm.call.start`, `llm.call.end`
+- **Tool calls** - `tool.call.start`, `tool.call.end`
+
+### CrewAI
+- **Crew execution** - `crew.kickoff.start`, `crew.kickoff.complete`
+- **Agent activity** - `agent.execution.start`, `agent.execution.complete`
+- **Task progress** - `task.start`, `task.complete`, `task.failed`
+- **Handoffs** - `handoff.proposed`, `handoff.ack`, `handoff.complete`
+
+### LangChain
+- **Chain execution** - `chain.start`, `chain.end`, `chain.error`
+- **Agent actions** - `agent.action`, `agent.finish`
+- **Retriever calls** - `retriever.start`, `retriever.end`
+
+### AutoGen (v0.2 and v0.7+)
+- **Messages** - `agent.message.send`, `agent.message.receive`
+- **Agent lifecycle** - `agent.start`, `agent.end`
+- **Conversations** - `conversation.start`, `conversation.end`
+- **Code execution** - `code.execution` (v0.2 only)
+- **Handoffs** - `handoff.proposed`, `handoff.ack`, `handoff.complete`
+- **Agent events** - `agent.event` (v0.7+ only)
+
+### Claude Code
+- **Sessions** - `session.start`, `session.end`
+- **Turns** - `turn.start`, `turn.end`
+- **Tool calls** - `tool.call.start`, `tool.call.end`
+- **Subagents** - `subagent.start`, `subagent.stop`
+- **User prompts** - `user.prompt.submit`
+- **Notifications** - `notification`
+
+## TraceEvent Format
+
+Each event follows the `trace_event.v0_1` schema:
+
+```json
+{
+  "schema_version": "trace_event.v0_1",
+  "run_id": "uuid",
+  "tenant_id": "uuid",
+  "project_id": "uuid",
+  "trace_id": "32hex",
+  "span_id": "16hex",
+  "parent_span_id": "16hex|null",
+  "seq": 123,
+  "ts": "2025-12-24T07:12:03.123Z",
+  "agent": { "id": "crewai:role:Writer", "role": "Writer" },
+  "workstream_id": null,
+  "task_id": null,
+  "event_type": "tool.call.start",
+  "status": "ok|error|blocked|null",
+  "summary": "short description",
+  "attrs_compact": { "tool_name": "Search" },
+  "payload": {},
+  "raw_ref": { "storage": "inline" }
+}
+```
+
+## Instrumentation Modes
+
+All integrations support two modes:
+
+```python
+# Full instrumentation (default)
+instrument_crewai(mode="global")
+instrument_langchain(mode="global")
+instrument_autogen(mode="global")
+
+# Minimal instrumentation (lifecycle events only)
+instrument_crewai(mode="minimal")
+instrument_langchain(mode="minimal")
+instrument_autogen(mode="minimal")
+```
+
+## CLI
+
+View trace files locally:
+
+```bash
+# Timeline view
+arzule view traces/output.jsonl
+
+# Table format
+arzule view traces/output.jsonl -f table
+
+# JSON output
+arzule view traces/output.jsonl -f json
+
+# Statistics
+arzule stats traces/output.jsonl
+```
+
+## Configuration
+
+| Environment Variable | Description | Default |
+|---------------------|-------------|---------|
+| `ARZULE_API_KEY` | API key for authentication | Required |
+| `ARZULE_TENANT_ID` | Your tenant ID | Required |
+| `ARZULE_PROJECT_ID` | Your project ID | Required |
+| `ARZULE_INGEST_URL` | Ingest endpoint URL | Arzule Cloud |
+| `ARZULE_BATCH_SIZE` | Events per batch | 100 |
+| `ARZULE_REDACT_PII` | Redact PII in payloads | true |
+
+## PII Redaction
+
+The SDK automatically redacts sensitive data from trace payloads:
+
+- API keys and tokens
+- Passwords and secrets
+- Email addresses
+- Phone numbers
+- Credit card numbers
+- SSNs and other PII patterns
+
+To disable (not recommended for production):
+```bash
+export ARZULE_REDACT_PII=false
+```
+
+## License
+
+Apache 2.0 - See [LICENSE](LICENSE) file for details.

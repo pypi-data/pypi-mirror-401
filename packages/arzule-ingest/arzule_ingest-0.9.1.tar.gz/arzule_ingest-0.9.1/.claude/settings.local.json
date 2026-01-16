@@ -1,0 +1,126 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} bash -c 'echo \"\"\"\"=== {} ===\"\"\"\" && ls -la {} | head -20')",
+      "Bash(wc:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(python3:*)",
+      "Bash(PYTHONPATH=src python:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m build:*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "Bash(npx tsc:*)",
+      "Bash(python -c:*)",
+      "Bash(uv add:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(pipx list:*)",
+      "Bash(uv build:*)",
+      "Bash(defaults read:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v arzule-hook >/dev/null 2>&1 && arzule-hook || uvx arzule-ingest hook"
+          }
+        ]
+      }
+    ]
+  }
+}
