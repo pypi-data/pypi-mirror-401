@@ -1,0 +1,78 @@
+# Zi MCP Server
+
+Connect AI agents like Claude Code to [Zi](https://ziai.chat) - your AI companion for life guidance.
+
+## Installation
+
+```bash
+# Using uvx (recommended)
+uvx zi-mcp
+
+# Or install with pip
+pip install zi-mcp
+```
+
+## Setup
+
+1. **Get your API key** from [ziai.chat/settings](https://ziai.chat/settings)
+
+2. **Configure Claude Code** - Add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "zi": {
+      "command": "uvx",
+      "args": ["zi-mcp"],
+      "env": {
+        "ZI_API_KEY": "zi_your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+3. **Restart Claude Code** and start chatting with Zi!
+
+## Usage
+
+Once configured, you can ask Claude to interact with Zi:
+
+- "Ask Zi about my career direction"
+- "Talk to Zi about work-life balance"
+- "Continue my conversation with Zi about relationships"
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `zi_chat` | Send a message to Zi, optionally continuing an existing thread |
+| `zi_list_threads` | List all your conversation threads |
+| `zi_get_thread` | Get the history of a specific thread |
+| `zi_create_thread` | Create a new conversation thread |
+| `zi_delete_thread` | Delete a conversation thread |
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ZI_API_KEY` | Yes | Your Zi API key |
+| `ZI_API_URL` | No | Custom API URL (default: https://api.ziai.chat) |
+
+## Development
+
+```bash
+# Clone the repo
+git clone https://github.com/bigsmall-jsc/zi.git
+cd zi/zi-mcp
+
+# Install in development mode
+pip install -e .
+
+# Run locally
+ZI_API_KEY=your_key python -m zi_mcp.server
+```
+
+## License
+
+MIT
