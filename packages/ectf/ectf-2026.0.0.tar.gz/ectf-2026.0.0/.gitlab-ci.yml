@@ -1,0 +1,10 @@
+image: ghcr.io/astral-sh/uv:debian
+
+test:
+  stage: test
+  script:
+    - wget https://gitlab.mitre.org/mitre-scripts/mitre-pki/raw/master/normalized/mitre-chain.txt
+      -O /usr/local/share/ca-certificates/mitre-chain.pem
+      && update-ca-certificates && git config --global http.sslCAInfo /usr/local/share/ca-certificates/mitre-chain.pem
+      && git config --global https.sslCAInfo /usr/local/share/ca-certificates/mitre-chain.pem
+    - uv --native-tls --allow-insecure-host github.com --allow-insecure-host files.pythonhosted.org --allow-insecure-host pypi.org run pre-commit run --all

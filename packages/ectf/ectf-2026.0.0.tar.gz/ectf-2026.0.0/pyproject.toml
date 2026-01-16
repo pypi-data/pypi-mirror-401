@@ -1,0 +1,55 @@
+[project]
+name = "ectf"
+version = "2026.0.0"
+description = "Tools for eCTF competitors"
+readme = "README.md"
+authors = [
+    { name = "Ben Janis", email = "btjanis@mitre.org" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "arrow>=1.3.0",
+    "attrs>=25.3.0",
+    "loguru>=0.7.3",
+    "pyserial>=3.5",
+    "pyyaml>=6.0.2",
+    "requests>=2.32.5",
+    "rich>=14.1.0",
+    "tqdm>=4.67.1",
+    "typer>=0.16.1",
+]
+
+[project.scripts]
+ectf = "ectf.cli:app"
+update = "ectf.hw.fthr:update"
+unlock = "ectf.hw.fthr:unlock"
+bootinfo = "ectf.tools.utils.bootinfo:main"
+flash = "ectf.tools.utils.flash:main"
+list = "ectf.tools.hsm.list:main"
+read = "ectf.tools.hsm.read:main"
+write = "ectf.tools.hsm.write:main"
+listen = "ectf.tools.hsm.listen:main"
+interrogate = "ectf.tools.hsm.interrogate:main"
+receive = "ectf.tools.hsm.receive:main"
+pack = "ectf.tools.utils.pack:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "isort>=6.0.1",
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.8",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["ERA001","T201","S603","PERF401","S101","PLR0912","C901","COM812","D415","D400","D203","D213","TD002","TD003","TD004","FIX002"]
+
+[tool.ruff.lint.flake8-annotations]
+mypy-init-return = true
+
+[tool.ruff.format]
+indent-style = "space"
