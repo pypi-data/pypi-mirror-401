@@ -1,0 +1,33 @@
+Metadata-Version: 2.4
+Name: zeekr_ev_api
+Version: 0.1.8
+Summary: 
+License-File: LICENSE
+Author: Fry
+Author-email: fryx0r@gmail.com
+Requires-Python: >=3.10
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Dist: pycryptodome (>=3.23.0,<4.0.0)
+Requires-Dist: requests (>=2.32.5,<3.0.0)
+Description-Content-Type: text/markdown
+
+# zeekr_ev_api
+
+API for interacting with Zeekr EVs
+
+It is highly recommended to create a _new Zeekr account_ and share the car with it, otherwise you will be logged out from the phone app whenever you call the API.
+
+Some values are required to call this API in addition to the username and password including:
+
+* HMAC Access Key
+* HMAC Secret Key
+* Password encryption public key
+* VIN encryption key and IV
+
+Extracting these values are left to the user and will not be provided.
+
