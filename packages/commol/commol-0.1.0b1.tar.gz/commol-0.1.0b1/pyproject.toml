@@ -1,0 +1,122 @@
+[project]
+name = "commol"
+dynamic = ["version"]
+description = "A high-performance compartment modelling library in Rust and Python."
+authors = [
+    {name = "Rafael J. Villanueva Micó", email = "rjvillan@imm.upv.es"},
+    {name = "Carlos Andreu Vilarroig", email = "caranvi1@upv.es"},
+    {name = "David Martínez Rodríguez", email = "damarro3@upv.es"},
+]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.12.0"
+
+dependencies = [
+    "cffi (>=2.0,<3.0)",
+    "numpy (>=2.4.0,<3.0)",
+    "pint (>=0.25.2,<0.26.0)",
+    "pydantic (>=2.0,<3.0)",
+    "scikit-learn (>=1.8,<2.0)",
+    "seaborn (>=0.13.2,<0.14.0)",
+]
+
+[project.optional-dependencies]
+dev = [
+    "maturin (>=1.9.1,<1.10.0)",
+    "pre-commit (>=3.8,<4.0)",
+    "pytest (>=8.4,<9.0)",
+    "pytest-cov (>=6.2,<7.0)",
+    "ruff (>=0.12,<0.13)",
+    "twine (>=6.2.0,<7.0.0)",
+    "ty (>=0.0.9,<0.0.10)",
+    "vulture (>=2.14,<3.0)",
+]
+docs = [
+    "mike>=2.0,<3.0",
+    "mkdocs>=1.6,<2.0",
+    "mkdocstrings[python]>=0.26,<1.0",
+    "mkdocs-autorefs>=1.2,<2.0",
+    "mkdocs-material>=9.5,<10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/MUNQU/commol"
+Documentation = "https://munqu.github.io/commol"
+Repository = "https://github.com/MUNQU/commol"
+"Bug Tracker" = "https://github.com/MUNQU/commol/issues"
+
+# Poetry-specific configuration
+[tool.poetry]
+version = "0.0.0"  # Placeholder for Poetry compatibility - maturin uses dynamic version from Cargo.toml
+packages = [{include = "commol"}]
+requires-poetry = ">=2.2"
+
+# Build system
+[build-system]
+requires = ["maturin>=1.9.1,<1.10.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+python-source = "commol"
+manifest-path = "py-commol/Cargo.toml"
+
+# Testing configuration
+[tool.pytest]
+log_cli_format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "--log-cli-level=WARN"
+
+# Linting and formatting
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    ".zed",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "target",
+    ".vulture_allowlist.py",
+]
+
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E", "F", "C90", "ARG", "ERA", "B007"]
+fixable = ["ALL"]
+unfixable = []
+ignore = [
+    "ERA001",  # Allow explanatory comments that look like commented code
+]
+
+[tool.ruff.format]
+indent-style = "space"
+docstring-code-format = true
+skip-magic-trailing-comma = false
+
+[tool.ty.src]
+exclude = [".vulture_allowlist.py"]

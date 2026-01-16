@@ -1,0 +1,19 @@
+[package]
+name = "commol"
+version = "0.1.0-beta.1"
+edition = "2024"
+readme = "README.md"
+
+[lib]
+name = "commol_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { workspace = true }
+serde_json = "1.0"
+commol-core = { path = "../crates/commol-core" }
+commol-difference = { path = "../crates/commol-difference" }
+commol-calibration = { path = "../crates/commol-calibration" }
+
+# Required for custom argmin observer
+argmin = { git = "https://github.com/MUNQU/argmin", branch = "development" }
