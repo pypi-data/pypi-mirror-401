@@ -1,0 +1,65 @@
+Metadata-Version: 2.3
+Name: rainpy
+Version: 0.1.1
+Summary: 
+Author: zmdsn
+Author-email: zmdsn <zmdsn@126.com>
+License: BSD-3-Clause
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: chardet>=5.2.0 ; extra == 'ts'
+Requires-Dist: diskcache>=5.6.3 ; extra == 'ts'
+Requires-Dist: jsonlines>=4.0.0 ; extra == 'ts'
+Requires-Dist: pandas>=2.3.3 ; extra == 'ts'
+Requires-Dist: pyod>=2.0.5 ; extra == 'ts'
+Requires-Dist: pytest>=8.4.2 ; extra == 'ts'
+Requires-Python: >=3.9
+Provides-Extra: all
+Provides-Extra: dev
+Provides-Extra: log
+Provides-Extra: ts
+Description-Content-Type: text/markdown
+
+# rainpy
+![](https://img.shields.io/badge/rainpy-base-blue?logo=N&labelColor=white)
+![](https://img.shields.io/badge/License-BSD-blue?logo=N&labelColor=white)
+
+
+For the Scientific Research to test problems.
+
+## easy to read or save file 
+
+### easy to read a file
+
+> rainpy.read(file_path, *args, *kwargs)
+
+### easy to write a file
+
+> rainpy.save(file_path, *args, *kwargs)
+or
+> rainpy.write(file_path, *args, *kwargs)
+
+
+## easy to start a project
+
+> rainpy -n example -a zmdsn -e zmdsn@126.com
+
+## easy to run a python function with file
+
+> def func(data):
+>     data['base'] = "rainpy base"
+>     return data
+
+> rainpy --run func.py --file ./test.json --save ./result.json
+
+or
+
+> @rainpy(from="./test.json", to="./result.json")
+> def func(data):
+>     data['base'] = "rainpy base"
+>     return data
+
+
+# log
+> uv add rainpy[log]
+
+set_logger(name="app")
