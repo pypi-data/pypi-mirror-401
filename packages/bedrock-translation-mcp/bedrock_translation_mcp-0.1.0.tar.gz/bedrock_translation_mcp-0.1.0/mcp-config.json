@@ -1,0 +1,158 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/mcp-config.json",
+  "description": "MCP server configuration template for Translation Power. Replace placeholder values with your actual AWS credentials or use environment variables.",
+  
+  "mcpServers": {
+    "translation-power": {
+      "command": "python",
+      "args": [
+        "-m",
+        "src.server"
+      ],
+      "cwd": "${workspaceFolder}/translation-power",
+      "env": {
+        "_comment_aws_region": "AWS region where Bedrock is available (e.g., us-east-1, us-west-2, eu-west-1)",
+        "AWS_REGION": "${AWS_REGION:us-east-1}",
+        
+        "_comment_aws_credentials": "AWS credentials - use environment variables or IAM role. Never commit actual credentials!",
+        "AWS_ACCESS_KEY_ID": "${AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${AWS_SECRET_ACCESS_KEY}",
+        
+        "_comment_model": "Bedrock model identifier - Nova Pro is recommended for translation",
+        "MODEL_ID": "${MODEL_ID:amazon.nova-pro-v1:0}",
+        
+        "_comment_logging": "Logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL",
+        "LOG_LEVEL": "${LOG_LEVEL:INFO}",
+        
+        "_comment_retry": "Maximum number of retry attempts for failed API calls",
+        "MAX_RETRIES": "${MAX_RETRIES:3}",
+        
+        "_comment_timeout": "Request timeout in seconds",
+        "TIMEOUT": "${TIMEOUT:30}",
+        
+        "_comment_input_limit": "Maximum input text length in characters",
+        "MAX_INPUT_LENGTH": "${MAX_INPUT_LENGTH:10000}",
+        
+        "_comment_temperature": "Model temperature (0.0-1.0). Lower values = more deterministic translations",
+        "TEMPERATURE": "${TEMPERATURE:0.3}",
+        
+        "_comment_max_tokens": "Maximum tokens in model response",
+        "MAX_TOKENS": "${MAX_TOKENS:2000}",
+        
+        "_comment_default_langs": "Default source and target languages (ISO 639-1 codes)",
+        "DEFAULT_SOURCE_LANG": "${DEFAULT_SOURCE_LANG:auto}",
+        "DEFAULT_TARGET_LANG": "${DEFAULT_TARGET_LANG:en}"
+      },
+      
+      "_comment_disabled": "Set to true to disable this MCP server without removing the configuration",
+      "disabled": false,
+      
+      "_comment_autoApprove": "List of tool names that don't require user approval (e.g., ['translate', 'get_sample_code'])",
+      "autoApprove": []
+    }
+  },
+  
+  "_configuration_reference": {
+    "_comment": "This section documents available configuration options. Remove this section when deploying.",
+    
+    "server_options": {
+      "host": "localhost (default)",
+      "port": "8080 (default)",
+      "log_level": "INFO (default) | DEBUG | WARNING | ERROR | CRITICAL"
+    },
+    
+    "aws_options": {
+      "region": "us-east-1 (default) | us-west-2 | eu-west-1 | ap-southeast-1 | etc.",
+      "model_id": "amazon.nova-pro-v1:0 (default) | other Bedrock model IDs",
+      "max_retries": "3 (default) - Number of retry attempts for transient failures",
+      "timeout": "30 (default) - Request timeout in seconds"
+    },
+    
+    "translation_options": {
+      "default_source_lang": "auto (default) - Automatic language detection | ISO 639-1 code",
+      "default_target_lang": "en (default) - ISO 639-1 language code",
+      "max_input_length": "10000 (default) - Maximum characters in input text",
+      "temperature": "0.3 (default) - Range: 0.0 to 1.0. Lower = more deterministic",
+      "max_tokens": "2000 (default) - Maximum tokens in model response"
+    },
+    
+    "supported_languages": [
+      "en (English)",
+      "es (Spanish)",
+      "fr (French)",
+      "de (German)",
+      "it (Italian)",
+      "pt (Portuguese)",
+      "zh (Chinese)",
+      "ja (Japanese)",
+      "ko (Korean)",
+      "ar (Arabic)",
+      "ru (Russian)",
+      "and many more ISO 639-1 codes"
+    ],
+    
+    "environment_variable_syntax": {
+      "description": "Use ${VAR_NAME} to reference environment variables",
+      "with_default": "${VAR_NAME:default_value} - Uses default_value if VAR_NAME is not set",
+      "without_default": "${VAR_NAME} - Required, will fail if not set"
+    }
+  },
+  
+  "_setup_instructions": {
+    "_comment": "Quick setup guide. Remove this section when deploying.",
+    
+    "step_1": "Set environment variables or replace placeholders with actual values",
+    "step_2": "Ensure AWS credentials have bedrock:InvokeModel permission",
+    "step_3": "Verify Python 3.9+ is installed: python --version",
+    "step_4": "Install dependencies: pip install -r requirements.txt",
+    "step_5": "Copy this file to .kiro/settings/mcp.json (or workspace-specific location)",
+    "step_6": "Restart Kiro or reload MCP servers",
+    "step_7": "Verify server status in Kiro's MCP Server panel",
+    
+    "aws_credential_options": {
+      "option_1": "Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)",
+      "option_2": "AWS credentials file (~/.aws/credentials)",
+      "option_3": "IAM role (for EC2 instances)",
+      "option_4": "AWS SSO",
+      "recommended": "Use environment variables or IAM roles. Never commit credentials to version control!"
+    },
+    
+    "testing_setup": {
+      "test_credentials": "aws bedrock list-foundation-models --region us-east-1",
+      "test_server": "python -m src.server (should start without errors)",
+      "test_translation": "Use Kiro to invoke the 'translate' tool with sample text"
+    }
+  },
+  
+  "_troubleshooting": {
+    "_comment": "Common issues and solutions. Remove this section when deploying.",
+    
+    "server_wont_start": [
+      "Check Python version (requires 3.9+)",
+      "Verify all dependencies are installed",
+      "Check AWS credentials are valid",
+      "Review server logs for detailed errors"
+    ],
+    
+    "authentication_errors": [
+      "Verify AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are set",
+      "Check IAM permissions include bedrock:InvokeModel",
+      "Ensure credentials are not expired",
+      "Test with: aws bedrock list-foundation-models"
+    ],
+    
+    "translation_fails": [
+      "Verify Bedrock access is enabled in your AWS account",
+      "Check Nova Pro model is available in your region",
+      "Ensure input text is within MAX_INPUT_LENGTH",
+      "Review AWS Bedrock service quotas"
+    ],
+    
+    "performance_issues": [
+      "Enable streaming for large texts (stream: true)",
+      "Increase TIMEOUT for large documents",
+      "Use AWS region closer to your location",
+      "Check AWS Bedrock rate limits"
+    ]
+  }
+}

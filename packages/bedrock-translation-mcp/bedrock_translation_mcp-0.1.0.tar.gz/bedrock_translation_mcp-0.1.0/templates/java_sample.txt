@@ -1,0 +1,114 @@
+// Java Sample Code for Translation Power Integration
+// This example demonstrates how to use the Translation Power MCP server from Java
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import org.json.JSONObject;
+
+public class TranslationClient {
+    
+    // MCP server endpoint configuration
+    private static final String MCP_SERVER_URL = "http://localhost:8080";
+    private final HttpClient httpClient;
+    
+    public TranslationClient() {
+        this.httpClient = HttpClient.newHttpClient();
+    }
+    
+    /**
+     * Translate text using the Translation Power MCP server
+     * 
+     * @param text The text to translate
+     * @param targetLang The target language code (e.g., "es", "fr", "de")
+     * @param sourceLang Optional source language (null for auto-detect)
+     * @return The translated text
+     */
+    public String translate(String text, String targetLang, String sourceLang) throws Exception {
+        // Build the MCP request payload
+        JSONObject payload = new JSONObject();
+        payload.put("tool", "translate");
+        
+        JSONObject params = new JSONObject();
+        params.put("input", text);
+        params.put("target_lang", targetLang);
+        params.put("is_file", false);
+        if (sourceLang != null) {
+            params.put("source_lang", sourceLang);
+        }
+        payload.put("params", params);
+        
+        // Send HTTP POST request to MCP server
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(MCP_SERVER_URL + "/invoke"))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+            .build();
+        
+        // Get response from server
+        HttpResponse<String> response = httpClient.send(request, 
+            HttpResponse.BodyHandlers.ofString());
+        
+        // Parse the response and extract translated text
+        JSONObject result = new JSONObject(response.body());
+        return result.getString("translated_text");
+    }
+    
+    /**
+     * Translate text from a file
+     * 
+     * @param filePath Path to the file containing text to translate
+     * @param targetLang The target language code
+     * @return The translated text
+     */
+    public String translateFile(String filePath, String targetLang) throws Exception {
+        // Build the MCP request payload for file translation
+        JSONObject payload = new JSONObject();
+        payload.put("tool", "translate");
+        
+        JSONObject params = new JSONObject();
+        params.put("input", filePath);
+        params.put("target_lang", targetLang);
+        params.put("is_file", true);  // Indicate this is a file path
+        payload.put("params", params);
+        
+        // Send request and get response
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(MCP_SERVER_URL + "/invoke"))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+            .build();
+        
+        HttpResponse<String> response = httpClient.send(request, 
+            HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject result = new JSONObject(response.body());
+        return result.getString("translated_text");
+    }
+    
+    // Example usage
+    public static void main(String[] args) {
+        try {
+            TranslationClient client = new TranslationClient();
+            
+            // Example 1: Translate plain text
+            String translatedText = client.translate(
+                "Hello, world!", 
+                "es",  // Spanish
+                null   // Auto-detect source language
+            );
+            System.out.println("Translated: " + translatedText);
+            
+            // Example 2: Translate from file
+            String translatedFromFile = client.translateFile(
+                "/path/to/document.txt",
+                "fr"  // French
+            );
+            System.out.println("Translated from file: " + translatedFromFile);
+            
+        } catch (Exception e) {
+            System.err.println("Translation error: " + e.getMessage());
+        }
+    }
+}

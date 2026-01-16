@@ -1,0 +1,186 @@
+"""
+Python Sample Code for Translation Power Integration
+
+This example demonstrates how to use the Translation Power MCP server from Python.
+"""
+
+import requests
+import json
+from typing import Optional
+
+
+class TranslationClient:
+    """Client for interacting with the Translation Power MCP server"""
+    
+    def __init__(self, server_url: str = "http://localhost:8080"):
+        """
+        Initialize the translation client
+        
+        Args:
+            server_url: The MCP server endpoint URL
+        """
+        self.server_url = server_url
+        self.session = requests.Session()
+    
+    def translate(
+        self, 
+        text: str, 
+        target_lang: str, 
+        source_lang: Optional[str] = None,
+        stream: bool = False
+    ) -> str:
+        """
+        Translate text using the Translation Power MCP server
+        
+        Args:
+            text: The text to translate
+            target_lang: Target language code (e.g., "es", "fr", "de")
+            source_lang: Optional source language (None for auto-detect)
+            stream: Whether to use streaming response
+            
+        Returns:
+            The translated text
+        """
+        # Build the MCP request payload
+        payload = {
+            "tool": "translate",
+            "params": {
+                "input": text,
+                "target_lang": target_lang,
+                "is_file": False,
+                "stream": stream
+            }
+        }
+        
+        # Add source language if provided
+        if source_lang:
+            payload["params"]["source_lang"] = source_lang
+        
+        # Send HTTP POST request to MCP server
+        response = self.session.post(
+            f"{self.server_url}/invoke",
+            json=payload,
+            headers={"Content-Type": "application/json"}
+        )
+        
+        # Check for errors
+        response.raise_for_status()
+        
+        # Parse and return the translated text
+        result = response.json()
+        return result["translated_text"]
+    
+    def translate_file(
+        self, 
+        file_path: str, 
+        target_lang: str,
+        source_lang: Optional[str] = None
+    ) -> str:
+        """
+        Translate text from a file
+        
+        Args:
+            file_path: Path to the file containing text to translate
+            target_lang: Target language code
+            source_lang: Optional source language (None for auto-detect)
+            
+        Returns:
+            The translated text
+        """
+        # Build the MCP request payload for file translation
+        payload = {
+            "tool": "translate",
+            "params": {
+                "input": file_path,
+                "target_lang": target_lang,
+                "is_file": True  # Indicate this is a file path
+            }
+        }
+        
+        if source_lang:
+            payload["params"]["source_lang"] = source_lang
+        
+        # Send request and get response
+        response = self.session.post(
+            f"{self.server_url}/invoke",
+            json=payload,
+            headers={"Content-Type": "application/json"}
+        )
+        
+        response.raise_for_status()
+        result = response.json()
+        return result["translated_text"]
+    
+    def translate_streaming(self, text: str, target_lang: str):
+        """
+        Translate text with streaming response
+        
+        Args:
+            text: The text to translate
+            target_lang: Target language code
+            
+        Yields:
+            Translation chunks as they arrive
+        """
+        # Build streaming request payload
+        payload = {
+            "tool": "translate",
+            "params": {
+                "input": text,
+                "target_lang": target_lang,
+                "is_file": False,
+                "stream": True
+            }
+        }
+        
+        # Send request with streaming enabled
+        response = self.session.post(
+            f"{self.server_url}/invoke",
+            json=payload,
+            headers={"Content-Type": "application/json"},
+            stream=True
+        )
+        
+        response.raise_for_status()
+        
+        # Yield chunks as they arrive
+        for line in response.iter_lines():
+            if line:
+                chunk_data = json.loads(line)
+                yield chunk_data["chunk"]
+                if chunk_data.get("is_complete", False):
+                    break
+
+
+# Example usage
+if __name__ == "__main__":
+    # Create client instance
+    client = TranslationClient()
+    
+    try:
+        # Example 1: Translate plain text
+        translated = client.translate(
+            text="Hello, world!",
+            target_lang="es",  # Spanish
+            source_lang=None   # Auto-detect
+        )
+        print(f"Translated: {translated}")
+        
+        # Example 2: Translate from file
+        translated_file = client.translate_file(
+            file_path="/path/to/document.txt",
+            target_lang="fr"  # French
+        )
+        print(f"Translated from file: {translated_file}")
+        
+        # Example 3: Streaming translation
+        print("Streaming translation:")
+        for chunk in client.translate_streaming(
+            text="This is a longer text that will be translated in chunks.",
+            target_lang="de"  # German
+        ):
+            print(chunk, end="", flush=True)
+        print()  # New line after streaming
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Translation error: {e}")

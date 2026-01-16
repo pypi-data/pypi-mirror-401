@@ -1,0 +1,187 @@
+/**
+ * Node.js Sample Code for Translation Power Integration
+ * 
+ * This example demonstrates how to use the Translation Power MCP server from Node.js.
+ */
+
+const axios = require('axios');
+
+/**
+ * Client for interacting with the Translation Power MCP server
+ */
+class TranslationClient {
+    /**
+     * Initialize the translation client
+     * 
+     * @param {string} serverUrl - The MCP server endpoint URL
+     */
+    constructor(serverUrl = 'http://localhost:8080') {
+        this.serverUrl = serverUrl;
+        this.client = axios.create({
+            baseURL: serverUrl,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
+    /**
+     * Translate text using the Translation Power MCP server
+     * 
+     * @param {string} text - The text to translate
+     * @param {string} targetLang - Target language code (e.g., "es", "fr", "de")
+     * @param {string|null} sourceLang - Optional source language (null for auto-detect)
+     * @param {boolean} stream - Whether to use streaming response
+     * @returns {Promise<string>} The translated text
+     */
+    async translate(text, targetLang, sourceLang = null, stream = false) {
+        // Build the MCP request payload
+        const payload = {
+            tool: 'translate',
+            params: {
+                input: text,
+                target_lang: targetLang,
+                is_file: false,
+                stream: stream
+            }
+        };
+
+        // Add source language if provided
+        if (sourceLang) {
+            payload.params.source_lang = sourceLang;
+        }
+
+        try {
+            // Send HTTP POST request to MCP server
+            const response = await this.client.post('/invoke', payload);
+            
+            // Return the translated text
+            return response.data.translated_text;
+        } catch (error) {
+            throw new Error(`Translation failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Translate text from a file
+     * 
+     * @param {string} filePath - Path to the file containing text to translate
+     * @param {string} targetLang - Target language code
+     * @param {string|null} sourceLang - Optional source language (null for auto-detect)
+     * @returns {Promise<string>} The translated text
+     */
+    async translateFile(filePath, targetLang, sourceLang = null) {
+        // Build the MCP request payload for file translation
+        const payload = {
+            tool: 'translate',
+            params: {
+                input: filePath,
+                target_lang: targetLang,
+                is_file: true  // Indicate this is a file path
+            }
+        };
+
+        if (sourceLang) {
+            payload.params.source_lang = sourceLang;
+        }
+
+        try {
+            // Send request and get response
+            const response = await this.client.post('/invoke', payload);
+            return response.data.translated_text;
+        } catch (error) {
+            throw new Error(`File translation failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Translate text with streaming response
+     * 
+     * @param {string} text - The text to translate
+     * @param {string} targetLang - Target language code
+     * @param {function} onChunk - Callback function for each chunk
+     * @returns {Promise<void>}
+     */
+    async translateStreaming(text, targetLang, onChunk) {
+        // Build streaming request payload
+        const payload = {
+            tool: 'translate',
+            params: {
+                input: text,
+                target_lang: targetLang,
+                is_file: false,
+                stream: true
+            }
+        };
+
+        try {
+            // Send request with streaming enabled
+            const response = await this.client.post('/invoke', payload, {
+                responseType: 'stream'
+            });
+
+            // Process chunks as they arrive
+            response.data.on('data', (chunk) => {
+                const chunkData = JSON.parse(chunk.toString());
+                onChunk(chunkData.chunk);
+                
+                if (chunkData.is_complete) {
+                    response.data.destroy();
+                }
+            });
+
+            // Handle stream completion
+            return new Promise((resolve, reject) => {
+                response.data.on('end', resolve);
+                response.data.on('error', reject);
+            });
+        } catch (error) {
+            throw new Error(`Streaming translation failed: ${error.message}`);
+        }
+    }
+}
+
+// Example usage
+async function main() {
+    // Create client instance
+    const client = new TranslationClient();
+
+    try {
+        // Example 1: Translate plain text
+        const translated = await client.translate(
+            'Hello, world!',
+            'es',  // Spanish
+            null   // Auto-detect source language
+        );
+        console.log('Translated:', translated);
+
+        // Example 2: Translate from file
+        const translatedFile = await client.translateFile(
+            '/path/to/document.txt',
+            'fr'  // French
+        );
+        console.log('Translated from file:', translatedFile);
+
+        // Example 3: Streaming translation
+        console.log('Streaming translation:');
+        await client.translateStreaming(
+            'This is a longer text that will be translated in chunks.',
+            'de',  // German
+            (chunk) => {
+                process.stdout.write(chunk);
+            }
+        );
+        console.log();  // New line after streaming
+
+    } catch (error) {
+        console.error('Translation error:', error.message);
+    }
+}
+
+// Run the example if this file is executed directly
+if (require.main === module) {
+    main();
+}
+
+// Export the client class for use in other modules
+module.exports = TranslationClient;

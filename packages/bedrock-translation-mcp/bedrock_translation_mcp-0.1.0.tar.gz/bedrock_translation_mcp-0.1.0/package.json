@@ -1,0 +1,208 @@
+{
+  "name": "translation-power",
+  "version": "1.0.0",
+  "description": "A Kiro Power that provides text translation capabilities through AWS Bedrock Nova Pro LLM via a custom MCP server. Supports plain text and file-based inputs, streaming responses, and multi-language sample code generation.",
+  "type": "kiro-power",
+  "main": "src/server.py",
+  "keywords": [
+    "kiro-power",
+    "kiro",
+    "translation",
+    "translate",
+    "language",
+    "i18n",
+    "localization",
+    "aws",
+    "bedrock",
+    "nova-pro",
+    "llm",
+    "ai",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "streaming",
+    "code-generation",
+    "sample-code",
+    "java",
+    "python",
+    "nodejs"
+  ],
+  "author": {
+    "name": "Kiro Team",
+    "email": "support@kiro.ai",
+    "url": "https://kiro.ai"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/kiro/translation-power#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kiro/translation-power.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kiro/translation-power/issues",
+    "email": "support@kiro.ai"
+  },
+  "kiro": {
+    "powerType": "mcp-server",
+    "displayName": "Translation Power",
+    "category": "AI & Language",
+    "tags": [
+      "translation",
+      "aws-bedrock",
+      "language-processing",
+      "code-generation"
+    ],
+    "mcpServer": {
+      "name": "translation-power",
+      "command": "python",
+      "args": [
+        "-m",
+        "src.server"
+      ],
+      "env": {
+        "AWS_REGION": "${AWS_REGION:us-east-1}",
+        "AWS_ACCESS_KEY_ID": "${AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${AWS_SECRET_ACCESS_KEY}",
+        "MODEL_ID": "${MODEL_ID:amazon.nova-pro-v1:0}",
+        "LOG_LEVEL": "${LOG_LEVEL:INFO}",
+        "MAX_RETRIES": "${MAX_RETRIES:3}",
+        "TIMEOUT": "${TIMEOUT:30}",
+        "MAX_INPUT_LENGTH": "${MAX_INPUT_LENGTH:10000}",
+        "TEMPERATURE": "${TEMPERATURE:0.3}",
+        "MAX_TOKENS": "${MAX_TOKENS:2000}"
+      }
+    },
+    "tools": [
+      {
+        "name": "translate",
+        "description": "Translate text from one language to another using AWS Bedrock Nova Pro",
+        "parameters": {
+          "input": {
+            "type": "string",
+            "required": true,
+            "description": "The text to translate or a file path"
+          },
+          "is_file": {
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "description": "Whether the input is a file path"
+          },
+          "source_lang": {
+            "type": "string",
+            "required": false,
+            "default": "auto",
+            "description": "Source language code (ISO 639-1) or 'auto' for detection"
+          },
+          "target_lang": {
+            "type": "string",
+            "required": true,
+            "description": "Target language code (ISO 639-1)"
+          },
+          "stream": {
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "description": "Enable streaming response"
+          }
+        }
+      },
+      {
+        "name": "get_sample_code",
+        "description": "Generate sample code for integrating the translation service",
+        "parameters": {
+          "language": {
+            "type": "string",
+            "required": true,
+            "enum": ["java", "python", "nodejs"],
+            "description": "Programming language for the sample code"
+          },
+          "include_comments": {
+            "type": "boolean",
+            "required": false,
+            "default": true,
+            "description": "Include explanatory comments in the code"
+          }
+        }
+      }
+    ],
+    "capabilities": [
+      "text-translation",
+      "file-translation",
+      "streaming-responses",
+      "sample-code-generation",
+      "multi-language-support",
+      "aws-bedrock-integration"
+    ],
+    "requiredDependencies": {
+      "python": ">=3.9",
+      "packages": [
+        "boto3>=1.34.0",
+        "mcp>=0.1.0",
+        "hypothesis>=6.92.0",
+        "pytest>=7.4.0"
+      ]
+    },
+    "requiredServices": [
+      {
+        "name": "AWS Bedrock",
+        "description": "Amazon Bedrock with Nova Pro model access",
+        "setupUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html"
+      }
+    ],
+    "configuration": {
+      "required": [
+        "AWS_REGION",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY"
+      ],
+      "optional": [
+        "MODEL_ID",
+        "LOG_LEVEL",
+        "MAX_RETRIES",
+        "TIMEOUT",
+        "MAX_INPUT_LENGTH",
+        "TEMPERATURE",
+        "MAX_TOKENS"
+      ]
+    }
+  },
+  "engines": {
+    "python": ">=3.9",
+    "kiro": ">=1.0.0"
+  },
+  "dependencies": {
+    "boto3": "^1.34.0",
+    "mcp": "^0.1.0"
+  },
+  "devDependencies": {
+    "pytest": "^7.4.0",
+    "pytest-cov": "^4.1.0",
+    "hypothesis": "^6.92.0",
+    "black": "^23.12.0",
+    "flake8": "^6.1.0",
+    "mypy": "^1.7.0"
+  },
+  "scripts": {
+    "start": "python -m src.server",
+    "test": "pytest tests/",
+    "test:verbose": "pytest tests/ -v",
+    "test:coverage": "pytest tests/ --cov=src --cov-report=html",
+    "test:property": "pytest tests/ -k property",
+    "lint": "flake8 src/ tests/",
+    "format": "black src/ tests/",
+    "typecheck": "mypy src/"
+  },
+  "files": [
+    "src/",
+    "templates/",
+    "tests/",
+    "POWER.md",
+    "README.md",
+    "mcp-config.json",
+    "requirements.txt"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
