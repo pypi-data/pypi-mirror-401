@@ -1,0 +1,8 @@
+[console_scripts]
+no-slop-unused-defaults = no_slop.unused_defaults:main
+
+[flake8.extension]
+SLOP = no_slop.flake8_plugin:SlopStyleChecker
+
+[mypy.plugins]
+no_slop = no_slop.mypy_plugin:plugin
