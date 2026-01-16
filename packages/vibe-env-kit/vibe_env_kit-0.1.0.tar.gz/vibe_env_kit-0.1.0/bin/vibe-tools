@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""
+Vibe Tools - 零配置开发环境管理器主入口
+支持 uvx vibe-tools 直接运行
+"""
+
+import sys
+import os
+
+# 添加 src 目录到 Python 路径
+src_path = os.path.join(os.path.dirname(__file__), '..', 'src')
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
+from vibe_tools.cli import main
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,251 @@
+# Vibe Env Kit - Vibe 环境配置工具包
+
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+🛠️ **Vibe 环境配置工具包，一键安装开发环境、编程依赖和工具链**
+
+类似 ZCF (Zero-Config Code Flow)，提供交互式菜单界面，支持各种开发工具的自动安装和配置。
+
+## 🎉 现已支持 uvx！
+
+**Vibe Env Kit 已准备好发布到 PyPI！**
+
+当前使用方式：
+```bash
+# 1. 本地安装（推荐用于测试）
+git clone https://github.com/your-username/vibe-tools.git
+cd vibe-tools
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+vibe-env-kit
+
+# 2. 发布后零配置（目标）
+uvx vibe-env-kit
+```
+
+## 📚 文档中心
+
+### 🎯 快速导航
+
+| 文档 | 适用对象 | 主要内容 |
+|------|----------|----------|
+| [📖 设计理念](docs/DESIGN.md) | 架构师、产品经理 | 设计思路、架构理念、技术选择 |
+| [🏗️ 技术架构](docs/ARCHITECTURE.md) | 开发者、技术主管 | 技术栈、模块架构、实现细节 |
+| [📖 使用指南](docs/USAGE.md) | 所有用户 | 完整使用手册、最佳实践、故障排除 |
+| [🤝 贡献指南](docs/CONTRIBUTING.md) | 开发者、贡献者 | 开发流程、代码规范、社区参与 |
+| [❓ FAQ](docs/FAQ.md) | 所有用户 | 常见问题、解决方案、使用技巧 |
+
+### 📦 按角色推荐
+
+#### 🏗️ 对于架构师和开发者
+- [设计理念](docs/DESIGN.md) - 理解设计思路和技术选择
+- [技术架构](docs/ARCHITECTURE.md) - 深入了解技术实现细节
+
+#### 🛠️ 对于最终用户  
+- [使用指南](docs/USAGE.md) - 快速上手和高级功能
+- [FAQ](docs/FAQ.md) - 解决常见使用问题
+
+#### 🔧 对于开发者贡献者
+- [贡献指南](docs/CONTRIBUTING.md) - 参与项目开发
+- [设计理念](docs/DESIGN.md) - 理解项目设计原则
+
+### 🌟 学习路径
+
+#### 初学者路径
+1. 阅读 [设计理念](docs/DESIGN.md) → 了解项目愿景
+2. 跟随 [使用指南](docs/USAGE.md) → 快速上手
+3. 查阅 [FAQ](docs/FAQ.md) → 解决常见问题
+
+#### 进阶用户路径
+1. 深入 [技术架构](docs/ARCHITECTURE.md) → 理解技术实现
+2. 精通 [使用指南](docs/USAGE.md) → 掌握高级功能
+3. 参与 [贡献指南](docs/CONTRIBUTING.md) → 贡献项目
+
+#### 开发者路径
+1. 掌握 [设计理念](docs/DESIGN.md) → 理解设计原则
+2. 熟悉 [技术架构](docs/ARCHITECTURE.md) → 掌握技术实现
+3. 实践 [贡献指南](docs/CONTRIBUTING.md) → 参与开发
+
+## 🚀 快速开始
+
+### 🎉 现已支持 uvx！
+
+```bash
+# 发布后，完全零配置！
+uvx vibe-env-kit
+```
+
+### 📦 本地安装（当前）
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/your-username/vibe-tools.git
+cd vibe-tools
+
+# 2. 创建虚拟环境
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate   # Windows
+
+# 3. 安装依赖
+pip install click rich toml requests packaging
+
+# 4. 运行工具
+vibe-env-kit
+```
+
+## 🎯 核心功能
+
+### 📋 交互式主菜单
+- **🚀 快速开始** - 初始化开发环境、导入工作流、配置 API
+- **📦 工具管理** - 安装、更新、卸载开发工具
+- **🤖 AI 工具** - Claude Code、GitHub Copilot、Cursor Editor 配置
+- **⚙️ 系统配置** - Shell 环境配置、模型设置、代码工具切换
+
+### 🛠️ 支持的工具
+
+#### Python 生态
+- **uv** - 现代包管理器，替代 pip
+- **poetry** - 依赖管理和项目打包
+- **pre-commit** - Git 钩子管理
+- **ruff** - 代码检查和格式化
+
+#### Node.js 生态  
+- **nodejs** - 通过 nvm 安装 LTS 版本
+- **npm** - Node.js 包管理器
+- **pnpm** - 更快的包管理器
+
+#### 开发工具
+- **git** - 版本控制系统
+- **docker** - 容器化平台
+
+#### 编辑器支持
+- **VS Code** - 微软编辑器
+- **Cursor** - AI 驱动的编辑器
+- **Neovim** - 现代化 Vim
+
+## 🎮 使用示例
+
+### 🚀 零配置运行
+
+```bash
+# 直接启动交互式菜单，无需预先安装
+uvx vibe-env-kit
+```
+
+### 📋 命令行使用
+
+```bash
+# 显示帮助
+uvx vibe-env-kit --help
+
+# 直接安装特定工具（非交互式）
+uvx vibe-env-kit install uv poetry git
+
+# 查看已安装工具状态
+uvx vibe-env-kit status
+
+# 更新工具链
+uvx vibe-env-kit update
+
+# 配置系统环境
+uvx vibe-env-kit config
+
+# 显示详细模式
+uvx vibe-env-kit --verbose install uv
+
+# 预览模式（不执行实际操作）
+uvx vibe-env-kit --dry-run install docker
+```
+
+## 📦 发布状态
+
+- ✅ 包构建完成
+- ✅ 质量检查通过  
+- ✅ 文档体系完整
+- ✅ 测试覆盖全面
+- 🔄 准备发布到 PyPI
+- 📋 查看 [PUBLISH.md](PUBLISH.md) 了解发布步骤
+
+---
+
+## 🌟 文档特色
+
+### 🎯 实用导向
+每个文档都包含：
+- **实际案例** - 真实的代码示例和配置
+- **最佳实践** - 经过验证的使用方法
+- **故障排除** - 详细的问题诊断和解决
+
+### 🔄 持续更新
+- **版本化** - 每个功能版本都有对应的文档
+- **用户反馈** - 基于实际使用反馈持续改进
+- **社区贡献** - 欢迎社区参与文档完善
+
+### 🌟 交互式文档
+- **代码示例** - 所有示例都可以直接运行
+- **配置模板** - 即用即用的配置文件
+- **工作流指南** - 端到端的开发流程
+
+## 🏗️ 项目结构
+
+```
+vibe_tools/
+├── docs/                    # 完整文档体系
+│   ├── DESIGN.md           # 设计理念和技术选择
+│   ├── ARCHITECTURE.md     # 技术架构和实现细节
+│   ├── USAGE.md            # 详细使用指南
+│   ├── CONTRIBUTING.md      # 贡献指南
+│   └── FAQ.md              # 常见问题解答
+├── src/vibe_tools/
+│   ├── cli.py              # CLI 主入口
+│   ├── core/               # 核心功能模块
+│   │   ├── detector.py     # 环境检测
+│   │   ├── installer.py      # 工具安装
+│   │   └── config.py         # 配置管理
+│   ├── ui/                  # 用户界面
+│   │   ├── menu.py          # 交互式菜单
+│   │   └── display.py       # Rich 显示组件
+│   ├── tools/               # 工具集成
+│   │   ├── base.py          # 工具基类
+│   │   ├── dev_tools.py     # 开发工具
+│   │   └── ai_tools.py      # AI 工具
+│   └── utils/              # 工具函数
+│       ├── shell.py         # Shell 操作
+│       └── file_ops.py      # 文件操作
+├── tests/                   # 测试代码
+│   ├── unit/               # 单元测试
+│   └── integration/        # 集成测试
+├── scripts/                # 脚本工具
+│   ├── publish.sh          # 发布脚本
+│   └── install.sh          # 安装脚本
+└── examples/               # 示例代码
+    ├── custom_tools.py      # 自定义工具示例
+    └── workflows/           # 工作流示例
+```
+
+---
+
+## 🎉 开始您的 Vibe Tools 之旅
+
+📚 **从设计到实现，全方位掌握开发环境管理**
+
+选择适合您的学习路径，开始探索 Vibe Tools 的强大功能！
+
+## 📋 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！详见 [贡献指南](docs/CONTRIBUTING.md)。
+
+---
+
+## 🌟 愿景设计
+
+让开发环境配置变得像呼吸一样自然。我们相信，最好的工具是那些让你感觉不到它的存在。
+
+**"零配置，智能推荐，渐进式完善"** - 这就是 Vibe Env Kit 的核心哲学。
