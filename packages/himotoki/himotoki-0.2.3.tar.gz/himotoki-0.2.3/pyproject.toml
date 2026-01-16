@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "himotoki"
+version = "0.2.3"
+description = "Japanese Morphological Analyzer and Romanization tool - Python remake of ichiran"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    {name = "Himotoki Contributors"}
+]
+keywords = ["japanese", "nlp", "morphological-analysis", "dictionary", "jmdict"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Natural Language :: Japanese",
+]
+
+dependencies = [
+    "sqlalchemy>=2.0.0",
+    "lxml>=4.9.0",
+    "marisa-trie>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "hypothesis>=6.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+himotoki = "himotoki.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/msr2903/himotoki"
+Documentation = "https://github.com/msr2903/himotoki#readme"
+Repository = "https://github.com/msr2903/himotoki"
+Issues = "https://github.com/msr2903/himotoki/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["himotoki*"]
+exclude = ["scripts*", "tests*"]
+
+[tool.setuptools.package-data]
+himotoki = ["../data/*.csv", "../data/*.md", "../data/.gitkeep"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312', 'py313']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=himotoki --cov-report=term-missing"
