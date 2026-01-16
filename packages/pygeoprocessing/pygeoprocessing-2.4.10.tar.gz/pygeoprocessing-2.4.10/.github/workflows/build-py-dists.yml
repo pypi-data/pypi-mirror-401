@@ -1,0 +1,89 @@
+name: Python distributions
+on: [push, pull_request]
+
+concurrency:
+  # make sure only one run of this workflow for a given PR or a given branch
+  # can happen at one time. previous queued or started runs will be cancelled.
+  # github.workflow is the workflow name
+  # github.ref is the ref that triggered the workflow run
+  # on push, this is refs/heads/<branch name>
+  # on pull request, this is refs/pull/<pull request number>/merge
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+    build-wheels:
+        name: Wheel
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [windows-latest, macos-latest]
+                python-version: [3.9, "3.10", "3.11", "3.12", "3.13"]
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  # Fetch all history so that setuptools_scm can build the correct version string.
+                  fetch-depth: 0
+
+            - name: Fetch git tags
+              run: git fetch origin +refs/tags/*:refs/tags/*
+
+            - name: setup-micromamba
+              uses: mamba-org/setup-micromamba@v1
+              with:
+                condarc: |
+                  channels:
+                    - conda-forge
+                create-args: >-
+                  python=${{ matrix.python-version }}
+                  gdal
+                  setuptools
+                  python-build
+                environment-name: env
+
+            - name: Build wheel
+              run: PYGEOPROCESSING_GDAL_LIB_PATH="$CONDA_PREFIX/Library" python -m build --wheel
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: Wheel for ${{ matrix.os }} ${{ matrix.python-version }}
+                  path: dist
+
+    build-sdist:
+        name: Source Dist
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  # Fetch all history so that setuptools_scm can build the correct version string.
+                  fetch-depth: 0
+
+            - name: Fetch git tags
+              run: git fetch origin +refs/tags/*:refs/tags/*
+
+            - name: setup-micromamba
+              uses: mamba-org/setup-micromamba@v1
+              with:
+                condarc: |
+                  channels:
+                    - conda-forge
+                create-args: >-
+                  python=3.13
+                  gdal
+                  setuptools
+                  python-build
+                environment-name: env
+
+            - name: Build source distribution
+              run: python -m build --sdist
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: Source distribution
+                  path: dist
