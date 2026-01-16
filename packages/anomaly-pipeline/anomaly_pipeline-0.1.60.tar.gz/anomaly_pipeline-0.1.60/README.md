@@ -1,0 +1,242 @@
+# anomaly-pipeline
+
+anomaly-pipeline is an ensemble framework for detecting outliers in grouped time-series data. It automates the entire workflow from data cleaning and calendar interpolation to running 8 different detection algorithms and generating visual diagnostic reports.
+
+## Key Capabilities
+
+- Ensemble Scoring: Combines 8 models (Statistical + ML) to provide a robust Anomaly_Score and a final is_Anomaly consensus.
+- Hierarchical Processing: Natively handles grouped data (e.g., detecting anomalies per Region, Product, or Channel).
+- Automated Preprocessing: Handles missing dates via linear interpolation and filters out "low-quality" groups automatically.
+- Parallel Execution: Leverages joblib for multi-core processing of large datasets.
+- Visual Analytics: Generates pie charts, stacked bar plots, and detailed group-level time-series breakdowns.
+
+## Included Models
+
+The pipeline utilizes an ensemble of the following methodologies:
+
+- Statistical: Percentile (5th/95th), Standard Deviation (SD), Median Absolute Deviation (MAD), and Interquartile Range (IQR).
+
+- Time-Series Specific: EWMA (Exponentially Weighted Moving Average) and FB Prophet (Walk-forward validation).
+
+- Machine Learning: Isolation Forest (General & Time-series optimized) and DBSCAN.
+
+## Detailed Functionality
+
+Robust Input Validation: Clear error messaging for missing parameters or incorrect data types.
+
+Quality Control: Automatically generates a Success Report and an Exclusion Report (identifying groups dropped due to low history or high interpolation).
+
+Visual Suite: Automated rendering of Pie Charts (Summary), Stacked Bars (Distribution), and Top-5 Anomaly Heatmaps.
+
+## 🚀 Quick Start
+
+!pip install anomaly-pipeline
+from anomaly_pipeline import timeseries_anomaly_detection
+
+ 1. Load your data
+df = pd.read_csv("your_data.csv")
+
+ 2. Run the pipeline
+anomaly_df, success_report, exclusion_report = timeseries_anomaly_detection( master_data=df,
+                                                                             group_columns=['category', 'region'],
+                                                                             variable='sales',
+                                                                             date_column='timestamp',
+                                                                             freq='W-MON',
+                                                                             eval_period=1  # Evaluate the most recent recor
+                                                                             )
+
+## 📊 Visualizing Results & Deep Dives
+Inspecting a Specific Group, if a specific group shows a high anomaly rate, use the evaluation_info tool to render detailed diagnostic plots.
+
+
+from anomaly_pipeline import evaluation_info
+
+ 1. Define the group values (must match the order in group_columns)
+group_values = ['appliances', 'TX'] 
+
+ 2. Filter the results for this group
+mask = anomaly_df[group_columns].eq(group_values).all(axis=1)
+group_df = anomaly_df[mask]
+
+ 3. Generate detailed diagnostic plots
+evaluation_info(group_df,
+                group_columns,
+                variable,
+                date_column,
+                eval_period=1
+                )
+
+The Evaluation Dashboard provides:
+
+- Model Breakdown: Individual charts for FB Prophet, EWMA, and Isolation Forest with confidence intervals.
+
+- Ensemble View: A summary highlighting where multiple models overlap.
+
+- Statistical Thresholds: Visual markers for IQR, MAD, and SD limits.
+
+## Input_data: 
+
+### Mandatory
+master_data: Input DataFrame containing variables, dates, and group identifiers.
+   
+group_columns: Mandatory,"A list of column names defining the granularity of the time series". Ex: For sales, if the timeseries data is at store level and would like find the anomalous sales values at store level/ so the group columns will be ["store"].
+
+variable: Mandatory,The column name containing the time series value being analyzed. Ex: for sales it is 'sales', for Ad_requests it is "ad_requests".
+
+date_column: Mandatory,The column name containing the timestamp.
+
+### Default
+
+freq: Optional,Pandas frequency string for calendar interpolation. Default : "W-MON" (Weekly, starting Monday)". If it is monthly data, change it to M, Daily change it to D.
+
+min_records: Minimum history required per group. Default is None; If None, extracts based on freq (1 Year + eval_period). Ex: if freq is weekly and eval_period is 1: min_records = 52+1.
+
+max_records: Maximum history to retain per group. Default is None; if the value is provided (N), filters for the most recent N records.
+
+contamination (float): Expected proportion of outliers in the data (0 to 0.5). Defaults to 0.03.
+
+random_state (int): Seed for reproducibility in stochastic models. Defaults to 42.
+
+alpha (float): Smoothing factor for trend calculations. Defaults to 0.3.
+
+sigma (float): Standard deviation multiplier for thresholding. Defaults to 1.5.
+
+eval_period: The number of trailing records in each group to evaluate for anomalies. Default to 1
+
+prophet_CI (float): The confidence level for the prediction interval (0 to 1). Defaults to 0.9.
+
+mad_scale_factor (float): This is a constant used to make the MAD comparable to the Standard Deviation. Default is 0.6745.
+
+mad_threshold (float): This is the  "sensitivity" dial. It determines how many "Adjusted MADs" a data point must be away from the median to be flagged as an anomaly. Default is 2.
+
+## Output columns: All the output values are at "group_columns" level. 
+
+MIN_value
+The minimum historical "variable" values. For train data the value is fixed. For test data varies. It is the min_value up to t-1.
+________________________________________
+MAX_value
+The maximum historical "variable" values. For train data the value is fixed. For test data varies. It is the max_value up to t-1. 
+________________________________________
+Percentile_low / Percentile_high
+The 5th and 95th percentile  "variable" values
+Used to detect unusually low or unusually high "variable" values. Fixed for train data. Varies for test data. Takes the stats by considering historical data upto t-1.
+________________________________________
+Percentile_anomaly
+Flags based on percentile limits:
+• Low → value < Percentile_low
+• High → value > Percentile_high
+• None → within the range
+________________________________________
+
+Mean / SD (Standard Deviation)
+The average "variable"and its standard deviation based on historical data.Fixed for train data. Varies for test data. Takes the stats by considering historical data upto t-1.
+________________________________________
+SD2_low / SD2_high
+Two-standard-deviation control limits:
+• SD2_low = mean − 2×SD (floored at 0)
+• SD2_high = mean + 2×SD 
+__________________________________
+SD_anomaly
+Flags based on SD2 limits:
+• Low → value < SD2_low
+• High → value > SD2_high
+• None → within the range
+________________________________________
+Median / MAD (Median Absolute Deviation)
+Median of "variable" and the median of absolute deviations from the median.Fixed for train data. Varies for test data. Takes the stats by considering historical data upto t-1.
+Used for robust anomaly detection when data contains outliers.
+________________________________________
+MAD_low / MAD_high
+MAD-based limits:
+• MAD_low = median − 2 × MAD / 0.6745 (floored at 0)
+• MAD_high = median + 2 × MAD / 0.6745 
+
+________________________________________
+MAD_anomaly
+Flags based on MAD limits:
+• Low → value < MAD_low
+• High → value > MAD_high
+• None → within the range
+________________________________________
+Q1 / Q3 / IQR (Interquartile Range)
+• Q1: 25th percentile
+• Q3: 75th percentile
+• IQR = Q3 − Q1
+Used to detect unusually low or high "variable" values.
+________________________________________
+IQR_low / IQR_high
+IQR-based limits:
+• IQR_low = Q1 − 1.5 × IQR (floored at 0)
+• IQR_high = Q3 + 1.5 × IQR 
+______________________________________
+IQR_anomaly
+Flags based on IQR limits:
+• Low → value < IQR_low
+• High → value > IQR_high
+• None → within the range
+________________________________________
+is_Percentile_anomaly / is_SD_anomaly / is_MAD_anomaly / is_IQR_anomaly
+Boolean indicators stating whether each method classified the value as an anomaly (low or high).
+________________________________________
+Alpha
+Smoothing factor used in EWMA. Higher values give more weight to recent observations.
+________________________________________
+EWMA_forecast
+Expected value estimated using the EWMA model.
+________________________________________
+EWMA_STD
+Rolling standard deviation of residuals around the EWMA forecast.
+________________________________________
+EWMA_high
+Upper anomaly threshold (EWMA_forecast + sigma × EWMA_STD).
+_____________________________________ 
+EWMA_low
+lower anomaly threshold (EWMA_forecast - sigma × EWMA_STD).
+_____________________________________ 
+Is_EWMA_anomaly
+Boolean flag indicating whether the observed value falls outside the EWMA bounds.
+________________________________________
+FB_forecast
+Expected value estimated using the EWMA model.
+________________________________________
+FB_low
+Lower confidence interval of the Prophet forecast
+________________________________________
+FB_high
+Upper confidence interval of the Prophet forecast.
+_____________________________________ 
+FB_residual
+Difference between observed value and Prophet forecast.
+_____________________________________ 
+FB_anomaly
+Raw anomaly indicator based on Prophet confidence bounds.
+_____________________________________ 
+Is_FB_anomaly
+Boolean flag indicating a Prophet-detected anomaly.
+______________________________________   
+isolation_forest_score
+Score from the Isolation Forest model indicating anomaly severity. Typical range: –0.5 to +0.5
+• Higher scores = more normal
+• Lower scores = more anomalous
+________________________________________
+is_IsoForest_anomaly
+Boolean flag based on Isolation Forest model output:
+• True → model predicts anomaly (prediction = –1)
+• False → model predicts normal (prediction = 1)
+______________________________________   
+dbscan_score
+Cluster label or distance score produced by DBSCAN (-1 indicates noise/anomaly).
+________________________________________
+is_DBSCAN_anomaly
+Boolean flag indicating DBSCAN-detected anomaly.
+________________________________________
+Anomaly_Votes
+Count of anomaly-detection methods that agree a point is anomalous.
+Ranges from 0 to 8.
+________________________________________
+is_Anomaly
+Final ensemble decision:
+• True → value flagged anomalous by 4 or more methods
+• False → fewer than 4 methods indicate anomaly
+
+
