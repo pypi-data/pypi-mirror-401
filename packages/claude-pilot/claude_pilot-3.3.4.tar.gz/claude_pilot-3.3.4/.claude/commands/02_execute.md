@@ -1,0 +1,300 @@
+---
+description: Execute a plan (auto-moves pending to in-progress) with Ralph Loop TDD pattern
+argument-hint: "[--no-docs] [--wt] - optional flags: --no-docs skips auto-documentation, --wt enables worktree mode
+allowed-tools: Read, Glob, Grep, Edit, Write, Bash(*), AskUserQuestion, Task
+---
+
+# /02_execute
+
+_Execute plan using Ralph Loop TDD pattern - iterate until all tests pass._
+
+## Core Philosophy
+
+- **Single source of truth**: Plan file drives the work
+- **One active plan**: Exactly one plan active per git branch
+- **No drift**: Update plan and todo list if scope changes
+- **Evidence required**: Never claim completion without verification output
+
+---
+
+## Step 0: Source Worktree Utilities
+
+```bash
+WORKTREE_UTILS=".claude/scripts/worktree-utils.sh"
+[ -f "$WORKTREE_UTILS" ] && . "$WORKTREE_UTILS" || echo "Warning: Worktree utilities not found"
+```
+
+---
+
+## Step 1: Plan State Transition (ATOMIC)
+
+> **🚨 CRITICAL - BLOCKING OPERATION**: MUST complete successfully BEFORE any other work. If fails, EXIT IMMEDIATELY.
+
+### 1.1 Worktree Mode (--wt)
+
+> **🚨 CRITICAL**: Plan MUST be moved to in_progress before any worktree setup.
+
+```bash
+if is_worktree_mode "$@"; then
+    check_worktree_support || exit 1
+    PENDING_PLAN="$(select_oldest_pending)" || exit 1
+
+    # ATOMIC: Move plan FIRST, THEN create worktree
+    PLAN_FILENAME="$(basename "$PENDING_PLAN")"
+    IN_PROGRESS_PATH="$PROJECT_ROOT/.pilot/plan/in_progress/${PLAN_FILENAME}"
+    mkdir -p "$PROJECT_ROOT/.pilot/plan/in_progress"
+    mv "$PENDING_PLAN" "$IN_PROGRESS_PATH" || exit 1
+
+    # NOW create worktree
+    BRANCH_NAME="$(plan_to_branch "$PLAN_FILENAME")"
+    MAIN_BRANCH="main"; git rev-parse --verify "$MAIN_BRANCH" >/dev/null 2>&1 || MAIN_BRANCH="master"
+    WORKTREE_DIR="$(create_worktree "$BRANCH_NAME" "$PLAN_FILENAME" "$MAIN_BRANCH")" || exit 1
+    PLAN_PATH="$IN_PROGRESS_PATH"; cd "$WORKTREE_ABS" || exit 1
+fi
+```
+
+### 1.2 Select and Move Plan (ATOMIC BLOCK)
+
+> **🚨 CRITICAL - BLOCKING OPERATION**: All three operations MUST complete successfully.
+
+```bash
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+PLAN_PATH="${EXPLICIT_PATH}"
+
+# Priority: Explicit path → Oldest pending → Most recent in_progress
+[ -z "$PLAN_PATH" ] && PLAN_PATH="$(ls -1t "$PROJECT_ROOT/.pilot/plan/pending"/*.md 2>/dev/null | tail -1)"
+
+# IF pending, MUST move FIRST
+if [ -n "$PLAN_PATH" ] && printf "%s" "$PLAN_PATH" | grep -q "/pending/"; then
+    PLAN_FILENAME="$(basename "$PLAN_PATH")"
+    IN_PROGRESS_PATH="$PROJECT_ROOT/.pilot/plan/in_progress/${PLAN_FILENAME}"
+    mkdir -p "$PROJECT_ROOT/.pilot/plan/in_progress"
+    mv "$PLAN_PATH" "$IN_PROGRESS_PATH" || { echo "❌ FATAL: Failed to move plan" >&2; exit 1; }
+    PLAN_PATH="$IN_PROGRESS_PATH"
+fi
+
+[ -z "$PLAN_PATH" ] && PLAN_PATH="$(ls -1t "$PROJECT_ROOT/.pilot/plan/in_progress"/*.md 2>/dev/null | head -1)"
+
+# Final validation and active pointer
+[ -z "$PLAN_PATH" ] || [ ! -f "$PLAN_PATH" ] && { echo "❌ No plan found. Run /00_plan first" >&2; exit 1; }
+
+mkdir -p "$PROJECT_ROOT/.pilot/plan/active"
+BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo detached)"
+KEY="$(printf "%s" "$BRANCH" | sed -E 's/[^a-zA-Z0-9._-]+/_/g')"
+printf "%s" "$PLAN_PATH" > "$PROJECT_ROOT/.pilot/plan/active/${KEY}.txt"
+```
+
+---
+
+## Step 2: Convert Plan to Todo List
+
+Read plan, extract: Deliverables, Phases, Tasks, Acceptance Criteria, Test Plan
+
+**Rules**:
+- Atomic/verifiable todos
+- **Sequential**: One `in_progress` at a time, mark complete immediately after finishing
+- **Parallel**: Mark ALL parallel items as `in_progress` simultaneously, complete together when ALL agents return
+
+**MANDATORY**: After EVERY "Implement/Add/Create" todo, add corresponding "Run tests for [X]" todo immediately after
+
+---
+
+## Step 2.5: SC Dependency Analysis (For Parallel Execution)
+
+**Full parallel patterns**: See @.claude/guides/parallel-execution.md
+
+| Group | SCs | Rationale |
+|-------|-----|-----------|
+| Group 1 | SC-1, SC-2, SC-3 | Independent, no shared files |
+| Group 2 | SC-4, SC-5 | Depend on Group 1 |
+| Group 3 | SC-6 | Depends on SC-4 |
+
+### Parallel Execution
+
+> **When independent SCs exist, YOU MUST invoke multiple agents NOW**
+
+**Coder agents**: Execute independent SCs using TDD + Ralph Loop
+**Verification agents**: Tester (tests/coverage), Validator (type/lint), Code-Reviewer (quality)
+**File conflicts**: Each agent works on different files
+
+**Fallback**: If SCs have dependencies or share files, use sequential execution
+---
+
+## Step 3: Delegate to Coder Agent (Context Isolation)
+
+### 🚀 MANDATORY ACTION: Coder Agent Invocation
+
+> **CRITICAL**: YOU MUST invoke the Coder Agent NOW using the Task tool for context isolation.
+> This is not optional. Execute this Task tool call immediately.
+
+**Why Agent?**: Coder Agent runs in **isolated context window** (~80K tokens internally). Only summary returns here (8x token efficiency).
+
+**EXECUTE IMMEDIATELY - DO NOT SKIP**:
+
+```markdown
+Task:
+  subagent_type: coder
+  prompt: |
+    Execute the following plan:
+
+    Plan Path: {PLAN_PATH}
+    Success Criteria: {SC_LIST_FROM_PLAN}
+    Test Scenarios: {TS_LIST_FROM_PLAN}
+
+    Implement using TDD + Ralph Loop. Return summary only.
+
+    Reference: @.claude/skills/tdd/SKILL.md, @.claude/skills/ralph-loop/SKILL.md, @.claude/skills/vibe-coding/SKILL.md
+```
+
+**Context Flow**: Main (~5K tokens) → Coder Agent (80K internal) → Summary (1K) = 8x efficiency
+
+### 3.3 Process Coder Results
+
+**Expected Output**: `<CODER_COMPLETE>` or `<CODER_BLOCKED>`
+
+| Marker | Meaning | Action |
+|--------|---------|--------|
+| `<CODER_COMPLETE>` | All SCs met, tests pass, coverage达标 | Proceed to next step |
+| `<CODER_BLOCKED>` | Cannot complete (coverage, errors, etc.) | Use `AskUserQuestion` for guidance |
+
+**TaskOutput Anti-Pattern**: DO NOT use `TaskOutput` after Task completion - results return inline automatically
+
+**Error Recovery**: If agent returns error, use `AskUserQuestion` with options: "Retry", "Continue manually", "Cancel"
+
+---
+
+## Step 4: Execute with TDD (Legacy - Use Agent Instead)
+
+> **NOTE**: This step is preserved for backward compatibility. For new plans, use **Step 3: Delegate to Coder Agent** instead.
+
+**Full TDD methodology**: See @.claude/skills/tdd/SKILL.md
+
+| Phase | Action | Command |
+|-------|--------|---------|
+| **Discovery** | Search codebase | `Glob`, `Grep` |
+| **Red** | Write failing test | Run test → confirm FAIL |
+| **Green** | Implement minimal code | Run test → confirm PASS |
+| **Refactor** | Improve quality (DRY, SOLID) | Run ALL tests → confirm PASS |
+
+**Micro-Cycle**: After EVERY Edit/Write, run tests immediately (mark todo in_progress → test → fix/complete)
+
+**Test Detection**: See @.claude/guides/test-environment.md
+
+---
+
+## Step 5: Ralph Loop (Autonomous Completion)
+
+**Full Ralph Loop methodology**: See @.claude/skills/ralph-loop/SKILL.md
+
+### Entry Condition (CRITICAL)
+
+**Ralph Loop starts IMMEDIATELY after the FIRST code change.**
+
+✅ **Correct**: After implementing first feature, fixing bug, any Edit/Write
+❌ **WRONG**: After completing all todos, at very end
+
+### Completion Promise
+
+Output `<RALPH_COMPLETE>` **ONLY when** ALL conditions are met:
+- [ ] All tests pass
+- [ ] Coverage 80%+ (core modules 90%+)
+- [ ] Type check clean
+- [ ] Lint clean
+- [ ] All todos completed
+
+### Loop Structure
+
+```
+MAX_ITERATIONS=7
+WHILE ITERATION <= MAX AND NOT <RALPH_COMPLETE>:
+    1. Run: tests, type-check, lint, coverage
+    2. Log iteration to ralph-loop-log.md
+    3. IF all pass AND coverage >= threshold AND todos complete:
+         Output: <RALPH_COMPLETE>
+    4. ELSE: Fix (priority: errors > coverage > lint), ITERATION++
+```
+
+**Exit Conditions**:
+- ✅ **Success**: All tests pass, coverage 80%+ (core 90%+), type clean, lint clean, todos complete
+- ❌ **Failure**: Max 7 iterations reached, unrecoverable error
+- ⚠️ **Blocked**: `<RALPH_BLOCKED>` output
+
+**Test Detection**: See @.claude/guides/test-environment.md
+
+---
+
+## Step 6: Todo Continuation Enforcement
+
+**Default Rule**: One `in_progress` at a time (sequential), mark complete RIGHT AFTER finishing
+
+**Parallel Group Rule**: Mark ALL parallel items as `in_progress` simultaneously, complete together when ALL agents return
+
+---
+
+## Step 7: Verification
+
+```bash
+# Run all checks
+npx tsc --noEmit && npm test && npm run lint
+[ $? -eq 0 ] && echo "✅ All passed" || { echo "❌ Some failed"; exit 1; }
+```
+
+---
+
+## Step 8: Update Plan Artifacts
+
+```bash
+cat >> "$PLAN_PATH" << 'EOF'
+## Execution Summary
+### Changes Made: [List]
+### Verification: Type ✅, Tests ✅ (X% coverage), Lint ✅
+### Follow-ups: [Items]
+EOF
+```
+
+---
+
+## Step 9: Auto-Chain to Documentation
+
+**Trigger**: All todos complete, Ralph Loop success, coverage 80%+ (core 90%+), type + lint clean
+
+**Auto-Invoke**: `/91_document` (3-sync pattern: implementation → docs auto-sync)
+
+**Skip**: If `--no-docs` specified, skip documentation
+
+---
+
+## Success Criteria
+
+| Criteria | Verification |
+|----------|-------------|
+| Plan executed | All phases completed |
+| Tests pass | All SC met |
+| Type clean | Type check exits 0 |
+| Lint clean | Lint exits 0 |
+| Coverage | 80%+ overall, 90%+ core |
+| Ready for close | Documentation synced |
+
+---
+
+## Workflow
+```
+/00_plan → /01_confirm → /02_execute → /03_close
+                      ↓
+                [Ralph Loop → TDD → 91_document]
+```
+
+---
+
+## Related Guides
+- @.claude/skills/tdd/SKILL.md - Red-Green-Refactor cycle
+- @.claude/skills/ralph-loop/SKILL.md - Autonomous completion loop
+- @.claude/skills/vibe-coding/SKILL.md - Code quality standards
+- @.claude/guides/test-environment.md - Test framework detection
+- @.claude/guides/3tier-documentation.md - Auto-sync documentation
+- @.claude/guides/parallel-execution.md - Parallel execution patterns
+
+---
+
+## Next Command
+After successful execution: `/03_close`
