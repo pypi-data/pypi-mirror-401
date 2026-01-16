@@ -1,0 +1,35 @@
+import sys
+
+from pythonslisp.Listener import Listener
+from pythonslisp.LispInterpreter import LispInterpreter
+
+LANGUAGE     = 'Python\'s Lisp'
+VERSION      = '0.19.0'
+AUTHOR       = 'Ronald Provost/Longo'
+EMAIL        = 'ronLongo9@outlook.com'
+TEST_DIR     = 'pythonslisp/testing'
+LIBRARY_DIR  = 'pythonslisp/lib'
+
+def main( ) -> None:
+   interp = LispInterpreter( runtimeLibraryDir=LIBRARY_DIR )
+
+   argv = sys.argv        # argument values
+   argc = len(argv)       # argument count
+   if argc == 1:
+      # Enter the repl
+      theListener = Listener( interp, language=LANGUAGE,
+                                      version=VERSION,
+                                      author=AUTHOR,
+                                      email=EMAIL,
+                                      testdir=TEST_DIR
+                                      )
+      theListener.readEvalPrintLoop( )
+   elif argc == 2:
+      # Execute a lisp source file
+      sourceFilename = argv[1]
+      interp.evalFile( sourceFilename )
+   else:
+      print( 'Error: Invalid number of arguments.' )
+
+if __name__ == '__main__':
+   main( )
