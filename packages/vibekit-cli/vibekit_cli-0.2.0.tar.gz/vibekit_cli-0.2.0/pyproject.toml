@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vibekit-cli"
+version = "0.2.0"
+description = "VibeKit CLI - Configure AI coding workflows in SaaS, execute locally"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "ZySec AI", email = "hello@zysec.ai"}]
+keywords = ["vibekit", "vkcli", "claude-code", "ai-coding", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "httpx>=0.27.0",
+    "pyyaml>=6.0",
+    "keyring>=25.0.0",
+    "pydantic>=2.0.0",
+    "PyJWT>=2.8.0",
+]
+
+[project.urls]
+Homepage = "https://vkcli.com"
+Documentation = "https://vkcli.com/docs"
+Repository = "https://github.com/ZySec-AI/vkcli"
+
+[project.scripts]
+vk = "vk.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["vk*"]
+
+[tool.setuptools.package-data]
+vk = ["py.typed"]
