@@ -1,0 +1,22 @@
+[project]
+name = "iflow-mcp_braindead-dev_instagram-dms-mcp"
+version = "0.1.0"
+description = "A Model Context Protocol server that lets AI assistants read and send Instagram DMs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp>=2.12.0",
+    "uvicorn>=0.35.0",
+    "httpx",
+    "python-dotenv",
+]
+
+[project.scripts]
+instagram-dms-mcp = "server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
