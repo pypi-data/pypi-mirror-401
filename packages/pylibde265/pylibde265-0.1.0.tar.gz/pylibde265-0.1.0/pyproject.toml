@@ -1,0 +1,57 @@
+[build-system]
+requires = ["scikit-build-core>=0.10.0", "pybind11>=2.12.0", "numpy>=2.0.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pylibde265"
+version = "0.1.0"
+authors = [
+  { name="梦归云帆", email="1138663075@qq.com" },
+]
+description = "Decode HEVC(H.265) video in python"
+keywords = ["libde265", "h265", "video", "decode", "mp4", "hevc", "python"]
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+requires-python = ">=3.9"
+dependencies = [
+  "numpy>=2.0.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pybind11>=2.12.0",
+  "cmake>=4.2.0",
+  "build>=1.2.0",
+  "pytest>=8.0.0",
+]
+
+[tool.scikit-build]
+cmake.version = ">=3.15"
+build.verbose = true
+wheel.packages = ["src/pylibde265"]
+sdist.include = ["src/pylibde265", "libde265", "test", "example", "README.md", "LICENSE"]
+
+[tool.cibuildwheel]
+build = "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "*-win32 *-manylinux_i686 *-musllinux_*"
+test-command = "pytest {project}/test"
+test-requires = ["pytest", "numpy"]
+
+[tool.cibuildwheel.macos]
+archs = "x86_64 arm64"
+
+[project.urls]
+Homepage = "https://github.com/Puiching-Memory/pylibde265"
+Issues = "https://github.com/Puiching-Memory/pylibde265/issues"
+
+[dependency-groups]
+dev = []
+
+[tool.uv.sources]
