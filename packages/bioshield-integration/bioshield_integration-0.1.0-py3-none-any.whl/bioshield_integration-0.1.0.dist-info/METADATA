@@ -1,0 +1,1305 @@
+Metadata-Version: 2.4
+Name: bioshield-integration
+Version: 0.1.0
+Summary: Unified Intelligence Framework with Adaptive Learning & Real-Time Alerts
+Home-page: https://github.com/emerladcompass/BioShield-Integration
+Author: Emerlad Compass
+Author-email: Emerlad Compass <emerladcompass@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/emerladcompass/BioShield-Integration
+Project-URL: Documentation, https://github.com/emerladcompass/BioShield-Integration#readme
+Project-URL: Repository, https://github.com/emerladcompass/BioShield-Integration
+Project-URL: Issues, https://github.com/emerladcompass/BioShield-Integration/issues
+Keywords: ai,monitoring,alerts,adaptive,intelligence
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.21.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: web
+Requires-Dist: requests>=2.28.0; extra == "web"
+Provides-Extra: full
+Requires-Dist: requests>=2.28.0; extra == "full"
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# 🌍 BioShield Integration System
+
+**Unified Intelligence Framework: A→B→C→D with Adaptive Learning & Real-Time Alerts**
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Production-success.svg)]()
+[![Live](https://img.shields.io/badge/Live_Data-Active-brightgreen.svg)]()
+
+Part of the **BioShield Sovereign Intelligence Framework** by Emerlad Compass 🧭
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Live Demo](#live-demo)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Dashboard](#dashboard)
+- [Alerts System](#alerts-system)
+- [Automated Reports](#automated-reports)
+- [API Reference](#api-reference)
+- [Testing Results](#testing-results)
+- [Contributing](#contributing)
+
+---
+
+## 🎯 Overview
+
+BioShield-Integration is the central orchestration system that connects all levels of the BioShield framework with **Adaptive Intelligence**, **Real-Time Monitoring**, and **Automated Alerting**:
+
+```
+🌊 A_HydroNet (Water)  →  🌱 B_Agro_Immunity (Agriculture)
+          ↓                           ↓
+    🦠 C_Pathogen_Intel (Disease)  →  🔐 D_Crypto_Infra (Security)
+                    ↓
+            🧠 Adaptive Engine
+        (Memory + Microbiome + Genetics)
+                    ↓
+        🔔 Real-Time Alerts & Reports
+```
+
+### Key Innovation
+
+Transforms **reactive alerts** into **predictive adaptive responses** with **automated monitoring**:
+
+| Traditional System | BioShield Integration |
+|-------------------|----------------------|
+| Fixed thresholds | Dynamic learning thresholds |
+| React to crisis | Predict and prevent |
+| Blind alerts | Context-aware decisions |
+| Manual monitoring | Automated alerts & reports |
+| Single-factor | Multi-factor intelligence |
+
+---
+
+## 🌐 Live Demo
+
+### Production Websites
+- 🌊 **HydroNet**: [https://hydronet-v1.netlify.app/](https://hydronet-v1.netlify.app/)
+- 🌱 **BioShield**: [https://bioshield-b1.netlify.app/](https://bioshield-b1.netlify.app/)
+
+### Alert Endpoint (Pipedream)
+- 🔔 **Webhook**: `https://eoi3vhd0zol7y5o.m.pipedream.net`
+  - Auto-sends to Slack
+  - Forwards to external services
+  - Processes data automatically
+
+---
+
+## ✨ Features
+
+### 🌐 Live Web Data Integration
+
+- **Real-time data fetching** from deployed websites:
+  - 🌊 [HydroNet](https://hydronet-v1.netlify.app/) - Water intelligence
+  - 🌱 [BioShield](https://bioshield-b1.netlify.app/) - Agricultural immunity
+- **Smart caching** (5-minute TTL) - reduces bandwidth usage
+- **Multi-level fallback**: `Live Web → Cache → Local Files → Simulated`
+- **HTML scraping** as fallback when APIs unavailable
+
+### 🏠 Interactive Dashboard
+
+- **Main Dashboard** (`dashboard/dashboard.py`)
+  - View real-time alerts
+  - Browse hourly/daily reports
+  - Run cascade manually
+  - Check system directories
+- **Visual monitoring** with color-coded indicators
+- **Auto-refresh** capabilities
+- **User-friendly menu** interface
+
+### 🔔 Automated Alert System
+
+- **CRITICAL alerts** sent automatically via webhook
+- **Pipedream integration** for multi-channel notifications
+- **Local logging** in `reports/alerts/`
+- **Alert files** with timestamps: `alert_20260116_1352.txt`
+- **Alert log** tracking: `alerts.log`
+
+### 📊 Automated Reports
+
+- **Hourly reports**: `reports/hourly/hourly_YYYYMMDD_HHMM.txt`
+- **Daily reports**: `reports/daily/report_YYYY-MM-DD.txt`
+- **Weekly reports**: `reports/weekly/`
+- **Monthly reports**: `reports/monthly/`
+- **Automatic generation** on cascade completion
+
+### 🧠 Adaptive Intelligence
+
+- **Memory System**: Learns from alert history, adjusts thresholds dynamically
+- **Microbiome Analysis**: Network-based soil health assessment using Transfer Entropy
+- **Genetic Resilience**: Crop-specific stress tolerance scoring
+- **Multi-Factor Decisions**: Combines water stress, biological immunity, and genetic capacity
+
+### 🔄 Cascade Management
+
+- **Sequential Execution**: A→AB→B→C→D data flow
+- **Parallel Processing**: Multi-level concurrent operations
+- **Adaptive Mode**: Intelligent routing based on system state
+- **Continuous Monitoring**: Auto-run cascades at configurable intervals
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+```bash
+Python >= 3.8
+numpy >= 1.21.0
+scipy >= 1.7.0
+pyyaml >= 6.0
+# No additional dependencies for web data fetching (uses urllib)
+```
+
+### Quick Install
+
+```bash
+# Clone repository
+git clone https://github.com/emerladcompass/BioShield-Integration.git
+cd BioShield-Integration
+
+# Install
+pip install -e .
+
+# Or with all extras
+pip install -e ".[dev,viz,network]"
+```
+
+### Termux (Android)
+
+```bash
+pkg install python git
+cd /storage/emulated/0/download
+git clone https://github.com/emerladcompass/BioShield-Integration.git
+cd BioShield-Integration
+pip install -e .
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Main Dashboard (Recommended)
+
+```bash
+# Launch interactive main dashboard
+python dashboard/dashboard.py
+
+# Features:
+# 1. 🚨 View Alerts - Browse all CRITICAL alerts
+# 2. 📊 View Reports - Check hourly/daily reports
+# 3. 🚀 Run Cascade Now - Execute cascade manually
+# 4. 📁 Check Directories - Verify system structure
+# 5. 🚪 Exit
+```
+
+**Dashboard Output:**
+```
+🏠 BIO-SHIELD MAIN DASHBOARD
+============================================================
+
+Select an option:
+1. 🚨 View Alerts
+2. 📊 View Reports
+3. 🚀 Run Cascade Now
+4. 📁 Check Directories
+5. 🚪 Exit
+
+Enter choice (1-5): 3
+
+🚀 Running Cascade...
+🌊 HydroNet Data: SVI=1.0, Source=web_scrape
+🎯 Decision: CRITICAL_INTERVENTION (Confidence: 85%)
+🚨 CRITICAL alert sent to webhook!
+✅ Alert saved: reports/alerts/alert_20260116_1352.txt
+```
+
+### 2. Single Cascade Run (CLI)
+
+```bash
+# Single run with live web data
+python orchestrator/cascade_manager.py --mode single
+
+# Output:
+# ✅ Using live web data
+# 🎯 DECISION: CRITICAL_INTERVENTION
+# 📊 Confidence: 85%
+# 🔔 Alert sent successfully!
+```
+
+### 3. Continuous Monitoring
+
+```python
+from orchestrator.cascade_manager import CascadeManager
+
+# Initialize with alerts enabled
+manager = CascadeManager()
+
+# Run continuous monitoring (every 5 minutes)
+manager.run_continuous_monitoring(interval=300)
+
+# Automatically:
+# • Fetches live data
+# • Makes adaptive decisions
+# • Sends CRITICAL alerts
+# • Generates reports
+```
+
+### 4. Single Cascade (Python)
+
+```python
+from orchestrator.cascade_manager import CascadeManager
+
+# Initialize
+manager = CascadeManager()
+
+# Run complete cascade - fetches from:
+# • https://hydronet-v1.netlify.app/
+# • https://bioshield-b1.netlify.app/
+result = manager.run_full_cascade()
+
+print(f"Action: {result['final_action']}")
+print(f"Confidence: {result['confidence']*100:.0f}%")
+print(f"Alert Sent: {result.get('alert_sent', False)}")
+```
+
+---
+
+## 🏠 Dashboard
+
+### Main Dashboard Features
+
+The comprehensive main dashboard (`dashboard/dashboard.py`) provides:
+
+#### 1. 🚨 View Alerts
+```
+📋 Alerts Log (reports/alerts/alerts.log):
+[2026-01-16T13:44:15] CRITICAL | SVI: 1.000 | Immunity: 0.7
+[2026-01-16T13:52:58] CRITICAL | SVI: 1.000 | Immunity: 0.7
+
+📁 Alert Files (2 total):
+📄 alert_20260116_1352.txt
+📄 alert_20260116_1344.txt
+```
+
+#### 2. 📊 View Reports
+```
+🕐 Hourly Reports (10 files):
+📄 hourly_20260116_1344.txt
+📄 hourly_20260116_1334.txt
+...
+
+📅 Daily Reports (1 files):
+📄 report_2026-01-16.txt
+```
+
+#### 3. 🚀 Run Cascade Now
+- Execute cascade with live web data
+- Automatic alert generation if CRITICAL
+- Real-time status updates
+- Confidence scores displayed
+
+#### 4. 📁 Check Directories
+```
+✅ reports/
+✅ reports/hourly/
+✅ reports/daily/
+✅ reports/alerts/
+✅ src/
+✅ src/modules/
+✅ src/orchestrator/
+✅ config/
+```
+
+---
+
+## 🔔 Alerts System
+
+### How It Works
+
+1. **Detection**: System detects CRITICAL condition (SVI > 0.35)
+2. **Decision**: Adaptive Engine decides: `CRITICAL_INTERVENTION`
+3. **Alert Generation**: Creates alert with full context
+4. **Webhook Delivery**: Sends to Pipedream endpoint
+5. **Local Storage**: Saves to `reports/alerts/`
+6. **Logging**: Records in `alerts.log`
+
+### Alert Structure
+
+```json
+{
+  "timestamp": "2026-01-16T13:52:58.894550",
+  "alert_type": "CRITICAL",
+  "water_svi": 1.0,
+  "immunity_score": 0.7,
+  "confidence": 0.85,
+  "message": "🚨 BioShield Alert: CRITICAL_INTERVENTION required",
+  "system": "BioShield Cascade",
+  "alert_id": "BS-20260116-135258"
+}
+```
+
+### Webhook Endpoint
+
+```bash
+# Pipedream Workflow
+POST https://eoi3vhd0zol7y5o.m.pipedream.net
+
+# Auto-forwards to:
+# • Slack channel
+# • Email notifications
+# • External webhooks
+# • Custom integrations
+```
+
+### Alert Files Location
+
+```
+reports/alerts/
+├── alerts.log                    # All alerts log
+├── alert_20260116_1352.txt      # Individual alert files
+└── alert_20260116_1344.txt
+```
+
+---
+
+## 📊 Automated Reports
+
+### Report Types & Schedule
+
+| Report Type | Location | Frequency | Naming |
+|------------|----------|-----------|--------|
+| **Hourly** | `reports/hourly/` | Every cascade | `hourly_YYYYMMDD_HHMM.txt` |
+| **Daily** | `reports/daily/` | Daily rollup | `report_YYYY-MM-DD.txt` |
+| **Weekly** | `reports/weekly/` | Weekly | `weekly_YYYY_WW.txt` |
+| **Monthly** | `reports/monthly/` | Monthly | `monthly_YYYY_MM.txt` |
+
+### Sample Report Content
+
+```
+============================================================
+BioShield Hourly Report - 2026-01-16 13:52
+============================================================
+
+📊 System Statistics:
+   • Cycles: 1
+   • Average Duration: 2.13 seconds
+   • Success Rate: 100%
+
+🌐 Data Sources:
+   • HydroNet: web_scrape (live)
+   • BioShield: web_live (live)
+
+🎯 Decisions:
+   • CRITICAL_INTERVENTION: 1 (100%)
+
+📈 Latest Data:
+   • SVI: 1.000 (🔴 CRITICAL)
+   • Water Quality: 7%
+   • Immunity: 0.700 (🟠 MODERATE)
+   • Confidence: 85%
+
+🚨 Alerts:
+   • 1 CRITICAL alert sent
+   • Webhook: ✅ 200 OK
+   • File: alert_20260116_1352.txt
+
+🔧 Module Status:
+   • A_HydroNet: ✅ Active (web_scrape)
+   • AB_Bridge: ✅ Active
+   • B_Agro_Immunity: ✅ Active (web_live)
+   • Adaptive_Engine: ✅ Active
+   • Alert System: ✅ Active
+============================================================
+```
+
+### Accessing Reports
+
+```bash
+# Via Dashboard
+python dashboard/dashboard.py
+# Select: 2. 📊 View Reports
+
+# Via CLI
+ls reports/hourly/
+ls reports/daily/
+ls reports/alerts/
+
+# Via Python
+from pathlib import Path
+
+reports = list(Path("reports/hourly").glob("*.txt"))
+latest = max(reports, key=lambda p: p.stat().st_mtime)
+print(latest.read_text())
+```
+
+---
+
+## 📊 Testing Results
+
+### Live System Performance (2026-01-16)
+
+```
+============================================================
+PRODUCTION TEST - CRITICAL SCENARIO
+============================================================
+
+🌊 HydroNet (Live Web):
+   SVI: 1.000 (🔴 CRITICAL)
+   Quality: 7%
+   Contamination: 15.0
+   Source: web_scrape
+
+🌱 Agro-Immunity (Live Web):
+   Immunity: 0.700 (🟠 MODERATE)
+   Indicators: 12/12 active
+   Source: web_live
+
+🎯 Adaptive Decision:
+   Action: CRITICAL_INTERVENTION
+   Confidence: 85%
+   Duration: 2.13s
+
+🔔 Alert System:
+   Status: ✅ Sent successfully
+   Webhook: 200 OK
+   File: alert_20260116_1352.txt
+   Log: alerts.log updated
+
+📊 Reports Generated:
+   Hourly: hourly_20260116_1352.txt
+   Daily: report_2026-01-16.txt
+============================================================
+```
+
+### Performance Benchmarks
+
+| Metric | Dashboard | CLI | Webhook | Status |
+|--------|-----------|-----|---------|--------|
+| Processing Time | 2.13s | 0.011s | 0.15s | ⚡ Fast |
+| Data Freshness | Real-time | Real-time | Real-time | 🌐 Live |
+| Auto-refresh | Yes | No | N/A | 🔄 Active |
+| Alert Delivery | ✅ Yes | ✅ Yes | ✅ Yes | 🔔 Active |
+| Report Generation | ✅ Yes | ✅ Yes | N/A | 📊 Auto |
+| Cache Efficiency | 5min TTL | 5min TTL | N/A | 💾 Optimized |
+| Accuracy | 85% | 70% | N/A | ✅ High |
+| System Uptime | 100% | 100% | 100% | ✅ Stable |
+
+**Key Performance Indicators:**
+- 🎨 Color-coded alerts (🔴 Critical, 🟠 Warning, 🟢 Normal)
+- 🔔 Webhook delivery: <200ms typical
+- 📊 Report generation: automatic
+- 🌐 Live data: <3s fetch time
+- ⚡ Decision making: <3s total
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Components](#components)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [API Reference](#api-reference)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## 🎯 Overview
+
+BioShield-Integration is the central orchestration system that connects all levels of the BioShield framework with **Adaptive Intelligence**:
+
+```
+🌊 A_HydroNet (Water)  →  🌱 B_Agro_Immunity (Agriculture)
+          ↓                           ↓
+    🦠 C_Pathogen_Intel (Disease)  →  🔐 D_Crypto_Infra (Security)
+                    ↓
+            🧠 Adaptive Engine
+        (Memory + Microbiome + Genetics)
+```
+
+### Key Innovation
+
+Transforms **reactive alerts** into **predictive adaptive responses**:
+
+| Traditional System | BioShield Integration |
+|-------------------|----------------------|
+| Fixed thresholds | Dynamic learning thresholds |
+| React to crisis | Predict and prevent |
+| Blind alerts | Context-aware decisions |
+| Single-factor | Multi-factor intelligence |
+
+---
+
+## 🏗️ Architecture
+
+### Three-Layer Adaptive System
+
+```
+┌─────────────────────────────────────────────────────────┐
+│         Layer 3: ADAPTIVE INTELLIGENCE                  │
+│  ┌──────────────────────────────────────────────┐      │
+│  │  • Memory: Learns from past cycles           │      │
+│  │  • Microbiome: Biological network analysis   │      │
+│  │  • Genetics: Crop resilience scoring         │      │
+│  └──────────────────────────────────────────────┘      │
+└─────────────────────────────────────────────────────────┘
+                        ↓↑
+┌─────────────────────────────────────────────────────────┐
+│         Layer 2: ORCHESTRATION                          │
+│  ┌──────────────────────────────────────────────┐      │
+│  │  • Cascade Manager: A→B→C→D coordination     │      │
+│  │  • Data Router: Intelligent data flow        │      │
+│  │  • Unified API: Single entry point           │      │
+│  └──────────────────────────────────────────────┘      │
+└─────────────────────────────────────────────────────────┘
+                        ↓↑
+┌─────────────────────────────────────────────────────────┐
+│         Layer 1: MODULES (A, B, C, D)                   │
+│  ┌─────────┬──────────┬──────────┬─────────────┐      │
+│  │HydroNet │AquaCrop  │Pathogen  │Crypto       │      │
+│  │(Water)  │(Bridge)  │(Disease) │(Security)   │      │
+│  └─────────┴──────────┴──────────┴─────────────┘      │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ✨ Features
+
+### 🌐 Live Web Data Integration
+
+- **Real-time data fetching** from deployed websites:
+  - 🌊 [HydroNet](https://hydronet-v1.netlify.app/) - Water intelligence
+  - 🌱 [BioShield](https://bioshield-b1.netlify.app/) - Agricultural immunity
+- **Interactive Dashboard** with auto-refresh (10s interval)
+- **Smart caching** (5-minute cache) - reduces bandwidth usage
+- **Multi-level fallback**: `Live Web → Cache → Local Files → Simulated`
+- **HTML scraping** as fallback when APIs unavailable
+- **Visual indicators**: Color-coded alerts and progress bars
+
+### 🧠 Adaptive Intelligence
+
+- **Memory System**: Learns from alert history, adjusts thresholds dynamically
+- **Microbiome Analysis**: Network-based soil health assessment using Transfer Entropy
+- **Genetic Resilience**: Crop-specific stress tolerance scoring
+- **Multi-Factor Decisions**: Combines water stress, biological immunity, and genetic capacity
+
+### 🔄 Cascade Management
+
+- **Sequential Execution**: A→AB→B→C→D data flow
+- **Parallel Processing**: Multi-level concurrent operations
+- **Adaptive Mode**: Intelligent routing based on system state
+- **Continuous Monitoring**: Auto-run cascades at configurable intervals
+
+### 📡 Data Routing
+
+- **Intelligent Transformation**: Format conversion between levels
+- **Data Validation**: Schema checking for each level
+- **Route Logging**: Complete audit trail of data flows
+- **Broadcast Capability**: Multi-target data distribution
+
+### 📊 Performance Tracking
+
+- **Real-time Metrics**: Cascade duration, decision confidence, memory accuracy
+- **Historical Analysis**: Trend detection and pattern recognition
+- **Comprehensive Reports**: JSON exports for all system components
+- **Auto-cleanup**: Configurable data retention policies
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+```bash
+Python >= 3.8
+numpy >= 1.21.0
+scipy >= 1.7.0
+pyyaml >= 6.0
+# No additional dependencies for web data fetching (uses urllib)
+```
+
+### Quick Install
+
+```bash
+# Clone repository
+git clone https://github.com/emerladcompass/BioShield-Integration.git
+cd BioShield-Integration
+
+# Install
+pip install -e .
+
+# Or with all extras
+pip install -e ".[dev,viz,network]"
+```
+
+### Termux (Android)
+
+```bash
+pkg install python git
+cd /storage/emulated/0/download
+git clone https://github.com/emerladcompass/BioShield-Integration.git
+cd BioShield-Integration
+pip install -e .
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Dashboard (Live Monitoring)
+
+```bash
+# Launch interactive dashboard with live web data
+python dashboard.py
+
+# Features:
+# • Real-time data from hydronet-v1.netlify.app
+# • Real-time data from bioshield-b1.netlify.app
+# • Auto-refresh every 10 seconds
+# • Visual indicators and progress bars
+# • Color-coded alerts (🔴 Critical, 🟠 Warning, 🟢 Normal)
+```
+
+**Dashboard Output:**
+```
+🌊 HYDRO NET - 🔴 CRITICAL SVI: 1.000
+🌱 AGRO IMMUNITY - 🟠 MODERATE Score: 0.700
+🎯 DECISION: CRITICAL_INTERVENTION (85% confidence)
+⚡ Duration: 2.13s | Auto-refresh: 10s
+```
+
+### 2. Single Cascade Run (CLI)
+
+```bash
+# Single run with live web data
+python orchestrator/cascade_manager.py --mode single
+
+# Output:
+# ✅ Using live web data
+# 🎯 DECISION: CRITICAL_INTERVENTION
+# 📊 Confidence: 85%
+```
+
+### 3. Single Cascade Run (Python)
+
+```python
+from orchestrator.cascade_manager import CascadeManager
+
+# Initialize with live web data enabled
+manager = CascadeManager()
+
+# Run complete cascade - fetches from:
+# • https://hydronet-v1.netlify.app/
+# • https://bioshield-b1.netlify.app/
+result = manager.run_full_cascade()
+
+print(f"Action: {result['final_action']}")
+print(f"Confidence: {result['confidence']*100:.0f}%")
+print(f"Data Source: {result['cascade_steps']['a_hydronet'].get('source')}")
+```
+
+### 1b. Single Cascade via CLI
+
+```bash
+# Single run with live web data
+python orchestrator/cascade_manager.py --mode single
+
+# Output:
+# ✅ Using live web data
+# 🎯 DECISION: NORMAL_OPERATIONS
+# 📊 Confidence: 70%
+```
+
+### 2. Continuous Monitoring
+
+```python
+# Run every 5 minutes
+manager.run_continuous_monitoring(interval=300)
+```
+
+### 3. CLI Usage
+
+```bash
+# Single run
+python orchestrator/cascade_manager.py --mode single
+
+# Continuous (60s interval)
+python orchestrator/cascade_manager.py --mode continuous --interval 60
+
+# Show statistics
+python orchestrator/cascade_manager.py --mode stats
+```
+
+### 4. Adaptive Engine Only
+
+```python
+from adaptive import AdaptiveEngine
+
+engine = AdaptiveEngine("my_component")
+
+decision = engine.decide_intervention(
+    water_data={'svi': 0.38, 'quality': 62, 'contamination': 28},
+    soil_data={'bacteria_species': [120, 85, 200], ...},
+    crop_data={'type': 'wheat', 'growth_stage': 'flowering'}
+)
+
+print(decision['action'])  # CRITICAL_INTERVENTION | MONITOR_CLOSELY | ...
+```
+
+---
+
+## 🧩 Components
+
+### Adaptive Module (`adaptive/`)
+
+```
+adaptive/
+├── __init__.py
+├── adaptive_memory.py       # Phase 1: Learning system
+├── microbiome_network.py    # Phase 2: Biological analysis
+└── adaptive_engine.py       # Phase 3: Decision engine
+```
+
+**Usage:**
+
+```python
+from adaptive import AdaptiveMemory, MicrobiomeNetwork, AdaptiveEngine
+
+# Memory: Learn from past
+memory = AdaptiveMemory("component_name")
+threshold = memory.get_adaptive_threshold()
+
+# Microbiome: Analyze soil health
+network = MicrobiomeNetwork("component_name")
+analysis = network.analyze_soil_microbiome(soil_data)
+
+# Engine: Make decisions
+engine = AdaptiveEngine("component_name")
+decision = engine.decide_intervention(water, soil, crop)
+```
+
+### Orchestrator Module (`orchestrator/`)
+
+```
+orchestrator/
+├── cascade_manager.py       # Main orchestration
+└── data_router.py           # Data flow management
+```
+
+**Usage:**
+
+```python
+from orchestrator import CascadeManager, DataRouter
+
+# Cascade: Run full pipeline
+manager = CascadeManager()
+result = manager.run_full_cascade()
+
+# Router: Transform data
+router = DataRouter(base_dir)
+b_data = router.route_a_to_b(a_data)
+```
+
+### Modules (`modules/`)
+
+Wrappers for individual BioShield levels:
+
+```
+modules/
+├── hydronet/          # A: Water intelligence
+├── aquacrop/          # AB: Bridge integration
+├── agro_immunity/     # B: Agricultural immunity
+├── pathogen_intel/    # C: Disease surveillance (future)
+└── crypto_infra/      # D: Security infrastructure (future)
+```
+
+---
+
+## ⚙️ Configuration
+
+### Main Config (`config/integration_config.yaml`)
+
+```yaml
+# Paths
+paths:
+  a_hydronet: "modules/hydronet"
+  b_agro_immunity: "modules/agro_immunity"
+  data: "data"
+  reports: "reports"
+
+# Cascade settings
+cascade:
+  auto_adapt: true
+  learning_enabled: true
+  base_threshold: 0.35
+  monitoring_interval: 300
+
+# Adaptive intelligence
+adaptive:
+  memory:
+    enabled: true
+    learning_rate: 0.01
+  microbiome:
+    enabled: true
+    diversity_weight: 0.30
+  genetics:
+    enabled: true
+    resilience_weight: 0.30
+
+# Alerts
+alerts:
+  thresholds:
+    critical: {svi: 0.35, water_quality: 60}
+    warning: {svi: 0.25, water_quality: 75}
+```
+
+### Custom Configuration
+
+```python
+manager = CascadeManager(config_path="my_config.yaml")
+```
+
+---
+
+## 📊 API Reference
+
+### CascadeManager
+
+```python
+class CascadeManager:
+    def __init__(config_path: Optional[str] = None)
+    def run_full_cascade(...) -> Dict
+    def run_continuous_monitoring(interval: int = 300)
+    def get_cascade_stats() -> Dict
+    def export_cascade_report(filepath: str = None)
+```
+
+### AdaptiveEngine
+
+```python
+class AdaptiveEngine:
+    def __init__(component_name: str = "shared")
+    def decide_intervention(water_data, soil_data, crop_data) -> Dict
+    def record_outcome(decision: Dict, actual_outcome: Dict)
+    def get_system_status() -> Dict
+    def export_full_report(filepath: str = None)
+```
+
+### AdaptiveMemory
+
+```python
+class AdaptiveMemory:
+    def __init__(component_name: str = "shared")
+    def record_cycle(alert_data, action_taken, outcome)
+    def get_adaptive_threshold(context: Optional[Dict] = None) -> float
+    def get_performance_metrics() -> Dict
+    def predict_alert_need(current_data: Dict) -> Dict
+```
+
+### MicrobiomeNetwork
+
+```python
+class MicrobiomeNetwork:
+    def __init__(component_name: str = "shared")
+    def analyze_soil_microbiome(soil_data: Dict) -> Dict
+    def calculate_biological_svi(current_state: Dict) -> float
+    def predict_collapse_risk(time_series: List[Dict]) -> Dict
+```
+
+---
+
+## 🧪 Testing
+
+### Run All Tests
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest tests/ -v --cov
+
+# Test individual components
+python adaptive/adaptive_memory.py
+python adaptive/microbiome_network.py
+python adaptive/adaptive_engine.py
+python orchestrator/data_router.py
+```
+
+### Example Test
+
+```python
+def test_full_cascade():
+    manager = CascadeManager()
+    
+    # Automatically fetches live data from:
+    # • https://hydronet-v1.netlify.app/
+    # • https://bioshield-b1.netlify.app/
+    result = manager.run_full_cascade()
+    
+    # Verify data source
+    assert result['cascade_steps']['a_hydronet']['source'] in [
+        'web_live', 'web_scrape', 'cache', 'local', 'simulated'
+    ]
+    
+    # Verify decision
+    assert result['final_action'] in [
+        'CRITICAL_INTERVENTION',
+        'MONITOR_CLOSELY',
+        'PREVENTIVE_ACTION',
+        'NORMAL_OPERATIONS'
+    ]
+    assert 0 <= result['confidence'] <= 1
+    
+    print(f"✅ Data from: {result['cascade_steps']['a_hydronet']['source']}")
+    print(f"✅ Decision: {result['final_action']}")
+```
+
+---
+
+## 📈 Example Scenarios
+
+### Scenario 1: High Stress, Poor Immunity (Live Data)
+
+```python
+# Run with actual live data from websites
+water = engine.fetch_live_hydronet_data()
+soil = engine.fetch_live_bioshield_data()
+
+# Real-world example from 2026-01-16:
+# Water: SVI=0.356, Quality=74%
+# Soil: Immunity=70%, pH=6.7
+# Decision: NORMAL_OPERATIONS (70% confidence)
+
+decision = engine.decide_intervention(water, soil, crop)
+# Expected: Based on actual live conditions
+```
+
+### Scenario 2: Simulated Critical Scenario (Testing)
+
+```python
+# Override with test data for specific scenarios
+# Water: High SVI
+water = {'svi': 0.42, 'quality': 58, 'contamination': 32}
+
+# Soil: Low diversity, poor health
+soil = {
+    'bacteria_species': [50, 30, 40],  # Low
+    'fungi_species': [20, 15],
+    'nutrients': {'N': 25, 'P': 20, 'K': 30},
+    'pH': 5.5,
+    'moisture': 30
+}
+
+# Crop: Wheat
+crop = {'type': 'wheat', 'growth_stage': 'flowering'}
+
+decision = engine.decide_intervention(water, soil, crop)
+# Expected: CRITICAL_INTERVENTION
+```
+
+### Scenario 2: Moderate Stress, Good Immunity
+
+```python
+# Water: Moderate SVI
+water = {'svi': 0.36, 'quality': 68, 'contamination': 18}
+
+# Soil: High diversity, good health
+soil = {
+    'bacteria_species': [120, 85, 200, 45, 90, 150],  # High
+    'fungi_species': [60, 40, 80, 25],
+    'nutrients': {'N': 40, 'P': 30, 'K': 42},
+    'pH': 6.7,
+    'moisture': 55
+}
+
+decision = engine.decide_intervention(water, soil, crop)
+# Expected: MONITOR_CLOSELY or NORMAL_OPERATIONS
+```
+
+---
+
+## 📊 Recent Test Results
+
+### Live Dashboard Performance (2026-01-16 09:09)
+
+```
+======================================================================
+BIO-SHIELD INTEGRATION DASHBOARD
+======================================================================
+🕒 2026-01-16 09:09:24
+
+🌊 HYDRO NET (Level A)
+──────────────────────────────────────────────────
+🔴 CRITICAL SVI: 1.000
+Quality: 7% | Contamination: 15.0 | Flow: 85
+Source: web_scrape (live from hydronet-v1.netlify.app)
+📈 Prediction: increasing | Confidence: 65%
+
+🌱 AGRO IMMUNITY (Level B)
+──────────────────────────────────────────────────
+🟠 MODERATE Score: 0.700
+Status: MODERATE | Source: web_live (bioshield-b1.netlify.app)
+Indicators: 12/12 active
+
+🔄 CASCADE RESULT
+──────────────────────────────────────────────────
+✅ Decision: CRITICAL_INTERVENTION
+📊 Confidence: 85%
+⚡ Duration: 2.13s
+🔄 Auto-refresh: 10s
+
+⚙️ SYSTEM STATUS
+──────────────────────────────────────────────────
+All modules: ✅ Active
+Live Web Data: ✅ Enabled
+Total Runs: 1
+======================================================================
+```
+
+### Command Line Performance (2026-01-16)
+
+```
+============================================================
+BioShield Daily Report - 2026-01-16
+============================================================
+
+📊 System Statistics:
+   • Cycles: 1
+   • Average Duration: 0.011 seconds ⚡
+   • Success Rate: 100%
+
+🌐 Data Sources:
+   • HydroNet: web_live (scraped from HTML)
+   • BioShield: web_live (scraped from HTML)
+   • Cache Hit Rate: 0% (first run)
+
+🎯 Decision Distribution:
+   • CRITICAL_INTERVENTION: 1 (when SVI=1.0)
+   • NORMAL_OPERATIONS: 1 (when SVI=0.32)
+   • System Status: All modules active ✅
+
+📈 Real-world Examples:
+   Scenario 1 (SVI=1.0):
+   • Water Quality: 7% (Critical!)
+   • Decision: CRITICAL_INTERVENTION
+   • Confidence: 85%
+   
+   Scenario 2 (SVI=0.32):
+   • Water Quality: 72% (Good)
+   • Decision: NORMAL_OPERATIONS
+   • Confidence: 70%
+
+🔧 Module Status:
+   • A_HydroNet: ✅ Active (live web)
+   • AB_Bridge: ✅ Active
+   • B_Agro_Immunity: ✅ Active (live web)
+   • Adaptive_Engine: ✅ Active
+============================================================
+```
+
+### Performance Benchmarks
+
+| Metric | Dashboard | CLI | Status |
+|--------|-----------|-----|--------|
+| Processing Time | 2.13s | 0.011s | ⚡ Fast |
+| Data Freshness | Real-time | Real-time | 🌐 Live |
+| Auto-refresh | 10s | Manual | 🔄 Active |
+| Visualization | ✅ Yes | ❌ No | 📊 Rich |
+| Cache Efficiency | 5min TTL | 5min TTL | 💾 Optimized |
+| Accuracy | 85% confidence | 70% confidence | ✅ Good |
+| System Uptime | 100% | 100% | ✅ Stable |
+
+**Key Features:**
+- 🎨 Color-coded alerts (🔴 Critical, 🟠 Warning, 🟢 Normal)
+- 📊 Visual progress bars for all indicators
+- 🔄 Auto-refresh every 10 seconds
+- 🌐 Real-time data from live websites
+- ⚡ Fast response times (<3s typical)
+
+---
+
+## 🔧 Development
+
+### Project Structure
+
+```
+BioShield-Integration/
+├── adaptive/              # Adaptive intelligence
+├── orchestrator/          # Cascade management
+├── modules/               # Level wrappers
+├── config/                # Configuration files
+├── tests/                 # Unit tests
+├── data/                  # Runtime data
+├── reports/               # Generated reports
+├── logs/                  # System logs
+├── requirements.txt
+├── setup.py
+└── README.md
+```
+
+### Adding a New Module
+
+1. Create wrapper in `modules/your_module/`
+2. Implement standard interface
+3. Register in `cascade_manager.py`
+4. Add config section in `integration_config.yaml`
+
+### Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+## 📞 Contact
+
+**Samir Baladi**  
+Emerlad Compass 🧭  
+Email: emerladcompass@gmail.com
+
+**Project Links:**
+- 🌊 [A_HydroNet](https://github.com/emerladcompass/HydroNet) - Water intelligence ([Live Demo](https://hydronet-v1.netlify.app/))
+- 🌿 [AquaCrop](https://github.com/emerladcompass/AquaCrop) - AB Bridge
+- 🛡️ [BioShield](https://github.com/emerladcompass/BioShield) - Agro immunity ([Live Demo](https://bioshield-b1.netlify.app/))
+- 🔗 [Integration](https://github.com/emerladcompass/BioShield-Integration) - This project
+
+---
+
+## 🙏 Acknowledgments
+
+- Part of the **BioShield Sovereign Intelligence Framework**
+- Built on research from HydroNet (8.4-month water prediction)
+- Integrates constitutive and adaptive immunity concepts
+- Foundation for C_Pathogen_Intel and D_Crypto_Infra
+
+---
+
+## 📊 Roadmap
+
+### ✅ Completed (v1.0.0)
+- Adaptive Memory System
+- Microbiome Network Analysis
+- Adaptive Decision Engine
+- Cascade Manager
+- Data Router
+- **Live Web Data Integration** 🌐
+  - Real-time fetching from deployed websites
+  - Smart caching system (5min TTL)
+  - HTML scraping fallback
+- **Interactive Dashboard** 📊
+  - Real-time monitoring
+  - Color-coded alerts
+  - Visual progress bars
+  - Auto-refresh (10s interval)
+
+### 🔄 In Progress (v1.1.0)
+- Enhanced ML models
+- Real-time learning optimization
+- Multi-crop analysis
+- **Enhanced Dashboard** 
+  - Historical charts
+  - Export functionality
+  - Mobile responsive design
+
+### ⏳ Planned (v2.0.0)
+- C_Pathogen_Intel integration
+- Multi-level cascade (A→B→C)
+- Advanced threat modeling
+
+### 🔮 Future (v3.0.0)
+- D_Crypto_Infra security layer
+- Complete ABCD integration
+- Sovereign intelligence platform
+
+---
+
+**Version:** 2.0.0  
+**Last Updated:** January 16, 2026  
+**Status:** 🟢 Production Ready - Full System Active
+
+### System Components
+- ✅ Real-time data from hydronet-v1.netlify.app
+- ✅ Real-time data from bioshield-b1.netlify.app  
+- ✅ Interactive main dashboard with menu system
+- ✅ Automated alert system with webhook (Pipedream)
+- ✅ Automated hourly/daily/weekly/monthly reports
+- ✅ Multi-level fallback (Web → Cache → Local → Simulated)
+- ✅ Smart caching (5min TTL)
+- ✅ HTML scraping fallback
+- ✅ Color-coded visual alerts
+- ✅ Performance: <3s typical response time
+
+### Quick Commands
+```bash
+# Main Dashboard (recommended)
+python dashboard/dashboard.py
+
+# Single cascade with alerts
+python orchestrator/cascade_manager.py --mode single
+
+# Continuous monitoring (5min interval)
+python orchestrator/cascade_manager.py --mode continuous --interval 300
+
+# Test modules
+python src/modules/hydronet/hydronet_wrapper.py
+python src/modules/agro_immunity/agro_immunity_wrapper.py
+
+# View reports
+ls reports/hourly/
+ls reports/daily/
+ls reports/alerts/
+```
+
+### Alert Webhook
+```bash
+# Pipedream endpoint for CRITICAL alerts
+POST https://eoi3vhd0zol7y5o.m.pipedream.net
+
+# Auto-forwards to:
+# • Slack notifications
+# • Email alerts  
+# • Custom webhooks
+```
+
+---
+
+🌍 **Building Sovereign Intelligence for Agricultural Security** 🛡️
