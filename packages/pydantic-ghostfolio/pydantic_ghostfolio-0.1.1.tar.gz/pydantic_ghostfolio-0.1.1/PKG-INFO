@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: pydantic-ghostfolio
+Version: 0.1.1
+Summary: Pydantic models for Ghostfolio export/import data
+Project-URL: Homepage, https://github.com/romamo/pydantic-ghostfolio
+Project-URL: Repository, https://github.com/romamo/pydantic-ghostfolio
+Project-URL: Issues, https://github.com/romamo/pydantic-ghostfolio/issues
+Author-email: Roman Medvedev <pypi@romavm.dev>
+License-Expression: MIT
+License-File: LICENSE
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Office/Business :: Financial :: Investment
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Requires-Dist: pycountry>=24.6.1
+Requires-Dist: pydantic-extra-types>=2.11.0
+Requires-Dist: pydantic>=2.12.5
+Description-Content-Type: text/markdown
+
+# Pydantic Ghostfolio
+
+Pydantic models for [Ghostfolio](https://github.com/ghostfolio/ghostfolio) export/import format.
+This package allows you to parse, validate, and type-check Ghostfolio data in Python.
+
+## Installation
+
+```bash
+pip install pydantic-ghostfolio
+```
+
+## Usage
+
+See [examples/basic_usage.py](examples/basic_usage.py) for a complete example.
+
+```python
+from pydantic_ghostfolio import GhostfolioExport
+import json
+
+with open("ghostfolio-export.json", "r") as f:
+    data = json.load(f)
+
+export = GhostfolioExport(**data)
+print(f"Export version: {export.meta.version}")
+```
+
+## References
+
+The models are based on the Ghostfolio source code interfaces:
+
+- **Export Response Schema**: [export-response.interface.ts](https://github.com/ghostfolio/ghostfolio/blob/main/libs/common/src/lib/interfaces/responses/export-response.interface.ts)
+- **Activity Interface**: [activities.interface.ts](https://github.com/ghostfolio/ghostfolio/blob/main/libs/common/src/lib/interfaces/activities.interface.ts)
+- **Prisma Schema**: [schema.prisma](https://github.com/ghostfolio/ghostfolio/blob/main/prisma/schema.prisma)
+
+## Development
+
+Run tests:
+```bash
+uv run pytest
+```
