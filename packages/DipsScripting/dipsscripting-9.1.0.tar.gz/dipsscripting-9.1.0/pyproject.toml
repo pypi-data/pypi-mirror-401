@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DipsScripting"
+version = "9.1.0"
+dependencies = [
+  "grpcio",
+  "protobuf<6.0",
+  "pytest>=7.0.0",
+  "pytest-mock>=3.0.0"
+]
+authors = [
+  { name="Rocscience"},
+]
+description = "Client library for interacting with Dips through python"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering",
+]
+
+license-files = ["License.txt"]
+keywords = ["Rocscience", "Dips", "Scripting", "RocScript", "Geotechnical"]
+
+[project.urls]
+Homepage = "https://www.rocscience.com/software/dips"
+Documentation = "https://www.rocscience.com/help/dips/overview"
+
