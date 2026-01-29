@@ -1,0 +1,1697 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cat Cafe API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/datasets": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "List Datasets",
+        "description": "List all datasets with optional tag filtering and experiment counts",
+        "operationId": "list_datasets_api_datasets_get",
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "description": "Comma-separated list of tags to filter by",
+              "title": "Tags"
+            },
+            "description": "Comma-separated list of tags to filter by"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DatasetMetadata"
+                  },
+                  "title": "Response List Datasets Api Datasets Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["datasets"],
+        "summary": "Create Dataset",
+        "description": "Create a new dataset",
+        "operationId": "create_dataset_api_datasets_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDatasetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dataset"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "Get Dataset",
+        "description": "Get dataset details (latest version)",
+        "operationId": "get_dataset_api_datasets__dataset_id__get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dataset"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["datasets"],
+        "summary": "Update Dataset",
+        "description": "Update dataset metadata",
+        "operationId": "update_dataset_api_datasets__dataset_id__put",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDatasetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Update Dataset Api Datasets  Dataset Id  Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["datasets"],
+        "summary": "Delete Dataset",
+        "description": "Delete dataset",
+        "operationId": "delete_dataset_api_datasets__dataset_id__delete",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}/examples": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "List Examples",
+        "description": "List examples in dataset (latest or specific version)",
+        "operationId": "list_examples_api_datasets__dataset_id__examples_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "nullable": true,
+              "description": "Dataset version to get examples from",
+              "title": "Version"
+            },
+            "description": "Dataset version to get examples from"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Maximum number of examples to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Maximum number of examples to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Number of examples to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of examples to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DatasetExample"
+                  },
+                  "title": "Response List Examples Api Datasets  Dataset Id  Examples Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["datasets"],
+        "summary": "Create Example",
+        "description": "Create a new example in the dataset",
+        "operationId": "create_example_api_datasets__dataset_id__examples_post",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExampleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Create Example Api Datasets  Dataset Id  Examples Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiments": {
+      "get": {
+        "tags": ["experiments"],
+        "summary": "List Experiments",
+        "description": "List all experiments.",
+        "operationId": "list_experiments_api_experiments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListExperimentsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["experiments"],
+        "summary": "Create Experiment",
+        "description": "Create a new experiment.",
+        "operationId": "create_experiment_api_experiments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExperimentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiments/{experiment_id}": {
+      "get": {
+        "tags": ["experiments"],
+        "summary": "Get Experiment",
+        "description": "Get an experiment by ID.",
+        "operationId": "get_experiment_api_experiments__experiment_id__get",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiments/{experiment_id}/runs": {
+      "put": {
+        "tags": ["experiments"],
+        "summary": "Create Run",
+        "description": "Create a run entry for an experiment (task output only).",
+        "operationId": "create_run_api_experiments__experiment_id__runs_put",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExperimentRunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["experiments"],
+        "summary": "Create Run",
+        "description": "Create a run entry for an experiment (task output only).",
+        "operationId": "create_run_post_api_experiments__experiment_id__runs_post",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExperimentRunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["experiments"],
+        "summary": "List Runs",
+        "description": "List run records for an experiment.",
+        "operationId": "list_runs_api_experiments__experiment_id__runs_get",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentRunListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiments/{experiment_id}/runs/{run_id}": {
+      "get": {
+        "tags": ["experiments"],
+        "summary": "Get Run",
+        "description": "Get a single run (task + evaluations) by run_id.",
+        "operationId": "get_run_api_experiments__experiment_id__runs__run_id__get",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiments/{experiment_id}/runs/{run_id}/evaluations": {
+      "put": {
+        "tags": ["experiments"],
+        "summary": "Append Evaluation",
+        "description": "Append an evaluator result to a run.",
+        "operationId": "append_evaluation_api_experiments__experiment_id__runs__run_id__evaluations_put",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExperimentEvaluationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["experiments"],
+        "summary": "Append Evaluation",
+        "description": "Append an evaluator result to a run.",
+        "operationId": "append_evaluation_post_api_experiments__experiment_id__runs__run_id__evaluations_post",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExperimentEvaluationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["experiments"],
+        "summary": "List Evaluations",
+        "description": "List evaluations for a run.",
+        "operationId": "list_evaluations_api_experiments__experiment_id__runs__run_id__evaluations_get",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExperimentEvaluationView"
+                  },
+                  "title": "Response List Evaluations Api Experiments  Experiment Id  Runs  Run Id  Evaluations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiments/{experiment_id}/complete": {
+      "post": {
+        "tags": ["experiments"],
+        "summary": "Complete Experiment",
+        "description": "Complete an experiment and mark it as finished.",
+        "operationId": "complete_experiment_api_experiments__experiment_id__complete_post",
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteExperimentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteExperimentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ExperimentRunCreate": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "example_id": {
+            "type": "string",
+            "title": "Example Id"
+          },
+          "repetition_number": {
+            "type": "integer",
+            "title": "Repetition Number",
+            "default": 1
+          },
+          "input_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input Data"
+          },
+          "output": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Output"
+          },
+          "actual_output": {
+            "title": "Actual Output"
+          },
+          "trace_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Trace Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Started At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Completed At"
+          },
+          "execution_time_ms": {
+            "type": "number",
+            "nullable": true,
+            "title": "Execution Time Ms"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": ["example_id", "input_data", "output"],
+        "title": "ExperimentRunCreate",
+        "description": "Request model for creating a run record (task output)."
+      },
+      "CompleteExperimentRequest": {
+        "properties": {
+          "summary": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Summary"
+          }
+        },
+        "type": "object",
+        "title": "CompleteExperimentRequest",
+        "description": "Request model for completing an experiment."
+      },
+      "DatasetExample": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Id",
+            "description": "Unique identifier for the document"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Created At",
+            "description": "Timestamp when document was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Updated At",
+            "description": "Timestamp when document was last updated"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "description": "Document version for optimistic locking",
+            "default": 1
+          },
+          "dataset_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Dataset Id",
+            "description": "ID of the parent dataset"
+          },
+          "input": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input",
+            "description": "Structured LLM input payload (e.g. {'messages': [...]})"
+          },
+          "output": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Output",
+            "description": "Structured reference output payload (e.g. {'messages': [...]})"
+          },
+          "expected_tool_calls": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            },
+            "type": "array",
+            "nullable": true,
+            "title": "Expected Tool Calls",
+            "description": "Expected tool calls that should be made during execution"
+          },
+          "source_trace_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Source Trace Id",
+            "description": "Original trace ID"
+          },
+          "source_node_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Source Node Id",
+            "description": "Original LLM span node ID"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata",
+            "description": "Additional metadata"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "description": "Example tags"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["input", "output"],
+        "title": "DatasetExample",
+        "description": "A single example within a dataset"
+      },
+      "CompleteExperimentResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": ["message", "completed_at"],
+        "title": "CompleteExperimentResponse",
+        "description": "Response model for completing an experiment."
+      },
+      "ToolCall": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "title": "Name"
+          },
+          "arguments": {
+            "nullable": true,
+            "title": "Arguments"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "default": "function"
+          },
+          "result": {
+            "nullable": true,
+            "title": "Result"
+          }
+        },
+        "type": "object",
+        "title": "ToolCall",
+        "description": "Tool/function call emitted by the model."
+      },
+      "ExperimentResponse": {
+        "properties": {
+          "experiment_id": {
+            "type": "string",
+            "title": "Experiment Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "dataset_version": {
+            "type": "string",
+            "nullable": true,
+            "title": "Dataset Version"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Completed At"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Summary"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "experiment_id",
+          "name",
+          "description",
+          "dataset_id",
+          "tags",
+          "metadata",
+          "status",
+          "created_at",
+          "completed_at",
+          "summary",
+          "created_by"
+        ],
+        "title": "ExperimentResponse",
+        "description": "Response model for experiment operations."
+      },
+      "ExperimentRunListResponse": {
+        "properties": {
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentRunView"
+            },
+            "type": "array",
+            "title": "Runs"
+          }
+        },
+        "type": "object",
+        "required": ["runs"],
+        "title": "ExperimentRunListResponse",
+        "description": "Response wrapper for listing runs."
+      },
+      "ExperimentEvaluationView": {
+        "properties": {
+          "evaluator_name": {
+            "type": "string",
+            "title": "Evaluator Name"
+          },
+          "score": {
+            "type": "number",
+            "nullable": true,
+            "title": "Score"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true,
+            "title": "Label"
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true,
+            "title": "Explanation"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "trace_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Trace Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Started At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Completed At"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true,
+            "title": "Error"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": ["evaluator_name", "created_at"],
+        "title": "ExperimentEvaluationView",
+        "description": "View model for a recorded evaluator result."
+      },
+      "ExperimentEvaluationCreate": {
+        "properties": {
+          "evaluator_name": {
+            "type": "string",
+            "title": "Evaluator Name"
+          },
+          "score": {
+            "type": "number",
+            "nullable": true,
+            "title": "Score"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true,
+            "title": "Label"
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true,
+            "title": "Explanation"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "trace_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Trace Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Started At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Completed At"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true,
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": ["evaluator_name"],
+        "title": "ExperimentEvaluationCreate",
+        "description": "Request model for appending an evaluation result to a run."
+      },
+      "CreateExperimentRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "dataset_version_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Dataset Version Id"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": ["name", "description", "dataset_id"],
+        "title": "CreateExperimentRequest",
+        "description": "Request model for creating an experiment."
+      },
+      "UpdateDatasetRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "nullable": true,
+            "title": "Tags"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "nullable": true,
+            "title": "Metadata"
+          },
+          "change_summary": {
+            "type": "string",
+            "nullable": true,
+            "title": "Change Summary"
+          }
+        },
+        "type": "object",
+        "title": "UpdateDatasetRequest",
+        "description": "Request to update dataset metadata"
+      },
+      "DatasetMetadata": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "example_count": {
+            "type": "integer",
+            "title": "Example Count"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "experiment_count": {
+            "type": "integer",
+            "title": "Experiment Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "example_count",
+          "tags",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "DatasetMetadata",
+        "description": "Lightweight dataset information for listing"
+      },
+      "CreateDatasetRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": ["name"],
+        "title": "CreateDatasetRequest",
+        "description": "Request to create a new dataset"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "ListExperimentsResponse": {
+        "properties": {
+          "experiments": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentResponse"
+            },
+            "type": "array",
+            "title": "Experiments"
+          }
+        },
+        "type": "object",
+        "required": ["experiments"],
+        "title": "ListExperimentsResponse",
+        "description": "Response model for listing experiments."
+      },
+      "CreateExampleRequest": {
+        "properties": {
+          "input": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input"
+          },
+          "output": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Output"
+          },
+          "expected_tool_calls": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            },
+            "type": "array",
+            "nullable": true,
+            "title": "Expected Tool Calls",
+            "description": "Expected tool calls for this example"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": ["input", "output"],
+        "title": "CreateExampleRequest",
+        "description": "Request to manually create an example"
+      },
+      "Dataset": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Id",
+            "description": "Unique identifier for the document"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Created At",
+            "description": "Timestamp when document was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Updated At",
+            "description": "Timestamp when document was last updated"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "description": "Document version for optimistic locking",
+            "default": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name",
+            "description": "Dataset name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description",
+            "description": "Dataset description"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "description": "Dataset tags"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata",
+            "description": "Additional metadata"
+          },
+          "example_count": {
+            "type": "integer",
+            "title": "Example Count",
+            "description": "Number of examples in dataset",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["name"],
+        "title": "Dataset",
+        "description": "A collection of examples for training/evaluation"
+      },
+      "ExperimentRunView": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "example_id": {
+            "type": "string",
+            "title": "Example Id"
+          },
+          "repetition_number": {
+            "type": "integer",
+            "title": "Repetition Number"
+          },
+          "input_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input Data"
+          },
+          "output": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Output"
+          },
+          "actual_output": {
+            "title": "Actual Output"
+          },
+          "trace_id": {
+            "type": "string",
+            "nullable": true,
+            "title": "Trace Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Started At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "Completed At"
+          },
+          "execution_time_ms": {
+            "type": "number",
+            "nullable": true,
+            "title": "Execution Time Ms"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "evaluation_scores": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Evaluation Scores"
+          },
+          "evaluator_metadata": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Evaluator Metadata"
+          },
+          "evaluations": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentEvaluationView"
+            },
+            "type": "array",
+            "title": "Evaluations"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "example_id",
+          "repetition_number",
+          "input_data",
+          "output",
+          "actual_output",
+          "created_at"
+        ],
+        "title": "ExperimentRunView",
+        "description": "Aggregated run view with evaluations merged in."
+      }
+    }
+  }
+}
