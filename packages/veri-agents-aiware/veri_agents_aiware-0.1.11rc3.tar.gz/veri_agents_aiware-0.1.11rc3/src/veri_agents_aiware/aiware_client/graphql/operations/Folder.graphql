@@ -1,0 +1,31 @@
+query Get_Folder($id: ID!, $limit: Int = 30, $offset: Int = 0, $tdoLimit: Int = 100) {
+  folder(id: $id) {
+    id
+    name
+    parent {
+      id
+      name
+    }
+    childFolders(
+        limit: $limit,
+        offset: $offset,
+        orderBy: [{field: name, direction: asc}]
+    ) {
+      records {
+        id
+        name
+      }
+    }
+    childTDOs(
+        limit: $tdoLimit,
+    ) {
+      count
+      records {
+        id
+        name
+        createdDateTime
+        modifiedDateTime
+      }
+    }
+  }
+}

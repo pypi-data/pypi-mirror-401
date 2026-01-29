@@ -1,0 +1,39 @@
+query GetMentions(
+  $limit: Int = 100,
+  $offset: Int = 0,
+  $id: ID,
+  $watchlistid: ID,
+) {
+  mentions(
+    limit: $limit,
+    offset: $offset,
+    watchlistId: $watchlistid,
+    id: $id,
+  ) {
+    count
+    records {
+      ...Mention_Content
+    }
+  }
+}
+
+query GetMentionsWithEngineResults(
+  $limit: Int = 100,
+  $offset: Int = 0,
+  $id: ID,
+  $watchlistid: ID,
+) {
+  mentions(
+    limit: $limit,
+    offset: $offset,
+    watchlistId: $watchlistid,
+    id: $id,
+  ) {
+    count
+    records {
+      ...Mention_Content
+      cognitiveEngineResults
+    }
+  }
+}
+
