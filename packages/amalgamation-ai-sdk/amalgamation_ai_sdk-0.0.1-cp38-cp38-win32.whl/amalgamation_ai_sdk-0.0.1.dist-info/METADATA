@@ -1,0 +1,550 @@
+Metadata-Version: 2.1
+Name: amalgamation-ai-sdk
+Version: 0.0.1
+Summary: Official Python SDK for AmalgamationAI - AI Vision Blueprint Platform
+Author: AmalgamationAI Team
+Keywords: ai,computer-vision,amalgamation
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: httpx
+Requires-Dist: pydantic
+Requires-Dist: python-dateutil
+Requires-Dist: pyyaml
+Requires-Dist: typing-extensions
+Provides-Extra: dev
+Requires-Dist: black>=23.7.0; extra == "dev"
+Requires-Dist: mypy>=1.4.0; extra == "dev"
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.11.0; extra == "dev"
+Requires-Dist: respx>=0.20.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: myst-parser>=2.0.0; extra == "docs"
+Requires-Dist: sphinx>=7.0.0; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints>=1.24.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.3.0; extra == "docs"
+
+# AmalgamationAI Python SDK
+
+Official Python SDK for AmalgamationAI - AI Vision Blueprint Platform.
+
+## Installation
+
+```bash
+pip install amalgamation-ai-sdk
+```
+
+## Quick Start
+
+### Cloud Mode
+
+```python
+import asyncio
+from amalgamation_ai import AmalgamationAISDK
+
+async def main():
+    # By default, the SDK connects to amalgamation-ai.mvp-e.com
+    async with AmalgamationAISDK(api_key="aai_your_key_here") as client:
+        # Generate blueprint from prompt and images
+        result = await client.generate_blueprint(
+            prompt="What is in the image?",
+            images=["photo.jpg"]
+        )
+        print(f"Blueprint: {result.blueprint}")
+        
+        # Execute the blueprint
+        execution = await client.execute_blueprint(
+            blueprint=result.blueprint,
+            input_files=["photo.jpg"]
+        )
+        print(f"Results: {execution.results}")
+
+asyncio.run(main())
+```
+
+### On-Premise Mode
+
+```python
+import asyncio
+from amalgamation_ai import AmalgamationAISDK
+
+async def main():
+    async with AmalgamationAISDK(
+        api_key="dummy",  # Not validated or used in on-premise mode
+        environment="on-premise",
+        base_url="http://localhost:8888"
+    ) as client:
+        # Generate blueprint (synchronous, returns immediately)
+        result = await client.generate_blueprint(
+            prompt="What is in the image?",
+            images=["photo.jpg"]
+        )
+        print(f"Blueprint: {result.blueprint}")
+        
+        # Execute the blueprint (synchronous, returns immediately)
+        execution = await client.execute_blueprint(
+            blueprint=result.blueprint,
+            input_files=["photo.jpg"]
+        )
+        print(f"Results: {execution.results}")
+
+asyncio.run(main())
+```
+
+## Features
+
+- **Simplified Interface**: One-step methods that handle the entire workflow automatically
+- **Dual Mode Support**: Works with both cloud and on-premise deployments
+- **Async/Await Support**: Built on modern Python async/await patterns
+- **Automatic File Upload**: Handles S3 uploads transparently (cloud mode)
+- **Status Polling**: Built-in polling with progress callbacks (cloud mode)
+- **Synchronous On-Premise**: Direct API calls with immediate results (on-premise mode)
+- **Type Safety**: Full type hints and Pydantic models
+
+## SDK Usage
+
+### Generate Blueprint
+
+Generate a blueprint from a prompt and optional input files:
+
+```python
+async with AmalgamationAISDK(api_key="aai_...") as client:
+    result = await client.generate_blueprint(
+        prompt="Count the number of people in the image",
+        images=["photo.jpg"],
+        wait=True,              # Wait for completion (default: True)
+        timeout=300,            # Timeout in seconds
+        poll_interval=5,         # Poll every 5 seconds
+        on_progress=lambda status: print(f"Status: {status.status}")
+    )
+    
+    if result.status == "completed":
+        print(f"Generated blueprint: {result.blueprint}")
+    elif result.status == "failed":
+        print(f"Error: {result.error}")
+```
+
+### Execute Blueprint
+
+Execute a blueprint with input files:
+
+```python
+async with AmalgamationAISDK(api_key="aai_...") as client:
+    blueprint = """
+    final_result = tools.vlm(
+        images=image_list,
+        text='Describe this image in detail <image_0>'
+    )
+    """
+    
+    result = await client.execute_blueprint(
+        blueprint=blueprint,
+        input_files=["input.jpg"],
+        wait=True,
+        timeout=600,
+        poll_interval=5
+    )
+    
+    if result.status == "completed":
+        print(f"Results: {result.results}")
+        print(f"Output files: {result.output_files}")
+```
+
+### Check Status (Cloud Mode Only)
+
+Query the status of a generation or execution:
+
+```python
+# Get generation result (with polling)
+result = await client.get_generation_result(
+    generation_id="gen_123",
+    wait=True,
+    timeout=300
+)
+
+# Get execution result (with polling)
+result = await client.get_execution_result(
+    execution_id="exec_123",
+    wait=True,
+    timeout=600
+)
+```
+
+**Note:** `get_generation_result()` and `get_execution_result()` are only available in cloud mode. On-premise mode returns results directly from `generate_blueprint()` and `execute_blueprint()`.
+
+### Non-Blocking Operations (Cloud Mode Only)
+
+If you don't want to wait for completion:
+
+```python
+# Start generation without waiting
+generation = await client.generate_blueprint(
+    prompt="Analyze image",
+    images=["photo.jpg"],
+    wait=False  # Don't wait for completion
+)
+
+# Check status later
+result = await client.get_generation_result(
+    generation_id=generation.generation_id,
+    wait=True
+)
+```
+
+**Note:** On-premise mode always returns results immediately (synchronous), so `wait` parameter is ignored.
+
+## Configuration
+
+### Cloud API Endpoint
+
+The SDK connects to the AmalgamationAI cloud service at:
+
+**Default Cloud URL**: `https://amalgamation-ai.mvp-e.com`
+
+You typically don't need to specify the `base_url` parameter - the SDK will use this default endpoint automatically. Only override it if you need to connect to a different environment (e.g., staging or testing).
+
+### Environment Variables
+
+#### Cloud Mode
+
+```bash
+# Required
+export AMALGAMATION_API_KEY="aai_your_key_here"
+
+# Optional: Override API base URL
+# Default cloud URL: https://amalgamation-ai.mvp-e.com
+export AAI_API_BASE_URL="https://amalgamation-ai.mvp-e.com"
+```
+
+#### On-Premise Mode
+
+```bash
+# Optional: Override on-premise API base URL (default: http://localhost:8888)
+export AAI_ON_PREMISE_URL="http://localhost:8888"
+```
+
+### SDK Initialization Options
+
+#### Cloud Mode
+
+```python
+async with AmalgamationAISDK(
+    api_key="aai_your_key_here",      # Required for cloud mode
+    base_url=None,                     # Optional: Override base URL
+                                       # Default: https://amalgamation-ai.mvp-e.com
+    timeout=30,                         # Request timeout in seconds
+    environment="production"           # "production" or "localstack"
+) as client:
+    ...
+```
+
+#### On-Premise Mode
+
+```python
+async with AmalgamationAISDK(
+    api_key="dummy",                   # Not validated or used in on-premise mode
+    environment="on-premise",          # Required: Enable on-premise mode
+    base_url="http://localhost:8888", # Optional: Default is http://localhost:8888
+    timeout=300                         # Request timeout in seconds (5 minutes)
+                                       # Adjust based on task complexity
+                                       # First-time execution may need longer timeout
+) as client:
+    ...
+```
+
+## API Key Management
+
+### Getting Your API Key
+
+Contact your AmalgamationAI administrator to obtain an API key, or visit the [API Key Management Portal](https://your-portal-url.com).
+
+### API Key Format
+
+API keys follow the format: `aai_<64 hex characters>`
+
+Example: `aai_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef`
+
+### Setting Your API Key
+
+```bash
+# Option 1: Environment variable (recommended)
+export AMALGAMATION_API_KEY="aai_your_key_here"
+
+# Option 2: Pass directly to SDK
+async with AmalgamationAISDK(api_key="aai_your_key_here") as client:
+    ...
+```
+
+## Examples
+
+See the `examples/` directory for complete usage examples:
+
+```bash
+# Run the cloud mode quickstart example
+python examples/01_quickstart.py path/to/your/image.png
+
+# Run the on-premise mode quickstart example
+python examples/02_on_premise_quickstart.py path/to/your/image.png
+```
+
+### Example: Complete Workflow
+
+```python
+import asyncio
+from amalgamation_ai import AmalgamationAISDK
+
+async def main():
+    async with AmalgamationAISDK(api_key="aai_...") as client:
+        # Step 1: Generate blueprint
+        generation = await client.generate_blueprint(
+            prompt="Detect scratches on the product",
+            images=["product.jpg"]
+        )
+        
+        if generation.status != "completed":
+            print(f"Generation failed: {generation.error}")
+            return
+        
+        # Step 2: Execute blueprint
+        execution = await client.execute_blueprint(
+            blueprint=generation.blueprint,
+            input_files=["product.jpg"]
+        )
+        
+        if execution.status == "completed":
+            print(f"Analysis results: {execution.results}")
+
+asyncio.run(main())
+```
+
+## On-Premise Mode
+
+The SDK supports on-premise deployments for organizations that need to run AmalgamationAI services locally.
+
+### Key Differences from Cloud Mode
+
+| Feature | Cloud Mode | On-Premise Mode |
+|---------|-----------|-----------------|
+| **API Key** | Required | Not required (use "dummy") |
+| **Execution** | Asynchronous (SQS queue) | Synchronous (direct call) |
+| **Results** | Polling required | Returned immediately |
+| **Status Query** | `get_generation_result()` available | Not available (results returned directly) |
+| **Base URL** | `https://amalgamation-ai.mvp-e.com` (default) | `http://localhost:8888` (default) |
+
+### On-Premise Usage Example
+
+```python
+import asyncio
+from amalgamation_ai import AmalgamationAISDK
+
+async def main():
+    async with AmalgamationAISDK(
+        api_key="dummy",  # Not validated or used in on-premise mode
+        environment="on-premise",
+        base_url="http://localhost:8888"
+    ) as client:
+        # Generate blueprint - returns immediately
+        result = await client.generate_blueprint(
+            prompt="What is in the image?",
+            images=["photo.jpg"]
+        )
+        
+        # Execute blueprint - returns immediately
+        execution = await client.execute_blueprint(
+            blueprint=result.blueprint,
+            input_files=["photo.jpg"]
+        )
+        
+        print(f"Results: {execution.results}")
+
+asyncio.run(main())
+```
+
+### On-Premise Requirements
+
+1. **On-Premise API Service**: The `amalgamation_api_client` service must be running
+2. **Accessible Endpoint**: The service should be accessible at the specified `base_url`
+3. **Python Package**: The `amalgamation_api_client` package must be available in your Python environment
+
+### Setting Up On-Premise Mode
+
+```bash
+# 1. Ensure the on-premise API service is running
+# (This depends on your deployment setup)
+
+# 2. Set the base URL (optional, defaults to http://localhost:8888)
+export AAI_ON_PREMISE_URL="http://localhost:8888"
+
+# 3. Use the SDK with on-premise mode
+python examples/02_on_premise_quickstart.py path/to/image.jpg
+```
+
+## Error Handling
+
+The SDK provides specific exception types:
+
+```python
+from amalgamation_ai import (
+    AmalgamationAISDK,
+    AuthenticationError,
+    ValidationError,
+    APIError,
+    TimeoutError
+)
+
+try:
+    async with AmalgamationAISDK(api_key="aai_...") as client:
+        result = await client.generate_blueprint(prompt="...")
+except AuthenticationError:
+    print("Invalid API key")
+except ValidationError as e:
+    print(f"Invalid input: {e}")
+except TimeoutError:
+    print("Operation timed out")
+except APIError as e:
+    print(f"API error: {e}")
+```
+
+## Troubleshooting
+
+### Problem: Invalid API Key
+
+**Symptom:**
+```
+AuthenticationError: Invalid API key
+```
+
+**Solution:**
+- Verify your API key is correct
+- Check that the API key hasn't expired
+- Ensure the API key is set correctly: `echo $AMALGAMATION_API_KEY`
+
+### Problem: Connection Timeout
+
+**Symptom:**
+```
+TimeoutError: Request timed out
+```
+
+**Solution:**
+- Check your internet connection
+- Verify the API endpoint is accessible
+- Increase timeout: `AmalgamationAISDK(..., timeout=60)`
+
+### Problem: ImportError
+
+**Symptom:**
+```
+ImportError: cannot import name 'AmalgamationAISDK'
+```
+
+**Solution:**
+```bash
+# Reinstall SDK
+pip install --upgrade amalgamation-ai-sdk
+```
+
+### Problem: Generation/Execution Stuck in QUEUED Status (Cloud Mode)
+
+**Symptom:**
+Status remains `QUEUED` for a long time
+
+**Solution:**
+- This is normal for async operations - the system is processing your request
+- Increase the timeout: `wait=True, timeout=600`
+- Check the status periodically using `get_generation_result()` or `get_execution_result()`
+
+### Problem: On-Premise API Not Available
+
+**Symptom:**
+```
+RuntimeError: On-premise client not available
+ConnectionError: Connection refused
+```
+
+**Solution:**
+- Ensure the on-premise API service is running
+- Verify the service is accessible at the specified `base_url`
+- Check that `amalgamation_api_client` package is installed and accessible
+- Test the endpoint: `curl http://localhost:8888/-/healthz`
+
+### Problem: On-Premise Request Timeout
+
+**Symptom:**
+```
+httpx.ReadTimeout
+Request failed: ReadTimeout
+```
+
+**Solution:**
+- **First-time execution**: May take longer due to model loading - increase timeout to 300+ seconds
+- **Complex tasks**: Video processing or large images may require longer timeouts
+- **Hardware limitations**: Slower hardware may need extended timeouts
+- Increase timeout: `AmalgamationAISDK(..., timeout=300)` (5 minutes)
+- For very long operations, consider timeout=600 (10 minutes) or more
+
+## Status Values
+
+- `created`: Request created, waiting to start
+- `queued`: Request queued for processing
+- `processing`: Currently being processed
+- `completed`: Successfully completed
+- `failed`: Processing failed
+
+## Quick Reference
+
+### Main Methods
+
+```python
+# Generate blueprint
+result = await client.generate_blueprint(
+    prompt="...",
+    images=["..."],
+    videos=["..."],  # Optional
+    wait=True
+)
+
+# Execute blueprint
+result = await client.execute_blueprint(
+    blueprint="...",
+    input_files=["..."],
+    wait=True
+)
+
+# Get results
+generation = await client.get_generation_result(generation_id, wait=True)
+execution = await client.get_execution_result(execution_id, wait=True)
+
+# Health check
+health = await client.health_check()
+```
+
+### File Input Types
+
+The SDK accepts file inputs in multiple formats:
+
+```python
+# String path
+images=["/path/to/image.jpg"]
+
+# Path object
+from pathlib import Path
+images=[Path("/path/to/image.jpg")]
+
+# File-like object
+with open("image.jpg", "rb") as f:
+    images=[f]
+```
+
+## License
+
+Fujitsu License - see LICENSE for details.
+
+## Support
+
+For issues, questions, or feature requests, please contact your account manager, who will be your direct point of contact for all support needs.
