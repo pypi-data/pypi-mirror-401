@@ -1,0 +1,17 @@
+[project]
+name = "mcp-server-sqlite3"
+version = "20260116"
+description = "SQLite3 tools for MCP"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "mcp[cli]>=1.25.0",
+]
+
+[project.scripts]
+mcp-server-sqlite3 = "mcp-server-sqlite3:main"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
