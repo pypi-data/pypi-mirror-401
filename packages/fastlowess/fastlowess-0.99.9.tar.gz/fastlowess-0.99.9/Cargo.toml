@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = ["bindings/python"]
+exclude = ["bindings/r/src/vendor"]
+
+[workspace.package]
+version = "0.99.9"
+authors = ["Amir Valizadeh <thisisamirv@gmail.com>"]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/thisisamirv/lowess-project"
+homepage = "https://github.com/thisisamirv/lowess-project"
+documentation = "https://lowess.readthedocs.io/"
+rust-version = "1.88"
+readme = "README.md"
+description = "High-performance LOWESS (Locally Weighted Scatterplot Smoothing)"
+keywords = ["lowess", "smoothing", "statistics", "regression", "bioinformatics"]
+categories = ["science", "algorithms"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
