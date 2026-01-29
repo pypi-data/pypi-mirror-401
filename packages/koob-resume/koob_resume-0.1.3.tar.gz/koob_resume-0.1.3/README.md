@@ -1,0 +1,126 @@
+# koob-resume
+
+A Python CLI tool to generate professional PDF resumes from JSON data.
+
+## Features
+
+- Generate clean, professional PDF resumes
+- Configurable section titles and font sizes via JSON
+- Uses core PDF fonts (Helvetica) - no font dependencies
+- Optional certifications section
+
+## Installation
+
+### From PyPI
+
+```bash
+pip install koob-resume
+```
+
+### From Debian Package
+
+Download the latest `.deb` package from [Releases](https://github.com/koobfoo/koob-resume/releases).
+
+```bash
+sudo apt install ./koob-resume_*.deb
+```
+
+### From Source
+
+```bash
+git clone https://github.com/koobfoo/koob-resume.git
+cd koob-resume
+pip install -e .
+```
+
+## Usage
+
+```bash
+koob-resume examples/sample.json
+```
+
+This generates a PDF resume in the current directory.
+
+### Using Docker
+
+You can also run koob-resume using Docker:
+
+```bash
+# Build the image
+docker build -t koob-resume .
+
+# Run with your JSON file
+# Mounts current directory to access JSON and output PDF
+docker run --rm -v $(pwd):/data -w /data koob-resume examples/sample.json
+```
+
+### JSON Configuration
+
+See `examples/sample.json` for a complete example. Key sections:
+
+- `p_info` - Personal information (name, email, phone, LinkedIn)
+- `job_target` - Metadata for tracking applications (role, company, dates) - useful for scripting and automation
+- `section_titles` - Customize section header names
+- `font_sizes` - Customize font sizes (name, role, section_header, body)
+- `summary` - Professional summary
+- `skills` - Skills by category
+- `experience` - Work experience entries
+- `certifications` - Optional certifications list
+- `education` - Education entries
+
+## Development
+
+### Prerequisites
+
+- Python 3.11+
+- Git
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/koobfoo/koob-resume.git
+cd koob-resume
+
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install build tools and dependencies
+pip install build
+python3 -m build
+pip install -e ".[dev]"
+
+# Install pre-commit hooks
+pre-commit install
+```
+
+### Running Tests
+
+```bash
+pytest
+```
+
+### Linting
+
+```bash
+ruff check src/
+ruff format --check src/
+```
+
+### Building a Debian Package
+
+```bash
+# Install system build dependencies
+sudo apt-get install build-essential python3-all debhelper dh-python
+
+# Install python build tool
+pip install stdeb>=0.11
+python3 setup.py --command-packages=stdeb.command bdist_deb
+```
+
+The `.deb` file will be in `deb_dist/`.
+
+## License
+
+MIT
