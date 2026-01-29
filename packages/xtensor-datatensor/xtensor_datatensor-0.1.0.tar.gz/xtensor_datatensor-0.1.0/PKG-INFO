@@ -1,0 +1,44 @@
+Metadata-Version: 2.4
+Name: xtensor-datatensor
+Version: 0.1.0
+Summary: Lightweight DataTensor wrapper that mimics a subset of xarray.DataArray APIs on top of torch.Tensor.
+Author: Codex Assistant
+License-Expression: MIT
+Keywords: tensor,data,xarray,pytorch
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.23
+Requires-Dist: pandas>=1.5
+Requires-Dist: torch>=1.13
+Requires-Dist: xarray>=2023.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Dynamic: license-file
+
+# xtensor
+
+`xtensor` provides a `DataTensor` class that wraps a `torch.Tensor` with labels and coordinates inspired by `xarray.DataArray`. The goal is to enjoy lightweight labeled computations without leaving eager PyTorch workflows.
+
+## Features
+
+- Construction from torch / numpy data with dimension names and coordinates.
+- Factory helpers from `pandas` objects or existing `xarray.DataArray`.
+- Label (`sel`) and positional (`isel`) slicing.
+- Mean, standard deviation, sum, min, max style reductions.
+- Elementwise math with scalars or other `DataTensor` objects that share the same coordinates.
+- Device-agnostic `.to()` mirror of `torch.Tensor.to`.
+
+## Development
+
+Install dependencies in editable mode.
+
+```bash
+pip install -e ".[dev]"
+```
+
+Run the tests.
+
+```bash
+pytest
+```

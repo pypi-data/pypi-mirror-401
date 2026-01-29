@@ -1,0 +1,154 @@
+import numpy as np
+import pandas as pd
+import pytest
+import xarray as xr
+import torch
+
+from xtensor import DataTensor, Dataset
+
+
+def _assert_identical(xt_ds: Dataset, xr_ds: xr.Dataset) -> None:
+    xr.testing.assert_identical(xt_ds.to_xarray(), xr_ds)
+
+
+def test_dataset_roundtrip_matches_xarray(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    _assert_identical(ds, base_dataset)
+
+
+def test_dataset_selection_matches_xarray(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    xt_sel = ds.sel(time=base_dataset.time.values[2])
+    xr_sel = base_dataset.sel(time=base_dataset.time.values[2])
+    _assert_identical(xt_sel, xr_sel)
+
+    xt_isel = ds.isel(time=[0, 3], level=slice(1, None))
+    xr_isel = base_dataset.isel(time=[0, 3], level=slice(1, None))
+    _assert_identical(xt_isel, xr_isel)
+
+
+def test_dataset_assign_coords_matches_xarray(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    shifted = base_dataset.assign_coords(time=base_dataset.time + 10.0)
+    xt_shifted = ds.assign_coords(time=(base_dataset.time.values + 10.0))
+    _assert_identical(xt_shifted, shifted)
+
+
+def test_dataset_assign_and_rename(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    new_var = np.linspace(0.0, 1.0, base_dataset.sizes["time"])
+    xr_assigned = base_dataset.assign(speed=("time", new_var)).rename({"temp": "temperature"})
+    xt_assigned = ds.assign(speed=(("time",), new_var)).rename({"temp": "temperature"})
+    _assert_identical(xt_assigned, xr_assigned)
+
+
+def test_dataset_transpose_and_squeeze(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    xr_transposed = base_dataset.transpose("level", "time")
+    xt_transposed = ds.transpose("level", "time")
+    _assert_identical(xt_transposed, xr_transposed)
+
+    xr_squeezed = xr_transposed.expand_dims(batch=[0]).squeeze()
+    xt_squeezed = Dataset.from_xarray(xr_transposed.expand_dims(batch=[0])).squeeze()
+    _assert_identical(xt_squeezed, xr_squeezed)
+
+
+def test_dataset_coordinate_precedence(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    # Add a data variable with the same name as an existing coordinate
+    time_coord = ds["time"]
+    coord_values = time_coord.data
+    ds = ds.assign(new_time=DataTensor(coord_values + 1.0, {"time": coord_values}, ("time",)))
+    ds["time"] = ds["time"] + 1.0
+    coord = ds["time"]
+    torch.testing.assert_close(coord.data, coord_values + 1.0)
+    torch.testing.assert_close(ds.data_vars["new_time"].data, coord_values + 1.0)
+
+
+def test_dataset_initializes_with_coordinates_only():
+    coords = {
+        "time": np.linspace(0.0, 4.0, 5),
+        "level": np.array([1000.0, 850.0, 700.0]),
+    }
+    ds = Dataset({}, coords=coords)
+    def _as_tuple(value):
+        if isinstance(value, torch.Tensor):
+            return tuple(value.cpu().tolist())
+        return tuple(value)
+
+    assert _as_tuple(ds.coords["time"]) == tuple(coords["time"])
+    assert _as_tuple(ds.coords["level"]) == tuple(coords["level"])
+
+    ds["temp"] = (("time",), np.arange(5.0))
+    assert "temp" in ds.data_vars
+    assert _as_tuple(ds.coords["level"]) == tuple(coords["level"])
+
+    ds["pressure"] = (("level",), np.linspace(0.0, 1.0, 3))
+    torch.testing.assert_close(ds["pressure"].coords["level"], torch.as_tensor(coords["level"]))
+
+
+def test_dataset_constructs_from_raw_variables():
+    time = np.array([0.0, 1.0, 2.0])
+    level = torch.tensor([100.0, 250.0])
+    temp = torch.arange(6.0, dtype=torch.float32).reshape(3, 2)
+    wind = torch.linspace(0.0, 1.0, 3)
+    ds = Dataset(
+        {
+            "temp": (("time", "level"), temp),
+            "wind": (("time",), wind),
+        },
+        coords={"time": time, "level": level},
+    )
+    torch.testing.assert_close(ds["temp"].data, temp)
+    torch.testing.assert_close(ds["wind"].data, wind)
+    torch.testing.assert_close(ds["temp"].coords["time"], torch.as_tensor(time))
+    torch.testing.assert_close(ds["temp"].coords["level"], level)
+    assert "time" in ds.coords
+    assert "time" in ds.indexes
+    assert len(ds.indexes["time"]) == time.shape[0]
+
+
+def test_dataset_to_matches_xarray(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    xt_fp32 = ds.to(dtype=torch.float32)
+    xr_fp32 = base_dataset.astype(np.float32)
+
+    _assert_identical(xt_fp32, xr_fp32)
+    assert ds["temp"].data.dtype == torch.float64
+
+
+def test_assign_coords_allows_new_dimension():
+    ds = Dataset({})
+    ds = ds.assign_coords(ens=np.arange(3))
+    values = ds.coords["ens"]
+    if isinstance(values, torch.Tensor):
+        values = tuple(values.tolist())
+    assert tuple(values) == (0.0, 1.0, 2.0)
+
+    ds["values"] = (("ens",), np.array([10.0, 20.0, 30.0]))
+    torch.testing.assert_close(ds["values"].coords["ens"], torch.arange(3, dtype=torch.int64))
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA is required for this test")
+def test_dataset_accepts_cuda_coordinate_inputs():
+    device = torch.device("cuda:0")
+    coords = {"obs": torch.arange(4, dtype=torch.float64, device=device)}
+    ds = Dataset({}, coords=coords)
+    obs = ds.coords["obs"]
+    if isinstance(obs, torch.Tensor):
+        obs = tuple(obs.cpu().tolist())
+    assert tuple(obs) == (0.0, 1.0, 2.0, 3.0)
+    ds["values"] = (("obs",), np.ones(4))
+
+
+def test_dataset_coordinate_returns_pandas_index_for_strings():
+    ds = Dataset({}, coords={"labels": ["north", "south"]})
+    coord = ds["labels"]
+    assert isinstance(coord, pd.Index)
+    assert coord.equals(pd.Index(["north", "south"]))
+
+
+def test_dataset_rejects_dimension_mismatch(base_dataset):
+    ds = Dataset.from_xarray(base_dataset)
+    with pytest.raises(ValueError):
+        ds["bad"] = (("time",), np.arange(base_dataset.sizes["time"] - 1))
