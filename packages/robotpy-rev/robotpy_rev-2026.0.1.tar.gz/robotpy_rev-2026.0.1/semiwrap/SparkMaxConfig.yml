@@ -1,0 +1,20 @@
+extra_includes:
+- sparkbaseconfig_apply.h
+
+classes:
+  rev::spark::SparkMaxConfig:
+    force_no_trampoline: true
+    attributes:
+      alternateEncoder:
+    enums:
+      DataPortConfig:
+    methods:
+      SparkMaxConfig:
+      Apply:
+        overloads:
+          SparkBaseConfig&:
+          SparkMaxConfig&:
+          AlternateEncoderConfig&:
+      Flatten:
+inline_code: |
+  bind_sparkbaseconfig_apply<SparkMaxConfig, decltype(cls_SparkMaxConfig)>(cls_SparkMaxConfig);

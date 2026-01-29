@@ -1,0 +1,30 @@
+extra_includes_first:
+- rev/REVLibError.h
+- rev/SparkLowLevel.h
+
+typealias:
+- rev::REVLibError
+
+classes:
+  rev::spark::SparkMax:
+    typealias:
+    - rev::spark::SparkLowLevel::MotorType
+    - rev::spark::SparkBase::PersistMode
+    - rev::spark::SparkBase::ResetMode
+    attributes:
+      configAccessor:
+    methods:
+      SparkMax:
+      Configure:
+        overloads:
+          SparkBaseConfig&, ResetMode, PersistMode:
+            ignore: true # semiwrap redeclaration bug?
+          SparkBaseConfig&, rev::ResetMode, rev::PersistMode:
+      GetAlternateEncoder:
+        return_value_policy: reference_internal
+      GetAbsoluteEncoder:
+        return_value_policy: reference_internal
+      GetForwardLimitSwitch:
+        return_value_policy: reference_internal
+      GetReverseLimitSwitch:
+        return_value_policy: reference_internal
