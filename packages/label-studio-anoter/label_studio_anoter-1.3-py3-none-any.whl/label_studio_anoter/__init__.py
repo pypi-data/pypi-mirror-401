@@ -1,0 +1,1 @@
+from label_studio_anoter.label_studio_anoter import LabelStudioAnoter
