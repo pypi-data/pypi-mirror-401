@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcd_stitcher"
+version = "2.0.0"
+authors = [
+    {name = "Pawan Chaurasia", email = "pchaurasia98@gmail.com"},
+]
+description = "MCD to single tiffs, stitched tiff and tiff tools"
+readme = "README.md"
+license = {text = "GPL-3.0"}
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+keywords = ["imaging", "masscytometry", "StandardBio", "SBT", "IMC", "stitching", "conversion"]
+
+dependencies = [
+    "click",
+	"imagecodecs",
+	"numpy",
+    "pandas",
+	"readimc",
+    "scikit-image",
+    "tifffile"	
+]
+
+[project.urls]
+Homepage = "https://github.com/PawanChaurasia/mcd_stitcher"
+"Bug Tracker" = "https://github.com/PawanChaurasia/mcd_stitcher/issues"
+Repository = "https://github.com/PawanChaurasia/mcd_stitcher"
+
+[project.scripts]
+mcd_stitch = "mcd_stitcher.mcd_stitch:main"
+mcd_convert = "mcd_stitcher.mcd_convert:main"
+tiff_subset = "mcd_stitcher.tiff_subset:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mcd_stitcher*"]
