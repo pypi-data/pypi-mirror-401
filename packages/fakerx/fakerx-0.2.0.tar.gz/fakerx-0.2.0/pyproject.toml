@@ -1,0 +1,45 @@
+[build-system]
+# 构建系统要求
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# 基础元数据
+name = "fakerx"
+version = "0.2.0"
+authors = [
+    { name = "YingZi", email = "yxdszlkc@163.com" }
+]
+description = "强大的Python数据生成库，Faker的增强版"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "faker",
+    "pydantic",
+    "pydantic[email]",
+    "pyyaml"
+]
+
+# 项目 URL
+[project.urls]
+Homepage = "https://github.com/yourusername/fakerx"
+Repository = "https://github.com/yourusername/fakerx"
+
+# 控制台脚本入口
+[project.scripts]
+fakerx = "fakerx_cli:main"
