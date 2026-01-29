@@ -1,0 +1,921 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+pypeline-cli is a highly-opinionated, batteries-included lightweight framework for building data pipeline projects on Snowflake or Databricks. It scaffolds production-ready ETL pipelines with built-in session management, logging, table configuration, and a proven Extract-Transform-Load pattern. The framework generates complete project structures with platform-specific utilities (Snowpark for Snowflake, PySpark for Databricks), manages dependencies via a user-friendly Python file, and provides runtime components (ETL singleton, Logger, decorators) that enforce best practices.
+
+## Development Commands
+
+### Setup for Development
+```bash
+# Install in editable mode globally
+pip install -e .
+
+# The pypeline command will now reflect local code changes immediately
+```
+
+### Testing
+```bash
+# Run all tests with coverage
+pytest
+
+# Run specific test file
+pytest tests/test_basic.py
+
+# Run tests without coverage
+pytest --no-cov
+```
+
+### Code Quality
+```bash
+# Format and lint code
+ruff format .
+ruff check .
+
+# Run pre-commit hooks manually
+pre-commit run --all-files
+```
+
+### Building and Distribution
+```bash
+# Build distribution packages
+python -m build
+
+# Check distribution
+twine check dist/*
+
+# Upload to PyPI (requires credentials)
+twine upload dist/*
+```
+
+## Platform Support
+
+pypeline-cli supports two data platforms:
+
+- **Snowflake**: Uses Snowpark for DataFrame operations, Snowflake session management, and native table operations
+- **Databricks**: Uses PySpark with Unity Catalog for metadata and Delta tables for storage
+
+### Platform Selection
+
+Platform is selected during project initialization via the `--platform` flag:
+
+```bash
+# Create a Snowflake project (default)
+pypeline init my_project --platform snowflake
+
+# Create a Databricks project
+pypeline init my_project --platform databricks
+```
+
+If `--platform` is not specified, it defaults to `snowflake` for backwards compatibility.
+
+### Platform Storage
+
+The selected platform is stored in `pyproject.toml` under the `[tool.pypeline]` section:
+
+```toml
+[tool.pypeline]
+platform = "snowflake"  # or "databricks"
+```
+
+All subsequent commands (create-pipeline, create-processor, sync-deps) read this value to determine which platform-specific templates to use.
+
+### Template Organization
+
+Templates are organized by platform:
+
+- `templates/shared/` - Pure Python files with no platform dependencies (logger.py, types.py, databases.py, etc.)
+- `templates/snowflake/` - Snowpark-specific implementations (etl.py, snowflake_utils.py, decorators.py, table_cache.py)
+- `templates/databricks/` - PySpark-specific implementations (etl.py, databricks_utils.py, decorators.py, table_cache.py)
+- `templates/licenses/` - License templates (shared across platforms)
+
+### Platform-Specific Differences
+
+| Component | Snowflake | Databricks |
+|-----------|-----------|------------|
+| DataFrame Library | `snowflake.snowpark` | `pyspark.sql` |
+| Session Management | `SnowflakeSession` | `SparkSession` (wraps Databricks-managed session) |
+| Catalog System | Database.Schema.Table | Catalog.Schema.Table (Unity Catalog) |
+| Write Method | `df.write.mode().save_as_table()` | `df.write.format("delta").mode().saveAsTable()` |
+| Utils File | `snowflake_utils.py` | `databricks_utils.py` |
+| Pipeline Write | `_write_to_snowflake()` | `_write_to_databricks()` |
+| Dependencies | snowflake-snowpark-python | pyspark, delta-spark, databricks-connect, snowflake-connector-python |
+| Cross-Platform | N/A | Snowflake connectivity via `databricks_utils.py` |
+| Credentials File | Snowflake connection for local dev | Snowflake connection for cross-platform access |
+
+## Refactoring Progress
+
+### Task 1.1: Create Template Directory Structure ✅
+
+- Created new template directory structure: `templates/shared/`, `templates/snowflake/`, `templates/databricks/`
+- Each platform directory contains: `init/`, `pipelines/`, `processors/` subdirectories (currently empty)
+- Existing template directories (`init/`, `pipelines/`, `processors/`) remain in place for now
+- No code changes, directory structure only
+- All tests pass
+
+### Task 1.2: Organize Shared and Snowflake Templates ✅
+
+- Moved 8 shared templates to `templates/shared/init/`: databases.py, date_parser.py, logger.py, types.py, basic_test.py, .gitignore, README.md, _init.py
+- Moved 5 Snowflake-specific templates to `templates/snowflake/init/`: etl.py, snowflake_utils.py, decorators.py, table_cache.py, credentials.py.example
+- Moved dependencies.py.template to `templates/snowflake/init/` with BASE_DEPENDENCIES structure
+- Moved 5 pipeline templates to `templates/snowflake/pipelines/`: runner.py, config.py, README.md, processors_init.py, tests_init.py
+- Moved 2 processor templates to `templates/snowflake/processors/`: processor.py, test_processor.py
+- Removed original files from `templates/init/`, `templates/pipelines/`, `templates/processors/` (directories remain empty for now)
+
+### Task 1.3: Update config.py with Platform Support ✅
+
+- Added `Platform` enum with SNOWFLAKE and DATABRICKS values
+- Added `get_platform_from_toml()` helper function to read platform from pyproject.toml [tool.pypeline] section
+- Updated template path constants to use shared/platform structure:
+  - `PATH_TO_TEMPLATES` - Base path for all templates
+  - `PATH_TO_SHARED_INIT` - Platform-agnostic templates
+  - Removed obsolete `PATH_TO_INIT_TEMPLATES`
+- Added platform path helper functions:
+  - `get_platform_init_path()` - Returns platform's init templates directory
+  - `get_platform_pipelines_path()` - Returns platform's pipelines templates directory
+  - `get_platform_processors_path()` - Returns platform's processors templates directory
+  - `get_platform_dependencies_template()` - Returns platform's dependencies.py.template file
+- Created `SHARED_SCAFFOLD_FILES` list with 8 platform-agnostic template references
+- Added `get_platform_scaffold_files()` function that returns combined shared + platform-specific files
+- Maintained backwards compatibility: `INIT_SCAFFOLD_FILES` now defaults to Snowflake platform
+- Removed `DEFAULT_DEPENDENCIES` constant (now platform-specific in templates)
+- Updated `toml_manager.py` to initialize empty dependencies list (populated via sync-deps)
+- All template files verified to exist at expected paths
+- All tests pass
+
+### Task 2.1: Create Databricks etl.py Template ✅
+
+- Created `templates/databricks/init/etl.py.template`
+- Uses `SparkSession` from `pyspark.sql` (NOT DatabricksSession)
+- Implements singleton pattern matching Snowflake version structure
+- Simplified for Databricks notebook execution:
+  - Uses `SparkSession.builder.getOrCreate()` to wrap the Databricks-managed session
+  - No credentials fallback (notebooks have session pre-configured)
+- Designed for use inside Databricks notebooks where Spark session is already managed
+- Includes proper docstrings and usage examples
+- Has "Framework File - Do Not Modify" header
+- Syntax validated with py_compile
+
+### Task 2.2: Create Databricks databricks_utils.py Template ✅
+
+- Created `templates/databricks/init/databricks_utils.py.template`
+- Uses Unity Catalog APIs for table operations:
+  - `system.information_schema.tables` for metadata queries
+  - `session.catalog.tableExists()` for existence checks
+  - `session.sql()` for read access verification
+- Implements 4 functions with matching signatures to snowflake_utils:
+  - `get_table_last_modified()` - Query Unity Catalog INFORMATION_SCHEMA
+  - `check_table_exists()` - Use `session.catalog.tableExists()`
+  - `check_table_read_access()` - Attempt minimal SELECT query
+  - `parse_table_path()` - Convert TableConfig to ParsedTablePath
+- **Snowflake Connectivity Functions** (for cross-platform data access):
+  - `get_snowflake_connection_options()` - Load credentials and return Spark connector options
+  - `read_snowflake_table()` - Read a Snowflake table into a Spark DataFrame
+  - `read_snowflake_query()` - Execute SQL against Snowflake and return results
+  - `write_to_snowflake()` - Write a Spark DataFrame to a Snowflake table
+- Uses PySpark imports (`from pyspark.sql import SparkSession`)
+- Parameters use `catalog_name` instead of `database_name`
+- Includes proper docstrings and type hints
+- Has "Framework File - Do Not Modify" header
+- Syntax validated with py_compile
+
+### Task 2.3: Create Databricks decorators.py Template ✅
+
+- Created `templates/databricks/init/decorators.py.template`
+- `@time_function` decorator included (unchanged from Snowflake - platform-agnostic)
+- `@skip_if_exists` adapted to use `session.catalog.tableExists()` for Unity Catalog
+- `@skip_if_updated_this_month` adapted to query `system.information_schema.tables` for `last_altered` timestamp
+- All decorators have proper docstrings and type hints
+- Has "Framework File - Do Not Modify" header
+- Syntax validated with py_compile
+
+### Task 2.4: Create Databricks table_cache.py Template ✅
+
+- Created `templates/databricks/init/table_cache.py.template`
+- Uses PySpark DataFrame imports (`from pyspark.sql import DataFrame`)
+- TableCache class structure matches Snowflake version
+- Methods: `add_table()`, `get_table()`, `preload_tables()`, `clear_cache()`, `get_cache_info()`, `_load_table()`
+- Table loading uses `self.etl.session.table(table_name)` (Unity Catalog aware)
+- Updated documentation references from "Snowflake" to "Databricks"
+- Updated documentation references from "Snowpark" to "Spark/PySpark"
+- Includes proper docstrings and type hints
+- Has "Framework File - Do Not Modify" header
+- Syntax validated with py_compile
+
+### Task 2.5a: Create Databricks dependencies.py Template ✅
+
+- Created `templates/databricks/init/dependencies.py.template`
+- Contains `BASE_DEPENDENCIES` with Databricks-specific packages:
+  - pyspark>=3.5.0
+  - delta-spark>=3.0.0
+  - databricks-connect>=13.0.0
+  - snowflake-connector-python>=3.0.0 (for cross-platform Snowflake connectivity)
+  - Standard packages: numpy, pandas, build, twine, ruff, pre-commit, pytest, pytest-cov
+- Contains empty `USER_DEPENDENCIES` list for user additions
+- Contains `DEFAULT_DEPENDENCIES = BASE_DEPENDENCIES + USER_DEPENDENCIES`
+- Includes docstring explaining usage and sync-deps workflow
+- Syntax validated with py_compile
+
+### Task 2.5b: Create Databricks credentials.py.example Template ✅
+
+- Created `templates/databricks/init/credentials.py.example.template`
+- **Purpose**: Store Snowflake credentials for cross-platform connectivity from Databricks
+- Contains Snowflake connection parameters:
+  - `SNOWFLAKE_ACCOUNT` - Snowflake account identifier
+  - `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD` - Authentication
+  - `SNOWFLAKE_WAREHOUSE`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_SCHEMA` - Default context
+  - `SNOWFLAKE_ROLE` - Role to use
+- Provides `get_snowflake_connection_params()` helper function
+- Includes comprehensive security warnings about not committing credentials
+- Includes setup instructions for copying to credentials.py
+- Includes alternative approach using environment variables
+- Syntax validated with py_compile
+
+### Task 2.6: Create Databricks Pipeline Templates ✅
+
+- Created all 5 Databricks pipeline templates in `templates/databricks/pipelines/`:
+  - `runner.py.template` - Uses PySpark DataFrame and Delta Lake writes
+  - `config.py.template` - Same as Snowflake (platform-agnostic TableConfig)
+  - `README.md.template` - Updated references to Databricks and Unity Catalog
+  - `processors_init.py.template` - Package marker (same as Snowflake)
+  - `tests_init.py.template` - Package marker (same as Snowflake)
+- runner.py uses `from pyspark.sql import DataFrame` instead of Snowpark
+- Write method renamed to `_write_to_databricks()` instead of `_write_to_snowflake()`
+- Write operation uses Delta format: `df.write.format("delta").mode(write_mode).saveAsTable(table_path)`
+- README.md references Unity Catalog (CATALOG.SCHEMA.TABLE) instead of Snowflake databases
+- All templates include correct variable placeholders ($class_name, $pipeline_name, $project_name)
+- All templates validated with py_compile
+
+### Task 3.1: Update ProjectContext with Platform Property ✅
+
+- Added `platform` property that reads from `[tool.pypeline].platform` in pyproject.toml
+- Property raises `ValueError` with clear message if platform field is not set or file doesn't exist
+- Updated `platform_utils_file` property to use `self.platform` instead of calling `get_platform_from_toml()` directly
+- Updated `dependencies_template` property to use `self.platform` for consistency
+- Removed deprecated `snowflake_utils_file` property (breaking change)
+- All properties now consistently use `self.platform` for platform detection
+- All tests pass
+
+### Task 3.2: Update TOMLManager to Store Platform ✅
+
+- Added `platform` parameter to `TOMLManager.create()` method
+- Platform stored in `[tool.pypeline].platform` field in pyproject.toml
+- Updated `init` command to prompt for platform selection (defaults to "snowflake")
+- Updated `create_project()` to accept and pass platform parameter to managers
+- Updated `DependenciesManager` to accept optional platform parameter for init vs. existing project scenarios
+- Updated `ProjectContext.dependencies_template` property to read platform from pyproject.toml and use platform-specific template
+- Added `ProjectContext.platform_utils_file` property for dynamic platform utils path resolution
+- Platform value correctly stored in pyproject.toml for both Snowflake and Databricks
+- Verified correct platform-specific files are created (snowflake_utils.py vs databricks_utils.py)
+- Verified correct platform-specific dependencies.py template is used
+- All tests pass
+
+### Task 3.4: Update ProcessorManager with Platform Awareness ✅
+
+- Reads platform from `ctx.platform`
+- Uses dynamic template paths via `get_platform_processors_path()`
+- Correct templates are used for each platform (Snowflake vs Databricks)
+- All tests pass
+
+### Task 3.3: Update PipelineManager with Platform Awareness ✅
+
+- Updated `PipelineManager.__init__()` to read platform from `ctx.toml_path` using `get_platform_from_toml()`
+- Set `templates_path` dynamically using `get_platform_pipelines_path(platform)`
+- Defaults to Snowflake platform for backwards compatibility when platform not set
+- Imports platform functions inside `__init__()` to avoid circular imports
+- Verified Snowflake projects use templates from `templates/snowflake/pipelines/`
+- Verified Databricks projects use templates from `templates/databricks/pipelines/`
+- All existing tests pass
+
+## Architecture
+
+### Manager Pattern
+The codebase uses a manager pattern where specialized managers handle different aspects of project creation:
+
+- **ProjectContext** (`core/managers/project_context.py`): Discovers project root by walking up the directory tree looking for `pyproject.toml` with `[tool.pypeline]` marker. Provides all path properties as dynamic computed attributes (e.g., `ctx.project_root`, `ctx.import_folder`, `ctx.dependencies_path`, `ctx.pipelines_folder_path`). The `platform` property reads the platform from `[tool.pypeline].platform` and raises `ValueError` if not set. Platform-aware properties like `platform_utils_file` and `dependencies_template` use `self.platform` for dynamic path resolution.
+
+- **TOMLManager** (`core/managers/toml_manager.py`): Handles `pyproject.toml` read/write operations. Uses `tomllib` for reading, `tomli_w` for writing. The `create()` method accepts a `platform` parameter and stores it in `[tool.pypeline].platform` field. The `update_dependencies()` method parses existing deps, merges new ones by package name, and writes back. Creates pyproject.toml with empty dependencies list (populated via sync-deps).
+
+- **DependenciesManager** (`core/managers/dependencies_manager.py`): Reads `DEFAULT_DEPENDENCIES` from user's `dependencies.py` file and manages the template file creation. Dependencies are now platform-specific, defined in each platform's dependencies.py.template file.
+
+- **LicenseManager** (`core/managers/license_manager.py`): Creates LICENSE files from templates in `templates/licenses/`, performing variable substitution for author name, year, etc. Uses `string.Template` for variable substitution.
+
+- **ScaffoldingManager** (`core/managers/scaffolding_manager.py`): Creates folder structure and copies template files to destination paths using the `ScaffoldFile` dataclass configuration. Automatically creates `__init__.py` files in Python package folders (pipelines/, utils/, schemas/) to ensure proper package structure.
+
+- **PipelineManager** (`core/managers/pipeline_manager.py`): Creates pipeline folder structures with runner, config, tests, and processors directories. Uses `string.Template` for variable substitution in templates. Automatically creates `__init__.py` in each pipeline folder and registers pipeline classes in the package's `__init__.py` for top-level imports.
+
+- **ProcessorManager** (`core/managers/processor_manager.py`): Creates processor classes within existing pipelines. Generates processor file with Extract/Transform pattern, test file with pytest fixtures, and auto-registers import in pipeline runner file. Uses `string.Template` for variable substitution.
+
+- **GitManager** (`core/managers/git_manager.py`): Initializes git repos and creates initial commits with proper line ending configuration.
+
+### Core Flow
+
+The `init` command flow:
+1. Prompts user for platform selection (defaults to "snowflake" if `--platform` flag not provided)
+2. Creates ProjectContext with `init=True` (uses provided path, doesn't search for existing project)
+3. Optionally creates project directory and initializes git (controlled by `--git/--no-git` flag, default: disabled)
+4. If git enabled, creates `.gitattributes` for consistent line endings
+5. TOMLManager creates `pyproject.toml` with:
+   - Platform stored in `[tool.pypeline].platform` field
+   - Either git-based versioning (if `--git` flag used): Uses hatch-vcs, dynamic version from git tags
+   - Or manual versioning (if `--no-git` flag used): Static version "0.1.0", no hatch-vcs dependency
+6. DependenciesManager creates `dependencies.py` from platform-specific template
+7. LicenseManager creates LICENSE file
+8. ScaffoldingManager creates folder structure (project_name/, tests/, pipelines/, schemas/, utils/) with `__init__.py` files in package folders
+9. ScaffoldingManager copies all template files from `config.get_platform_scaffold_files(platform)` (8 shared + 5 platform-specific files)
+
+The `sync-deps` command flow:
+1. ProjectContext searches up tree for pypeline project (looks for `[tool.pypeline]` in pyproject.toml)
+2. DependenciesManager reads `DEFAULT_DEPENDENCIES` from user's `dependencies.py`
+3. TOMLManager parses dependencies with `dependency_parser.py`, merges by package name, and writes to `pyproject.toml`
+
+The `create-pipeline` command flow:
+1. Validates and normalizes pipeline name (accepts hyphens, converts to underscores)
+2. Converts to PascalCase with "Pipeline" suffix (e.g., `beneficiary-claims` → `BeneficiaryClaimsPipeline`)
+3. ProjectContext searches up tree for pypeline project (init=False mode)
+4. Creates pipeline folder structure:
+   - `pipelines/{name}/__init__.py` - Package marker (auto-created)
+   - `pipelines/{name}/{name}_runner.py` - Main pipeline orchestrator
+   - `pipelines/{name}/config.py` - Pipeline-specific configuration with TableConfig imports
+   - `pipelines/{name}/README.md` - Pipeline documentation template
+   - `pipelines/{name}/processors/` - Directory for processor classes
+   - `pipelines/{name}/tests/` - Integration tests for the pipeline
+5. PipelineManager registers pipeline class in package `__init__.py` for top-level imports
+6. Updates `__all__` list in `__init__.py` for explicit exports
+
+The `create-processor` command flow:
+1. Validates and normalizes both processor name and pipeline name
+2. Converts processor name to PascalCase with "Processor" suffix (e.g., `sales-extractor` → `SalesExtractorProcessor`)
+3. ProjectContext searches up tree for pypeline project (init=False mode)
+4. Verifies pipeline exists at `pipelines/{pipeline_name}/`
+5. Creates processor files:
+   - `pipelines/{pipeline}/processors/{name}_processor.py` - Processor class with Extract/Transform pattern
+   - `pipelines/{pipeline}/processors/tests/test_{name}_processor.py` - Unit test file with pytest fixtures
+6. Creates `processors/tests/` subdirectory if it doesn't exist
+7. ProcessorManager auto-registers import in `{pipeline}_runner.py`
+8. Import statement inserted after existing processor imports (or after last import if first processor)
+
+The `build` command flow:
+1. ProjectContext searches up tree for pypeline project (init=False mode)
+2. Reads `pyproject.toml` to get project name and version
+3. Cleans existing `dist/snowflake/` directory
+4. Creates ZIP archive of project files using Python's `zipfile` module
+5. Adds files relative to project root (ensuring `pyproject.toml` is at ZIP root level)
+6. Excludes build artifacts (.venv, dist, __pycache__, .git, etc.)
+7. Verifies `pyproject.toml` is at ZIP root and displays upload instructions
+
+**Critical**: The ZIP must have `pyproject.toml` at root level (not nested in a folder) for Snowflake to properly import the package. The build command ensures this by adding all files relative to the project root. Package structure is `project_name/project_name/` (NOT `project_name/src/project_name/`).
+
+### Template System
+
+Templates are stored in `src/pypeline_cli/templates/`:
+- `shared/init/` - Platform-agnostic scaffolding templates:
+  - `databases.py.template` - Database configuration (user-editable)
+  - `date_parser.py.template` - Date parsing utilities
+  - `logger.py.template` - Logger singleton
+  - `types.py.template` - Shared types, enums, dataclasses
+  - `basic_test.py.template` - Basic test template
+  - `.gitignore.template` - Git ignore patterns
+  - `README.md.template` - Project README
+  - `_init.py.template` - Package __init__.py
+- `snowflake/init/` - Snowflake-specific scaffolding templates:
+  - `etl.py.template` - ETL singleton (uses Snowpark)
+  - `snowflake_utils.py.template` - Snowflake helper functions
+  - `decorators.py.template` - Timing and logging decorators (uses Snowflake APIs)
+  - `table_cache.py.template` - TableCache for pre-loading (uses Snowpark DataFrame)
+  - `credentials.py.example.template` - Snowflake connection parameters
+  - `dependencies.py.template` - BASE_DEPENDENCIES with Snowflake packages
+- `snowflake/pipelines/` - Snowflake pipeline templates with variable substitution:
+  - `runner.py.template` - Pipeline orchestrator with run(), pipeline(), run_processors(), _write_to_snowflake()
+  - `config.py.template` - Pipeline configuration with Database, Schema, TableConfig imports
+  - `README.md.template` - Pipeline documentation structure
+  - `processors_init.py.template` - Processors package marker
+  - `tests_init.py.template` - Integration tests package marker
+- `snowflake/processors/` - Snowflake processor templates with variable substitution:
+  - `processor.py.template` - Processor class with __init__() for Extract, process() for Transform
+  - `test_processor.py.template` - pytest unit test template with mocking fixtures
+- `databricks/init/` - Databricks-specific scaffolding templates:
+  - `etl.py.template` - ETL singleton (uses SparkSession from pyspark.sql, wraps Databricks-managed session)
+  - `databricks_utils.py.template` - Databricks helper functions (Unity Catalog integration + Snowflake connectivity)
+  - `decorators.py.template` - Timing and logging decorators (uses Unity Catalog APIs)
+  - `table_cache.py.template` - TableCache for pre-loading (uses PySpark DataFrame)
+  - `credentials.py.example.template` - Snowflake connection parameters for cross-platform data access
+  - `dependencies.py.template` - BASE_DEPENDENCIES with PySpark + snowflake-connector-python packages
+- `databricks/pipelines/` - Databricks pipeline templates with variable substitution:
+  - `runner.py.template` - Pipeline orchestrator with run(), pipeline(), run_processors(), _write_to_databricks()
+  - `config.py.template` - Pipeline configuration with Catalog, Schema, TableConfig imports
+  - `README.md.template` - Pipeline documentation structure
+  - `processors_init.py.template` - Processors package marker
+  - `tests_init.py.template` - Integration tests package marker
+- `databricks/processors/` - Databricks processor templates with variable substitution:
+  - `processor.py.template` - Processor class with __init__() for Extract, process() for Transform
+  - `test_processor.py.template` - pytest unit test template with mocking fixtures
+- `licenses/` - 14 different license templates with variable substitution
+- `init/`, `pipelines/`, `processors/` - Legacy directories (empty, will be removed in future task)
+
+**Config.py Platform Support**:
+The `config.py` file (`src/pypeline_cli/config.py`) provides platform-aware template path resolution:
+
+- **Platform Enum**: Defines `Platform.SNOWFLAKE` and `Platform.DATABRICKS` values for type-safe platform references
+- **Platform Detection**: `get_platform_from_toml(project_root)` reads platform from `pyproject.toml` `[tool.pypeline]` section
+- **Shared Templates**: `SHARED_SCAFFOLD_FILES` list contains 8 platform-agnostic templates (databases.py, logger.py, types.py, etc.)
+- **Platform-Specific Templates**: `get_platform_scaffold_files(platform)` returns combined shared + platform-specific files:
+  - Snowflake: 13 files total (8 shared + 5 Snowflake-specific)
+  - Databricks: 13 files total (8 shared + 5 Databricks-specific)
+- **Backwards Compatibility**: `INIT_SCAFFOLD_FILES` defaults to Snowflake for legacy code
+- **Path Helper Functions**:
+  - `get_platform_init_path(platform)` - Returns `templates/{platform}/init/` directory
+  - `get_platform_pipelines_path(platform)` - Returns `templates/{platform}/pipelines/` directory
+  - `get_platform_processors_path(platform)` - Returns `templates/{platform}/processors/` directory
+  - `get_platform_dependencies_template(platform)` - Returns `templates/{platform}/init/dependencies.py.template` file
+
+**Example Usage in Managers**:
+```python
+from pypeline_cli.config import Platform, get_platform_scaffold_files
+
+# Get all scaffold files for a platform
+files = get_platform_scaffold_files(Platform.DATABRICKS)  # Returns 13 ScaffoldFile objects
+
+# Platform detection from existing project
+platform = ctx.platform  # ProjectContext.platform reads from pyproject.toml
+
+# Get platform-specific paths
+pipeline_templates = get_platform_pipelines_path(platform)
+```
+
+**Template Variable Substitution**:
+Pipeline templates use `string.Template` with variables:
+- `$class_name` - PascalCase class name with "Pipeline" suffix (e.g., "BeneficiaryClaimsPipeline")
+- `$pipeline_name` - Normalized name (e.g., "beneficiary_claims")
+- `$project_name` - Project name from ProjectContext for import paths
+
+Processor templates use `string.Template` with variables:
+- `$class_name` - PascalCase class name with "Processor" suffix (e.g., "SalesExtractorProcessor")
+- `$processor_name` - Normalized name (e.g., "sales_extractor")
+- `$pipeline_name` - Normalized pipeline name (e.g., "customer_segmentation")
+- `$project_name` - Project name from ProjectContext for import paths
+
+### Dependency Management Philosophy
+
+pypeline projects use a two-file approach:
+1. `dependencies.py` - User-editable Python list (`DEFAULT_DEPENDENCIES`)
+2. `pyproject.toml` - Auto-generated via `pypeline sync-deps`
+
+The `dependency_parser.py` utility handles parsing dependency strings with version specifiers (>=, ==, ~=, etc.) into `Dependency` namedtuples for manipulation.
+
+## Python Version Compatibility
+
+**Critical**: This codebase requires Python 3.12-3.13 because:
+- Generated projects target Snowflake compatibility (snowflake-snowpark-python supports up to Python 3.13)
+- The CLI itself declares `requires-python = ">=3.12"`
+- Generated projects declare `requires-python = ">=3.12,<3.14"`
+- `tomllib` is part of stdlib in Python 3.11+, so no compatibility shim needed
+
+**TOML handling**:
+```python
+import tomllib  # For reading TOML (stdlib in 3.11+)
+import tomli_w  # For writing TOML (separate package)
+```
+
+This simplified approach is used in `toml_manager.py` and `project_context.py`.
+
+## Project Structure
+
+```
+pypeline-cli/
+├── src/pypeline_cli/
+│   ├── main.py              # Click group, registers commands
+│   ├── config.py            # Constants, paths, scaffold configuration
+│   ├── commands/            # Click command definitions
+│   │   ├── init.py          # pypeline init
+│   │   ├── sync_deps.py     # pypeline sync-deps
+│   │   ├── install.py       # pypeline install
+│   │   ├── create_pipeline.py   # pypeline create-pipeline
+│   │   ├── create_processor.py  # pypeline create-processor
+│   │   └── build.py         # pypeline build
+│   ├── core/
+│   │   ├── create_project.py     # Orchestrates project creation
+│   │   └── managers/             # Manager classes for different concerns
+│   │       ├── project_context.py
+│   │       ├── toml_manager.py
+│   │       ├── dependencies_manager.py
+│   │       ├── license_manager.py
+│   │       ├── scaffolding_manager.py
+│   │       ├── pipeline_manager.py    # Pipeline creation
+│   │       ├── processor_manager.py   # Processor creation
+│   │       └── git_manager.py
+│   ├── templates/
+│   │   ├── licenses/             # License templates
+│   │   ├── shared/               # Platform-agnostic templates
+│   │   │   └── init/             # 8 shared templates (databases.py, logger.py, types.py, etc.)
+│   │   ├── snowflake/            # Snowflake-specific templates
+│   │   │   ├── init/             # 6 Snowflake init templates (etl.py, snowflake_utils.py, etc.)
+│   │   │   ├── pipelines/        # 5 pipeline templates (runner.py, config.py, etc.)
+│   │   │   └── processors/       # 2 processor templates (processor.py, test_processor.py)
+│   │   ├── databricks/           # Databricks-specific templates
+│   │   │   ├── init/             # 6 Databricks init templates (etl.py, databricks_utils.py, etc.)
+│   │   │   ├── pipelines/        # 5 pipeline templates (runner.py, config.py, etc.)
+│   │   │   └── processors/       # 2 processor templates (processor.py, test_processor.py)
+│   │   ├── init/                 # Legacy directory (empty, to be removed in future task)
+│   │   ├── pipelines/            # Legacy directory (empty, to be removed in future task)
+│   │   └── processors/           # Legacy directory (empty, to be removed in future task)
+│   └── utils/
+│       ├── dependency_parser.py  # Parse dependency strings
+│       ├── valdators.py          # Input validation
+│       └── name_converter.py     # Name normalization/conversion
+└── tests/                        # Test files
+```
+
+## Generated Project Structure
+
+When users run `pypeline init`, the generated project has this structure (NO src/ folder):
+
+```
+my_project/                      # Project root
+├── pyproject.toml               # Package configuration
+├── dependencies.py              # User-editable dependency list
+├── LICENSE                      # Project license
+├── README.md                    # Project documentation
+├── my_project/                  # Package directory (importable)
+│   ├── __init__.py             # Package exports
+│   ├── _version.py             # Auto-generated version (if using git)
+│   ├── pipelines/              # Pipeline orchestrators
+│   │   └── example_pipeline/
+│   │       ├── example_pipeline_runner.py
+│   │       ├── config.py
+│   │       ├── README.md
+│   │       ├── processors/
+│   │       └── tests/
+│   ├── schemas/                # Database schemas (user-created)
+│   └── utils/                  # Framework utilities
+│       ├── databases.py
+│       ├── date_parser.py
+│       ├── decorators.py
+│       ├── etl.py             # ETL singleton
+│       ├── logger.py          # Logger singleton
+│       ├── snowflake_utils.py
+│       ├── table_cache.py     # TableCache for pre-loading
+│       └── types.py           # Shared types, enums, dataclasses
+└── tests/                      # Integration tests
+    └── basic_test.py
+```
+
+## Pipeline Architecture
+
+### Generated Pipeline Structure
+
+When `pypeline create-pipeline --name beneficiary-claims` is run, it creates:
+
+```
+pipelines/beneficiary_claims/
+├── beneficiary_claims_runner.py    # Main orchestrator
+├── config.py                        # Pipeline-specific config with TableConfig
+├── README.md                        # Pipeline documentation
+├── processors/                      # Processor classes go here
+│   └── __init__.py
+└── tests/                           # Integration tests
+    └── __init__.py
+```
+
+### Pipeline Runner Pattern
+
+The generated runner follows this architecture (from scratch.py):
+
+```python
+class BeneficiaryClaimsPipeline:
+    def __init__(self):
+        self.logger = Logger()
+        self.etl = ETL()
+
+    @time_function("BeneficiaryClaimsPipeline.run")
+    def run(self, _write: bool = False):
+        """Entry point with timing decorator"""
+        self.pipeline(_write)
+
+    def pipeline(self, _write: bool):
+        """Orchestrates processors and conditional write"""
+        df = self.run_processors()
+        if _write:
+            self._write_to_snowflake(df, ...)
+
+    def run_processors(self) -> DataFrame:
+        """Instantiates and runs processor classes"""
+        # Processors import from ./processors/
+        # Each processor handles its own extract in __init__ using TableConfig
+        # Each processor has process() method for transformations
+
+    def _write_to_snowflake(self, df, write_mode, table_path):
+        """Uses df.write.mode().save_as_table()"""
+```
+
+### Processor Pattern
+
+Processors are created using `pypeline create-processor --name <name> --pipeline <pipeline>`:
+- Handle data extraction in `__init__` using TableConfig from `utils/tables.py` or pipeline `config.py`
+- Implement `process()` method as orchestrator for transformations
+- Use private methods for atomized transformation steps
+- Return DataFrames
+- Auto-instantiate Logger and ETL utilities
+- Use `@time_function` decorator on `process()` method
+
+Generated processor structure:
+```python
+class SalesExtractorProcessor:
+    def __init__(self, month: int):
+        self.logger = Logger()
+        self.etl = ETL()
+        # Extract data using TableConfig
+        SALES_TABLE.month = month
+        table_name = SALES_TABLE.generate_table_name()
+        self.sales_df = self.etl.session.table(table_name)
+
+    @time_function(f"{MODULE_NAME}.process")
+    def process(self) -> DataFrame:
+        # Orchestrate transformations
+        df = self._filter_valid()
+        df = self._aggregate(df)
+        return df
+
+    def _filter_valid(self) -> DataFrame:
+        # Atomized transformation
+        return self.sales_df.filter(col("STATUS") == "COMPLETED")
+
+    def _aggregate(self, df: DataFrame) -> DataFrame:
+        # Atomized transformation
+        return df.group_by("CUSTOMER_ID").agg(sum_("AMOUNT"))
+```
+
+### Auto-Registration
+
+Pipeline classes are automatically registered in the package's `__init__.py`:
+
+```python
+# Generated in src/{project_name}/__init__.py
+from .pipelines.beneficiary_claims.beneficiary_claims_runner import BeneficiaryClaimsPipeline
+
+__all__ = ["BeneficiaryClaimsPipeline"]
+```
+
+This allows users to import pipelines directly:
+```python
+from my_project import BeneficiaryClaimsPipeline, EnrollmentPipeline
+```
+
+### Naming Conventions
+
+**Pipelines:**
+- **Input**: User provides name (e.g., `beneficiary-claims`, `enrollment`, `CLAIMS`)
+- **Normalization**: Convert to lowercase with underscores (e.g., `beneficiary_claims`)
+- **Folder/File**: Use normalized name (e.g., `pipelines/beneficiary_claims/beneficiary_claims_runner.py`)
+- **Class Name**: PascalCase + "Pipeline" suffix (e.g., `BeneficiaryClaimsPipeline`)
+- **Import**: Registered in package `__init__.py` for top-level import
+
+**Processors:**
+- **Input**: User provides name (e.g., `sales-extractor`, `msp`, `ENRICHMENT`)
+- **Normalization**: Convert to lowercase with underscores (e.g., `sales_extractor`)
+- **File**: Use normalized name with `_processor.py` suffix (e.g., `sales_extractor_processor.py`)
+- **Class Name**: PascalCase + "Processor" suffix (e.g., `SalesExtractorProcessor`)
+- **Import**: Auto-registered in pipeline runner file (e.g., `from .processors.sales_extractor_processor import SalesExtractorProcessor`)
+
+Handled by `utils/name_converter.py`:
+- `normalize_name()` - Strips whitespace, lowercases, converts hyphens to underscores
+- `to_pascal_case()` - Converts normalized name to PascalCase
+- Commands add appropriate suffix ("Pipeline" or "Processor") to class name
+
+## Key Conventions
+
+- **Path handling**: Use `pathlib.Path` throughout, never string concatenation
+- **Click output**: Use `click.echo()` for all user-facing messages, not `print()`
+- **Template naming**: Templates end with `.template` extension
+- **Manager initialization**: All managers receive `ProjectContext` instance
+- **Version management**: Projects use hatch-vcs for git tag-based versioning
+- **Class naming**:
+  - Pipeline classes always have "Pipeline" suffix (e.g., `BeneficiaryClaimsPipeline`)
+  - Processor classes always have "Processor" suffix (e.g., `SalesExtractorProcessor`)
+- **ETL Pattern**:
+  - Extract happens in processor `__init__()` method
+  - Transform happens in processor `process()` method
+  - Load happens in pipeline `_write_to_snowflake()` method
+- **Framework vs User Code**:
+  - Framework files (etl.py, logger.py, decorators.py, table_cache.py, snowflake_utils.py, types.py) marked "DO NOT MODIFY"
+  - User-editable files (databases.py, dependencies.py) clearly documented
+  - Generated scaffolding (runners, processors) includes TODO comments for implementation
+
+## Key Utility Functions
+
+### types.py - Shared Types and Dataclasses
+
+**File:** `utils/types.py` (⚙️ Framework - Do Not Modify)
+
+**Purpose:** Centralized location for all shared types, enums, and dataclasses used across the framework.
+
+**Key Components:**
+
+#### `LogLevel` Enum
+Defines log levels with color coding for terminal output:
+- `DEBUG` (10): Gray - Detailed diagnostic information
+- `INFO` (20): Green - General informational messages
+- `WARN` (30): Yellow - Warning messages
+- `ERROR` (40): Red - Error messages
+- `CRITICAL` (50): Magenta - Critical failures
+
+#### `TableConfig` Dataclass
+Configuration for dynamic table naming with temporal partitioning:
+
+```python
+from ...utils.types import TableConfig
+
+# Yearly table
+config = TableConfig(
+    database="ANALYTICS",
+    schema="RAW",
+    table_name_template="sales_{YYYY}",
+    type="YEARLY",
+    is_output=False
+)
+config.generate_table_name(year=2025)  # "ANALYTICS.RAW.sales_2025"
+
+# Monthly table
+config = TableConfig(
+    database="PROD",
+    schema="STAGING",
+    table_name_template="events_{MM}",
+    type="MONTHLY",
+    month=3,
+    is_output=False
+)
+config.generate_table_name()  # "PROD.STAGING.events_03"
+
+# Stable table
+config = TableConfig(
+    database="ANALYTICS",
+    schema="REPORTING",
+    table_name_template="dim_products",
+    type="STABLE",
+    is_output=True  # Marks as output table (not pre-loaded into cache)
+)
+config.generate_table_name()  # "ANALYTICS.REPORTING.dim_products"
+```
+
+**Methods:**
+- `generate_table_name(year: Optional[int] = None) -> str`: Returns fully qualified table name
+- `generate_parsed_table_path(year: Optional[int] = None) -> Dict`: Returns dict with `database`, `schema`, `table` keys
+
+**Template Placeholders:**
+- `{YYYY}` - 4-digit year (e.g., 2025)
+- `{YY}` - 2-digit year (e.g., 25)
+- `{MM}` - 2-digit month with leading zero (e.g., 01, 12)
+
+#### `ParsedTablePath` Dataclass
+Represents a decomposed table path with database, schema, and table components:
+
+```python
+@dataclass
+class ParsedTablePath:
+    database: str
+    schema: str
+    table: str
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.database}.{self.schema}.{self.table}"
+```
+
+#### `TimestampResult` TypedDict
+Return type for timestamp queries:
+- `dt`: timezone-aware datetime object
+- `iso`: ISO 8601 formatted string
+
+#### `ParsedDateTime` TypedDict
+Validated datetime with UTC normalization for date parsing utilities.
+
+### snowflake_utils.py - Snowflake Helper Functions
+
+**File:** `utils/snowflake_utils.py` (⚙️ Framework - Do Not Modify)
+
+**Purpose:** Provides Snowflake-specific helper functions that integrate with TableConfig for common operations.
+
+**Key Functions:**
+
+#### `get_table_last_modified()`
+
+Get the last modified timestamp for a table in Eastern timezone.
+
+```python
+from ...utils.snowflake_utils import get_table_last_modified
+from ...utils.etl import ETL
+
+etl = ETL()
+
+# Using TableConfig (preferred)
+result = get_table_last_modified(
+    etl.session,
+    config=SALES_TABLE,
+    year=2025
+)
+print(result["iso"])  # '2025-01-15T14:30:00-05:00'
+print(result["dt"])   # datetime object in America/New_York
+
+# Using explicit path
+result = get_table_last_modified(
+    etl.session,
+    database_name="ANALYTICS",
+    schema_name="RAW",
+    table_name="sales_2025"
+)
+```
+
+**Parameters:**
+- `session`: Active Snowpark Session
+- `config`: Optional TableConfig (preferred)
+- `year`: Optional year for TableConfig resolution
+- `database_name`, `schema_name`, `table_name`: Alternative explicit path
+
+**Returns:** `TimestampResult` dict with `dt` (datetime) and `iso` (string) keys
+
+#### `check_table_exists()`
+
+Check if a table exists in Snowflake. Returns False on permission errors.
+
+```python
+from ...utils.snowflake_utils import check_table_exists
+
+# Using TableConfig
+exists = check_table_exists(etl.session, config=SALES_TABLE, year=2025)
+
+# Using explicit path
+exists = check_table_exists(
+    etl.session,
+    database_name="PROD",
+    schema_name="ANALYTICS",
+    table_name="customer_segments"
+)
+
+if exists:
+    logger.info("Table found")
+```
+
+**Returns:** `True` if table exists, `False` otherwise (including on permission errors)
+
+#### `check_table_read_access()`
+
+Verify read permissions by attempting a minimal read operation (SELECT 1 LIMIT 1).
+
+```python
+from ...utils.snowflake_utils import check_table_read_access
+
+# Check if we can read from the table
+can_read = check_table_read_access(
+    etl.session,
+    config=ORDERS_TABLE,
+    year=2025
+)
+
+if can_read:
+    # Safe to proceed with data extraction
+    df = etl.session.table(ORDERS_TABLE.generate_table_name(year=2025))
+else:
+    logger.error("No read access to orders table")
+```
+
+**Returns:** `True` if read succeeds, `False` if table doesn't exist or is inaccessible
+
+#### `parse_table_path()`
+
+Internal helper that resolves table paths from either TableConfig or explicit components.
+
+```python
+from ...utils.snowflake_utils import parse_table_path
+
+# From TableConfig
+path = parse_table_path(config=SALES_TABLE, year=2025)
+print(path.database)   # "ANALYTICS"
+print(path.schema)     # "RAW"
+print(path.table)      # "sales_2025"
+print(path.full_name)  # "ANALYTICS.RAW.sales_2025"
+
+# From explicit parts
+path = parse_table_path(
+    database_name="PROD",
+    schema_name="DIM",
+    table_name="customers"
+)
+```
+
+**Returns:** `ParsedTablePath` with `database`, `schema`, `table`, and `full_name` attributes
+
+**Best Practices:**
+- Prefer using TableConfig parameter over explicit paths for consistency
+- Use `check_table_exists()` before operations that assume table presence
+- Use `check_table_read_access()` to verify permissions before data extraction
+- Use `get_table_last_modified()` for freshness checks and monitoring
+- All functions handle errors gracefully and log warnings/errors appropriately
+
+**Common Use Cases:**
+- Pre-flight checks in pipeline `__init__()` to validate table availability
+- Permission verification before attempting data extraction
+- Freshness monitoring for data quality and staleness detection
+- Dynamic table discovery with TableConfig integration
+- Error handling for missing or inaccessible tables
