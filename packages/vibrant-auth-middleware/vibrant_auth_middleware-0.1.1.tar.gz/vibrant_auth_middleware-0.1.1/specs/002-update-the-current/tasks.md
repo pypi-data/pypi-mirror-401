@@ -1,0 +1,402 @@
+# Tasks: Remove Config Service URL and SSE Channel Dependencies
+
+**Input**: Design documents from `/specs/002-update-the-current/`
+**Prerequisites**: plan.md (✓), research.md (✓), data-model.md (✓), contracts/ (✓)
+
+## Execution Flow (main)
+```
+1. Load plan.md from feature directory ✓
+2. Load optional design documents ✓
+   → data-model.md: SigningMaterial, MiddlewareSettings
+   → contracts/: initialization-contract.md
+   → research.md: Remove httpx, simplify async
+3. Generate tasks by category ✓
+4. Apply task rules ✓
+5. Number tasks sequentially ✓
+6. Generate dependency graph ✓
+7. Create parallel execution examples ✓
+8. Validate task completeness ✓
+9. Return: SUCCESS (tasks ready for execution) ✓
+```
+
+## Format: `[ID] [P?] Description`
+- **[P]**: Can run in parallel (different files, no dependencies)
+- Include exact file paths in descriptions
+
+## Path Conventions
+- **Single project**: `src/vibrant_auth_middleware/`, `tests/` at repository root
+- Tests are TDD: written first, must fail, then implement to make them pass
+
+---
+
+## Phase 3.1: Setup & Dependencies
+
+- [X] **T001** Remove httpx dependency from pyproject.toml
+  - File: `/pyproject.toml`
+  - Action: Remove `httpx[sse]>=0.27,<0.28` from dependencies list
+  - Rationale: No longer needed after removing config fetching and SSE subscription
+
+---
+
+## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
+**CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
+
+### Contract Tests for Initialization
+
+- [X] **T002** [P] Write contract test for valid SigningMaterial initialization
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: Valid material with hs256_secret, rs256_public_keys, version succeeds
+  - Reference: contracts/initialization-contract.md Scenario 1
+  - Expected: Test fails (validation not yet implemented)
+
+- [X] **T003** [P] Write contract test for multiple RS256 keys
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: Material with multiple RS256 keys in dict succeeds
+  - Reference: contracts/initialization-contract.md Scenario 2
+  - Expected: Test fails (validation not yet implemented)
+
+- [X] **T004** [P] Write contract test for custom clock skew
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: MiddlewareSettings with custom clock_skew_leeway succeeds
+  - Reference: contracts/initialization-contract.md Scenario 3
+  - Expected: Test fails (MiddlewareSettings signature not yet changed)
+
+### Validation Error Tests
+
+- [X] **T005** [P] Write contract test for missing hs256_secret
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: SigningMaterial with empty hs256_secret raises ValueError
+  - Expected message: "Signing material must include hs256_secret"
+  - Reference: contracts/initialization-contract.md Error 2
+  - Expected: Test fails (validation not yet implemented)
+
+- [X] **T006** [P] Write contract test for empty rs256_public_keys
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: SigningMaterial with {} rs256_public_keys raises ValueError
+  - Expected message: "Signing material must include at least one RS256 public key"
+  - Reference: contracts/initialization-contract.md Error 3
+  - Expected: Test fails (validation not yet implemented)
+
+- [X] **T007** [P] Write contract test for missing version
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: SigningMaterial with empty version raises ValueError
+  - Expected message: "Signing material must include version identifier"
+  - Reference: contracts/initialization-contract.md Error 4
+  - Expected: Test fails (validation not yet implemented)
+
+- [X] **T008** [P] Write contract test for invalid RS256 key value
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: SigningMaterial with empty RS256 key value raises ValueError
+  - Expected message: "RS256 public key for kid '{kid}' must be non-empty"
+  - Reference: contracts/initialization-contract.md Error 5
+  - Expected: Test fails (validation not yet implemented)
+
+- [X] **T009** [P] Write contract test for wrong settings type
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Test: VibrantAuthMiddleware with dict instead of MiddlewareSettings raises TypeError
+  - Expected message: "settings must be MiddlewareSettings instance"
+  - Reference: contracts/initialization-contract.md Error 6
+  - Expected: Test fails (type check not yet implemented)
+
+### Integration Tests for Updated Behavior
+
+- [X] **T010** [P] Write integration test for initialization without bootstrap delay
+  - File: `/tests/integration/test_negative_paths.py`
+  - Test: Middleware is immediately ready after initialization (no async bootstrap)
+  - Verify: Can process request immediately without waiting
+  - Expected: Test fails (_ensure_bootstrap still exists)
+
+- [X] **T011** [P] Write integration test for immutable material
+  - File: `/tests/integration/test_negative_paths.py`
+  - Test: Attempt to modify material after initialization fails (frozen dataclass)
+  - Expected: Test fails (SigningMaterial not yet frozen)
+
+---
+
+## Phase 3.3: Core Implementation (ONLY after tests T002-T011 are failing)
+
+### Data Model Refactoring
+
+- [X] **T012** Refactor SigningMaterial dataclass in config.py
+  - File: `/src/vibrant_auth_middleware/config.py`
+  - Actions:
+    1. Remove `expires_at` field and `Optional` from imports
+    2. Change `hs256_secret` from `Optional[str]` to `str`
+    3. Add `frozen=True` to @dataclass decorator
+    4. Remove `is_expired()` method
+  - Reference: data-model.md Section 1
+  - Verify: T002-T003 now pass for valid cases
+
+- [X] **T013** Add validation function for SigningMaterial
+  - File: `/src/vibrant_auth_middleware/config.py`
+  - Add: `_validate_signing_material()` function
+  - Implement validation rules VR-1 through VR-4 from data-model.md
+  - Verify: T005-T008 now pass (validation errors raised correctly)
+
+- [X] **T014** Remove load_initial_material function
+  - File: `/src/vibrant_auth_middleware/config.py`
+  - Actions:
+    1. Delete `load_initial_material()` async function (lines 77-93)
+    2. Delete `_build_material()` helper (lines 48-62)
+    3. Delete `_parse_expires_at()` helper (lines 32-45)
+    4. Delete `_get_async_client()` context manager (lines 65-74)
+  - Verify: No references to these functions remain
+
+- [X] **T015** Remove subscribe_to_rotation function
+  - File: `/src/vibrant_auth_middleware/config.py`
+  - Actions:
+    1. Delete `subscribe_to_rotation()` async function (lines 96-135)
+    2. Remove unused imports: `asyncio`, `json`, `Callable`, `Awaitable`
+    3. Remove httpx import (no longer needed)
+  - Verify: config.py only contains SigningMaterial and _validate_signing_material
+
+- [X] **T016** Refactor MiddlewareSettings dataclass
+  - File: `/src/vibrant_auth_middleware/middleware.py`
+  - Actions:
+    1. Remove `config_service_url: str = ""` field
+    2. Remove `sse_channel: str = ""` field
+    3. Remove `deny_on_missing_material: bool = True` field
+    4. Add `signing_material: SigningMaterial` as required field (no default)
+  - Reference: data-model.md Section 2
+  - Verify: T004 now passes
+
+### Middleware Initialization Refactoring
+
+- [X] **T017** Refactor VibrantAuthMiddleware.__init__
+  - File: `/src/vibrant_auth_middleware/middleware.py`
+  - Actions:
+    1. Make `settings` parameter required (remove `| None = None`)
+    2. Add type check: `if not isinstance(settings, MiddlewareSettings): raise TypeError(...)`
+    3. Call `config_module._validate_signing_material(settings.signing_material)`
+    4. Assign `self._material = settings.signing_material` directly
+    5. Remove initialization of: `_material_ready`, `_bootstrap_lock`, `_refresh_lock`, `_rotation_pending`, `_rotation_task`
+  - Reference: data-model.md Section 3
+  - Verify: T009 now passes (type check works)
+
+- [X] **T018** Remove _ensure_bootstrap method
+  - File: `/src/vibrant_auth_middleware/middleware.py`
+  - Actions:
+    1. Delete `_ensure_bootstrap()` async method (lines 120-130)
+    2. Remove call to `await self._ensure_bootstrap()` from `__call__` method (lines 60-67)
+  - Verify: Middleware no longer has async initialization delay
+
+- [X] **T019** Remove _listen_for_rotations and _handle_rotation_event methods
+  - File: `/src/vibrant_auth_middleware/middleware.py`
+  - Actions:
+    1. Delete `_listen_for_rotations()` async method (lines 132-143)
+    2. Delete `_handle_rotation_event()` async method (lines 145-159)
+  - Verify: No rotation-related code remains
+
+- [X] **T020** Update __call__ method to use immediate material
+  - File: `/src/vibrant_auth_middleware/middleware.py`
+  - Actions:
+    1. Remove `_rotation_pending` check (lines 81-84)
+    2. Simplify material availability check - just use `self._material` directly
+    3. Remove `is_expired()` check (no longer needed)
+  - Verify: T010 now passes (immediate readiness)
+
+---
+
+## Phase 3.4: Test Updates
+
+### Update Existing Tests
+
+- [X] **T021** Update existing contract tests to use new initialization pattern
+  - File: `/tests/contract/test_middleware_contract.py`
+  - Actions:
+    1. Update test fixtures to create SigningMaterial directly
+    2. Pass material via MiddlewareSettings
+    3. Remove any config_service_url or sse_channel usage
+  - Verify: All existing contract tests pass with new pattern
+
+- [X] **T022** Update integration tests to use new initialization pattern
+  - File: `/tests/integration/test_negative_paths.py`
+  - Actions:
+    1. Update fixtures to create SigningMaterial
+    2. Remove any mock HTTP fetching setup
+    3. Update assertions for immediate readiness
+  - Verify: T010-T011 now pass
+
+- [X] **T023** [P] Update unit tests to use new initialization pattern
+  - File: `/tests/unit/test_algorithm_switch.py`
+  - Action: Update middleware fixtures to use SigningMaterial
+  - Verify: Tests still pass
+
+- [X] **T024** [P] Update unit tests to use new initialization pattern
+  - File: `/tests/unit/test_header_extraction.py`
+  - Action: Update middleware fixtures to use SigningMaterial
+  - Verify: Tests still pass
+
+- [X] **T025** [P] Update unit tests to use new initialization pattern
+  - File: `/tests/unit/test_cookie_extraction.py`
+  - Action: Update middleware fixtures to use SigningMaterial
+  - Verify: Tests still pass
+
+- [X] **T026** Delete rotation events integration test
+  - File: `/tests/integration/test_rotation_events.py`
+  - Action: Delete entire file (rotation no longer supported)
+  - Rationale: SSE rotation functionality removed
+
+---
+
+## Phase 3.5: Integration & Examples
+
+- [X] **T027** Update example application
+  - File: `/examples/app.py`
+  - Actions:
+    1. Show how to create SigningMaterial
+    2. Update middleware initialization to use new pattern
+    3. Add comment about rotation strategy
+  - Reference: quickstart.md patterns
+
+- [X] **T028** Update public exports
+  - File: `/src/vibrant_auth_middleware/__init__.py`
+  - Actions:
+    1. Verify SigningMaterial is exported
+    2. Verify MiddlewareSettings is exported
+    3. Remove any exports related to load_initial_material or subscribe_to_rotation
+
+---
+
+## Phase 3.6: Documentation & Polish
+
+- [X] **T029** [P] Update README.md with new initialization pattern
+  - File: `/README.md`
+  - Actions:
+    1. Update initialization examples
+    2. Document breaking changes
+    3. Add migration guide section
+    4. Show key rotation strategies
+  - Reference: quickstart.md
+
+- [X] **T030** [P] Update CHANGELOG.md
+  - File: `/CHANGELOG.md`
+  - Add:
+    - **BREAKING CHANGE**: Removed config_service_url and sse_channel
+    - **BREAKING CHANGE**: SigningMaterial expiration removed
+    - **BREAKING CHANGE**: httpx dependency removed
+    - **Changed**: SigningMaterial is now immutable (frozen dataclass)
+    - **Changed**: MiddlewareSettings.signing_material is now required
+    - **Removed**: load_initial_material() function
+    - **Removed**: subscribe_to_rotation() function
+    - Migration guide link
+
+- [X] **T031** Run full test suite
+  - Command: `pytest tests/ -v`
+  - Verify: All tests pass
+  - Expected: ~same test count as before (minus rotation tests, plus new validation tests)
+
+- [X] **T032** Run performance tests
+  - File: `/tests/performance/test_middleware_latency.py`
+  - Verify: Still <1ms middleware overhead
+  - Expected: Should be faster (no async bootstrap, no rotation checks)
+
+- [X] **T033** Verify no remaining references to old patterns
+  - Action: Search codebase for removed patterns
+  - Check: No references to `config_service_url`, `sse_channel`, `expires_at`, `is_expired`
+  - Tools: `grep -r "config_service_url" src/ tests/` (should return nothing)
+
+---
+
+## Dependencies
+
+### Phase Dependencies
+- **T001** (remove httpx) → blocks nothing (can run early)
+- **T002-T011** (write tests) → MUST complete before T012-T020
+- **T012-T020** (implementation) → MUST complete before T021-T026
+- **T021-T026** (test updates) → MUST complete before T027-T028
+- **T027-T028** (integration) → MUST complete before T029-T033
+
+### File-Level Dependencies
+- **config.py changes** (T012-T015) → can run sequentially
+- **middleware.py changes** (T016-T020) → can run sequentially, depends on T012-T013
+- **Contract tests** (T002-T009) → can run in parallel [P]
+- **Integration tests** (T010-T011) → can run in parallel [P]
+- **Unit test updates** (T023-T025) → can run in parallel [P]
+- **Documentation** (T029-T030) → can run in parallel [P]
+
+---
+
+## Parallel Execution Examples
+
+### Phase 3.2: Writing Tests (All Parallel)
+```bash
+# All contract tests can be written in parallel
+pytest tests/contract/test_middleware_contract.py::test_valid_initialization &
+pytest tests/contract/test_middleware_contract.py::test_multiple_rs256_keys &
+pytest tests/contract/test_middleware_contract.py::test_custom_clock_skew &
+pytest tests/contract/test_middleware_contract.py::test_missing_hs256_secret &
+pytest tests/contract/test_middleware_contract.py::test_empty_rs256_keys &
+pytest tests/contract/test_middleware_contract.py::test_missing_version &
+pytest tests/contract/test_middleware_contract.py::test_invalid_rs256_value &
+pytest tests/contract/test_middleware_contract.py::test_wrong_settings_type &
+wait
+```
+
+### Phase 3.4: Updating Unit Tests (Parallel)
+```bash
+# Update multiple unit test files in parallel
+# Task T023, T024, T025 together
+pytest tests/unit/test_algorithm_switch.py &
+pytest tests/unit/test_header_extraction.py &
+pytest tests/unit/test_cookie_extraction.py &
+wait
+```
+
+### Phase 3.6: Documentation Updates (Parallel)
+```bash
+# Update documentation in parallel
+# Task T029, T030 together
+# (Both modify different files)
+```
+
+---
+
+## Validation Checklist
+*GATE: Verified before task execution*
+
+- [x] All contracts have corresponding tests (T002-T009 cover initialization-contract.md)
+- [x] All entities have model tasks (T012 for SigningMaterial, T016 for MiddlewareSettings)
+- [x] All tests come before implementation (T002-T011 before T012-T020)
+- [x] Parallel tasks truly independent (different files, marked [P])
+- [x] Each task specifies exact file path
+- [x] No task modifies same file as another [P] task
+- [x] Breaking changes documented (T030)
+- [x] Migration path provided (T029)
+
+---
+
+## Success Criteria
+
+1. **All tests pass** (T031)
+2. **Performance maintained** <1ms (T032)
+3. **No old pattern references** (T033)
+4. **httpx dependency removed** (T001)
+5. **Breaking changes documented** (T029-T030)
+6. **Examples updated** (T027)
+
+---
+
+## Estimated Effort
+
+- **Phase 3.1 Setup**: 10 min (1 task)
+- **Phase 3.2 Tests**: 2-3 hours (10 tasks, TDD)
+- **Phase 3.3 Implementation**: 3-4 hours (9 tasks, refactoring)
+- **Phase 3.4 Test Updates**: 1-2 hours (6 tasks)
+- **Phase 3.5 Integration**: 30 min (2 tasks)
+- **Phase 3.6 Documentation**: 1 hour (5 tasks)
+
+**Total**: ~8-11 hours
+
+---
+
+## Notes
+
+- **TDD Required**: Tests T002-T011 MUST fail before starting implementation
+- **Breaking Change**: This is a major version bump - document clearly
+- **Migration Support**: Provide clear error messages for old patterns (see data-model.md)
+- **Performance Improvement**: Removal of async bootstrap should improve first-request latency
+- **Simplification Win**: Removing httpx reduces dependency footprint and attack surface
+
+---
+*Tasks ready for execution - follow TDD strictly*
