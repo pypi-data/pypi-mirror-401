@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hyprtodo"
+version = "0.1.1"
+description = "A todo list widget for Hyprland"
+authors = [{name = "William Elder", email = "williamxelder@gmail.com"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "textual",
+    "PyQt6",
+]
+
+[project.urls]
+Homepage = "https://github.com/williamj48/hyprtodo"
+Repository = "https://github.com/williamj48/hyprtodo"
+
+[project.scripts]
+hyprtodo = "hyprtodo.trayLauncher:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hyprtodo"]
