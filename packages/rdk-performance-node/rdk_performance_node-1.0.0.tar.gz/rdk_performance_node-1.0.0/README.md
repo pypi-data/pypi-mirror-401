@@ -1,0 +1,62 @@
+# RDK Performance Node
+
+Web-based hardware monitoring node for RDK devices (X3/X3 Module/X5/Ultra/S100).
+
+## Features
+
+- Real-time CPU/BPU/Memory/Disk/Temperature monitoring
+- Performance mode switching (performance/powersave/schedutil)
+- Web-based interface accessible via browser
+- Support for multiple RDK device types
+
+## Installation
+
+```bash
+pip install rdk_performance_node -i http://archive.d-robotics.cc/simple/ --trusted-host archive.d-robotics.cc
+```
+
+## Usage
+
+```bash
+sudo performance_node --device -1 --port 7999
+```
+
+### Command Line Arguments
+
+- `--device`: Device type (0: RDK X3, 1: RDK Ultra, 2: RDK X5, 3: RDK S100, -1: auto detect)
+- `--port`: Port number (default: 7999)
+- `--debug`: Flask debug mode (0: false, 1: true)
+- `--log`: Flask log (0: false, 1: true)
+
+### Examples
+
+```bash
+# Auto detect device, default port 7999
+sudo performance_node
+
+# Specify RDK Ultra, port 6666, enable debug
+sudo performance_node --device 1 --port 6666 --debug 1 --log 1
+```
+
+## Access
+
+After starting, access the web interface via:
+```
+http://deviceIP:7999
+```
+
+## Supported Devices
+
+- RDK X3 / X3 Module
+- RDK X5
+- RDK Ultra
+- RDK S100
+
+## License
+
+Apache 2.0
+
+## Documentation
+
+For more information, visit: https://developer.d-robotics.cc/nodehubdetail/1887025046701215746
+
