@@ -1,0 +1,1445 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "FastAPI",
+        "version": "0.1.1"
+    },
+    "paths": {
+        "/valid": {
+            "post": {
+                "summary": "Valid",
+                "description": "Validate wether a ScanSpec[str] can produce a viable scan.\n\nArgs:\n    spec: The scanspec to validate\n\nReturns:\n    ValidResponse: A canonical version of the spec if it is valid.\n        An error otherwise.",
+                "operationId": "valid_valid_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Spec-Input",
+                                "examples": [
+                                    {
+                                        "outer": {
+                                            "axis": "y",
+                                            "start": 0.0,
+                                            "stop": 10.0,
+                                            "num": 3,
+                                            "type": "Linspace"
+                                        },
+                                        "inner": {
+                                            "axis": "x",
+                                            "start": 0.0,
+                                            "stop": 10.0,
+                                            "num": 4,
+                                            "type": "Linspace"
+                                        },
+                                        "gap": true,
+                                        "type": "Product"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/midpoints": {
+            "post": {
+                "summary": "Midpoints",
+                "description": "Generate midpoints from a scanspec.\n\nA scanspec can produce bounded points (i.e. a point is valid if an\naxis is between a minimum and and a maximum, see /bounds). The midpoints\nare the middle of each set of bounds.\n\nArgs:\n    request: Scanspec and formatting info.\n\nReturns:\n    MidpointsResponse: Midpoints of the scan",
+                "operationId": "midpoints_midpoints_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PointsRequest",
+                                "examples": [
+                                    {
+                                        "spec": {
+                                            "outer": {
+                                                "axis": "y",
+                                                "start": 0.0,
+                                                "stop": 10.0,
+                                                "num": 3,
+                                                "type": "Linspace"
+                                            },
+                                            "inner": {
+                                                "axis": "x",
+                                                "start": 0.0,
+                                                "stop": 10.0,
+                                                "num": 4,
+                                                "type": "Linspace"
+                                            },
+                                            "gap": true,
+                                            "type": "Product"
+                                        },
+                                        "max_frames": 1024,
+                                        "format": "FLOAT_LIST"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MidpointsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bounds": {
+            "post": {
+                "summary": "Bounds",
+                "description": "Generate bounds from a scanspec.\n\nA scanspec can produce points with lower and upper bounds.\n\nArgs:\n    request: Scanspec and formatting info.\n\nReturns:\n    BoundsResponse: Bounds of the scan",
+                "operationId": "bounds_bounds_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PointsRequest",
+                                "examples": [
+                                    {
+                                        "spec": {
+                                            "outer": {
+                                                "axis": "y",
+                                                "start": 0.0,
+                                                "stop": 10.0,
+                                                "num": 3,
+                                                "type": "Linspace"
+                                            },
+                                            "inner": {
+                                                "axis": "x",
+                                                "start": 0.0,
+                                                "stop": 10.0,
+                                                "num": 4,
+                                                "type": "Linspace"
+                                            },
+                                            "gap": true,
+                                            "type": "Product"
+                                        },
+                                        "max_frames": 1024,
+                                        "format": "FLOAT_LIST"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BoundsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/gap": {
+            "post": {
+                "summary": "Gap",
+                "description": "Generate gaps from a scanspec.\n\nA scanspec may indicate if there is a gap between two frames.\nThe array returned corresponds to whether or not there is a gap\nafter each frame.\n\nArgs:\n    spec: Scanspec and formatting info.\n\nReturns:\n    GapResponse: Bounds of the scan",
+                "operationId": "gap_gap_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Spec-Input",
+                                "examples": [
+                                    {
+                                        "outer": {
+                                            "axis": "y",
+                                            "start": 0.0,
+                                            "stop": 10.0,
+                                            "num": 3,
+                                            "type": "Linspace"
+                                        },
+                                        "inner": {
+                                            "axis": "x",
+                                            "start": 0.0,
+                                            "stop": 10.0,
+                                            "num": 4,
+                                            "type": "Linspace"
+                                        },
+                                        "gap": true,
+                                        "type": "Product"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GapResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/smalleststep": {
+            "post": {
+                "summary": "Smallest Step",
+                "description": "Calculate the smallest step in a scan, both absolutely and per-axis.\n\nIgnore any steps of size 0.\n\nArgs:\n    spec: The spec of the scan\n\nReturns:\n    SmallestStepResponse: A description of the smallest steps in the spec",
+                "operationId": "smallest_step_smalleststep_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Spec-Input",
+                                "examples": [
+                                    {
+                                        "outer": {
+                                            "axis": "y",
+                                            "start": 0.0,
+                                            "stop": 10.0,
+                                            "num": 3,
+                                            "type": "Linspace"
+                                        },
+                                        "inner": {
+                                            "axis": "x",
+                                            "start": 0.0,
+                                            "stop": 10.0,
+                                            "num": 4,
+                                            "type": "Linspace"
+                                        },
+                                        "gap": true,
+                                        "type": "Product"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmallestStepResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "BoundsResponse": {
+                "properties": {
+                    "total_frames": {
+                        "type": "integer",
+                        "title": "Total Frames",
+                        "description": "Total number of frames in spec"
+                    },
+                    "returned_frames": {
+                        "type": "integer",
+                        "title": "Returned Frames",
+                        "description": "Total of number of frames in this response, may be less than total_frames due to downsampling etc."
+                    },
+                    "format": {
+                        "$ref": "#/components/schemas/PointsFormat",
+                        "description": "Format of returned point data"
+                    },
+                    "lower": {
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "items": {
+                                        "type": "number"
+                                    },
+                                    "type": "array"
+                                }
+                            ]
+                        },
+                        "type": "object",
+                        "title": "Lower",
+                        "description": "Lower bounds of scan frames if different from midpoints"
+                    },
+                    "upper": {
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "items": {
+                                        "type": "number"
+                                    },
+                                    "type": "array"
+                                }
+                            ]
+                        },
+                        "type": "object",
+                        "title": "Upper",
+                        "description": "Upper bounds of scan frames if different from midpoints"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "total_frames",
+                    "returned_frames",
+                    "format",
+                    "lower",
+                    "upper"
+                ],
+                "title": "BoundsResponse",
+                "description": "Bounds of a generated scan."
+            },
+            "Concat_str_-Input": {
+                "properties": {
+                    "left": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The left-hand Spec to Concat, midpoints will appear earlier"
+                    },
+                    "right": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The right-hand Spec to Concat, midpoints will appear later"
+                    },
+                    "gap": {
+                        "type": "boolean",
+                        "title": "Gap",
+                        "description": "If True, force a gap in the output at the join",
+                        "default": false
+                    },
+                    "check_path_changes": {
+                        "type": "boolean",
+                        "title": "Check Path Changes",
+                        "description": "If True path through scan will not be modified by squash",
+                        "default": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Concat",
+                        "title": "Type",
+                        "default": "Concat"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "left",
+                    "right"
+                ],
+                "title": "Concat",
+                "description": "Concatenate two Specs together, running one after the other.\n\nEach Dimension of left and right must contain the same axes. Typically\nformed using `Spec.concat`.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 3, 3).concat(Linspace(\"x\", 4, 5, 5)))"
+            },
+            "Concat_str_-Output": {
+                "properties": {
+                    "left": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The left-hand Spec to Concat, midpoints will appear earlier"
+                    },
+                    "right": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The right-hand Spec to Concat, midpoints will appear later"
+                    },
+                    "gap": {
+                        "type": "boolean",
+                        "title": "Gap",
+                        "description": "If True, force a gap in the output at the join",
+                        "default": false
+                    },
+                    "check_path_changes": {
+                        "type": "boolean",
+                        "title": "Check Path Changes",
+                        "description": "If True path through scan will not be modified by squash",
+                        "default": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Concat",
+                        "title": "Type",
+                        "default": "Concat"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "left",
+                    "right"
+                ],
+                "title": "Concat",
+                "description": "Concatenate two Specs together, running one after the other.\n\nEach Dimension of left and right must contain the same axes. Typically\nformed using `Spec.concat`.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 3, 3).concat(Linspace(\"x\", 4, 5, 5)))"
+            },
+            "ConstantDuration_str_-Input": {
+                "properties": {
+                    "constant_duration": {
+                        "type": "number",
+                        "title": "Constant Duration",
+                        "description": "The value at each point"
+                    },
+                    "spec": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Spec-Input"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Spec contaning the path to be followed"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "ConstantDuration",
+                        "title": "Type",
+                        "default": "ConstantDuration"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "constant_duration"
+                ],
+                "title": "ConstantDuration",
+                "description": "Apply a constant duration to every point in a Spec.\n\nTypically applied with the ``@`` modifier.\n\n.. example_spec::\n\n    from scanspec.specs import Linspace\n\n    spec = 0.1 @ Linspace(\"x\", 1, 2, 3)"
+            },
+            "ConstantDuration_str_-Output": {
+                "properties": {
+                    "constant_duration": {
+                        "type": "number",
+                        "title": "Constant Duration",
+                        "description": "The value at each point"
+                    },
+                    "spec": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Spec-Output"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Spec contaning the path to be followed"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "ConstantDuration",
+                        "title": "Type",
+                        "default": "ConstantDuration"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "constant_duration"
+                ],
+                "title": "ConstantDuration",
+                "description": "Apply a constant duration to every point in a Spec.\n\nTypically applied with the ``@`` modifier.\n\n.. example_spec::\n\n    from scanspec.specs import Linspace\n\n    spec = 0.1 @ Linspace(\"x\", 1, 2, 3)"
+            },
+            "Ellipse_str_": {
+                "properties": {
+                    "x_axis": {
+                        "type": "string",
+                        "title": "X Axis",
+                        "description": "An identifier for what to move for x"
+                    },
+                    "x_centre": {
+                        "type": "number",
+                        "title": "X Centre",
+                        "description": "x centre of the spiral"
+                    },
+                    "x_diameter": {
+                        "type": "number",
+                        "title": "X Diameter",
+                        "description": "x width of the spiral"
+                    },
+                    "x_step": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "X Step",
+                        "description": "Spacing along x"
+                    },
+                    "y_axis": {
+                        "type": "string",
+                        "title": "Y Axis",
+                        "description": "An identifier for what to move for y"
+                    },
+                    "y_centre": {
+                        "type": "number",
+                        "title": "Y Centre",
+                        "description": "y centre of the spiral"
+                    },
+                    "y_diameter": {
+                        "type": "number",
+                        "title": "Y Diameter",
+                        "description": "y width of the spiral (defaults to x_diameter)"
+                    },
+                    "y_step": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Y Step",
+                        "description": "Spacing along y (defaults to x_step)"
+                    },
+                    "snake": {
+                        "type": "boolean",
+                        "title": "Snake",
+                        "description": "If True, path zigzag like a snake (defaults to False)",
+                        "default": false
+                    },
+                    "vertical": {
+                        "type": "boolean",
+                        "title": "Vertical",
+                        "description": "If True, y axis is the fast axis (defaults to False)",
+                        "default": false
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Ellipse",
+                        "title": "Type",
+                        "default": "Ellipse"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "x_axis",
+                    "x_centre",
+                    "x_diameter",
+                    "x_step",
+                    "y_axis",
+                    "y_centre"
+                ],
+                "title": "Ellipse",
+                "description": "Grid of points masked to an elliptical footprint.\n\nConstructs a 2-D scan over an axis-aligned ellipse defined by\n``(x_axis, y_axis)``, centred at (``x_centre``, ``y_centre``), with\ndiameters ``x_diameter`` and ``y_diameter``. Grid spacing along each axis is\ncontrolled by ``x_step`` and ``y_step``. If ``snake`` is True, the fast\naxis will zigzag like a snake. If ``vertical`` is True, the y axis will be\nthe fast axis.\n\nStarts from one of the four extremes of the ellipse identified by the signs of\n``x_step`` and ``y_step``.\n\n.. example_spec::\n\n    from scanspec.specs import Ellipse, Fly\n\n    # An elliptical region centred at (0, 0) on axes \"x\" and \"y\",\n    # with 10x6 diameters and steps of 0.5 in both directions.\n    spec = Fly(\n        Ellipse(\n            \"x\", 0, 10, 0.5,\n            \"y\", 0, 6,\n            snake=True,\n            vertical=False,\n        )\n    )"
+            },
+            "Fly_str_-Input": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "Spec contaning the path to be followed"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Fly",
+                        "title": "Type",
+                        "default": "Fly"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "Fly",
+                "description": "Move through lower to upper bounds of the Spec rather than stopping.\n\nThis is commonly termed a \"fly scan\" rather than a \"step scan\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 3))"
+            },
+            "Fly_str_-Output": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "Spec contaning the path to be followed"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Fly",
+                        "title": "Type",
+                        "default": "Fly"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "Fly",
+                "description": "Move through lower to upper bounds of the Spec rather than stopping.\n\nThis is commonly termed a \"fly scan\" rather than a \"step scan\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 3))"
+            },
+            "GapResponse": {
+                "properties": {
+                    "gap": {
+                        "items": {
+                            "type": "boolean"
+                        },
+                        "type": "array",
+                        "title": "Gap",
+                        "description": "Boolean array indicating if there is a gap between each frame"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "gap"
+                ],
+                "title": "GapResponse",
+                "description": "Presence of gaps in a generated scan."
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "Linspace_str_": {
+                "properties": {
+                    "axis": {
+                        "type": "string",
+                        "title": "Axis",
+                        "description": "An identifier for what to move"
+                    },
+                    "start": {
+                        "type": "number",
+                        "title": "Start",
+                        "description": "Midpoint of the first point of the line"
+                    },
+                    "stop": {
+                        "type": "number",
+                        "title": "Stop",
+                        "description": "Midpoint of the last point of the line"
+                    },
+                    "num": {
+                        "type": "integer",
+                        "minimum": 1.0,
+                        "title": "Num",
+                        "description": "Number of frames to produce (defaults to 1)",
+                        "default": 1
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Linspace",
+                        "title": "Type",
+                        "default": "Linspace"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "axis",
+                    "start",
+                    "stop"
+                ],
+                "title": "Linspace",
+                "description": "Linearly spaced frames with start and stop as first and last midpoints.\n\nThis class is intended to handle linearly spaced frames defined with a\nspecific number of frames.\n\n.. seealso::\n    `Range`: For linearly spaced frames defined with a step size.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 5))"
+            },
+            "MidpointsResponse": {
+                "properties": {
+                    "total_frames": {
+                        "type": "integer",
+                        "title": "Total Frames",
+                        "description": "Total number of frames in spec"
+                    },
+                    "returned_frames": {
+                        "type": "integer",
+                        "title": "Returned Frames",
+                        "description": "Total of number of frames in this response, may be less than total_frames due to downsampling etc."
+                    },
+                    "format": {
+                        "$ref": "#/components/schemas/PointsFormat",
+                        "description": "Format of returned point data"
+                    },
+                    "midpoints": {
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "items": {
+                                        "type": "number"
+                                    },
+                                    "type": "array"
+                                }
+                            ]
+                        },
+                        "type": "object",
+                        "title": "Midpoints",
+                        "description": "The midpoints of scan frames for each axis"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "total_frames",
+                    "returned_frames",
+                    "format",
+                    "midpoints"
+                ],
+                "title": "MidpointsResponse",
+                "description": "Midpoints of a generated scan."
+            },
+            "PointsFormat": {
+                "type": "string",
+                "enum": [
+                    "STRING",
+                    "FLOAT_LIST",
+                    "BASE64_ENCODED"
+                ],
+                "title": "PointsFormat",
+                "description": "Formats in which we can return points."
+            },
+            "PointsRequest": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The spec from which to generate points"
+                    },
+                    "max_frames": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Max Frames",
+                        "description": "The maximum number of points to return, if None will return as many as calculated",
+                        "default": 100000
+                    },
+                    "format": {
+                        "$ref": "#/components/schemas/PointsFormat",
+                        "description": "The format in which to output the points data",
+                        "default": "FLOAT_LIST"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "PointsRequest",
+                "description": "A request for generated scan points."
+            },
+            "Polygon_str_": {
+                "properties": {
+                    "x_axis": {
+                        "type": "string",
+                        "title": "X Axis",
+                        "description": "An identifier for what to move for x"
+                    },
+                    "y_axis": {
+                        "type": "string",
+                        "title": "Y Axis",
+                        "description": "An identifier for what to move for y"
+                    },
+                    "vertices": {
+                        "items": {
+                            "prefixItems": [
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "number"
+                                }
+                            ],
+                            "type": "array",
+                            "maxItems": 2,
+                            "minItems": 2
+                        },
+                        "type": "array",
+                        "title": "Vertices",
+                        "description": "List of (x, y) vertices defining the polygon"
+                    },
+                    "x_step": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "X Step",
+                        "description": "Spacing along x"
+                    },
+                    "y_step": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Y Step",
+                        "description": "Spacing along y (defaults to x_step)"
+                    },
+                    "snake": {
+                        "type": "boolean",
+                        "title": "Snake",
+                        "description": "If True, path zigzag like a snake (defaults to False)",
+                        "default": false
+                    },
+                    "vertical": {
+                        "type": "boolean",
+                        "title": "Vertical",
+                        "description": "If True, y axis is the fast axis (defaults to False)",
+                        "default": false
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Polygon",
+                        "title": "Type",
+                        "default": "Polygon"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "x_axis",
+                    "y_axis",
+                    "vertices",
+                    "x_step"
+                ],
+                "title": "Polygon",
+                "description": "Grid of points masked to a polygonal footprint.\n\nConstructs a 2-D scan over an axis-aligned polygon defined by an ordered\nlist of vertices \"(x, y)\" given in ``vertices``. The polygon may be convex\nor concave, and the interior is determined using an even-odd ray-casting\nrule. Grid spacing along each axis is controlled by ``x_step`` and ``y_step``,\nIf ``snake`` is True, the fast axis will zigzag like a snake. If ``vertical`` is\nTrue, the y axis will be the fast axis.\n\n.. example_spec::\n\n    from scanspec.specs import Polygon, Fly\n\n    # A triangular region on axes \"x\" and \"y\", stepped by 0.2 units\n    # in both directions.\n    spec = Fly(\n        Polygon(\n            x_axis=\"x\",\n            y_axis=\"y\",\n            vertices=[(0, 0), (5, 0), (2.5, 4)],\n            x_step=0.2,\n            y_step=0.2,\n            snake=True,\n            vertical=False,\n        )\n    )"
+            },
+            "Product_str_-Input": {
+                "properties": {
+                    "outer": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Spec-Input"
+                            },
+                            {
+                                "type": "integer"
+                            }
+                        ],
+                        "title": "Outer",
+                        "description": "Will be executed once"
+                    },
+                    "inner": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Spec-Input"
+                            },
+                            {
+                                "type": "integer"
+                            }
+                        ],
+                        "title": "Inner",
+                        "description": "Will be executed len(outer) times"
+                    },
+                    "gap": {
+                        "type": "boolean",
+                        "title": "Gap",
+                        "description": "If False and the outer spec is an integer and the inner spec is snaked then the end and start of consecutive iterations of inner will have no gap",
+                        "default": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Product",
+                        "title": "Type",
+                        "default": "Product"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "outer",
+                    "inner"
+                ],
+                "title": "Product",
+                "description": "Outer product of two Specs, nesting inner within outer.\n\nThis means that inner will run in its entirety at each point in outer.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 3, 4, 12))\n\nAn inner integer can be used to repeat the same point many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * 2)\n\nAn outer integer can be used to repeat the same scan many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(2 * ~Linspace.bounded(\"x\", 3, 4, 1))\n\nIf you want snaked axes to have no gap between iterations you can do:\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Product\n\n    spec = Fly(Product(2, ~Linspace.bounded(\"x\", 3, 4, 1), gap=False))\n\n.. note:: There is no turnaround arrow at x=4"
+            },
+            "Product_str_-Output": {
+                "properties": {
+                    "outer": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Spec-Output"
+                            },
+                            {
+                                "type": "integer"
+                            }
+                        ],
+                        "title": "Outer",
+                        "description": "Will be executed once"
+                    },
+                    "inner": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/Spec-Output"
+                            },
+                            {
+                                "type": "integer"
+                            }
+                        ],
+                        "title": "Inner",
+                        "description": "Will be executed len(outer) times"
+                    },
+                    "gap": {
+                        "type": "boolean",
+                        "title": "Gap",
+                        "description": "If False and the outer spec is an integer and the inner spec is snaked then the end and start of consecutive iterations of inner will have no gap",
+                        "default": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Product",
+                        "title": "Type",
+                        "default": "Product"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "outer",
+                    "inner"
+                ],
+                "title": "Product",
+                "description": "Outer product of two Specs, nesting inner within outer.\n\nThis means that inner will run in its entirety at each point in outer.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 3, 4, 12))\n\nAn inner integer can be used to repeat the same point many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * 2)\n\nAn outer integer can be used to repeat the same scan many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(2 * ~Linspace.bounded(\"x\", 3, 4, 1))\n\nIf you want snaked axes to have no gap between iterations you can do:\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Product\n\n    spec = Fly(Product(2, ~Linspace.bounded(\"x\", 3, 4, 1), gap=False))\n\n.. note:: There is no turnaround arrow at x=4"
+            },
+            "Range_str_": {
+                "properties": {
+                    "axis": {
+                        "type": "string",
+                        "title": "Axis",
+                        "description": "An identifier for what to move"
+                    },
+                    "start": {
+                        "type": "number",
+                        "title": "Start",
+                        "description": "Midpoint of the first point of the line"
+                    },
+                    "stop": {
+                        "type": "number",
+                        "title": "Stop",
+                        "description": "Midpoint of the last point of the line"
+                    },
+                    "step": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Step",
+                        "description": "Step size (defaults to stop - start)"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Range",
+                        "title": "Type",
+                        "default": "Range"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "axis",
+                    "start",
+                    "stop"
+                ],
+                "title": "Range",
+                "description": "Linearly spaced frames with start and stop as the bounding midpoints.\n\n``step`` defines the distance between midpoints.\n\n.. seealso::\n    `Linspace`: For linearly spaced frames defined with a number of frames.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Range\n\n    spec = Fly(Range(\"x\", 1, 2, 0.25))"
+            },
+            "SmallestStepResponse": {
+                "properties": {
+                    "absolute": {
+                        "type": "number",
+                        "title": "Absolute",
+                        "description": "Absolute smallest distance between two points on a single axis"
+                    },
+                    "per_axis": {
+                        "additionalProperties": {
+                            "type": "number"
+                        },
+                        "type": "object",
+                        "title": "Per Axis",
+                        "description": "Smallest distance between two points on each axis"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "absolute",
+                    "per_axis"
+                ],
+                "title": "SmallestStepResponse",
+                "description": "Information about the smallest steps between points in a spec."
+            },
+            "Snake_str_-Input": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The Spec to run in reverse every other iteration"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Snake",
+                        "title": "Type",
+                        "default": "Snake"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "Snake",
+                "description": "Run the Spec in reverse on every other iteration when nested.\n\nTypically created with the ``~`` operator.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 3, 3) * ~Linspace(\"x\", 3, 5, 5))"
+            },
+            "Snake_str_-Output": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The Spec to run in reverse every other iteration"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Snake",
+                        "title": "Type",
+                        "default": "Snake"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "Snake",
+                "description": "Run the Spec in reverse on every other iteration when nested.\n\nTypically created with the ``~`` operator.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 3, 3) * ~Linspace(\"x\", 3, 5, 5))"
+            },
+            "Spec-Input": {
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/Product_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Zip_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Snake_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Concat_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Squash_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Linspace_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Range_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Fly_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ConstantDuration_str_-Input"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Static_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Spiral_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Ellipse_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Polygon_str_"
+                    }
+                ],
+                "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                        "Concat": "#/components/schemas/Concat_str_-Input",
+                        "ConstantDuration": "#/components/schemas/ConstantDuration_str_-Input",
+                        "Ellipse": "#/components/schemas/Ellipse_str_",
+                        "Fly": "#/components/schemas/Fly_str_-Input",
+                        "Linspace": "#/components/schemas/Linspace_str_",
+                        "Polygon": "#/components/schemas/Polygon_str_",
+                        "Product": "#/components/schemas/Product_str_-Input",
+                        "Range": "#/components/schemas/Range_str_",
+                        "Snake": "#/components/schemas/Snake_str_-Input",
+                        "Spiral": "#/components/schemas/Spiral_str_",
+                        "Squash": "#/components/schemas/Squash_str_-Input",
+                        "Static": "#/components/schemas/Static_str_",
+                        "Zip": "#/components/schemas/Zip_str_-Input"
+                    }
+                }
+            },
+            "Spec-Output": {
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/Product_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Zip_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Snake_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Concat_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Squash_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Linspace_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Range_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Fly_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ConstantDuration_str_-Output"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Static_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Spiral_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Ellipse_str_"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Polygon_str_"
+                    }
+                ],
+                "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                        "Concat": "#/components/schemas/Concat_str_-Output",
+                        "ConstantDuration": "#/components/schemas/ConstantDuration_str_-Output",
+                        "Ellipse": "#/components/schemas/Ellipse_str_",
+                        "Fly": "#/components/schemas/Fly_str_-Output",
+                        "Linspace": "#/components/schemas/Linspace_str_",
+                        "Polygon": "#/components/schemas/Polygon_str_",
+                        "Product": "#/components/schemas/Product_str_-Output",
+                        "Range": "#/components/schemas/Range_str_",
+                        "Snake": "#/components/schemas/Snake_str_-Output",
+                        "Spiral": "#/components/schemas/Spiral_str_",
+                        "Squash": "#/components/schemas/Squash_str_-Output",
+                        "Static": "#/components/schemas/Static_str_",
+                        "Zip": "#/components/schemas/Zip_str_-Output"
+                    }
+                }
+            },
+            "Spiral_str_": {
+                "properties": {
+                    "x_axis": {
+                        "type": "string",
+                        "title": "X Axis",
+                        "description": "An identifier for what to move for x"
+                    },
+                    "x_centre": {
+                        "type": "number",
+                        "title": "X Centre",
+                        "description": "x centre of the spiral"
+                    },
+                    "x_diameter": {
+                        "type": "number",
+                        "title": "X Diameter",
+                        "description": "x width of the spiral"
+                    },
+                    "x_step": {
+                        "type": "number",
+                        "title": "X Step",
+                        "description": "Radial spacing along x"
+                    },
+                    "y_axis": {
+                        "type": "string",
+                        "title": "Y Axis",
+                        "description": "An identifier for what to move for y"
+                    },
+                    "y_centre": {
+                        "type": "number",
+                        "title": "Y Centre",
+                        "description": "y centre of the spiral"
+                    },
+                    "y_diameter": {
+                        "type": "number",
+                        "title": "Y Diameter",
+                        "description": "y width of the spiral (defaults to x_diameter)"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Spiral",
+                        "title": "Type",
+                        "default": "Spiral"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "x_axis",
+                    "x_centre",
+                    "x_diameter",
+                    "x_step",
+                    "y_axis",
+                    "y_centre"
+                ],
+                "title": "Spiral",
+                "description": "Archimedean spiral of \"x_axis\" and \"y_axis\".\n\nStarts at centre point (\"x_start\", \"y_start\")\". Produces \"num\" points in a\nspiral spanning width of \"x_range\" and height of \"y_range\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Spiral\n\n    spec = Fly(Spiral(\"x\", 1, 10, 2.5, \"y\", 5, 50))"
+            },
+            "Squash_str_-Input": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The Spec to squash the dimensions of"
+                    },
+                    "check_path_changes": {
+                        "type": "boolean",
+                        "title": "Check Path Changes",
+                        "description": "If True path through scan will not be modified by squash",
+                        "default": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Squash",
+                        "title": "Type",
+                        "default": "Squash"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "Squash",
+                "description": "Squash a stack of Dimension together into a single expanded Dimension object.\n\nSee Also:\n    `why-squash-can-change-path`\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Squash\n\n    spec = Fly(Squash(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 0, 1, 4)))"
+            },
+            "Squash_str_-Output": {
+                "properties": {
+                    "spec": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The Spec to squash the dimensions of"
+                    },
+                    "check_path_changes": {
+                        "type": "boolean",
+                        "title": "Check Path Changes",
+                        "description": "If True path through scan will not be modified by squash",
+                        "default": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Squash",
+                        "title": "Type",
+                        "default": "Squash"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "spec"
+                ],
+                "title": "Squash",
+                "description": "Squash a stack of Dimension together into a single expanded Dimension object.\n\nSee Also:\n    `why-squash-can-change-path`\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Squash\n\n    spec = Fly(Squash(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 0, 1, 4)))"
+            },
+            "Static_str_": {
+                "properties": {
+                    "axis": {
+                        "type": "string",
+                        "title": "Axis",
+                        "description": "An identifier for what to move"
+                    },
+                    "value": {
+                        "type": "number",
+                        "title": "Value",
+                        "description": "The value at each point"
+                    },
+                    "num": {
+                        "type": "integer",
+                        "minimum": 1.0,
+                        "title": "Num",
+                        "description": "Number of frames to produce",
+                        "default": 1
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Static",
+                        "title": "Type",
+                        "default": "Static"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "axis",
+                    "value"
+                ],
+                "title": "Static",
+                "description": "A static frame, repeated num times, with axis at value.\n\nCan be used to set axis=value at every point in a scan.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Static\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3).zip(Static(\"x\", 3)))"
+            },
+            "ValidResponse": {
+                "properties": {
+                    "input_spec": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The input scanspec"
+                    },
+                    "valid_spec": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The validated version of the spec"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "input_spec",
+                    "valid_spec"
+                ],
+                "title": "ValidResponse",
+                "description": "Response model for spec validation."
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            },
+            "Zip_str_-Input": {
+                "properties": {
+                    "left": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The left-hand Spec to Zip, will appear earlier in axes"
+                    },
+                    "right": {
+                        "$ref": "#/components/schemas/Spec-Input",
+                        "description": "The right-hand Spec to Zip, will appear later in axes"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Zip",
+                        "title": "Type",
+                        "default": "Zip"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "left",
+                    "right"
+                ],
+                "title": "Zip",
+                "description": "Run two Specs in parallel, merging their midpoints together.\n\nTypically formed using `Spec.zip`.\n\nStacks of Dimension are merged by:\n\n- If right creates a stack of a single Dimension object of size 1, expand it to\n  the size of the fastest Dimension object created by left\n- Merge individual Dimension objects together from fastest to slowest\n\nThis means that Zipping a Spec producing stack [l2, l1] with a Spec\nproducing stack [r1] will assert len(l1)==len(r1), and produce\nstack [l2, l1.zip(r1)].\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(\n        Linspace(\"z\", 1, 2, 3) * Linspace(\"y\", 3, 4, 5).zip(Linspace(\"x\", 4, 5, 5))\n    )"
+            },
+            "Zip_str_-Output": {
+                "properties": {
+                    "left": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The left-hand Spec to Zip, will appear earlier in axes"
+                    },
+                    "right": {
+                        "$ref": "#/components/schemas/Spec-Output",
+                        "description": "The right-hand Spec to Zip, will appear later in axes"
+                    },
+                    "type": {
+                        "type": "string",
+                        "const": "Zip",
+                        "title": "Type",
+                        "default": "Zip"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "left",
+                    "right"
+                ],
+                "title": "Zip",
+                "description": "Run two Specs in parallel, merging their midpoints together.\n\nTypically formed using `Spec.zip`.\n\nStacks of Dimension are merged by:\n\n- If right creates a stack of a single Dimension object of size 1, expand it to\n  the size of the fastest Dimension object created by left\n- Merge individual Dimension objects together from fastest to slowest\n\nThis means that Zipping a Spec producing stack [l2, l1] with a Spec\nproducing stack [r1] will assert len(l1)==len(r1), and produce\nstack [l2, l1.zip(r1)].\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(\n        Linspace(\"z\", 1, 2, 3) * Linspace(\"y\", 3, 4, 5).zip(Linspace(\"x\", 4, 5, 5))\n    )"
+            }
+        }
+    }
+}
