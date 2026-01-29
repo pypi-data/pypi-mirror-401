@@ -1,0 +1,108 @@
+[package]
+name = "budtiktok-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core tokenization algorithms for BudTikTok"
+
+[features]
+default = []
+# Use jemalloc as the global allocator (recommended for Linux servers)
+jemalloc = ["dep:tikv-jemallocator"]
+# Use mimalloc as the global allocator (good cross-platform performance)
+mimalloc = ["dep:mimalloc"]
+# Enable all allocator options (for benchmarking)
+all-allocators = ["jemalloc", "mimalloc"]
+# Enable AVX-512 support (requires nightly Rust)
+nightly = []
+
+[dependencies]
+ahash.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+unicode-normalization.workspace = true
+unicode-general-category.workspace = true
+fancy-regex.workspace = true
+aho-corasick.workspace = true
+daachorse.workspace = true  # Faster double-array Aho-Corasick
+bumpalo.workspace = true
+smallvec.workspace = true
+fastrand.workspace = true
+parking_lot.workspace = true
+once_cell.workspace = true
+tracing.workspace = true
+rayon.workspace = true
+num_cpus = "1.16"
+lru.workspace = true
+lazy_static.workspace = true
+
+# Optional allocators
+tikv-jemallocator = { workspace = true, optional = true }
+mimalloc = { workspace = true, optional = true }
+
+# For benchmark binary (can't use dev-dependencies in bins)
+tokenizers = { workspace = true }
+
+# Platform-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+rstest.workspace = true
+tokenizers.workspace = true
+tempfile = "3.9"
+
+[[bench]]
+name = "scalar_tokenization"
+harness = false
+
+[[bench]]
+name = "hf_tokenizers_benchmark"
+harness = false
+
+[[bench]]
+name = "unigram_benchmark"
+harness = false
+
+[[bench]]
+name = "wordlevel_benchmark"
+harness = false
+
+[[bench]]
+name = "decoder_benchmark"
+harness = false
+
+[[bin]]
+name = "run_1gb_benchmark"
+path = "benches/unigram_1gb_benchmark.rs"
+
+[[bin]]
+name = "accuracy_debug"
+path = "benches/accuracy_debug.rs"
+
+[[bin]]
+name = "deep_debug"
+path = "benches/deep_debug.rs"
+
+[[bin]]
+name = "test_specific"
+path = "benches/test_specific.rs"
+
+[[bin]]
+name = "fix_accuracy"
+path = "benches/fix_accuracy.rs"
+
+[[bin]]
+name = "full_accuracy_test"
+path = "benches/full_accuracy_test.rs"
+
+[[bin]]
+name = "cache_benchmark"
+path = "benches/cache_benchmark.rs"
+
+[[bin]]
+name = "wordlevel_1gb_benchmark"
+path = "benches/wordlevel_1gb_benchmark.rs"
