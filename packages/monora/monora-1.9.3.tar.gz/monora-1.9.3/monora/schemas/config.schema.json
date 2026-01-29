@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://monora.ai/schemas/config.schema.json",
+  "title": "Monora Configuration",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["config_version"],
+  "properties": {
+    "config_version": { "type": "string", "default": "1.0.0" },
+    "defaults": { "$ref": "#/$defs/defaults" },
+    "sinks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sink" }
+    },
+    "immutability": { "$ref": "#/$defs/immutability" },
+    "attestation": { "$ref": "#/$defs/attestation" },
+    "registry": { "$ref": "#/$defs/registry" },
+    "instrumentation": { "$ref": "#/$defs/instrumentation" },
+    "tracing": { "$ref": "#/$defs/tracing" },
+    "reporting": { "$ref": "#/$defs/reporting" },
+    "data_handling": { "$ref": "#/$defs/data_handling" },
+    "policies": { "$ref": "#/$defs/policies" },
+    "alerts": { "$ref": "#/$defs/alerts" },
+    "error_handling": { "$ref": "#/$defs/error_handling" },
+    "buffering": { "$ref": "#/$defs/buffering" },
+    "wal": { "$ref": "#/$defs/wal" },
+    "signing": { "$ref": "#/$defs/signing" },
+    "ai_act": { "$ref": "#/$defs/ai_act" },
+    "telemetry": { "$ref": "#/$defs/telemetry" }
+  },
+  "$defs": {
+    "defaults": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "service_name": { "type": ["string", "null"] },
+        "environment": { "type": ["string", "null"], "default": "dev" },
+        "data_classification": { "type": ["string", "null"], "default": "internal" },
+        "purpose": { "type": ["string", "null"], "default": "general" }
+      }
+    },
+    "sink": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["stdout", "file", "https"] },
+        "path": { "type": ["string", "null"] },
+        "endpoint": { "type": ["string", "null"] },
+        "headers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "api_key": { "type": ["string", "null"] },
+        "batch_size": { "type": "integer", "minimum": 1 },
+        "flush_interval_sec": { "type": "number", "minimum": 0 },
+        "timeout_sec": { "type": "number", "minimum": 0 },
+        "retry_attempts": { "type": "integer", "minimum": 0 },
+        "backoff_base_sec": { "type": "number", "minimum": 0 },
+        "rotation": { "type": ["string", "null"] },
+        "max_size_mb": { "type": ["integer", "null"], "minimum": 1 },
+        "format": { "type": ["string", "null"] },
+        "circuit_breaker": { "$ref": "#/$defs/circuit_breaker" },
+        "retry_queue": { "$ref": "#/$defs/retry_queue" },
+        "idempotency": { "$ref": "#/$defs/idempotency" }
+      }
+    },
+    "circuit_breaker": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "failure_threshold": { "type": "integer", "minimum": 1, "default": 5 },
+        "success_threshold": { "type": "integer", "minimum": 1, "default": 2 },
+        "reset_timeout_sec": { "type": "number", "minimum": 1, "default": 60 }
+      }
+    },
+    "retry_queue": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "path": { "type": "string", "default": "./monora_http_queue" },
+        "max_items": { "type": "integer", "minimum": 1, "default": 10000 },
+        "flush_interval_sec": { "type": "number", "minimum": 0.1, "default": 5.0 }
+      }
+    },
+    "idempotency": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "header_name": { "type": "string", "default": "Idempotency-Key" }
+      }
+    },
+    "immutability": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "scope": { "type": "string", "enum": ["per_trace", "global"], "default": "per_trace" },
+        "hash_algorithm": { "type": "string", "enum": ["sha256", "sha384", "sha512"], "default": "sha256" },
+        "verify_on_emit": { "type": "boolean", "default": false },
+        "verify_on_shutdown": { "type": "boolean", "default": true },
+        "persist_chain": { "type": "boolean", "default": false }
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "gpg": { "$ref": "#/$defs/gpg" }
+      }
+    },
+    "gpg": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "key_id": { "type": ["string", "null"] },
+        "gpg_home": { "type": ["string", "null"] }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "version": { "type": "string", "default": "1.0.0" },
+        "providers": { "type": "array", "items": { "$ref": "#/$defs/provider" } },
+        "allow_unknown": { "type": "boolean", "default": true },
+        "default_provider": { "type": ["string", "null"] },
+        "registry_path": { "type": ["string", "null"] },
+        "history": { "type": "array", "items": { "$ref": "#/$defs/registry_history" } }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "model_patterns": { "type": "array", "items": { "type": "string" } },
+        "version_range": { "type": ["string", "null"] },
+        "deprecated": { "type": "boolean", "default": false },
+        "deprecation_message": { "type": ["string", "null"] },
+        "risk_category": { "type": "string", "enum": ["minimal", "limited", "high", "unacceptable"], "default": "limited" },
+        "capabilities": { "type": "array", "items": { "type": "string" } },
+        "intended_use": { "type": ["string", "null"] },
+        "deployment_regions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "registry_history": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "version": { "type": ["string", "null"] },
+        "date": { "type": ["string", "null"] },
+        "changes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "instrumentation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "auto_patch": { "type": "boolean", "default": true },
+        "targets": { "type": "array", "items": { "type": "string" }, "default": ["openai", "anthropic"] },
+        "fail_fast": { "type": "boolean", "default": false },
+        "default_purpose": { "type": ["string", "null"] },
+        "data_classification": { "type": ["string", "null"] },
+        "reason": { "type": ["string", "null"] },
+        "log_report": { "type": "boolean", "default": false }
+      }
+    },
+    "tracing": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "emit_span_events": { "type": "boolean", "default": true }
+      }
+    },
+    "reporting": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "emit_trust_summary": { "type": "boolean", "default": true },
+        "output_dir": { "type": "string", "default": "./monora_reports" },
+        "formats": { "type": "array", "items": { "type": "string" }, "default": ["json"] },
+        "include_security_report": { "type": "boolean", "default": false },
+        "include_executive_summary": { "type": "boolean", "default": false },
+        "max_events_per_trace": { "type": "integer", "minimum": 1 },
+        "redact_host": { "type": "boolean", "default": true }
+      }
+    },
+    "data_handling": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "mode": { "type": "string", "enum": ["redact", "block", "allow"], "default": "redact" },
+        "apply_to": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["request", "response", "tool_args", "tool_result", "agent_input", "agent_output", "custom"]
+        },
+        "rules": { "type": "array", "items": { "$ref": "#/$defs/redaction_rule" }, "default": [] }
+      }
+    },
+    "redaction_rule": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "pattern": { "type": "string" },
+        "replacement": { "type": "string", "default": "[REDACTED]" },
+        "apply_to": { "type": "array", "items": { "type": "string" } },
+        "classifications": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "model_allowlist": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "model_denylist": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "classification_max_models": { "type": "object", "additionalProperties": true },
+        "enforce": { "type": "boolean", "default": false }
+      }
+    },
+    "alerts": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "violation_webhook": { "type": ["string", "null"] },
+        "headers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "timeout_sec": { "type": "number", "default": 5.0 },
+        "retry_attempts": { "type": "integer", "default": 3 },
+        "backoff_base_sec": { "type": "number", "default": 0.5 },
+        "queue_size": { "type": "integer", "default": 200 }
+      }
+    },
+    "error_handling": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "sink_failure_mode": { "type": "string", "enum": ["warn", "raise", "silent"], "default": "warn" },
+        "queue_full_mode": { "type": "string", "enum": ["warn", "raise", "block"], "default": "warn" },
+        "fallback_path": { "type": ["string", "null"] },
+        "log_user_exceptions": { "type": "boolean", "default": true }
+      }
+    },
+    "buffering": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "queue_size": { "type": "integer", "minimum": 1, "default": 1000 },
+        "batch_size": { "type": "integer", "minimum": 1, "default": 50 },
+        "flush_interval_sec": { "type": "number", "minimum": 0, "default": 1.0 },
+        "queue_full_timeout_sec": { "type": ["number", "null"], "minimum": 0 },
+        "adaptive_batching": { "type": "boolean", "default": true },
+        "min_batch_size": { "type": "integer", "minimum": 1, "default": 10 },
+        "max_batch_size": { "type": "integer", "minimum": 1, "default": 500 }
+      }
+    },
+    "wal": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "path": { "type": "string", "default": "./monora_wal" },
+        "sync_mode": { "type": "string", "enum": ["fsync", "async", "none"], "default": "fsync" },
+        "max_file_size_mb": { "type": "integer", "minimum": 1, "default": 100 },
+        "retention_hours": { "type": "integer", "minimum": 1, "default": 24 },
+        "recovery_on_startup": { "type": "boolean", "default": true }
+      }
+    },
+    "signing": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "algorithm": { "type": "string", "enum": ["ed25519", "hmac-sha256"], "default": "ed25519" },
+        "key_id": { "type": ["string", "null"] },
+        "key_file": { "type": ["string", "null"] },
+        "key_env": { "type": ["string", "null"], "default": "MONORA_SIGNING_KEY" }
+      }
+    },
+    "ai_act": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "organization_name": { "type": ["string", "null"] },
+        "contact_email": { "type": ["string", "null"] },
+        "default_risk_category": { "type": "string", "enum": ["minimal", "limited", "high", "unacceptable"], "default": "limited" },
+        "generate_transparency_report": { "type": "boolean", "default": true },
+        "transparency_report_formats": { "type": "array", "items": { "type": "string" }, "default": ["json"] }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "backend": { "type": "string", "enum": ["prometheus", "statsd"], "default": "prometheus" },
+        "prometheus": { "$ref": "#/$defs/prometheus" },
+        "statsd": { "$ref": "#/$defs/statsd" }
+      }
+    },
+    "prometheus": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535, "default": 9090 },
+        "start_server": { "type": "boolean", "default": true },
+        "push_gateway": { "type": ["string", "null"] },
+        "job_name": { "type": "string", "default": "monora" }
+      }
+    },
+    "statsd": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "host": { "type": "string", "default": "localhost" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535, "default": 8125 },
+        "prefix": { "type": "string", "default": "monora" }
+      }
+    }
+  }
+}

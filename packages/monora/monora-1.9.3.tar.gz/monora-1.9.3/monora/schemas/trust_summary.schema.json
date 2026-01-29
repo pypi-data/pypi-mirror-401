@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://monora.ai/schemas/trust_summary.schema.json",
+  "title": "Monora Trust Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "summary_version",
+    "trace_id",
+    "generated_at",
+    "events",
+    "chain_integrity",
+    "compliance",
+    "compliance_score",
+    "artifacts",
+    "report_paths",
+    "trust_bundle_path"
+  ],
+  "properties": {
+    "summary_version": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captured", "dropped"],
+      "properties": {
+        "captured": { "type": "integer", "minimum": 0 },
+        "dropped": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "chain_integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "error", "events_verified", "proof"],
+      "properties": {
+        "status": { "type": "string" },
+        "error": { "type": ["string", "null"] },
+        "events_verified": { "type": "integer", "minimum": 0 },
+        "proof": {
+          "type": ["object", "null"],
+          "additionalProperties": true
+        }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_events",
+        "total_traces",
+        "policy_violations",
+        "unknown_models_used",
+        "forbidden_models_blocked"
+      ],
+      "properties": {
+        "total_events": { "type": "integer", "minimum": 0 },
+        "total_traces": { "type": "integer", "minimum": 0 },
+        "policy_violations": { "type": "integer", "minimum": 0 },
+        "unknown_models_used": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "forbidden_models_blocked": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "compliance_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "grade", "breakdown", "max_score"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0 },
+        "grade": { "type": "string" },
+        "max_score": { "type": "integer", "minimum": 0 },
+        "breakdown": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["report_type", "format", "path", "sha256", "status"],
+        "properties": {
+          "report_type": { "type": "string" },
+          "format": { "type": "string" },
+          "path": { "type": ["string", "null"] },
+          "sha256": { "type": ["string", "null"] },
+          "status": { "type": "string" },
+          "error": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "report_paths": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "trust_bundle_path": { "type": ["string", "null"] },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "hash", "history"],
+      "properties": {
+        "version": { "type": ["string", "null"] },
+        "hash": { "type": ["string", "null"] },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["version", "date", "changes"],
+            "properties": {
+              "version": { "type": ["string", "null"] },
+              "date": { "type": ["string", "null"] },
+              "changes": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

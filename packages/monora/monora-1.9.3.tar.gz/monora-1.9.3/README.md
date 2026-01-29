@@ -1,0 +1,221 @@
+# Monora v1.9 SDK
+
+**Lightweight governance and trace SDK for AI systems**
+
+Monora provides minimal viable trust through immutable event logs, policy enforcement, and comprehensive auditability for LLM applications.
+
+## Features
+
+- **🔒 Immutable Event Logs**: Cryptographic hash chains for tamper detection
+- **📋 Policy Enforcement**: Model allowlists/denylists with data classification controls
+- **🧭 Provider Registry**: Explicit model-to-provider mapping with unknown-model alerts
+- **🧾 Versioned Registry**: Registry versioning, history, and provider deprecation metadata
+- **🔍 Full Auditability**: JSON-lines event logs with CLI reporting tools
+- **📎 Auto Reports**: Compliance artifacts generated at trace completion with trust summaries
+- **📦 Trust Packages**: One-shot vendor export with compliance, config snapshot, and hash-chain proof
+- **⚡ Non-blocking**: Background worker with bounded queue for zero user-code latency
+- **🎯 Simple API**: Decorator-based interface with sensible defaults
+- **🧩 Auto-Instrumentation**: Optional OpenAI/Anthropic patching for drop-in logging
+- **✅ Completeness Checks**: Event sequencing and security review reports
+- **🔌 Pluggable Sinks**: Stdout, file, and HTTPS endpoints
+- **🧰 Durable HTTP Delivery**: Retry queue + idempotency keys for HTTPS sinks
+- **🚨 Violation Alerts**: Callback or webhook notifications for policy violations
+- **🧹 Data Handling**: Regex redaction rules tied to data classifications
+- **🛡️ Signed Attestations**: Optional GPG-signed security review bundles
+
+### New in v1.9.0
+
+- **🔄 Circuit Breaker**: Fault tolerance for HTTPS sinks with automatic recovery
+- **📊 Telemetry/Analytics**: Prometheus and StatsD metrics export for observability
+- **📄 PDF Reports**: Generate compliance and EU AI Act PDF reports
+- **🌐 Django Middleware**: W3C Trace Context propagation for Django applications
+
+## Installation
+
+```bash
+pip install monora
+
+# With YAML config support
+pip install "monora[yaml]"
+
+# With HTTPS sink support
+pip install "monora[https]"
+
+# Development dependencies
+pip install "monora[dev]"
+```
+
+## Quick Start
+
+### Minimal Example (Dev Mode)
+
+```python
+import monora
+
+# Initialize with defaults (stdout logging, no policies)
+monora.init()
+
+@monora.llm_call(purpose="customer_support")
+def ask_gpt(prompt: str, model: str = "gpt-4o-mini"):
+    # Your LLM call here
+    return {"response": "Hello!"}
+
+# Use trace context for grouping events
+with monora.trace("ticket_123"):
+    response = ask_gpt("How do I reset my password?")
+```
+
+### Guided Setup (Wizard)
+
+```bash
+monora init
+```
+
+This generates a `monora.yml` you can edit and pass to `monora.init(config_path="monora.yml")`.
+
+### Validate & Diagnose
+
+```bash
+monora validate --config monora.yml
+monora doctor --config monora.yml
+monora verify --input events.jsonl --config monora.yml --pretty
+monora retry-queue --config monora.yml
+```
+
+### Export Vendor Trust Package
+
+```python
+trust_package = monora.export_trust_package(
+    trace_id="trace-123",
+    input_path="events.jsonl",
+    config_path="monora.yml",
+)
+```
+
+See README.md for full documentation and examples.
+
+## v1.9.0 Features
+
+### Circuit Breaker
+
+Prevent cascading failures with circuit breaker pattern for HTTPS sinks:
+
+```yaml
+sinks:
+  - type: https
+    endpoint: https://api.example.com/events
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 5
+      success_threshold: 2
+      reset_timeout_sec: 60
+```
+
+### HTTP Retry Queue + Idempotency
+
+Keep HTTPS delivery resilient and safely retryable:
+
+```yaml
+sinks:
+  - type: https
+    endpoint: https://api.example.com/events
+    retry_queue:
+      enabled: true
+      path: ./monora_http_queue
+      max_items: 10000
+      flush_interval_sec: 5.0
+    idempotency:
+      enabled: true
+      header_name: Idempotency-Key
+```
+
+Inspect or clear the local retry queue:
+
+```bash
+monora retry-queue --config monora.yml
+monora retry-queue --path ./monora_http_queue --clear
+```
+
+### Telemetry/Analytics
+
+Export metrics to Prometheus or StatsD:
+
+```python
+import monora
+
+# Configure telemetry
+monora.init(config={
+    "telemetry": {
+        "enabled": True,
+        "backend": "prometheus",  # or "statsd"
+        "prometheus": {
+            "port": 9090,
+            "start_server": True
+        }
+    }
+})
+
+# Metrics are automatically recorded:
+# - monora_events_total (by event_type)
+# - monora_violations_total (by policy_type)
+# - monora_queue_depth
+# - monora_tokens_total
+```
+
+### PDF Report Generation
+
+Generate compliance PDF reports:
+
+```python
+from monora import generate_compliance_pdf, generate_ai_act_pdf
+
+# Generate compliance PDF
+generate_compliance_pdf(
+    report=compliance_report,
+    output_path="compliance_report.pdf"
+)
+
+# Generate EU AI Act transparency PDF
+generate_ai_act_pdf(
+    report=ai_act_report,
+    output_path="ai_act_report.pdf"
+)
+```
+
+Requires optional dependency: `pip install weasyprint`
+
+### Django Middleware
+
+Automatic W3C Trace Context propagation for Django:
+
+```python
+# settings.py
+MIDDLEWARE = [
+    'monora.middleware.django.MonoraDjangoMiddleware',
+    # ... other middleware
+]
+
+# Optional configuration
+MONORA_MIDDLEWARE = {
+    'skip_paths': ['/health', '/ready'],
+}
+```
+
+For async ASGI deployments:
+
+```python
+MIDDLEWARE = [
+    'monora.middleware.django.MonoraDjangoAsyncMiddleware',
+    # ...
+]
+```
+
+## Testing
+
+```bash
+pytest
+```
+
+## License
+
+MIT

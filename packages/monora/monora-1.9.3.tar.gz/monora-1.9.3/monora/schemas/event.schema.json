@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://monora.ai/schemas/event.schema.json",
+  "title": "Monora Event Envelope",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_type",
+    "trace_id",
+    "span_id",
+    "parent_span_id",
+    "parent_event_id",
+    "input_event_ids",
+    "prompt_id",
+    "template_id",
+    "data_source_ids",
+    "data_classification",
+    "purpose",
+    "body",
+    "timestamp",
+    "service_name",
+    "environment",
+    "process_id"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "event_id": { "type": "string" },
+    "event_type": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "span_id": { "type": "string" },
+    "parent_span_id": { "type": ["string", "null"] },
+    "parent_event_id": { "type": ["string", "null"] },
+    "input_event_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "prompt_id": { "type": ["string", "null"] },
+    "template_id": { "type": ["string", "null"] },
+    "data_source_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "data_classification": { "type": "string" },
+    "purpose": { "type": "string" },
+    "reason": { "type": ["string", "null"] },
+    "body": {
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "timestamp": { "type": "string" },
+    "service_name": { "type": "string" },
+    "environment": { "type": "string" },
+    "host": { "type": ["string", "null"] },
+    "process_id": { "type": "integer" },
+    "event_sequence": { "type": "integer" },
+    "event_hash": { "type": ["string", "null"] },
+    "prev_hash": { "type": ["string", "null"] },
+    "event_signature": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["algorithm", "signature"],
+      "properties": {
+        "algorithm": { "type": "string" },
+        "signature": { "type": "string" },
+        "key_id": { "type": "string" }
+      }
+    }
+  }
+}
