@@ -1,0 +1,74 @@
+# EvidentSource Client for Python
+
+Python client for the EvidentSource event sourcing database.
+
+## Installation
+
+```bash
+pip install evidentsource-client
+```
+
+## Usage
+
+```python
+import asyncio
+from evidentsource_client import EvidentSource
+from evidentsource_core import DatabaseName, Selector, ProspectiveEvent, StringEventData
+
+async def main():
+    # Connect to the server
+    async with await EvidentSource.connect("localhost:50051") as es:
+        # Create a database
+        db_name = DatabaseName("my-app")
+        await es.create_database(db_name)
+
+        # Connect to the database
+        conn = await es.connect_database(db_name)
+
+        # Transact events
+        events = [
+            ProspectiveEvent(
+                id="evt-1",
+                stream="orders",
+                event_type="OrderCreated",
+                data=StringEventData('{"orderId": "123"}'),
+            )
+        ]
+        db = await conn.transact(events)
+        print(f"Committed at revision: {db.revision}")
+
+        # Query events
+        db = await conn.latest_database()
+        async for event in db.query_events(Selector.stream("orders")):
+            print(f"Event: {event.id} - {event.event_type}")
+
+asyncio.run(main())
+```
+
+## API
+
+### EvidentSource
+
+The main entry point for connecting to an EvidentSource server.
+
+- `EvidentSource.connect(address)` - Connect to a server
+- `create_database(name)` - Create a new database
+- `connect_database(name)` - Connect to an existing database
+
+### Connection
+
+Represents a connection to a specific database.
+
+- `transact(events, constraints?)` - Commit events atomically
+- `latest_database()` - Get the latest database state
+
+### DatabaseAtRevision
+
+A point-in-time view of the database.
+
+- `query_events(selector)` - Query events matching a selector
+- `view_state(name, version, params)` - Get a state view
+
+## License
+
+MIT OR Apache-2.0
