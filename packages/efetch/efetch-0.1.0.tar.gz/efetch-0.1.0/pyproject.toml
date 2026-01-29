@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "efetch"
+version = "0.1.0"
+description = "A BETTER LINUX FETCH - Forked from efetch, Upgraded to Py3!"
+readme = "README.md"
+authors = [{name = "W0BBLEMASTER"}]
+license = {text = "MIT"}
+dependencies = [
+    "colorama",
+]
+
+[project.urls]
+Homepage = "https://github.com/W0BBLEMASTER/PRJ_efetch"
+
+[project.scripts]
+efetch = "efetch.Fetch:run"
+
+[tool.setuptools]
+packages = ["efetch", "efetch.Art", "efetch.Platform"]
