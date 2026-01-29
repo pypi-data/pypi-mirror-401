@@ -1,0 +1,136 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torchguard"
+version = "1.1.0"
+description = "Compile-time error handling for torch.compile() regions"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+keywords = [
+    "pytorch",
+    "torch",
+    "compile",
+    "error-handling",
+    "machine-learning",
+    "deep-learning",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "torch>=2.0.0",
+    "packaging",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+lint = [
+    "black>=23.0",
+    "isort>=5.12",
+    "mypy>=1.0",
+]
+all = [
+    "torchguard[dev,lint]",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/torchguard"
+Documentation = "https://github.com/yourusername/torchguard#readme"
+Repository = "https://github.com/yourusername/torchguard"
+Issues = "https://github.com/yourusername/torchguard/issues"
+Changelog = "https://github.com/yourusername/torchguard/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["torchguard*"]
+exclude = ["tests*", "scripts*", "benchmarks*", "docs*"]
+
+[tool.setuptools.package-data]
+torchguard = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["torchguard/tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | __pycache__
+  | build
+  | dist
+  | \.eggs
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["torchguard"]
+known_third_party = ["torch", "packaging", "pytest"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = [
+    "tests/",
+    "scripts/",
+    "benchmarks/",
+]
+
+[tool.coverage.run]
+source = ["torchguard"]
+omit = [
+    "torchguard/tests/*",
+    "torchguard/scripts/*",
+    "torchguard/benchmarks/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
