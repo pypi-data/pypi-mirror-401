@@ -1,0 +1,43 @@
+Metadata-Version: 2.4
+Name: qdflow
+Version: 1.0.2
+Summary: Quantum dot simulation and noise modeling package
+Author: Donovan Buterakos, Sandesh S. Kalantre, Joshua Ziegler, Jacob M. Taylor, Justyna P. Zwolak
+Author-email: dbuterak@umd.edu, jpzwolak@nist.gov
+License-Expression: GPL-2.0-or-later
+Keywords: qdflow,quantum,dot,QD,data,dataset,training,learning,ML,tuning,autotuning,charge,stability,CSD,ray
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.21.3
+Requires-Dist: scipy>=1.8
+Requires-Dist: networkx>=2.8
+Requires-Dist: numba>=0.55.0
+Provides-Extra: dev
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Dynamic: license-file
+
+# QFlow-physics
+
+A Thomas-Fermi simulation for modeling Quantum Dot devices. Generates Charge Stability Diagrams complete with sensor readout, state labels, charge configuration, and noise.
+
+For more information, see [arXiv:2509.13298](https://arxiv.org/abs/2509.13298).
+
+# Installation
+
+Install the latest version of QDFlow:
+
+```sh
+pip install qdflow
+```
+
+# Documentaion
+
+Documentation is available at https://qdflow-sim.readthedocs.io/.
+
+# Dependencies
+
+* numpy >= 1.21.3
+* scipy >= 1.8
+* networkx >= 2.8
+* numba >= 0.55
