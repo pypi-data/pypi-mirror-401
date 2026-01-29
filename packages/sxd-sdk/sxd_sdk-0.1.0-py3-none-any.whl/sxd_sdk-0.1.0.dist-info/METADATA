@@ -1,0 +1,199 @@
+Metadata-Version: 2.4
+Name: sxd-sdk
+Version: 0.1.0
+Summary: SDK for building and deploying data pipelines on SentientX Data Platform
+Project-URL: Homepage, https://github.com/sentient-x/sxd
+Project-URL: Documentation, https://sentient-x.github.io/sxd
+Project-URL: Repository, https://github.com/sentient-x/sxd
+Project-URL: Issues, https://github.com/sentient-x/sxd/issues
+Author-email: SentientX <dev@sentient-x.com>
+License: Apache-2.0
+License-File: LICENSE
+Keywords: computer-vision,data-pipelines,distributed-computing,machine-learning,temporal,workflows
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: System :: Distributed Computing
+Requires-Python: >=3.11
+Requires-Dist: httpx>=0.23.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: temporalio>=1.5.0
+Provides-Extra: all
+Requires-Dist: mypy>=1.8.0; extra == 'all'
+Requires-Dist: numpy>=1.24.0; extra == 'all'
+Requires-Dist: opencv-python>=4.8.0; extra == 'all'
+Requires-Dist: pytest-asyncio>=0.23.0; extra == 'all'
+Requires-Dist: pytest-cov>=4.1.0; extra == 'all'
+Requires-Dist: pytest>=8.0.0; extra == 'all'
+Requires-Dist: ruff>=0.2.0; extra == 'all'
+Requires-Dist: torch>=2.0.0; extra == 'all'
+Requires-Dist: torchvision>=0.15.0; extra == 'all'
+Provides-Extra: dev
+Requires-Dist: mypy>=1.8.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.23.0; extra == 'dev'
+Requires-Dist: pytest-cov>=4.1.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.2.0; extra == 'dev'
+Provides-Extra: opencv
+Requires-Dist: numpy>=1.24.0; extra == 'opencv'
+Requires-Dist: opencv-python>=4.8.0; extra == 'opencv'
+Provides-Extra: pytorch
+Requires-Dist: torch>=2.0.0; extra == 'pytorch'
+Requires-Dist: torchvision>=0.15.0; extra == 'pytorch'
+Description-Content-Type: text/markdown
+
+# SXD SDK
+
+Python library for building data pipelines on SentientX Data Platform.
+
+## Installation
+
+```bash
+pip install sxd-sdk
+```
+
+With optional dependencies:
+
+```bash
+pip install sxd-sdk[pytorch]   # PyTorch pipelines
+pip install sxd-sdk[opencv]    # OpenCV pipelines
+```
+
+## Quick Start
+
+### 1. Create Pipeline
+
+Create a new directory with this structure:
+
+```
+my-pipeline/
+├── my_pipeline/
+│   ├── __init__.py
+│   ├── activities.py
+│   └── workflows.py
+├── sxd.yaml
+└── pyproject.toml
+```
+
+### 2. Define Activities
+
+```python
+# my_pipeline/activities.py
+from temporalio import activity
+from sxd_sdk import ProcessingResult
+
+@activity.defn
+async def process_video(video_path: str) -> ProcessingResult:
+    # Your processing logic
+    return ProcessingResult.ok(output_path="/output/result.mp4")
+```
+
+### 3. Define Workflow
+
+```python
+# my_pipeline/workflows.py
+from datetime import timedelta
+from temporalio import workflow
+from sxd_sdk import PipelineInput, PipelineOutput
+
+with workflow.unsafe.imports_passed_through():
+    from my_pipeline.activities import process_video
+
+@workflow.defn(name="my-pipeline")
+class MyPipelineWorkflow:
+    @workflow.run
+    async def run(self, input: PipelineInput) -> PipelineOutput:
+        result = await workflow.execute_activity(
+            process_video,
+            args=[input.source_url],
+            start_to_close_timeout=timedelta(minutes=30),
+        )
+        return PipelineOutput(status="success", output_path=result.output_path)
+```
+
+### 4. Configure (sxd.yaml)
+
+```yaml
+base_image: sxd-base    # or: sxd-pytorch, sxd-opencv, sxd-cuda
+timeout: 3600           # optional, default 3600s
+gpu: false              # optional, default false
+```
+
+### 5. Publish
+
+Use the `sxd` CLI (from the main SXD repo):
+
+```bash
+sxd publish .
+```
+
+This builds the Docker image, pushes it to the registry, and registers with the cluster.
+
+### 6. Submit Jobs
+
+```bash
+sxd submit my-pipeline '{"source_url": "s3://bucket/video.mp4"}'
+```
+
+## API Reference
+
+### Schemas
+
+```python
+from sxd_sdk import (
+    PipelineInput,    # Base input with source_url, customer_id, options
+    PipelineOutput,   # Base output with status, output_path, metrics, errors
+    ProcessingResult, # Activity result with success, output_path, error, metadata
+)
+
+# Convenience constructors
+result = ProcessingResult.ok("/output/path", count=10)
+result = ProcessingResult.fail("Something went wrong")
+```
+
+### Testing
+
+```python
+from sxd_sdk import MockActivityEnvironment, WorkflowSimulator
+
+# Test activities
+async def test_my_activity():
+    env = MockActivityEnvironment()
+    result = await env.run(my_activity, "input")
+    assert result.success
+
+# Test workflows
+async def test_my_workflow():
+    sim = WorkflowSimulator()
+    sim.mock_activity("process_video", ProcessingResult.ok("/output"))
+    result = await sim.run(MyWorkflow, input_data)
+    assert result.status == "success"
+```
+
+### Client
+
+```python
+from sxd_sdk import SXDClient, connect
+
+async with await connect(host="cluster.example.com") as client:
+    job = await client.submit("my-pipeline", {"source_url": "..."})
+    result = await client.wait(job.workflow_id)
+```
+
+## Base Images
+
+| Image | Use Case |
+|-------|----------|
+| `sxd-base` | General Python processing |
+| `sxd-pytorch` | ML/AI with PyTorch |
+| `sxd-opencv` | Video/image processing |
+| `sxd-cuda` | GPU workloads |
+
+## License
+
+Apache 2.0
