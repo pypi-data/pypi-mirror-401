@@ -1,0 +1,159 @@
+# Diagram Layout Configuration
+# This file contains all spacing and layout constants for diagram generation
+
+layout:
+  # Canvas settings
+  canvas_padding: 20
+  page_width: 1169
+  page_height: 827
+  
+  # Legend settings
+  legend_width: 700  # Width of legend box (increased to fit 3 columns without overlap)
+  legend_height: 280 # Height of legend box (auto-calculated if needed, increased to account for hybrid connection lines)
+  legend_padding: 25 # Padding inside legend box (reduced to give more space for columns)
+  legend_item_spacing: 8  # Spacing between legend items
+  legend_item_height: 20  # Height of legend item labels
+  legend_x: 20  # X position of legend (left edge)
+  legend_y: 50  # Y position of legend (top edge)
+  legend_to_diagram_spacing: 20  # Vertical spacing between legend bottom and diagram content (for hubless/orphan pages)
+  legend:
+    column_gap: 12  # Gap between main columns (VNet Types, Connection Types, Icons) - reduced to fit better
+    column_margin: 5  # Margin on right side of each column to prevent overflow
+    vnet_box_width: 35  # Width of VNet type sample boxes (reduced slightly)
+    vnet_box_height: 30  # Height of VNet type sample boxes
+    vnet_box_to_label_gap: 40  # Gap between VNet box and its label (reduced to fit in column)
+    connection_line_length: 50  # Length of connection type sample lines
+    connection_line_to_label_gap: 5  # Gap between connection line and its label
+    icon_size: 20  # Size of icon images in legend
+    icons_per_sub_column: 4  # Number of icons in first sub-column (rest go to second)
+    icon_sub_column_gap: 70  # Gap between icon sub-columns within Icons column
+    icon_to_label_gap: 5  # Gap between icon and its label
+  
+  # Zone settings (for multiple hubs)
+  zone_width: 920
+  zone_spacing: 200  # Reduced spacing between hubs for closer alignment
+  
+  # VNet box dimensions
+  vnet_width: 400
+  vnet_height_base: 50  # Base height, expands for subnets
+  vnet_min_height: 70  # Minimum height for label area
+  
+  # Spacing constants
+  vnet_spacing_x: 300  # Horizontal spacing between hub and spokes (reduced from 450)
+  vnet_spacing_y: 100  # Vertical spacing between VNets
+  hub_y: 200  # Y position for hubs
+  spoke_start_y: 300  # Starting Y position for spokes (below hubs)
+  spacing_below_hub: 50  # Spacing between hub bottom and first spoke (increased for better visual separation)
+  spacing_between_spokes: 40  # Vertical spacing between spokes (increased for better visual separation)
+  
+  # Subnet layout within VNet boxes
+  subnet_padding_top: 75  # Start below VNet label area
+  subnet_height: 30
+  subnet_spacing: 5
+  subnet:
+    padding_left: 5  # Padding from left edge of VNet box
+    width_offset: 10  # Subnet width = VNet width - this value
+    padding_bottom: 10  # Extra padding at bottom of subnet area
+  
+  # External VNet positioning
+  external_spacing_x: 50  # Horizontal spacing between external VNets
+  external_spacing_y: 100  # Vertical spacing above hub for external VNets
+  
+  # Stub/Orphan VNet positioning
+  stub_spacing_x: 100  # Horizontal spacing between stub/orphan VNets
+  
+  # Hybrid connectivity layout settings
+  hybrid:
+    onprem_x_offset: 200  # Horizontal offset from canvas padding for on-premises boxes
+    azure_x: 700  # X position for Azure VNets (right side)
+    connection_spacing: 300  # Horizontal spacing between on-prem and Azure
+    vertical_spacing: 150  # Vertical spacing between connection groups
+    onprem_box_width: 250  # Width of on-premises box
+    onprem_box_height: 140  # Height of on-premises box
+    router_icon_size: 30  # Size of router icon
+    content_start_y: 35  # Y position to start content (padding from title bar)
+    content_spacing: 8  # Vertical spacing between content elements (reduced for tighter layout)
+    content_bottom_padding: 50  # Bottom padding inside on-premises box
+    # Box above the Connector line showing DPD timeout and IPsec policies
+    info_box_width: 150  # Width of connection info box (above connection line)
+    info_box_line_height: 20  # Height per line in info box
+    info_box_padding: 10  # Vertical padding inside info box
+    info_box_offset_y: 50  # Vertical offset above connection line for info box
+  
+  # Icon settings
+  icon:
+    vnet_size: 20  # VNet icon size (width and height)
+    subnet_size: 20  # Subnet icon width
+    subnet_height: 12  # Subnet icon height
+    icon_spacing: 5  # Spacing between icons in subnet box
+    icon_margin_right: 6  # Right margin for icons
+    # Icon image paths
+    vnet: "img/lib/azure2/networking/Virtual_Networks.svg"
+    subnet: "img/lib/azure2/networking/Subnet.svg"
+    route_table: "img/lib/azure2/networking/Route_Tables.svg"
+    nsg: "img/lib/azure2/networking/Network_Security_Groups.svg"
+    firewall: "img/lib/azure2/networking/Firewalls.svg"
+    bastion: "img/lib/azure2/networking/Bastions.svg"
+    vpn_gateway: "img/lib/mscae/VPN_Gateway.svg"
+    expressroute: "img/lib/azure2/networking/ExpressRoute_Circuits.svg"
+    router_vpn: "img/lib/active_directory/shadowed_router.svg"
+    router_expressroute: "img/lib/active_directory/shadowed_router.svg"
+    nat: "img/lib/azure2/networking/NAT.svg"
+    private_endpoint: "img/lib/azure2/other/Private_Endpoints.svg"
+    ddos: "img/lib/azure2/networking/DDoS_Protection_Plans.svg"
+  
+  # Routing/waypoint settings
+  routing:
+    waypoint_offset_horizontal: 50  # Horizontal offset for routing around VNets
+    waypoint_offset_vertical: 20  # Vertical offset for routing above/below VNets
+    waypoint_offset_close: 5  # Close waypoint offset (just outside boxes)
+    route_clearance: 20  # Space to leave around VNets when routing
+  
+  # Style colors
+  colors:
+    hub_stroke: "#0078D4"  # Hub border color (Azure blue)
+    hub_fill: "#E6F1FB"  # Hub fill color (light blue)
+    hub_font: "#004578"  # Hub text color (dark blue)
+    spoke_stroke: "#CC6600"  # Spoke border color (orange)
+    spoke_fill: "#f2f7fc"  # Spoke fill color (light gray-blue)
+    spoke_font: "#CC6600"  # Spoke text color (orange)
+    stub_stroke: "#20B2AA"  # Stub/Orphan VNet border color (teal)
+    stub_fill: "#E0F7F5"  # Stub/Orphan VNet fill color (light teal)
+    stub_font: "#006666"  # Stub/Orphan VNet text color (dark teal)
+    external_stroke: "#6C757D"  # External VNet border (gray)
+    external_fill: "#F8F9FA"  # External VNet fill (light gray)
+    external_font: "#495057"  # External VNet text (dark gray)
+    subnet_stroke: "#C8C6C4"  # Subnet border (light gray)
+    subnet_fill: "#FAF9F8"  # Subnet fill (very light gray)
+    subnet_font: "#323130"  # Subnet text (dark gray)
+    hub_to_hub: "#6A1B9A"  # Hub-to-hub edge color (purple)
+    hub_to_spoke: "#0078D4"  # Hub-to-spoke edge color (blue)
+  
+  # Edge colors (legacy - kept for backward compatibility)
+  edge_color_hubless_spoke: "#8B0000"  # Maroon color for hubless spoke-to-spoke connections
+  edge_color_cross_tenant: "#808080"  # Gray color for cross-tenant/cross-subscription connections
+  
+  # Edge line patterns (for quick testing)
+  edge_patterns:
+    hub_to_hub: "solid"  # solid, dashed
+    hub_to_spoke: "solid"  # solid, dashed
+    hubless_spoke: "dashed"  # solid, dashed
+    cross_tenant: "solid"  # solid, dashed
+    external: "solid"  # solid, dashed
+    dash_pattern: "1 2"  # Dash pattern for dashed lines (e.g., "8 8", "5 5", "10 5")
+  
+  # Cell ID management
+  cell_id:
+    start: 10  # Starting cell ID to avoid conflicts with root cells
+  
+  # Draw.io XML settings
+  drawio:
+    grid_size: 10
+    page_dx: 1422
+    page_dy: 794
+  
+  # Label/text spacing
+  label:
+    spacing_top: 5  # Top spacing for labels
+    spacing_left: 5  # Left spacing for labels
+
