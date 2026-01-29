@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Development Status :: 4 - Beta"
+]
+name = "workerlib"
+dynamic = ["version"]
+description = "Async RabbitMQ worker utilities"
+license = { file = "LICENSE" }
+readme = "README.md"
+keywords = ["async", "rabbitmq", "aio-pika", "workers"]
+authors = [
+    { name = "YOUR_NAME", email = "your.email@example.com" }
+]
+maintainers = [
+    { name = "YOUR_NAME", email = "your.email@example.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "aio-pika>=9.0.0,<10"
+]
+
+[project.urls]
+Homepage = "https://github.com/ametist-dev/workerlib"
+Repository = "https://github.com/ametist-dev/workerlib"
+Issues = "https://github.com/ametist-dev/workerlib/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+select = ["E", "F", "I", "B"]
+ignore = ["E501"]
+
+[tool.black]
+target-version = ["py310"]
+line-length = 88
+
+[tool.setuptools.dynamic]
+version = { attr = "workerlib.__version__" }
