@@ -1,0 +1,100 @@
+__all__ = []
+
+import logging
+from typing import Any
+
+import numpy as np
+import xxhash as xxh
+from scipy.fftpack import dct
+
+from dataeval.types import Array3D
+from dataeval.utils.arrays import as_numpy
+from dataeval.utils.preprocessing import normalize_image_shape, resize, to_canonical_grayscale
+
+_logger = logging.getLogger(__name__)
+
+HASH_SIZE = 8
+MAX_FACTOR = 4
+
+
+def pchash(image: Array3D[Any]) -> str:
+    """
+    Performs a perceptual hash on an image by resizing to a square NxN image
+    using the Lanczos algorithm where N is 32x32 or the largest multiple of
+    8 that is smaller than the input image dimensions. The resampled image
+    is compressed using a discrete cosine transform and the lowest frequency
+    component is encoded as a bit array of greater or less than median value
+    and returned as a hex string.
+
+    Parameters
+    ----------
+    image : Array3D
+        An image in CxHxW format. Can be a 3D list, or array-like object.
+
+    Returns
+    -------
+    str
+        The hex string hash of the image using perceptual hashing, or empty
+        string if the image is too small to be hashed or is not spatial data
+    """
+    image_np = as_numpy(image)
+    _logger.debug("Computing perceptual hash for image with shape: %s", image_np.shape)
+
+    # Perceptual hashing only works on spatial data (2D or higher)
+    if image_np.ndim < 2:
+        _logger.warning("Perceptual hashing requires spatial data (2D or higher dimensions)")
+        return ""
+
+    # Verify that the image is at least larger than an 8x8 image
+    min_dim = min(image_np.shape[-2:])
+    if min_dim < HASH_SIZE + 1:
+        _logger.warning("Image too small for perceptual hashing: min_dim=%d", min_dim)
+        return ""
+
+    # Calculates the dimensions of the resized square image
+    resize_dim = HASH_SIZE * min((min_dim - 1) // HASH_SIZE, MAX_FACTOR)
+
+    # Normalize the image shape to CxHxW
+    normalized = normalize_image_shape(image_np)
+
+    # Convert to single-channel grayscale image
+    grayscale = to_canonical_grayscale(normalized)
+
+    # Resizes the image using the Lanczos algorithm to a square image
+    im = resize(grayscale, resize_dim)
+
+    # Performs discrete cosine transforms to compress the image information and takes the lowest frequency component
+    transform = dct(dct(im.T).T)[:HASH_SIZE, :HASH_SIZE]
+
+    # Encodes the transform as a bit array over the median value
+    diff = transform > np.median(transform)
+
+    # Convert the bit array to a hex string
+    padded = diff.flatten()
+    hash_hex = np.packbits(padded).tobytes().hex()
+    result = hash_hex if hash_hex else "0"
+    _logger.debug("Perceptual hash computed: %s", result[:16] + "..." if len(result) > 16 else result)
+    return result
+
+
+def xxhash(image: Array3D[Any]) -> str:
+    """
+    Performs a fast non-cryptographic hash using the xxhash algorithm
+    (xxhash.com) against the image as a flattened bytearray. The hash
+    is returned as a hex string.
+
+    Parameters
+    ----------
+    image : Array3D
+        An image in CxHxW format. Can be a 3D list, or array-like object.
+
+    Returns
+    -------
+    str
+        The hex string hash of the image using the xxHash algorithm
+    """
+    image_np = as_numpy(image)
+    _logger.debug("Computing xxhash for image with shape: %s", image_np.shape)
+    hash_result = xxh.xxh3_64_hexdigest(image_np.ravel().tobytes())
+    _logger.debug("xxhash computed: %s", hash_result)
+    return hash_result

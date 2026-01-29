@@ -1,0 +1,331 @@
+__all__ = []
+
+import logging
+from typing import Any, TypedDict
+
+import numpy as np
+from numpy.typing import NDArray
+
+from dataeval.core._mst import compute_neighbor_distances, minimum_spanning_tree_edges
+from dataeval.types import ArrayND
+from dataeval.utils.arrays import flatten_samples, to_numpy
+
+_logger = logging.getLogger(__name__)
+
+
+class CondensedTree(TypedDict):
+    """
+    Derived from fast_hdbscan.cluster_trees.CondensedTree
+
+    Attributes
+    ----------
+    parent : NDArray[np.int64]
+    child : NDArray[np.int64]
+    lambda_val : NDArray[np.float32]
+    child_size : NDArray[np.float32]
+    """
+
+    parent: NDArray[np.int64]
+    child: NDArray[np.int64]
+    lambda_val: NDArray[np.float32]
+    child_size: NDArray[np.float32]
+
+
+class ClusterResult(TypedDict):
+    """
+    Cluster output data structure.
+
+    Attributes
+    ----------
+    clusters : NDArray[np.int64]
+        Assigned clusters
+    mst : NDArray[np.float32]
+        The minimum spanning tree of the data
+    linkage_tree : NDArray[np.float32]
+        The linkage array of the data
+    condensed_tree : CondensedTree
+        The condensed tree of the data
+    membership_strengths : NDArray[np.float32]
+        The strength of the data point belonging to the assigned cluster
+    k_neighbors : NDArray[np.int64]
+        Indices of the nearest points in the population matrix
+    k_distances : NDArray[np.float32]
+        Array representing the lengths to points
+    """
+
+    clusters: NDArray[np.int64]
+    mst: NDArray[np.float32]
+    linkage_tree: NDArray[np.float32]
+    condensed_tree: CondensedTree
+    membership_strengths: NDArray[np.float32]
+    k_neighbors: NDArray[np.int64]
+    k_distances: NDArray[np.float32]
+
+
+class ClusterStats(TypedDict):
+    """
+    Pre-calculated statistics for adaptive outlier detection.
+
+    Attributes
+    ----------
+    cluster_ids : NDArray[np.int64]
+        Array of unique cluster IDs (excluding -1)
+    centers : NDArray[np.floating]
+        Cluster centers, shape (n_clusters, n_features)
+    cluster_distances_mean : NDArray[np.floating]
+        Mean distance from points to their cluster center, shape (n_clusters,)
+    cluster_distances_std : NDArray[np.floating]
+        Standard deviation of distances within each cluster, shape (n_clusters,)
+    distances : NDArray[np.floating]
+        Distance from each point to its nearest cluster center, shape (n_samples,)
+    nearest_cluster_idx : NDArray[np.int64]
+        Index of nearest cluster center for each point, shape (n_samples,)
+    """
+
+    cluster_ids: NDArray[np.int64]
+    centers: NDArray[np.floating]
+    cluster_distances_mean: NDArray[np.floating]
+    cluster_distances_std: NDArray[np.floating]
+    distances: NDArray[np.floating]
+    nearest_cluster_idx: NDArray[np.int64]
+
+
+def compute_cluster_stats(
+    embeddings: NDArray[np.floating],
+    clusters: NDArray[np.int64],
+) -> ClusterStats:
+    """
+    Compute cluster centers and distance statistics for adaptive outlier detection.
+
+    Parameters
+    ----------
+    embeddings : NDArray[np.floating]
+        The embedding vectors, shape (n_samples, n_features)
+    clusters : NDArray[np.int64]
+        Cluster labels from HDBSCAN (-1 for HDBSCAN outliers)
+
+    Returns
+    -------
+    ClusterStats
+        Pre-calculated statistics with empty arrays if no valid clusters found
+    """
+    _logger.debug("Computing cluster statistics for %d samples", len(embeddings))
+
+    # Get unique clusters (excluding -1)
+    unique_clusters = np.unique(clusters[clusters >= 0])
+    n_samples = len(embeddings)
+
+    _logger.debug("Found %d unique clusters (excluding outliers)", len(unique_clusters))
+
+    if len(unique_clusters) == 0:
+        _logger.warning("No valid clusters found, returning empty statistics")
+        return ClusterStats(
+            cluster_ids=np.array([], dtype=np.int64),
+            centers=np.array([], dtype=embeddings.dtype),
+            cluster_distances_mean=np.array([], dtype=embeddings.dtype),
+            cluster_distances_std=np.array([], dtype=embeddings.dtype),
+            distances=np.full(n_samples, np.inf, dtype=embeddings.dtype),
+            nearest_cluster_idx=np.full(n_samples, -1, dtype=np.int64),
+        )
+
+    n_clusters = len(unique_clusters)
+    n_features = embeddings.shape[1]
+
+    centers = np.zeros((n_clusters, n_features), dtype=embeddings.dtype)
+    cluster_distances_mean = np.zeros(n_clusters, dtype=embeddings.dtype)
+    cluster_distances_std = np.zeros(n_clusters, dtype=embeddings.dtype)
+
+    for i, cluster_id in enumerate(unique_clusters):
+        cluster_mask = clusters == cluster_id
+        cluster_points = embeddings[cluster_mask]
+        cluster_center = cluster_points.mean(axis=0)
+
+        # Calculate distances from center
+        distances = np.linalg.norm(cluster_points - cluster_center, axis=1)
+
+        centers[i] = cluster_center
+        cluster_distances_mean[i] = distances.mean()
+        cluster_distances_std[i] = distances.std()
+
+    # Pre-calculate distance from each point to its nearest cluster center
+    # Shape: (n_samples, n_clusters)
+    all_distances = np.linalg.norm(embeddings[:, np.newaxis, :] - centers[np.newaxis, :, :], axis=2)
+    # Get minimum distance and nearest cluster index for each point
+    nearest_cluster_idx = np.argmin(all_distances, axis=1)
+    min_distances = all_distances[np.arange(n_samples), nearest_cluster_idx]
+
+    _logger.debug("Cluster stats computed: %d centers with mean distances %s", n_clusters, cluster_distances_mean)
+
+    return ClusterStats(
+        cluster_ids=unique_clusters,
+        centers=centers,
+        cluster_distances_mean=cluster_distances_mean,
+        cluster_distances_std=cluster_distances_std,
+        distances=min_distances,
+        nearest_cluster_idx=nearest_cluster_idx,
+    )
+
+
+def cluster(
+    embeddings: ArrayND[float],
+    n_expected_clusters: int | None = None,
+    max_cluster_size: int | None = None,
+) -> ClusterResult:
+    """
+    Uses hierarchical clustering on the flattened data and returns clustering
+    information.
+
+    Parameters
+    ----------
+    embeddings : ArrayND, shape - (N, ...)
+        A dataset that can be a list, or array-like object. Function expects
+        the data to have 2 or more dimensions which will flatten to (N, P) where N is
+        the number of observations in a P-dimensional space.
+    n_expected_clusters : int, optional
+        Hint for the expected number of clusters (e.g., number of classes in dataset).
+        If provided, adaptively adjusts min_cluster_size to encourage finding
+        approximately this many clusters. Useful when you have domain knowledge
+        about the data structure.
+    max_cluster_size : int, optional
+        Option to limit the size of the identified clusters. Useful when you have
+        domain knowledge about the data structure.
+
+    Returns
+    -------
+    ClusterResult
+        Mapping with keys:
+        - clusters : NDArray[np.int64] - Assigned clusters
+        - mst : NDArray[np.float32] - The minimum spanning tree of the data
+        - linkage_tree : NDArray[np.float32] - The linkage array of the data
+        - condensed_tree : CondensedTree(Mapping) - Derived from fast_hdbscan.cluster_trees.CondensedTree
+        - membership_strengths : NDArray[np.float32] - The strength of the data point belonging to the assigned cluster
+        - k_neighbors : NDArray[np.int64] - Indices of the nearest points in the population matrix
+        - k_distances : NDArray[np.float32] - Array representing the lengths to points
+
+    Notes
+    -----
+    The cluster function works best when the length of the feature dimension,
+    P, is less than 500. If flattening a CxHxW image results in a dimension
+    larger than 500, then it is recommended to reduce the dimensions.
+
+    Examples
+    --------
+    Return dataset clusters
+
+    >>> import sklearn.datasets as dsets
+    >>> from dataeval.core import cluster
+    >>> clusterer_images = dsets.make_blobs(
+    ...     n_samples=50, centers=np.array([(-1, -1), (1, 1)]), cluster_std=0.5, random_state=33
+    ... )[0]
+
+    Two distinct clusters
+
+    >>> output = cluster(clusterer_images)
+    >>> output["clusters"]
+    array([0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0,
+           0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0,
+           1, 0, 0, 1, 1, 1])
+    """
+    # Import from our cached cluster_trees implementation
+    from dataeval.core._fast_hdbscan._cluster_trees import (
+        cluster_tree_from_condensed_tree,
+        condense_tree,
+        extract_eom_clusters,
+        get_cluster_label_vector,
+        get_point_membership_strength_vector,
+        mst_to_linkage_tree,
+    )
+
+    _logger.info("Starting cluster calculation")
+
+    single_cluster = True
+    cluster_selection_epsilon = 0.0
+    # cluster_selection_method = "eom"
+
+    x: NDArray[Any] = flatten_samples(to_numpy(embeddings))
+    samples, features = x.shape  # Due to flatten_samples(), we know shape has a length of 2
+
+    _logger.debug("Input embeddings shape after flattening: (%d samples, %d features)", samples, features)
+
+    if samples < 2:
+        raise ValueError(f"Data should have at least 2 samples; got {samples}")
+    if features < 1:
+        raise ValueError(f"Samples should have at least 1 feature; got {features}")
+
+    num_samples = len(x)
+
+    # Adaptive min_cluster_size based on expected clusters hint
+    if n_expected_clusters is not None:
+        # Encourage finding approximately n_expected_clusters
+        # Divide by 3 to allow smaller, more granular clusters
+        min_cluster_size = max(5, num_samples // (n_expected_clusters * 3))
+        _logger.debug(
+            "Using adaptive min_cluster_size=%d for %d expected clusters", min_cluster_size, n_expected_clusters
+        )
+    else:
+        # Default behavior: use 5% but cap at 100
+        min_num = int(num_samples * 0.05)
+        min_cluster_size = min(max(5, min_num), 100)
+        _logger.debug("Using default min_cluster_size=%d", min_cluster_size)
+
+    max_num = max_cluster_size if max_cluster_size is not None else np.inf
+    if max_num <= min_cluster_size:
+        _logger.warning("Provided max_cluster_size is smaller than min_cluster_size. Resetting to infinity.")
+        max_num = np.inf
+
+    max_neighbors = min(25, num_samples - 1)
+    _logger.debug("Computing neighbors with max_neighbors=%d", max_neighbors)
+    kneighbors, kdistances = compute_neighbor_distances(x, k=max_neighbors)
+    unsorted_mst: NDArray[np.float32] = minimum_spanning_tree_edges(x, kneighbors, kdistances)
+    mst: NDArray[np.float32] = unsorted_mst[np.argsort(unsorted_mst.T[2])]
+    linkage_tree: NDArray[np.float32] = mst_to_linkage_tree(mst).astype(np.float32)
+    condensed_tree = condense_tree(linkage_tree, min_cluster_size, max_cluster_size=max_num)
+    cluster_tree = cluster_tree_from_condensed_tree(condensed_tree)
+
+    selected_clusters = extract_eom_clusters(
+        condensed_tree, cluster_tree, max_cluster_size=max_num, allow_single_cluster=single_cluster
+    )
+
+    # Uncomment if cluster_selection_method is made a parameter
+    # if cluster_selection_method != "eom":
+    #     selected_clusters = extract_leaves(condensed_tree, allow_single_cluster=single_cluster)
+
+    # Uncomment if cluster_selection_epsilon is made a parameter
+    # if len(selected_clusters) > 1 and cluster_selection_epsilon > 0.0:
+    #     selected_clusters = cluster_epsilon_search(
+    #         selected_clusters,
+    #         cluster_tree,
+    #         min_epsilon=cluster_selection_epsilon,
+    #     )
+
+    clusters: NDArray[np.int64] = get_cluster_label_vector(
+        condensed_tree,
+        selected_clusters,
+        cluster_selection_epsilon,
+        n_samples=mst.shape[0] + 1,
+    )
+
+    membership_strengths: NDArray[np.float32] = get_point_membership_strength_vector(
+        condensed_tree,
+        selected_clusters,
+        clusters,
+    )
+
+    n_clusters = len(np.unique(clusters[clusters >= 0]))
+    n_outliers = np.sum(clusters == -1)
+    _logger.info(
+        "Cluster calculation complete: found %d clusters, %d outliers out of %d samples",
+        n_clusters,
+        n_outliers,
+        num_samples,
+    )
+
+    return ClusterResult(
+        clusters=clusters,
+        mst=mst,
+        linkage_tree=linkage_tree,
+        condensed_tree=CondensedTree(**condensed_tree._asdict()),
+        membership_strengths=membership_strengths,
+        k_neighbors=kneighbors,
+        k_distances=kdistances,
+    )
