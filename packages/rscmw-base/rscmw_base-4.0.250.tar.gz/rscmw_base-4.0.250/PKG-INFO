@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: rscmw-base
+Version: 4.0.250
+Summary: CMW Base System Remote-control module
+Author: Rohde & Schwarz GmbH & Co. KG
+Maintainer: Rohde & Schwarz GmbH & Co. KG
+License-Expression: MIT
+Project-URL: Documentation, https://rscmw-base.readthedocs.io/
+Project-URL: Examples, https://github.com/Rohde-Schwarz/Examples/
+Keywords: CMW
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Topic :: Scientific/Engineering :: Instrument Drivers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+Requires-Dist: pyvisa>=1.13.0
+Requires-Dist: typing-extensions>=4.0.0
+
+==================================
+ rscmw-base
+==================================
+
+.. image:: https://img.shields.io/pypi/v/rscmw-base.svg
+   :target: https://pypi.org/project/ rscmw-base/
+
+.. image:: https://readthedocs.org/projects/sphinx/badge/?version=master
+   :target: https://rscmw-base.readthedocs.io/
+
+.. image:: https://img.shields.io/pypi/l/rscmw-base.svg
+   :target: https://pypi.python.org/pypi/rscmw-base/
+
+.. image:: https://img.shields.io/pypi/pyversions/pybadges.svg
+   :target: https://img.shields.io/pypi/pyversions/pybadges.svg
+
+.. image:: https://img.shields.io/pypi/dm/rscmw-base.svg
+   :target: https://pypi.python.org/pypi/rscmw-base/
+
+Rohde & Schwarz CMW Base System rscmw-base instrument driver.
+
+Basic Hello-World code:
+
+.. code-block:: python
+
+    from rscmw_base import *
+
+    instr = RsCmwBase('TCPIP::192.168.2.101::hislip0')
+    idn = instr.utilities.query('*IDN?')
+    print('Hello, I am: ' + idn)
+
+Supported instruments: CMW500, CMW100, CMW270, CMW280
+
+The package is hosted here: https://pypi.org/project/rscmw-base/
+
+Documentation: https://rscmw-base.readthedocs.io/
+
+Examples: https://github.com/Rohde-Schwarz/Examples/
+
+
+Version history
+----------------
+
+	Latest release notes summary: New package+module name, update for FW 4.0.250
+
+	Version 4.0.250
+		- New package and module name 'rscmw_base'
+		- Update for FW 4.0.250
