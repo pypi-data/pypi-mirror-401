@@ -1,0 +1,52 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # need tags to generate release notes
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Set up Python 3.10
+      run: uv python install 3.10
+
+    - name: Install package
+      run: uv sync
+
+    - name: Run tests
+      run: uv run pytest -v
+
+    - name: Build wheel
+      id: build
+      run: |
+        uv build
+        echo "py_wheel_name=investments-${GITHUB_REF#refs/tags/}-py3-none-any.whl" >> $GITHUB_OUTPUT
+
+    - name: Generate Release Notes
+      run: |
+        echo '## Changes since previous release:' > changelog.md
+        git log --oneline $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- [%h](https://github.com/cdump/investments/commit/%H) %s" >> changelog.md
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body_path: changelog.md
+          files: |
+            dist/${{ steps.build.outputs.py_wheel_name }}
+
+    - name: Publish
+      env:
+        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      run: uv publish
