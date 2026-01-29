@@ -1,0 +1,13 @@
+[project]
+name = "uniql"
+version = "0.1.5"
+description = "Unified Query Language - A unified query language for diffirent multiple query language"
+dependencies = ["typer"]
+
+[project.scripts]
+uniql = "uniql.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["uniql*"]
+
