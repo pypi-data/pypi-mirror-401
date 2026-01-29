@@ -1,0 +1,103 @@
+Metadata-Version: 2.4
+Name: ezmodulemanager
+Version: 1.0.0
+Summary: Lightweight Framework - Remove circular dependencies in an event-driven way by decoupling your imports from your class/function execution.
+Project-URL: Documentation, https://github.com/Obsidian-Cloud/EZModuleManager/blob/main/README.md
+Project-URL: GitHub, https://github.com/Obsidian-Cloud/EZModuleManager
+Author-email: Obsidian-Cloud <obsidiancloud25@gmail.com>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: decouple,framework,imports,index,loader,manager,module,module manager,packaging,plugin,registry
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: System :: Software Distribution
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# EZ Module Manager
+
+![PyPI - Version](https://img.shields.io/pypi/v/ezmodulemanager)
+![PyPI - License](https://img.shields.io/pypi/l/ezmodulemanager)
+---
+## Get it
+```python
+#PyPI
+python3 -m pip install ezmodulemanager
+```
+
+[Read the full documentation on GitHub](https://github.com/Obsidian-Cloud/EZModuleManager)
+
+
+## What is it?
+
+EZ Module Manager is a zero-bloat, event-driven framework designed to 
+decouple your imports from your function and class executions. It uses a 
+`registry` component - isolated at the end of the system - to hold 
+references to any shared objects you deem fit.
+
+This architecture allows your modules to remain completely unaware of 
+each other while still being able to call each other's functions, pass 
+variables, and execute class method objects. By storing references in 
+this registry, you eliminate circular dependencies and the need for 
+complex import chains. It is truly "Plug-n-Play" and requires no 
+additional imports or external bloat. 
+
+
+## Features
+
+**Supports All Object Types:** Functions, Classes, Class methods, 
+Variables... Bring it on.
+
+**Decoupled Object Execution:** Call a function in `module_A` from 
+`module_B` as easily as calling a local function, without the modules 
+ever importing one another.
+
+**Isolated Registry:** A powerful registry component that stores the 
+reference of any shared objects, allowing for "magic" communication 
+across your entire codebase.
+
+**Simple Registration:** Use a custom decorator `@mmreg` to easily 
+register your classes, class methods and functions.
+
+**Circular Dependency Elimination:** Bypasses the common pitfalls of 
+Python imports by utilizing a centralized registry for object access.
+
+**Sequential Event-Driven Loading:** Uses `importlib` to load 
+modules via custom `import_modlist()`, ensuring every shared object is
+registered before your application logic ever executes.
+
+**Versatile Calling Methods:**
+
+- **Direct Calls:** Execute functions/class methods immediately across 
+namespaces (with or without arguments).
+    
+- **Deferred Use:** Retrieve and store objects for later use in your 
+program.
+
+**Zero-Bloat System:** No third-party dependencies; the system is 
+designed to be lightweight and stay out of your way.
+
+**Framework Agnostic:** Compatible with any standard Python entry point, 
+including **Django**, **Flask**, and **FastAPI.** Completely standalone 
+and modular.
+
+**Version:** As it sits, works with Python 3.8+. The only reason
+for not having backwards compatibility across all versions, is simply 
+type-hinting. 
+
+## License
+
+[MIT License](https://github.com/Obsidian-Cloud/EZModuleManager/blob/main/LICENSE)
+
