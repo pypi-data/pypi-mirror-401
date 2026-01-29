@@ -1,0 +1,246 @@
+"""
+MCP gateway server that surfaces library documentation by querying GitHub, PyPI, and GoDocs.
+
+The server uses a pluggable provider architecture with auto-discovery. Providers are loaded
+from the providers/ directory and can optionally expose individual MCP tools or participate
+in the aggregated search_library_docs tool.
+"""
+
+from __future__ import annotations
+
+import sys
+from typing import Any
+
+from mcp.server.fastmcp import FastMCP
+from mcp.types import CallToolResult
+
+from .cache import CacheManager
+from .chunking import ChunkingManager
+from .providers import discover_providers
+from .providers.base import BaseProvider, ToolTierInfo
+from .utils import create_http_client, get_cache_config, serialize_response_with_meta
+
+# Initialize FastMCP server
+mcp = FastMCP("RTFD!")
+
+# Initialize Cache
+_cache_manager = CacheManager()
+
+# Initialize Chunking Manager
+_chunking_manager = ChunkingManager()
+
+# Server-level tool tiers for defer_loading recommendations
+SERVER_TOOL_TIERS: dict[str, ToolTierInfo] = {
+    "search_library_docs": ToolTierInfo(tier=1, defer_recommended=False, category="search"),
+    "get_cache_info": ToolTierInfo(tier=6, defer_recommended=True, category="admin"),
+    "get_cache_entries": ToolTierInfo(tier=6, defer_recommended=True, category="admin"),
+    "get_next_chunk": ToolTierInfo(tier=6, defer_recommended=True, category="admin"),
+}
+
+# Provider instances (initialized on first use)
+_provider_instances: dict[str, BaseProvider] = {}
+
+
+def _get_provider_instances() -> dict[str, BaseProvider]:
+    """
+    Get or create provider instances.
+
+    Lazy initialization of providers with shared HTTP client factory.
+    """
+    if _provider_instances:
+        return _provider_instances
+
+    provider_classes = discover_providers()
+
+    for name, provider_class in provider_classes.items():
+        try:
+            instance = provider_class(create_http_client)
+            _provider_instances[name] = instance
+        except Exception as e:
+            # Log but don't crash - defensive initialization
+            sys.stderr.write(f"Warning: Failed to initialize provider {name}: {e}\n")
+
+    return _provider_instances
+
+
+def get_all_tool_tiers() -> dict[str, ToolTierInfo]:
+    """
+    Get all tool tier information from all providers and server-level tools.
+
+    Returns:
+        Dictionary mapping tool names to their tier information.
+    """
+    all_tiers = dict(SERVER_TOOL_TIERS)
+
+    for provider in _get_provider_instances().values():
+        metadata = provider.get_metadata()
+        all_tiers.update(metadata.tool_tiers)
+
+    return all_tiers
+
+
+def _register_provider_tools() -> None:
+    """
+    Discover and register all provider tools with FastMCP.
+
+    This function is called once at module initialization to dynamically
+    register all tools from providers that opt-in via expose_as_tool=True.
+    """
+    providers = _get_provider_instances()
+
+    for provider_name, provider in providers.items():
+        metadata = provider.get_metadata()
+
+        # Skip providers that don't want individual tool exposure
+        if not metadata.expose_as_tool:
+            continue
+
+        # Get tool functions from provider
+        tools = provider.get_tools()
+
+        # Register each tool with FastMCP
+        for _tool_name, tool_fn in tools.items():
+            # Extract description from docstring
+            description = tool_fn.__doc__ or f"{provider_name} tool"
+
+            # Decorate and register the tool with FastMCP
+            mcp.tool(description=description)(tool_fn)
+
+
+async def _locate_library_docs(library: str, limit: int = 5) -> dict[str, Any]:
+    """
+    Try to find documentation links for a given library using all available providers.
+
+    This is the aggregator function that combines results from PyPI, GoDocs, and GitHub.
+    """
+
+    result: dict[str, Any] = {"library": library}
+
+    # Check cache first
+    cache_enabled, cache_ttl = get_cache_config()
+    cache_key = f"search:{library}:{limit}"
+
+    if cache_enabled:
+        # Cleanup expired entries occasionally (could be optimized)
+        # For now, we rely on lazy cleanup or external process,
+        # but let's do a quick check on read if we wanted strict TTL.
+        # The CacheManager.get() returns None if not found.
+        # We can also run cleanup on startup or periodically.
+        # Here we just check if we have a valid entry.
+        cached_entry = _cache_manager.get(cache_key)
+        if cached_entry:
+            # Check TTL
+            age = __import__("time").time() - cached_entry.timestamp
+            if age < cache_ttl:
+                return cached_entry.data
+
+    providers = _get_provider_instances()
+
+    # Query each provider that supports library search
+    for provider_name, provider in providers.items():
+        metadata = provider.get_metadata()
+
+        if not metadata.supports_library_search:
+            continue
+
+        provider_result = await provider.search_library(library, limit=limit)
+
+        if provider_result.success:
+            # Success: add data to result
+            # Map provider name to appropriate result key
+            key_mapping = {
+                "pypi": "pypi",
+                "godocs": "godocs",
+                "github": "github_repos",
+            }
+            result_key = key_mapping.get(provider_name, provider_name)
+            result[result_key] = provider_result.data
+        elif provider_result.error:
+            # Error: add error message (skip if error is None - silent fail)
+            error_key = f"{provider_name}_error"
+            result[error_key] = provider_result.error
+
+    # Update cache if enabled
+    if cache_enabled:
+        _cache_manager.set(cache_key, result)
+
+    return result
+
+
+@mcp.tool(
+    description="Search for library docs across PyPI, GoDocs, GitHub. Returns metadata with stats."
+)
+async def search_library_docs(library: str, limit: int = 5) -> CallToolResult:
+    """Aggregated library documentation search across all providers."""
+    result = await _locate_library_docs(library, limit=limit)
+    return serialize_response_with_meta(result)
+
+
+@mcp.tool(description="Get cache statistics: entry count, size, memory usage.")
+async def get_cache_info() -> CallToolResult:
+    """Return cache statistics including entry count and size."""
+    stats = _cache_manager.get_stats()
+    return serialize_response_with_meta(stats)
+
+
+@mcp.tool(description="Get details for all cached entries: age, size, content preview.")
+async def get_cache_entries() -> CallToolResult:
+    """Return detailed information about all cached items including age, size, and content preview."""
+    entries = _cache_manager.get_all_entries()
+    result = {
+        "total_entries": len(entries),
+        "entries": entries,
+    }
+    return serialize_response_with_meta(result)
+
+
+@mcp.tool(
+    description="Get next chunk of large response using continuation token from previous chunked response."
+)
+async def get_next_chunk(continuation_token: str) -> CallToolResult:
+    """
+    Get the next chunk of content from a previous chunked response.
+
+    Args:
+        continuation_token: Token from the 'continuation_token' field in a chunked response
+
+    Returns:
+        Next chunk with updated chunking metadata, or error if token invalid/expired
+    """
+    from .chunking import get_chunk_size
+
+    chunk_size = get_chunk_size()
+
+    if chunk_size == 0:
+        return serialize_response_with_meta({"error": "Chunking is disabled (RTFD_CHUNK_TOKENS=0)"})
+
+    result = _chunking_manager.get_next_chunk(continuation_token, chunk_size)
+
+    if result is None:
+        return serialize_response_with_meta(
+            {"error": "Invalid or expired continuation token. Tokens expire after 10 minutes."}
+        )
+
+    # Reconstruct the full response with chunking metadata
+    chunk_data = result.copy()
+
+    # Add helpful hint if there are more chunks
+    if chunk_data.get("has_more"):
+        chunk_data["hint"] = (
+            f"Call get_next_chunk('{chunk_data['continuation_token']}') for more content"
+        )
+
+    return serialize_response_with_meta(chunk_data)
+
+
+# Auto-register all provider tools
+_register_provider_tools()
+
+
+def run() -> None:
+    """Entry point for console script."""
+    mcp.run()
+
+
+if __name__ == "__main__":
+    run()
