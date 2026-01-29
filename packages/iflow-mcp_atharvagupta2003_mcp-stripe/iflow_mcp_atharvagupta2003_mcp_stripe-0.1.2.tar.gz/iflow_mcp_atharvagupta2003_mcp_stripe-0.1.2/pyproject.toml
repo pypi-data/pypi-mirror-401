@@ -1,0 +1,15 @@
+[project]
+name = "iflow-mcp_atharvagupta2003_mcp-stripe"
+version = "0.1.2"
+description = "MCP server for Stripe payments, customers, and refunds"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.2.1",
+    "stripe>=11.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+mcp-stripe = "__main__:main"
