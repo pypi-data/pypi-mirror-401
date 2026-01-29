@@ -1,0 +1,23 @@
+[project]
+name = "okx-sqphi"
+version = "5.5.1009"
+requires-python = ">=3.8,<4.0"
+
+dependencies = [
+    "importlib-metadata",
+    "httpx[http2]",
+    "keyring",
+    "requests",
+    "Twisted",
+    "pyOpenSSL",
+]
+
+[tool.poetry]
+packages = [
+    { include = "okx" }
+]
+include = ["okx/*"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
