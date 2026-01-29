@@ -1,0 +1,268 @@
+Metadata-Version: 2.4
+Name: montecarlo-swe-probability
+Version: 0.1.0
+Summary: Monte Carlo simulation CLI for software engineering team forecasting
+Project-URL: Homepage, https://github.com/TheLostByGass/montecarlo-swe-probability
+Project-URL: Repository, https://github.com/TheLostByGass/montecarlo-swe-probability
+Project-URL: Issues, https://github.com/TheLostByGass/montecarlo-swe-probability/issues
+Author-email: TheLostByGass <info@revobill.de>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: agile,forecasting,monte-carlo,software-engineering,throughput
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Quality Assurance
+Requires-Python: >=3.11
+Requires-Dist: click>=8.0
+Requires-Dist: numpy>=1.24
+Provides-Extra: dev
+Requires-Dist: pytest-cov>=4.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Monte Carlo SWE Probability
+
+A CLI tool that uses Monte Carlo simulation to forecast delivery dates and scope for software engineering teams.
+
+## Installation
+
+```bash
+pip install montecarlo-swe-probability
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/yourusername/montecarlo-swe-probability
+cd montecarlo-swe-probability
+pip install -e .
+```
+
+## Quick Start
+
+### 1. Prepare Your Data
+
+Create a CSV file with your historical work item data:
+
+```csv
+item_id,start_date,end_date
+PROJ-101,2024-01-05,2024-01-08
+PROJ-102,2024-01-06,2024-01-10
+PROJ-103,2024-01-08,2024-01-09
+```
+
+Required columns:
+- `start_date`: When work started (YYYY-MM-DD)
+- `end_date`: When work completed (YYYY-MM-DD)
+
+Optional columns:
+- `item_id`: Identifier for the work item
+- `item_type`: Type of work (e.g., feature, bug, task)
+
+### 2. Validate Your Data
+
+```bash
+mcswe validate history.csv
+```
+
+### 3. Run a Forecast
+
+**Date Forecasting** - When will 20 items be done?
+
+```bash
+mcswe forecast date --items 20 --data history.csv
+```
+
+**Scope Forecasting** - How many items by March 1st?
+
+```bash
+mcswe forecast scope --target-date 2025-03-01 --data history.csv
+```
+
+## Example Output
+
+```
+Monte Carlo Forecast - Date Prediction
+========================================
+Items remaining: 20
+Forecast start: 2025-01-16
+Simulations: 10,000
+Historical data: 50 items (2024-10-03 to 2024-12-11)
+Mode: Working days only (excludes weekends)
+
+Forecast Results:
+  50% confidence: 2025-02-05 (15 working days)
+  85% confidence: 2025-02-12 (20 working days)
+  95% confidence: 2025-02-19 (24 working days)
+
+Distribution:
+   10-   12 │████░░░░░░░░░░░░░░░░│  8.2%
+   12-   14 │████████████░░░░░░░░│ 28.5%
+   14-   16 │██████████████████░░│ 35.1%
+   16-   18 │████████░░░░░░░░░░░░│ 18.4%
+   18-   20 │███░░░░░░░░░░░░░░░░░│  6.8%
+   20-   22 │█░░░░░░░░░░░░░░░░░░░│  2.1%
+   22-   24 │░░░░░░░░░░░░░░░░░░░░│  0.7%
+   24-   26 │░░░░░░░░░░░░░░░░░░░░│  0.2%
+```
+
+## CLI Reference
+
+### Global Options
+
+```bash
+mcswe --version          # Show version
+mcswe --help             # Show help
+mcswe -v, --verbose      # Verbose output
+mcswe --debug            # Debug output
+```
+
+### Forecast Commands
+
+#### Date Forecast
+
+```bash
+mcswe forecast date [OPTIONS]
+
+Options:
+  -i, --items INTEGER       Number of items to complete (required)
+  -d, --data PATH           Path to CSV data file (required)
+  --start-date DATE         Forecast start date (default: today)
+  -n, --simulations INT     Number of simulations (default: 10000)
+  -c, --confidence TEXT     Confidence levels (default: 50,85,95)
+  --exclude-weekends        Exclude weekends (default)
+  --include-weekends        Include weekends
+  --json                    Output as JSON
+  --no-histogram            Hide histogram
+```
+
+#### Scope Forecast
+
+```bash
+mcswe forecast scope [OPTIONS]
+
+Options:
+  -t, --target-date DATE    Target completion date (required)
+  -d, --data PATH           Path to CSV data file (required)
+  --start-date DATE         Forecast start date (default: today)
+  -n, --simulations INT     Number of simulations (default: 10000)
+  -c, --confidence TEXT     Confidence levels (default: 50,85,95)
+  --exclude-weekends        Exclude weekends (default)
+  --include-weekends        Include weekends
+  --json                    Output as JSON
+  --no-histogram            Hide histogram
+```
+
+### Validate Command
+
+```bash
+mcswe validate FILE [--json]
+```
+
+### Config Commands
+
+```bash
+mcswe config show          # Show current configuration
+mcswe config init          # Create default config file
+mcswe config init --force  # Overwrite existing config
+```
+
+## Configuration
+
+Create a config file at `~/.config/montecarlo-swe/config.toml`:
+
+```bash
+mcswe config init
+```
+
+Example configuration:
+
+```toml
+[simulation]
+num_simulations = 10000
+confidence_levels = [50, 85, 95]
+exclude_weekends = true
+
+[filtering]
+# sample_size_limit = 100  # Use only last N items
+# date_from = "2024-01-01"
+# date_to = "2024-12-31"
+
+[output]
+show_histogram = true
+histogram_buckets = 10
+```
+
+## How It Works
+
+### Monte Carlo Simulation
+
+The tool uses Monte Carlo simulation to forecast based on historical throughput (items completed per day):
+
+1. **Data Collection**: Reads historical work items from CSV
+2. **Throughput Calculation**: Calculates daily completion rates
+3. **Simulation**: Runs thousands of simulations by randomly sampling from historical throughput
+4. **Percentile Calculation**: Reports results at various confidence levels
+
+### Date Forecasting Algorithm
+
+```
+For each simulation:
+  1. Sample random daily throughput values from history
+  2. Sum throughput until reaching target item count
+  3. Record total days needed
+Report percentiles of days distribution
+```
+
+### Scope Forecasting Algorithm
+
+```
+For each simulation:
+  1. Calculate available working days until target date
+  2. Sample random throughput for each day
+  3. Sum total items completed
+Report percentiles of items distribution
+```
+
+## JSON Output
+
+Add `--json` for machine-readable output:
+
+```bash
+mcswe forecast date --items 20 --data history.csv --json
+```
+
+```json
+{
+  "forecast_type": "date",
+  "input": {
+    "items_remaining": 20,
+    "start_date": "2025-01-16",
+    "exclude_weekends": true
+  },
+  "results": {
+    "percentiles": {
+      "50": {"days": 15, "date": "2025-02-05"},
+      "85": {"days": 20, "date": "2025-02-12"},
+      "95": {"days": 24, "date": "2025-02-19"}
+    }
+  }
+}
+```
+
+## Requirements
+
+- Python 3.11+
+- click
+- numpy
+
+## License
+
+MIT
