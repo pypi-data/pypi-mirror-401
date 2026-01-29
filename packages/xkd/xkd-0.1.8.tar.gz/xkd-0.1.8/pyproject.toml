@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xkd"  # 包名（PyPI 上必须唯一）
+version = "0.1.8"           # 版本号
+authors = [
+  { name="Jiabao Yang", email="airfly000@163.com" }
+]
+description = "本模块用来帮助儿童进行3d编程学习，使用简化的语法让孩子们更容易得学习编程，促进孩子们对于三维数学和三维编程的理解和使用。"
+readme = "README.md"  # 关联长描述文件
+classifiers = [             # 分类标签（可选，帮助用户检索）
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+requires-python = ">=3.7"   # 支持的 Python 版本
+
+dependencies=[
+	"panda3d>=1.10.15",
+	"panda3d-gltf>=1.2.0",
+]
+
+[tool.setuptools.package-data]
+xkd = ["*.glb"]
