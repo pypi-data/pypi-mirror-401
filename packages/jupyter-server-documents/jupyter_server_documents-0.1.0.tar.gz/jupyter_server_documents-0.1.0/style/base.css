@@ -1,0 +1,14 @@
+/*
+    See the JupyterLab Developer Guide for useful CSS Patterns:
+
+    https://jupyterlab.readthedocs.io/en/stable/developer/css.html
+*/
+
+/**
+ * Hide "Save" icons from notebook toolbar
+ */
+.jp-ToolbarButtonComponent[data-command='docmanager:save'],
+.jp-ToolbarButtonComponent[data-command='docmanager:save-as'],
+.jp-ToolbarButtonComponent[data-command='docmanager:save-all'] {
+  display: none;
+}
