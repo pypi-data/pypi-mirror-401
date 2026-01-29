@@ -1,0 +1,32 @@
+[project]
+name = "heat_helper"
+description = "A python library to help users of the Higher Education Access Tracker (HEAT) process their data."
+authors = [
+    {name = "Hannah Merry"}
+]
+version = "0.1.0"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "rapidfuzz>=3.14.3",
+]
+
+[project.urls]
+Documentation = "https://hammezii.github.io/heat-helper/"
+Repository = "https://github.com/hammezii/heat-helper"
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mkdocs-material>=9.7.1",
+    "mkdocstrings[python]>=1.0.0",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+]
