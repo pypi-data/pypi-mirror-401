@@ -1,0 +1,445 @@
+# Agimus Python SDK
+
+Official Python SDK for the Agimus Platform Object Store API.
+
+## Installation
+
+```bash
+pip install agimus
+```
+
+**Requirements:** Python 3.9+, httpx
+
+## Quick Start
+
+```python
+from agimus import AgimusClient
+
+client = AgimusClient(api_key="agm_your_key_here")
+
+# Query objects
+customers = client.objects("Customer").filter(status="active").all()
+
+# Get by primary key
+customer = client.objects("Customer").get(123)
+
+# Create
+client.objects("Customer").create({"customerId": 1, "name": "Acme Corp"})
+
+# Update
+client.objects("Customer").update(1, {"status": "premium"})
+
+# Delete
+client.objects("Customer").delete(1)
+```
+
+## Core Concepts
+
+### Ontology & API Names
+
+The Agimus Object Store is built on an **ontology** that defines your data model. Each element has an `apiName` which is what you use in the SDK:
+
+- **Entities** - Data types (e.g., `Customer`, `Order`, `Product`)
+- **Properties** - Fields on entities (e.g., `customerId`, `name`, `createdAt`)
+- **Links** - Relationships between entities, with forward and reverse API names:
+  - Forward: from source to target (e.g., Customer → `orders` → Order)
+  - Reverse: from target to source (e.g., Order → `customer` → Customer)
+
+Use `client.list_entities()` and `client.get_entity_schema("EntityName")` to discover available entities, properties, and links.
+
+### Primary Keys
+
+Every entity has a primary key property defined in the ontology.
+
+**Valid PK types:** `string`, `integer`, `long`, `short`, `byte`
+
+**On Create:**
+- Primary key **must** be provided in the data
+- Value must match the property's type
+- Must be unique - duplicates will error
+
+**On Get/Update/Delete:**
+- Pass the PK value directly - accepts both `int` and `str`
+- SDK converts to the appropriate type automatically
+
+```python
+# These are equivalent
+client.objects("Customer").get(123)
+client.objects("Customer").get("123")
+```
+
+### Property Types
+
+The ontology defines each property's base type:
+
+**Primitives:**
+
+| Type | Python | JSON | Notes |
+|------|--------|------|-------|
+| `string` | `str` | `"text"` | |
+| `integer` | `int` | `123` | 32-bit signed |
+| `long` | `int` | `123` | 64-bit signed |
+| `short` | `int` | `123` | 16-bit signed |
+| `byte` | `int` | `123` | 8-bit signed |
+| `float` | `float` | `1.5` | 32-bit |
+| `double` | `float` | `1.5` | 64-bit |
+| `decimal` | `str` or `Decimal` | `"123.45"` | Arbitrary precision |
+| `boolean` | `bool` | `true` | |
+| `date` | `str` | `"2024-01-15"` | ISO 8601 date |
+| `timestamp` | `str` | `"2024-01-15T10:30:00Z"` | ISO 8601 datetime |
+| `time` | `str` | `"10:30:00"` | ISO 8601 time |
+| `bytes` | `str` | `"base64..."` | Base64 encoded |
+
+**Complex types** (stored as JSON objects):
+
+| Type | Description |
+|------|-------------|
+| `struct` | Nested object with defined fields |
+| `geopoint` | `{"lat": 40.7, "lng": -74.0}` |
+| `geoshape` | GeoJSON geometry object |
+| `attachment` | File attachment metadata |
+| `media_reference` | Media file reference |
+
+**Arrays:** Properties can be arrays (e.g., `tags: string[]`). Pass as Python lists.
+
+**Nullable:** Check `nullable` in the schema. Non-nullable fields are required on create.
+
+## Authentication
+
+API keys are created in the Agimus dashboard under **Settings > API Access**. Keys use the format `agm_<prefix>_<secret>` and inherit permissions from their associated Service User.
+
+```python
+client = AgimusClient(
+    api_key="agm_...",
+    timeout=30.0  # Optional: request timeout in seconds (default: 30)
+)
+```
+
+## Querying
+
+All queries start with `client.objects("EntityName")` and support method chaining.
+
+### Filtering
+
+Use Django-style double-underscore syntax for operators:
+
+```python
+# Equals (default)
+.filter(status="active")
+
+# Comparison
+.filter(age__gt=18)        # greater than
+.filter(age__gte=18)       # greater than or equal
+.filter(age__lt=65)        # less than
+.filter(age__lte=65)       # less than or equal
+.filter(age__ne=0)         # not equal
+.filter(age__between=[18, 65])  # between (inclusive)
+
+# Lists
+.filter(region__in=["US", "EU"])      # in list
+.filter(status__nin=["deleted"])      # not in list
+
+# Strings
+.filter(name__like="Acme%")           # SQL LIKE (case-sensitive)
+.filter(name__ilike="%acme%")         # SQL LIKE (case-insensitive)
+.filter(name__starts_with="A")        # starts with
+.filter(name__ends_with="Corp")       # ends with
+
+# Null checks
+.filter(deletedAt__is_null=True)      # is null
+.filter(verifiedAt__is_not_null=True) # is not null
+
+# Empty checks (arrays/strings)
+.filter(tags__is_empty=True)          # is empty
+.filter(tags__is_not_empty=True)      # is not empty
+
+# Array operations
+.filter(tags__contains="vip")         # array contains value
+.filter(tags__overlaps=["a", "b"])    # arrays overlap
+
+# Multiple filters (AND)
+.filter(status="active", region="US")
+```
+
+### Sorting
+
+```python
+.sort("name")                    # ascending
+.sort("-createdAt")              # descending (prefix with -)
+.sort("-createdAt", "name")      # multiple fields
+```
+
+Alias: `.order_by()`
+
+### Field Selection
+
+```python
+# Return only specific fields (use property apiNames)
+.fields("customerId", "name", "email").all()
+```
+
+Alias: `.select()`
+
+### Expanding Relations
+
+Include related objects inline using link `apiName`:
+
+```python
+.expand("orders").all()
+.expand("orders", "orders.items").all()  # nested
+
+# Or on single object fetch
+.get(123, expand=["orders"])
+```
+
+Alias: `.include()`
+
+### Pagination
+
+```python
+# Limit total results returned
+.limit(100).all()
+
+# Set page size for API calls (max 100, default 50)
+.page_size(25).all()
+
+# Auto-pagination with iteration
+for customer in client.objects("Customer").filter(status="active"):
+    print(customer["name"])
+```
+
+### Executing Queries
+
+```python
+.all()      # Get all results as list
+.first()    # Get first result (or None)
+.exists()   # Check if any results exist (bool)
+.count()    # Get count of matching objects
+.iter()     # Iterator with auto-pagination
+```
+
+### Single Object Operations
+
+```python
+# Get by primary key (raises NotFoundError if not found)
+customer = client.objects("Customer").get(123)
+
+# Get by primary key (returns None if not found)
+customer = client.objects("Customer").get_or_none(123)
+
+# Get multiple by primary keys (max 100)
+result = client.objects("Customer").batch_get([1, 2, 3])
+# Returns: {"data": [...], "found": 3, "requested": 3}
+```
+
+### Distinct Values
+
+```python
+regions = client.objects("Customer").distinct("region")
+# Returns: ["US", "EU", "APAC", ...]
+
+# With filter
+regions = client.objects("Customer").filter(status="active").distinct("region")
+```
+
+## Aggregation
+
+```python
+result = client.objects("Order").filter(status="completed").aggregate(
+    metrics=[
+        {"op": "count", "alias": "orderCount"},
+        {"op": "sum", "field": "total", "alias": "revenue"},
+        {"op": "avg", "field": "total", "alias": "avgOrder"},
+    ],
+    group_by=[
+        {"field": "region"},
+        {"field": "createdAt", "granularity": "month"}
+    ],
+    sort=["-revenue"],
+    limit=100
+)
+```
+
+**Operators:** `count`, `count_distinct`, `sum`, `avg`, `min`, `max`, `first`, `last`
+
+**Time Granularities:** `year`, `quarter`, `month`, `week`, `day`, `hour`
+
+## Link Traversal
+
+Navigate relationships using the link's API name. Use the forward name when traversing from source entity, reverse name when traversing from target entity.
+
+```python
+# Customer -> orders (forward link)
+orders = client.objects("Customer").links(123, "orders")
+# Returns: {"data": [...], "hasMore": False}
+
+# Order -> customer (reverse link)
+customer = client.objects("Order").links(456, "customer")
+
+# With pagination
+orders = client.objects("Customer").links(123, "orders", page_size=10, offset=0)
+
+# Count related objects
+count = client.objects("Customer").count_links(123, "orders")
+```
+
+## Write Operations
+
+### Create
+
+```python
+customer = client.objects("Customer").create({
+    "customerId": 1,        # PK required
+    "name": "Acme Corp",    # non-nullable fields required
+    "email": "contact@acme.com",
+    "status": "active"
+})
+```
+
+- Primary key must be included
+- All non-nullable properties must be provided
+- Property values must match their ontology types
+
+### Update
+
+```python
+# Partial update - only specified fields change
+updated = client.objects("Customer").update(1, {
+    "status": "premium"
+})
+```
+
+- Cannot modify the primary key
+- Only include fields you want to change
+
+### Upsert
+
+```python
+# Create if not exists, update if exists
+customer = client.objects("Customer").upsert(1, {
+    "name": "Acme Corp",
+    "status": "active"
+})
+```
+
+### Delete
+
+```python
+deleted = client.objects("Customer").delete(1)  # Returns: True
+```
+
+Deletes create a tombstone - the object won't appear in queries but the PK can be reused.
+
+### Batch Operations
+
+```python
+result = client.objects("Customer").batch([
+    {"op": "create", "data": {"customerId": 1, "name": "Customer 1"}},
+    {"op": "update", "pk": 2, "data": {"status": "active"}},
+    {"op": "delete", "pk": 3},
+])
+# Returns: {"results": [...], "succeeded": 2, "failed": 1}
+```
+
+## Schema Discovery
+
+Discover your ontology programmatically:
+
+```python
+# List all accessible entities
+entities = client.list_entities()
+for e in entities:
+    print(f"{e['apiName']}: {e['displayName']}")
+
+# Get full entity schema
+schema = client.get_entity_schema("Customer")
+print(f"Primary key: {schema['primaryKey']}")
+for prop in schema["properties"]:
+    print(f"  {prop['apiName']}: {prop['baseType']} (nullable: {prop['nullable']})")
+for link in schema["links"]:
+    print(f"  -> {link['apiName']}: {link['targetEntity']}")
+
+# Individual schema methods
+properties = client.get_properties("Customer")
+prop = client.get_property("Customer", "email")
+pk = client.get_primary_key("Customer")
+links = client.get_links("Customer")
+```
+
+## Async Client
+
+For async/await applications:
+
+```python
+from agimus import AsyncAgimusClient
+
+async with AsyncAgimusClient(api_key="agm_...") as client:
+    customers = await client.objects("Customer").filter(status="active").all()
+    customer = await client.objects("Customer").get(123)
+
+    # Async iteration
+    async for customer in client.objects("Customer").filter(status="active"):
+        print(customer["name"])
+
+    # Write operations
+    await client.objects("Customer").create({"customerId": 1, "name": "Acme"})
+    await client.objects("Customer").update(1, {"status": "premium"})
+    await client.objects("Customer").delete(1)
+```
+
+The async client has identical methods to the sync client.
+
+## Error Handling
+
+```python
+from agimus import (
+    AgimusError,          # Base class for all errors
+    AuthenticationError,  # Invalid or missing API key (401)
+    AccessDeniedError,    # Permission denied (403)
+    NotFoundError,        # Entity or object not found (404)
+    ValidationError,      # Invalid request data (400/422)
+    RateLimitError,       # Rate limit exceeded (429)
+    ServerError,          # Server error (5xx)
+)
+
+try:
+    customer = client.objects("Customer").get(999)
+except NotFoundError as e:
+    print(f"Not found: {e.entity}")
+except ValidationError as e:
+    print(f"Validation error: {e.message}, field: {e.field}")
+except AuthenticationError:
+    print("Invalid API key")
+except AccessDeniedError:
+    print("Permission denied")
+except RateLimitError as e:
+    print(f"Rate limited. Retry after: {e.retry_after}s")
+except ServerError as e:
+    print(f"Server error ({e.status_code}): {e.message}")
+except AgimusError as e:
+    print(f"API error: {e.message}")
+```
+
+## Utility Methods
+
+```python
+# Health check
+health = client.health()
+# {"status": "healthy", "version": "..."}
+
+# Current API key info
+me = client.me()
+# {"tenantName": "...", "rateLimitPerMinute": 1000, "requestId": "..."}
+```
+
+## Context Manager
+
+```python
+with AgimusClient(api_key="agm_...") as client:
+    customers = client.objects("Customer").all()
+# Connection automatically closed
+```
+
+## License
+
+MIT
