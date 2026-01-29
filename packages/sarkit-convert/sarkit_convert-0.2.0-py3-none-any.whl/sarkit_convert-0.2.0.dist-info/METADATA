@@ -1,0 +1,59 @@
+Metadata-Version: 2.1
+Name: sarkit-convert
+Version: 0.2.0
+Summary: Python library for converting SAR data to standard formats.
+Author-Email: Valkyrie Systems Corporation <info@govsco.com>
+License: MIT
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Scientific/Engineering
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.11
+Requires-Dist: lxml>=5.1.0
+Requires-Dist: numpy>=1.26.3
+Requires-Dist: pyproj>=3.7.2
+Requires-Dist: sarkit>=1.3.0
+Requires-Dist: scipy>=1.15.1
+Provides-Extra: iceye
+Requires-Dist: h5py>=3.12.1; extra == "iceye"
+Requires-Dist: python-dateutil>=2.9.0; extra == "iceye"
+Provides-Extra: cosmo
+Requires-Dist: astropy>=6.0.0; extra == "cosmo"
+Requires-Dist: h5py>=3.12.1; extra == "cosmo"
+Requires-Dist: python-dateutil>=2.9.0; extra == "cosmo"
+Requires-Dist: shapely>=2.0.2; extra == "cosmo"
+Provides-Extra: terrasar
+Requires-Dist: python-dateutil>=2.9.0; extra == "terrasar"
+Provides-Extra: sentinel
+Requires-Dist: python-dateutil>=2.9.0; extra == "sentinel"
+Requires-Dist: tifffile>=2025.5.10; extra == "sentinel"
+Provides-Extra: all
+Requires-Dist: sarkit-convert[iceye]; extra == "all"
+Requires-Dist: sarkit-convert[cosmo]; extra == "all"
+Requires-Dist: sarkit-convert[terrasar]; extra == "all"
+Requires-Dist: sarkit-convert[sentinel]; extra == "all"
+Description-Content-Type: text/markdown
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/ValkyrieSystems/sarkit/main/docs/source/_static/sarkit_logo.png" width=200>
+
+</div>
+
+**sarkit-convert** is a Python library for converting SAR data to standard formats.
+
+## License
+This repository is licensed under the [MIT license](./LICENSE).
+
+A few tips for getting started using [PDM](https://pdm-project.org/en/latest/) are below:
+
+
+```shell
+$ pdm install -G:all  # install SARkit-convert with optional & dev dependencies
+$ pdm run nox  # run lint and tests
+```
