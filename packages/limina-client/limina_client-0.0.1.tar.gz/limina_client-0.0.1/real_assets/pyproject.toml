@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "limina_client"
+dynamic = ["version"]
+authors = [
+  { name="Adam Guiducci", email="adam.guiducci@getlimina.ai" },
+  { name="Bryan Bell-Smith", email="bryan.bellsmith@getlimina.ai" },
+]
+description = "A thin client for communicating with the Limina de-identication API."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "requests~=2.32.3",
+  "pyxDamerauLevenshtein~=1.8.0"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/limina/limina-client/"
+"Bug Tracker" = "https://github.com/limina/limina-client/issues"
+"Changelog" = "https://github.com/limina/limina-client/blob/main/CHANGELOG.md"
+"Contributing" = "https://github.com/limina/limina-client/blob/main/CONTRIBUTING.md"
+
+[tool.hatch.version]
+path = "src/limina_client/__about__.py"
+
+[tool.black]
+line-length = 88
