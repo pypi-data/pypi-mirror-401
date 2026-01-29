@@ -1,0 +1,126 @@
+Metadata-Version: 2.4
+Name: thinkpdf
+Version: 1.0.2
+Summary: PDF to Markdown engine for LLMs. Smart table extraction, OCR, MCP server for AI IDEs.
+Author-email: Augusto Cesar Perin <augustocesarperin@abstratuslabs.com>
+License: AGPL-3.0
+Keywords: pdf,markdown,converter,ocr,tables,math,latex,llm,ai,mcp,cursor,docling
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Text Processing :: Markup :: Markdown
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pymupdf>=1.23.0
+Provides-Extra: docling
+Requires-Dist: docling>=2.0.0; extra == "docling"
+Provides-Extra: gui
+Requires-Dist: customtkinter>=5.2.0; extra == "gui"
+Requires-Dist: Pillow>=10.0.0; extra == "gui"
+Provides-Extra: ocr
+Requires-Dist: pytesseract>=0.3.10; extra == "ocr"
+Provides-Extra: cli
+Requires-Dist: rich>=13.0.0; extra == "cli"
+Provides-Extra: full
+Requires-Dist: docling>=2.0.0; extra == "full"
+Requires-Dist: customtkinter>=5.2.0; extra == "full"
+Requires-Dist: Pillow>=10.0.0; extra == "full"
+Requires-Dist: pytesseract>=0.3.10; extra == "full"
+Requires-Dist: rich>=13.0.0; extra == "full"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Dynamic: license-file
+
+# thinkpdf
+
+Convert PDFs to clean Markdown for LLMs. Includes MCP Server for AI coding assistants.
+
+## Features
+
+- PDF to Markdown conversion
+- MCP Server for AI assistants (Cursor, Antigravity)
+- GUI included
+- Batch conversion with parallel workers
+- Optional: Docling for better table extraction
+
+## Installation
+
+```bash
+pip install thinkpdf
+```
+
+For GUI:
+```bash
+pip install thinkpdf[gui]
+```
+
+## Quick Start
+
+### GUI
+```bash
+thinkpdf-gui
+```
+
+### CLI
+```bash
+thinkpdf document.pdf                    # Convert single file
+thinkpdf document.pdf -o output.md       # Specify output
+thinkpdf folder/ --batch                 # Convert all PDFs in folder
+thinkpdf folder/ --batch --workers 4     # Parallel conversion
+```
+
+### Python API
+```python
+from thinkpdf import convert
+
+markdown = convert("document.pdf")
+print(markdown)
+```
+
+## MCP Server Setup
+
+Run this to see the config:
+```bash
+thinkpdf setup
+```
+
+Add to `~/.cursor/mcp.json` or `~/.gemini/antigravity/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "thinkpdf": {
+      "command": "python",
+      "args": ["-m", "thinkpdf.mcp_server"]
+    }
+  }
+}
+```
+
+Then ask your AI: "Read the PDF at D:\docs\manual.pdf"
+
+### MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| read_pdf | Convert and return content directly (no file created) |
+| convert_pdf | Convert and save to file |
+| get_document_info | Get PDF metadata |
+
+## Requirements
+
+- Python 3.10+
+- PyMuPDF (included)
+- Docling (optional, for best quality)
+
+## License
+
+AGPL-3.0
