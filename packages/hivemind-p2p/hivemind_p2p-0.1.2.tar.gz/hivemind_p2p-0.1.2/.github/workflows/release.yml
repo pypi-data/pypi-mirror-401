@@ -1,0 +1,150 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  update-version:
+    name: Update version from tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get-version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Update pyproject.toml version
+        run: |
+          VERSION=${{ steps.get-version.outputs.version }}
+          sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
+          echo "Updated pyproject.toml version to $VERSION"
+
+      - name: Update Cargo.toml version
+        run: |
+          VERSION=${{ steps.get-version.outputs.version }}
+          sed -i "s/^version = .*/version = \"$VERSION\"/" Cargo.toml
+          echo "Updated Cargo.toml version to $VERSION"
+
+      - name: Upload updated files
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-config
+          path: |
+            pyproject.toml
+            Cargo.toml
+
+  build-wheels:
+    name: Build wheel (${{ matrix.target }})
+    needs: [update-version]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            args: --release --out dist
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            args: --release --out dist --zig
+          - os: macos-14
+            target: x86_64-apple-darwin
+            args: --release --out dist
+          - os: macos-14
+            target: aarch64-apple-darwin
+            args: --release --out dist
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            args: --release --out dist
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download updated config
+        uses: actions/download-artifact@v4
+        with:
+          name: updated-config
+          path: .
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: ${{ matrix.args }}
+          manylinux: auto
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.target }}
+          path: dist/*.whl
+
+  sdist:
+    name: Build source distribution
+    needs: [update-version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download updated config
+        uses: actions/download-artifact@v4
+        with:
+          name: updated-config
+          path: .
+
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [build-wheels, sdist]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+
+      - name: Download sdist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+      - name: List distribution files
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
