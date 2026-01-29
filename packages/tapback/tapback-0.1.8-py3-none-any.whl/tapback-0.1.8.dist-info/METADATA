@@ -1,0 +1,95 @@
+Metadata-Version: 2.4
+Name: tapback
+Version: 0.1.8
+Summary: Tapback - Mobile approval tool for LLM workflows
+Project-URL: Homepage, https://github.com/mk1018/tapback
+Project-URL: Repository, https://github.com/mk1018/tapback
+Author: motonari kurita
+License-Expression: MIT
+License-File: LICENSE
+Keywords: claude code,cli,codex,llm,mcp,vibe coding
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.10
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: mcp>=1.25.0
+Requires-Dist: python-multipart>=0.0.20
+Requires-Dist: requests>=2.32.5
+Requires-Dist: uvicorn>=0.34.0
+Requires-Dist: websockets>=14.0
+Description-Content-Type: text/markdown
+
+# Tapback
+
+ターミナルをスマホに同期するツール。Claude Codeなどをリモートで操作できます。
+
+## 使い方
+
+インストール不要で直接実行:
+
+```bash
+uvx --from tapback tapback-server claude
+```
+
+最新版を使いたい場合は `--refresh` を付ける:
+
+```bash
+uvx --refresh --from tapback tapback-server claude
+```
+
+表示されるURLにスマホでアクセスし、PINを入力。
+
+ターミナルの内容がリアルタイムで同期され、スマホから入力できます。
+
+## インストール（オプション）
+
+```bash
+pip install tapback
+```
+
+インストール後:
+
+```bash
+tapback-server claude
+```
+
+## 要件
+
+- tmux (`brew install tmux`)
+- スマホとMacが同じWi-Fiネットワーク（または ngrok）
+
+## ローカルで確認
+
+tmuxセッションに直接アタッチして確認:
+
+```bash
+tmux attach -t tapback
+```
+
+## 外部ネットワークから使う
+
+外出先など別ネットワークから使う場合は ngrok でトンネリング:
+
+```bash
+ngrok http 8080
+```
+
+表示されるURL（例: `https://xxxx.ngrok.io`）をスマホで開きます。
+
+## オプション
+
+```bash
+tapback-server --port 9000 claude   # ポート変更
+tapback-server --no-auth claude     # PIN認証を無効化
+tapback-server --kill               # 既存セッションを終了
+```
+
+## License
+
+MIT
