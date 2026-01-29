@@ -1,0 +1,61 @@
+[build-system]
+requires = ["maturin>=1.9,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "vurze"
+version = "0.1.2"
+description = "Version control your Python functions and classes with automated cryptographic decorator injection."
+authors = [
+    {name = "Aidan Dyga"}
+]
+requires-python = ">=3.8"
+readme = "README.md"
+license = {text = "MIT"}
+keywords = ["rust", "python", "decorator", "version-control", "cryptography"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "typer>=0.9.0",
+]
+
+[project.scripts]
+vurze = "vurze.cli:main"
+
+[project.urls]
+Repository = "https://github.com/MCP-Security-Research/vurze"
+Issues = "https://github.com/MCP-Security-Research/vurze/issues"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "vurze._vurze"
+python-source = "src/python"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v -s --cov=vurze"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0"
+]
