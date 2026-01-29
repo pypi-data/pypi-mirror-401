@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aria-cli"
+version = "1.0.9"
+description = "ARIA - Adaptive Runtime Intelligence Architecture. Cognitive CLI with live folder-based messaging."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Lenix Project", email = "aria@lenix.dev" }
+]
+keywords = [
+    "ai", "llm", "cognitive", "runtime", "holomap", "connection", "messaging", 
+    "visualization", "explainer", "self-narrating"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.10"
+
+dependencies = [
+    "click>=8.0",
+    "rich>=13.0",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+llm = [
+    "llama-cpp-python>=0.2.0",
+]
+server = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.20.0",
+    "websockets>=11.0",
+]
+viz = [
+    "plotly>=5.0",
+    "networkx>=3.0",
+]
+full = [
+    "aria-cli[llm,server,viz]",
+    "huggingface-hub>=0.20.0",
+    "httpx>=0.25.0",
+    "watchfiles>=0.20.0",
+]
+dev = [
+    "aria-cli[full]",
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+aria = "aria.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/lenix-project/aria-cli"
+Documentation = "https://aria.lenix.dev"
+Repository = "https://github.com/lenix-project/aria-cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aria"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true

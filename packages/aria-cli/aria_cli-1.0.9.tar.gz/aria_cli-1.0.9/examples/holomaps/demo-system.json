@@ -1,0 +1,71 @@
+{
+    "nodes": [
+        {
+            "id": "LenixTrinityEngine",
+            "type": "core",
+            "label": "Trinity Core",
+            "metadata": {
+                "description": "The central processing engine",
+                "state": "active"
+            }
+        },
+        {
+            "id": "InputNode",
+            "type": "io",
+            "label": "Input Handler",
+            "metadata": {
+                "description": "Receives external data",
+                "state": "receiving"
+            }
+        },
+        {
+            "id": "ProcessNode",
+            "type": "compute",
+            "label": "Process Unit",
+            "metadata": {
+                "description": "Transforms data",
+                "state": "processing"
+            }
+        },
+        {
+            "id": "OutputNode",
+            "type": "io",
+            "label": "Output Handler",
+            "metadata": {
+                "description": "Emits results",
+                "state": "idle"
+            }
+        },
+        {
+            "id": "WaterwheelHub",
+            "type": "orchestrator",
+            "label": "Waterwheel",
+            "metadata": {
+                "description": "Manages data flow",
+                "state": "cycling"
+            }
+        },
+        {
+            "id": "ARIA",
+            "type": "ai",
+            "label": "ARIA Observer",
+            "metadata": {
+                "description": "Monitors and explains",
+                "state": "observing"
+            }
+        }
+    ],
+    "flows": [
+        {"source": "InputNode", "target": "LenixTrinityEngine", "type": "data"},
+        {"source": "LenixTrinityEngine", "target": "ProcessNode", "type": "data"},
+        {"source": "ProcessNode", "target": "OutputNode", "type": "data"},
+        {"source": "WaterwheelHub", "target": "LenixTrinityEngine", "type": "control"},
+        {"source": "ARIA", "target": "LenixTrinityEngine", "type": "observe"},
+        {"source": "ARIA", "target": "WaterwheelHub", "type": "observe"}
+    ],
+    "metrics": {
+        "throughput": {"value": 1000, "unit": "ops/sec"},
+        "latency": {"value": 5, "unit": "ms"},
+        "health": {"value": 0.98, "unit": "ratio"}
+    }
+}

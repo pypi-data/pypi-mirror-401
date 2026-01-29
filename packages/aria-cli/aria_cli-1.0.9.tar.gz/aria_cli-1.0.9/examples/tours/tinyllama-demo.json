@@ -1,0 +1,46 @@
+{
+    "id": "tinyllama-example",
+    "name": "TinyLlama Demo Tour",
+    "description": "A quick tour demonstrating ARIA cognitive explanations",
+    "version": "1.0",
+    "author": "ARIA",
+    "steps": [
+        {
+            "id": "intro",
+            "title": "Welcome to ARIA",
+            "description": "This tour demonstrates how ARIA provides cognitive explanations of holomap systems.",
+            "auto_advance": true,
+            "delay_ms": 3000
+        },
+        {
+            "id": "trinity",
+            "title": "Trinity Core",
+            "description": "The Trinity is the heart of the Lenix system - Input, Process, Output.",
+            "focus_nodes": ["LenixTrinityEngine", "InputNode", "ProcessNode", "OutputNode"],
+            "trigger_explainer": true,
+            "explainer_style": "narrative",
+            "auto_advance": true,
+            "delay_ms": 5000
+        },
+        {
+            "id": "flow",
+            "title": "Data Flow",
+            "description": "Watch how data flows through the system.",
+            "focus_nodes": ["WaterwheelHub", "DataFlow"],
+            "trigger_explainer": true,
+            "explainer_style": "technical",
+            "auto_advance": true,
+            "delay_ms": 5000
+        },
+        {
+            "id": "conclusion",
+            "title": "Tour Complete",
+            "description": "You've seen how ARIA provides intelligent explanations of complex systems.",
+            "auto_advance": false
+        }
+    ],
+    "metadata": {
+        "difficulty": "beginner",
+        "duration_estimate": "2 minutes"
+    }
+}

@@ -1,0 +1,37 @@
+# ARIA CLI Configuration
+# Save this file as aria.toml in your project root or ~/.aria/config.toml
+
+[brain]
+# Default brain to use for explanations
+default = "tinyllama"
+
+# Context window size (adjust based on brain)
+context_size = 2048
+
+# Temperature for generation (0.0-1.0)
+temperature = 0.7
+
+# Uncomment to use a custom model directory
+# model_dir = "/path/to/models"
+
+[server]
+# API server settings
+host = "127.0.0.1"
+port = 8000
+reload = false
+
+[session]
+# Session recording settings
+format = "json"  # json or jsonl
+compress = false
+
+# Uncomment to use a custom session directory
+# output_dir = "/path/to/sessions"
+
+[paths]
+# Custom paths for project resources
+# Uncomment and adjust as needed
+
+# project = "/path/to/lenix_holomap"
+# tours = "/path/to/tours"
+# holomaps = "/path/to/holomaps"

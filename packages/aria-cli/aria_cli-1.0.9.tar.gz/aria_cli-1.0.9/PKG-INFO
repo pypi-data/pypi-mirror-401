@@ -1,0 +1,359 @@
+Metadata-Version: 2.4
+Name: aria-cli
+Version: 1.0.9
+Summary: ARIA - Adaptive Runtime Intelligence Architecture. Cognitive CLI with live folder-based messaging.
+Project-URL: Homepage, https://github.com/lenix-project/aria-cli
+Project-URL: Documentation, https://aria.lenix.dev
+Project-URL: Repository, https://github.com/lenix-project/aria-cli
+Author-email: Lenix Project <aria@lenix.dev>
+License-Expression: Apache-2.0
+Keywords: ai,cognitive,connection,explainer,holomap,llm,messaging,runtime,self-narrating,visualization
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Requires-Dist: click>=8.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: rich>=13.0
+Provides-Extra: dev
+Requires-Dist: fastapi>=0.100.0; extra == 'dev'
+Requires-Dist: httpx>=0.25.0; extra == 'dev'
+Requires-Dist: huggingface-hub>=0.20.0; extra == 'dev'
+Requires-Dist: llama-cpp-python>=0.2.0; extra == 'dev'
+Requires-Dist: mypy>=1.0; extra == 'dev'
+Requires-Dist: networkx>=3.0; extra == 'dev'
+Requires-Dist: plotly>=5.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest>=7.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Requires-Dist: uvicorn[standard]>=0.20.0; extra == 'dev'
+Requires-Dist: watchfiles>=0.20.0; extra == 'dev'
+Requires-Dist: websockets>=11.0; extra == 'dev'
+Provides-Extra: full
+Requires-Dist: fastapi>=0.100.0; extra == 'full'
+Requires-Dist: httpx>=0.25.0; extra == 'full'
+Requires-Dist: huggingface-hub>=0.20.0; extra == 'full'
+Requires-Dist: llama-cpp-python>=0.2.0; extra == 'full'
+Requires-Dist: networkx>=3.0; extra == 'full'
+Requires-Dist: plotly>=5.0; extra == 'full'
+Requires-Dist: uvicorn[standard]>=0.20.0; extra == 'full'
+Requires-Dist: watchfiles>=0.20.0; extra == 'full'
+Requires-Dist: websockets>=11.0; extra == 'full'
+Provides-Extra: llm
+Requires-Dist: llama-cpp-python>=0.2.0; extra == 'llm'
+Provides-Extra: server
+Requires-Dist: fastapi>=0.100.0; extra == 'server'
+Requires-Dist: uvicorn[standard]>=0.20.0; extra == 'server'
+Requires-Dist: websockets>=11.0; extra == 'server'
+Provides-Extra: viz
+Requires-Dist: networkx>=3.0; extra == 'viz'
+Requires-Dist: plotly>=5.0; extra == 'viz'
+Description-Content-Type: text/markdown
+
+# ARIA - Adaptive Runtime Intelligence Architecture
+
+> The cognitive CLI for self-narrating systems
+
+[![PyPI version](https://badge.fury.io/py/aria-cli.svg)](https://badge.fury.io/py/aria-cli)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+---
+
+## What is ARIA?
+
+ARIA is the cognitive layer that makes systems **explain themselves**.
+
+It connects to live runtimes, observes their state, and generates natural language explanations of what's happening and why. ARIA turns opaque systems into self-narrating organisms.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         ARIA                                │
+│                                                             │
+│   Observe  ───►  Predict  ───►  Act  ───►  Explain         │
+│                                                             │
+│   "I see Trinity cycling at 847 events/sec.                │
+│    The Waterwheel is stabilizing incoming data.            │
+│    ARIA predicts load will spike in 3 minutes."            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Installation
+
+### Minimal (CLI only)
+```bash
+pip install aria-cli
+```
+
+### With LLM support (local inference)
+```bash
+pip install aria-cli[llm]
+```
+
+### With server (REST API + WebSocket)
+```bash
+pip install aria-cli[server]
+```
+
+### Full installation (everything)
+```bash
+pip install aria-cli[full]
+```
+
+---
+
+## Quick Start
+
+### 1. Download a brain
+```bash
+aria brain download tinyllama
+```
+
+### 2. Start the cognitive server
+```bash
+aria serve --brain tinyllama
+```
+
+### 3. Explain a system
+```bash
+aria explain --snapshot system-state.json
+```
+
+### 4. Run a guided tour
+```bash
+aria tour run cognitive-loop.json
+```
+
+### 5. Record a session
+```bash
+aria session start --name "my-session"
+aria session stop
+aria session list
+```
+
+---
+
+## Commands
+
+### `aria brain`
+Manage LLM brains for cognition.
+
+```bash
+aria brain list                    # Show available brains
+aria brain download tinyllama      # Download TinyLlama (638 MB)
+aria brain download phi2           # Download Phi-2 (1.7 GB)
+aria brain download qwen2          # Download Qwen2 1.5B (940 MB)
+aria brain download llama3         # Download Llama 3.2 1B (770 MB)
+aria brain info tinyllama          # Show brain details
+aria brain benchmark               # Benchmark all brains
+```
+
+### `aria explain`
+Generate explanations from system state.
+
+```bash
+aria explain --snapshot state.json           # Explain from file
+aria explain --url http://localhost:8080     # Explain from live endpoint
+aria explain --stdin                          # Explain from stdin
+aria explain --focus node-123                # Focus on specific node
+aria explain --style technical               # Technical explanation
+aria explain --style narrative               # Narrative explanation
+```
+
+### `aria serve`
+Start the cognitive server.
+
+```bash
+aria serve                                   # Start with defaults
+aria serve --brain phi2                      # Use specific brain
+aria serve --port 8080                       # Custom port
+aria serve --host 0.0.0.0                    # Bind to all interfaces
+aria serve --reload                          # Auto-reload on changes
+```
+
+### `aria tour`
+Run guided cognitive tours.
+
+```bash
+aria tour list                               # List available tours
+aria tour run cognitive-loop.json            # Run a tour
+aria tour validate tour.json                 # Validate tour file
+aria tour create --name "My Tour"            # Interactive tour creation
+```
+
+### `aria session`
+Record cognitive sessions.
+
+```bash
+aria session start --name "debug-session"    # Start recording
+aria session stop                            # Stop recording
+aria session list                            # List all sessions
+aria session show session-123                # Show session details
+aria session export session-123 --format json
+aria session replay session-123              # Replay a session
+```
+
+### `aria holomap`
+Manage Holomap world files.
+
+```bash
+aria holomap validate world.hmap             # Validate a holomap
+aria holomap diff old.hmap new.hmap          # Diff two holomaps
+aria holomap stats world.hmap                # Show statistics
+aria holomap visualize world.hmap            # Open visualization
+```
+
+### `aria watch`
+Live monitoring with real-time narration.
+
+```bash
+aria watch http://localhost:8080             # Watch live endpoint
+aria watch --interval 5                      # Poll every 5 seconds
+aria watch --alert "load > 80%"              # Alert on condition
+```
+
+---
+
+## Configuration
+
+ARIA uses `~/.aria/config.toml` for configuration:
+
+```toml
+[brain]
+default = "tinyllama"
+path = "~/.aria/models"
+timeout = 30
+
+[server]
+host = "127.0.0.1"
+port = 7777
+
+[session]
+output_dir = "~/.aria/sessions"
+format = "jsonl"
+compress = false
+
+[style]
+theme = "dark"
+verbosity = "normal"
+```
+
+---
+
+## Python API
+
+```python
+from aria import CognitiveEngine, WorldSnapshot
+
+# Initialize engine
+engine = CognitiveEngine(brain="tinyllama")
+
+# Create snapshot
+snapshot = WorldSnapshot.from_file("state.json")
+
+# Generate explanation
+response = engine.explain(snapshot)
+
+print(response.summary)
+# "Trinity Core is cycling at 847 events/second, 
+#  indicating healthy recursive processing."
+
+print(response.focus_nodes)
+# ["LenixTrinityEngine", "WaterwheelHub"]
+```
+
+### Async API
+
+```python
+import asyncio
+from aria import AsyncCognitiveEngine
+
+async def main():
+    engine = AsyncCognitiveEngine(brain="phi2")
+    
+    async with engine:
+        response = await engine.explain_async(snapshot)
+        print(response.summary)
+
+asyncio.run(main())
+```
+
+### Session Recording
+
+```python
+from aria import SessionRecorder
+
+with SessionRecorder("my-session") as recorder:
+    # All cognitive events are automatically recorded
+    response = engine.explain(snapshot)
+    
+# Session saved to ~/.aria/sessions/my-session.jsonl
+```
+
+---
+
+## The Cognitive Contract
+
+ARIA implements the **Explainer Contract**:
+
+```
+Input:  WorldSnapshot (nodes, flows, metrics, focus)
+Output: ExplainerResponse (summary, details, focus_nodes, confidence)
+```
+
+Every explanation is:
+- **Grounded** — references only nodes/flows that exist
+- **Bounded** — respects token limits
+- **Deterministic** — same input → consistent output
+- **Traceable** — includes confidence and reasoning
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      aria-cli                               │
+├─────────────────────────────────────────────────────────────┤
+│  CLI Layer          │  click + rich                        │
+├─────────────────────────────────────────────────────────────┤
+│  Cognitive Engine   │  LLM orchestration + prompts         │
+├─────────────────────────────────────────────────────────────┤
+│  Brain Backend      │  llama-cpp-python (local)            │
+│                     │  OpenAI API (remote)                 │
+│                     │  Ollama (local server)               │
+├─────────────────────────────────────────────────────────────┤
+│  Data Layer         │  WorldSnapshot, ExplainerResponse    │
+├─────────────────────────────────────────────────────────────┤
+│  Session Layer      │  Recording, replay, lineage          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## License
+
+Apache 2.0 — Free for commercial use.
+
+---
+
+## Related
+
+- [Holomap Specification](https://github.com/lenix-project/holomap-spec)
+- [Cognitive Runtime Pattern](https://github.com/lenix-project/cognitive-runtime-pattern)
+- [Lenix Project](https://github.com/lenix-project)
+
+---
+
+> *"The system that explains itself is the system that can be trusted."*
