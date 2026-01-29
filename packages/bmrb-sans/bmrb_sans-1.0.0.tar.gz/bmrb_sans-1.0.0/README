@@ -1,0 +1,40 @@
+FILES:
+------
+
+sans/   -- SANS parser package
+   test.py -- SANS parsing example for NMR-STAR
+
+INSTALL:
+--------
+sans parsers: simply copy sans subdirectory somewhere.
+
+USE:
+----
+
+SANS:
+
+Use ciftest.py and/or test.py as starting point.
+
+if sans is a subdirectory in . : import sans
+if sans is in /var/tmp/sans    : sys.path.append( "/var/tmp" )
+                                 import sans
+
+from sans import STARLexer
+from sans import ErrorHandler, ContentHandler*
+from sans import *parser
+ -- pick the content handler and parser you want to use:
+  parser/cifparser need ContentHandler, parser2 needs ContentHandler2
+
+Finally, write a handler class with methods that'll do something useful 
+with the data.
+
+DOCUMENTATION:
+--------------
+SANS is modelled after SAX parsers, if you know how those work look up 
+the *Handler classes in sans/handlers.py and you should be all set.
+
+To generate SANS documentation you'll need ant. Run "ant javadoc" in java 
+subdirectory, then  look in java/doc/api.
+
+Java documentation is not 100% accurate for python version, but the
+descriptions of handler classes and parser basics are close enough.
