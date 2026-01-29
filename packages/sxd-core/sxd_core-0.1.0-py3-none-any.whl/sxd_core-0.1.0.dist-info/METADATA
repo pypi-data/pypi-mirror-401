@@ -1,0 +1,31 @@
+Metadata-Version: 2.4
+Name: sxd-core
+Version: 0.1.0
+Summary: Core library for SentientX Data Platform
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: universal-pathlib>=0.2.0
+Requires-Dist: s3fs>=2024.0.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: pyarrow>=14.0.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: chdb>=2.0.0
+Requires-Dist: clickhouse-connect>=0.7.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: textual>=0.47.0
+Requires-Dist: temporalio>=1.5.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: huggingface-hub>=0.20.0
+Requires-Dist: tqdm>=4.66.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: aiofiles>=24.1.0
+Provides-Extra: simulation
+Requires-Dist: hypothesis>=6.0.0; extra == "simulation"
+Provides-Extra: dev
+Requires-Dist: hypothesis>=6.0.0; extra == "dev"
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
