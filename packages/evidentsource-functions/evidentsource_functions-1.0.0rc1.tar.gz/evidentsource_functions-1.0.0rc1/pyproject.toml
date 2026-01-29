@@ -1,0 +1,66 @@
+[project]
+name = "evidentsource-functions"
+version = "1.0.0-rc1"
+description = "Python Server Functions library for building EvidentSource WASM state views and state changes"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Evident Systems", email = "info@evidentsystems.com" }
+]
+keywords = ["eventsourcing", "wasm", "event-driven", "cqrs", "wasi"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "evidentsource-core>=1.0.0-rc1",
+    "componentize-py>=0.17.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "mypy>=1.13.0",
+    "ruff>=0.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/evidentsource_functions"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+# Exclude auto-generated WIT binding and async support files
+extend-exclude = [
+    "src/evidentsource_functions/wasm/*/wit_world",
+    "src/evidentsource_functions/wasm/*/componentize_py_*",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+# E501: line too long (handled at project level)
+# N818: Exception classes don't require "Error" suffix (existing API)
+# B020: Loop variable overrides (in auto-generated poll_loop code)
+ignore = ["E501", "N818", "B020"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

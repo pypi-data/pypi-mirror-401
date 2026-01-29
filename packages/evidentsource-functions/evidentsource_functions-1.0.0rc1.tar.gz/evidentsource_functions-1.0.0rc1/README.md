@@ -1,0 +1,150 @@
+# EvidentSource SDK for Python
+
+Python SDK for building WebAssembly state changes and state views that run on the EvidentSource event sourcing platform.
+
+## Installation
+
+```bash
+pip install evidentsource-functions
+```
+
+## Quick Start - State View
+
+Create a state view by extending `StateViewBase` and using `StateViewAdapter`:
+
+```python
+from dataclasses import dataclass
+from evidentsource_functions import StateViewBase, Event
+from evidentsource_functions.wasm import StateViewAdapter
+
+@dataclass
+class AccountSummary(StateViewBase):
+    balance: float = 0.0
+    transaction_count: int = 0
+
+    def evolve_event(self, event: Event) -> None:
+        if event.event_type == "account.credited":
+            import json
+            data = json.loads(event.data_as_string() or "{}")
+            self.balance += data.get("amount", 0)
+            self.transaction_count += 1
+
+    def to_dict(self) -> dict:
+        return {
+            "balance": self.balance,
+            "transaction_count": self.transaction_count,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "AccountSummary":
+        return cls(
+            balance=data.get("balance", 0.0),
+            transaction_count=data.get("transaction_count", 0),
+        )
+
+# Export WitWorld for componentize-py
+class WitWorld(StateViewAdapter):
+    state_view_type = AccountSummary
+```
+
+## Quick Start - State Change
+
+Create a state change by defining a command type, decide function, and using `StateChangeAdapter`:
+
+```python
+from dataclasses import dataclass
+from evidentsource_functions import (
+    StateChangeError,
+    StateChangeMetadata,
+    DecideResult,
+    ProspectiveEvent,
+    StringEventData,
+)
+from evidentsource_functions.wasm import StateChangeAdapter
+import json
+import uuid
+
+@dataclass
+class DepositCommand:
+    account_id: str
+    amount: float
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "DepositCommand":
+        return cls(
+            account_id=data["account_id"],
+            amount=data["amount"],
+        )
+
+def decide(db, command: DepositCommand, metadata: StateChangeMetadata) -> DecideResult:
+    if command.amount <= 0:
+        raise StateChangeError.validation("Amount must be positive")
+
+    event = ProspectiveEvent(
+        id=str(uuid.uuid4()),
+        stream="accounts",
+        event_type="account.credited",
+        subject=command.account_id,
+        data=StringEventData(json.dumps({
+            "account_id": command.account_id,
+            "amount": command.amount,
+        })),
+        datacontenttype="application/json",
+    )
+
+    return ([event], [])
+
+# Export WitWorld for componentize-py
+class WitWorld(StateChangeAdapter):
+    command_type = DepositCommand
+    decide_func = staticmethod(decide)
+```
+
+## Building WASM Components
+
+Use componentize-py to build your state views and state changes:
+
+```bash
+# Build a state view
+componentize-py -d ./interface/decider.wit -w state-view \
+    componentize \
+    -p . \
+    -p /path/to/evidentsource-core/src \
+    -p /path/to/evidentsource-functions/src \
+    -o state_view.wasm \
+    my_state_view
+
+# Build a state change
+componentize-py -d ./interface/decider.wit -w state-change \
+    componentize \
+    -p . \
+    -p /path/to/evidentsource-core/src \
+    -p /path/to/evidentsource-functions/src \
+    -o state_change.wasm \
+    my_state_change
+```
+
+The `-p` flags add Python paths so componentize-py can find the SDK packages and your local modules.
+
+## Features
+
+- **StateViewBase**: Base class for implementing state views
+- **StateViewAdapter**: WASM adapter for state views
+- **StateChangeAdapter**: WASM adapter for state changes
+- **StateChangeError**: Structured errors for state change failures
+- **Content negotiation**: Automatic JSON serialization/deserialization
+- **Type conversions**: WIT type utilities
+
+## Design Philosophy
+
+The SDK provides a clean separation between WIT types (internal implementation details) and domain types (what users work with). Users define their own domain types and use simple conversion methods to bridge the gap.
+
+**Key Points:**
+- State changes emit `ProspectiveEvent` (events before storage)
+- State views receive `Event` (stored events with metadata)
+- WIT types are handled by the adapter layer
+- Your code works with clean Python types
+
+## License
+
+MIT OR Apache-2.0
