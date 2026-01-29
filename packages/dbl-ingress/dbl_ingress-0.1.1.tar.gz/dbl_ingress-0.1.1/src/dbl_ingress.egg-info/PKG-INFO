@@ -1,0 +1,61 @@
+Metadata-Version: 2.4
+Name: dbl-ingress
+Version: 0.1.1
+Summary: Admission and shaping layer for DBL gateway authority surfaces.
+Author: Lukas Pfister
+License: MIT
+Project-URL: Repository, https://github.com/lukaspfisterch/dbl-ingress
+Project-URL: Issues, https://github.com/lukaspfisterch/dbl-ingress/issues
+Keywords: dbl,ingress,admission,shaping,deterministic,governance
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Typing :: Typed
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: dbl-core<0.4.0,>=0.3.2
+Requires-Dist: kl-kernel-logic<0.6.0,>=0.5.0
+Provides-Extra: test
+Requires-Dist: pytest<9,>=8; extra == "test"
+Provides-Extra: lint
+Requires-Dist: ruff<1,>=0.5; extra == "lint"
+Provides-Extra: typecheck
+Requires-Dist: mypy<2,>=1.10; extra == "typecheck"
+Requires-Dist: types-setuptools<71,>=69; extra == "typecheck"
+Provides-Extra: dev
+Requires-Dist: dbl-ingress[lint,test,typecheck]; extra == "dev"
+Dynamic: license-file
+
+# dbl-ingress
+
+`dbl-ingress` serves as the admission and shaping layer for the Deterministic Boundary Layer (DBL). Its primary purpose is to strictly validate and shape external inputs into `AdmissionRecord` structures before they are processed by the core system, ensuring that no invalid or non-deterministic data enters the boundary event stream.
+
+## Scope
+
+- **Admission**: strict validation of incoming data payloads.
+- **Shaping**: converting raw inputs into typed, immutable records.
+- **Invariants**: enforcing data types (e.g., rejecting floats in deterministic fields) early in the pipeline.
+
+## Non-Goals
+
+- Execution logic or side effects.
+- Policy decisions or complex business rules.
+- Network transport or service runtime concerns.
+- CLI tools.
+
+## Relation to dbl-core
+
+This library acts as a precursor to `dbl-core`. While `dbl-core` manages the deterministic event log and state reconstruction, `dbl-ingress` ensures that the data fed into `dbl-core` is well-formed and safe for deterministic processing.
+
+## Validation against dbl-reference
+
+See `docs/validation_workflow.md`.
+
+## Status
+
+**Experimental**: This project is in early development.

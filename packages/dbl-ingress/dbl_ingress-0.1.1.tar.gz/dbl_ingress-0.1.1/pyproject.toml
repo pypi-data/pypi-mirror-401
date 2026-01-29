@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dbl-ingress"
+version = "0.1.1"
+description = "Admission and shaping layer for DBL gateway authority surfaces."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Lukas Pfister" }]
+keywords = ["dbl", "ingress", "admission", "shaping", "deterministic", "governance"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed",
+]
+
+# No hard pins. Keep only compatibility ranges.
+dependencies = [
+  "dbl-core>=0.3.2,<0.4.0",
+  "kl-kernel-logic>=0.5.0,<0.6.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8,<9",
+]
+lint = [
+  "ruff>=0.5,<1",
+]
+typecheck = [
+  "mypy>=1.10,<2",
+  "types-setuptools>=69,<71",
+]
+dev = [
+  "dbl-ingress[test,lint,typecheck]",
+]
+
+[project.urls]
+Repository = "https://github.com/lukaspfisterch/dbl-ingress"
+Issues = "https://github.com/lukaspfisterch/dbl-ingress/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["dbl_ingress*"]
+
+[tool.setuptools.package-data]
+dbl_ingress = ["py.typed"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = ["-q", "--strict-markers", "--strict-config"]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+fix = true
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E203"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = ["src"]
+strict = true
+warn_unreachable = true
+show_error_codes = true
+disallow_any_generics = true
+no_implicit_optional = true

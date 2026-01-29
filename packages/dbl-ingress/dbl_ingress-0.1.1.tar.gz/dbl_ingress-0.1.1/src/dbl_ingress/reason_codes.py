@@ -1,0 +1,8 @@
+ADMISSION_INVALID_PROMPT = "admission.invalid_prompt"
+ADMISSION_INVALID_MAX_TOKENS = "admission.invalid_max_tokens"
+ADMISSION_INVALID_TEMPERATURE = "admission.invalid_temperature"
+ADMISSION_INVALID_PIPELINE_MODE = "admission.invalid_pipeline_mode"
+ADMISSION_INVALID_POLICY_OVERRIDE = "admission.invalid_policy_override"
+ADMISSION_MISSING_API_KEY = "admission.missing_api_key"
+ADMISSION_SECRETS_PRESENT = "admission.secrets_present"
+ADMISSION_INVALID_INPUT = "admission.invalid_input"
