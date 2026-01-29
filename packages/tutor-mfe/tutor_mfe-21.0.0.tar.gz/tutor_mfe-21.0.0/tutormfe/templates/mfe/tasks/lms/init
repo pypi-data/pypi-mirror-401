@@ -1,0 +1,47 @@
+# MFE-specific tasks
+./manage.py lms waffle_flag --list > /tmp/lms_waffle_flags.txt
+
+{% if is_mfe_enabled("account") %}
+./manage.py lms populate_retirement_states
+{% endif %}
+
+
+{% if is_mfe_enabled("learner-dashboard") %}
+grep learner_home_mfe.enabled /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone learner_home_mfe.enabled
+{% else %}
+./manage.py lms waffle_delete --flags learner_home_mfe.enabled
+{% endif %}
+
+{% if is_mfe_enabled("learning") %}
+grep course_home.course_home_mfe_progress_tab /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone course_home.course_home_mfe_progress_tab
+grep courseware.enable_navigation_sidebar /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone courseware.enable_navigation_sidebar
+grep courseware.always_open_auxiliary_sidebar /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --deactivate courseware.always_open_auxiliary_sidebar
+{% else %}
+./manage.py lms waffle_delete --flags \
+    course_home.course_home_mfe_progress_tab \
+    courseware.enable_navigation_sidebar \
+    courseware.always_open_auxiliary_sidebar
+{% endif %}
+
+{% if is_mfe_enabled("discussions") %}
+grep discussions.enable_discussions_mfe  /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone discussions.enable_discussions_mfe
+grep discussions.enable_learners_tab_in_discussions_mfe  /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone discussions.enable_learners_tab_in_discussions_mfe
+grep discussions.enable_moderation_reason_codes  /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone discussions.enable_moderation_reason_codes
+grep discussions.enable_reported_content_email_notifications  /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone discussions.enable_reported_content_email_notifications
+grep discussions.enable_learners_stats  /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone discussions.enable_learners_stats
+grep discussions.enable_new_structure_discussions  /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone discussions.enable_new_structure_discussions
+{% else %}
+./manage.py lms waffle_delete --flags \
+    discussions.enable_discussions_mfe \
+    discussions.enable_learners_tab_in_discussions_mfe \
+    discussions.enable_moderation_reason_codes \
+    discussions.enable_reported_content_email_notifications \
+    discussions.enable_learners_stats \
+    discussions.enable_new_structure_discussions
+{% endif %}
+
+{% if is_mfe_enabled("ora-grading") %}
+grep openresponseassessment.enhanced_staff_grader /tmp/lms_waffle_flags.txt || ./manage.py lms waffle_flag --create --everyone openresponseassessment.enhanced_staff_grader
+{% else %}
+./manage.py lms waffle_delete --flags openresponseassessment.enhanced_staff_grader
+{% endif %}
