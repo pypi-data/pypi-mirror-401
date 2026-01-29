@@ -1,0 +1,119 @@
+Metadata-Version: 2.4
+Name: level-ws-client
+Version: 0.1.0
+Summary: Async WebSocket and HTTP client for Level Lock API
+Project-URL: Homepage, https://github.com/LevelHome/level-ws-client
+Project-URL: Repository, https://github.com/LevelHome/level-ws-client
+Author: Level Lock
+License: MIT License
+        
+        Copyright (c) 2025 Albert Yang
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: iot,level-lock,smart-home,websocket
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Home Automation
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Requires-Dist: aiohttp>=3.8.0
+Provides-Extra: dev
+Requires-Dist: black>=24.0.0; extra == 'dev'
+Requires-Dist: build>=1.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.5.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# level-ws-client
+
+Async WebSocket and HTTP client for the Level Lock API.
+
+## Installation
+
+```bash
+pip install level-ws-client
+```
+
+## Usage
+
+### HTTP Client
+
+```python
+import asyncio
+from aiohttp import ClientSession
+from level_ws_client import Client
+
+async def main():
+    async def get_token() -> str:
+        return "your-api-token"
+
+    async with ClientSession() as session:
+        client = Client(session, "https://api.level.co", get_token)
+        locks = await client.async_list_locks()
+        print(locks)
+
+asyncio.run(main())
+```
+
+### WebSocket Client
+
+```python
+import asyncio
+from aiohttp import ClientSession
+from level_ws_client import LevelWebsocketManager
+
+async def on_state_update(device_uuid: str, is_locked: bool | None, state: dict | None):
+    print(f"Device {device_uuid}: locked={is_locked}")
+
+async def main():
+    async def get_token() -> str:
+        return "your-api-token"
+
+    async with ClientSession() as session:
+        ws = LevelWebsocketManager(
+            session,
+            "https://api.level.co",
+            get_token,
+            on_state_update,
+        )
+        await ws.async_start()
+        devices = await ws.async_get_devices()
+        print(devices)
+        await ws.async_stop()
+
+asyncio.run(main())
+```
+
+## Development
+
+```bash
+uv sync --all-extras --dev
+uv run ruff check .
+uv run black .
+```
+
+## License
+
+MIT
