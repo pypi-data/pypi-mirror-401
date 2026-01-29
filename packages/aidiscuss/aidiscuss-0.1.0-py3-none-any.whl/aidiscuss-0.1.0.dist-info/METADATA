@@ -1,0 +1,129 @@
+Metadata-Version: 2.4
+Name: aidiscuss
+Version: 0.1.0
+Summary: AI-powered chat application with multi-provider support and embedded web UI
+Author: Devsarc
+License: MIT
+Project-URL: Homepage, https://www.devsarc.com
+Keywords: ai,chat,llm,langchain,fastapi,anthropic,openai,groq
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Communications :: Chat
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Framework :: FastAPI
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: uvicorn[standard]>=0.30.0
+Requires-Dist: starlette>=0.49.1
+Requires-Dist: pydantic<3.0.0,>=2.4.0
+Requires-Dist: pydantic-settings<3.0.0,>=2.2.0
+Requires-Dist: sqlalchemy<3.0.0,>=2.0.25
+Requires-Dist: aiosqlite>=0.20.0
+Requires-Dist: alembic<2.0.0,>=1.13.0
+Requires-Dist: langchain>=1.2.0
+Requires-Dist: langchain-community>=0.4.0
+Requires-Dist: langchain-core>=1.2.5
+Requires-Dist: langchain-text-splitters>=1.0.0
+Requires-Dist: langchain-anthropic>=1.0.0
+Requires-Dist: langchain-openai>=1.0.0
+Requires-Dist: langchain-google-genai>=4.0.0
+Requires-Dist: langchain-groq>=1.0.0
+Requires-Dist: langgraph>=1.0.0
+Requires-Dist: sentence-transformers>=3.0.0
+Requires-Dist: chromadb>=1.0.0
+Requires-Dist: nanoid>=2.0.0
+Requires-Dist: pypdf>=5.0.0
+Requires-Dist: python-multipart>=0.0.18
+Requires-Dist: platformdirs>=4.2.0
+Requires-Dist: packaging>=24.0
+Requires-Dist: httpx>=0.27.0
+Provides-Extra: dev
+Requires-Dist: build>=1.0.0; extra == "dev"
+Requires-Dist: twine>=5.0.0; extra == "dev"
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.24.0; extra == "dev"
+Dynamic: license-file
+
+# AIDiscuss
+
+> AI-powered chat application with multi-provider support and embedded web UI
+
+AIDiscuss is a modern, production-ready AI chat application that supports multiple LLM providers (Anthropic, OpenAI, Google, Groq) with advanced features like RAG, memory management, and multi-agent conversations. Built with FastAPI and React, distributed as a PyPI package.
+
+## Features
+
+- **Multi-Provider Support**: Anthropic Claude, OpenAI, Google Gemini, Groq
+- **Advanced AI Features**: RAG (Retrieval-Augmented Generation), conversation memory, multi-agent orchestration
+- **Embedded Web UI**: Beautiful React interface bundled with the Python package
+- **Multi-Environment Isolation**: Automatic data separation for virtual environments vs global installs
+- **Secure by Default**: Local-only storage, localhost binding, bytecode distribution
+- **Production Ready**: Structured logging, version checking, graceful error handling
+
+## Installation
+
+```bash
+pip install aidiscuss
+```
+
+Requires Python 3.11+
+
+## Usage
+
+```bash
+aidiscuss
+```
+
+Opens the web UI at http://127.0.0.1:8000
+
+### Configuration
+
+On first run, AIDiscuss creates a config file:
+- **Virtual env**: `{venv}/.aidiscuss_data/.env`
+- **Global**: `~/.aidiscuss/.env`
+
+API keys are configured through the web UI.
+
+### Environment Isolation
+
+Each installation maintains separate data:
+
+```bash
+venv1/bin/aidiscuss  # Data in venv1/.aidiscuss_data/
+venv2/bin/aidiscuss  # Data in venv2/.aidiscuss_data/
+aidiscuss            # Global data in ~/.aidiscuss/
+```
+
+## API
+
+- **Web UI**: http://127.0.0.1:8000
+
+### Key Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /health` | Health check |
+| `POST /api/chat/stream` | Streaming chat |
+| `GET /api/providers` | List LLM providers |
+| `POST /api/rag/upload` | Upload documents |
+
+## Troubleshooting
+
+**Port in use**: AIDiscuss auto-finds ports 8000-8100, or set `PORT=8080`
+
+**Custom data dir**: Set `AIDISCUSS_DATA_DIR=/path/to/data`
+
+**Logs**: `~/.aidiscuss/logs/aidiscuss.log` or `{venv}/.aidiscuss_data/logs/`
+
+## Security
+
+Report vulnerabilities via GitHub Security Advisories. Do not open public issues.
+
+## License
+
+MIT License - see [LICENSE](LICENSE)

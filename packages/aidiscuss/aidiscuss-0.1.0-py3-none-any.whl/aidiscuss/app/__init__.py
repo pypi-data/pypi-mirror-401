@@ -1,0 +1,1 @@
+"""AIDiscuss Backend Application"""
