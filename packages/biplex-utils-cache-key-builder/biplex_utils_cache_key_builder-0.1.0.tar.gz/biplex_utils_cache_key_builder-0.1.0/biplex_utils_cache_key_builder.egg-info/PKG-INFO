@@ -1,0 +1,123 @@
+Metadata-Version: 2.4
+Name: biplex_utils_cache_key_builder
+Version: 0.1.0
+Summary: Deterministic Redis key builder for cache-aside CRUD with cursor pagination
+Author: Alex Dudiak
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Dynamic: license-file
+
+# biplex-utils-cache-key-builder
+
+Deterministic Redis key builder for cache-aside CRUD with cursor pagination.
+
+## Installation
+
+```bash
+pip install biplex-utils-cache-key-builder
+```
+
+## Usage
+
+```python
+from biplex_utils_cache_key_builder import CacheKeyBuilder
+
+kb = CacheKeyBuilder(tenant="myapp", service="orders")
+```
+
+### Single Entity Key
+
+Cache a single entity (e.g., for GET by ID operations):
+
+```python
+key = kb.entity_key(
+    entity="order",
+    company_id="company-123",
+    entity_id="order-456"
+)
+# Result: "myapp:orders:order:item:c:a1b2c3d4e5f6:order-456"
+```
+
+### List Version Key
+
+Track cache version for list invalidation:
+
+```python
+key = kb.list_version_key(
+    entity="order",
+    companies_ids=["company-123", "company-456"]
+)
+# Result: "myapp:orders:order:list:c:b2c3d4e5f6a7:version"
+```
+
+### List Cursor Key
+
+Cache paginated list results with cursor-based pagination:
+
+```python
+key = kb.list_cursor_key(
+    entity="order",
+    companies_ids=["company-123"],
+    version=1,
+    filters={"status": "active"},
+    sort=[{"field": "created_at", "direction": "desc"}],
+    cursor=None,  # First page
+    limit=20
+)
+# Result: "myapp:orders:order:list:c:a1b2c3d4e5f6:v1:c3d4e5f6a7:start:20"
+
+# For subsequent pages, pass the cursor:
+key = kb.list_cursor_key(
+    entity="order",
+    companies_ids=["company-123"],
+    version=1,
+    filters={"status": "active"},
+    sort=[{"field": "created_at", "direction": "desc"}],
+    cursor={"id": "order-100", "created_at": "2024-01-15T10:00:00Z"},
+    limit=20
+)
+```
+
+## Key Features
+
+- **Deterministic**: Same inputs always produce the same key
+- **Order-independent**: Company IDs and dict keys are normalized before hashing
+- **Multi-tenant**: Keys include tenant and service prefixes
+- **Cursor pagination**: Built-in support for cursor-based pagination
+- **Version tracking**: List version keys for cache invalidation strategies
+
+## Key Format
+
+| Method | Format |
+|--------|--------|
+| `entity_key` | `{tenant}:{service}:{entity}:item:c:{company_hash}:{entity_id}` |
+| `list_version_key` | `{tenant}:{service}:{entity}:list:c:{companies_hash}:version` |
+| `list_cursor_key` | `{tenant}:{service}:{entity}:list:c:{companies_hash}:v{version}:{query_hash}:{cursor_hash}:{limit}` |
+
+## Hash Lengths
+
+| Hash Type | Length | Used For |
+|-----------|--------|----------|
+| Company hash | 12 chars | Single/multiple company IDs |
+| Query hash | 10 chars | Filters + sort parameters |
+| Cursor hash | 8 chars | Pagination cursor |
+
+## Requirements
+
+- Python 3.10+
+
+## License
+
+MIT
