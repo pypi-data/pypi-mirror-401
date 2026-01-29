@@ -1,0 +1,17 @@
+[project]
+name = "b64image"
+version = "0.1.0"
+description = "Base64 image encoding/decoding with LLM API support"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+b64image = "b64image.cli:main"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+
+[tool.uv]
+package = true
