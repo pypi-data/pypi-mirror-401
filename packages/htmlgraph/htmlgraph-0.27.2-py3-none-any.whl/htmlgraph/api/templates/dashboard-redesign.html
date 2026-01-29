@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HtmlGraph Dashboard - Agent Activity & Orchestration</title>
+    <script src="/static/htmx.min.js"></script>
+    <link rel="stylesheet" href="/static/style-redesign.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">▲</span>
+                    <span>HtmlGraph</span>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-badge">
+                        <span class="stat-label">Events</span>
+                        <span class="stat-value" id="event-count">0</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-label">Agents</span>
+                        <span class="stat-value" id="agent-count">0</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-label">Sessions</span>
+                        <span class="stat-value" id="session-count">0</span>
+                    </div>
+                    <div class="ws-indicator">
+                        <div class="ws-dot connected" id="ws-indicator"></div>
+                        <span id="ws-status">Connected</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="tabs-navigation">
+            <button class="tab-button active" data-tab="activity"
+                    hx-get="/views/activity-feed"
+                    hx-target="#content-area"
+                    hx-trigger="click">
+                <span class="tab-icon">▤</span>
+                ACTIVITY
+            </button>
+            <button class="tab-button" data-tab="orchestration"
+                    hx-get="/views/orchestration"
+                    hx-target="#content-area"
+                    hx-trigger="click">
+                <span class="tab-icon">◊</span>
+                ORCHESTRATION
+            </button>
+            <button class="tab-button" data-tab="work-items"
+                    hx-get="/views/work-items"
+                    hx-target="#content-area"
+                    hx-trigger="click">
+                <span class="tab-icon">█</span>
+                WORK ITEMS
+            </button>
+            <button class="tab-button" data-tab="agents"
+                    hx-get="/views/agents"
+                    hx-target="#content-area"
+                    hx-trigger="click">
+                <span class="tab-icon">◆</span>
+                AGENTS
+            </button>
+            <button class="tab-button" data-tab="metrics"
+                    hx-get="/views/metrics"
+                    hx-target="#content-area"
+                    hx-trigger="click">
+                <span class="tab-icon">▼</span>
+                METRICS
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area" id="content-area">
+            <div class="loading-indicator">
+                <div class="spinner"></div>
+                <p>Loading dashboard...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        let eventCount = 0;
+        let agentSet = new Set();
+        let sessionCount = 0;
+        let processedEventIds = new Set();
+        let wsConnected = false;
+
+        // Load initial stats from server
+        async function loadInitialStats() {
+            try {
+                const response = await fetch('/api/initial-stats');
+                const data = await response.json();
+
+                eventCount = data.total_events || 0;
+                sessionCount = data.total_sessions || 0;
+
+                if (data.agents) {
+                    data.agents.forEach(agent => agentSet.add(agent));
+                }
+
+                document.getElementById('event-count').textContent = eventCount;
+                document.getElementById('agent-count').textContent = agentSet.size;
+                document.getElementById('session-count').textContent = sessionCount;
+
+                console.log('Initial stats loaded:', data);
+            } catch (error) {
+                console.error('Failed to load initial stats:', error);
+            }
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInitialStats();
+            htmx.ajax('GET', '/views/activity-feed', {target: '#content-area'});
+            connectWebSocket();
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.tab-button').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // WebSocket Connection
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(wsProtocol + '//' + window.location.host + '/ws/events');
+
+            ws.onopen = function(event) {
+                console.log('WebSocket connected');
+                wsConnected = true;
+                updateWSStatus(true);
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+
+                    if (data.type === 'event') {
+                        if (processedEventIds.has(data.event_id)) {
+                            return;
+                        }
+                        processedEventIds.add(data.event_id);
+
+                        eventCount++;
+                        if (data.agent_id) {
+                            agentSet.add(data.agent_id);
+                        }
+
+                        document.getElementById('event-count').textContent = eventCount;
+                        document.getElementById('agent-count').textContent = agentSet.size;
+
+                        const badge = document.getElementById('event-count').parentElement;
+                        badge.classList.add('pulse');
+                        setTimeout(() => badge.classList.remove('pulse'), 500);
+
+                        insertNewEventIntoActivityFeed(data);
+                    }
+                } catch (e) {
+                    console.error('WebSocket message error:', e);
+                }
+            };
+
+            ws.onerror = function(event) {
+                console.error('WebSocket error:', event);
+                updateWSStatus(false);
+            };
+
+            ws.onclose = function(event) {
+                console.log('WebSocket disconnected, reconnecting in 3s...');
+                updateWSStatus(false);
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function updateWSStatus(isConnected) {
+            wsConnected = isConnected;
+            const indicator = document.getElementById('ws-indicator');
+            const status = document.getElementById('ws-status');
+            if (indicator) {
+                indicator.classList.toggle('connected', isConnected);
+                indicator.classList.toggle('disconnected', !isConnected);
+            }
+            if (status) {
+                status.textContent = isConnected ? 'Connected' : 'Disconnected';
+            }
+        }
+
+        /**
+         * Insert new event into the grouped conversation turn activity feed
+         * Handles both UserQuery events (new turns) and child events (tool calls, etc.)
+         */
+        function insertNewEventIntoActivityFeed(eventData) {
+            const conversationFeed = document.querySelector('.conversation-feed');
+            if (!conversationFeed) return;
+
+            // Check for empty state and remove it
+            const emptyState = conversationFeed.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            // Get or create the turns list container
+            let turnsList = conversationFeed.querySelector('.conversation-turns-list');
+            if (!turnsList) {
+                turnsList = document.createElement('div');
+                turnsList.className = 'conversation-turns-list';
+                conversationFeed.appendChild(turnsList);
+            }
+
+            // Check for duplicates
+            if (document.querySelector(`[data-event-id="${eventData.event_id}"]`)) {
+                console.log('Event already exists:', eventData.event_id);
+                return;
+            }
+
+            // Handle UserQuery events - create new conversation turn
+            if (eventData.tool_name === 'UserQuery') {
+                insertNewConversationTurn(eventData, turnsList);
+                return;
+            }
+
+            // Handle child events (tool calls, etc.)
+            if (eventData.parent_event_id) {
+                insertChildEvent(eventData);
+                return;
+            }
+
+            console.warn('Event with no parent_event_id and not UserQuery:', eventData);
+        }
+
+        /**
+         * Create and insert a new conversation turn for a UserQuery event
+         */
+        function insertNewConversationTurn(userQueryEvent, turnsList) {
+            const turnId = userQueryEvent.event_id;
+            const prompt = userQueryEvent.input_summary || userQueryEvent.summary || '';
+            const timestamp = formatTimestamp(userQueryEvent.timestamp);
+
+            // Determine if this turn has spawner delegation
+            const hasSpawner = userQueryEvent.context && userQueryEvent.context.spawner_type ? 'spawner' : 'direct';
+            const agentId = userQueryEvent.agent_id || 'unknown';
+
+            const turnHtml = `
+                <div class="conversation-turn"
+                     data-turn-id="${turnId}"
+                     data-spawner-type="${hasSpawner}"
+                     data-agent="${agentId}">
+                    <!-- User Query Parent Row (Clickable) -->
+                    <div class="userquery-parent"
+                         onclick="toggleConversationTurn('${turnId}')"
+                         data-turn-id="${turnId}">
+
+                        <!-- Expand/Collapse Toggle -->
+                        <span class="expand-toggle-turn" id="toggle-${turnId}">▶</span>
+
+                        <!-- User Prompt Text -->
+                        <div class="prompt-section">
+                            <span class="prompt-text" title="${escapeHtml(prompt)}">
+                                ${escapeHtml(prompt.substring(0, 100))}${prompt.length > 100 ? '...' : ''}
+                            </span>
+                        </div>
+
+                        <!-- Stats Badges (initialized to 0) -->
+                        <div class="turn-stats">
+                            <span class="stat-badge tool-count" data-value="0" style="display: none;"></span>
+                            <span class="stat-badge duration" data-value="0">0s</span>
+                        </div>
+
+                        <!-- Timestamp -->
+                        <div class="turn-timestamp">
+                            ${timestamp}
+                        </div>
+                    </div>
+
+                    <!-- Child Events Container (Hidden by default) -->
+                    <div class="turn-children collapsed" id="children-${turnId}">
+                        <div class="no-children-message">
+                            <span class="tree-connector">└─</span>
+                            <span class="text-muted">No child events</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Insert at top of turns list
+            const firstTurn = turnsList.firstChild;
+            if (firstTurn) {
+                firstTurn.insertAdjacentHTML('beforebegin', turnHtml);
+            } else {
+                turnsList.insertAdjacentHTML('afterbegin', turnHtml);
+            }
+
+            // Auto-expand the new turn
+            const childrenContainer = document.getElementById(`children-${turnId}`);
+            const toggleButton = document.getElementById(`toggle-${turnId}`);
+            if (childrenContainer && toggleButton) {
+                childrenContainer.classList.remove('collapsed');
+                toggleButton.classList.add('expanded');
+            }
+
+            // Highlight the new turn briefly
+            const newTurn = document.querySelector(`[data-turn-id="${turnId}"]`);
+            if (newTurn) {
+                highlightElement(newTurn.querySelector('.userquery-parent'));
+            }
+        }
+
+        /**
+         * Find the root conversation turn ID that contains this event in the DOM.
+         * Walks up the DOM tree to find the parent conversation-turn element.
+         *
+         * @param {string} eventId - The event ID to find
+         * @returns {string|null} - The root UserQuery event_id or null if not found
+         */
+        function findRootConversationTurn(eventId) {
+            // First, check if this event is already in the DOM
+            const eventElement = document.querySelector(`[data-event-id="${eventId}"]`);
+            if (!eventElement) {
+                return null; // Event not in DOM yet
+            }
+
+            // Walk up the DOM to find the nearest conversation turn container
+            let current = eventElement;
+            while (current && current.parentElement) {
+                current = current.parentElement;
+                if (current.classList && current.classList.contains('conversation-turn')) {
+                    return current.getAttribute('data-turn-id');
+                }
+            }
+
+            return null;
+        }
+
+        /**
+         * Find or create a children container for an event.
+         * If the event is the root conversation turn, use children-${turnId}.
+         * If the event is a nested event, create a nested children container.
+         *
+         * @param {string} parentEventId - The parent event ID
+         * @returns {HTMLElement|null} - The children container or null if not found
+         */
+        function findOrCreateChildrenContainer(parentEventId) {
+            // First, check if this is a conversation turn (root level)
+            let container = document.getElementById(`children-${parentEventId}`);
+            if (container) {
+                return container;
+            }
+
+            // Otherwise, look for the parent event in the DOM
+            const parentElement = document.querySelector(`[data-event-id="${parentEventId}"]`);
+            if (!parentElement) {
+                return null; // Parent event not in DOM yet
+            }
+
+            // Check if parent event already has a nested children container
+            let nestedContainer = parentElement.querySelector(':scope > .event-children');
+            if (!nestedContainer) {
+                // Create a nested children container
+                nestedContainer = document.createElement('div');
+                nestedContainer.className = 'event-children';
+                nestedContainer.setAttribute('data-parent-id', parentEventId);
+                parentElement.appendChild(nestedContainer);
+            }
+
+            return nestedContainer;
+        }
+
+        /**
+         * Calculate the depth of an event based on how many containers separate it from the root turn.
+         * Walks up the DOM tree counting .turn-children and .event-children containers.
+         *
+         * @param {string} parentEventId - The parent event ID
+         * @returns {number} - The depth (0 for direct children of a UserQuery turn)
+         */
+        function calculateEventDepth(parentEventId) {
+            let depth = 0;
+
+            // Start by finding the children container for this parent
+            let container = document.getElementById(`children-${parentEventId}`);
+            if (!container) {
+                const parentElement = document.querySelector(`[data-event-id="${parentEventId}"]`);
+                if (parentElement) {
+                    container = parentElement.querySelector(':scope > .event-children');
+                }
+            }
+
+            if (!container) {
+                return 0; // Parent not yet in DOM or is a root turn
+            }
+
+            // Walk up the DOM to count nesting levels
+            let current = container.parentElement; // Start from parent of container
+            while (current) {
+                // Check if we're in a .turn-children container (root level)
+                if (current.classList && current.classList.contains('turn-children')) {
+                    return depth; // We've reached the root turn
+                }
+
+                // Check if we're in a child-event-row (nested event) that has children
+                if (current.classList && current.classList.contains('child-event-row')) {
+                    depth++;
+                    // Move up to find the next ancestor event row
+                    current = current.parentElement; // Move to .event-children container
+                    if (current) {
+                        current = current.parentElement; // Move to parent event row
+                    }
+                } else {
+                    current = current.parentElement;
+                }
+            }
+
+            return depth;
+        }
+
+        /**
+         * Insert a child event into its parent (which could be a conversation turn or another event).
+         * Handles multi-level nesting for spawner delegations.
+         */
+        function insertChildEvent(eventData) {
+            const parentEventId = eventData.parent_event_id;
+            if (!parentEventId) {
+                console.warn('Child event has no parent_event_id:', eventData.event_id);
+                return;
+            }
+
+            // Find or create the children container for this parent
+            const childrenContainer = findOrCreateChildrenContainer(parentEventId);
+            if (!childrenContainer) {
+                console.warn('Could not find or create children container for parent:', parentEventId);
+                return;
+            }
+
+            // Remove "no children" message if it exists
+            const noChildrenMsg = childrenContainer.querySelector('.no-children-message');
+            if (noChildrenMsg) {
+                noChildrenMsg.remove();
+            }
+
+            // Extract event data
+            const toolName = eventData.tool_name || 'unknown';
+            const summary = eventData.output_summary || eventData.input_summary || eventData.summary || '';
+            const duration = eventData.duration_seconds || 0;
+            const timestamp = formatTimestamp(eventData.timestamp);
+            const agentId = eventData.agent_id || 'Claude Code';
+            const model = eventData.context && eventData.context.model ? eventData.context.model : null;
+            const spawnerType = eventData.context && eventData.context.spawner_type ? eventData.context.spawner_type : null;
+            const spawnedAgent = eventData.context && eventData.context.spawned_agent ? eventData.context.spawned_agent : null;
+            const costUsd = eventData.context && eventData.context.cost_usd ? eventData.context.cost_usd : null;
+
+            // Calculate depth: count how many levels of nesting this event is at
+            const depth = calculateEventDepth(parentEventId);
+
+            // Determine tree connector based on whether this is the last child
+            const existingChildren = childrenContainer.querySelectorAll(':scope > .child-event-row');
+            const isLastChild = existingChildren.length === 0;
+            const hasChildren = eventData.context && eventData.context.has_children;
+            const treeConnector = (isLastChild && !hasChildren) ? '└─' : '├─';
+
+            // Build child event HTML with nested container placeholder
+            let childHtml = `
+                <div class="child-event-row depth-${depth}"
+                     data-event-id="${eventData.event_id}"
+                     data-parent-id="${parentEventId}"
+                     style="margin-left: ${depth * 20}px;">
+
+                    <!-- Tree Connector -->
+                    <span class="tree-connector">${treeConnector}</span>
+
+                    <!-- Tool Name -->
+                    <span class="child-tool-name">${escapeHtml(toolName)}</span>
+
+                    <!-- Summary/Input -->
+                    <span class="child-summary" title="${escapeHtml(summary)}">
+                        ${escapeHtml(summary.substring(0, 80))}${summary.length > 80 ? '...' : ''}
+                    </span>
+            `;
+
+            // Add agent badge with spawner support
+            if (spawnerType) {
+                // Spawner delegation: show orchestrator → spawned AI
+                childHtml += `
+                    <span class="child-agent-badge agent-${agentId.toLowerCase().replace(/\\s+/g, '-')}">
+                        ${escapeHtml(agentId)}
+                        ${model ? `<span class="model-indicator">${escapeHtml(model)}</span>` : ''}
+                    </span>
+                    <span class="delegation-arrow">→</span>
+                    <span class="spawner-badge spawner-${spawnerType.toLowerCase()}">
+                        ${escapeHtml(spawnedAgent || spawnerType)}
+                        ${costUsd ? `<span class="cost-badge">$${costUsd.toFixed(2)}</span>` : ''}
+                    </span>
+                `;
+            } else {
+                // Regular agent: just show agent name + model if available
+                childHtml += `
+                    <span class="child-agent-badge agent-${agentId.toLowerCase().replace(/\\s+/g, '-')}">
+                        ${escapeHtml(agentId)}
+                        ${model ? `<span class="model-indicator">${escapeHtml(model)}</span>` : ''}
+                    </span>
+                `;
+            }
+
+            // Add duration and timestamp
+            childHtml += `
+                    <!-- Duration -->
+                    <span class="child-duration">
+                        ${duration.toFixed(2)}s
+                    </span>
+
+                    <!-- Timestamp -->
+                    <span class="child-timestamp">
+                        ${timestamp}
+                    </span>
+                </div>
+            `;
+
+            // Insert child event
+            childrenContainer.insertAdjacentHTML('beforeend', childHtml);
+
+            // Update root conversation turn statistics
+            const rootTurnId = findRootConversationTurn(eventData.event_id);
+            if (rootTurnId) {
+                updateParentTurnStats(rootTurnId, eventData);
+            }
+
+            // Highlight the new child event
+            const newChild = document.querySelector(`[data-event-id="${eventData.event_id}"]`);
+            if (newChild) {
+                highlightElement(newChild);
+            }
+        }
+
+        /**
+         * Update the statistics of a parent conversation turn based on a child event
+         */
+        function updateParentTurnStats(parentTurnId, childEvent) {
+            const turnElement = document.querySelector(`[data-turn-id="${parentTurnId}"]`);
+            if (!turnElement) return;
+
+            const statsContainer = turnElement.querySelector('.turn-stats');
+            if (!statsContainer) return;
+
+            // Get current stats from badges
+            let toolCount = parseInt(statsContainer.querySelector('.stat-badge.tool-count')?.getAttribute('data-value') || '0', 10);
+            let totalDuration = parseFloat(statsContainer.querySelector('.stat-badge.duration')?.getAttribute('data-value') || '0');
+            let successCount = parseInt(statsContainer.querySelector('.stat-badge.success')?.getAttribute('data-value') || '0', 10);
+            let errorCount = parseInt(statsContainer.querySelector('.stat-badge.error')?.getAttribute('data-value') || '0', 10);
+
+            // Update counts based on event
+            if (childEvent.tool_name !== 'UserQuery') {
+                toolCount++;
+            }
+
+            totalDuration += (childEvent.duration_seconds || 0);
+
+            // Determine success/error based on status
+            const status = childEvent.status || 'completed';
+            if (status === 'completed' || status === 'success') {
+                successCount++;
+            } else if (status === 'error' || status === 'failed') {
+                errorCount++;
+            }
+
+            // Update tool count badge
+            const toolCountBadge = statsContainer.querySelector('.stat-badge.tool-count');
+            if (toolCountBadge) {
+                toolCountBadge.setAttribute('data-value', toolCount);
+                toolCountBadge.textContent = toolCount;
+                toolCountBadge.style.display = toolCount > 0 ? 'inline-block' : 'none';
+            }
+
+            // Update duration badge
+            const durationBadge = statsContainer.querySelector('.stat-badge.duration');
+            if (durationBadge) {
+                durationBadge.setAttribute('data-value', totalDuration.toFixed(2));
+                durationBadge.textContent = totalDuration.toFixed(2) + 's';
+            }
+
+            // Update success badge
+            let successBadge = statsContainer.querySelector('.stat-badge.success');
+            if (successCount > 0) {
+                if (!successBadge) {
+                    const badge = document.createElement('span');
+                    badge.className = 'stat-badge success';
+                    statsContainer.appendChild(badge);
+                    successBadge = badge;
+                }
+                successBadge.setAttribute('data-value', successCount);
+                successBadge.textContent = `✓ ${successCount}`;
+            } else if (successBadge) {
+                successBadge.remove();
+            }
+
+            // Update error badge
+            let errorBadge = statsContainer.querySelector('.stat-badge.error');
+            if (errorCount > 0) {
+                if (!errorBadge) {
+                    const badge = document.createElement('span');
+                    badge.className = 'stat-badge error';
+                    statsContainer.appendChild(badge);
+                    errorBadge = badge;
+                }
+                errorBadge.setAttribute('data-value', errorCount);
+                errorBadge.textContent = `✗ ${errorCount}`;
+            } else if (errorBadge) {
+                errorBadge.remove();
+            }
+        }
+
+        /**
+         * Format timestamp to readable format (HH:MM:SS)
+         */
+        function formatTimestamp(timestamp) {
+            try {
+                const date = new Date(timestamp);
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${hours}:${minutes}:${seconds}`;
+            } catch (e) {
+                return timestamp;
+            }
+        }
+
+        /**
+         * Escape HTML special characters to prevent XSS
+         */
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        /**
+         * Highlight an element briefly with a background color animation
+         */
+        function highlightElement(element) {
+            if (!element) return;
+            element.style.transition = 'background-color 0.3s ease';
+            element.style.backgroundColor = 'rgba(163, 230, 53, 0.2)';
+            setTimeout(() => {
+                element.style.backgroundColor = '';
+            }, 500);
+        }
+
+        function highlightRow(row) {
+            if (row) {
+                row.classList.add('new-event-highlight');
+                setTimeout(() => {
+                    row.classList.remove('new-event-highlight');
+                }, 2000);
+            }
+        }
+
+        function createActivityRowHTML(eventData) {
+            // Event type emoji mapping
+            let eventEmoji = '&#128203;'; // clipboard
+            if (eventData.event_type === 'delegation') eventEmoji = '&#128279;'; // link
+            else if (eventData.event_type === 'tool_call') eventEmoji = '&#128296;'; // hammer
+            else if (eventData.event_type === 'completion') eventEmoji = '&#127881;'; // party
+            else if (eventData.event_type === 'tool_result') eventEmoji = '&#9989;'; // check
+            else if (eventData.event_type === 'error') eventEmoji = '&#10060;'; // x
+
+            const inputSummary = eventData.input_summary ? eventData.input_summary.substring(0, 150) : '';
+            const inputTruncated = eventData.input_summary && eventData.input_summary.length > 150 ? '...' : '';
+            const outputSummary = eventData.output_summary ? eventData.output_summary.substring(0, 150) : '';
+            const outputTruncated = eventData.output_summary && eventData.output_summary.length > 150 ? '...' : '';
+
+            const isChild = !!eventData.parent_event_id;
+            const rowClass = isChild ? 'child-row hidden' : 'parent-row';
+            const borderStyle = isChild ? 'border-left: 4px solid var(--text-muted);' : 'border-left: 4px solid var(--accent-lime);';
+
+            // New column order: Agent | Tool | Input | Output | Status | Timestamp (no ID column)
+            const html = `
+                <tr class="activity-row ${rowClass} event-${eventData.status || 'pending'}"
+                    data-event-id="${escapeHtml(eventData.event_id)}"
+                    ${isChild ? `data-parent="${escapeHtml(eventData.parent_event_id)}"` : ''}
+                    style="${borderStyle}">
+                    <td class="col-agent">
+                        ${isChild ? '<span class="child-indicator">&#8627;</span>' : ''}
+                        <span class="agent-badge agent-${escapeHtml(eventData.agent_id.toLowerCase())}">${escapeHtml(eventData.agent_id)}</span>
+                    </td>
+                    <td class="col-tool">
+                        <span class="event-type-badge" title="${escapeHtml(eventData.event_type)}">
+                            ${eventEmoji}
+                        </span>
+                        ${eventData.tool_name ? `<code class="tool-name">${escapeHtml(eventData.tool_name)}</code>` : '<span class="text-muted">-</span>'}
+                    </td>
+                    <td class="col-input">
+                        ${inputSummary ? `<span class="truncate" title="${escapeHtml(eventData.input_summary)}">${escapeHtml(inputSummary)}${inputTruncated}</span>` : '<span class="text-muted">-</span>'}
+                    </td>
+                    <td class="col-output">
+                        ${outputSummary ? `<span class="truncate" title="${escapeHtml(eventData.output_summary)}">${escapeHtml(outputSummary)}${outputTruncated}</span>` : '<span class="text-muted">-</span>'}
+                    </td>
+                    <td class="col-status">
+                        <span class="status-badge status-${eventData.status || 'pending'}">${escapeHtml(eventData.status || 'pending')}</span>
+                    </td>
+                    <td class="col-timestamp">
+                        <span class="timestamp-text" data-utc-time="${escapeHtml(eventData.timestamp)}">${escapeHtml(eventData.timestamp)}</span>
+                    </td>
+                </tr>
+            `;
+            return html;
+        }
+
+        function convertTimestampsToLocal() {
+            const timestampElements = document.querySelectorAll('[data-utc-time]');
+            timestampElements.forEach(element => {
+                const utcTime = element.getAttribute('data-utc-time');
+                if (utcTime) {
+                    try {
+                        const date = new Date(utcTime.replace(' ', 'T') + 'Z');
+                        const localTime = new Intl.DateTimeFormat('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false,
+                            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                        }).format(date);
+                        element.textContent = localTime;
+                        element.setAttribute('title', `UTC: ${utcTime} | Local: ${localTime}`);
+                    } catch (err) {
+                        console.warn('Failed to convert timestamp:', utcTime, err);
+                    }
+                }
+            });
+        }
+
+        // Convert timestamps after HTMX loads content
+        document.body.addEventListener('htmx:afterSettle', function(evt) {
+            if (evt.detail.target.id === 'content-area') {
+                if (typeof convertTimestampsToLocal === 'function') {
+                    convertTimestampsToLocal();
+                }
+            }
+        });
+
+        // Toggle child rows visibility (for expandable tracing)
+        function toggleChildren(parentRow) {
+            const eventId = parentRow.dataset.eventId;
+            const children = document.querySelectorAll(`[data-parent="${eventId}"]`);
+            const expandIcon = parentRow.querySelector('.expand-icon');
+
+            children.forEach(child => {
+                child.classList.toggle('hidden');
+            });
+
+            if (expandIcon) {
+                expandIcon.classList.toggle('expanded');
+            }
+        }
+
+        // Expand all parent rows
+        function expandAll() {
+            document.querySelectorAll('.parent-row.has-children').forEach(row => {
+                const eventId = row.dataset.eventId;
+                const children = document.querySelectorAll(`[data-parent="${eventId}"]`);
+                const expandIcon = row.querySelector('.expand-icon');
+
+                children.forEach(child => {
+                    child.classList.remove('hidden');
+                });
+
+                if (expandIcon) {
+                    expandIcon.classList.add('expanded');
+                }
+            });
+        }
+
+        // Collapse all parent rows
+        function collapseAll() {
+            document.querySelectorAll('.child-row').forEach(child => {
+                child.classList.add('hidden');
+            });
+            document.querySelectorAll('.expand-icon').forEach(icon => {
+                icon.classList.remove('expanded');
+            });
+        }
+
+        // ============================================
+        // Jaeger-Style Trace Interactivity Functions
+        // (Must be global for HTMX-loaded partials)
+        // ============================================
+
+        // Toggle expand/collapse with animation
+        function toggleTrace(id, event) {
+            if (event) event.stopPropagation();
+
+            const children = document.querySelectorAll(`[data-parent="${id}"]`);
+            const toggle = document.querySelector(`[data-id="${id}"] .expand-toggle`);
+
+            children.forEach(child => {
+                child.classList.toggle('collapsed');
+            });
+
+            if (toggle) {
+                toggle.classList.toggle('expanded');
+            }
+
+            // Update breadcrumbs if drilling into a trace
+            updateBreadcrumbs(id);
+        }
+
+        // Highlight ancestor path on hover (Jaeger pattern)
+        function highlightAncestors(row) {
+            clearAncestorHighlight();
+
+            let parentId = row.dataset.parent;
+            while (parentId) {
+                const parent = document.querySelector(`[data-id="${parentId}"]`);
+                if (parent) {
+                    parent.classList.add('ancestor-highlight');
+                    parentId = parent.dataset.parent;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // Clear all ancestor highlights
+        function clearAncestorHighlight() {
+            document.querySelectorAll('.ancestor-highlight').forEach(el => {
+                el.classList.remove('ancestor-highlight');
+            });
+        }
+
+        // Expand all traces
+        function expandAllTraces() {
+            document.querySelectorAll('.child-row').forEach(child => {
+                child.classList.remove('collapsed');
+            });
+            document.querySelectorAll('.expand-toggle').forEach(toggle => {
+                toggle.classList.add('expanded');
+            });
+        }
+
+        // Collapse all traces
+        function collapseAllTraces() {
+            document.querySelectorAll('.child-row').forEach(child => {
+                child.classList.add('collapsed');
+            });
+            document.querySelectorAll('.expand-toggle').forEach(toggle => {
+                toggle.classList.remove('expanded');
+            });
+        }
+
+        // Breadcrumb management
+        let breadcrumbStack = ['root'];
+
+        function updateBreadcrumbs(id) {
+            const breadcrumbsContainer = document.getElementById('trace-breadcrumbs');
+            if (!breadcrumbsContainer) return;
+
+            const row = document.querySelector(`[data-id="${id}"]`);
+            if (!row) return;
+
+            // Only show breadcrumbs when we have nested navigation
+            const depth = parseInt(row.dataset.depth || '0');
+            if (depth > 0 || breadcrumbStack.length > 1) {
+                breadcrumbsContainer.style.display = 'flex';
+            }
+
+            // Get tool name or operation for breadcrumb label
+            const toolName = row.querySelector('.tool-name');
+            const label = toolName ? toolName.textContent : `Trace ${id.substring(0, 8)}`;
+
+            // Add to breadcrumb stack if not already present
+            if (!breadcrumbStack.includes(id)) {
+                breadcrumbStack.push(id);
+
+                const separator = document.createElement('span');
+                separator.className = 'separator';
+                separator.textContent = '>';
+
+                const crumb = document.createElement('span');
+                crumb.className = 'breadcrumb active';
+                crumb.dataset.id = id;
+                crumb.textContent = label;
+                crumb.onclick = () => navigateToBreadcrumb(id);
+
+                // Remove active class from previous breadcrumbs
+                breadcrumbsContainer.querySelectorAll('.breadcrumb').forEach(b => {
+                    b.classList.remove('active');
+                });
+
+                breadcrumbsContainer.appendChild(separator);
+                breadcrumbsContainer.appendChild(crumb);
+            }
+        }
+
+        function navigateToBreadcrumb(id) {
+            // Find position in stack and remove everything after
+            const index = breadcrumbStack.indexOf(id);
+            if (index === -1) return;
+
+            // Remove breadcrumbs after this one
+            const breadcrumbsContainer = document.getElementById('trace-breadcrumbs');
+            if (!breadcrumbsContainer) return;
+
+            const allCrumbs = breadcrumbsContainer.querySelectorAll('.breadcrumb, .separator');
+
+            let removing = false;
+            allCrumbs.forEach(el => {
+                if (removing) {
+                    el.remove();
+                }
+                if (el.dataset && el.dataset.id === id) {
+                    el.classList.add('active');
+                    removing = true;
+                }
+            });
+
+            // Update stack
+            breadcrumbStack = breadcrumbStack.slice(0, index + 1);
+
+            // Hide breadcrumbs if back to root
+            if (breadcrumbStack.length <= 1) {
+                breadcrumbsContainer.style.display = 'none';
+            }
+        }
+
+        function resetBreadcrumbs() {
+            const breadcrumbsContainer = document.getElementById('trace-breadcrumbs');
+            if (!breadcrumbsContainer) return;
+
+            breadcrumbsContainer.innerHTML = '<span class="breadcrumb" data-id="root" onclick="resetBreadcrumbs()">Session</span>';
+            breadcrumbsContainer.style.display = 'none';
+            breadcrumbStack = ['root'];
+
+            // Collapse all traces when resetting
+            collapseAllTraces();
+        }
+    </script>
+
+    <style>
+        .new-event-highlight {
+            animation: highlightPulse 2s ease-out;
+        }
+
+        @keyframes highlightPulse {
+            0% {
+                background-color: rgba(205, 255, 0, 0.1);
+                border-left-color: #CDFF00 !important;
+            }
+            100% {
+                background-color: transparent;
+                border-left-color: transparent !important;
+            }
+        }
+
+        /* Activity Feed Table Styles */
+        .activity-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .activity-table thead {
+            background: var(--bg-darker);
+        }
+
+        .activity-table th {
+            padding: var(--spacing-lg);
+            text-align: left;
+            color: var(--accent-lime);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .activity-table td {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .activity-row:hover {
+            background: var(--bg-hover);
+        }
+
+        .activity-row.parent-row {
+            font-weight: 500;
+        }
+
+        .activity-row.child-row {
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 0.95rem;
+        }
+
+        .event-type-badge {
+            margin-right: var(--spacing-sm);
+            font-size: 1.1rem;
+        }
+
+        .agent-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(205, 255, 0, 0.1);
+            border: 1px solid rgba(205, 255, 0, 0.3);
+            border-radius: 2px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-lime);
+        }
+
+        .agent-badge.agent-claude {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--agent-claude);
+        }
+
+        .agent-badge.agent-gemini {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--agent-gemini);
+        }
+
+        .child-indicator {
+            margin-left: var(--spacing-md);
+            color: var(--text-muted);
+        }
+
+        .tool-name {
+            color: var(--accent-lime);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--status-success);
+            border: 1px solid var(--status-success);
+        }
+
+        .status-badge.progress {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--status-progress);
+            border: 1px solid var(--status-progress);
+        }
+
+        .status-badge.blocked {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--status-blocked);
+            border: 1px solid var(--status-blocked);
+        }
+
+        .status-badge.todo {
+            background: rgba(107, 114, 128, 0.15);
+            color: var(--status-todo);
+            border: 1px solid var(--status-todo);
+        }
+
+        .status-badge.pending {
+            background: rgba(99, 102, 241, 0.15);
+            color: #6366F1;
+            border: 1px solid #6366F1;
+        }
+
+        .status-badge.done {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--status-done);
+            border: 1px solid var(--status-done);
+        }
+
+        .event-id-code {
+            color: var(--accent-lime);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            max-width: 200px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .empty-state small {
+            color: var(--text-secondary);
+        }
+
+        /* New column widths - Input/Output are flexible, others fixed */
+        .col-agent { width: 120px; }
+        .col-tool { width: 100px; }
+        .col-input { width: auto; }
+        .col-output { width: auto; }
+        .col-status { width: 100px; }
+        .col-timestamp { width: 140px; }
+
+        /* Make table use fixed layout for predictable column widths */
+        .activity-table {
+            table-layout: fixed;
+        }
+
+        /* Expandable tracing structure */
+        .expand-icon {
+            cursor: pointer;
+            display: inline-block;
+            margin-right: 0.5rem;
+            transition: transform 0.2s ease;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .parent-row.has-children {
+            cursor: pointer;
+        }
+
+        .child-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+        }
+
+        .child-row.hidden {
+            display: none;
+        }
+
+        /* Nested event children container styles */
+        .event-children {
+            display: flex;
+            flex-direction: column;
+            margin-top: 0;
+            border-left: 1px solid var(--border-subtle);
+            padding-left: var(--spacing-sm);
+        }
+
+        .child-event-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .child-event-row:hover {
+            background: rgba(0, 0, 0, 0.15);
+            border-color: var(--border-subtle);
+        }
+
+        .child-event-row.depth-0 {
+            margin-left: 0;
+        }
+
+        .child-event-row.depth-1 {
+            margin-left: 20px;
+        }
+
+        .child-event-row.depth-2 {
+            margin-left: 40px;
+        }
+
+        .child-event-row.depth-3 {
+            margin-left: 60px;
+        }
+
+        .child-event-row.depth-4 {
+            margin-left: 80px;
+        }
+
+        .child-event-row.depth-5 {
+            margin-left: 100px;
+        }
+
+        .tree-connector {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+
+        .child-tool-name {
+            font-weight: 600;
+            color: var(--accent-lime);
+            flex-shrink: 0;
+        }
+
+        .child-summary {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .child-agent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(205, 255, 0, 0.1);
+            border: 1px solid rgba(205, 255, 0, 0.3);
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-lime);
+            flex-shrink: 0;
+        }
+
+        .child-agent-badge.agent-claude {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--agent-claude);
+        }
+
+        .child-agent-badge.agent-gemini {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--agent-gemini);
+        }
+
+        .model-indicator {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .delegation-arrow {
+            color: var(--text-muted);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .spawner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B5CF6;
+            flex-shrink: 0;
+        }
+
+        .spawner-badge.spawner-gemini {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #3B82F6;
+        }
+
+        .spawner-badge.spawner-codex {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.4);
+            color: #22C55E;
+        }
+
+        .spawner-badge.spawner-copilot {
+            background: rgba(251, 146, 60, 0.15);
+            border-color: rgba(251, 146, 60, 0.4);
+            color: #FB923C;
+        }
+
+        .cost-badge {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            margin-left: 2px;
+        }
+
+        .child-duration {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            font-family: monospace;
+        }
+
+        .child-timestamp {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            font-family: monospace;
+        }
+
+        @media (max-width: 1024px) {
+            .col-agent { width: 100px; }
+            .col-tool { width: 90px; }
+            .col-status { width: 90px; }
+            .col-timestamp { width: 120px; }
+
+            .activity-table th,
+            .activity-table td {
+                padding: var(--spacing-md) var(--spacing-sm);
+                font-size: 0.9rem;
+            }
+
+            .truncate {
+                max-width: 100%;
+            }
+
+            .child-event-row {
+                flex-wrap: wrap;
+                gap: var(--spacing-xs);
+                padding: var(--spacing-sm);
+            }
+
+            .child-summary {
+                flex-basis: 100%;
+                order: 3;
+            }
+        }
+    </style>
+</body>
+</html>
