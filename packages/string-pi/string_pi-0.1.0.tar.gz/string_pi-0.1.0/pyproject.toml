@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "string-pi"
+version = "0.1.0"
+description = "Implementation of the Saha-Sinha Pi formula derived from string theory"
+authors = [
+  { name = "Vecture Laboratories", email = "info@vecture.de" },
+]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "mpmath",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/VectureLaboratories/string-pi"
+"Bug Tracker" = "https://github.com/VectureLaboratories/string-pi/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
