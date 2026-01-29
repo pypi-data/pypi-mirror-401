@@ -1,0 +1,29 @@
+[project]
+name = "mcp_douyin"
+version = "0.1.0"
+description = "MCP server for downloading Douyin videos and extracting text"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "anyue"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[fastmcp]>=1.0.0",
+    "requests",
+    "ffmpeg-python",
+    "tqdm",
+    "dashscope",
+]
+
+[project.scripts]
+mcp_douyin = "mcp_douyin.main:main"
