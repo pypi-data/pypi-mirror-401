@@ -1,0 +1,195 @@
+# ACE Documentation Index
+
+**ACE v0.1.0** - Adaptive Concurrency Engine
+
+---
+
+## Getting Started (30 minutes)
+
+1. **[Install](README.md#installation)** - `pip install ace-concurrency`
+2. **[Quick Start](README.md#quick-start)** - Run async example
+3. **[Configuration](README.md#configuration)** - Customize AIMD parameters
+4. **[Observability](README.md#observability)** - Monitor via JSON logs
+
+---
+
+## Core Concepts
+
+### System Signals
+
+Monitored every 2 seconds:
+
+- CPU utilization (%)
+- Memory utilization (%)
+- Event loop lag (milliseconds)
+- Queue depth (tasks waiting)
+- Kafka consumer lag (optional)
+
+### Decision Types
+
+- **INCREASE:** Proactive (low load) or reactive (queue catching up)
+- **DECREASE:** High CPU/memory or queue overflow
+- **HOLD:** Steady state, system healthy
+
+---
+
+## Integration Guides
+
+### Async Tasks
+
+**Best for:** I/O-bound work (API calls, database queries)
+
+```python
+async with ACEAsyncioManager(config) as mgr:
+    await mgr.submit(your_async_task())
+```
+
+### Thread Pools
+
+**Best for:** CPU-bound work (calculations, data processing)
+
+```python
+with ACEThreadPoolManager(config) as mgr:
+    mgr.submit(your_sync_function)
+```
+
+### Kafka Consumers
+
+**Best for:** Event streaming with backpressure
+
+```python
+async with ACEKafkaConsumerManager(config, "topic") as mgr:
+    await mgr.process_async(handler)
+```
+
+---
+
+## Configuration Guide
+
+### Basic Configuration
+
+```python
+config = AIMDConfig(
+    min_limit=1,
+    max_limit=100,
+    initial_limit=10,
+)
+```
+
+### Advanced Configuration
+
+```python
+config = AIMDConfig(
+    # Concurrency bounds
+    min_limit=5,
+    max_limit=200,
+    initial_limit=50,
+
+    # AIMD parameters
+    increase_step=5,           # More aggressive increase
+    decrease_factor=0.3,       # Faster decrease
+
+    # Thresholds (CPU/Memory %)
+    cpu_threshold=75.0,
+    memory_threshold=80.0,
+    cpu_increase_threshold=30.0,      # Earlier proactive scaling
+    memory_increase_threshold=40.0,
+
+    # Timing (seconds)
+    adjustment_interval=1,     # More frequent decisions
+    cooldown_period=10,        # Longer wait after decrease
+)
+```
+
+---
+
+## Monitoring & Observability
+
+### Structured JSON Logs
+
+```json
+{
+  "timestamp": "2026-01-16T14:30:45Z",
+  "level": "INFO",
+  "message": "AIMD decision",
+  "decision": "INCREASE",
+  "current_limit": 10,
+  "new_limit": 12,
+  "signals": {
+    "cpu_percent": 35.5,
+    "memory_percent": 42.3,
+    "queue_depth": 5,
+    "event_loop_lag_ms": 2.1
+  }
+}
+```
+
+### Metrics to Track
+
+- Current concurrency limit
+- Active task count
+- CPU/Memory utilization
+- Decision frequency (INCREASE/DECREASE/HOLD)
+- System response time
+
+## Version Information
+
+| Property | Value                                     |
+| -------- | ----------------------------------------- |
+| Package  | ace-concurrency                           |
+| Version  | 0.1.0                                     |
+| Python   | 3.8+                                      |
+| License  | MIT                                       |
+| Status   | Production-Ready                          |
+| PyPI     | https://pypi.org/project/ace-concurrency/ |
+
+---
+
+## Common Tasks
+
+### Task: Change concurrency limits
+
+```python
+# During runtime (if you need dynamic adjustment)
+with ACEAsyncioManager(config) as mgr:
+    # Limits controlled automatically by AIMD
+    # To override, set directly:
+    # Not recommended - trust AIMD algorithm
+    pass
+```
+
+### Task: Access current limit
+
+```python
+async with ACEAsyncioManager(config) as mgr:
+    print(f"Current limit: {mgr.current_limit}")
+    print(f"Active tasks: {mgr.active_tasks}")
+```
+
+### Task: Custom signal collection
+
+```python
+from ace.core.signals import SignalCollector
+
+collector = SignalCollector()
+collector.set_queue_depth(len(my_queue))
+signals = await collector.collect_all_async()
+```
+
+### Task: Batch multiple AIMD managers
+
+```python
+# Multiple independent managers (recommended for isolation)
+async with ACEAsyncioManager(config1) as mgr1:
+    async with ACEAsyncioManager(config2) as mgr2:
+        # Separate control loops
+        pass
+```
+
+---
+
+## Support Resources
+
+- **Bug Reports:** GitHub Issues
+- **Feature Requests:** GitHub Discussions
+- **Code Examples:** See `intergrations/` directory
