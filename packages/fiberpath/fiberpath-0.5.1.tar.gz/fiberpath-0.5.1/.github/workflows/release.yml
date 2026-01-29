@@ -1,0 +1,241 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (e.g., 0.3.14)
+        required: true
+        type: string
+      prerelease:
+        description: Mark as pre-release
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+
+      - name: Validate version format
+        id: check
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "Error: Invalid version format. Use semantic versioning (e.g., 0.3.14 or 0.3.14-rc.1)"
+            exit 1
+          fi
+          TAG="v$VERSION"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Release tag: $TAG"
+
+      - name: Check if tag already exists
+        run: |
+          TAG="${{ steps.check.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Error: Tag $TAG already exists"
+            exit 1
+          fi
+          echo "Tag $TAG is available"
+
+      - name: Verify version in pyproject.toml
+        run: |
+          VERSION="${{ inputs.version }}"
+          PYPROJECT_VERSION=$(grep -E '^version = ' pyproject.toml | cut -d'"' -f2)
+          if [ "$VERSION" != "$PYPROJECT_VERSION" ]; then
+            echo "Warning: Input version ($VERSION) doesn't match pyproject.toml ($PYPROJECT_VERSION)"
+            echo "Please update pyproject.toml before releasing"
+            exit 1
+          fi
+
+  create-release:
+    name: Create GitHub Release
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create release tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ needs.validate.outputs.tag }} -m "Release ${{ inputs.version }}"
+          git push origin ${{ needs.validate.outputs.tag }}
+
+      - name: Get previous tag
+        id: previous-tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "previous=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: ${PREV_TAG:-none}"
+
+      - name: Generate release notes
+        id: notes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prevTag = '${{ steps.previous-tag.outputs.previous }}';
+            const newTag = '${{ needs.validate.outputs.tag }}';
+            const version = '${{ inputs.version }}';
+            const repo = context.repo;
+
+            let notes = '';
+
+            // Desktop installers section
+            notes += `## Desktop Installers\n\n`;
+            notes += `**Windows:**\n`;
+            notes += `- \`FiberPath_${version}_x64_en-US.msi\` (recommended)\n`;
+            notes += `- \`FiberPath_${version}_x64-setup.exe\`\n\n`;
+            notes += `**macOS:**\n`;
+            notes += `- \`FiberPath_${version}_universal.dmg\`\n\n`;
+            notes += `**Linux:**\n`;
+            notes += `- \`fiberpath_${version}_amd64.deb\`\n`;
+            notes += `- \`fiberpath_${version}_amd64.AppImage\`\n\n`;
+            notes += `📚 [Installation Guide](https://cameronbrooks11.github.io/fiberpath/getting-started/) | `;
+            notes += `🆘 [Troubleshooting](https://cameronbrooks11.github.io/fiberpath/troubleshooting/)\n\n`;
+
+            // Python package section
+            notes += `## Python Package\n\n`;
+            notes += `\`\`\`bash\n`;
+            notes += `pip install fiberpath==${version}\n`;
+            notes += `\`\`\`\n\n`;
+            notes += `[PyPI Package](https://pypi.org/project/fiberpath/${version}/) | `;
+            notes += `[Source Code](https://github.com/${repo.owner}/${repo.repo}/tree/${newTag})\n\n`;
+
+            // Changelog section
+            notes += `## Changelog\n\n`;
+
+            if (prevTag) {
+              const { data: comparison } = await github.rest.repos.compareCommits({
+                owner: repo.owner,
+                repo: repo.repo,
+                base: prevTag,
+                head: newTag
+              });
+              
+              // Categorize commits
+              const added = [];
+              const fixed = [];
+              const changed = [];
+              
+              comparison.commits.forEach(commit => {
+                const msg = commit.commit.message.split('\n')[0];
+                const sha = commit.sha.substring(0, 7);
+                const entry = `- ${msg} (\`${sha}\`)`;
+                
+                const lower = msg.toLowerCase();
+                if (lower.startsWith('add') || lower.startsWith('feat')) {
+                  added.push(entry);
+                } else if (lower.startsWith('fix')) {
+                  fixed.push(entry);
+                } else {
+                  changed.push(entry);
+                }
+              });
+              
+              if (added.length > 0) {
+                notes += `### Added\n${added.join('\n')}\n\n`;
+              }
+              if (fixed.length > 0) {
+                notes += `### Fixed\n${fixed.join('\n')}\n\n`;
+              }
+              if (changed.length > 0) {
+                notes += `### Changed\n${changed.join('\n')}\n\n`;
+              }
+              
+              notes += `**Full Changelog:** https://github.com/${repo.owner}/${repo.repo}/compare/${prevTag}...${newTag}\n`;
+            } else {
+              notes += `Initial release.\n`;
+            }
+
+            return notes;
+          result-encoding: string
+
+      - name: Verify expected assets
+        run: |
+          VERSION="${{ inputs.version }}"
+          echo "Expected release assets for v$VERSION:"
+          echo "  - FiberPath_${VERSION}_x64_en-US.msi"
+          echo "  - FiberPath_${VERSION}_x64-setup.exe"
+          echo "  - FiberPath_${VERSION}_universal.dmg"
+          echo "  - fiberpath_${VERSION}_amd64.deb"
+          echo "  - fiberpath_${VERSION}_amd64.AppImage"
+          echo "Assets will be uploaded by build-gui-installers workflow"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.validate.outputs.tag }}
+          name: Release ${{ inputs.version }}
+          body: ${{ steps.notes.outputs.result }}
+          draft: false
+          prerelease: ${{ inputs.prerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-backend:
+    name: Publish Backend to PyPI
+    needs: [validate, create-release]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/fiberpath/
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+        with:
+          dependencies: ".[dev]"
+
+      - name: Verify version matches tag
+        run: |
+          TAG_VERSION="${{ inputs.version }}"
+          PACKAGE_VERSION=$(uv run python -c "import fiberpath; print(fiberpath.__version__)")
+          if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "Error: Tag version ($TAG_VERSION) doesn't match package version ($PACKAGE_VERSION)"
+            exit 1
+          fi
+          echo "Version check passed: $PACKAGE_VERSION"
+
+      - name: Build distribution packages
+        run: uv build
+
+      - name: Verify build artifacts
+        run: |
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
+            echo "Error: No distribution files in dist/"
+            exit 1
+          fi
+          echo "Built packages:"
+          ls -lh dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
+
+  build-gui-installers:
+    name: Build GUI Installers
+    needs: [validate, create-release]
+    uses: ./.github/workflows/gui-packaging.yml
+    with:
+      release_tag: ${{ needs.validate.outputs.tag }}
+    secrets: inherit
