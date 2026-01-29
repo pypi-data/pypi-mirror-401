@@ -1,0 +1,29 @@
+"""Custom Exceptions and Errors for COMPASS"""
+
+import logging
+
+
+logger = logging.getLogger("compass")
+
+
+class COMPASSError(Exception):
+    """Generic COMPASS Error"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if args:
+            logger.error(
+                "<%s> %s", self.__class__.__name__, args[0], stacklevel=2
+            )
+
+
+class COMPASSNotInitializedError(COMPASSError):
+    """COMPASS not initialized error"""
+
+
+class COMPASSValueError(COMPASSError, ValueError):
+    """COMPASS ValueError"""
+
+
+class COMPASSRuntimeError(COMPASSError, RuntimeError):
+    """COMPASS RuntimeError"""
