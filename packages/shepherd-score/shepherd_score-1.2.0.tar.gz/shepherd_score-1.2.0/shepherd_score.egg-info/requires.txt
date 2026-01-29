@@ -1,0 +1,46 @@
+torch>=1.12
+open3d>=0.18
+py3Dmol
+numpy
+pandas>=2.0
+scipy>=1.10
+molscrub
+
+[:python_version == "3.9"]
+rdkit<2025.09.3,>=2023.03
+
+[:python_version >= "3.10"]
+rdkit>=2023.03
+
+[all]
+shepherd-score[dev,docking,docs,jax]
+
+[dev]
+pytest>=6.0
+pytest-cov
+ruff
+mypy
+
+[docking]
+meeko
+vina>=1.2.5
+openbabel
+prolif>=2.0.3
+
+[docking:python_version == "3.9"]
+biopython<1.86,>=1.84
+
+[docking:python_version >= "3.10"]
+biopython>=1.84
+
+[docs]
+sphinx>=7.0
+sphinx-book-theme>=1.0
+sphinx-copybutton>=0.5
+myst-nb>=1.0
+
+[jax]
+jax>=0.4.20
+jaxlib>=0.4.20
+optax>=0.2.0
+scikit-learn>=1.3
