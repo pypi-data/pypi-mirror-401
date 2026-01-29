@@ -1,0 +1,17 @@
+[project]
+name = "vidcraft"
+version = "0.1.0"
+description = "Use your ffmpeg for transcodes without having to remember all the nifty options and best values."
+readme = "readme.md"
+authors = [
+    { name = "siru", email = "siru@codessh.de" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+vidcraft = "vidcraft:main"
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
