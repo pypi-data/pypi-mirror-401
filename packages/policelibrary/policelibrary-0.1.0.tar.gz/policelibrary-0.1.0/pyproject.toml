@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=70.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "policelibrary"
+dynamic = ["version"]
+description = "PoliceLibrary"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { "text" = "AGPL-3.0" }
+keywords = ["private"]
+authors = [
+    { name = "Felix Fu", email = "alanmathisonturing@163.com" }
+]
+maintainers = [
+    { name = "Felix Fu", email = "alanmathisonturing@163.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+]
+dependencies = [
+    "aiohttp>=3.13.3",
+    "loguru>=0.7.3",
+    "numpy>=2.2.6",
+    "openai>=2.15.0",
+    "opencv-python>=4.11.0.86",
+]
+
+[tool.setuptools]
+packages = { find = { where = ["."], include = ["policelibrary", "policelibrary.*"] } }
+package-data = { "policelibrary" = ["**/*.yaml", "../tests/*.py", "**/*.sh", "**/*.bat", "**/*.so", "**/*.dll", "**/*.pyd"], "policelibrary.assets" = ["*.jpg", "*.wav"] }
+
+
+[tool.setuptools.dynamic]
+version = { attr = "policelibrary.__version__" }
