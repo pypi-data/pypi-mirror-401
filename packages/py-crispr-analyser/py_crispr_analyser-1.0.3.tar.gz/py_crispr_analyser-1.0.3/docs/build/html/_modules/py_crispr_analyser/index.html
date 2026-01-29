@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py_crispr_analyser.index &mdash; py-crispr-analyser  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            py-crispr-analyser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation and Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Command Line Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cross_reference.html">Cross Referencing Guides to CRISPRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license_contact.html">License and Contact Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">py-crispr-analyser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">py_crispr_analyser.index</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py_crispr_analyser.index</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2025 Genome Research Ltd.</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">getopt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FILE_VERSION</span><span class="p">,</span>
+    <span class="n">sequence_to_binary_encoding</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_metadata">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.index.create_metadata">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_metadata</span><span class="p">(</span>
+    <span class="n">number_of_sequences</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">sequence_length</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">species_id</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+    <span class="n">species_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">assembly</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create metadata for the version 3 of the binary output file</span>
+
+<span class="sd">    :param number_of_sequences: Number of sequences in the file</span>
+<span class="sd">    :param sequence_length: Length of each sequence (guide + PAM)</span>
+<span class="sd">    :param offset: Offset of the first sequence</span>
+<span class="sd">    :param species_id: ID of the species e.g. 1</span>
+<span class="sd">    :param species_name: Name of the species e.g. &#39;Human&#39;</span>
+<span class="sd">    :param assembly: Genome assembly used e.g. &#39;GRCh38&#39;</span>
+<span class="sd">    :return: A bytes object containing the metadata</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">format</span> <span class="o">=</span> <span class="s2">&quot;&lt;QQQB30s30s&quot;</span>
+    <span class="n">number_of_sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">number_of_sequences</span><span class="p">)</span>
+    <span class="n">sequence_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">sequence_length</span><span class="p">)</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+    <span class="n">species_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="n">species_id</span><span class="p">)</span>
+    <span class="n">species_name</span> <span class="o">=</span> <span class="n">species_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">assembly</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span>
+        <span class="nb">format</span><span class="p">,</span>
+        <span class="n">number_of_sequences</span><span class="p">,</span>
+        <span class="n">sequence_length</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">,</span>
+        <span class="n">species_id</span><span class="p">,</span>
+        <span class="n">species_name</span><span class="p">,</span>
+        <span class="n">assembly</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_record">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.index.parse_record">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_record</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">guide_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pam_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a line from the input CSV file</span>
+
+<span class="sd">    :param record: A line from the input CSV file</span>
+<span class="sd">    :param guide_length: The length of the guide sequence (CRISPR excluding PAM)</span>
+<span class="sd">    :param pam_length: The length of the PAM sequence (CRISPR excluding guide)</span>
+<span class="sd">    :return: A tuple containing the guide sequence and PAM right flag</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Record &#39;</span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2">&#39; contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span><span class="si">}</span><span class="s2"> columns, expected 5&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">pam_right</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">crispr_sequence</span> <span class="o">=</span> <span class="n">records</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">crispr_sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="n">guide_length</span> <span class="o">+</span> <span class="n">pam_length</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Record </span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2"> has sequence_length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">crispr_sequence</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="s2">&quot;expected {guide_length + pam_length}&quot;</span>
+        <span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pam_right</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">guide_sequence</span> <span class="o">=</span> <span class="n">crispr_sequence</span><span class="p">[</span><span class="n">pam_length</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">guide_sequence</span> <span class="o">=</span> <span class="n">crispr_sequence</span><span class="p">[:</span><span class="n">guide_length</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">guide_sequence</span><span class="p">,</span> <span class="n">pam_right</span></div>
+
+
+
+<div class="viewcode-block" id="index">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.index.index">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span>
+    <span class="n">inputfiles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">outputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">species</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">assembly</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">species_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">guide_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">pam_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the CRISPR indexer.</span>
+
+<span class="sd">    :param inputfiles: The input CSV files e.g. [&#39;input1.csv&#39;, &#39;input2.csv&#39;]</span>
+<span class="sd">    :param outputfile: The name of the output binary file to be generated.</span>
+<span class="sd">    :param species: The species name e.g. &#39;Human&#39;.</span>
+<span class="sd">    :param assembly: The assembly name e.g. &#39;GRCh38&#39;.</span>
+<span class="sd">    :param offset: The integer for offset after which to start numbering ID.</span>
+<span class="sd">    :param species_id: The integer of the species ID e.g. 1.</span>
+<span class="sd">    :param guide_length: The length of the guide sequence default is 20.</span>
+<span class="sd">        (CRISPR excluding PAM)</span>
+<span class="sd">    :param pam_length: The length of the PAM sequence default is 3.</span>
+<span class="sd">        (CRISPR excluding guide)</span>
+<span class="sd">    :param verbose: A boolean indicating if verbose output is enabled.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">number_of_sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Outfile:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">outputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inputfiles:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">inputfile</span> <span class="ow">in</span> <span class="n">inputfiles</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;writing metadata&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Version: </span><span class="si">{</span><span class="n">FILE_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_file</span><span class="p">:</span>
+        <span class="c1"># write the file header</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&lt;BL&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint</span><span class="p">(</span><span class="n">FILE_VERSION</span><span class="p">)))</span>
+        <span class="c1"># write the metadata</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="n">create_metadata</span><span class="p">(</span>
+                <span class="n">number_of_sequences</span><span class="p">,</span>
+                <span class="n">guide_length</span><span class="p">,</span>
+                <span class="n">offset</span><span class="p">,</span>
+                <span class="n">species_id</span><span class="p">,</span>
+                <span class="n">species</span><span class="p">,</span>
+                <span class="n">assembly</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># put in a separator of 3 empty bytes before the vector of sequences</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&lt;BBB&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">inputfile</span> <span class="ow">in</span> <span class="n">inputfiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing </span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_file</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">in_file</span><span class="p">:</span>
+                    <span class="n">sequence</span><span class="p">,</span> <span class="n">pam_right</span> <span class="o">=</span> <span class="n">parse_record</span><span class="p">(</span>
+                        <span class="n">line</span><span class="p">,</span> <span class="n">guide_length</span><span class="p">,</span> <span class="n">pam_length</span>
+                    <span class="p">)</span>
+                    <span class="n">record</span> <span class="o">=</span> <span class="n">sequence_to_binary_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">pam_right</span><span class="p">)</span>
+                    <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&lt;Q&quot;</span><span class="p">,</span> <span class="n">record</span><span class="p">))</span>
+                    <span class="n">number_of_sequences</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># write the number of sequences in the correct position in the file</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&lt;Q&quot;</span><span class="p">,</span> <span class="n">number_of_sequences</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Converted </span><span class="si">{</span><span class="n">number_of_sequences</span><span class="si">}</span><span class="s2"> sequences in </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="run">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.index.run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the CRISPR indexer from the command line.</span>
+
+<span class="sd">    :param argv: The command line arguments.</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inputfiles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">species_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">assembly</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">guide_length</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">pam_length</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Usage: crispr_analyser_index [options...]</span>
+<span class="sd">-a, --assembly &lt;name&gt;         The assembly name</span>
+<span class="sd">-e, --species_id &lt;integer&gt;    The species ID</span>
+<span class="sd">-f, --offset &lt;integer&gt;        The offset to start numbering from</span>
+<span class="sd">-g, --guide_length &lt;integer&gt;  The length of the guide sequence</span>
+<span class="sd">-h, --help                    Print this help message</span>
+<span class="sd">-i, --ifile &lt;file&gt;            The input CSV file</span>
+<span class="sd">-o, --ofile &lt;file&gt;            The ouput file</span>
+<span class="sd">-p, --pam_length &lt;integer&gt;    The length of the PAM sequence</span>
+<span class="sd">-s, --species &lt;name&gt;          The species name</span>
+<span class="sd">&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">getopt</span><span class="o">.</span><span class="n">getopt</span><span class="p">(</span>
+            <span class="n">argv</span><span class="p">,</span>
+            <span class="s2">&quot;hi:o:a:s:f:e:g:p:&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;help&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ifile=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ofile=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;assembly=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;species=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;offset=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;species_id=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;guide_length=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pam_length=&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">getopt</span><span class="o">.</span><span class="n">GetoptError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">usage</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">):</span>
+            <span class="n">usage</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--ifile&quot;</span><span class="p">):</span>
+            <span class="n">inputfiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--ofile&quot;</span><span class="p">):</span>
+            <span class="n">outputfile</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;--assembly&quot;</span><span class="p">):</span>
+            <span class="n">assembly</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--species&quot;</span><span class="p">):</span>
+            <span class="n">species</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--offset&quot;</span><span class="p">):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="s2">&quot;--species_id&quot;</span><span class="p">):</span>
+            <span class="n">species_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;--guide_length&quot;</span><span class="p">):</span>
+            <span class="n">guide_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--pam_length&quot;</span><span class="p">):</span>
+            <span class="n">pam_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unhandled Option&quot;</span><span class="p">)</span>
+            <span class="n">usage</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inputfiles</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">or</span> <span class="n">outputfile</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">assembly</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">species</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">usage</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">index</span><span class="p">(</span>
+        <span class="n">inputfiles</span><span class="p">,</span>
+        <span class="n">outputfile</span><span class="p">,</span>
+        <span class="n">species</span><span class="p">,</span>
+        <span class="n">assembly</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">,</span>
+        <span class="n">species_id</span><span class="p">,</span>
+        <span class="n">guide_length</span><span class="p">,</span>
+        <span class="n">pam_length</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 Genome Research Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

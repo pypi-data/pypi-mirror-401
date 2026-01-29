@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Line Usage &mdash; py-crispr-analyser  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cross Referencing Guides to CRISPRs" href="cross_reference.html" />
+    <link rel="prev" title="Installation and Testing" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            py-crispr-analyser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gather-crisprs-from-genome-files">Gather CRISPRs from genome files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#index-grna-guides-in-binary-format">Index gRNA guides in binary format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#find-crispr-ids-given-a-grna-sequence">Find CRISPR IDs given a gRNA sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#find-off-targets-for-given-crispr-ids">Find off-targets for given CRISPR IDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gpu-acceleration">GPU Acceleration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cross_reference.html">Cross Referencing Guides to CRISPRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license_contact.html">License and Contact Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">py-crispr-analyser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Command Line Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-line-usage">
+<h1>Command Line Usage<a class="headerlink" href="#command-line-usage" title="Link to this heading"></a></h1>
+<p>If Python CRISPR Analyser is installed using pip, then the command line tools are available as follows:</p>
+<section id="gather-crisprs-from-genome-files">
+<h2>Gather CRISPRs from genome files<a class="headerlink" href="#gather-crisprs-from-genome-files" title="Link to this heading"></a></h2>
+<p>For subsequent analysis we need to gather the CRISPRs from the genome files.</p>
+<p>To run the <strong>Gather</strong> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>crispr_analyser_gather<span class="w"> </span>-i<span class="w"> </span>&lt;input_fasta&gt;<span class="w"> </span>-o<span class="w"> </span>&lt;output_file&gt;<span class="w"> </span>-p<span class="w"> </span>&lt;pam_sequence&gt;
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ul class="simple">
+<li><p><em>-i</em>, <em>–ifile</em> - the Input File needs to be a FASTA file containing the genenome sequence. For example GRCh38 which can be downloaded from <a class="reference external" href="https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/">Ensembl</a> - <em>Required</em>,</p></li>
+<li><p><em>-o</em>, <em>–ofile</em> - the Output File which will be a CSV file (without headers) - <em>Required</em>,</p></li>
+<li><p><em>-p</em>, <em>–pam</em> - the PAM sequence which can consist of A, C, G, T and N (for any) - <em>Required</em>,</p></li>
+<li><p><em>-h</em>, <em>–help</em> - shows the help</p></li>
+</ul>
+<p>For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>crispr_analyser_gather<span class="w"> </span>-i<span class="w"> </span>Homo_sapiens.GRCh38.dna.chromosome.18.fa<span class="w"> </span>-o<span class="w"> </span>chromosome.18.csv<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;NGG&quot;</span>
+</pre></div>
+</div>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>the inpul file(s) can only be uncompressed FASTA files</p></li>
+<li><p>the PAM sequence can only be three characters long e.g. “NGG”</p></li>
+</ul>
+</section>
+</section>
+<section id="index-grna-guides-in-binary-format">
+<h2>Index gRNA guides in binary format<a class="headerlink" href="#index-grna-guides-in-binary-format" title="Link to this heading"></a></h2>
+<p>From the CRISPRs gathered from genome files we create a binary index of gRNA guides for efficient searching of CRISPRs and off-targets.</p>
+<p>To run the <strong>Index</strong> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>crispr_analyser_index<span class="w"> </span>-i<span class="w"> </span>&lt;input_csv&gt;<span class="w"> </span>-a<span class="w"> </span>&lt;assembly&gt;<span class="w"> </span>-o<span class="w"> </span>&lt;offset&gt;<span class="w"> </span>-o<span class="w"> </span>&lt;output_bin&gt;<span class="w"> </span>-s<span class="w"> </span>&lt;species&gt;<span class="w"> </span>-e<span class="w"> </span>&lt;species_id&gt;<span class="w"> </span>-g<span class="w"> </span>&lt;guide_length&gt;<span class="w"> </span>-p<span class="w"> </span>&lt;pam_length&gt;
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ul class="simple">
+<li><p><em>-i</em>, <em>–ifile</em> - The Input CSV file, can be declared one or many times (see example below) - <em>Required</em>,</p></li>
+<li><p><em>-o</em>, <em>–ofile</em> - The Output binary file - <em>Required</em>,</p></li>
+<li><p><em>-a</em>, <em>–assembly</em> - The name of the genome assembly - <em>Required</em>,</p></li>
+<li><p><em>-s</em>, <em>–species</em> - The name of the species - <em>Required</em>,</p></li>
+<li><p><em>-f</em>, <em>–offset</em> - the offset after which to start the ID for CRISPRS, defaults to 0,</p></li>
+<li><p><em>-e</em>, <em>–species_id</em> - The species ID, defaults to 0,</p></li>
+<li><p><em>-g</em>, <em>–guide_length</em> - The length of the gRNA, defaults to 20,</p></li>
+<li><p><em>-p</em>, <em>–pam_length</em> - The length of the PAM, defaults to 3,</p></li>
+<li><p><em>-h</em>, <em>–help</em> - shows the help</p></li>
+</ul>
+<p>for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>crispr_analyser_index<span class="w"> </span>-i<span class="w"> </span>chromosome.1.csv<span class="w"> </span>-i<span class="w"> </span>chromosome.2.csv<span class="w"> </span>-o<span class="w"> </span>guides.bin<span class="w"> </span>-a<span class="w"> </span>GRCh38<span class="w"> </span>-s<span class="w"> </span>Human
+</pre></div>
+</div>
+<p>The CSV input file must have the following fields (but no headers):</p>
+<ul class="simple">
+<li><p>Chromosome Name as a string e.g. ‘18’</p></li>
+<li><p>Position Start - an integer indicating the start position offset from the start of the Chromasome (using 5’ to 3’ orientation),</p></li>
+<li><p>CRISPR Sequence - the string representing the CRISPR including the PAM,</p></li>
+<li><p>PAM Right? - a 1 or 0 (true or false) indicating if the PAM is on the right side of the CRISPR,</p></li>
+<li><p>Species ID - this is currently always set to 1.</p></li>
+</ul>
+<p>Note that <em>Species ID</em> is a legacy field and is not used in the current version of the software.</p>
+</section>
+<section id="find-crispr-ids-given-a-grna-sequence">
+<h2>Find CRISPR IDs given a gRNA sequence<a class="headerlink" href="#find-crispr-ids-given-a-grna-sequence" title="Link to this heading"></a></h2>
+<p>In order to find CRISPR IDs given a gRNA sequence we can use the <strong>Search</strong> command with the binary gRNA guides file created by the <strong>Index</strong> command.</p>
+<p>Run the <strong>Search</strong> command as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>crispr_analyser_search<span class="w"> </span>-i<span class="w"> </span>&lt;input_bin&gt;<span class="w"> </span>-s<span class="w"> </span>&lt;gRNA_sequence&gt;
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ul class="simple">
+<li><p>-i, –ifile - The Input binary guides file - <em>Required</em>,</p></li>
+<li><p>-s, –search - The gRNA sequence - <em>Required</em>.</p></li>
+</ul>
+<p>Output is split between STDERR and STDOUT. The IDs of the CRISPRs are printed to STDOUT and the summary of the search is printed to STDERR.</p>
+<p>For example, output to STDERR might look like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Version<span class="w"> </span>is<span class="w"> </span><span class="m">3</span>
+Assembly<span class="w"> </span>is<span class="w"> </span>GRCh38<span class="w"> </span><span class="o">(</span>Human<span class="o">)</span>
+File<span class="w"> </span>has<span class="w"> </span><span class="m">1200559014</span><span class="w"> </span>sequences
+Sequence<span class="w"> </span>length<span class="w"> </span>is<span class="w"> </span><span class="m">20</span>
+Offset<span class="w"> </span>is<span class="w"> </span><span class="m">0</span>
+Species<span class="w"> </span>id<span class="w"> </span>is<span class="w"> </span><span class="m">1</span>
+Loading<span class="w"> </span>took<span class="w"> </span><span class="m">12</span>.25<span class="w"> </span>seconds
+Loaded<span class="w"> </span><span class="m">1200559014</span><span class="w"> </span>sequences
+Found<span class="w"> </span><span class="m">1</span><span class="w"> </span>exact<span class="w"> </span>matches
+Found<span class="w"> </span>the<span class="w"> </span>following<span class="w"> </span>matches:
+</pre></div>
+</div>
+<p>And the CRISPR IDs found would be printed to STDOUT, separated by newlines:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1200551676</span>
+<span class="m">3249821234</span>
+</pre></div>
+</div>
+</section>
+<section id="find-off-targets-for-given-crispr-ids">
+<h2>Find off-targets for given CRISPR IDs<a class="headerlink" href="#find-off-targets-for-given-crispr-ids" title="Link to this heading"></a></h2>
+<p>We can calculate the summary of off-targets for one or more CRISPRs given their ID and using the <strong>Align</strong> command as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>crispr_analyser_align<span class="w"> </span>-i<span class="w"> </span>&lt;input_bin&gt;<span class="w"> </span><span class="o">[</span>ids<span class="o">]</span>
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ul class="simple">
+<li><p>-i, –ifile - The Input binary guides file - <em>Required</em></p></li>
+<li><p>–no-cuda - Disable CUDA GPU acceleration</p></li>
+<li><p>[ids] - one or more IDs of the CRISPRs to search for off-targets - <em>Required</em></p></li>
+</ul>
+<p>As with the <strong>Search</strong> command, the output is split between STDERR and STDOUT. The summary of the search is printed to STDERR and the off-targets are printed to STDOUT.</p>
+<p>For example, output to STDERR might look like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Assembly<span class="w"> </span>is<span class="w"> </span>GRCh38<span class="w"> </span><span class="o">(</span>Human<span class="o">)</span>
+File<span class="w"> </span>has<span class="w"> </span><span class="m">1200559014</span><span class="w"> </span>sequences
+Sequence<span class="w"> </span>length<span class="w"> </span>is<span class="w"> </span><span class="m">20</span>
+Offset<span class="w"> </span>is<span class="w"> </span><span class="m">0</span>
+Species<span class="w"> </span>id<span class="w"> </span>is<span class="w"> </span><span class="m">1</span>
+Loading<span class="w"> </span>took<span class="w"> </span><span class="m">7</span>.33<span class="w"> </span>seconds
+</pre></div>
+</div>
+<p>And the off-targets found would be printed to STDOUT, separated by newlines. The format for off-targets for each CRISPR ID is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;CRISPR<span class="w"> </span>ID&gt;<span class="w"> </span>&lt;Species<span class="w"> </span>ID&gt;<span class="w"> </span>&lt;Off-Target<span class="w"> </span>CRISPR<span class="w"> </span>IDS&gt;<span class="w"> </span>&lt;Summary&gt;
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1200551673</span><span class="w">	</span><span class="m">1</span><span class="w">	</span><span class="o">{</span><span class="m">5631600</span>,12587091,19109163,22079030,23239000,26501597,30414111,33581723,34229111,34705555,37873467,43668607,45229014,50360433,51303777,53203244,53787722,54810107,55678064,56111581,57172117,60111258,65696513,73938350,78186291,78909324,79032225,79131485,79199752,81814531,83282318,89311432,91700045,94095775,104106532,110628740,117838121,119302948,120328606,121417854,123785758,128025190,129308028,129383427,131704114,141154489,143221468,144953871,153584006,156820656,159690561,162463025,165704925,166653098,169556513,169894014,170813225,172596043,173336999,176798557,176900263,179624805,179879820,180325270,183714994,183725616,187191479,188483145,190105865,194567945,195833213,199102585,199290226,204836295,205765766,213995462,215497592,217290825,218224164,218365574,219065926,222205282,228956564,230872099,231530511,233998802,235057869,236017990,242874656,252500366,252748162,261804881,269244299,270042584,272049195,277367575,280089801,284873674,285627010,287098376,288534000,289237233,289343988,289586896,290746480,298407995,299035379,299567888,305616511,308195124,309038582,313972681,314572210,314878175,316358683,316911638,323421292,325962990,326919721,329949795,331922709,334295731,334846296,338562318,341435450,341728613,342597884,343360904,343429153,352681255,353840365,357616747,357754197,358166591,368932159,379035147,380305864,385343331,388328199,392759812,394013711,395936214,408491849,408755686,410174279,414936251,418511742,425649740,427086025,427886947,429883343,435641334,436616343,437452167,441768519,442845158,444661399,444882063,445672975,447255070,464745129,470350960,471383043,473890728,475060642,475095613,476200278,477156460,479489876,490092071,493128577,500044319,503670391,504239932,506502770,511566658,513551025,515010796,516910537,518522314,518874302,527066517,532871367,540555229,545417977,546590944,548995953,554798163,560390395,561444072,562793216,567065284,570069112,571278043,572715670,575189618,578564090,583318535,590254469,595390813,598450204,599871415,600025117,602055868,602803144,604432573,606497148,607805800,609515434,612971857,613980801,614891455,616693924,617497175,618674279,618693888,619233704,620102197,620871357,627733346,643459607,647558077,650210205,654411215,656081271,656174099,657016785,659425058,662332362,666877185,668392011,670105960,671623434,673828082,676419287,678522049,680269126,681812795,682181056,683858037,687904397,688086499,695096280,699808758,700377621,708176275,714939183,724429779,727287866,730342818,734284179,746863119,756989553,764145480,769124497,772312880,772734053,772994362,776138952,778124819,787329528,794112125,801591361,803539013,807757046,810087625,811896473,824317786,827097789,828717444,833506447,835651412,841880152,844083167,845039322,847014004,849545231,851108109,851287298,855567341,856446172,863783477,864162969,873077012,878677577,882676574,884021802,904384677,906818273,908646372,914503814,919559357,922317697,922699712,923562980,923905133,926409128,929053437,929419673,929656450,935525941,948268750,949547398,949827174,950751939,954122925,957141360,964414988,964488502,965562242,968418491,973758282,974537517,978780419,981858792,998620175,1000284084,1006076964,1012073812,1014825674,1016416691,1020485961,1020497125,1022107423,1023413695,1027567634,1030193706,1030733180,1031536226,1034216041,1037422056,1044851271,1048162796,1052896575,1054970838,1060958364,1061603994,1064490807,1065149388,1065786298,1070371661,1072182346,1072279792,1081522519,1082356418,1083654553,1083959717,1087957969,1094427998,1096775589,1099668608,1107229436,1108523358,1113194026,1118220025,1134507117,1135049225,1135867617,1139813789,1142353946,1144755203,1146013879,1147253218,1153982157,1164707102,1165778714,1167191051,1167628030,1170541198,1173456426,1173689054,1176790664,1178223456,1181252406,1200551673<span class="o">}</span><span class="w">	</span><span class="o">{</span><span class="m">0</span>:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">1</span>:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span><span class="m">2</span>:<span class="w"> </span><span class="m">4</span>,<span class="w"> </span><span class="m">3</span>:<span class="w"> </span><span class="m">18</span>,<span class="w"> </span><span class="m">4</span>:<span class="w"> </span><span class="m">352</span><span class="o">}</span>
+<span class="m">910190339</span><span class="w">	</span><span class="m">1</span><span class="w">	</span><span class="o">{</span><span class="m">0</span>:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">1</span>:<span class="w"> </span><span class="m">7</span>,<span class="w"> </span><span class="m">2</span>:<span class="w"> </span><span class="m">109</span>,<span class="w"> </span><span class="m">3</span>:<span class="w"> </span><span class="m">951</span>,<span class="w"> </span><span class="m">4</span>:<span class="w"> </span><span class="m">2452</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Note that any CRISPRs with more than 2000 off-targets will not have the off-target CRISPR IDs printed to STDOUT as shown in the second CRISPR above.</p>
+</section>
+<section id="gpu-acceleration">
+<h2>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Link to this heading"></a></h2>
+<p>The <strong>Align</strong> command will run on GPUs if it detects a compatible Nvidia GPU. Note that CUDA libraries are only installed on Linux. To disable GPU acceleration use the <em>–no-cuda</em> flag. This software supports CUDA 12 but depending on the minor version of CUDA you may need to run the <strong>Align</strong> command with the <em>NUMBA_CUDA_ENABLE_PYNVJITLINK=1</em> environmental variable. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">NUMBA_CUDA_ENABLE_PYNVJITLINK</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>crispr_analyser_align<span class="w"> </span>-i<span class="w"> </span>grch38_ngg.bin<span class="w"> </span><span class="m">23322</span><span class="w"> </span><span class="m">44343</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Installation and Testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cross_reference.html" class="btn btn-neutral float-right" title="Cross Referencing Guides to CRISPRs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 Genome Research Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

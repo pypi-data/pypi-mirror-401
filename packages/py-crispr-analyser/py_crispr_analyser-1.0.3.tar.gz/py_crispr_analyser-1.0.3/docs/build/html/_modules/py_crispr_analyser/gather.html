@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py_crispr_analyser.gather &mdash; py-crispr-analyser  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            py-crispr-analyser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation and Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Command Line Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cross_reference.html">Cross Referencing Guides to CRISPRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license_contact.html">License and Contact Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">py-crispr-analyser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">py_crispr_analyser.gather</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py_crispr_analyser.gather</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2025 Genome Research Ltd.</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">getopt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse_complement</span>
+
+<span class="n">GUIDE_RNA_LENGTH</span> <span class="o">=</span> <span class="mi">20</span>
+
+
+<div class="viewcode-block" id="match_pam">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.gather.match_pam">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">match_pam</span><span class="p">(</span>
+    <span class="n">dna_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pam_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pam_on_right</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">legacy_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the DNA sequence has a PAM sequence match.</span>
+
+<span class="sd">    :param dna_sequence: The string DNA sequence to check.</span>
+<span class="sd">    :param pam_sequence: The string PAM sequence to match.</span>
+<span class="sd">    :param pam_on_right: A boolean indicating if PAM sequence is on the right.</span>
+<span class="sd">    :param legacy_mode: A boolean indicating if non-ACGT chars allowed in PAM</span>
+<span class="sd">        region of the DNA sequence. Default is False.</span>
+<span class="sd">    :return: True if the PAM sequence matches, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dna_sequence</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">pam_sequence</span><span class="p">)</span> <span class="k">if</span> <span class="n">pam_on_right</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pam_sequence</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">legacy_mode</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">dna_sequence</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;ACGT&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">pam_sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">dna_sequence</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pam_sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="gather">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.gather.gather">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gather</span><span class="p">(</span>
+    <span class="n">inputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">outputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pam</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">legacy_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the CRISPR gatherer.</span>
+
+<span class="sd">    :param inputfile: The input FASTA file containing DNA sequences.</span>
+<span class="sd">    :param outputfile: The output CSV file to write results to.</span>
+<span class="sd">    :param pam: The string PAM sequence to search for e.g. &quot;NGG&quot;.</span>
+<span class="sd">    :param verbose: A boolean indicating if verbose output is enabled.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    :param legacy_mode: A boolean indicating that species ID column</span>
+<span class="sd">        is added to CSV file (always equalling 1). Default is False.</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">chromosome</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">crispr_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">pam</span><span class="p">)</span> <span class="o">+</span> <span class="n">GUIDE_RNA_LENGTH</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">csvwriter</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                    <span class="n">chromosome</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                        <span class="sa">r</span><span class="s2">&quot;&gt;(.*?) dna:chromosome&quot;</span><span class="p">,</span> <span class="n">line</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing chromosome </span><span class="si">{</span><span class="n">chromosome</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                    <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">buffer</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pam</span><span class="p">)</span> <span class="o">+</span> <span class="n">GUIDE_RNA_LENGTH</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">position</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">match_pam</span><span class="p">(</span>
+                            <span class="n">dna_sequence</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span>
+                            <span class="n">pam_sequence</span><span class="o">=</span><span class="n">reverse_complement</span><span class="p">(</span><span class="n">pam</span><span class="p">),</span>
+                            <span class="n">pam_on_right</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="p">[</span><span class="n">chromosome</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                                <span class="k">if</span> <span class="n">legacy_mode</span>
+                                <span class="k">else</span> <span class="p">[</span><span class="n">chromosome</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="mi">0</span><span class="p">]</span>
+                            <span class="p">)</span>
+                            <span class="n">csvwriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                            <span class="n">crispr_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">match_pam</span><span class="p">(</span>
+                            <span class="n">dna_sequence</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span>
+                            <span class="n">pam_sequence</span><span class="o">=</span><span class="n">pam</span><span class="p">,</span>
+                            <span class="n">pam_on_right</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="p">[</span><span class="n">chromosome</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                                <span class="k">if</span> <span class="n">legacy_mode</span>
+                                <span class="k">else</span> <span class="p">[</span><span class="n">chromosome</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="mi">1</span><span class="p">]</span>
+                            <span class="p">)</span>
+                            <span class="n">csvwriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                            <span class="n">crispr_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gathered </span><span class="si">{</span><span class="n">crispr_count</span><span class="si">}</span><span class="s2"> CRISPRs in </span><span class="si">{</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="run">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.gather.run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the CRISPR gatherer from the command line.&quot;&quot;&quot;</span>
+    <span class="n">inputfile</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">pam</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Usage: crispr_analyser_gather [options...]</span>
+<span class="sd">-h, --help           Print this help message</span>
+<span class="sd">-i, --ifile &lt;file&gt;   The input FASTA file</span>
+<span class="sd">-o, --ofile &lt;file&gt;   The output file</span>
+<span class="sd">-p, --pam &lt;pam seq&gt;  The PAM sequence to search for</span>
+<span class="sd">&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">getopt</span><span class="o">.</span><span class="n">getopt</span><span class="p">(</span>
+            <span class="n">argv</span><span class="p">,</span> <span class="s2">&quot;hi:o:p:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">,</span> <span class="s2">&quot;ifile=&quot;</span><span class="p">,</span> <span class="s2">&quot;ofile=&quot;</span><span class="p">,</span> <span class="s2">&quot;pam=&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">getopt</span><span class="o">.</span><span class="n">GetoptError</span><span class="p">:</span>
+        <span class="n">usage</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">):</span>
+            <span class="n">usage</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--ifile&quot;</span><span class="p">):</span>
+            <span class="n">inputfile</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--ofile&quot;</span><span class="p">):</span>
+            <span class="n">outputfile</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--pam&quot;</span><span class="p">):</span>
+            <span class="n">pam</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unhandled Option&quot;</span><span class="p">)</span>
+            <span class="n">usage</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inputfile</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">outputfile</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">pam</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">usage</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">gather</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">,</span> <span class="n">pam</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 Genome Research Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,647 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py_crispr_analyser package &mdash; py-crispr-analyser  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License and Contact Information" href="license_contact.html" />
+    <link rel="prev" title="API" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            py-crispr-analyser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Command Line Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cross_reference.html">Cross Referencing Guides to CRISPRs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">py_crispr_analyser package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py_crispr_analyser.align">py_crispr_analyser.align module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.align.find_off_targets"><code class="docutils literal notranslate"><span class="pre">find_off_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.align.find_off_targets_kernel"><code class="docutils literal notranslate"><span class="pre">find_off_targets_kernel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.align.print_off_targets"><code class="docutils literal notranslate"><span class="pre">print_off_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.align.reverse_complement_binary"><code class="docutils literal notranslate"><span class="pre">reverse_complement_binary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.align.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py_crispr_analyser.gather">py_crispr_analyser.gather module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.gather.gather"><code class="docutils literal notranslate"><span class="pre">gather()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.gather.match_pam"><code class="docutils literal notranslate"><span class="pre">match_pam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.gather.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py_crispr_analyser.index">py_crispr_analyser.index module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.index.create_metadata"><code class="docutils literal notranslate"><span class="pre">create_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.index.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.index.parse_record"><code class="docutils literal notranslate"><span class="pre">parse_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.index.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py_crispr_analyser.search">py_crispr_analyser.search module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.search.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.search.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py_crispr_analyser.utils">py_crispr_analyser.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.Metadata"><code class="docutils literal notranslate"><span class="pre">Metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.check_file_header"><code class="docutils literal notranslate"><span class="pre">check_file_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.get_file_metadata"><code class="docutils literal notranslate"><span class="pre">get_file_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.get_guides"><code class="docutils literal notranslate"><span class="pre">get_guides()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.parse_c_string"><code class="docutils literal notranslate"><span class="pre">parse_c_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.print_metadata"><code class="docutils literal notranslate"><span class="pre">print_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.reverse_complement"><code class="docutils literal notranslate"><span class="pre">reverse_complement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py_crispr_analyser.utils.sequence_to_binary_encoding"><code class="docutils literal notranslate"><span class="pre">sequence_to_binary_encoding()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py_crispr_analyser">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license_contact.html">License and Contact Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">py-crispr-analyser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API</a></li>
+      <li class="breadcrumb-item active">py_crispr_analyser package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/py_crispr_analyser.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="py-crispr-analyser-package">
+<h1>py_crispr_analyser package<a class="headerlink" href="#py-crispr-analyser-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-py_crispr_analyser.align">
+<span id="py-crispr-analyser-align-module"></span><h2>py_crispr_analyser.align module<a class="headerlink" href="#module-py_crispr_analyser.align" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.align.find_off_targets">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.align.</span></span><span class="sig-name descname"><span class="pre">find_off_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_query_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py_crispr_analyser.align.find_off_targets" title="Link to this definition"></a></dt>
+<dd><p>Find off-targets for a given query sequence using the CPU</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>guides</strong> (<em>numpy.ndarray</em>) – The array of encoded gRNA sequences</p></li>
+<li><p><strong>query_sequence</strong> (<em>numpy.uint64</em>) – The query sequence</p></li>
+<li><p><strong>reverse_query_sequence</strong> (<em>numpy.uint64</em>) – The reverse complement of the query sequence</p></li>
+<li><p><strong>offset</strong> (<em>numpy.uint64</em>) – The offset of the guides default 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing a summary and a list of off-target ids</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list[int], list[numpy.uint64]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.align.find_off_targets_kernel">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.align.</span></span><span class="sig-name descname"><span class="pre">find_off_targets_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_query_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">off_target_ids_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">off_target_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py_crispr_analyser.align.find_off_targets_kernel" title="Link to this definition"></a></dt>
+<dd><p>Find off-targets for a given query sequence using CUDA</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>guides</strong> (<em>numpy.ndarray</em>) – The array of encoded gRNA sequences</p></li>
+<li><p><strong>query_sequence</strong> (<em>numpy.uint64</em>) – The query sequence</p></li>
+<li><p><strong>reverse_query_sequence</strong> (<em>numpy.uint64</em>) – The reverse complement of the query sequence</p></li>
+<li><p><strong>summary</strong> (<em>numpy.ndarray</em>) – The array to store the results</p></li>
+<li><p><strong>off_target_ids_idx</strong> (<em>numpy.ndarray</em>) – The index for the off-target_ids array</p></li>
+<li><p><strong>off_target_ids</strong> (<em>numpy.ndarray</em>) – The array to store the off-target ids</p></li>
+<li><p><strong>offset</strong> (<em>numpy.uint64</em>) – The offset of the guides default 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.align.print_off_targets">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.align.</span></span><span class="sig-name descname"><span class="pre">print_off_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crispr_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">off_target_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/align.html#print_off_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.align.print_off_targets" title="Link to this definition"></a></dt>
+<dd><p>Print the off targets to the console</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crispr_id</strong> (<em>numpy.uint64</em>) – The id of the CRISPR</p></li>
+<li><p><strong>summary</strong> (<em>numpy.ndarray</em>) – The summary of the off targets</p></li>
+<li><p><strong>off_target_ids</strong> (<em>numpy.ndarray</em>) – The off target CRISPR ids</p></li>
+<li><p><strong>species_id</strong> (<em>numpy.uint8</em>) – The species id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.align.reverse_complement_binary">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.align.</span></span><span class="sig-name descname"><span class="pre">reverse_complement_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/align.html#reverse_complement_binary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.align.reverse_complement_binary" title="Link to this definition"></a></dt>
+<dd><p>Reverse complement a binary sequence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>numpy.uint64</em>) – The binary sequence to reverse complement</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – The size of the sequence</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The reverse complemented binary sequence</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.uint64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.align.run">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.align.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['-M',</span> <span class="pre">'html',</span> <span class="pre">'source',</span> <span class="pre">'build']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/align.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.align.run" title="Link to this definition"></a></dt>
+<dd><p>Run the align command to find off-targets for CRISPRs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-py_crispr_analyser.gather">
+<span id="py-crispr-analyser-gather-module"></span><h2>py_crispr_analyser.gather module<a class="headerlink" href="#module-py_crispr_analyser.gather" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.gather.gather">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.gather.</span></span><span class="sig-name descname"><span class="pre">gather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/gather.html#gather"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.gather.gather" title="Link to this definition"></a></dt>
+<dd><p>Run the CRISPR gatherer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputfile</strong> (<em>str</em>) – The input FASTA file containing DNA sequences.</p></li>
+<li><p><strong>outputfile</strong> (<em>str</em>) – The output CSV file to write results to.</p></li>
+<li><p><strong>pam</strong> (<em>str</em>) – The string PAM sequence to search for e.g. “NGG”.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean indicating if verbose output is enabled.
+Default is False.</p></li>
+<li><p><strong>legacy_mode</strong> (<em>bool</em>) – A boolean indicating that species ID column
+is added to CSV file (always equalling 1). Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.gather.match_pam">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.gather.</span></span><span class="sig-name descname"><span class="pre">match_pam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dna_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_on_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/gather.html#match_pam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.gather.match_pam" title="Link to this definition"></a></dt>
+<dd><p>Check if the DNA sequence has a PAM sequence match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dna_sequence</strong> (<em>str</em>) – The string DNA sequence to check.</p></li>
+<li><p><strong>pam_sequence</strong> (<em>str</em>) – The string PAM sequence to match.</p></li>
+<li><p><strong>pam_on_right</strong> (<em>bool</em>) – A boolean indicating if PAM sequence is on the right.</p></li>
+<li><p><strong>legacy_mode</strong> (<em>bool</em>) – A boolean indicating if non-ACGT chars allowed in PAM
+region of the DNA sequence. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the PAM sequence matches, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.gather.run">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.gather.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['-M',</span> <span class="pre">'html',</span> <span class="pre">'source',</span> <span class="pre">'build']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/gather.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.gather.run" title="Link to this definition"></a></dt>
+<dd><p>Run the CRISPR gatherer from the command line.</p>
+</dd></dl>
+
+</section>
+<section id="module-py_crispr_analyser.index">
+<span id="py-crispr-analyser-index-module"></span><h2>py_crispr_analyser.index module<a class="headerlink" href="#module-py_crispr_analyser.index" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.index.create_metadata">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.index.</span></span><span class="sig-name descname"><span class="pre">create_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_sequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assembly</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/index.html#create_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.index.create_metadata" title="Link to this definition"></a></dt>
+<dd><p>Create metadata for the version 3 of the binary output file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number_of_sequences</strong> (<em>numpy.uint64</em>) – Number of sequences in the file</p></li>
+<li><p><strong>sequence_length</strong> (<em>numpy.uint64</em>) – Length of each sequence (guide + PAM)</p></li>
+<li><p><strong>offset</strong> (<em>numpy.uint64</em>) – Offset of the first sequence</p></li>
+<li><p><strong>species_id</strong> (<em>numpy.uint8</em>) – ID of the species e.g. 1</p></li>
+<li><p><strong>species_name</strong> (<em>str</em>) – Name of the species e.g. ‘Human’</p></li>
+<li><p><strong>assembly</strong> (<em>str</em>) – Genome assembly used e.g. ‘GRCh38’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A bytes object containing the metadata</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.index.index">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.index.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputfiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assembly</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/index.html#index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.index.index" title="Link to this definition"></a></dt>
+<dd><p>Run the CRISPR indexer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputfiles</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – The input CSV files e.g. [‘input1.csv’, ‘input2.csv’]</p></li>
+<li><p><strong>outputfile</strong> (<em>str</em>) – The name of the output binary file to be generated.</p></li>
+<li><p><strong>species</strong> (<em>str</em>) – The species name e.g. ‘Human’.</p></li>
+<li><p><strong>assembly</strong> (<em>str</em>) – The assembly name e.g. ‘GRCh38’.</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – The integer for offset after which to start numbering ID.</p></li>
+<li><p><strong>species_id</strong> (<em>int</em>) – The integer of the species ID e.g. 1.</p></li>
+<li><p><strong>guide_length</strong> (<em>int</em>) – The length of the guide sequence default is 20.
+(CRISPR excluding PAM)</p></li>
+<li><p><strong>pam_length</strong> (<em>int</em>) – The length of the PAM sequence default is 3.
+(CRISPR excluding guide)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean indicating if verbose output is enabled.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.index.parse_record">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.index.</span></span><span class="sig-name descname"><span class="pre">parse_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/index.html#parse_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.index.parse_record" title="Link to this definition"></a></dt>
+<dd><p>Parse a line from the input CSV file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>record</strong> (<em>str</em>) – A line from the input CSV file</p></li>
+<li><p><strong>guide_length</strong> (<em>int</em>) – The length of the guide sequence (CRISPR excluding PAM)</p></li>
+<li><p><strong>pam_length</strong> (<em>int</em>) – The length of the PAM sequence (CRISPR excluding guide)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the guide sequence and PAM right flag</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(&lt;class ‘str’&gt;, &lt;class ‘int’&gt;)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.index.run">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.index.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['-M',</span> <span class="pre">'html',</span> <span class="pre">'source',</span> <span class="pre">'build']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/index.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.index.run" title="Link to this definition"></a></dt>
+<dd><p>Run the CRISPR indexer from the command line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>argv</strong> – The command line arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-py_crispr_analyser.search">
+<span id="py-crispr-analyser-search-module"></span><h2>py_crispr_analyser.search module<a class="headerlink" href="#module-py_crispr_analyser.search" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.search.run">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.search.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['-M',</span> <span class="pre">'html',</span> <span class="pre">'source',</span> <span class="pre">'build']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/search.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.search.run" title="Link to this definition"></a></dt>
+<dd><p>Run the search command from the command line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>argv</strong> – The command line arguments</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.search.search">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/search.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.search.search" title="Link to this definition"></a></dt>
+<dd><p>Search for a sequence in an indexed binary file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>guides</strong> (<em>numpy.ndarray</em>) – The numpy uint64 array of guides</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – The query sequence to search for</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean to print verbose output</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of indices where the sequence is found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-py_crispr_analyser.utils">
+<span id="py-crispr-analyser-utils-module"></span><h2>py_crispr_analyser.utils module<a class="headerlink" href="#module-py_crispr_analyser.utils" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">Metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_sequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assembly</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#Metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.Metadata" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A dataclass to hold metadata information from the guides file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number_of_sequences</strong> (<em>numpy.uint64</em>)</p></li>
+<li><p><strong>sequence_length</strong> (<em>numpy.uint64</em>)</p></li>
+<li><p><strong>offset</strong> (<em>numpy.uint64</em>)</p></li>
+<li><p><strong>species_id</strong> (<em>numpy.uint8</em>)</p></li>
+<li><p><strong>species_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>assembly</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata.assembly">
+<span class="sig-name descname"><span class="pre">assembly</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#py_crispr_analyser.utils.Metadata.assembly" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata.number_of_sequences">
+<span class="sig-name descname"><span class="pre">number_of_sequences</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.uint64</span></em><a class="headerlink" href="#py_crispr_analyser.utils.Metadata.number_of_sequences" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.uint64</span></em><a class="headerlink" href="#py_crispr_analyser.utils.Metadata.offset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata.sequence_length">
+<span class="sig-name descname"><span class="pre">sequence_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.uint64</span></em><a class="headerlink" href="#py_crispr_analyser.utils.Metadata.sequence_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata.species_id">
+<span class="sig-name descname"><span class="pre">species_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.uint8</span></em><a class="headerlink" href="#py_crispr_analyser.utils.Metadata.species_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.Metadata.species_name">
+<span class="sig-name descname"><span class="pre">species_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#py_crispr_analyser.utils.Metadata.species_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.check_file_header">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">check_file_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#check_file_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.check_file_header" title="Link to this definition"></a></dt>
+<dd><p>Check the header of the file from binary data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bytes</strong> (<em>bytes</em>) – The binary data to check</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the header file version is not supported</p></li>
+<li><p><strong>ValueError</strong> – If the header length is not correct</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.get_file_metadata">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">get_file_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#get_file_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.get_file_metadata" title="Link to this definition"></a></dt>
+<dd><p>Parse the metadata from binary data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bytes</strong> (<em>bytes</em>) – The binary data to parse</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the metadata length is not correct</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A Metadata object containing the parsed metadata</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#py_crispr_analyser.utils.Metadata" title="py_crispr_analyser.utils.Metadata"><em>Metadata</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.get_guides">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">get_guides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guidesfile_handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#get_guides"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.get_guides" title="Link to this definition"></a></dt>
+<dd><p>Get array of guides from the binary guides file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>guidesfile_handle</strong> (<em>BinaryIO</em>) – The file handle of the guides file</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean to print verbose output</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A numpy array of guides</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.parse_c_string">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">parse_c_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#parse_c_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.parse_c_string" title="Link to this definition"></a></dt>
+<dd><p>Parse a null-terminated C string from a byte array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>bytes</em>) – The byte array to parse</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.print_metadata">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">print_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#print_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.print_metadata" title="Link to this definition"></a></dt>
+<dd><p>Print the metadata information to STDERR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metadata</strong> (<a class="reference internal" href="#py_crispr_analyser.utils.Metadata" title="py_crispr_analyser.utils.Metadata"><em>Metadata</em></a>) – The Metadata object to print</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.reverse_complement">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">reverse_complement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#reverse_complement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.reverse_complement" title="Link to this definition"></a></dt>
+<dd><p>Return the reverse complement of a DNA sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sequence</strong> (<em>str</em>) – The string DNA sequence to reverse complement.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The reverse complemented string DNA sequence</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_crispr_analyser.utils.sequence_to_binary_encoding">
+<span class="sig-prename descclassname"><span class="pre">py_crispr_analyser.utils.</span></span><span class="sig-name descname"><span class="pre">sequence_to_binary_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_crispr_analyser/utils.html#sequence_to_binary_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_crispr_analyser.utils.sequence_to_binary_encoding" title="Link to this definition"></a></dt>
+<dd><p>Convert a string DNA sequence to bits accounting for pam right or left.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>str</em>) – The string DNA sequence to convert</p></li>
+<li><p><strong>pam_right</strong> (<em>int</em>) – An integer indicating if PAM is on the right (1) or left (0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 64-bit unsigned integer representing the sequence</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.uint64</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-py_crispr_analyser">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-py_crispr_analyser" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="license_contact.html" class="btn btn-neutral float-right" title="License and Contact Information" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 Genome Research Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

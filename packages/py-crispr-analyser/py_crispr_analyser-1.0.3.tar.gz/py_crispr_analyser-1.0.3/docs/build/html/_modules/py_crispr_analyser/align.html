@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py_crispr_analyser.align &mdash; py-crispr-analyser  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            py-crispr-analyser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation and Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Command Line Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cross_reference.html">Cross Referencing Guides to CRISPRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license_contact.html">License and Contact Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">py-crispr-analyser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">py_crispr_analyser.align</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py_crispr_analyser.align</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2025 Genome Research Ltd.</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">getopt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">cuda</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ERROR_STR</span><span class="p">,</span>
+    <span class="n">FILE_VERSION</span><span class="p">,</span>
+    <span class="n">HEADER_SIZE</span><span class="p">,</span>
+    <span class="n">METADATA_SIZE</span><span class="p">,</span>
+    <span class="n">check_file_header</span><span class="p">,</span>
+    <span class="n">get_guides</span><span class="p">,</span>
+    <span class="n">get_file_metadata</span><span class="p">,</span>
+    <span class="n">print_metadata</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">MAX_MISSMATCHES</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">MAX_OFF_TARGETS</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">PAM_ON</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">left_shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
+<span class="n">PAM_OFF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">PAM_ON</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
+
+
+<span class="nd">@cuda</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_off_targets_kernel</span><span class="p">(</span>
+    <span class="n">guides</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">query_sequence</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">reverse_query_sequence</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">summary</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">off_target_ids_idx</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">off_target_ids</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find off-targets for a given query sequence using CUDA</span>
+
+<span class="sd">    :param guides: The array of encoded gRNA sequences</span>
+<span class="sd">    :param query_sequence: The query sequence</span>
+<span class="sd">    :param reverse_query_sequence: The reverse complement of the query sequence</span>
+<span class="sd">    :param summary: The array to store the results</span>
+<span class="sd">    :param off_target_ids_idx: The index for the off-target_ids array</span>
+<span class="sd">    :param off_target_ids: The array to store the off-target ids</span>
+<span class="sd">    :param offset: The offset of the guides default 0</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">threads_per_grid</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">gridDim</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">cuda</span><span class="o">.</span><span class="n">blockDim</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">guides</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">threads_per_grid</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">guides</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">guides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">ERROR_STR</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">query_sequence</span> <span class="o">^</span> <span class="n">guides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="o">&amp;</span> <span class="n">PAM_ON</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">reverse_query_sequence</span> <span class="o">^</span> <span class="n">guides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">match</span> <span class="o">&amp;</span> <span class="n">PAM_OFF</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="p">(</span><span class="n">match</span> <span class="o">|</span> <span class="p">(</span><span class="n">match</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x5555555555555555</span>
+            <span class="n">nos_off_targets</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">libdevice</span><span class="o">.</span><span class="n">popcll</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nos_off_targets</span> <span class="o">&lt;</span> <span class="n">MAX_MISSMATCHES</span><span class="p">:</span>
+                <span class="n">cuda</span><span class="o">.</span><span class="n">atomic</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">nos_off_targets</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">atomic</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">off_target_ids_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">cuda</span><span class="o">.</span><span class="n">atomic</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">off_target_ids</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="nd">@jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_off_targets</span><span class="p">(</span>
+    <span class="n">guides</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">query_sequence</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">reverse_query_sequence</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find off-targets for a given query sequence using the CPU</span>
+
+<span class="sd">    :param guides: The array of encoded gRNA sequences</span>
+<span class="sd">    :param query_sequence: The query sequence</span>
+<span class="sd">    :param reverse_query_sequence: The reverse complement of the query sequence</span>
+<span class="sd">    :param offset: The offset of the guides default 0</span>
+<span class="sd">    :return: A tuple containing a summary and a list of off-target ids</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_MISSMATCHES</span>
+    <span class="n">off_target_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">guide</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">guides</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">guide</span> <span class="o">==</span> <span class="n">ERROR_STR</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">query_sequence</span> <span class="o">^</span> <span class="n">guide</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="o">&amp;</span> <span class="n">PAM_ON</span><span class="p">:</span>
+            <span class="n">match_r</span> <span class="o">=</span> <span class="n">reverse_query_sequence</span> <span class="o">^</span> <span class="n">guide</span>
+            <span class="n">match_count</span> <span class="o">=</span> <span class="n">_pop_count</span><span class="p">(</span><span class="n">match_r</span> <span class="o">&amp;</span> <span class="n">PAM_OFF</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">match_count</span> <span class="o">=</span> <span class="n">_pop_count</span><span class="p">(</span><span class="n">match</span> <span class="o">&amp;</span> <span class="n">PAM_OFF</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match_count</span> <span class="o">&lt;</span> <span class="n">MAX_MISSMATCHES</span><span class="p">:</span>
+            <span class="n">summary</span><span class="p">[</span><span class="n">match_count</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">off_target_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">summary</span><span class="p">,</span> <span class="n">off_target_ids</span>
+
+
+<span class="nd">@jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_pop_count</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count bits in integer accounting for encoding</span>
+<span class="sd">    as everything is two bit we must convert them all to one bit,</span>
+<span class="sd">    to do this we must turn off all MSBs, but before we can do that</span>
+<span class="sd">    we need to ensure that when an MSB is set to 1, the LSB is also set.</span>
+<span class="sd">    the 4 will change pam_right to 0 so it doesnt get counted.</span>
+<span class="sd">    5 is 0101, 4 is 0100</span>
+
+<span class="sd">    :param x: The integer to count the bits of</span>
+<span class="sd">    :return: The number of bits set in the integer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">((</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x5555555555555555</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&amp;</span> <span class="mh">0x3333333333333333</span><span class="p">)</span> <span class="o">+</span> <span class="p">((</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x3333333333333333</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x0F0F0F0F0F0F0F0F</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mh">0x0101010101010101</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">56</span>
+
+
+<div class="viewcode-block" id="reverse_complement_binary">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.align.reverse_complement_binary">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reverse_complement_binary</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reverse complement a binary sequence</span>
+
+<span class="sd">    :param sequence: The binary sequence to reverse complement</span>
+<span class="sd">    :param size: The size of the sequence</span>
+<span class="sd">    :return: The reverse complemented binary sequence</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="mh">0xFFFFFFFFFFFFFFFF</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="mi">63</span> <span class="o">-</span> <span class="p">(</span><span class="n">size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)))</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="o">~</span><span class="n">sequence</span> <span class="o">&amp;</span> <span class="n">mask</span>
+    <span class="nb">reversed</span> <span class="o">=</span> <span class="n">sequence</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="nb">reversed</span> <span class="o">&lt;&lt;=</span> <span class="mi">2</span>
+        <span class="nb">reversed</span> <span class="o">|=</span> <span class="p">(</span><span class="n">sequence</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x3</span>
+        <span class="n">shift</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="nb">reversed</span></div>
+
+
+
+<div class="viewcode-block" id="print_off_targets">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.align.print_off_targets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_off_targets</span><span class="p">(</span>
+    <span class="n">crispr_id</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+    <span class="n">summary</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">off_target_ids</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">species_id</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print the off targets to the console</span>
+
+<span class="sd">    :param crispr_id: The id of the CRISPR</span>
+<span class="sd">    :param summary: The summary of the off targets</span>
+<span class="sd">    :param off_target_ids: The off target CRISPR ids</span>
+<span class="sd">    :param species_id: The species id</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">summary_output</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">summary</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_MISSMATCHES</span><span class="p">)]</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">off_target_ids</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">MAX_OFF_TARGETS</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">crispr_id</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">species_id</span><span class="si">}</span><span class="se">\t{{</span><span class="si">{</span><span class="n">summary_output</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">crispr_id</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">species_id</span><span class="si">}</span><span class="se">\t</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">off_target_ids</span><span class="p">))</span><span class="si">}</span><span class="se">}}\t{{</span><span class="si">{</span><span class="n">summary_output</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="run">
+<a class="viewcode-back" href="../../py_crispr_analyser.html#py_crispr_analyser.align.run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the align command to find off-targets for CRISPRs&quot;&quot;&quot;</span>
+    <span class="n">inputfile</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">use_cuda</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Usage: crispr_analyser_align [options...] [ids...]</span>
+<span class="sd">-h, --help            Print this help message</span>
+<span class="sd">-i, --ifile &lt;file&gt;    The input binary guides file</span>
+<span class="sd">--no-cuda             Do not use CUDA GPU acceleration</span>
+<span class="sd">[ids...]              The ids of the CRISPRs to find off-targets for</span>
+<span class="sd">&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">getopt</span><span class="o">.</span><span class="n">getopt</span><span class="p">(</span>
+            <span class="n">argv</span><span class="p">,</span>
+            <span class="s2">&quot;hi:&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;help&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ifile=&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;no-cuda&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">getopt</span><span class="o">.</span><span class="n">GetoptError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">usage</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">):</span>
+            <span class="n">usage</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--ifile&quot;</span><span class="p">):</span>
+            <span class="n">inputfile</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--no-cuda&quot;</span><span class="p">:</span>
+            <span class="n">use_cuda</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">inputfile</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">usage</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_file</span><span class="p">:</span>
+        <span class="n">check_file_header</span><span class="p">(</span><span class="n">in_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">HEADER_SIZE</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Version is </span><span class="si">{</span><span class="n">FILE_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">get_file_metadata</span><span class="p">(</span><span class="n">in_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">METADATA_SIZE</span><span class="p">))</span>
+        <span class="n">print_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="n">guides</span> <span class="o">=</span> <span class="n">get_guides</span><span class="p">(</span><span class="n">in_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Searching for off targets&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_cuda</span> <span class="o">&amp;</span> <span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">memory_required</span> <span class="o">=</span> <span class="n">guides</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Requires </span><span class="si">{</span><span class="n">memory_required</span><span class="si">}</span><span class="s2"> MB of GPU memory&quot;</span><span class="p">,</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">device_guides</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">to_device</span><span class="p">(</span><span class="n">guides</span><span class="p">)</span>
+            <span class="n">threads_per_block</span> <span class="o">=</span> <span class="mi">256</span>
+            <span class="n">blocks_per_grid</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">guides</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="p">(</span><span class="n">threads_per_block</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">threads_per_block</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+                <span class="n">query_sequence</span> <span class="o">=</span> <span class="n">guides</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">reverse_query_sequence</span> <span class="o">=</span> <span class="n">reverse_complement_binary</span><span class="p">(</span>
+                    <span class="n">query_sequence</span><span class="p">,</span> <span class="mi">20</span>
+                <span class="p">)</span>
+                <span class="n">summary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MAX_MISSMATCHES</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+                <span class="n">off_target_ids_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+                <span class="n">off_target_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MAX_OFF_TARGETS</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+                <span class="n">device_summary</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">to_device</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+                <span class="n">device_off_target_ids_idx</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">to_device</span><span class="p">(</span><span class="n">off_target_ids_idx</span><span class="p">)</span>
+                <span class="n">device_off_target_ids</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">to_device</span><span class="p">(</span><span class="n">off_target_ids</span><span class="p">)</span>
+                <span class="n">find_off_targets_kernel</span><span class="p">[</span><span class="n">blocks_per_grid</span><span class="p">,</span> <span class="n">threads_per_block</span><span class="p">](</span>
+                    <span class="n">device_guides</span><span class="p">,</span>
+                    <span class="n">query_sequence</span><span class="p">,</span>
+                    <span class="n">reverse_query_sequence</span><span class="p">,</span>
+                    <span class="n">device_summary</span><span class="p">,</span>
+                    <span class="n">device_off_target_ids_idx</span><span class="p">,</span>
+                    <span class="n">device_off_target_ids</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">host_summary</span> <span class="o">=</span> <span class="n">device_summary</span><span class="o">.</span><span class="n">copy_to_host</span><span class="p">()</span>
+                <span class="n">host_off_target_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trim_zeros</span><span class="p">(</span>
+                    <span class="n">device_off_target_ids</span><span class="o">.</span><span class="n">copy_to_host</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">print_off_targets</span><span class="p">(</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">host_summary</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">host_off_target_ids</span><span class="p">),</span>
+                    <span class="n">metadata</span><span class="o">.</span><span class="n">species_id</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+                <span class="n">query_sequence</span> <span class="o">=</span> <span class="n">guides</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">reverse_query_sequence</span> <span class="o">=</span> <span class="n">reverse_complement_binary</span><span class="p">(</span>
+                    <span class="n">query_sequence</span><span class="p">,</span> <span class="mi">20</span>
+                <span class="p">)</span>
+                <span class="n">summary</span><span class="p">,</span> <span class="n">off_target_ids</span> <span class="o">=</span> <span class="n">find_off_targets</span><span class="p">(</span>
+                    <span class="n">guides</span><span class="p">,</span>
+                    <span class="n">query_sequence</span><span class="p">,</span>
+                    <span class="n">reverse_query_sequence</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">print_off_targets</span><span class="p">(</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">summary</span><span class="p">,</span> <span class="n">off_target_ids</span><span class="p">,</span> <span class="n">metadata</span><span class="o">.</span><span class="n">species_id</span>
+                <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 Genome Research Ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
