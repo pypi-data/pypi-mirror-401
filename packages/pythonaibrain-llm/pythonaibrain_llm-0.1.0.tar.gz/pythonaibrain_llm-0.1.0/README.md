@@ -1,0 +1,593 @@
+# Pythonaibrain-LLM
+
+**Production-ready LLM extension for Pythonaibrain with quantized model support.**
+
+This package provides seamless integration of large language models into Pythonaibrain, featuring automatic model downloading, intelligent caching, cross-platform system validation, and robust error handling.
+
+---
+
+## Features
+
+- **Quantized Models**: ~988 MB `.safetensors` format for optimal size/performance
+- **Smart Caching**: Download once, use offline forever
+- **Resumable Downloads**: Network interruptions won't stop you
+- **System Validation**: Automatic RAM and version checks across Windows, Linux, macOS
+- **Simple API**: One function to rule them all: `load_llm_model()`
+- **CLI Tools**: Command-line utilities for model management
+- **Production-Ready**: Comprehensive error handling and type hints
+
+---
+
+## System Requirements
+
+| Component | Requirement |
+|-----------|-------------|
+| **Python** | 3.9 or higher |
+| **System RAM** | >= 4 GB (enforced) |
+| **pythonaibrain** | >= 1.1.9 |
+| **Disk Space** | ~1 GB for model cache |
+| **Internet** | Required for first download only |
+
+> **CRITICAL**: This extension requires a minimum of **4 GB system RAM**. Systems with less RAM will raise `InsufficientRAMError` and refuse to load the model. This is a safety feature, not a bug.
+
+---
+
+## Installation
+
+### Option 1: Standalone Installation (Recommended)
+
+```bash
+pip install pythonaibrain-llm
+```
+
+### Option 2: As Optional Dependency
+
+```bash
+pip install pythonaibrain[llm]
+```
+
+---
+
+## Quick Start
+
+### Basic Usage
+
+```python
+from pythonaibrain_llm import load_llm_model
+
+# Load model (downloads on first use, ~947 MB)
+model_path = load_llm_model()
+print(f"Model ready at: {model_path}")
+
+# Use with pythonaibrain
+import pythonaibrain
+# ... your code here
+```
+
+### With Error Handling (Recommended)
+
+```python
+from pythonaibrain_llm import (
+    load_llm_model,
+    InsufficientRAMError,
+    EngineVersionError,
+    ModelDownloadError,
+)
+
+try:
+    model_path = load_llm_model()
+    print(f"Model loaded successfully: {model_path}")
+    
+except InsufficientRAMError as e:
+    print(f"System RAM insufficient: {e}")
+    # Upgrade system RAM or use different machine
+    
+except EngineVersionError as e:
+    print(f"pythonaibrain version incompatible: {e}")
+    # Run: pip install --upgrade pythonaibrain>=1.1.9
+    
+except ModelDownloadError as e:
+    print(f"Download failed: {e}")
+    # Check internet connection and retry
+```
+
+### Pre-flight System Check
+
+```python
+from pythonaibrain_llm import validate_system, model_exists
+
+# Validate system before loading
+try:
+    info = validate_system()
+    print(f"Platform: {info['platform']}")
+    print(f"RAM: {info['ram_gb']} GB")
+    print(f"Engine: {info['pythonaibrain_version']}")
+    print(f"Status: {info['status']}")
+except Exception as e:
+    print(f"System validation failed: {e}")
+    exit(1)
+
+# Check if model is already cached
+if not model_exists():
+    print("Model will be downloaded (~947 MB)")
+```
+
+---
+
+## CLI Usage
+
+The package includes a powerful command-line interface for model management.
+
+### Check System Readiness
+
+```bash
+pythonaibrain-llm check
+```
+
+**Output:**
+```
+============================================================
+pythonaibrain-llm System Check
+============================================================
+Platform: Linux
+Python: 3.11.5
+System RAM: 16.00 GB (minimum: 4.00 GB)
+pythonaibrain: 1.2.0 (minimum: 1.1.9)
+Model: Cached at /home/user/.cache/pythonaibrain-llm/model.safetensors
+
+Status: READY
+Your system meets all requirements for pythonaibrain-llm.
+```
+
+### Download Model Manually
+
+```bash
+pythonaibrain-llm download
+```
+
+Force re-download:
+```bash
+pythonaibrain-llm download --force
+```
+
+### Show Model Information
+
+```bash
+pythonaibrain-llm info
+```
+
+**Output:**
+```
+Model Information:
+  Repository: DvyanshuSinha/TIGER
+  Filename: model.safetensors
+  Cached: Yes
+  Cache Path: /home/user/.cache/pythonaibrain-llm/model.safetensors
+  Size: 988 MB
+```
+
+### Clear Model Cache
+
+```bash
+pythonaibrain-llm clear
+```
+
+Skip confirmation prompt:
+```bash
+pythonaibrain-llm clear --force
+```
+
+---
+
+## Architecture
+
+### Package Structure
+
+```
+pythonaibrain-llm/
+├── src/
+│   └── pythonaibrain_llm/
+│       ├── __init__.py          # Public API
+│       ├── __version__.py       # Version info
+│       ├── model_loader.py      # Model download/caching
+│       ├── system_check.py      # RAM/version validation
+│       ├── exceptions.py        # Custom exceptions
+│       ├── cli.py              # Command-line interface
+│       └── config.py           # Configuration constants
+├── tests/
+│   └── test_system_check.py    # Test suite
+├── .gitignore
+├── LICENSE.txt
+├── pyproject.toml              # Modern packaging
+├── README.md
+└── use.md
+```
+
+### Design Principles
+
+- **Separation of Concerns**: Core engine (pythonaibrain) stays lightweight
+- **Fail Fast**: System validation before any downloads
+- **User-Friendly**: Clear error messages with actionable solutions
+- **Offline-First**: Cache models locally for offline use
+- **Cross-Platform**: Works on Windows, Linux, macOS
+
+### Model Details
+
+- **Repository**: `DvyanshuSinha/TIGER` (Hugging Face)
+- **File**: `model.safetensors`
+- **Format**: Quantized safetensors
+- **Size**: ~988 MB
+- **Cache Location**: `~/.cache/pythonaibrain-llm/`
+- **Download**: Automatic with resumable support via `huggingface_hub`
+
+---
+
+## API Reference
+
+### Primary Functions
+
+#### `load_llm_model(force_download=False, validate=True) -> Path`
+
+Load the LLM model, downloading if necessary.
+
+**Parameters:**
+- `force_download` (bool): Force re-download even if cached
+- `validate` (bool): Validate model integrity after download
+
+**Returns:**
+- `Path`: Local path to the `.safetensors` model file
+
+**Raises:**
+- `InsufficientRAMError`: System RAM < 4 GB
+- `EngineVersionError`: pythonaibrain version incompatible
+- `ModelDownloadError`: Download failed
+- `ModelValidationError`: Model file corrupted
+
+**Example:**
+```python
+model_path = load_llm_model()
+```
+
+---
+
+#### `validate_system() -> dict`
+
+Validate all system requirements.
+
+**Returns:**
+```python
+{
+    "platform": "Linux",
+    "python_version": "3.11.5",
+    "ram_gb": 16.0,
+    "pythonaibrain_version": "1.2.0",
+    "status": "ready"
+}
+```
+
+**Raises:**
+- `InsufficientRAMError`: RAM requirement not met
+- `EngineVersionError`: Version requirement not met
+
+---
+
+#### `model_exists() -> bool`
+
+Check if model is already cached locally.
+
+**Returns:**
+- `True` if model exists and appears valid
+- `False` otherwise
+
+---
+
+#### `get_model_info() -> dict`
+
+Get metadata about the model.
+
+**Returns:**
+```python
+{
+    "repo_id": "DvyanshuSinha/TIGER",
+    "filename": "model.safetensors",
+    "cached": True,
+    "cache_path": "/home/user/.cache/pythonaibrain-llm/model.safetensors"
+}
+```
+
+---
+
+#### `get_system_ram_gb() -> float`
+
+Get total system RAM in gigabytes.
+
+**Returns:**
+- Float representing total RAM (rounded to 2 decimals)
+
+---
+
+#### `check_ram_requirement(min_gb=4.0) -> None`
+
+Verify system meets RAM requirement.
+
+**Raises:**
+- `InsufficientRAMError` if RAM < min_gb
+
+---
+
+#### `check_engine_version(min_version="1.1.9") -> None`
+
+Verify pythonaibrain version is compatible.
+
+**Raises:**
+- `EngineVersionError` if version too old
+- `ImportError` if pythonaibrain not installed
+
+---
+
+### Exception Classes
+
+All exceptions inherit from `LLMError` base class.
+
+#### `InsufficientRAMError`
+
+Raised when system RAM is below 4 GB minimum.
+
+```python
+except InsufficientRAMError as e:
+    print(e.available_gb)  # Actual RAM
+    print(e.required_gb)   # Required RAM (4.0)
+```
+
+#### `EngineVersionError`
+
+Raised when pythonaibrain version is incompatible.
+
+```python
+except EngineVersionError as e:
+    print(e.current_version)   # Installed version
+    print(e.required_version)  # Required version
+```
+
+#### `ModelDownloadError`
+
+Raised when model download fails.
+
+```python
+except ModelDownloadError as e:
+    print(e.repo_id)  # Repository ID
+    print(e.reason)   # Failure reason
+```
+
+#### `ModelValidationError`
+
+Raised when downloaded model is corrupted.
+
+```python
+except ModelValidationError as e:
+    print(e.path)    # Model file path
+    print(e.reason)  # Validation failure reason
+```
+
+---
+
+## Advanced Usage
+
+### Force Re-download
+
+Useful if cached model is corrupted:
+
+```python
+model_path = load_llm_model(force_download=True)
+```
+
+### Skip Validation
+
+For faster loading (not recommended for production):
+
+```python
+model_path = load_llm_model(validate=False)
+```
+
+### Custom RAM Requirements
+
+```python
+from pythonaibrain_llm import check_ram_requirement
+
+# Require 8 GB instead of 4 GB
+check_ram_requirement(min_gb=8.0)
+```
+
+### Check Specific Engine Version
+
+```python
+from pythonaibrain_llm import check_engine_version
+
+check_engine_version(min_version="1.2.0")
+```
+
+---
+
+## Integration with pythonaibrain
+
+### Core Package Integration
+
+Add this to `pythonaibrain/pyproject.toml`:
+
+```toml
+[project.optional-dependencies]
+llm = ["pythonaibrain-llm>=1.1.9"]
+```
+
+### Usage in pythonaibrain
+
+```python
+# In pythonaibrain code
+try:
+    from pythonaibrain_llm import load_llm_model
+    model_path = load_llm_model()
+    # Use model_path with your engine
+except ImportError:
+    print("Install LLM extension: pip install pythonaibrain[llm]")
+```
+
+---
+
+## Troubleshooting
+
+### InsufficientRAMError
+
+**Problem:** Your system has less than 4 GB RAM.
+
+**Solutions:**
+- Upgrade system RAM to at least 4 GB
+- Use a different machine with more memory
+- Use cloud computing resources (AWS, GCP, Azure)
+
+**Note:** This is a hard requirement. The model cannot run safely below 4 GB RAM.
+
+---
+
+### EngineVersionError
+
+**Problem:** Your pythonaibrain version is too old.
+
+**Solution:**
+```bash
+pip install --upgrade pythonaibrain>=1.1.9
+```
+
+---
+
+### ModelDownloadError
+
+**Problem:** Network or repository access issues.
+
+**Checklist:**
+- Check internet connectivity
+- Verify Hugging Face Hub is accessible
+- Check firewall/proxy settings
+- Ensure sufficient disk space (~1 GB)
+
+**Retry download:**
+```bash
+pythonaibrain-llm download --force
+```
+
+---
+
+### ModelValidationError
+
+**Problem:** Cached model file is corrupted.
+
+**Solution:**
+```bash
+# Clear corrupted cache
+pythonaibrain-llm clear --force
+
+# Re-download fresh copy
+pythonaibrain-llm download
+```
+
+---
+
+### Import Error: "No module named 'pythonaibrain_llm'"
+
+**Problem:** Package not installed.
+
+**Solution:**
+```bash
+pip install pythonaibrain-llm
+```
+
+---
+
+## Performance
+
+- **Initial download**: ~2-5 minutes (depending on connection)
+- **Subsequent loads**: Instant (cached)
+- **RAM overhead**: Minimal (~50 MB for Python process)
+- **Model loading time**: ~1-2 seconds (from cache)
+
+---
+
+## Security
+
+- Models are downloaded from trusted Hugging Face repositories
+- SHA-256 checksums can be verified (optional)
+- No API keys or credentials stored
+- All data stays local after download
+
+---
+
+## License
+
+This project is licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0).
+
+Copyright © 2025 Divyanshu Sinha.
+
+See the [LICENSE.txt](LICENSE.txt) file for details.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests for new functionality
+5. Run the test suite (`pytest tests/`)
+6. Format code (`black src/ tests/`)
+7. Commit changes (`git commit -m 'Add amazing feature'`)
+8. Push to branch (`git push origin feature/amazing-feature`)
+9. Open a Pull Request
+
+### Contribution Guidelines
+
+- Follow PEP 8 style guide
+- Write comprehensive tests
+- Update documentation
+- Add type hints
+- Keep functions focused and small
+
+---
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/DivyanshuSinha136/pythonaibrain-v1.1.9/issues)
+- **Documentation**: [Read the Docs](https://pypi.org/project/pythonaibrain-llm)
+- **Main Project**: [pythonaibrain](https://github.com/DivyanshuSinha136/pythonaibrain-v1.1.9)
+
+---
+
+## Acknowledgments
+
+- Built with [Hugging Face Hub](https://huggingface.co/docs/huggingface_hub)
+- Uses [safetensors](https://github.com/huggingface/safetensors) for model format
+- Cross-platform RAM detection via [psutil](https://github.com/giampaolo/psutil)
+
+---
+
+## Roadmap
+
+- [ ] Support for multiple model sizes (small, medium, large)
+- [ ] Automatic GPU detection and utilization
+- [ ] Model quantization options (2-bit, 8-bit)
+- [ ] Progress bars for downloads
+- [ ] Model benchmarking utilities
+- [ ] Docker container support
+
+---
+
+## Quick Links
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [CLI Usage](#cli-usage)
+- [API Reference](#api-reference)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+
+---
