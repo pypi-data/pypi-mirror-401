@@ -1,0 +1,61 @@
+# {{ app_name | pascal_case }} - 项目规范
+
+> Anchor Stack v{{ stack_version }} | FastAPI {{ dependencies.fastapi }}
+
+## 禁止事项
+
+| ❌ 禁止 | ✅ 正确 |
+|--------|--------|
+| `print()` | `logger.info()` |
+| `os.getenv()` | `settings.xxx` |
+| 修改 `core/*` | 核心文件禁止修改 |
+
+## 日志
+
+```python
+from app.core.logger import logger
+
+logger.info("Action", user_id=123)
+logger.error("Failed", error=str(e))
+```
+
+## 配置
+
+```python
+from app.core.config import settings
+
+db_url = settings.database_url
+```
+
+## 目录结构
+
+- `src/app/api/v1/` - API 路由
+- `src/app/core/` - ⚠️ 核心模块 (勿改)
+- `src/app/models/` - SQLAlchemy 模型
+- `src/app/schemas/` - Pydantic Schema
+- `src/app/services/` - 业务逻辑
+
+## 新增 API
+
+1. Schema: `src/app/schemas/[模块].py`
+2. 路由: `src/app/api/v1/[模块].py`
+3. 注册: `src/app/api/v1/router.py`
+
+```python
+from fastapi import APIRouter
+from app.core.logger import logger
+
+router = APIRouter()
+
+@router.get("")
+async def list_items():
+    logger.info("Listing items")
+    return []
+```
+
+## 命令
+
+```bash
+cd src && uv run uvicorn app.main:app --reload
+uv run pytest
+```

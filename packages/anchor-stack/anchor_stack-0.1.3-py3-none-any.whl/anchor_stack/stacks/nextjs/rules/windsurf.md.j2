@@ -1,0 +1,82 @@
+# {{ app_name | pascal_case }} - 项目规范
+
+> Anchor Stack v{{ stack_version }} | Next.js {{ dependencies.next }} + React {{ dependencies.react }}
+
+## 禁止事项
+
+| ❌ 禁止 | ✅ 正确 |
+|--------|--------|
+| `console.log()` | `logger.info()` |
+| `process.env.XXX` | `config.appName` / `getServerConfig()` |
+| 修改 `src/lib/core/*` | 核心文件禁止修改 |
+
+## 日志
+
+```typescript
+import { logger } from '@/lib/core/logger';
+
+logger.info('Action', { userId: 123 });
+logger.error('Failed', { error: err.message });
+```
+
+## 配置
+
+```typescript
+import { config, getServerConfig } from '@/lib/core/config';
+
+// 客户端
+const appName = config.appName;
+
+// 服务端
+const apiKey = getServerConfig().apiKey;
+```
+
+## 目录结构
+
+- `src/app/` - Next.js App Router
+- `src/app/api/` - API 路由
+- `src/components/` - React 组件
+- `src/lib/core/` - ⚠️ 核心模块 (勿改)
+- `src/lib/utils/` - 工具函数
+- `src/services/` - 业务逻辑
+
+## 新增页面
+
+创建 `src/app/[路由]/page.tsx`:
+
+```typescript
+import { logger } from '@/lib/core/logger';
+
+export default function Page() {
+  logger.info('Page rendered');
+  return <main>Content</main>;
+}
+```
+
+## 新增 API
+
+创建 `src/app/api/[路由]/route.ts`:
+
+```typescript
+import { NextRequest } from 'next/server';
+import { logger } from '@/lib/core/logger';
+import { apiSuccess, apiError } from '@/lib/utils/api-response';
+
+export async function GET(request: NextRequest) {
+  logger.info('GET /api/example');
+  try {
+    return apiSuccess({ data: [] });
+  } catch (error) {
+    logger.error('Failed', { error: String(error) });
+    return apiError('Internal error', 500);
+  }
+}
+```
+
+## 命令
+
+```bash
+npm run dev      # 开发服务器
+npm run build    # 构建
+npm run lint     # 代码检查
+```
