@@ -1,0 +1,168 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "radionets-radiotools"
+description = "Tools for radio astronomy."
+readme = "README.rst"
+
+dynamic = ["version"]
+
+authors = [{ name = "radionets developers" }]
+maintainers = [
+  { name = "Anno Knierim", email = "anno.knierim@tu-dortmund.de" },
+  { name = "Tom Groß", email = "tom.gross@tu-dortmund.de" },
+]
+
+license = { text = "MIT" }
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Astronomy",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Development Status :: 4 - Beta",
+]
+
+requires-python = ">=3.10"
+
+dependencies = [
+  "astropy >=6.1.0",
+  "matplotlib ~=3.0",
+  "numpy ~=1.16",
+  "pandas >=2.0",
+  "rich >=13.0",
+  "requests",
+  "bs4",
+  "toml>=0.10.2",
+  "python-casacore>=3.7.1",
+]
+
+[dependency-groups]
+tests = [
+  "coverage!=6.3.0",
+  "h5py",
+  "pytest >= 7.0",
+  "pytest-cov",
+  "pytest-xdist",
+  "restructuredtext-lint",
+]
+
+docs = [
+  "graphviz",
+  "ipython",
+  "jupyter",
+  "linkify-it-py>=2.0.3",
+  "matplotlib",
+  "myst-parser>=4.0.1",
+  "nbsphinx",
+  "notebook",
+  "numpydoc",
+  "pydata_sphinx_theme",
+  "sphinx",
+  "sphinx-autobuild>=2024.10.3",
+  "sphinx-changelog",
+  "sphinx-copybutton",
+  "sphinx-design",
+  "sphinx-gallery >= 0.16.0",
+  "sphinx-tippy>=0.4.3",
+  "sphinx-togglebutton>=0.3.2",
+  "sphinx_automodapi",
+  "sphinxcontrib-bibtex",
+  "towncrier>=24.8.0",
+]
+
+dev = [
+  "ipython",
+  "jupyter",
+  "pre-commit",
+  { include-group = "tests" },
+  { include-group = "docs" },
+]
+
+[project.scripts]
+radiotools-info = "radiotools.info:main"
+radiotools-vis = "radiotools.cli_tools.vis:main"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/radiotools/_version.py"
+
+[tool.hatch.build.targets.wheel]
+include = ["src/radiotools"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/radiotools" = "radiotools"
+
+[tool.coverage.run]
+omit = ["docs/*", "src/radiotools/_version.py", "src/radiotools/version.py"]
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.towncrier]
+package = "radiotools"
+directory = "docs/changes"
+filename = "CHANGES.rst"
+template = "docs/changes/template.rst"
+# let towncrier create proper links to the merged PR
+issue_format = "`#{issue} <https://github.com/radionets-project/radiotools/pull/{issue}>`__"
+
+[tool.towncrier.fragment.feature]
+name = "New Features"
+showcontent = true
+
+[tool.towncrier.fragment.bugfix]
+name = "Bug Fixes"
+showcontent = true
+
+[tool.towncrier.fragment.api]
+name = "API Changes"
+showcontent = true
+
+[tool.towncrier.fragment.optimization]
+name = "Refactoring and Optimization"
+showcontent = true
+
+[tool.towncrier.fragment.maintenance]
+name = "Maintenance"
+showcontent = true
+
+[[tool.towncrier.section]]
+name = ""
+path = ""
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = ["tests"]
+
+[tool.ruff.lint]
+extend-select = [
+  "I",   # isort
+  "E",   # pycodestyle
+  "F",   # Pyflakes
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "SIM", # flake8-simplify
+]
+ignore = ["B905"]
+
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["radiotools"]
