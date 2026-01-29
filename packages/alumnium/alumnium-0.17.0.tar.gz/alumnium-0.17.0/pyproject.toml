@@ -1,0 +1,160 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = [
+    "poetry-core",
+]
+
+[tool.poe.tasks]
+check-format = [
+    { cmd = "pyprojectsort --diff" },
+    { cmd = "ruff check ." },
+]
+clean = "rm -rf .alumnium/cache dist log reports .pytest_cache __pycache__ .ruff_cache"
+test = "pytest tests/"
+upload-android-app = "curl -u $LT_USERNAME:$LT_ACCESS_KEY -X POST https://manual-api.lambdatest.com/app/upload/realDevice -F appFile=@examples/behave/features/support/TodoList.apk -F name=AndroidToDoApp"
+upload-ios-app = "curl -u $LT_USERNAME:$LT_ACCESS_KEY -X POST https://manual-api.lambdatest.com/app/upload/realDevice -F appFile=@examples/behave/features/support/TodoList.ipa -F name=TodoList"
+
+[tool.poe.tasks.examples-appium-android]
+cmd = "behave -t @appium-android -f html-pretty -o reports/behave.html -f pretty"
+
+[tool.poe.tasks.examples-appium-android.env]
+ALUMNIUM_DRIVER = "appium-android"
+
+[tool.poe.tasks.examples-appium-ios]
+sequence = [
+    { cmd = "behave -t @appium-ios -f html-pretty -o reports/behave.html -f pretty" },
+    { cmd = "pytest --retries 1 --html reports/pytest.html examples/pytest" },
+]
+
+[tool.poe.tasks.examples-appium-ios.env]
+ALUMNIUM_DRIVER = "appium-ios"
+
+[tool.poe.tasks.examples-playwright]
+sequence = [
+    { cmd = "behave -t @playwright -f html-pretty -o reports/behave.html -f pretty" },
+    { cmd = "pytest --retries 1 --html reports/pytest.html examples/pytest" },
+]
+
+[tool.poe.tasks.examples-playwright.env]
+ALUMNIUM_DRIVER = "playwright"
+
+[tool.poe.tasks.examples-selenium]
+sequence = [
+    { cmd = "behave -t @selenium -f html-pretty -o reports/behave.html -f pretty" },
+    { cmd = "pytest --retries 1 --html reports/pytest.html examples/pytest" },
+]
+
+[tool.poe.tasks.examples-selenium.env]
+ALUMNIUM_DRIVER = "selenium"
+
+[tool.poe.tasks.format]
+ignore_fail = true
+sequence = [
+    { cmd = "pyprojectsort" },
+    { cmd = "ruff check --fix ." },
+    { cmd = "ruff format ." },
+]
+
+[tool.poetry]
+authors = [
+    "Alex Rodionov <p0deje@gmail.com>",
+    "Tatiana Shepeleva <tati.shep@gmail.com>",
+]
+description = "Pave the way towards AI-powered test automation."
+homepage = "https://alumnium.ai"
+license = "MIT"
+name = "alumnium"
+packages = [
+    { from = "src", include = "alumnium" },
+]
+readme = "README.md"
+repository = "https://github.com/alumnium-hq/alumnium"
+version = "0.17.0"
+
+[tool.poetry.dependencies]
+appium-python-client = "^5.1.1"
+fastapi = "^0.127"
+langchain = "^1.1.0"
+langchain-anthropic = "^1.2.0"
+langchain-aws = "^1.1.0"
+langchain-deepseek = "^1.0.1"
+langchain-google-genai = "^4.2.0"
+langchain-mistralai = "^1.1.0"
+langchain-ollama = "^1.0.0"
+langchain-openai = "^1.1.0"
+langchain-xai = "^1.1.0"
+mcp = "^1.2.0"
+playwright = "^1.49"
+pydantic = "^2.10.0"
+python = "^3.10"
+retry2 = "^0.9"
+rich = "^14.0.0"
+selenium = "^4.0"
+sqlalchemy = "^2.0"
+xxhash = "^3.5.0"
+
+[tool.poetry.group.dev.dependencies]
+behave = "^1.2.6"
+behave-html-pretty-formatter = "^1.12"
+httpx = "^0.28.0"
+pre-commit = "^4.2.0"
+pyprojectsort = "^0.4.0"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+pytest-html = "^4.1.1"
+pytest-retry = "^1.7.0"
+python-dotenv = "^1.1.1"
+ruff = "^0.11.9"
+
+[tool.poetry.group.server.dependencies.uvicorn]
+extras = [
+    "standard",
+]
+version = "^0.32.0"
+
+[tool.poetry.requires-plugins.poethepoet]
+extras = [
+    "poetry_plugin",
+]
+version = "~0.35.0"
+
+[tool.poetry.scripts]
+alumnium-mcp = "alumnium.mcp.server:main"
+alumnium-server = "alumnium.server.main:main"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+generate_report_on_test = true
+pythonpath = "."
+retry_delay = 0.5
+
+[tool.ruff]
+extend-exclude = [
+    ".git",
+    ".venv",
+    "dist",
+    "log",
+    "reports",
+]
+line-length = 119
+
+[tool.ruff.lint]
+extend-select = [
+    "I",
+]
+ignore = [
+    "E402",
+    "F401",
+    "F403",
+    "F405",
+]
+select = [
+    "E",
+    "F",
+    "W",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"examples/behave/features/steps/*" = [
+    "F811",
+]
