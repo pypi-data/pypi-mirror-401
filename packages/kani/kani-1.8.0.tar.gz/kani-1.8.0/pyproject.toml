@@ -1,0 +1,119 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kani"
+dynamic = ["version"]
+authors = [
+    { name = "Andrew Zhu", email = "andrew@zhu.codes" },
+    { name = "Liam Dugan", email = "ldugan@seas.upenn.edu" },
+    { name = "Alyssa Hwang", email = "ahwang16@seas.upenn.edu" },
+]
+description = "kani (カニ) is a lightweight and highly hackable framework for chat-based language models with tool usage/function calling."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    # https://pypi.org/classifiers/
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "pydantic>=2.0.0,<3.0.0",
+]
+
+[project.optional-dependencies]
+all = [
+    "kani[multimodal,mcp,huggingface,llama,cpp,vllm,openai,anthropic,google]",
+]
+
+# extensions
+multimodal = [
+    "kani-multimodal-core<2.0.0",
+    "transformers>=4.56.1,<5.0.0", # v4.56.1: ProcessorMixin.__call__ update
+]
+
+mcp = [
+    "mcp>=1.15.0,<2.0.0", # 1.15.0: ClientSessionGroup
+]
+
+# providers
+huggingface = [
+    "transformers>=4.28.0,<5.0.0",
+    "huggingface-hub",
+]
+
+llama = [
+    "protobuf",
+    "sentencepiece>=0.1.99,<1.0.0",
+]
+
+cpp = [
+    "llama-cpp-python>=0.2.0,<1.0.0",
+    "huggingface-hub",
+    "sentencepiece>=0.1.99,<1.0.0",
+]
+
+vllm = [
+    "kani-ext-vllm",
+]
+
+openai = [
+    "openai>=1.26.0,<3.0.0",
+    "tiktoken>=0.7.0,<1.0.0",
+]
+
+anthropic = [
+    "anthropic>=0.27.0,<1.0.0",
+]
+
+google = [
+    "google-genai>=1.0.0,<2.0.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/zhudotexe/kani"
+"Bug Tracker" = "https://github.com/zhudotexe/kani/issues"
+
+[project.scripts]
+kani = "kani._cli:main"
+
+[tool.hatch]
+version.path = "kani/_version.py"
+
+[tool.black]
+line-length = 120
+preview = true
+unstable = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"  # to allow sharing async engine fixtures correctly
+markers = [
+    "local: these tests use a local language model.",
+    "e2e: these tests run end-to-end, use KANI_E2E_HYDRATE to hydrate cache.",
+    "request_model_capabilities",
+]
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+line_length = 120
+known_first_party = ["kani"]
+# I am bound by pycharm's import autosorting rules
+no_lines_before = "LOCALFOLDER"
+reverse_relative = true
+combine_as_imports = true
+
+[tool.coverage.run]
+omit = [
+    "sandbox/*",
+    "examples/*",
+    "docs/*",
+]
