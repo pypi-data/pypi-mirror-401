@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8", "pybind11>=2.10"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "new_year_2026"
+dynamic = ["version"]
+description = "TCP/TLS/HTTP/SSH learning scripts and demos."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{ name = "Tao Bo", email = "taobo@example.com" }]
+
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+new_year_2026 = [
+  "tcp_tls/*.pem",
+  "ctypes_shared/*",
+  "ctypes_shared/*.so",
+  "ctypes_shared/*.dylib",
+  "ctypes_shared/*.dll",
+  "hello_ext/*.h",
+]

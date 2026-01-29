@@ -1,0 +1,187 @@
+name: ci-release
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+ 
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          # 如果你有 requirements-dev.txt / requirements.txt，就装它们
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          # 如果你是标准包，建议装 editable + test 依赖（没有也不报错）
+          if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f setup.cfg ]; then pip install -e . || true; fi
+          pip install -U pytest pytest-cov ruff pylint
+      - name: Lint (ruff)
+        run: |
+          mkdir -p dist
+          # 你没有 ruff 配置也能跑；以后可在 pyproject.toml 里加规则
+          ruff check src --output-format=json > dist/ruff-report.json || true
+      - name: Lint (pylint)
+        run: |
+          mkdir -p dist
+          pylint src --output-format=json > dist/pylint-report.json || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ruff-report
+          path: dist/ruff-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pylint-report
+          path: dist/pylint-report.json
+      - name: Run tests (pytest)
+        run: |
+          mkdir -p dist
+          pytest -q \
+            --junitxml=dist/pytest-report.xml \
+            --cov=src --cov-report=xml:dist/coverage.xml \
+            --cov-fail-under=60 || true
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: dist/pytest-report.xml
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: dist/coverage.xml
+
+  build:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 关键：不要浅克隆
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Build ctypes shared library (for wheel)
+        run: |
+          bash scripts/build_ctypes_shared.sh src/new_year_2026/ctypes_shared
+      - name: Build sdist (main package)
+        run: |
+          python -m pip install -U pip build
+          python -m build --sdist
+          ls -lah dist
+      - name: Build wheels (manylinux)
+        env:
+          CIBW_BUILD: "cp39-*"
+          CIBW_SKIP: "pp* *musllinux*"
+          CIBW_BEFORE_BUILD: "pip install pybind11 && bash scripts/build_ctypes_shared.sh src/new_year_2026/ctypes_shared"
+        run: |
+          python -m pip install -U pip cibuildwheel
+          python -m cibuildwheel --output-dir dist
+          ls -lah dist
+      - name: Collect ctypes demo artifacts
+        run: |
+          demo_dir=src/new_year_2026/ctypes_shared
+          mkdir -p dist/ctypes_shared
+          cp -a "$demo_dir/hello.c" \
+            "$demo_dir/hello_ctypes.py" \
+            "$demo_dir/README.md" \
+            "$demo_dir/libhello.so" \
+            dist/ctypes_shared/
+          
+      - name: Upload build artifacts (Actions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: dist/**
+
+  build-extension-macos:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Build wheels (macOS)
+        env:
+          CIBW_BUILD: "cp39-*"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_BEFORE_BUILD: "pip install pybind11 && bash scripts/build_ctypes_shared.sh src/new_year_2026/ctypes_shared"
+        run: |
+          python -m pip install -U pip cibuildwheel
+          python -m cibuildwheel --output-dir "$GITHUB_WORKSPACE/dist"
+          ls -lah "$GITHUB_WORKSPACE/dist"
+
+      - name: Upload build artifacts (Actions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist-macos
+          path: dist/**
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build, build-extension-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dump GitHub context
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "GITHUB_REF_NAME=${GITHUB_REF_NAME}"
+          echo "GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME}"
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+          echo "GITHUB_ACTOR=${GITHUB_ACTOR}"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-dist*
+          path: dist
+          merge-multiple: true
+
+      - name: Inspect dist directory
+        run: |
+          echo "=== dist directory ==="
+          ls -lah dist
+
+      - name: Preflight checks
+        run: |
+          test -d dist
+          test "$(ls -A dist)"
+          echo "Preflight OK"
+
+      - name: Publish to PyPI (twine)
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m pip install -U pip twine
+          python -m twine upload \
+            dist/*.whl dist/*.tar.gz
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: dist/**
+          # generate_release_notes: true
+          body_path: CHANGELOG.md
