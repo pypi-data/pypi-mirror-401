@@ -1,0 +1,189 @@
+Metadata-Version: 2.4
+Name: debug-mcp
+Version: 0.1.6
+Summary: MCP server for uploading debug incidents to Debug Memory
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: sentence-transformers>=2.2.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.3.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Debug Incident MCP Server
+
+An MCP (Model Context Protocol) server for uploading debug incidents to Debug Memory via Cursor.
+
+## Installation
+
+### 1. Install the MCP Server
+
+Clone or download this repository:
+
+```bash
+git clone https://github.com/yourusername/debug-mcp.git
+cd debug-mcp
+```
+
+### 2. Install Dependencies
+
+Using [uv](https://github.com/astral-sh/uv) (recommended):
+
+```bash
+uv sync
+```
+
+This creates a virtual environment at `.venv` and installs all dependencies.
+
+Or install from PyPI using uv:
+
+```bash
+uv pip install debug-mcp
+```
+
+### 3. Get Your API Key
+
+1. Go to your **Debug Memory** dashboard
+2. Navigate to **Settings** → **API Keys**
+3. Create a new API key
+4. Copy the key (starts with `dm_`)
+
+### 4. Configure Cursor
+
+See **[Cursor Setup Guide](cursor-setup.md)** for detailed instructions.
+
+Quick config - create or edit `.cursor/mcp.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "debug-incident": {
+      "command": "uvx",
+      "args": ["debug-mcp"],
+      "env": {
+        "WORKSPACE_API_KEY": "dm_your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+**⚠️ Replace:**
+- `dm_your_api_key_here` with your API key from Debug Memory
+
+### 5. Restart Cursor
+
+Close and reopen Cursor for the MCP server to load.
+
+## Usage
+
+Once configured, the MCP server exposes these tools (see `docs/tools.md` for the full workflow and next_action behavior):
+
+### 1) `ranked_solutions`
+- Search similar incidents and return **env-aware ranked solutions**
+- **Inputs**: `query_text` (required), `env` (required), `limit` (optional, default 5)
+- **Output**: lookup_id, ranked solutions, recommended solution, next_action
+
+### 2) `add_incident`
+- Create a **new incident + solution + outcome** (blocks duplicates if a similar incident already exists)
+- **Inputs**: `title`, `summary`, `error_signature`, `tags`, `steps`, `env`, `worked`, `notes` (optional)
+
+### 3) `add_solution`
+- Add a new fix (or env-specific variant) for an existing incident
+- **Inputs**: `incident_id` (required), `steps` (required), `env` (required), `env_bucket` (optional)
+- **Next action**: Record an outcome for this solution
+
+### 4) `record_outcome`
+- Record whether a solution worked or failed
+- **Inputs**: `solution_id` (required), `worked` (required), `env` (required), `env_bucket` (optional), `notes` (optional)
+
+### Examples
+
+**Upload an incident:**
+```
+Upload an incident: "TypeError in auth module"
+```
+
+**Upload with details:**
+```
+Upload an incident with title "API timeout in production" 
+with summary "Payment API timing out after 30s" 
+and tags ["api", "performance", "production"]
+```
+
+**Search for similar incidents:**
+```
+Search for incidents about "null pointer exception"
+```
+
+```
+Find similar incidents to "cannot read property of undefined"
+```
+
+**Workflow example:**
+```
+1. "Search for incidents about TypeError in map function"
+2. (Review results, if no solution found)
+3. "Upload incident: TypeError when calling map on undefined array, 
+    fixed by adding null check, root cause was API returning null"
+```
+
+## How It Works
+
+1. The MCP client calls tools like `ranked_solutions`, `add_solution`, `record_outcome`, `add_incident`
+2. MCP server calls Debug Memory edge function endpoints
+3. Edge function authenticates your API key and creates the incident
+4. **MCP server generates embeddings** using `all-MiniLM-L6-v2` model
+5. **Embeddings are uploaded** for title, summary, and error_signature fields
+6. Incident is stored in your workspace with semantic search enabled
+
+## Architecture
+
+```
+┌─────────┐           ┌─────────────┐           ┌──────────────┐
+│ Cursor  │  ◄─MCP─►  │ MCP Server  │  ◄─HTTP─► │ Edge Function│
+│   AI    │   stdio   │  (Python)   │   POST    │  (Supabase)  │
+└─────────┘           └─────────────┘           └──────────────┘
+                             │                          │
+                             │                          ▼
+                      Configured with            ┌──────────────┐
+                      WORKSPACE_API_KEY          │   Database   │
+                                                 └──────────────┘
+```
+
+## Features
+
+- 🚀 **Easy Integration**: One-command setup with `uv`
+- 🔒 **Secure**: API keys stay in config, never exposed to LLM
+- 🧠 **Semantic Search**: Auto-generates embeddings for intelligent search
+- 🔍 **Find Solutions**: Search past incidents to find fixes for similar problems
+- 📝 **Rich Incident Data**: Capture title, summary, error signatures, fixes, and more
+- 🏷️ **Tagging**: Categorize incidents with custom tags
+
+## Security
+
+- ✅ API key stored in Cursor config (not in code)
+- ✅ API key never exposed to LLM or conversation logs
+- ✅ Edge function validates API key server-side
+- ✅ No direct database access from MCP server
+- ✅ Embeddings generated locally before upload
+
+## Technical Details
+
+- **Embedding Model**: `all-MiniLM-L6-v2` (384 dimensions)
+- **Transport**: stdio (local execution)
+- **Dependencies**: Managed with `uv`
+- **Python**: 3.10+
+
+## Files
+
+| File | Description |
+|------|-------------|
+| `mcp_server.py` | Main MCP server implementation |
+| `requirements.txt` | Python dependencies |
+| `cursor-setup.md` | Detailed Cursor configuration guide |
+| `env.example` | Environment variable template (optional) |
+| `README.md` | This file |
+
