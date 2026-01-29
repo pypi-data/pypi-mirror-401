@@ -1,0 +1,141 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gettopology"
+version = "0.1.0a10"
+description = "CLI tool for generating Azure VNet topology diagrams with enhanced features"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    {name = "Panda", email = "pandaeatsbamboomailer@pm.me"},
+]
+keywords = ["azure", "networking", "vnet", "topology", "diagram", "drawio", "cloud"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Networking",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+    "azure-identity>=1.25.1",
+    "azure-mgmt-resource>=24.0.0",
+    "azure-mgmt-network>=30.1.0",
+    "azure-mgmt-resourcegraph>=8.0.1",
+    "azure-mgmt-authorization>=4.0.0",
+    "pyyaml>=6.0.0",
+    "python-dotenv>=1.0.0",
+    "defusedxml>=0.7.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.14.10",
+    "mypy>=1.19.1",
+    "bandit>=1.9.2"
+
+]
+
+[project.urls]
+Homepage = "https://www.pandaeatsbamboo.com"
+Documentation = "https://github.com/PandaEatsBambooBlog"
+Repository = "https://github.com/PandaEatsBambooBlog"
+Issues = "https://github.com/PandaEatsBambooBlog"
+
+[project.scripts]
+gettopology = "gettopology.main:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "bandit[toml]>=1.7.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+gettopology = ["diagram_config.yaml"]
+
+[tool.ruff]
+# Ruff configuration
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# Linting rules
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "N803",  # invalid-argument-name (mxGeometry, etc. are XML element names)
+    "N806",  # non-lowercase-variable-in-function (mxGraphModel, etc. are XML element names)
+]
+
+[tool.mypy]
+# mypy configuration
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+    "azure.*",
+    "yaml.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# Pytest configuration
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-v --tb=short"
+
+[tool.bandit]
+# Bandit security checker configuration
+exclude_dirs = ["tests", "scripts", "docs", "dist", "build"]
+# Skip false positives:
+# B404, B603, B607: subprocess is used for Azure CLI (trusted, local command)
+# B405, B408, B318: XML parsing is for generating diagrams (not parsing untrusted input)
+skips = [
+    "B101",  # assert_used (asserts are fine in tests)
+    "B404",  # subprocess import (used for Azure CLI)
+    "B603",  # subprocess call (Azure CLI is trusted)
+    "B607",  # partial path (Azure CLI is trusted)
+    "B405",  # xml.etree.ElementTree (generating XML, not parsing untrusted)
+    "B408",  # xml.dom.minidom (generating XML, not parsing untrusted)
+    "B318",  # minidom.parseString (generating XML, not parsing untrusted)
+]
