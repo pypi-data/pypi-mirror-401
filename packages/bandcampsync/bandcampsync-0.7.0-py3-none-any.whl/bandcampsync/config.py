@@ -1,0 +1,2 @@
+VERSION = "0.7.0"
+INTERNAL_USER_AGENT = f"bandcampsync/{VERSION}"
