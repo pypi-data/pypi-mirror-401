@@ -1,0 +1,110 @@
+# Sleek YTDner
+
+<p align="center">
+  <img src="sleek_ytdner/static/images/logo.png" alt="Sleek Logo" width="150" height="auto">
+</p>
+
+<p align="center">
+  <strong>Pure. Potent. Permanent.</strong><br>
+  The last media archiver designed for the uncompromising perfectionist.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
+  <img src="https://img.shields.io/badge/Python-3.12%2B-blue" alt="Python Version">
+  <img src="https://img.shields.io/badge/Flask-3.0%2B-lightgrey" alt="Flask">
+</p>
+
+---
+[English](README.md) | [한국어](README_ko.md)
+---
+
+## 📖 Introduction
+
+**Sleek YTDner** is a modern, minimalist YouTube downloader and media archiver. Built with **Flask** and powered by the robust **yt-dlp** engine, it wraps powerful functionality in a stunning, high-performance Glassmorphism UI.
+
+Sleek is designed for those who value **aesthetics**, **privacy**, and **control**.
+
+### ✨ Key Features
+
+- **💎 Glassmorphism Design**: A beautiful, translucent user interface that blends with your system theme.
+- **🌗 Adaptive Theming**: Automatically syncs with your system's Light/Dark mode, with a manual toggle.
+- **🚀 8K Ready**: Supports extracting the highest possible quality video (up to 8K HDR) and lossless audio.
+- **🔒 Privacy First**: All processing happens locally. No external servers, no tracking, complete data sovereignty.
+- **📂 Smart Automation**: Remembers your preferred download paths and optimizes file formats automatically.
+- **⚡ Async Processing**: Non-blocking download streams for a responsive experience.
+
+## 🛠️ Technology Stack
+
+- **Backend**: Python 3.12+, Flask
+- **Core Engine**: yt-dlp
+- **Frontend**: HTML5, Vanilla JS, CSS3 (Variables, Flexbox/Grid, Backdrop Filter)
+- **License**: MIT
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Python 3.8+**: Ensure you have a compatible version installed.
+- **FFmpeg**: Required for merging high-quality video and audio streams.
+  - *Ubuntu/Debian*: `sudo apt install ffmpeg`
+  - *macOS*: `brew install ffmpeg`
+  - *Windows*: Download from [FFmpeg.org](https://ffmpeg.org/) and add to PATH.
+
+### Installation
+
+Sleek YTDner is distributed as a standard Python package. You can install it directly from the source.
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/hslcrb/pypack_sleek_a-ytdownloader-pkg.git
+   cd pypack_sleek_a-ytdownloader-pkg
+   ```
+
+2. **Install with pip**
+   We recommend installing in a virtual environment to keep your system clean.
+   ```bash
+   # Create and activate virtual environment (Optional but Recommended)
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+
+   # Install the package
+   pip install .
+   ```
+
+   For developers wishing to modify the code:
+   ```bash
+   pip install -e .
+   ```
+
+## 💻 Usage
+
+Once installed, **Sleek YTDner** is available as a global command in your environment.
+
+1. **Launch the Server**
+   Navigate to the directory where you want to store configuration and downloads (or rely on default settings), then run:
+   ```bash
+   sleek-downloader
+   ```
+
+2. **Access the Interface**
+   Open your web browser and navigate to:
+   ```
+   http://localhost:5000
+   ```
+   
+   The application will automatically create a `config.json` and a `downloads` folder in your current working directory if not configured otherwise.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+<p align="center">
+  © 2008-2026 Rheehose (Rhee Creative). Crafted with passion.<br>
+  <em>Last Updated: 2026-01-17 (KST)</em>
+</p>
