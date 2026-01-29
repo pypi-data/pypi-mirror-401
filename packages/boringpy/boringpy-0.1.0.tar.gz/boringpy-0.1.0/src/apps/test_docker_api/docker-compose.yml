@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test_docker_api_api
+    ports:
+      - "9000:9000"
+    environment:
+      - DATABASE_URL=postgresql://test_docker_api:devpassword@postgres:5432/test_docker_api_db
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      
+    volumes:
+      - ./app:/app/app  # Hot reload for development
+      networks:
+      - test_docker_api_network
+    restart: unless-stopped
+
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: test_docker_api_db
+    environment:
+      POSTGRES_USER: test_docker_api
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: test_docker_api_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - test_docker_api_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_docker_api"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+
+networks:
+  test_docker_api_network:
+    driver: bridge
+
+
+volumes:
+  postgres_data:

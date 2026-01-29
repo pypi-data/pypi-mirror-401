@@ -1,0 +1,58 @@
+{
+  "name": "api",
+  "description": "FastAPI application template with modern structure and database support",
+  "use_uv_init": true,
+  "init_type": "app",
+  "variables": {
+    "package_name": {
+      "description": "Name of the API package (snake_case)",
+      "required": true,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "display_name": {
+      "description": "Display name for the API",
+      "required": false,
+      "default": "{{package_name | title}}"
+    },
+    "port": {
+      "description": "Default port for the API",
+      "required": false,
+      "default": 8000
+    },
+    "version": {
+      "description": "Initial version",
+      "required": false,
+      "default": "0.1.0"
+    },
+    "db_type": {
+      "description": "Database type (postgresql, mysql, sqlite)",
+      "required": false,
+      "default": "postgresql",
+      "options": ["postgresql", "mysql", "sqlite"]
+    }
+  },
+  "dependencies": [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "pydantic-settings",
+    "sqlmodel",
+    "python-dotenv",
+    "loguru",
+    "alembic"
+  ],
+  "dev_dependencies": [
+    "pytest",
+    "pytest-cov",
+    "httpx",
+    "ruff",
+    "ty"
+  ],
+  "exclude_patterns": [
+    "*.pyc",
+    "__pycache__",
+    ".pytest_cache",
+    ".env",
+    "template.json"
+  ]
+}

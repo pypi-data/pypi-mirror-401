@@ -1,0 +1,11 @@
+[project]
+name = "test-boringpy-workspace"
+version = "0.1.0"
+description = "BoringPy workspace"
+requires-python = ">=3.13"
+
+[tool.uv.workspace]
+members = ["src/apps/*", "src/libs/*"]
+
+[tool.uv.sources]
+# Configure workspace dependencies here
