@@ -1,0 +1,104 @@
+Metadata-Version: 2.4
+Name: split-pdf-by-toc
+Version: 0.0.2
+Summary: Splits a PDF by its TOC.
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pypdf>=6.6.0
+Dynamic: license-file
+
+# split-pdf-by-toc
+
+A small command-line tool that splits a PDF into multiple files based on its
+**table of contents (TOC)**.
+
+It reads the embedded TOC entries of a PDF and uses them as cut points to
+generate one PDF per section.
+
+## Status
+
+**Status:** usable / evolving
+**Audience:** CLI users, developers
+**Python:** 3.12+
+
+## Features
+
+- Split PDFs using embedded TOC markers
+- Limit splitting by TOC depth
+- Filter TOC entries by name
+- Optional overlapping page ranges
+- Configurable output directory and filename prefix
+
+### Non-features
+
+- *No* OCR for scanned PDFs
+- *No* TOC generation or editing
+- *No* GUI
+
+---
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+cd split-pdf-by-toc
+pip install -r requirements.txt
+```
+
+## Usage
+
+```
+usage: split-pdf-by-toc [-h] [-o OUTPUT_DIR] [--overlap] [-d DEPTH]
+                        [-f FILTER] [-p PREFIX]
+                        pdf_path
+
+Splits a PDF by TOC markers.
+
+positional arguments:
+  pdf_path              Set the input PDF
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        Set the output directory
+  --overlap             If provided, let output pages overlap with each other.
+  -d DEPTH, --depth DEPTH
+                        Set the maximum depth of TOC entries
+  -f FILTER, --filter FILTER
+                        Only select TOC entries matching a filter
+  -p PREFIX, --prefix PREFIX
+                        Set a prefix for the output files
+```
+
+### Examples
+
+- Split a PDF by its top-level TOC entries:
+    ```bash
+    $ split-pdf-by-toc book.pdf
+    ```
+- Only split up to depth 2 and write results to out/:
+    ```bash
+    split-pdf-by-toc -d 2 -o out book.pdf
+    ```
+- Only split sections whose titles contain "Chapter":
+    ```bash
+    split-pdf-by-toc -f Chapter book.pdf
+    ```
+
+## Contributing
+Contributions are very welcome. Please use `ruff` to format and lint.
+
+Small changes (bug fixes, small improvements): please open a pull request
+directly.
+
+Larger changes (new features, refactors, behavior changes):
+please open an issue first to discuss the idea and avoid wasted work.
+
+If you add new behavior, tests are appreciated but not mandatory.
+
+## License
+
+This project is licensed under the AGPL (Affero General Public License).
+See the [LICENSE](./LICENSE) file for details.
