@@ -1,0 +1,215 @@
+from dataclasses import dataclass
+from numpy import ndarray
+
+
+@dataclass
+class ParameterVector:
+    """
+    A class used for specifying the parameters required to evaluate a
+    diagnostic model, field model or prior distribution.
+
+    :param: name \
+        The name of the parameter(s).
+
+    :param size: \
+        The size of the parameter set.
+    """
+    name: str
+    size: int
+
+    def __post_init__(self):
+        assert isinstance(self.size, int)
+        assert self.size > 0
+        assert isinstance(self.name, str)
+        assert len(self.name) > 0
+
+
+@dataclass
+class FieldRequest:
+    """
+    A class used to request the values of particular fields which
+    are required to evaluate a diagnostic model or prior distribution.
+
+    :param name: \
+        The name of the field from which values are being requested.
+
+    :param coordinates: \
+        The coordinates at which the field values are being requested as
+        a dictionary mapping the coordinate names to 1D arrays of coordinate
+        values.
+    """
+    name: str
+    coordinates: dict[str, ndarray]
+
+    def __post_init__(self):
+        # validate the inputs
+        assert isinstance(self.name, str)
+        validate_coordinates(coordinates=self.coordinates, error_source="FieldRequest")
+        arrays = [A for A in self.coordinates.values()]
+        self.size = arrays[0].size
+        # converting coordinate numpy array data to bytes allows us to create
+        # a hashable key for the overall coordinate set
+        coord_key = tuple((name, arr.tobytes()) for name, arr in self.coordinates.items())
+        # use a tuple of the field name and coordinate key to create a key for
+        # the field request.
+        self.__hash = hash((self.name, coord_key))
+
+    def __hash__(self):
+        return self.__hash
+
+    def __eq__(self, other):
+        return self.__hash == hash(other)
+
+
+class Parameters(tuple):
+    """
+    A tuple subclass which creates an immutable collection of validated ``ParameterVector``
+    objects. The arguments should be a series of ``ParameterVector``.
+    """
+    def __new__(cls, *parameters: ParameterVector | tuple[str, int]):
+        """
+
+        :param parameters: \
+            A series of ``ParameterVector`` objects specifying the required parameters.
+            Alternatively, a series of tuples containing the parameter name as a string
+            followed by the parameter vector size as an integer.
+        """
+        validated = []
+        parameter_names = set()
+        for param in parameters:
+            if isinstance(param, ParameterVector):
+                vector = param
+            elif isinstance(param, tuple) and len(param) == 2:
+                vector = ParameterVector(*param)
+            else:
+                raise TypeError(
+                    f"""\n
+                    \r[ Parameters error ]
+                    \r>> All arguments passed to Parameters must have type
+                    \r>> ``ParameterVector``, but instead an argument has type:
+                    \r>> {type(param)}
+                    """
+                )
+
+            # check that all the parameter names in the current prior are unique
+            if vector.name not in parameter_names:
+                parameter_names.add(vector.name)
+            else:
+                raise ValueError(
+                    f"""\n
+                    \r[ Parameters error ]
+                    \r>> At least two given ``ParameterVector`` objects share the name:
+                    \r>> '{vector.name}'
+                    \r>> but all names must be unique.
+                    """
+                )
+            validated.append(vector)
+
+        return tuple.__new__(cls, validated)
+
+
+class Fields(tuple):
+    """
+    A tuple subclass which creates an immutable collection of validated ``FieldRequest``
+    objects. The arguments should be a series of ``FieldRequest``.
+    """
+    def __new__(cls, *field_requests: FieldRequest):
+        """
+
+        :param field_requests: \
+            A series of ``FieldRequest`` objects specifying the requested fields.
+        """
+        field_names = set()
+        for request in field_requests:
+            if not isinstance(request, FieldRequest):
+                raise TypeError(
+                    f"""\n
+                    \r[ FieldRequests error ]
+                    \r>> All arguments passed to FieldRequests must have type
+                    \r>> ``FieldRequest``, but instead an argument has type:
+                    \r>> {type(request)}
+                    """
+                )
+
+            # check that all the parameter names in the current prior are unique
+            if request.name not in field_names:
+                field_names.add(request.name)
+            else:
+                raise ValueError(
+                    f"""\n
+                    \r[ FieldRequests error ]
+                    \r>> At least two given ``ParameterVector`` objects share the name:
+                    \r>> '{request.name}'
+                    \r>> but all names must be unique.
+                    """
+                )
+
+        return tuple.__new__(cls, field_requests)
+
+
+def validate_parameters(model, error_source: str, description: str):
+    valid_parameters = (
+        hasattr(model, "parameters")
+        and isinstance(model.parameters, Parameters)
+    )
+    if not valid_parameters:
+        raise TypeError(
+            f"""\n
+            \r[ {error_source} error ]
+            \r>> The {description}
+            \r>> does not possess a valid 'parameters' instance attribute.
+            \r>> 'parameters' must be an instance of the ``Parameters`` class.
+            """
+        )
+
+def validate_field_requests(model, error_source: str, description: str):
+    valid_field_requests = (
+        hasattr(model, "fields")
+        and isinstance(model.fields, Fields)
+    )
+    if not valid_field_requests:
+        raise TypeError(
+            f"""\n
+            \r[ {error_source} error ]
+            \r>> The {description}
+            \r>> does not possess a valid 'fields' instance attribute.
+            \r>> 'fields' must be a instance of the ``Fields`` class.
+            """
+        )
+
+
+def validate_coordinates(coordinates: dict[str, ndarray], error_source: str):
+    if not isinstance(coordinates, dict):
+        raise TypeError(
+            f"""\n
+            \r[ {error_source} error ]
+            \r>> The given coordinates should be a dictionary mapping strings to
+            \r>> 1D numpy arrays, but instead has type:
+            \r>> {type(coordinates)}
+            """
+        )
+
+    coord_sizes = set()
+    for key, value in coordinates.items():
+        valid_entry = (
+            isinstance(key, str) and isinstance(value, ndarray) and value.ndim == 1
+        )
+        if not valid_entry:
+            raise ValueError(
+                f"""\n
+                \r[ {error_source} error ]
+                \r>> The given coordinates should be a dictionary mapping strings to
+                \r>> 1D numpy arrays.
+                """
+            )
+
+        coord_sizes.add(value.size)
+    # if set size is 1, then all coord arrays are of equal size
+    if len(coord_sizes) != 1:
+        raise ValueError(
+            f"""\n
+            \r[ {error_source} error ]
+            \r>> The numpy arrays contained in the given coordinates dictionary
+            \r>> must all have equal size.
+            """
+        )
