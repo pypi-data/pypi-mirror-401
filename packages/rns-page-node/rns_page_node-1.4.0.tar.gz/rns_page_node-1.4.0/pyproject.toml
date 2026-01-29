@@ -1,0 +1,33 @@
+[project]
+name = "rns-page-node"
+version = "1.4.0"
+license = "GPL-3.0-only"
+description = "A simple way to serve pages and files over the Reticulum network."
+authors = [
+    {name = "Sudo-Ivan"}
+]
+readme = "README.md"
+requires-python = ">=3.9.2"
+dependencies = [
+    "rns (>=1.1.2,<1.5.0)",
+    "cryptography>=46.0.2"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://git.quad4.io/RNS-Things/rns-page-node"
+Repository = "https://git.quad4.io/RNS-Things/rns-page-node"
+
+[project.scripts]
+rns-page-node = "rns_page_node.main:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.14.10"
+twine = "^6.2.0"
