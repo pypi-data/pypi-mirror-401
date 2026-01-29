@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "secparse"
+version = "0.1.0"
+description = "SecParse API SDK for Python (secparse.com)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    {name = "Håkon Kleven", email = "haakon@secparse.com"}
+]
+
+keywords = ["secparse", "graphql", "sdk", "client", "subscriptions", "websocket"]
+dependencies = [
+    "gql[all]>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://secparse.com"
+Documentation = "https://github.com/PowerKuu/secparse-sdk#readme"
+Repository = "https://github.com/PowerKuu/secparse-sdk"
+"Bug Tracker" = "https://github.com/PowerKuu/secparse-sdk/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["secparse*"]
+exclude = ["tests*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
