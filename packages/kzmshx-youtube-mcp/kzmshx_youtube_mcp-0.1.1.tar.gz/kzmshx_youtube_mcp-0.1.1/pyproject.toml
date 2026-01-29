@@ -1,0 +1,60 @@
+[project]
+name = "kzmshx-youtube-mcp"
+version = "0.1.1"
+description = "MCP server for extracting YouTube video transcripts and metadata"
+authors = [{ name = "kzmshx" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastmcp>=2.14.0,<3.0.0",
+  "youtube-transcript-api>=1.0.0,<2.0.0",
+  "yt-dlp>=2024.0.0",
+]
+
+[project.scripts]
+kzmshx-youtube-mcp = "youtube_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/kzmshx/youtube-mcp"
+Repository = "https://github.com/kzmshx/youtube-mcp"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/youtube_mcp"]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.0.0",
+  "pytest>=8.0.0",
+  "pytest-asyncio>=0.24.0",
+  "ruff>=0.14.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B008"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/youtube_mcp"]
+
+[[tool.mypy.overrides]]
+module = ["youtube_transcript_api", "yt_dlp"]
+ignore_missing_imports = true

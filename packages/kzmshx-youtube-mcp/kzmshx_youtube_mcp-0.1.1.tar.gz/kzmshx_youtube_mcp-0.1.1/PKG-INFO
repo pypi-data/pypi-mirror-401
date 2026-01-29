@@ -1,0 +1,118 @@
+Metadata-Version: 2.4
+Name: kzmshx-youtube-mcp
+Version: 0.1.1
+Summary: MCP server for extracting YouTube video transcripts and metadata
+Project-URL: Homepage, https://github.com/kzmshx/youtube-mcp
+Project-URL: Repository, https://github.com/kzmshx/youtube-mcp
+Author: kzmshx
+License: MIT License
+        
+        Copyright (c) 2026 kzmshx
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Requires-Python: >=3.11
+Requires-Dist: fastmcp<3.0.0,>=2.14.0
+Requires-Dist: youtube-transcript-api<2.0.0,>=1.0.0
+Requires-Dist: yt-dlp>=2024.0.0
+Description-Content-Type: text/markdown
+
+# kzmshx-youtube-mcp
+
+An MCP server for extracting YouTube video transcripts and metadata.
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "youtube": {
+      "command": "uvx",
+      "args": ["kzmshx-youtube-mcp"]
+    }
+  }
+}
+```
+
+## Installation (Optional)
+
+If you prefer to install globally:
+
+```bash
+pip install kzmshx-youtube-mcp
+# or
+uv tool install kzmshx-youtube-mcp
+```
+
+## Tools
+
+### get_transcript
+
+Get transcript text from a YouTube video.
+
+| Parameter         | Type   | Description                              |
+| ----------------- | ------ | ---------------------------------------- |
+| `url`             | string | YouTube URL or video ID                  |
+| `language`        | string | Language code (default: auto)            |
+| `with_timestamps` | bool   | Include timestamps (default: false)      |
+
+**Example:**
+
+```json
+// Input
+{ "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+
+// Output
+{
+  "video_id": "dQw4w9WgXcQ",
+  "language": "en",
+  "transcript": "We're no strangers to love\nYou know the rules and so do I..."
+}
+```
+
+### get_video_info
+
+Get metadata from a YouTube video.
+
+| Parameter | Type   | Description             |
+| --------- | ------ | ----------------------- |
+| `url`     | string | YouTube URL or video ID |
+
+**Example:**
+
+```json
+// Input
+{ "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+
+// Output
+{
+  "id": "dQw4w9WgXcQ",
+  "title": "Rick Astley - Never Gonna Give You Up",
+  "description": "...",
+  "duration": 213,
+  "channel": "Rick Astley",
+  "upload_date": "2009-10-25",
+  "view_count": 1500000000,
+  "available_languages": ["en", "ja", "es", "fr"]
+}
+```
+
+## License
+
+MIT
