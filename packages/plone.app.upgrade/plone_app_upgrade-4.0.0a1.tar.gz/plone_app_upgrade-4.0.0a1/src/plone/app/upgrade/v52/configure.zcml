@@ -1,0 +1,178 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="plone"
+    >
+
+  <include file="profiles.zcml" />
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5207"
+      destination="5208"
+      >
+
+    <gs:upgradeStep
+        title="Miscellaneous"
+        handler=".final.to521"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5208"
+      destination="5209"
+      >
+
+    <gs:upgradeStep
+        title="Miscellaneous"
+        handler=".final.to522"
+        />
+
+    <gs:upgradeStep
+        title="Move markdown settings from portal_transforms to Plone registry"
+        handler=".final.move_markdown_transform_settings_to_registry"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5209"
+      destination="5210"
+      >
+
+    <gs:upgradeStep
+        title="Migrate site logo from native string to bytes"
+        handler=".final.migrate_site_logo_from_ascii_to_bytes"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5210"
+      destination="5211"
+      >
+
+    <gs:upgradeStep
+        title="Migrate site logo from native string to bytes again"
+        handler=".final.migrate_site_logo_from_ascii_to_bytes"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5211"
+      destination="5212"
+      >
+
+    <gs:upgradeStep
+        title="Make portal_setup logs accessible only to Manager/Owner."
+        handler=".final.secure_portal_setup_objects"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5212"
+      destination="5213"
+      >
+    <!-- Plone 5.2.5 -->
+
+    <gs:upgradeStep
+        title="Miscellaneous"
+        handler="..utils.null_upgrade_step"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5213"
+      destination="5214"
+      >
+    <!-- Plone 5.2.6 -->
+
+    <gs:upgradeStep
+        title="Miscellaneous"
+        handler="..utils.null_upgrade_step"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5214"
+      destination="5215"
+      >
+    <!-- Plone 5.2.7 -->
+
+    <gs:upgradeStep
+        title="Miscellaneous"
+        handler="..utils.null_upgrade_step"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5215"
+      destination="5216"
+      >
+    <!-- Plone 5.2.8 -->
+
+    <gs:upgradeStep
+        title="Miscellaneous upgrades to Plone 5.2.8"
+        handler="..utils.null_upgrade_step"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5216"
+      destination="5217"
+      >
+    <!-- Plone 5.2.9 -->
+
+    <gs:upgradeStep
+        title="Miscellaneous upgrades to Plone 5.2.9"
+        handler="..utils.null_upgrade_step"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5217"
+      destination="5218"
+      >
+    <!-- Plone 5.2.10 -->
+
+    <gs:upgradeStep
+        title="Add a timezone property to portal memberdata if it is missing."
+        handler=".final.add_the_timezone_property"
+        />
+
+  </gs:upgradeSteps>
+
+  <gs:upgradeSteps
+      profile="Products.CMFPlone:plone"
+      source="5218"
+      destination="5219"
+      >
+    <!-- Plone 5.2.11 -->
+
+    <gs:upgradeStep
+        title="Add GET application/json for content to weak caching."
+        handler=".final.add_get_application_json_to_weak_caching"
+        />
+
+  </gs:upgradeSteps>
+
+</configure>
