@@ -1,0 +1,128 @@
+Metadata-Version: 2.4
+Name: xkd
+Version: 0.1.7
+Summary: 本模块用来帮助儿童进行3d编程学习，使用简化的语法让孩子们更容易得学习编程，促进孩子们对于三维数学和三维编程的理解和使用。
+Author-email: Jiabao Yang <airfly000@163.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: panda3d>=1.10.15
+Requires-Dist: panda3d-gltf>=1.2.0
+
+# xkd - 基于Panda3D的儿童3D编程模块
+
+基于panda3d引擎开发的，帮助儿童学习3d编程的模块。
+
+## 安装方法
+
+```bash
+pip install xkd
+```
+
+## 创建一个三维程序，带有xyz轴
+
+```python
+from xkd import *
+x=XKD() #创建一个程序，XKD(s=True) 参数s:是否显示三维坐标轴，默认值:True
+x.run() #运行程序
+```
+
+## 创建3d线条
+
+```python
+from xkd import *
+x=XKD()
+p=Pen(x) #创建一个3d画笔，Pen(XKD_Inst)参数XKD_Inst是XKD类的实例
+"""
+Color可用颜色列表，可以用自定义颜色值，格式为:(r,g,b,a)，rgba的范围[0,1]
+red=(1,0,0,1)
+green=(0,1,0,1)
+blue=(0,0,1,1)
+yellow=(1,1,0,1)
+cyan=(0,1,1,1)
+pink=(255/255, 102/255, 255/255, 1) 
+brown=(102/255, 51/255, 255/255, 1)
+purple=(150/255, 102/255, 255/255, 1)
+orange=(255/255, 102/255, 0/255, 1)
+tan=(221/255, 201/255, 168/255, 1)
+gray=(80/255, 80/255, 80/255, 1)
+white=(1,1,1,1)
+black=(0,0,0,1)
+"""
+p.color(Color.tan) #设置线条颜色为tan
+p.size(8) #设置线条粗细
+p.moveTo(0,0,0) #画笔移到坐标，仅移动到(x,y,z)不绘制线条
+p.lineTo(3,3,3) #绘制线条到坐标，移动且绘制线条到(x,y,z)
+p.update() #更新线条，需要执行此行，线条才会显示出来
+x.run()
+
+```
+
+## 动态更新线条的形状
+
+```python
+from xkd import *
+
+x=XKD()#创建程序
+p=Pen(x) #画笔
+
+top=[2,2,1] #线段顶部的顶点坐标
+md=1#顶点移动方向 (move direction)
+step=0.05#移动步长
+
+def up():#自定义的帧更新函数
+    global md #存取模块全局变量md
+    p.clear()#清空
+    if md==1:#向上移动状态
+        c=Color.yellow#黄色
+        if top[2]>5:#超过最高点
+            md*=-1#移动反向
+    else:#向下移动状态
+        c=Color.pink#粉色
+        if top[2]<1:#超过最低点
+            md*=-1#移动反向
+    top[2]+=step*md#顶部顶点的移动
+    
+    p.color(c)  # 设置线条颜色
+    p.size(8)#设置线条粗细
+    p.moveTo(2, 2, 0)#线条的起点
+    p.lineTo(top[0],top[1],top[2])#线条的终点
+    p.update()#更新线条
+
+x.update=up #设置更新函数为自定义的up
+
+x.run()#运行程序
+```
+
+## 创建3d模型
+
+```python
+from xkd import *
+app=XKD(True)
+
+m1=app.gm("史蒂夫") #星空吾星引擎内置的模型
+m2=app.gm("艾利克斯")
+m2.setPos(2,0,0)#设置模型坐标
+m2.setH(45)#设置z轴角度，参数为角度制的数值，#setH(x)偏航角，setP(x)仰俯角，setR(x)横滚角
+
+app.run()
+```
+
+## 可用的内置模型列表
+星空吾星引擎预制的模型，方便学习者进行编程学习和研究，列表如下:
+艾利克斯，草方块，村民，地球，海龟，红石矿石，基本粒子，基本粒子1，箭头1，箭头2，金矿石，科研卫星，苦力怕，马，煤矿石，青金石矿石，球形机器人，史蒂夫，水地块，田园犬，铁矿石，小猪，星球，熊五，原石，月亮，炸药tnt
+
+## 依赖项
+
+- Panda3D >= 1.10.8
+- panda3d-gltf >= 1.2.0
+- panda3d-simplepbr >= 0.6
+
+## 许可证
+
+MIT License
+
+
+
