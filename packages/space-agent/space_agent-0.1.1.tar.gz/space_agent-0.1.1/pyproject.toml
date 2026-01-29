@@ -1,0 +1,18 @@
+[project]
+name = "space-agent"
+version = "0.1.1"
+description = "Space: A powerful, fully local CLI coding assistant powered by Ollama."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "crawl4ai>=0.7.8",
+    "ddgs>=9.10.0",
+    "mcp>=1.25.0",
+    "ollama>=0.6.1",
+    "prompt-toolkit>=3.0.52",
+    "rich>=14.2.0",
+    "typer>=0.21.0",
+]
+
+[project.scripts]
+space = "space.main:app"
