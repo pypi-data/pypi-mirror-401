@@ -1,0 +1,33 @@
+[project]
+name = "ddscatcli"
+version = "1.0.2"
+description = "CLI utility to edit and run a ddscat.par file for DDSCAT"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "GPL-3.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Clément Argentin", email = "argentin-clement@outlook.fr" }]
+keywords = ["DDSCAT", "DDA", "light scattering", "cli"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Education",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+]
+
+[project.scripts]
+ddscatcli = "ddscatcli.ddscat_cli:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://pypi.org/project/ddscatcli/"
+Repository = "https://github.com/Argencle/ddscatcli"
+Changelog = "https://github.com/Argencle/ddscatcli/blob/main/CHANGELOG.md"
+
+
