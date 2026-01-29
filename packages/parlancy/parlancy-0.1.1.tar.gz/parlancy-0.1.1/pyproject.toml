@@ -1,0 +1,20 @@
+[project]
+name = "parlancy"
+version = "0.1.1"
+description = "types, protocols and all things descriptive"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+[groups.dependencies]
+dev = [
+    "pytest"
+]
+[project.scripts]
+watch-parlancy = "parlancy.__devel__:watch"
+publish-parlancy = "parlancy.__devel__:publish"
+
+[build-system]
+requires=["uv_build"]
+build-backend="uv_build"
