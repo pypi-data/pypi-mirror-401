@@ -1,0 +1,486 @@
+"""InterMountableComponentConnectionAdvancedSystemDeflection"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
+from mastapy._private._internal.dataclasses import extended_dataclass
+from mastapy._private._internal.exception_bridge import exception_bridge
+from mastapy._private._internal.exceptions import CastException
+from mastapy._private._internal.python_net import (
+    python_net_import,
+    pythonnet_property_get,
+)
+
+from mastapy._private._internal import constructor, utility
+from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+    _7483,
+)
+
+_INTER_MOUNTABLE_COMPONENT_CONNECTION_ADVANCED_SYSTEM_DEFLECTION = python_net_import(
+    "SMT.MastaAPI.SystemModel.AnalysesAndResults.AdvancedSystemDeflections",
+    "InterMountableComponentConnectionAdvancedSystemDeflection",
+)
+
+if TYPE_CHECKING:
+    from typing import Any, Type, TypeVar
+
+    from mastapy._private.system_model.analyses_and_results import _2942, _2944, _2946
+    from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+        _7453,
+        _7457,
+        _7460,
+        _7465,
+        _7470,
+        _7475,
+        _7478,
+        _7481,
+        _7487,
+        _7490,
+        _7497,
+        _7504,
+        _7509,
+        _7513,
+        _7517,
+        _7520,
+        _7523,
+        _7534,
+        _7543,
+        _7546,
+        _7553,
+        _7556,
+        _7559,
+        _7562,
+        _7571,
+        _7578,
+        _7581,
+    )
+    from mastapy._private.system_model.analyses_and_results.analysis_cases import (
+        _7935,
+        _7938,
+    )
+    from mastapy._private.system_model.connections_and_sockets import _2541
+
+    Self = TypeVar(
+        "Self", bound="InterMountableComponentConnectionAdvancedSystemDeflection"
+    )
+    CastSelf = TypeVar(
+        "CastSelf",
+        bound="InterMountableComponentConnectionAdvancedSystemDeflection._Cast_InterMountableComponentConnectionAdvancedSystemDeflection",
+    )
+
+
+__docformat__ = "restructuredtext en"
+__all__ = ("InterMountableComponentConnectionAdvancedSystemDeflection",)
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True)
+class _Cast_InterMountableComponentConnectionAdvancedSystemDeflection:
+    """Special nested class for casting InterMountableComponentConnectionAdvancedSystemDeflection to subclasses."""
+
+    __parent__: "InterMountableComponentConnectionAdvancedSystemDeflection"
+
+    @property
+    def connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7483.ConnectionAdvancedSystemDeflection":
+        return self.__parent__._cast(_7483.ConnectionAdvancedSystemDeflection)
+
+    @property
+    def connection_static_load_analysis_case(
+        self: "CastSelf",
+    ) -> "_7938.ConnectionStaticLoadAnalysisCase":
+        from mastapy._private.system_model.analyses_and_results.analysis_cases import (
+            _7938,
+        )
+
+        return self.__parent__._cast(_7938.ConnectionStaticLoadAnalysisCase)
+
+    @property
+    def connection_analysis_case(self: "CastSelf") -> "_7935.ConnectionAnalysisCase":
+        from mastapy._private.system_model.analyses_and_results.analysis_cases import (
+            _7935,
+        )
+
+        return self.__parent__._cast(_7935.ConnectionAnalysisCase)
+
+    @property
+    def connection_analysis(self: "CastSelf") -> "_2942.ConnectionAnalysis":
+        from mastapy._private.system_model.analyses_and_results import _2942
+
+        return self.__parent__._cast(_2942.ConnectionAnalysis)
+
+    @property
+    def design_entity_single_context_analysis(
+        self: "CastSelf",
+    ) -> "_2946.DesignEntitySingleContextAnalysis":
+        from mastapy._private.system_model.analyses_and_results import _2946
+
+        return self.__parent__._cast(_2946.DesignEntitySingleContextAnalysis)
+
+    @property
+    def design_entity_analysis(self: "CastSelf") -> "_2944.DesignEntityAnalysis":
+        from mastapy._private.system_model.analyses_and_results import _2944
+
+        return self.__parent__._cast(_2944.DesignEntityAnalysis)
+
+    @property
+    def agma_gleason_conical_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7453.AGMAGleasonConicalGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7453,
+        )
+
+        return self.__parent__._cast(
+            _7453.AGMAGleasonConicalGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def belt_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7457.BeltConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7457,
+        )
+
+        return self.__parent__._cast(_7457.BeltConnectionAdvancedSystemDeflection)
+
+    @property
+    def bevel_differential_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7460.BevelDifferentialGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7460,
+        )
+
+        return self.__parent__._cast(
+            _7460.BevelDifferentialGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def bevel_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7465.BevelGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7465,
+        )
+
+        return self.__parent__._cast(_7465.BevelGearMeshAdvancedSystemDeflection)
+
+    @property
+    def clutch_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7470.ClutchConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7470,
+        )
+
+        return self.__parent__._cast(_7470.ClutchConnectionAdvancedSystemDeflection)
+
+    @property
+    def concept_coupling_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7475.ConceptCouplingConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7475,
+        )
+
+        return self.__parent__._cast(
+            _7475.ConceptCouplingConnectionAdvancedSystemDeflection
+        )
+
+    @property
+    def concept_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7478.ConceptGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7478,
+        )
+
+        return self.__parent__._cast(_7478.ConceptGearMeshAdvancedSystemDeflection)
+
+    @property
+    def conical_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7481.ConicalGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7481,
+        )
+
+        return self.__parent__._cast(_7481.ConicalGearMeshAdvancedSystemDeflection)
+
+    @property
+    def coupling_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7487.CouplingConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7487,
+        )
+
+        return self.__parent__._cast(_7487.CouplingConnectionAdvancedSystemDeflection)
+
+    @property
+    def cvt_belt_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7490.CVTBeltConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7490,
+        )
+
+        return self.__parent__._cast(_7490.CVTBeltConnectionAdvancedSystemDeflection)
+
+    @property
+    def cylindrical_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7497.CylindricalGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7497,
+        )
+
+        return self.__parent__._cast(_7497.CylindricalGearMeshAdvancedSystemDeflection)
+
+    @property
+    def face_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7504.FaceGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7504,
+        )
+
+        return self.__parent__._cast(_7504.FaceGearMeshAdvancedSystemDeflection)
+
+    @property
+    def gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7509.GearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7509,
+        )
+
+        return self.__parent__._cast(_7509.GearMeshAdvancedSystemDeflection)
+
+    @property
+    def hypoid_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7513.HypoidGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7513,
+        )
+
+        return self.__parent__._cast(_7513.HypoidGearMeshAdvancedSystemDeflection)
+
+    @property
+    def klingelnberg_cyclo_palloid_conical_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7517.KlingelnbergCycloPalloidConicalGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7517,
+        )
+
+        return self.__parent__._cast(
+            _7517.KlingelnbergCycloPalloidConicalGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def klingelnberg_cyclo_palloid_hypoid_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7520.KlingelnbergCycloPalloidHypoidGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7520,
+        )
+
+        return self.__parent__._cast(
+            _7520.KlingelnbergCycloPalloidHypoidGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def klingelnberg_cyclo_palloid_spiral_bevel_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7523.KlingelnbergCycloPalloidSpiralBevelGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7523,
+        )
+
+        return self.__parent__._cast(
+            _7523.KlingelnbergCycloPalloidSpiralBevelGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def part_to_part_shear_coupling_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7534.PartToPartShearCouplingConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7534,
+        )
+
+        return self.__parent__._cast(
+            _7534.PartToPartShearCouplingConnectionAdvancedSystemDeflection
+        )
+
+    @property
+    def ring_pins_to_disc_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7543.RingPinsToDiscConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7543,
+        )
+
+        return self.__parent__._cast(
+            _7543.RingPinsToDiscConnectionAdvancedSystemDeflection
+        )
+
+    @property
+    def rolling_ring_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7546.RollingRingConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7546,
+        )
+
+        return self.__parent__._cast(
+            _7546.RollingRingConnectionAdvancedSystemDeflection
+        )
+
+    @property
+    def spiral_bevel_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7553.SpiralBevelGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7553,
+        )
+
+        return self.__parent__._cast(_7553.SpiralBevelGearMeshAdvancedSystemDeflection)
+
+    @property
+    def spring_damper_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7556.SpringDamperConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7556,
+        )
+
+        return self.__parent__._cast(
+            _7556.SpringDamperConnectionAdvancedSystemDeflection
+        )
+
+    @property
+    def straight_bevel_diff_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7559.StraightBevelDiffGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7559,
+        )
+
+        return self.__parent__._cast(
+            _7559.StraightBevelDiffGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def straight_bevel_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7562.StraightBevelGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7562,
+        )
+
+        return self.__parent__._cast(
+            _7562.StraightBevelGearMeshAdvancedSystemDeflection
+        )
+
+    @property
+    def torque_converter_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7571.TorqueConverterConnectionAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7571,
+        )
+
+        return self.__parent__._cast(
+            _7571.TorqueConverterConnectionAdvancedSystemDeflection
+        )
+
+    @property
+    def worm_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7578.WormGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7578,
+        )
+
+        return self.__parent__._cast(_7578.WormGearMeshAdvancedSystemDeflection)
+
+    @property
+    def zerol_bevel_gear_mesh_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "_7581.ZerolBevelGearMeshAdvancedSystemDeflection":
+        from mastapy._private.system_model.analyses_and_results.advanced_system_deflections import (
+            _7581,
+        )
+
+        return self.__parent__._cast(_7581.ZerolBevelGearMeshAdvancedSystemDeflection)
+
+    @property
+    def inter_mountable_component_connection_advanced_system_deflection(
+        self: "CastSelf",
+    ) -> "InterMountableComponentConnectionAdvancedSystemDeflection":
+        return self.__parent__
+
+    def __getattr__(self: "CastSelf", name: str) -> "Any":
+        try:
+            return self.__getattribute__(name)
+        except AttributeError:
+            class_name = utility.camel(name)
+            raise CastException(
+                f'Detected an invalid cast. Cannot cast to type "{class_name}"'
+            ) from None
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True, eq=False)
+class InterMountableComponentConnectionAdvancedSystemDeflection(
+    _7483.ConnectionAdvancedSystemDeflection
+):
+    """InterMountableComponentConnectionAdvancedSystemDeflection
+
+    This is a mastapy class.
+    """
+
+    TYPE: ClassVar["Type"] = (
+        _INTER_MOUNTABLE_COMPONENT_CONNECTION_ADVANCED_SYSTEM_DEFLECTION
+    )
+
+    wrapped: "Any"
+
+    def __post_init__(self: "Self") -> None:
+        """Override of the post initialisation magic method."""
+        if not hasattr(self.wrapped, "reference_count"):
+            self.wrapped.reference_count = 0
+
+        self.wrapped.reference_count += 1
+
+    @property
+    @exception_bridge
+    def connection_design(self: "Self") -> "_2541.InterMountableComponentConnection":
+        """mastapy.system_model.connections_and_sockets.InterMountableComponentConnection
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "ConnectionDesign")
+
+        if temp is None:
+            return None
+
+        type_ = temp.GetType()
+        return constructor.new(type_.Namespace, type_.Name)(temp)
+
+    @property
+    def cast_to(
+        self: "Self",
+    ) -> "_Cast_InterMountableComponentConnectionAdvancedSystemDeflection":
+        """Cast to another type.
+
+        Returns:
+            _Cast_InterMountableComponentConnectionAdvancedSystemDeflection
+        """
+        return _Cast_InterMountableComponentConnectionAdvancedSystemDeflection(self)
