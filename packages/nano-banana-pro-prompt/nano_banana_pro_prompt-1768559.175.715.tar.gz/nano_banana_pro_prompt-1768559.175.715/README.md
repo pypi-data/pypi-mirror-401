@@ -1,0 +1,87 @@
+# nano-banana-pro-prompt
+
+The `nano-banana-pro-prompt` library provides a streamlined way to access and utilize pre-built prompt templates designed to enhance your applications and workflows. It offers a collection of ready-to-use prompts based on proven strategies, making it easier than ever to integrate effective prompting techniques into your projects.
+
+## Installation
+
+To install the `nano-banana-pro-prompt` package, use pip:
+bash
+pip install nano-banana-pro-prompt
+
+## Basic Usage Examples
+
+Here are a few examples demonstrating how to use the `nano-banana-pro-prompt` library in different scenarios:
+
+**1. Content Summarization:**
+python
+from nano_banana_pro_prompt import summarize_text
+
+text = "This is a long and detailed article about the benefits of using AI in education. It covers various aspects, including personalized learning, automated grading, and improved student engagement. The article also discusses the challenges associated with implementing AI in schools, such as data privacy and the need for teacher training."
+
+summary = summarize_text(text)
+print(summary)
+
+This will return a concise summary of the input text.
+
+**2. Creative Story Generation:**
+python
+from nano_banana_pro_prompt import generate_story
+
+topic = "A lost astronaut discovering a hidden oasis on Mars"
+story = generate_story(topic)
+print(story)
+
+This will generate a short story based on the provided topic.
+
+**3. Code Explanation:**
+python
+from nano_banana_pro_prompt import explain_code
+
+code = """
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+"""
+
+explanation = explain_code(code)
+print(explanation)
+
+This will provide a clear and concise explanation of the Python code snippet.
+
+**4. Email Subject Line Optimization:**
+python
+from nano_banana_pro_prompt import optimize_email_subject
+
+email_content = "Reminder about upcoming meeting next week."
+optimized_subject = optimize_email_subject(email_content)
+print(optimized_subject)
+
+This function will suggest a more engaging and effective subject line for your email.
+
+**5. Social Media Post Creation:**
+python
+from nano_banana_pro_prompt import create_social_media_post
+
+topic = "New product launch: The revolutionary AI assistant"
+platform = "Twitter"
+post = create_social_media_post(topic, platform)
+print(post)
+
+This will generate a compelling social media post tailored for the specified platform.
+
+## Feature List
+
+*   **Pre-built Prompt Templates:** Access a collection of expertly crafted prompts for various use cases.
+*   **Easy Integration:** Seamlessly integrate the library into your existing Python projects.
+*   **Customizable Prompts:** Modify and adapt the provided prompts to suit your specific needs.
+*   **Simplified Workflow:** Streamline your workflow by leveraging pre-tested and effective prompting strategies.
+*   **Improved Output Quality:** Enhance the quality and relevance of your application's output.
+*   **Diverse Applications:** Suitable for a wide range of tasks, including content generation, summarization, code explanation, and more.
+
+## License
+
+MIT License
+
+This project is a gateway to the nano-banana-pro-prompt ecosystem. For advanced features and full capabilities, please visit: https://supermaker.ai/blog/nano-banana-pro-prompt-use-cases-ready-to-copy-paste/
