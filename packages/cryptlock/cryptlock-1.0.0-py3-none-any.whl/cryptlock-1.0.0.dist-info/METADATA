@@ -1,0 +1,34 @@
+Metadata-Version: 2.4
+Name: cryptlock
+Version: 1.0.0
+Summary: Secure file & directory encryption CLI
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: cryptography
+Requires-Dist: tqdm
+
+# CryptLock 🔐
+
+Secure file & directory encryption CLI.
+
+## Install
+pip install cryptlock
+
+## Usage
+
+Encrypt file:
+cryptlock encrypt file.txt --wipe
+
+Decrypt:
+cryptlock decrypt file.txt.enc
+
+Encrypt directory:
+cryptlock encrypt folder --wipe
+
+## Features
+- AES encryption
+- Password protection
+- Directory support
+- Secure wipe
+- Progress bar
+- Integrity check
