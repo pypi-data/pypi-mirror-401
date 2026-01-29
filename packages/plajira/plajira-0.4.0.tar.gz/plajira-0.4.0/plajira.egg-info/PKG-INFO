@@ -1,0 +1,283 @@
+Metadata-Version: 2.4
+Name: plajira
+Version: 0.4.0
+Summary: Sync your .plan file with Jira Cloud
+Author: plajira contributors
+License: MIT
+Project-URL: Homepage, https://github.com/plajira
+Project-URL: Repository, https://github.com/plajira/plajira
+Project-URL: Issues, https://github.com/plajira/plajira/issues
+Keywords: jira,plan,sync,productivity,cli
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Bug Tracking
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# plajira
+
+Sync your `.plan` file with Jira Cloud.
+
+plajira is a command-line tool that bridges your personal `.plan` file with Jira, keeping your task tracking in sync without leaving your editor.
+
+## Features
+
+- **Zero intrusion**: Your `.plan` file is never modified by plajira
+- **Git-aware**: Only syncs items from commits that have been pushed
+- **Timestamp-aware**: Detects conflicts when Jira was updated more recently
+- **Interactive**: Every action requires confirmation
+- **Portable**: Python standard library only (no external dependencies)
+
+## Installation
+
+```bash
+pip install plajira
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/plajira/plajira.git
+cd plajira
+pip install -e .
+```
+
+## Quick Start
+
+1. Initialize plajira in a directory containing your `.plan` file:
+
+```bash
+plajira init
+```
+
+2. Copy `.env.example` to `.env` and add your Jira credentials:
+
+```bash
+cp .env.example .env
+# Edit .env with your Jira URL, email, and API token
+```
+
+3. Run your first sync:
+
+```bash
+plajira sync
+```
+
+## .plan File Format
+
+```
+> 2026-01-07
+* foo feedback
++ implement bar
+! review baz spreadsheet
+? begin legend mode implementation
+
+> 2026-01-08
+* touch base on foo feedback
+* implement bar
+? continue legend mode implementation
+~ old abandoned idea
+```
+
+### Markers
+
+| Marker | Meaning | Jira Status | Creates new issue? |
+|--------|---------|-------------|-------------------|
+| `?` | In progress / planned | In Progress | Yes |
+| `*` | Accomplished that day | Done | Yes |
+| `!` | Idea for future work | Backlog | Yes |
+| `+` | Accomplished later (was `?`) | Done | No - transitions only |
+| `~` | Abandoned (was `?`) | Won't Do | No - transitions only |
+
+Note: `+` and `~` are for transitioning items that were previously tracked as `?`. They won't create new Jira issues.
+
+## Commands
+
+### `plajira init`
+
+Initialize plajira configuration in the current directory.
+
+### `plajira status`
+
+Preview what would happen on sync, with an interactive menu.
+
+```
+$ plajira status
+
+Checking .plan for duplicate lines... OK
+Parsing .plan... 34 items
+Checking git status... all commits
+
+New items:
+  • "research spec" [SUSPECTED DUPLICATE]
+  • "baz spreadsheet"
+
+Status changes:
+  • CSD-42 "implement foobar": In Progress -> Done
+
+Skipped: 3  Up to date: 28
+
+[s] Sync  [v] View skip list  [l] List tracked  [q] Quit
+```
+
+Press `v` to view the skip list:
+
+```
+Skip list: (1-3 of 3)
+  [1] "old task from last year"
+  [2] "not really a task"
+  [3] "duplicate entry"
+
+[u] Unskip  [q] Back
+```
+
+Press `u` to unskip items by number. Lists with more than 10 items show `[p] Prev` and `[n] Next` for pagination.
+
+### `plajira sync`
+
+Synchronize your `.plan` with Jira.
+
+```
+$ plajira sync
+
+New item: "implement foobar"
+
+  [y] Create new Jira issue
+  [n] Not now (ask again next sync)
+  [d] Duplicate - link to existing item
+  [s] Skip (don't track in Jira)
+
+Choice [y]: y
+
+✓ Created CSD-72 "implement foobar"
+```
+
+#### `--gojira` mode
+
+Use `plajira sync --gojira` to auto-create new items without prompting. This is useful for batch operations or CI pipelines.
+
+In gojira mode:
+- New items are automatically created (no prompt)
+- Suspected duplicates still prompt for user input
+- Conflicts still prompt for user input
+- Transition failures auto-retry once, then prompt if still failing
+- Final confirmation is auto-approved
+
+### `plajira link <text> <jira-key>`
+
+Manually link a `.plan` line to an existing Jira issue.
+
+```
+$ plajira link "implement foobar" CSD-42
+
+Fetching CSD-42... found: "Implement foobar" (In Progress)
+
+Link "implement foobar" -> CSD-42? [y/N]: y
+
+✓ Linked.
+```
+
+### `plajira unlink <text>`
+
+Remove tracking for a line (doesn't affect Jira).
+
+### `plajira list`
+
+Show all tracked items and skip list with interactive pagination.
+
+```
+$ plajira list
+
+Tracked items: (1-2 of 2)
+
+  CSD-42 (Done)
+    • "implement foobar"
+
+  CSD-71 (In Progress)
+    • "research spec"
+    • "continue research spec"
+
+[q] Back
+```
+
+After pressing `q`, the skip list is shown (if any). Lists with more than 10 items show `[p] Prev` and `[n] Next` for pagination.
+
+### `plajira unskip <text>`
+
+Remove a line from the skip list.
+
+## Configuration
+
+Configuration is stored in `.plajira` (YAML format). Credentials are in `.env`.
+
+### .env
+
+```
+JIRA_URL=https://your-domain.atlassian.net
+JIRA_EMAIL=your-email@example.com
+JIRA_TOKEN=your-api-token
+```
+
+Get your API token from: https://id.atlassian.com/manage-profile/security/api-tokens
+
+### .plajira
+
+The configuration file has two sections:
+
+1. **config** (user-editable): Jira settings, marker mappings, keywords
+2. **state** (managed by plajira): Tracked items and skip list
+
+## Duplicate Detection
+
+plajira automatically detects suspected duplicates using:
+
+- Continuation keywords ("continue", "finish", etc.)
+- Word overlap (≥40% of significant words)
+- Fuzzy matching (Levenshtein similarity ≥50%)
+
+When a suspected duplicate is found, you can link it to an existing item instead of creating a new Jira issue.
+
+## Conflict Resolution
+
+If someone else updates a Jira issue after you changed your `.plan`, plajira detects the conflict:
+
+```
+⚠️  CONFLICT: "implement foo" (CSD-42)
+
+Your .plan shows: * (Done)
+  Changed: 2026-01-08 14:32
+
+Jira shows: Blocked
+  Changed: 2026-01-08 16:45
+
+Jira was updated MORE RECENTLY than your .plan change.
+
+  [s] Skip this item (recommended)
+  [v] View Jira issue in browser
+  [o] Override: force .plan status to Jira (dangerous!)
+
+Choice [s/v/o]:
+```
+
+## Requirements
+
+- Python 3.8+
+- Git repository with a remote tracking branch
+- Jira Cloud account with API access
+
+## License
+
+MIT
