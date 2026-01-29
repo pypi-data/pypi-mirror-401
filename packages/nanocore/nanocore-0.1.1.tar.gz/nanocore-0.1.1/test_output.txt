@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: /home/agp/vault/nanocore
+configfile: pytest.ini
+plugins: cov-7.0.0, asyncio-1.3.0, anyio-4.12.1, hypothesis-6.150.2
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 34 items
+
+tests/test_cli.py .....................                                  [ 61%]
+tests/test_code_ops_worker.py .............
+ERROR: Coverage failure: total of 76 is less than fail-under=90
+                                                                         [100%]
+
+=============================== warnings summary ===============================
+src/nanocore/cli.py:29
+  /home/agp/vault/nanocore/src/nanocore/cli.py:29: DeprecationWarning: websockets.WebSocketClientProtocol is deprecated
+    async def ws_listener(websocket: websockets.WebSocketClientProtocol):
+
+.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6
+  /home/agp/vault/nanocore/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+src/nanocore/cli.py:52
+  /home/agp/vault/nanocore/src/nanocore/cli.py:52: DeprecationWarning: websockets.WebSocketClientProtocol is deprecated
+    async def heartbeat_loop(websocket: websockets.WebSocketClientProtocol):
+
+src/nanocore/cli.py:82
+  /home/agp/vault/nanocore/src/nanocore/cli.py:82: DeprecationWarning: websockets.WebSocketClientProtocol is deprecated
+    async def shell_loop(websocket: websockets.WebSocketClientProtocol):
+
+tests/test_cli.py::test_cli_connect_keyboard_interrupt
+  /home/agp/.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/unittest/mock.py:2217: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    def __init__(self, name, parent):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.9-final-0 ________________
+
+Name                                Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------
+src/nanocore/cli.py                   138     10    93%   43-44, 47-48, 62-64, 187-188, 194
+src/nanocore/schema.py                 28     12    57%   44-59
+src/nanocore/subprocess_worker.py      29     11    62%   55, 58-60, 64-70
+src/nanocore/worker.py                 56     38    32%   26, 32-51, 55-79, 83, 87-88
+src/nanocore/workers/code_ops.py       46      0   100%
+-----------------------------------------------------------------
+TOTAL                                 297     71    76%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 90% not reached. Total coverage: 76.09%
+======================== 34 passed, 5 warnings in 6.39s ========================
