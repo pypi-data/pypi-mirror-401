@@ -1,0 +1,78 @@
+Metadata-Version: 2.4
+Name: biplex_utils_hash
+Version: 0.1.0
+Summary: Deterministic canonical JSON and stable UUID/hash generation
+Author: Alex Dudiak
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Dynamic: license-file
+
+# Biplex Utils Hash
+
+Deterministic canonical JSON serialization for stable UUIDv5 and hashes.
+
+## Installation
+
+```bash
+pip install biplex_utils_hash
+```
+
+## Usage
+
+```python
+from biplex_utils_hash import canonical_json, uuid5_from_data, sha256_from_data
+
+# Generate stable UUID from data (float precision issues are handled automatically)
+uuid = uuid5_from_data({"price": 0.1 + 0.2})
+
+# Generate stable SHA256 hash
+hash_hex = sha256_from_data({"price": 0.1 + 0.2})
+
+# Get canonical JSON representation
+json_str = canonical_json({"price": 0.1 + 0.2})
+# Returns: '{"price":"0.300000"}'
+
+# Custom decimal precision
+uuid = uuid5_from_data({"price": 0.123456789}, decimal_places=3)
+```
+
+## Features
+
+- **Deterministic output**: Same data always produces the same hash/UUID
+- **Float stability**: Handles floating-point precision issues (0.1 + 0.2 problem)
+- **Canonical JSON**: Sorted keys, compact format, consistent decimal formatting
+- **Support for common types**: dict, list, tuple, set, datetime, date, UUID
+
+## API
+
+### `canonical_json(data, *, decimal_places=None) -> str`
+
+Converts data to deterministic canonical JSON string.
+
+### `uuid5_from_data(data, *, namespace=NAMESPACE_OID, decimal_places=None) -> UUID`
+
+Generates stable UUID5 from data.
+
+### `sha256_from_data(data, *, decimal_places=None) -> str`
+
+Generates SHA256 hash from data.
+
+### `normalize(data, *, decimal_places=6) -> Any`
+
+Normalizes data for deterministic serialization.
+
+## License
+
+MIT
