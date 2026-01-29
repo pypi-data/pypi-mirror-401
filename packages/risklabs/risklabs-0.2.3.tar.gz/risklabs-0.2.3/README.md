@@ -1,0 +1,82 @@
+# RiskLabs
+
+**Decision-Risk & Robustness Simulator** by [Allostan Labs](https://allostanlabs.com/)
+
+RiskLabs is a Python library designed to help quantitative researchers and portfolio managers evaluate the robustness of their strategies. It goes beyond simple backtesting by subjecting strategies to various "flight path" scenarios, such as historical crashes, volatility spikes, and correlation breakdowns.
+
+## Features
+
+-   **Scenario Analysis**: Simulate strategies under stress conditions (e.g., 2008 Crash, COVID-19 Volatility).
+-   **Robustness Metrics**: Calculate specialized scores based on performance stability across regimes.
+-   **Regime Detection**: Analyze strategy behavior in Bull vs. Bear markets.
+-   **HTML Reporting**: Generate beautiful, standalone HTML dashboards with interactive charts.
+-   **Privacy-First**: Runs entirely locally. No data leaves your machine.
+
+## Installation
+
+```bash
+pip install risklabs
+```
+
+## Quick Start
+
+```python
+from risklabs.client import create_strategy, analyze
+
+# 1. Define a Strategy
+strategy = create_strategy(
+    name="My 60/40 Portfolio",
+    allocations=[
+        {"ticker": "SPY", "weight": 0.6},
+        {"ticker": "AGG", "weight": 0.4}
+    ]
+)
+
+# 2. Run Robustness Analysis
+print("Running simulations...")
+report = analyze(strategy)
+
+# 3. Generate Report
+report.to_file("my_portfolio_report.html")
+print("Report generated: my_portfolio_report.html")
+```
+
+### Running the Demo
+
+We include a demo simulation script to showcase the library's capabilities:
+
+```bash
+# Ensure you are in the risklabs directory
+python demo_hram.py
+```
+
+This will generate a sample robustness report showing stress tests and regime analysis.
+
+## How It Works
+
+1.  **Define Strategy**: You specify target allocations (static weights for MVP).
+2.  **Fetch Data**: The library automatically downloads historical data for the tickers using `yfinance`.
+3.  **Simulate Scenarios**: The engine runs multiple simulations:
+    -   *Historical Baseline*: Standard backtest.
+    -   *Crash Replay*: Applies historical shock factors.
+    -   *Regime Stress*: Modifies volatility and correlation matrices.
+4.  **Score & Report**: Aggregates results into a "Robustness Score" and renders an HTML dashboard.
+
+## Architecture & Methodology
+
+RiskLabs is designed as a modular pipeline to ensure rigorous stress testing:
+
+1.  **Client Layer (`risklabs.client`)**:
+    *   The entry point for users. Accepts a concise human-readable Strategy definition and orchestrates the analysis.
+2.  **Simulation Engine (`risklabs.engine`)**:
+    *   The core "brain" of the system. It doesn't just run a single backtest; it executes a battery of tests including **Historical Replays** (e.g., 2008 Crisis), **Monte Carlo Perturbations** (Fragility), and **Parameter Sweeps** (Sensitivity).
+3.  **Analyzers**:
+    *   `RegimeDetectionEngine`: Classifies market history into 4 regimes (Bull/Bear x High/Low Vol).
+    *   `FragilityAnalyzer`: Tests "what if my weights were slightly different?" to catch overfitting.
+    *   `DecisionEngine`: Aggregates all metrics into a final **Confidence Rating** and **Recommendation** (APPROVE/REJECT).
+4.  **Reporting (`risklabs.reporting`)**:
+    *   Compiles the rich data into an interactive, standalone HTML dashboard with no external dependencies.
+
+## License
+
+MIT
