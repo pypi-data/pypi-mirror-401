@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fiuai-sdk-agent"
+version = "0.1.1"
+description = "FiuAI SDK Agent - A framework for building AI agents with LLM support, context management, and event handling"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Proprietary"}
+authors = [
+    {name = "liming", email = "lmlala@aliyun.com"}
+]
+keywords = ["ai", "agent", "llm", "langchain", "fiuai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "fiuai-sdk-python>=0.6.5",
+    "langchain>=1.2.0",
+    "langchain-openai>=1.1.6",
+    "langchain-core>=1.2.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "redis>=7.1.0",
+    "httpx>=0.27.0",
+    "tenacity>=8.0.0",
+    "snowflake-id>=1.0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[tool.setuptools]
+# 由于在 fiuai_sdk_agent 目录内构建，当前目录就是包根
+# 明确列出所有包，确保所有子包都被包含
+packages = [
+    "fiuai_sdk_agent",
+    "fiuai_sdk_agent.agents",
+    "fiuai_sdk_agent.agents.callbacks",
+    "fiuai_sdk_agent.agents.context",
+    "fiuai_sdk_agent.agents.event",
+    "fiuai_sdk_agent.agents.knowlege",
+    "fiuai_sdk_agent.agents.plan",
+    "fiuai_sdk_agent.agents.prompts",
+    "fiuai_sdk_agent.agents.types",
+    "fiuai_sdk_agent.pkg",
+    "fiuai_sdk_agent.pkg.http",
+    "fiuai_sdk_agent.pkg.llm",
+    "fiuai_sdk_agent.pkg.llm.callbacks",
+    "fiuai_sdk_agent.pkg.llm.callbacks.utils",
+    "fiuai_sdk_agent.pkg.user_context",
+    "fiuai_sdk_agent.utils",
+]
+
+[tool.setuptools.package-dir]
+"fiuai_sdk_agent" = "."
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.txt", "*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
