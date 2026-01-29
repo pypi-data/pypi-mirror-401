@@ -1,0 +1,306 @@
+Metadata-Version: 2.4
+Name: pepmatch
+Version: 1.5.0
+Summary: Search tool for peptides and epitopes within a proteome, while considering potential residue substitutions.
+Author-email: Daniel Marrama <dmarrama@lji.org>
+License: Non-Profit Open Software License 3.0 (NPOSL-3.0)
+        
+        This Non-Profit Open Software License ("Non-Profit OSL") version 3.0 (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following licensing notice adjacent to the copyright notice for the Original Work:
+        
+        Licensed under the Non-Profit Open Software License version 3.0
+        
+        1) Grant of Copyright License. Licensor grants You a worldwide, royalty-free, non-exclusive, sublicensable license, for the duration of the copyright, to do the following:
+        
+        a) to reproduce the Original Work in copies, either alone or as part of a collective work;
+        
+        b) to translate, adapt, alter, transform, modify, or arrange the Original Work, thereby creating derivative works ("Derivative Works") based upon the Original Work;
+        
+        c) to distribute or communicate copies of the Original Work and Derivative Works to the public, with the proviso that copies of Original Work or Derivative Works that You distribute or communicate shall be licensed under this Non-Profit Open Software License or as provided in section 17(d);
+        
+        d) to perform the Original Work publicly; and
+        
+        e) to display the Original Work publicly.
+        
+        2) Grant of Patent License. Licensor grants You a worldwide, royalty-free, non-exclusive, sublicensable license, under patent claims owned or controlled by the Licensor that are embodied in the Original Work as furnished by the Licensor, for the duration of the patents, to make, use, sell, offer for sale, have made, and import the Original Work and Derivative Works.
+        
+        3) Grant of Source Code License. The term "Source Code" means the preferred form of the Original Work for making modifications to it and all available documentation describing how to modify the Original Work. Licensor agrees to provide a machine-readable copy of the Source Code of the Original Work along with each copy of the Original Work that Licensor distributes. Licensor reserves the right to satisfy this obligation by placing a machine-readable copy of the Source Code in an information repository reasonably calculated to permit inexpensive and convenient access by You for as long as Licensor continues to distribute the Original Work.
+        
+        4) Exclusions From License Grant. Neither the names of Licensor, nor the names of any contributors to the Original Work, nor any of their trademarks or service marks, may be used to endorse or promote products derived from this Original Work without express prior permission of the Licensor. Except as expressly stated herein, nothing in this License grants any license to Licensor's trademarks, copyrights, patents, trade secrets or any other intellectual property. No patent license is granted to make, use, sell, offer for sale, have made, or import embodiments of any patent claims other than the licensed claims defined in Section 2. No license is granted to the trademarks of Licensor even if such marks are included in the Original Work. Nothing in this License shall be interpreted to prohibit Licensor from licensing under terms different from this License any Original Work that Licensor otherwise would have a right to license.
+        
+        5) External Deployment. The term "External Deployment" means the use, distribution, or communication of the Original Work or Derivative Works in any way such that the Original Work or Derivative Works may be used by anyone other than You, whether those works are distributed or communicated to those persons or made available as an application intended for use over a network. As an express condition for the grants of license hereunder, You must treat any External Deployment by You of the Original Work or a Derivative Work as a distribution under section 1(c).
+        
+        6) Attribution Rights. You must retain, in the Source Code of any Derivative Works that You create, all copyright, patent, or trademark notices from the Source Code of the Original Work, as well as any notices of licensing and any descriptive text identified therein as an "Attribution Notice." You must cause the Source Code for any Derivative Works that You create to carry a prominent Attribution Notice reasonably calculated to inform recipients that You have modified the Original Work.
+        
+        7) Warranty of Provenance and Disclaimer of Warranty. The Original Work is provided under this License on an "AS IS" BASIS and WITHOUT WARRANTY, either express or implied, including, without limitation, the warranties of non-infringement, merchantability or fitness for a particular purpose. THE ENTIRE RISK AS TO THE QUALITY OF THE ORIGINAL WORK IS WITH YOU. This DISCLAIMER OF WARRANTY constitutes an essential part of this License. No license to the Original Work is granted by this License except under this disclaimer.
+        
+        8) Limitation of Liability. Under no circumstances and under no legal theory, whether in tort (including negligence), contract, or otherwise, shall the Licensor be liable to anyone for any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or the use of the Original Work including, without limitation, damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses. This limitation of liability shall not apply to the extent applicable law prohibits such limitation.
+        
+        9) Acceptance and Termination. If, at any time, You expressly assented to this License, that assent indicates your clear and irrevocable acceptance of this License and all of its terms and conditions. If You distribute or communicate copies of the Original Work or a Derivative Work, You must make a reasonable effort under the circumstances to obtain the express assent of recipients to the terms of this License. This License conditions your rights to undertake the activities listed in Section 1, including your right to create Derivative Works based upon the Original Work, and doing so without honoring these terms and conditions is prohibited by copyright law and international treaty. Nothing in this License is intended to affect copyright exceptions and limitations (including "fair use" or "fair dealing"). This License shall terminate immediately and You may no longer exercise any of the rights granted to You by this License upon your failure to honor the conditions in Section 1(c).
+        
+        10) Termination for Patent Action. This License shall terminate automatically and You may no longer exercise any of the rights granted to You by this License as of the date You commence an action, including a cross-claim or counterclaim, against Licensor or any licensee alleging that the Original Work infringes a patent. This termination provision shall not apply for an action alleging patent infringement by combinations of the Original Work with other software or hardware.
+        
+        11) Jurisdiction, Venue and Governing Law. Any action or suit relating to this License may be brought only in the courts of a jurisdiction wherein the Licensor resides or in which Licensor conducts its primary business, and under the laws of that jurisdiction excluding its conflict-of-law provisions. The application of the United Nations Convention on Contracts for the International Sale of Goods is expressly excluded. Any use of the Original Work outside the scope of this License or after its termination shall be subject to the requirements and penalties of copyright or patent law in the appropriate jurisdiction. This section shall survive the termination of this License.
+        
+        12) Attorneys' Fees. In any action to enforce the terms of this License or seeking damages relating thereto, the prevailing party shall be entitled to recover its costs and expenses, including, without limitation, reasonable attorneys' fees and costs incurred in connection with such action, including any appeal of such action. This section shall survive the termination of this License.
+        
+        13) Miscellaneous. If any provision of this License is held to be unenforceable, such provision shall be reformed only to the extent necessary to make it enforceable.
+        
+        14) Definition of "You" in This License. "You" throughout this License, whether in upper or lower case, means an individual or a legal entity exercising rights under, and complying with all of the terms of, this License. For legal entities, "You" includes any entity that controls, is controlled by, or is under common control with you. For purposes of this definition, "control" means (i) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding shares, or (iii) beneficial ownership of such entity.
+        
+        15) Right to Use. You may use the Original Work in all ways not otherwise restricted or conditioned by this License or by law, and Licensor promises not to interfere with or be responsible for such uses by You.
+        
+        16) Modification of This License. This License is Copyright © 2005 Lawrence Rosen. Permission is granted to copy, distribute, or communicate this License without modification. Nothing in this License permits You to modify this License as applied to the Original Work or to Derivative Works. However, You may modify the text of this License and copy, distribute or communicate your modified version (the "Modified License") and apply it to other original works of authorship subject to the following conditions: (i) You may not indicate in any way that your Modified License is the "Open Software License" or "OSL" and you may not use those names in the name of your Modified License; (ii) You must replace the notice specified in the first paragraph above with the notice "Licensed under <insert your license name here>" or with a notice of your own that is not confusingly similar to the notice in this License; and (iii) You may not claim that your original works are open source software unless your Modified License has been approved by Open Source Initiative (OSI) and You comply with its license review and certification process.
+        
+        17) Non-Profit Amendment. The name of this amended version of the Open Software License ("OSL 3.0") is "Non-Profit Open Software License 3.0". The original OSL 3.0 license has been amended as follows:
+        
+        (a) Licensor represents and declares that it is a not-for-profit organization that derives no revenue whatsoever from the distribution of the Original Work or Derivative Works thereof, or from support or services relating thereto.
+        
+        (b) The first sentence of Section 7 ["Warranty of Provenance"] of OSL 3.0 has been stricken. For Original Works licensed under this Non-Profit OSL 3.0, LICENSOR OFFERS NO WARRANTIES WHATSOEVER.
+        
+        (c) In the first sentence of Section 8 ["Limitation of Liability"] of this Non-Profit OSL 3.0, the list of damages for which LIABILITY IS LIMITED now includes "direct" damages.
+        
+        (d) The proviso in Section 1(c) of this License now refers to this "Non-Profit Open Software License" rather than the "Open Software License". You may distribute or communicate the Original Work or Derivative Works thereof under this Non-Profit OSL 3.0 license only if You make the representation and declaration in paragraph (a) of this Section 17. Otherwise, You shall distribute or communicate the Original Work or Derivative Works thereof only under the OSL 3.0 license and You shall publish clear licensing notices so stating. Also by way of clarification, this License does not authorize You to distribute or communicate works under this Non-Profit OSL 3.0 if You received them under the original OSL 3.0 license.
+        
+        (e) Original Works licensed under this license shall reference "Non-Profit OSL 3.0" in licensing notices to distinguish them from works licensed under the original OSL 3.0 license.
+        
+Project-URL: Homepage, https://github.com/IEDB/PEPMatch
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: polars>=1.31.0
+Requires-Dist: biopython>=1.78
+Requires-Dist: xlsxwriter>=3.2.5
+Requires-Dist: tqdm>=4.67.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: pre-commit>=3.3.2; extra == "dev"
+Dynamic: license-file
+
+<p align="center">
+  <img src="docs/logo.png" alt="PEPMatch Logo">
+</p>
+
+--------------------------------------------------------------------
+
+[![Unit Tests](https://github.com/IEDB/PEPMatch/actions/workflows/tests.yml/badge.svg)](https://github.com/IEDB/PEPMatch/actions/workflows/tests.yml)
+
+**Author:** Daniel Marrama
+
+`PEPMatch` is a high-performance Python tool designed to find short peptide sequences within a reference proteome or other large protein sets. It is optimized for speed and flexibility, supporting exact matches, searches with a defined number of residue substitutions (mismatches), and a "best match" mode to find the most likely hit.
+
+As a competition to improve tool performance, we created a benchmarking framework with instructions [here](./benchmarking).
+
+### Key Features
+
+* **Versatile Searching**: Find exact matches, matches with a specified tolerance for mismatches, or the single best match for each query peptide.
+* **Discontinuous Epitope Support**: Search for non-contiguous residues in the format `"R377, Q408, Q432, ..."`.
+* **High Performance**: Utilizes an efficient k-mer indexing strategy for rapid searching. The backend is powered by a C-based Hamming distance calculation for optimized mismatch detection.
+* **Optimized Preprocessing**: Employs a two-step process. Proteomes are preprocessed once into a format optimized for the search type (SQLite for exact matching, Pickle for mismatching), making subsequent searches extremely fast.
+* **Parallel Processing**: Built-in support for multicore processing to handle large query sets efficiently.
+* **Flexible I/O**: Accepts queries from FASTA files or Python lists and can output results to multiple formats, including CSV, TSV, XLSX, JSON, or directly as a Polars DataFrame.
+
+### Requirements
+
+* Python 3.7+
+* [Polars](https://pola.rs/)
+* [Biopython](https://biopython.org/)
+
+### Installation
+
+```bash
+pip install pepmatch
+```
+
+### Core Engine
+
+`PEPMatch` operates using a two-step workflow:
+
+1.  **Preprocessing**: First, the target proteome is processed into an indexed format. This step only needs to be performed once per proteome and k-mer size. `PEPMatch` uses SQLite databases for the speed of indexed lookups in exact matching and serialized Python objects (pickle) for the flexibility needed in mismatch searching.
+2.  **Matching**: The user's query peptides are then searched against the preprocessed proteome.
+
+This design ensures that the time-intensive task of parsing and indexing the proteome is separated from the search itself, allowing for rapid and repeated querying.
+
+### Command-Line Usage
+
+The tool provides two CLI commands: `pepmatch-preprocess` and `pepmatch-match`.
+
+#### 1. Preprocessing
+
+The `pepmatch-preprocess` command builds the necessary database from your proteome FASTA file.
+
+* For **exact matching** (0 mismatches), use the `sql` format.
+* For **mismatch matching**, use the `pickle` format.
+
+```bash
+# Preprocess for an exact match search using 5-mers
+pepmatch-preprocess -p human.fasta -k 5 -f sql
+
+# Preprocess for a mismatch search using 3-mers
+pepmatch-preprocess -p human.fasta -k 3 -f pickle
+```
+
+##### Flags
+* `-p`, `--proteome` (Required): Path to the proteome FASTA file.
+* `-k`, `--kmer_size` (Required): The k-mer size to use for indexing.
+* `-f`, `--preprocess_format` (Required): The format for the preprocessed database (`sql` or `pickle`).
+* `-n`: A custom name for the proteome.
+* `-P`: Path to the directory to save preprocessed files.
+* `-g`: Path to a gene priority proteome file (UniProt specific 1-1 protein per gene file to prioritize matches later)
+
+#### 2. Matching
+
+The `pepmatch-match` command runs the search against a preprocessed proteome.
+
+```bash
+# Find exact matches (-m 0) using the preprocessed 5-mer database
+pepmatch-match -q peptides.fasta -p human.fasta -m 0 -k 5
+
+# Find matches with up to 3 mismatches (-m 3) using the 3-mer database
+pepmatch-match -q neoepitopes.fasta -p human.fasta -m 3 -k 3
+```
+
+##### Flags
+
+* `-q`, `--query` (Required): Path to the query peptide FASTA file.
+* `-p`, `--proteome_file` (Required): Path to the original proteome FASTA file.
+* `-m`: Maximum number of mismatches allowed (e.g., `0` for exact).
+* `-k`: The k-mer size to use (must match the preprocessed file).
+* `-P`: Path to the directory containing preprocessed files.
+* `-b`: Enable "best match" mode.
+* `-f`: Output format (`csv`, `tsv`, `xlsx`, `json`). Defaults to `csv`.
+* `-o`: Name of the output file (do not include the file extension, i.e. `.csv`)
+* `-v`: Disable sequence versioning (e.g. for protein ID P05067.1, ".1" will be removed.)
+* `-n`: Number of parallel processing jobs (CPU cores) to use.
+
+### Python API Usage
+
+For more control and integration into other workflows, `PEPMatch` provides a simple Python API.
+
+#### 1. Exact Matching
+
+```python
+from pepmatch import Preprocessor, Matcher
+
+# Preprocess the proteome into a SQLite DB for exact matching
+Preprocessor('proteomes/human.fasta').sql_proteome(k=5)
+
+# Initialize the Matcher for an exact search (0 mismatches)
+matcher = Matcher(
+  query='queries/mhc-ligands-test.fasta',
+  proteome_file='proteomes/human.fasta',
+  max_mismatches=0,
+  k=5
+)
+
+# Run the search and get results
+results_df = matcher.match()
+```
+
+#### 2. Mismatching
+
+```python
+from pepmatch import Preprocessor, Matcher
+
+# Preprocess the proteome into pickle files for mismatching
+Preprocessor('proteomes/human.fasta').pickle_proteome(k=3)
+
+# Initialize the Matcher to allow up to 3 mismatches
+matcher = Matcher(
+  query='queries/neoepitopes-test.fasta',
+  proteome_file='proteomes/human.fasta',
+  max_mismatches=3,
+  k=3
+)
+
+results_df = matcher.match()
+```
+
+#### 3. Best Match
+
+The `best_match` mode automatically finds the optimal match for each peptide, trying different k-mer sizes and mismatch thresholds. No manual preprocessing is required.
+
+```python
+from pepmatch import Matcher
+
+matcher = Matcher(
+  query='queries/milk-peptides-test.fasta',
+  proteome_file='proteomes/human.fasta',
+  best_match=True
+)
+
+results_df = matcher.match()
+```
+
+#### 4. Parallel Processing
+
+Use the `ParallelMatcher` class to run searches on multiple CPU cores. The `n_jobs` parameter specifies the number of cores to use.
+
+```python
+from pepmatch import Preprocessor, ParallelMatcher
+
+# Preprocessing is the same
+Preprocessor('proteomes/betacoronaviruses.fasta').pickle_proteome(k=3)
+
+# Use ParallelMatcher to search with 4 jobs
+parallel_matcher = ParallelMatcher(
+  query='queries/coronavirus-test.fasta',
+  proteome_file='proteomes/betacoronaviruses.fasta',
+  max_mismatches=3,
+  k=3,
+  n_jobs=4
+)
+
+results_df = parallel_matcher.match()
+```
+
+#### 5. Discontinuous Epitope Searching
+
+`PEPMatch` can search for epitopes defined by non-contiguous residues and their positions. Simply provide a query list where each item is a string in the format `"A1, B10, C15"`.
+
+```python
+from pepmatch import Matcher
+
+# A list of discontinuous epitopes to find
+discontinuous_query = [
+  "R377, Q408, Q432, H433, F436",
+  "S2760, V2763, E2773, D2805, T2819"
+]
+
+matcher = Matcher(
+  query=discontinuous_query,
+  proteome_file='proteomes/sars-cov-2.fasta',
+  max_mismatches=1  # Allow 1 mismatch among the specified residues
+)
+
+results_df = matcher.match()
+```
+
+### Output Formats
+
+You can specify the output format using the `output_format` parameter in the `Matcher` or `ParallelMatcher`.
+
+* **`dataframe` (default for API)**: Returns a Polars DataFrame.
+* **`csv` (default for CLI)**: Saves results to a CSV file.
+* **`tsv`**: Saves results to a TSV file.
+* **`xlsx`**: Saves results to an Excel file.
+* **`json`**: Saves results to a JSON file.
+
+To receive a DataFrame from the API, you can either omit the `output_format` parameter or set it explicitly:
+
+```python
+# The match() method will return a Polars DataFrame
+df = Matcher(
+  'queries/neoepitopes-test.fasta',
+  'proteomes/human.fasta',
+  max_mismatches=3,
+  k=3,
+  output_format='dataframe' # Explicitly request a DataFrame
+).match()
+
+print(df.head())
+```
+
+### Citation
+
+If you use PEPMatch in your research, please cite the following paper:
+
+Marrama D, Chronister WD, Westernberg L, et al. PEPMatch: a tool to identify short peptide sequence matches in large sets of proteins. *BMC Bioinformatics*. 2023;24(1):485. Published 2023 Dec 18. doi:10.1186/s12859-023-05606-4
