@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+import functools
+import os
+import pprint
+from pathlib import Path
+from urllib.parse import quote
+
+import pydantic as _p
+from fastapi.encoders import jsonable_encoder
+from loguru import logger
+from pydantic import Field, computed_field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from starlette.templating import Jinja2Templates
+
+from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
+from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.base import ShipawBaseModel
+from shipaw.models.ship_types import ShipDirection
+from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
+
+
+def get_path_from_environment(env_key: str) -> Path:
+    env = os.getenv(env_key)
+    logger.warning(f'Getting env var {env_key}: {env}')
+    if not env:
+        raise ValueError(f'{env_key} not set')
+    env_path = Path(env)
+    if not env_path.exists():
+        raise FileNotFoundError(f'{env_key} file {env_path} does not exist')
+    return env_path
+
+
+class ProviderEnv(ShipawBaseModel):
+    name: str
+    env_file: Path
+
+
+class ShipawSettings(BaseSettings):
+    # toggles
+    shipper_live: bool
+    log_level: str = 'DEBUG'
+
+    # dirs
+    label_dir: Path
+    log_dir: Path
+    ui_dir: Path = Field(default_factory=get_ui)
+    log_db_path: str | None = None
+
+    # Provider env file dict (json string in .env)
+    provider_env_dict: dict[str, Path]
+
+    # auto dirs
+    static_dir: Path | None = None
+    template_dir: Path | None = None
+    templates: Jinja2Templates | None = None
+
+    # sender details
+    address_line1: str
+    address_line2: str | None = None
+    address_line3: str | None = None
+    town: str
+    postcode: str
+    country: str = 'GB'
+    business_name: str
+    contact_name: str
+    email: str
+    phone: str | None = None
+    mobile_phone: str
+
+    model_config = SettingsConfigDict()
+
+    @model_validator(mode='after')
+    def populate_provider_registry(self):
+        for name, env_path in self.provider_env_dict.items():
+            logger.warning(f'Registering provider {name} from env file {env_path}')  # todo not a warning
+            if provider_type := PROVIDER_TYPE_REGISTER.get(name):
+                provider_settings = provider_type.settings_type(_env_file=env_path)
+                provider = provider_type(settings=provider_settings)
+                register_provider_instance(provider)
+        return self
+
+    @classmethod
+    @functools.lru_cache
+    def from_env(cls, env_key='SHIPAW_ENV') -> ShipawSettings:
+        env_path = get_path_from_environment(env_key)
+        if not env_path.exists():
+            raise FileNotFoundError(f'Environment file {env_path} does not exist')
+        logger.info(f'Loading ShipawSettings from env file: {env_path}')
+        return cls(_env_file=env_path)  # pycharm_pydantic false positive
+
+    # SET UI/TEMPLATE DIRS #
+    @model_validator(mode='after')
+    def set_ui(self):
+        self.static_dir = self.static_dir or self.ui_dir / 'static'
+        self.template_dir = self.template_dir or self.ui_dir / 'templates'
+        self.templates = self.templates or Jinja2Templates(directory=self.template_dir)
+        self.templates.env.filters['jsonable'] = jsonable_encoder
+        self.templates.env.filters['urlencode'] = lambda value: quote(str(value))
+        self.templates.env.filters['sanitise_id'] = sanitise_id
+        self.templates.env.filters['ordinal_dt'] = ordinal_dt
+        return self
+
+    @model_validator(mode='after')
+    def log_self(self):
+        logger.info('ShipawSettings:\n' + pprint.pformat(self.model_dump(), indent=4))
+        return self
+
+    ## SET LOGGING & LABELS ##
+    @computed_field
+    @property
+    def log_file(self) -> Path:
+        return self.log_dir / 'shipaw.log'
+
+    @computed_field
+    @property
+    def ndjson_log_file(self) -> Path:
+        return self.log_dir / 'shipaw.ndjson'
+
+    @_p.model_validator(mode='after')
+    def create_log_files(self):
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        for v in (self.log_file, self.ndjson_log_file):
+            v.touch()
+        return self
+
+    @_p.field_validator('label_dir', mode='after')
+    def create_label_dirs(cls, v, values):
+        # todo bad path crashes progqram - try/except + fallback label path?
+        directions = [_ for _ in ShipDirection]
+        try:
+            make_label_dirs(directions, v)
+        except FileNotFoundError:
+            v = Path.home() / 'Shipping Labels'
+            make_label_dirs(directions, v)
+        return v
+
+    # SET ADDRESS/CONTACT OBJECTS #
+    @property
+    def contact(self):
+        return Contact(
+            contact_name=self.contact_name,
+            email_address=self.email,
+            mobile_phone=self.mobile_phone,
+        )
+
+    @property
+    def address(self):
+        return Address(
+            address_lines=[_ for _ in [self.address_line1, self.address_line2, self.address_line3] if _],
+            town=self.town,
+            postcode=self.postcode,
+            country=self.country,
+            business_name=self.business_name,
+        )
+
+    @property
+    def full_contact(self) -> FullContact:
+        return FullContact(
+            address=self.address,
+            contact=self.contact,
+        )
+
+
+def make_label_dirs(directions, v):
+    for direction in directions:
+        apath = v / direction
+        if not apath.exists():
+            apath.mkdir(parents=True, exist_ok=True)
