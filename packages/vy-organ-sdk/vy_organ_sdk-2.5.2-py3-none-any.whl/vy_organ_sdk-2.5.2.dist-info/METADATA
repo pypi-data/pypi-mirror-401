@@ -1,0 +1,64 @@
+Metadata-Version: 2.4
+Name: vy-organ-sdk
+Version: 2.5.2
+Summary: SDK for building VY-CNS organs
+Author: VY-AGI Team
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/vinver-labs/vy-organ-sdk
+Project-URL: Repository, https://github.com/vinver-labs/vy-organ-sdk
+Project-URL: Documentation, https://github.com/vinver-labs/vy-organ-sdk#readme
+Keywords: vy,organs,protocol,zenoh,microservices
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: eclipse-zenoh>=1.7.2
+Requires-Dist: msgpack>=1.0
+Dynamic: requires-python
+
+# VY Organ SDK (Python)
+
+Python SDK for building VY-CNS organs with Protocol v2 support.
+
+## Installation
+
+```bash
+pip install vy-organ-sdk
+```
+
+## Quick Start
+
+```python
+from vy_organ_sdk import OrganHandler, HandlerRequest, HandlerResponse
+from vy_organ_sdk.transports import ZenohOrganServer
+
+class MyOrgan(OrganHandler):
+    version = "1.0.0"
+    supported_intents = ["my.organ.hello.v1"]
+
+    def handle(self, request: HandlerRequest) -> HandlerResponse:
+        return HandlerResponse.success({"message": "Hello!"})
+
+if __name__ == "__main__":
+    import asyncio
+    server = ZenohOrganServer(MyOrgan(), organ_id="my-organ")
+    asyncio.run(server.start())
+```
+
+## Environment Variables
+
+- `ZENOH_CONNECT` - Zenoh router endpoints (required)
+- `ORGAN_ID` - Unique organ identifier
+- `ZENOH_CERT_PATH` - TLS client certificate path
+- `ZENOH_KEY_PATH` - TLS client key path
+- `ZENOH_CA_PATH` - TLS CA certificate path
+
+## License
+
+MIT
