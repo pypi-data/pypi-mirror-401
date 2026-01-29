@@ -1,0 +1,29 @@
+{
+  "project_name": "boringpy14",
+  "python_version": "3.13",
+  "description": "A modern Python scaffolding framework",
+  "logging": {
+    "level": "INFO",
+    "format": "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}",
+    "rotation": "10 MB",
+    "retention": "1 week",
+    "log_file": null
+  },
+  "apis": {
+    "default_port": 8000,
+    "host": "0.0.0.0",
+    "cors_enabled": true,
+    "cors_origins": [
+      "http://localhost:3000",
+      "http://localhost:8080"
+    ]
+  },
+  "scaffolding": {
+    "apps_dir": "src/apps",
+    "libs_dir": "src/libs",
+    "scripts_dir": "src/scripts"
+  },
+  "workspace_members": [
+    "src/apps/test_blog"
+  ]
+}
