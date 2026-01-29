@@ -1,0 +1,72 @@
+Metadata-Version: 2.4
+Name: xconnect
+Version: 1.0.0
+Summary: A professional cross-platform clipboard synchronization CLI by XDT Labs.
+Author-email: XDT Labs <contact@xdtlabs.com>
+License: MIT
+Project-URL: Homepage, https://github.com/xdtlabs/csync
+Project-URL: Bug Tracker, https://github.com/xdtlabs/csync/issues
+Keywords: clipboard,sync,cross-platform,cli,firebase
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pyperclip
+Requires-Dist: firebase-admin
+Requires-Dist: click
+Requires-Dist: requests
+Requires-Dist: rich
+Requires-Dist: flask
+Requires-Dist: pyfiglet
+
+# clipSync CLI by XDT Labs
+
+A secure, authenticated, cross-platform clipboard synchronization tool built with Python and Firebase.
+
+## Features
+- **Real-time Sync**: Automatically syncs your clipboard across devices.
+- **Secure Authentication**: Integrated with Firebase Auth. Collects profile details on first login.
+- **SaaS Model**: Includes version control and a remote kill-switch for service management.
+- **Cross-Platform**: Works on macOS, Windows, and Linux.
+
+## Installation
+```bash
+pip install clipsync-xdt
+```
+
+## Usage
+1. **Login**: Authenticate and set up your profile.
+   ```bash
+   csync login
+   ```
+2. **Start Service**: Begin syncing.
+   ```bash
+   csync serve
+   ```
+3. **Stop Service**: Stop background sync.
+   ```bash
+   csync stop
+   ```
+4. **Logout**:
+   ```bash
+   csync logout
+   ```
+
+## Development
+To set up locally:
+1. Clone the repository.
+2. Install dependencies: `pip install -e .`
+3. Deploy Firebase Functions in the `firebase/` directory.
+
+## License
+MIT
