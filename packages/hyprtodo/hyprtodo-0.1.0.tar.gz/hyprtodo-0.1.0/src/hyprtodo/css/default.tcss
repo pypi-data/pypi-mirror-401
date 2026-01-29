@@ -1,0 +1,84 @@
+/* Ayu Dark Theme for Textual */
+
+/* Overall app styling */
+Screen {
+    background: #0A0E14;
+}
+
+/* Top bar container for buttons and input */
+#buttons {
+    height: 3;
+    width: 100%;
+    dock: top;
+    background: #0A0E14;
+}
+
+/* Individual buttons */
+Button {
+    height: 3;
+    min-width: 12;
+    background: transparent;
+    border: round #FF8F40;
+    color: #FF8F40;
+}
+
+Button:hover {
+    background: #626A73;
+    text-style: bold;
+}
+
+Button:focus {
+    text-style: bold;
+    color: #FFB454;
+    background: #253340;
+}
+
+/* Input field */
+Input {
+    width: 1fr;
+    background: #0A0E14;
+    border: round #FF8F40;
+    color: #B3B1AD;
+}
+
+Input:focus {
+    border: round #FF8F40;
+}
+
+Input > .input--placeholder {
+    color: #626A73;
+}
+
+/* Selection list */
+SelectionList {
+    height: 1fr;
+    border: heavy #C2D94C;
+    background: #0A0E14;
+    color: #B3B1AD;
+}
+
+SelectionList:focus {
+    border: double #FF8F40;
+}
+
+SelectionList > .selection-list--button {
+    background: #0A0E14;
+    color: #B3B1AD;
+}
+
+SelectionList > .selection-list--button-selected {
+    background: #253340;
+    color: #C2D94C;
+    text-style: bold;
+}
+
+SelectionList > .selection-list--button-highlighted {
+    background: #626A73;
+    color: #FFB454;
+}
+
+/* Rich log (if you use it) */
+RichLog {
+    height: 0;
+    display: none;
+}
