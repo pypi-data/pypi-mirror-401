@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling>=1.13.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "heter"
+dynamic = ["version"]
+description = "Um buscador de arquivos recursivo, ultra-eficiente em memória usando geradores Python."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["search", "generator", "os.scandir", "recursive", "files"]
+authors = [
+    { name = "Samuel Prevideli", email = "samuelprevideli@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/S4muel-inz/Search-y"
+
+[tool.hatch.version]
+path = "src/heter_on/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/heter_on"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/tests"]
