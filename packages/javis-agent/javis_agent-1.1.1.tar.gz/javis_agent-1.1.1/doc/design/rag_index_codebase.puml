@@ -1,0 +1,47 @@
+@startuml
+autonumber
+actor User
+participant "MCP Server\n(server.py)" as Server
+participant "Tool Handler\n(tool_handlers.py)" as ToolHandler
+participant "RAG Handler\n(rag_handler.py)" as RagHandler
+participant "RAG Service\n(rag_service.py)" as RagService
+participant "Code Loader\n(code_loader.py)" as CodeLoader
+participant "Vector Store\n(vector_store.py)" as VectorStore
+participant "HuggingFace Embeddings" as HFEmb
+participant "OpenAI Embeddings API" as OpenAIEmb
+database "FAISS Vector DB" as FAISS
+
+User -> Server: Send rag_index_codebase (dir, index_name, mode)
+Server -> ToolHandler: route_tool_call("rag_index_codebase", ...)
+ToolHandler -> RagHandler: handle_rag_index_codebase(dir, index_name, mode)
+
+RagHandler -> RagHandler: _initialize_rag_components()
+note right: Initialize RAG Service\nwith specified mode
+
+RagHandler -> RagService: index_codebase(dir, index_name)
+RagService -> CodeLoader: load_and_chunk(dir)
+
+CodeLoader -> CodeLoader: Scan directory for code files\n(.cpp, .h, .hpp, .py, .java, .js, .ts)
+CodeLoader -> CodeLoader: Read file contents
+CodeLoader -> CodeLoader: Chunk code (size=1000, overlap=200)
+CodeLoader --> RagService: Return list of Document objects
+
+RagService -> VectorStore: create_vectorstore(documents, index_name)
+
+alt mode == "retrieval_only"
+    VectorStore -> HFEmb: Embed all code chunks (local)
+    HFEmb --> VectorStore: Return embeddings vectors
+else mode == "full_rag"
+    VectorStore -> OpenAIEmb: Request embeddings for all code chunks (HTTP)
+    OpenAIEmb --> VectorStore: Return embeddings vectors
+end
+
+VectorStore -> FAISS: Create FAISS index with embeddings
+VectorStore -> FAISS: Save index to disk
+VectorStore --> RagService: Confirm vectorstore created
+
+RagService --> RagHandler: Return success result
+RagHandler --> ToolHandler: Return result
+ToolHandler --> Server: Return result
+Server --> User: Return success message\n(indexed N files, M chunks)
+@enduml
