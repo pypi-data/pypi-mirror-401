@@ -1,0 +1,37 @@
+[project]
+name = "pdf-liner"
+version = "0.1.0"
+description = "A simple Python tool that adds equally spaced horizontal lines to PDF files, making them perfect for printing and handwriting"
+authors = [
+    {name = "raideno56", email = "nadirkichou@hotmail.fr"}
+]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9,<4"
+keywords = ["pdf", "lines", "handwriting", "notes", "printing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Office/Business",
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "reportlab>=4.0.7",
+    "pypdf2>=3.0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/raideno/pdf-liner"
+Repository = "https://github.com/raideno/pdf-liner"
+
+[project.scripts]
+pdf-liner = "pdf_liner.__main__:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
