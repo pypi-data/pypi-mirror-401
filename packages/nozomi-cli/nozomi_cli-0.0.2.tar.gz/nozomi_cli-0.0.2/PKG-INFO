@@ -1,0 +1,114 @@
+Metadata-Version: 2.4
+Name: nozomi-cli
+Version: 0.0.2
+Summary: Nozomi CLI - Remote workspace platform for AI coding agents
+Project-URL: Homepage, https://nozomi.sh
+Project-URL: Documentation, https://nozomi.sh/docs
+Author-email: Roshan Pawar <roshan@r614.dev>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: ai,cli,coding,remote,terminal,workspace
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development
+Classifier: Topic :: Terminals
+Requires-Python: >=3.11
+Requires-Dist: click>=8.1.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: keyring>=25.0.0
+Requires-Dist: packaging>=23.0
+Requires-Dist: questionary>=2.0.0
+Requires-Dist: rich>=13.0.0
+Description-Content-Type: text/markdown
+
+# Nozomi CLI
+
+Command-line interface for [Nozomi](https://nozomi.sh) - the remote workspace platform for AI coding agents.
+
+## Installation
+
+```bash
+# Using uv (recommended)
+uvx nozomi-cli
+
+# Or install globally
+uv tool install nozomi-cli
+
+# Or with pip
+pip install nozomi-cli
+```
+
+## Quick Start
+
+```bash
+# Initialize (login + setup)
+nozomi init
+
+# Create a workspace
+nozomi workspace create my-project --connect
+
+# Run a task with a prompt
+nozomi run "Fix the auth bug in login.py" --connect
+
+# List your workspaces
+nozomi workspace list
+
+# Connect to a running task
+nozomi task connect task_abc123
+```
+
+## Commands
+
+### Authentication
+- `nozomi init` - Interactive setup (login + config)
+- `nozomi login` - Login via browser
+- `nozomi logout` - Logout
+- `nozomi whoami` - Show current user
+
+### Workspaces
+- `nozomi workspace list` - List all workspaces
+- `nozomi workspace create <name>` - Create a new workspace
+- `nozomi workspace setup [id]` - Run interactive setup
+- `nozomi workspace connect [id]` - Connect to workspace
+
+### Tasks
+- `nozomi task list` - List tasks
+- `nozomi task connect <id>` - Connect terminal to task
+- `nozomi task stop <id>` - Stop a task
+- `nozomi task sleep <id>` - Put task to sleep
+- `nozomi task wake <id>` - Wake a sleeping task
+
+### Quick Launch
+- `nozomi run "<prompt>"` - Launch a task with AI harness
+
+### Configuration
+- `nozomi config show` - Show current config
+- `nozomi config init` - Interactive config setup
+
+## Global Options
+
+- `--json` - Output in JSON format (for scripting)
+
+## Configuration
+
+User config is stored in `~/.nozomi/config.json`.
+
+Project-specific config can be added to `.nozomi/config.json` in your project root:
+
+```json
+{
+  "workspace_id": "ws_abc123",
+  "default_machine_tier": "medium"
+}
+```
+
+## License
+
+MIT

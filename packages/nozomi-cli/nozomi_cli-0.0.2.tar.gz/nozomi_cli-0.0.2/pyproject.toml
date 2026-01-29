@@ -1,0 +1,47 @@
+[project]
+name = "nozomi-cli"
+version = "0.0.2"
+description = "Nozomi CLI - Remote workspace platform for AI coding agents"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "Roshan Pawar", email = "roshan@r614.dev" }
+]
+keywords = ["cli", "remote", "workspace", "ai", "coding", "terminal"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development",
+    "Topic :: Terminals",
+]
+dependencies = [
+    "click>=8.1.0",
+    "httpx>=0.27.0",
+    "keyring>=25.0.0",
+    "packaging>=23.0",
+    "questionary>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.urls]
+Homepage = "https://nozomi.sh"
+Documentation = "https://nozomi.sh/docs"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nozomi_cli"]
+
+[project.scripts]
+nozomi = "nozomi_cli.main:cli"
+nozomi-cli = "nozomi_cli.main:cli"
