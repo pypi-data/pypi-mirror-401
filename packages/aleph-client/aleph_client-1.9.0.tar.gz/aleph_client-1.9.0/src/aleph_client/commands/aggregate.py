@@ -1,0 +1,287 @@
+from __future__ import annotations
+
+import inspect
+import logging
+from json import JSONDecodeError, dumps, loads
+from pathlib import Path
+from typing import Annotated, Optional
+
+import typer
+from aiohttp import ClientResponseError, ClientSession
+from aleph.sdk.client import AlephHttpClient, AuthenticatedAlephHttpClient
+from aleph.sdk.conf import settings
+from aleph.sdk.utils import extended_json_encoder
+from aleph_message.models import Chain
+from aleph_message.status import MessageStatus
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+
+from aleph_client.commands import help_strings
+from aleph_client.commands.utils import setup_logging
+from aleph_client.utils import (
+    AccountTypes,
+    AsyncTyper,
+    get_account_and_address,
+    load_account,
+    sanitize_url,
+)
+
+logger = logging.getLogger(__name__)
+app = AsyncTyper(no_args_is_help=True)
+
+
+def is_same_context():
+    caller = inspect.currentframe().f_back.f_back  # type: ignore
+    current_file = __file__
+    caller_file = caller.f_code.co_filename  # type: ignore
+    return current_file == caller_file
+
+
+@app.command()
+async def forget(
+    key: Annotated[str, typer.Argument(help="Aggregate key to remove")],
+    subkeys: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Remove specified subkey(s) only. Must be a comma separated list. E.g. `key1` or `key1,key2`",
+        ),
+    ] = None,
+    address: Annotated[Optional[str], typer.Option(help=help_strings.TARGET_ADDRESS)] = None,
+    channel: Annotated[Optional[str], typer.Option(help=help_strings.CHANNEL)] = settings.DEFAULT_CHANNEL,
+    inline: Annotated[bool, typer.Option(help="inline")] = False,
+    sync: Annotated[bool, typer.Option(help="Sync response")] = False,
+    private_key: Annotated[Optional[str], typer.Option(help=help_strings.PRIVATE_KEY)] = settings.PRIVATE_KEY_STRING,
+    private_key_file: Annotated[
+        Optional[Path], typer.Option(help=help_strings.PRIVATE_KEY_FILE)
+    ] = settings.PRIVATE_KEY_FILE,
+    chain: Annotated[Optional[Chain], typer.Option(help=help_strings.ADDRESS_CHAIN)] = None,
+    print_message: bool = False,
+    verbose: bool = True,
+    debug: bool = False,
+) -> bool:
+    """Delete an aggregate by key or subkeys"""
+
+    setup_logging(debug)
+
+    account: AccountTypes = load_account(private_key_str=private_key, private_key_file=private_key_file, chain=chain)
+    address = account.get_address() if address is None else address
+
+    if key == "security" and not is_same_context():
+        typer.echo(help_strings.AGGREGATE_SECURITY_KEY_PROTECTED)
+        raise typer.Exit(1)
+
+    async with AuthenticatedAlephHttpClient(account=account, api_server=settings.API_HOST) as client:
+        content = None
+        if subkeys:
+            content = {sk: None for sk in subkeys.split(",")}
+        else:
+            aggregates = await list_aggregates(
+                address=address, private_key=private_key, private_key_file=private_key_file, verbose=False, debug=debug
+            )
+            if aggregates and key in aggregates.keys():
+                content = {k: None for k in aggregates.get(key).keys()}
+            else:
+                typer.echo(f"Aggregate `{key}` not found")
+                raise typer.Exit(1)
+
+        message, status = await client.create_aggregate(
+            key=key,
+            content=content,
+            channel=channel,
+            sync=sync,
+            inline=inline,
+            address=address,
+        )
+        dumped_content = f"{message.model_dump_json(indent=4)}"
+
+        if status != MessageStatus.REJECTED:
+            if print_message:
+                typer.echo(dumped_content)
+            if verbose:
+                label_subkeys = f" ➜ {subkeys}" if subkeys else ""
+                typer.echo(f"Aggregate `{key}{label_subkeys}` has been deleted")
+            return True
+        elif verbose:
+            typer.echo(f"Aggregate deletion has been rejected:\n{dumped_content}")
+    return False
+
+
+@app.command()
+async def post(
+    key: Annotated[str, typer.Argument(help="Aggregate key to create/update")],
+    content: Annotated[
+        str,
+        typer.Argument(
+            help=(
+                'Aggregate content, in json format and between single quotes. E.g. \'{"a": 1, '
+                '"b": 2}\'. If a subkey is provided, also allow to pass a string content between '
+                "quotes"
+            ),
+        ),
+    ],
+    subkey: Annotated[Optional[str], typer.Option(help="Specified subkey where the content will be replaced")] = None,
+    address: Annotated[Optional[str], typer.Option(help=help_strings.TARGET_ADDRESS)] = None,
+    channel: Annotated[Optional[str], typer.Option(help=help_strings.CHANNEL)] = settings.DEFAULT_CHANNEL,
+    inline: Annotated[bool, typer.Option(help="inline")] = False,
+    sync: Annotated[bool, typer.Option(help="Sync response")] = False,
+    private_key: Annotated[Optional[str], typer.Option(help=help_strings.PRIVATE_KEY)] = settings.PRIVATE_KEY_STRING,
+    private_key_file: Annotated[
+        Optional[Path], typer.Option(help=help_strings.PRIVATE_KEY_FILE)
+    ] = settings.PRIVATE_KEY_FILE,
+    chain: Annotated[Optional[Chain], typer.Option(help=help_strings.ADDRESS_CHAIN)] = None,
+    print_message: bool = False,
+    verbose: bool = True,
+    debug: bool = False,
+) -> bool:
+    """Create or update an aggregate by key or subkey"""
+
+    setup_logging(debug)
+
+    account: AccountTypes = load_account(private_key_str=private_key, private_key_file=private_key_file, chain=chain)
+    address = account.get_address() if address is None else address
+
+    if key == "security" and not is_same_context():
+        typer.echo(help_strings.AGGREGATE_SECURITY_KEY_PROTECTED)
+        raise typer.Exit(1)
+
+    content_dict: dict | str = content
+    try:
+        content_dict = loads(content)
+    except JSONDecodeError as e:
+        if not subkey:
+            typer.echo("Invalid JSON for content. Please provide valid JSON")
+            raise typer.Exit(1) from e
+
+    if subkey:
+        content_dict = {subkey: content_dict}
+
+    async with AuthenticatedAlephHttpClient(account=account, api_server=settings.API_HOST) as client:
+        message, status = await client.create_aggregate(
+            key=key,
+            content=content_dict,
+            channel=channel,
+            sync=sync,
+            inline=inline,
+            address=address,
+        )
+        content = f"{message.model_dump_json(indent=4)}"
+
+        if status != MessageStatus.REJECTED:
+            if print_message:
+                typer.echo(content)
+            if verbose:
+                label_subkey = f" ➜ {subkey}" if subkey else ""
+                typer.echo(f"Aggregate `{key}{label_subkey}` has been created/updated")
+            return True
+        elif verbose:
+            typer.echo(f"Aggregate creation/update has been rejected:\n{content}")
+    return False
+
+
+@app.command()
+async def get(
+    key: Annotated[str, typer.Argument(help="Aggregate key to fetch")],
+    subkeys: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Fetch specified subkey(s) only. Must be a comma separated list. E.g. `key1` or `key1,key2`",
+        ),
+    ] = None,
+    address: Annotated[Optional[str], typer.Option(help=help_strings.TARGET_ADDRESS)] = None,
+    private_key: Annotated[Optional[str], typer.Option(help=help_strings.PRIVATE_KEY)] = settings.PRIVATE_KEY_STRING,
+    private_key_file: Annotated[
+        Optional[Path], typer.Option(help=help_strings.PRIVATE_KEY_FILE)
+    ] = settings.PRIVATE_KEY_FILE,
+    chain: Annotated[Optional[Chain], typer.Option(help=help_strings.ADDRESS_CHAIN)] = None,
+    verbose: bool = True,
+    debug: bool = False,
+) -> Optional[dict]:
+    """Fetch an aggregate by key or subkeys"""
+
+    setup_logging(debug)
+
+    _, address = get_account_and_address(
+        private_key=private_key, private_key_file=private_key_file, chain=chain, address=address
+    )
+
+    async with AlephHttpClient(api_server=settings.API_HOST) as client:
+        aggregates = None
+        try:
+            aggregates = await client.fetch_aggregate(address=address, key=key)
+            if subkeys:
+                aggregates = {k: v for k, v in aggregates.items() if k in subkeys.split(",")}
+        except ClientResponseError:
+            pass
+
+        if verbose:
+            if not aggregates:
+                typer.echo("No aggregate found for the given key or subkeys")
+            else:
+                typer.echo(dumps(aggregates, indent=4, default=extended_json_encoder))
+
+        return aggregates
+
+
+@app.command(name="list")
+async def list_aggregates(
+    address: Annotated[Optional[str], typer.Option(help=help_strings.TARGET_ADDRESS)] = None,
+    private_key: Annotated[Optional[str], typer.Option(help=help_strings.PRIVATE_KEY)] = settings.PRIVATE_KEY_STRING,
+    private_key_file: Annotated[
+        Optional[Path], typer.Option(help=help_strings.PRIVATE_KEY_FILE)
+    ] = settings.PRIVATE_KEY_FILE,
+    chain: Annotated[Optional[Chain], typer.Option(help=help_strings.ADDRESS_CHAIN)] = None,
+    json: Annotated[bool, typer.Option(help="Print as json instead of rich table")] = False,
+    verbose: bool = True,
+    debug: bool = False,
+) -> Optional[dict]:
+    """Display all aggregates associated to an account"""
+
+    setup_logging(debug)
+    _, address = get_account_and_address(
+        private_key=private_key, private_key_file=private_key_file, chain=chain, address=address
+    )
+
+    aggr_link = f"{sanitize_url(settings.API_HOST)}/api/v0/aggregates/{address}.json"
+    async with ClientSession() as session:
+        aggregates = None
+        async with session.get(aggr_link) as resp:
+            if resp.status == 200:
+                aggregates = (await resp.json())["data"]
+
+        if verbose:
+            if not aggregates:
+                typer.echo(f"Address: {address}\n\nNo aggregate data found\n")
+            elif json:
+                typer.echo(dumps(aggregates, indent=4, default=extended_json_encoder))
+            else:
+                infos = [
+                    Text.from_markup(f"Address: [bright_cyan]{address}[/bright_cyan]\n\nKeys:"),
+                ]
+                for key, value in aggregates.items():
+                    infos.append(
+                        Text.from_markup(f"\n↳ [orange1]{key}[/orange1]:"),
+                    )
+                    if isinstance(value, dict) and any(v is None for _, v in value.items()):
+                        infos.append(
+                            Text.from_markup("\n[gray50]x empty[/gray50]"),
+                        )
+                    else:
+                        for k, v in value.items():
+                            infos.append(
+                                Text.from_markup(
+                                    f"\n• [orchid]{k}[/orchid]: {v if type(v) is str else dumps(v, indent=4)}"
+                                ),
+                            )
+                console = Console()
+                console.print(
+                    Panel(
+                        Text.assemble(*infos),
+                        title="Aggregates",
+                        border_style="bright_cyan",
+                        expand=False,
+                        title_align="left",
+                    )
+                )
+
+        return aggregates
