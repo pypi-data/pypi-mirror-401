@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-ai-admin-chat"
+version = "0.1.0"
+description = "Django app that adds AI-powered chat to Django admin interface"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Patryk Maruda"}
+]
+keywords = [
+    "django",
+    "admin",
+    "ai",
+    "chat",
+    "langchain",
+    "openai",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+]
+dependencies = [
+    "Django>=4.2",
+    "langchain>=0.1.0",
+    "langchain-community",
+    "langchain-experimental",
+    "langchain-openai>=0.0.5",
+    "numpy>=1.24.0",
+    "openai>=1.0.0",
+    "SQLAlchemy",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-django>=4.5",
+]
+
+[tool.setuptools]
+packages = ["django_ai_admin_chat"]
+
+[tool.setuptools.package-data]
+"django_ai_admin_chat" = ["static/**/*", "templates/**/*"]
