@@ -1,0 +1,38 @@
+from nicegui import ui, app
+from rt_commission_dashboard.ui.theme import Theme
+from rt_commission_dashboard.core.db_handler import get_db_handler
+
+def login_page():
+    Theme.apply_global_styles()
+
+    # Center container
+    with ui.column().classes('absolute-center w-full max-w-sm'):
+        # Logo/Brand
+        ui.label('RT Commission Dashboard').classes('text-3xl font-bold text-center w-full mb-8')
+
+        with Theme.card():
+            ui.label('Sign In').classes('text-xl font-bold mb-6 text-center w-full')
+
+            email = ui.input('Email').props('outlined dense').classes('w-full mb-4 rt-input')
+            password = ui.input('Password').props('outlined dense type=password').classes('w-full mb-6 rt-input')
+            
+            def handle_login():
+                db = get_db_handler()
+                user = db.get_user(email.value)
+                
+                # Phase 1: Any password works if email exists
+                if user:
+                    app.storage.user['authenticated'] = True
+                    app.storage.user['user_info'] = user
+                    ui.notify('Welcome back!', type='positive')
+                    ui.navigate.to('/')
+                else:
+                    ui.notify('Invalid email (Try: admin@rt.local)', type='negative')
+
+            ui.button('Login', on_click=handle_login).props('unelevated color=indigo-600').classes('w-full h-10')
+            
+        # Helper for Phase 1 testing
+        with ui.expansion('Dev Hints', icon='code').classes('w-full mt-4 rt-muted text-sm'):
+            with ui.column().classes('gap-1'):
+                ui.label('Test Account:')
+                ui.label('admin@rt.local (Admin)')
