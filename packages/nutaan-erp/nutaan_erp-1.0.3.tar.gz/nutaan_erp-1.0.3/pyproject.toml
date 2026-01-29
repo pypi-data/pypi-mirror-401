@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nutaan_erp"
+dynamic = ["version"]
+description = "Nutaan ERP AI Agent SDK - Autonomous AI agent for ERPNext/Frappe with 14 built-in tools"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Nutaan AI (Tecosys)", email = "hara@nutaan.com"}
+]
+keywords = ["ai", "agent", "erp", "erpnext", "frappe", "automation", "langchain", "gemini"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Office/Business",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "langchain>=0.3.0",
+    "langchain-google-genai>=2.0.0",
+    "langchain-core>=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/tecosys/nutaan-erp"
+Documentation = "https://github.com/tecosys/nutaan-erp"
+Repository = "https://github.com/tecosys/nutaan-erp"
+"Bug Tracker" = "https://github.com/tecosys/nutaan-erp/issues"
+
+[tool.setuptools]
+packages = ["nutaan_erp", "nutaan_erp.core", "nutaan_erp.integrations", "nutaan_erp.utils"]
