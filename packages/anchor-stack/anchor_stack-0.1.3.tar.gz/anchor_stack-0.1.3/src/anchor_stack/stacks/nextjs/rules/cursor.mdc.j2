@@ -1,0 +1,115 @@
+---
+description: {{ app_name | pascal_case }} 项目开发规范 - Next.js 前端
+globs: ["src/**/*.ts", "src/**/*.tsx", "**/*.json"]
+alwaysApply: true
+---
+
+# {{ app_name | pascal_case }} - 开发规范
+
+> Anchor Stack v{{ stack_version }} | Next.js {{ dependencies.next }} + React {{ dependencies.react }}
+
+## 🚨 禁止事项
+
+- ❌ `console.log()` → 使用 `logger.info()` / `logger.error()`
+- ❌ `process.env.XXX` → 使用 `config.appName` / `getServerConfig()`
+- ❌ 修改 `src/lib/core/*` 文件
+- ❌ 删除 `anchor.config.json`
+- ❌ 硬编码配置值或密钥
+- ❌ API 路由中省略错误处理
+
+## 📝 日志
+
+```typescript
+import { logger } from '@/lib/core/logger';
+
+// ✅ 正确
+logger.info('User logged in', { userId: 123 });
+logger.error('Payment failed', { error: err.message });
+
+// ❌ 错误
+console.log('debug');
+```
+
+## ⚙️ 配置
+
+```typescript
+import { config, getServerConfig } from '@/lib/core/config';
+
+// ✅ 客户端配置
+const appName = config.appName;
+
+// ✅ 服务端配置 (Server Components / API Routes)
+const apiKey = getServerConfig().apiKey;
+
+// ❌ 错误
+const bad = process.env.API_KEY;
+```
+
+## 📁 目录结构
+
+| 目录 | 用途 |
+|------|------|
+| `src/app/` | Next.js App Router 页面 |
+| `src/app/api/` | API 路由 |
+| `src/components/` | React 组件 |
+| `src/components/ui/` | UI 基础组件 |
+| `src/lib/core/` | ⚠️ 核心模块 (勿改) |
+| `src/lib/utils/` | 工具函数 |
+| `src/services/` | 业务逻辑 |
+| `src/types/` | TypeScript 类型 |
+
+## 🔧 新增页面
+
+创建 `src/app/[路由]/page.tsx`:
+
+```typescript
+import { logger } from '@/lib/core/logger';
+
+export default function AboutPage() {
+  logger.info('About page rendered');
+  return <main><h1>About</h1></main>;
+}
+```
+
+## 🔧 新增 API
+
+创建 `src/app/api/[路由]/route.ts`:
+
+```typescript
+import { NextRequest } from 'next/server';
+import { logger } from '@/lib/core/logger';
+import { apiSuccess, apiError } from '@/lib/utils/api-response';
+
+export async function GET(request: NextRequest) {
+  logger.info('GET /api/example');
+  try {
+    return apiSuccess({ data: [] });
+  } catch (error) {
+    logger.error('Failed', { error: String(error) });
+    return apiError('Internal error', 500);
+  }
+}
+```
+
+## 🛡️ 错误处理
+
+```typescript
+import { apiError, apiSuccess } from '@/lib/utils/api-response';
+
+// 400 - 请求错误
+return apiError('Email is required', 400);
+
+// 404 - 资源不存在
+return apiError('User not found', 404);
+
+// 500 - 服务器错误
+return apiError('Internal server error', 500);
+```
+
+## 📋 命令
+
+```bash
+npm run dev      # 开发服务器
+npm run build    # 构建
+npm run lint     # 代码检查
+```
