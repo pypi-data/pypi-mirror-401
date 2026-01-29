@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: sas7bdat-overview
+Version: 0.1.0
+Summary: Summarize SAS7BDAT register coverage and variable availability.
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+
+# sas7bdat-overview
+
+Summarize SAS7BDAT coverage by register, period, and variable availability.
+
+## Install (wheel)
+
+Build a wheel locally and upload to your PyPI mirror:
+
+```
+python -m pip install maturin
+maturin build --release
+```
+
+The wheel will be under `target/wheels/`.
+
+## Usage
+
+Basic metadata-only scan (fast):
+
+```
+sas7bdat-overview /path/to/sas/files --out-dir /path/to/output
+```
+
+Include per-variable value profiles (slower, scans all rows):
+
+```
+sas7bdat-overview /path/to/sas/files --out-dir /path/to/output --profile
+```
+
+Include unique person/family counts (slower, scans all rows):
+
+```
+sas7bdat-overview /path/to/sas/files --out-dir /path/to/output --compute-ids
+```
+
+Restrict to specific registers (case-insensitive):
+
+```
+sas7bdat-overview /path/to/sas/files --registers lpr_diag,ind
+```
+
+## Outputs
+
+When `--out-dir` is set, the tool writes:
+
+- `register_inventory.csv` — register coverage (first/last year, file count, column count)
+- `variable_coverage.csv` — variable coverage by register and year
+- `variable_profile.csv` — per-variable missingness and ranges (only populated if `--profile` is used)
+- `inventory_summary.md` — human-readable summary table
+
+The JSON output (`--output`) includes the full raw summaries.
+
+## File naming
+
+Handles filenames like:
+
+- `<register>.sas7bdat`
+- `<register><year>.sas7bdat`
+- `<register><year><month>.sas7bdat`
+- `<register>_YYYY_MM.sas7bdat`
+- `<register>-YYYY-MM.sas7bdat`
+
+Register names may include underscores.
+
