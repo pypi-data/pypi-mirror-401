@@ -1,0 +1,163 @@
+# mosaic-basis
+
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+   ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+   ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
+   ![Linting: Ruff](https://img.shields.io/badge/linting-ruff-red.svg)
+
+Forward-biased frame selection for OMP to reconstruct frame sequences and object trajectories as bases.
+
+## Installation
+
+### For Users
+
+```bash
+pip install mosaic-basis
+```
+
+### For Development
+
+```bash
+# Clone the repository
+git clone https://github.com/egoughnour/mosaic-basis.git
+cd mosaic-basis
+
+# Install in editable mode with development dependencies
+pip install -e ".[dev]"
+```
+
+## Development
+
+### Quick Start with Makefile
+
+The project includes a Makefile for common development tasks:
+
+```bash
+# Show all available commands
+make help
+
+# Run all checks (format, lint, test)
+make check
+
+# Run tests
+make test
+
+# Run tests with coverage
+make coverage
+
+# Format code
+make format
+
+# Run linter
+make lint
+
+# Clean build artifacts
+make clean
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run tests with coverage
+pytest --cov=mosaic_basis --cov-report=html
+
+# Run specific test file
+pytest tests/test_basic.py
+```
+
+The richer test suite downloads a tiny public clip via `yt-dlp` to validate the timestamp-aware mosaic and preview flows. Make sure you have network access when running `pytest`; if the download fails (e.g., offline CI), the integration tests will automatically skip.
+
+### Downloading Videos via yt-dlp
+
+Install the optional extra to enable the built-in downloader:
+
+```bash
+pip install -e ".[yt]"
+```
+
+You can then let the pipeline fetch a clip directly:
+
+```bash
+python src/video_omp_pipeline.py \
+  --video ./work/input.mp4 \
+  --download-url https://www.youtube.com/watch?v=V3-HL7MgzzA \
+  --work ./work \
+  --download-max-height 360
+```
+
+Use `--download-overwrite` to force a re-download if the target file already exists.
+
+### Code Quality
+
+```bash
+# Format code with black
+black src tests
+
+# Lint with ruff
+ruff check src tests
+
+# Type check with mypy
+mypy src
+```
+
+### Project Structure
+
+```
+mosaic-basis/
+├── src/
+│   └── mosaic_basis/      # Main package source code
+│       └── __init__.py
+├── tests/                  # Unit tests
+│   ├── __init__.py
+│   └── test_basic.py
+├── pyproject.toml         # Project configuration (TOML-style)
+├── README.md
+└── LICENSE
+```
+
+## Publishing to PyPI
+
+### Preparation
+
+1. Update the version in `pyproject.toml` and `src/mosaic_basis/__init__.py`
+2. Update the `README.md` with any new features or changes
+3. Ensure all tests pass: `pytest`
+4. Build the distribution: `python -m build`
+
+### Publishing
+
+```bash
+# Install build tools
+pip install build twine
+
+# Build the distribution
+python -m build
+
+# Upload to TestPyPI (for testing)
+twine upload --repository testpypi dist/*
+
+# Upload to PyPI
+twine upload dist/*
+```
+
+## Renaming the Package
+
+To rename this package for a different project:
+
+1. Update `name` in `pyproject.toml` (line 6)
+2. Rename the directory `src/mosaic_basis/` to `src/your_new_name/`
+3. Update `known-first-party` in `pyproject.toml` (line 109)
+4. Update imports in `tests/test_basic.py`
+5. Update the description and URLs in `pyproject.toml`
+6. Update this README.md
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
