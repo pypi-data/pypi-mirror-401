@@ -1,0 +1,331 @@
+# pyodbc-sqlserver
+
+[![PyPI](https://img.shields.io/pypi/v/roest1-pyodbc-sqlserver.svg)](https://pypi.org/project/roest1-pyodbc-sqlserver/)
+[![GitHub Release](https://img.shields.io/github/v/release/roest1/pyodbc-sqlserver)](https://github.com/roest1/pyodbc-sqlserver)
+
+**Lightweight, explicit helpers for connecting to Microsoft SQL Server using `pyodbc`.**
+
+This package is intentionally small and boring. It standardizes how Python services open SQL Server connections using environment variables, supports multiple databases in the same process, and exposes raw `pyodbc` objects—no ORM, no hidden abstractions.
+
+> **PyPI name:** `roest1-pyodbc-sqlserver`  
+> **Import name:** `pyodbc_sqlserver`
+
+---
+
+## Install
+
+```bash
+pip install roest1-pyodbc-sqlserver
+```
+
+System requirement: an installed SQL Server ODBC driver (see **System Requirements** below).
+
+---
+
+## 30‑Second Usage
+
+```python
+from pyodbc_sqlserver import get_connection, fetch_dicts
+
+# Connect using APPDB_* environment variables
+with get_connection("APP") as conn:
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1")
+    print(cursor.fetchone())
+
+rows = fetch_dicts("SELECT * FROM dbo.Users", dbkey="APP")
+```
+
+---
+
+## Environment Configuration
+
+This library reads connection settings from environment variables. A local `.env` file is automatically loaded **if present**, without overriding existing variables.
+
+### Single Database
+
+```env
+DB_SERVER=sqlserver.company.local
+DB_NAME=MyDatabase
+DB_USER=app_user
+DB_PASS=secret
+```
+
+### Multiple Databases (Recommended)
+
+Prefixes allow multiple connections to coexist cleanly:
+
+```env
+APPDB_SERVER=sqlserver.company.local
+APPDB_NAME=ApplicationDB
+APPDB_USER=app_user
+APPDB_PASS=secret
+
+REPORTDB_SERVER=sqlserver.company.local
+REPORTDB_NAME=ReportingDB
+REPORTDB_USER=report_user
+REPORTDB_PASS=secret
+```
+
+By default, helper functions assume a prefix of `APP`. This makes the multi‑database pattern explicit rather than implicit and avoids accidental cross‑database access.
+
+---
+
+## Public API
+
+Everything below is imported directly from `pyodbc_sqlserver`.
+
+```python
+from pyodbc_sqlserver import (
+    get_connection,
+    fetch_all,
+    fetch_dicts,
+    query,
+    execute,
+    execute_many,
+    run_sql_file,
+)
+```
+
+---
+
+### `get_connection(dbkey='APP', driver='ODBC Driver 18 for SQL Server')`
+
+Open a raw `pyodbc.Connection` using environment variables prefixed by `dbkey`.
+
+**Arguments**
+
+- `dbkey` (str): Environment variable prefix (e.g. `APP` → `APPDB_*`)
+- `driver` (str): ODBC driver name
+
+**Returns**
+
+- `pyodbc.Connection`
+
+**Behavior**
+
+- Fails fast if required variables are missing
+- Does not pool connections
+- Intended for short‑lived, explicit usage (`with` blocks)
+
+---
+
+### `fetch_all(sql, params=None, dbkey='APP')`
+
+Execute a SELECT query and return rows as tuples.
+
+**Good for**
+
+- Lightweight reads
+- Simple scripts and internal tooling
+
+---
+
+### `fetch_dicts(sql, params=None, dbkey='APP')`
+
+Execute a SELECT query and return rows as dictionaries keyed by column name.
+
+**Good for**
+
+- API layers
+- JSON‑friendly results
+
+---
+
+### `query(sql, dbkey='APP')`
+
+Execute a SELECT query and print results to stdout.
+
+**Good for**
+
+- Debugging
+- Quick inspection during development
+
+---
+
+### `execute(sql, params=None, dbkey='APP')`
+
+Execute a single INSERT / UPDATE / DELETE statement and commit.
+
+---
+
+### `execute_many(sql, rows, dbkey='APP')`
+
+Bulk insert or update using `executemany`.
+
+**Good for**
+
+- Seed scripts
+- Batch operations
+
+---
+
+### `run_sql_file(path, dbkey)`
+
+Execute a `.sql` file from disk.
+
+**Behavior**
+
+- Reads file as UTF‑8
+- Skips empty files
+- Prints execution progress
+
+**Good for**
+
+- Migrations
+- Bootstrap scripts
+
+---
+
+## System Requirements
+
+### ODBC Driver
+
+Default driver:
+
+```
+ODBC Driver 18 for SQL Server
+```
+
+### Linux
+
+```bash
+sudo apt install unixodbc unixodbc-dev
+```
+
+### Conda
+
+```bash
+conda install -c conda-forge unixodbc
+```
+
+---
+
+## Design Intent
+
+This package intentionally does **not**:
+
+- Provide ORM features
+- Manage migrations
+- Hide cursors or connections
+
+It exists to eliminate copy‑pasted connection code while keeping database access obvious, auditable, and explicit.
+
+---
+
+## Maintainer Notes
+
+- Versioned using **Semantic Versioning**
+- Releases are **tag‑based** and fully automated via GitHub Actions
+- Published to PyPI using **Trusted Publishing (OIDC)**
+
+## Developer Guide
+
+This section documents how this package is developed, versioned, and released.
+It is intended for maintainers (including future-you).
+
+### Repository Structure
+
+```
+
+.
+├── python/pyodbc_sqlserver/   # Package source
+│   ├── db.py                 # Connection factory
+│   ├── db_reader.py          # Read helpers
+│   ├── db_writer.py          # Write helpers
+│   └── **init**.py
+├── .github/workflows/
+│   └── release.yaml          # Tag-based release + PyPI publish
+├── pyproject.toml            # Package metadata (single source of truth)
+└── README.md
+
+```
+
+---
+
+### Versioning Strategy (SemVer)
+
+This project follows **Semantic Versioning**:
+
+```
+
+MAJOR.MINOR.PATCH
+
+```
+
+- **MAJOR**: breaking API changes
+- **MINOR**: backward-compatible features
+- **PATCH**: bug fixes, documentation, CI changes
+
+Examples:
+
+- `0.2.1` → workflow or documentation fix
+- `0.3.0` → new helper functions
+- `1.0.0` → stable API commitment
+
+---
+
+### Release Process (Tag-Based)
+
+Releases are fully automated via GitHub Actions.
+
+#### To publish a new release:
+
+```bash
+# Checkout and pull latest updates
+git checkout main
+git pull origin main
+
+# normal git workflow
+git status
+git add .
+git commit -m "..."
+git push origin main
+
+# push tag
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# pull changes for pyproject.toml
+git pull origin main
+```
+
+This will automatically:
+
+1. Update `pyproject.toml` with the tagged version
+2. Commit the version bump to `main`
+3. Create a GitHub Release
+4. Build source + wheel distributions
+5. Publish to PyPI via Trusted Publishing (OIDC)
+
+No manual uploads. No API tokens.
+
+---
+
+### PyPI Trusted Publishing
+
+This repository is configured as a **Trusted Publisher** on PyPI:
+
+- Publisher: GitHub Actions
+- Workflow: `release.yaml`
+- Environment: `pypi`
+
+This eliminates the need for stored PyPI credentials and ensures that **only tagged releases from this repository** can publish packages.
+
+---
+
+### Contributing Notes
+
+This is currently a single-maintainer project.
+
+If additional contributors are added in the future:
+
+- All changes should go through pull requests
+- Releases remain tag-based only
+- `main` should remain protected
+
+---
+
+## License
+
+MIT
