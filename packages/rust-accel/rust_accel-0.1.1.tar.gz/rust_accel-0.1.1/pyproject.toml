@@ -1,0 +1,19 @@
+# pyproject.toml  (maturin-based, production-friendly)
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rust_accel"
+version = "0.1.1"
+description = "Safe, fast Rust kernels exposed to Python via PyO3"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Orlando Trajano", email = "orlychikka@gmail.com" }]
+license = { text = "MIT" }
+homepage = "https://github.com/0rlych1kk4/rust_accel"
+repository = "https://github.com/0rlych1kk4/rust_accel"
+dependencies = ["numpy>=1.23"]
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
