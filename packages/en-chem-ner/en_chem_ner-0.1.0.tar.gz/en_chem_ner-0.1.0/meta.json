@@ -1,0 +1,54 @@
+{
+  "lang":"en",
+  "name":"chem_ner",
+  "version":"0.1.0",
+  "description":"A named entity recognition model for chemical entities.",
+  "author":"Dinga Wonanke",
+  "email":"dak52@uclive.ac.nz",
+  "url":"",
+  "license":"MIT",
+  "spacy_version":">=3.7.5,<3.8.0",
+  "spacy_git_version":"a6d0fc360",
+  "vectors":{
+    "width":0,
+    "vectors":0,
+    "keys":0,
+    "name":null
+  },
+  "labels":{
+    "tok2vec":[
+
+    ],
+    "ner":[
+      "CHEMICAL"
+    ]
+  },
+  "pipeline":[
+    "tok2vec",
+    "ner"
+  ],
+  "components":[
+    "tok2vec",
+    "ner"
+  ],
+  "disabled":[
+
+  ],
+  "performance":{
+    "ents_f":0.9145208949,
+    "ents_p":0.9140193224,
+    "ents_r":0.9150230181,
+    "ents_per_type":{
+      "CHEMICAL":{
+        "p":0.9140193224,
+        "r":0.9150230181,
+        "f":0.9145208949
+      }
+    },
+    "tok2vec_loss":758.1526841073,
+    "ner_loss":1248.6753836637
+  },
+  "requirements":[
+
+  ]
+}
