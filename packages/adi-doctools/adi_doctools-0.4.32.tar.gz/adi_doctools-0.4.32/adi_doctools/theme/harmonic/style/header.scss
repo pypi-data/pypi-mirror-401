@@ -1,0 +1,358 @@
+@use "variable";
+
+@media screen {
+    header {
+        position: sticky;
+    }
+}
+
+header {
+    z-index: 8;
+    width: 100%;
+    top: 0;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+
+    label, button {
+      cursor: pointer;
+    }
+
+    #right span {
+        display: flex;
+        align-items: center;
+    }
+
+    #right span.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .icon:before {
+        content: '';
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin: .5rem .25rem;
+        background: url('./icons.svg');
+        filter: invert(var(--is-dark-theme));
+    }
+
+    #search:before {
+        background-position: left calc(-1.5rem*4) top;
+    }
+
+    #theme:before {
+        background-position: left calc(-1.5rem*1) bottom;
+    }
+
+    #left {
+        margin: 0 .25rem;
+        display: flex;
+        align-items: center;
+    }
+
+    #right {
+        margin-right: .25rem;
+    }
+
+    #show-sidebar:before {
+        background-position: left calc(-1.5rem*0) top;
+        transition: .25s ease background-position;
+    }
+
+    #show-localtoc:before {
+        background-position: left calc(-1.5rem*2) top;
+        transition: .25s ease background-position;
+    }
+
+    button, label {
+        border-radius: variable.$border-radius;
+    }
+
+    button:hover, label:hover,
+    button:focus, label:focus {
+        background-color: var(--bg-color2);
+    }
+}
+
+@media (min-width: variable.$screen-3) {
+    header {
+        #right {
+          margin-left: calc(50vw - 20rem - 10vw + 1rem);
+          width: calc(40rem + 20vw - 1rem);
+        }
+    }
+}
+
+@media screen {
+    header {
+        border-bottom: variable.$border-panel1;
+    }
+}
+
+.repotoc-tree.overlay {
+    position: sticky;
+    top: 3.5rem;
+    pointer-events: none;
+    height: 0;
+    opacity: 0;
+    z-index: 7;
+    width: 0;
+    transition: opacity .25s ease;
+    overflow-y: visible;
+
+    /*
+     * root is delete by the extra script,
+     * kept just for no-javascript corner-case.
+     */
+    root {
+        background: var(--bg-color1);
+        overflow-y: auto;
+        padding-top: 1em;
+        height: calc(100vh - 3.5rem);
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+    }
+
+    a {
+        cursor: pointer;
+        display: block;
+        width: fit-content;
+        padding: 0 .5em 0 .5em;
+        transition: padding .25s ease;
+        margin: 0 .5em;
+    }
+
+    a:hover {
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    a.current {
+        color: var(--accent-color);
+    }
+}
+
+
+#input-show-toc:checked ~ header #show-sidebar:before {
+    background-position: left calc(-1.5rem*0) bottom;
+}
+
+#input-show-localtoc:checked ~ header #show-localtoc:before {
+    background-position: left calc(-1.5rem*2) bottom;
+}
+
+.dark header #theme:before {
+    background-position: left calc(-1.5rem*1) top;
+}
+
+@media (prefers-color-scheme: dark) {
+    header #theme:before {
+        background-position: left calc(-1.5rem*1) top;
+    }
+
+    .light header #theme:before {
+        background-position: left calc(-1.5rem*1) bottom;
+    }
+}
+
+@media (min-width: variable.$screen-1) {
+    header #show-localtoc {
+        display: none;
+    }
+}
+
+@media (max-width: variable.$screen-1) {
+    @media screen {
+        header {
+            border-bottom: variable.$border-panel1;
+        }
+    }
+
+    header {
+        display: flex;
+        width: 100%;
+    }
+}
+
+@media screen {
+    @media (max-width: variable.$screen-1) {
+        header {
+            background: var(--bg-color1-faded1);
+        }
+    }
+}
+
+header {
+    display: flex;
+    height: 3.5rem;
+
+    #right {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #logo-org {
+        display: inline-block;
+        width: 5.375rem;
+        height: 1.5rem;
+        margin: .75rem 0;
+        background: url('./logo-org.svg') no-repeat center top;
+        flex-shrink: 0;
+    }
+
+    .vertical-divider {
+        padding: 0 0.25rem 0 0.75rem;
+        border-right: variable.$border-panel1;
+        height: 1.75rem;
+    }
+
+    #logo {
+        padding-left: 0.5rem;
+        height: 3.5rem;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        line-height: 1rem;
+    }
+
+    #logo div {
+        transition: margin .25s ease, opacity .25s ease;
+    }
+}
+
+body.dark #logo-org {
+    background-position: center bottom;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not(.light) #logo-org {
+        background-position: center bottom;
+    }
+}
+
+@media (max-width: variable.$screen-1) {
+    header {
+        backdrop-filter: blur(1em);
+    }
+}
+
+@media (min-width: variable.$screen-1) {
+    header {
+        background: var(--bg-color1);
+    }
+
+    header #right {
+        text-align: right;
+    }
+}
+
+@media (min-width: variable.$screen-3) {
+    header #left {
+        display: none;
+    }
+}
+
+@media (min-width: variable.$screen-1) and (max-width: variable.$screen-3) {
+    header #right {
+        width: calc(75vw - 1rem);
+    }
+}
+
+@media (max-width: variable.$screen-1) {
+    header #right {
+        width: 100%;
+    }
+}
+
+@media (min-width: variable.$screen-1) and (max-width: variable.$screen-3) {
+    .repotoc-tree.overlay root {
+        padding-left: 9rem;
+    }
+}
+
+@media (min-width: variable.$screen-3) {
+    .repotoc-tree.overlay root {
+        padding-left: calc(40vw - 12.5em);
+    }
+}
+
+@media (max-width: variable.$screen-1) {
+    .repotoc-tree.overlay {
+        display: none;
+    }
+}
+
+header {
+    #show-repotoc {
+        display: flex;
+        margin: 0 0 0 .25em;
+        align-items: center;
+        border-radius: variable.$border-radius;
+        padding: .5em .75em;
+        user-select: none;
+    }
+
+    #show-repotoc:hover {
+        background-color: var(--bg-color2);
+    }
+
+    #show-repotoc:after {
+        border: 1px solid var(--text-color1);
+        border-width: 0 1px 1px 0;
+        display: block;
+        content: '';
+        transition: transform ease .125s, margin ease .125s;
+        width: .6em;
+        height: .6em;
+        transform: rotate(-45deg);
+        margin-top: 1px;
+        margin-left: .5em;
+    }
+
+}
+
+@media print {
+    header #show-repotoc {
+        display: none;
+    }
+    header #logo {
+        margin-left: .5em;
+    }
+}
+
+@media (max-width: variable.$screen-1) {
+    header #show-repotoc {
+        display: none;
+    }
+    header #logo {
+        margin-left: .5em;
+    }
+}
+
+#input-show-repotoc:checked ~ header #show-repotoc:after {
+    transform: rotate(45deg);
+    margin-top: -5px;
+    margin-left: calc(.5em + 2px);
+    margin-right: -2px;
+}
+
+@media (min-width: variable.$screen-1) {
+    #input-show-repotoc:checked ~ header #logo div {
+        margin-top: 6em;
+        opacity: 0;
+    }
+}
+
+#input-show-repotoc:checked ~ div.repotoc-tree {
+    pointer-events: initial;
+    opacity: 1;
+}
+
+#input-show-repotoc:checked ~ div.repotoc-tree a {
+    padding: .75em .5em;
+}
+
+body:has(> #input-show-repotoc:checked) {
+    overflow-y: hidden;
+}

@@ -1,0 +1,163 @@
+@use "sass:list";
+@use "mixin_admonition";
+@use "variable";
+
+/* Inspired by: https://github.com/pradyunsg/furo/blob/main/src/furo/assets/styles/content/_admonitions.sass */
+
+.admonition, .topic {
+    margin: 0 auto .5em auto;
+    padding: 0 0 0.5em 0;
+
+    background: var(--color-admonition-background);
+
+    border-radius: variable.$border-radius;
+
+    overflow: hidden;
+    page-break-inside: avoid;
+
+    /* First element should have a precise margin, since the title has it, to align center for single line admonitions. */
+    > :nth-child(2) {
+        margin-top: .75em;
+    }
+}
+
+.admonition p.admonition-title,
+p.topic-title {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    margin: 0;
+    position: relative;
+    margin-top: 0;
+    padding-left: 2em;
+    padding-top: .4em;
+    padding-bottom: .4em;
+
+    font-weight: 500;
+    line-height: 1.3;
+
+    /* Our fancy icon */
+    &::before {
+        content: "";
+        position: absolute;
+        left: .5em;
+        top: .5em;
+        width: 1em;
+        height: 1em;
+    }
+}
+
+/* Default styles */
+@media screen {
+    p.admonition-title {
+        background-color: var(--color-admonition-title-background);
+        &::before {
+            background-color: var(--color-admonition-title);
+            mask-image: var(--icon-admonition-default);
+            mask-repeat: no-repeat;
+        }
+    }
+}
+@media print {
+    p.admonition-title {
+        &::before {
+            opacity: .8;
+        }
+    }
+    p.admonition-title {
+        &::before {
+            background-image: var(--icon-admonition-default);
+        }
+    }
+}
+
+p.topic-title {
+    background-color: var(--color-topic-title-background);
+    &::before {
+        background-color: var(--color-topic-title);
+        mask-image: var(--icon-topic-default);
+        mask-repeat: no-repeat;
+    }
+}
+
+.admonition p, div.line{
+    margin: 0;
+    padding: 0 .5em;
+}
+
+/* Variants */
+@media screen {
+    .admonition {
+        @each $type, $value in mixin_admonition.$admonitions {
+            &.#{$type} {
+                border-color: var(--color-admonition-title--#{$type});
+                > .admonition-title {
+                    background-color: var(--color-admonition-title-background--#{$type});
+                }
+            }
+        }
+    }
+}
+
+@media print {
+    .admonition-title {
+        border-bottom: 1px solid var(--color-admonition-title-background);
+    }
+
+    .admonition {
+        break-inside: avoid;
+
+        @each $type, $value in mixin_admonition.$admonitions {
+            &.#{$type} {
+                > .admonition-title {
+                    border-color: var(--color-admonition-title-background--#{$type});
+                }
+            }
+        }
+    }
+}
+
+.admonition {
+    border: 1px solid var(--color-admonition-title);
+
+    @each $type, $value in mixin_admonition.$admonitions {
+        &.#{$type} {
+            border-color: var(--color-admonition-title--#{$type});
+            > .admonition-title {
+                border-color: var(--color-admonition-title--#{$type});
+            }
+        }
+    }
+}
+
+@media print {
+    .admonition {
+        @each $type, $value in mixin_admonition.$admonitions {
+            &.#{$type} {
+                > .admonition-title {
+                    &::before {
+                        background-image: var(--icon-#{list.nth($value, 2)});
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen {
+    .admonition {
+        @each $type, $value in mixin_admonition.$admonitions {
+            &.#{$type} {
+                > .admonition-title {
+                    &::before {
+                        background-color: var(--color-admonition-title--#{$type});
+                        mask-image: var(--icon-#{list.nth($value, 2)});
+                    }
+                }
+            }
+        }
+    }
+}
+
+.admonition-todo > .admonition-title {
+    text-transform: uppercase;
+}

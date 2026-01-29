@@ -1,0 +1,111 @@
+@use "variable";
+
+.collapsible_input {
+    display: none;
+}
+
+.collapsible_content {
+    overflow: auto;
+    overflow: hidden;
+    transition: ease opacity .25s;
+}
+
+@media not print {
+    .collapsible_content {
+        height: 0;
+        opacity: 0;
+    }
+
+    .collapsible {
+        border: variable.$border-panel1;
+        margin-bottom: .5em;
+
+        label {
+            padding: 0.75em 1em 0.75em .75em;
+        }
+
+        label .icon {
+            display: block;
+        }
+
+        table.docutils {
+            border: none;
+            width: 100%;
+        }
+    }
+
+    .collapsible_content {
+        border-top: variable.$border-panel1;
+    }
+}
+
+@media print {
+    .collapsible {
+        label {
+            padding: 0.5em 0 0.5em 0;
+        }
+
+        label .icon {
+            display: none;
+        }
+    }
+}
+
+
+.collapsible_input:checked ~ label .icon {
+    transform: rotate(45deg);
+    margin-top: -.5em;
+}
+
+.collapsible_input:checked ~ .collapsible_content {
+    height: 100%;
+    opacity: 1;
+}
+
+.collapsible {
+    border-radius: variable.$border-radius;
+
+    label {
+        width: 100%;
+        user-select: none;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    label .icon {
+        border: 1px solid var(--text-color1);
+        border-width: 0 2px 2px 0;
+        transition: transform ease .125s, margin-top ease .125s;
+        width: .6em;
+        height: .6em;
+        transform: rotate(-45deg);
+        z-index: -1;
+        margin-left: .5em;
+    }
+
+    label p {
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    label, div {
+        transition: box-shadow ease .25s;
+    }
+
+    label:hover ~ div, label:hover {
+        box-shadow: variable.$box-shadow-raised;
+    }
+
+    label div > p:first-child {
+        font-weight: 600;
+    }
+
+    .container > p {
+        margin-left: .5em;
+        margin-right: .5em;
+    }
+}
+

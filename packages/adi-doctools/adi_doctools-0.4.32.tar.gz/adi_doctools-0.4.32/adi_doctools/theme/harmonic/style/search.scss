@@ -1,0 +1,411 @@
+@use "variable";
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.search-area, .search-area-bg {
+    top: 0;
+}
+
+.search-area {
+    position: sticky;
+    display: none;
+    width: 100vw;
+}
+
+/**
+ * polyfill < v0.4.8
+ * Used to be darker without blur.
+ */
+.search-area-bg {
+    background: none !important;
+}
+
+.search-area-bg {
+    position: fixed;
+    display: none;
+    z-index: 9;
+    backdrop-filter: blur(1em);
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+@media screen {
+    .search-area.on {
+        display: block;
+    }
+
+    .search-area-bg.on {
+        display: block;
+    }
+}
+
+.search-area {
+    width: 0;
+    height: 0;
+    z-index: 10;
+    overflow: visible;
+}
+
+.search-area form {
+    display: flex;
+    position: relative;
+    width: 100vw;
+}
+
+.search-area form {
+    background: var(--bg-color2);
+    padding: .5rem;
+    height: 3.5rem;
+
+    input {
+        color: var(--text-color1);
+        width: 100%;
+        padding-left: .5em;
+    }
+
+    button {
+        cursor: pointer;
+        border-radius: variable.$border-radius;
+
+        &:hover, &:focus {
+            background-color: var(--bg-color1);
+        }
+    }
+
+    button:before {
+        content: '';
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin: .25rem;
+        background: url('./icons.svg');
+        filter: invert(var(--is-dark-theme));
+    }
+
+    button:before {
+        background-position: left calc(0*4) bottom;
+    }
+}
+
+.search-area .search-container {
+    height: calc(100vh - 3.5rem);
+}
+
+@keyframes blink {
+    25% {
+        opacity: .75;
+    }
+    50% {
+        opacity: .25;
+    }
+    75% {
+        opacity: .75;
+    }
+}
+
+.search-area .search-filter {
+    background: var(--bg-color1);
+    flex-shrink: 0;
+
+    input {
+        display: none;
+    }
+
+    & > span {
+        display: block;
+    }
+
+    label {
+        line-height: 1.5em;
+        cursor: pointer;
+        margin-right: .5em;
+        user-select: none;
+        white-space: nowrap;
+        font-size: .9em;
+    }
+
+    .search-entry {
+        display: flex;
+        align-items: center;
+
+        button.version-filter {
+            background: var(--bg-color2);
+            border: 1px solid var(--text-color3);
+            border-radius: variable.$border-radius;
+            color: var(--text-color2);
+            font-size: .75em;
+            padding: .2em .4em;
+            cursor: pointer;
+            min-width: 3em;
+            text-align: center;
+
+            &:hover {
+                background: var(--bg-color3);
+                border-color: var(--text-color2);
+                color: var(--text-color1);
+            }
+        }
+        input:not(:checked) ~ button.version-filter {
+            display: none;
+        }
+    }
+
+    input.failed ~ label {
+        opacity: .5;
+    }
+
+    .title {
+        display: block;
+        color: var(--text-color3);
+        text-align: left;
+        margin: 0 .5rem;
+        white-space: nowrap;
+
+        code {
+            margin: 0 .125em 0 .25em;
+        }
+
+        &::after {
+            content: ':';
+        }
+   }
+
+   label .checkbox {
+       display: inline-block;
+       font-family: monospace;
+       font-size: 1.2em;
+       text-align: center;
+       width: 2em;
+       height: 2em;
+       border-radius: 1em;
+       vertical-align: middle;
+       transition: color .25s ease;
+       color: var(--text-color3);
+       text-transform: uppercase;
+       line-height: 2em;
+   }
+}
+
+@media (max-width: variable.$screen-1) {
+    .search-area .search-filter {
+        padding: 1rem .5rem;
+
+        label {
+            border: 1px solid var(--text-color2);
+            color: var(--text-color2);
+            border-radius: 1em;
+            padding: 0 .5em 0 0;
+            display: block;
+
+            .checkbox {
+                border-right: 1px solid var(--text-color3);
+                margin-right: .25em;
+            }
+        }
+
+        input:checked ~ label {
+            background: var(--text-color2);
+            color: var(--bg-color1);
+        }
+
+        input.requested:checked~ label {
+            animation: blink 1s linear infinite;
+        }
+
+        button.version-filter {
+            margin-right: 1em;
+        }
+    }
+}
+
+@media (min-width: variable.$screen-1) {
+    .search-area .search-filter {
+        padding: 0 .5rem 1rem 0;
+
+        .title {
+            line-height: 3.5em;
+        }
+
+        label {
+            color: var(--text-color2);
+            padding: .5em .5em;
+            display: block;
+            text-align: left;
+
+            .checkbox {
+                border: 1px solid var(--text-color2);
+                margin-right: .5em;
+            }
+        }
+
+        input:checked ~ label .checkbox {
+            background: var(--text-color2);
+        }
+
+        input.requested:checked~ label .checkbox {
+            animation: blink 1s linear infinite;
+        }
+    }
+
+    .search-area .search-filter.on {
+        label .checkbox {
+            color: var(--text-color2);
+        }
+
+        input:checked ~ label .checkbox {
+            color: var(--bg-color1);
+        }
+    }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.search-area .search-results {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+    padding: .5em 1em;
+    margin: 0;
+    background: var(--bg-color1);
+    max-height: 100%;
+    box-shadow: 0 0.5em 2em 0em rgba(0,0,0,.2);
+
+    ul {
+        padding: 0;
+    }
+
+    div {
+        font-family: Barlow, Arial, sans-serif;
+        font-size: 1.2em;
+        margin-top: .5em;
+        color: var(--text-color2);
+        font-weight: 500;
+    }
+
+    li {
+        list-style-type: none;
+        padding: .25em 0;
+    }
+
+    li.empty {
+
+        opacity: .8;
+
+        ul::after {
+            color: var(--text-color3);
+            content: "No results.";
+        }
+    }
+
+    p, span {
+        color: var(--text-color3);
+    }
+
+    span {
+        margin-left: .25em;
+    }
+
+    p {
+        transition: .25s ease color;
+        margin: .125em 0em .25em 2em;
+        overflow: hidden;
+        min-height: 3em;
+    }
+
+    a {
+        color: var(--accent-color);
+    }
+
+    .loading {
+        border-radius: 1em;
+        animation: shimmer 1.5s infinite;
+        background: linear-gradient(90deg, var(--bg-color1) 25%, var(--bg-color3) 50%,  var(--bg-color1) 75%);
+        background-size: 200% 100%;
+        color: var(--bg-color1);
+    }
+}
+
+.search-area .search-results > li {
+    display: none;
+}
+
+.search-area .search-results > li.on {
+    display: block;
+}
+
+.search-area .search-container {
+    display: flex;
+    align-items: flex-start;
+    width: 100vw;
+}
+
+@media (max-width: variable.$screen-1) {
+    .search-area .search-filter {
+        overflow-y: auto;
+        display: flex;
+        width: 100vw;
+    }
+
+    .search-area .search-container {
+        flex-direction: column;
+    }
+
+    .search-area .search-results p {
+        font-size: 0.9em;
+        min-height: 4em;
+    }
+}
+
+@media (min-width: variable.$screen-1) {
+    .search-area form {
+        margin-left: calc(40vw - 22rem);
+        width: calc(25vw + 36em);
+    }
+
+    .search-area .search-filter {
+        display: block;
+        width: 22rem;
+        text-align: center;
+        overflow-x: auto;
+        height: calc(100% + 3.5em);
+        margin-top: -3.5em;
+        margin-left: -2rem;
+        padding-left: 2.5rem;
+    }
+}
+
+@media (min-width: variable.$screen-3) {
+    .search-area .search-filter {
+        padding-left: calc(40vw - 40rem);
+        width: calc(40vw - 20rem);
+    }
+
+    .search-area .search-results {
+        width: calc(25vw + 36em);
+    }
+}
+
+@media (max-width: variable.$screen-3) {
+    .search-area .search-container {
+        width: 100vw;
+    }
+}
+
+@media (min-width: variable.$screen-1) and (max-width: variable.$screen-3) {
+    .search-area form {
+        margin-left: 20rem;
+        width: calc(100vw - 20rem);
+    }
+}
+
