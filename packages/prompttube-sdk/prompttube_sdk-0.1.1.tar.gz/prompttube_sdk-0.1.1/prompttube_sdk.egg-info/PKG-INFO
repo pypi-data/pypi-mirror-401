@@ -1,0 +1,46 @@
+Metadata-Version: 2.4
+Name: prompttube-sdk
+Version: 0.1.1
+Summary: Tiny Python wrapper for the PromptTube Public API v0.
+Author: PromptTube
+License-Expression: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
+# PromptTube Python SDK (v0.1.0)
+
+Tiny wrapper around the PromptTube Public API v0.
+
+## Install
+
+Copy `prompttube.py` into your project, or publish this folder as a package.
+
+## Usage
+
+```python
+from prompttube import PromptTube
+
+client = PromptTube(
+    api_key="ptu_...",
+    base_url="https://prompttube.ai",
+)
+
+prompts = client.list_prompts(limit=10)
+run = client.run(
+    messages=[{"role": "user", "content": "Summarize this text."}],
+    tier="basic",
+)
+summary = client.create_summary(
+    text=run["text"],
+    intent="Conversation recap",
+    reusable_prompt="You are a helpful summarizer.",
+)
+
+print(len(prompts["items"]), run["text"], summary["summaryId"])
+```
+
+## Endpoints covered
+
+- Read: `/api/v0/prompts`
+- Run: `/api/v0/run`
+- Summaries: `/api/v0/summaries`
