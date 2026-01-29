@@ -1,0 +1,18 @@
+# Include the README and license
+include README.md
+include README_CLEARMAP.md
+include LICENSE
+include pyproject.toml
+
+# Include all Cython source files
+recursive-include ClearMap *.pyx
+recursive-include ClearMap *.pxd
+recursive-include ClearMap *.hpp
+
+# Include Python files
+recursive-include ClearMap *.py
+
+# Exclude build artifacts
+global-exclude *.cpp
+global-exclude *.so
+global-exclude __pycache__
