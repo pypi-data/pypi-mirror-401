@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sumo-logger"
+version = "1.2.2"  # increment version
+description = "A lightweight Python logging handler for sending logs to Sumo Logic HTTP Sources."
+authors = [{name = "Saad Ullah", email = "saadullah.butt@caregenix.solutions"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["requests"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sumo_logger*"]
