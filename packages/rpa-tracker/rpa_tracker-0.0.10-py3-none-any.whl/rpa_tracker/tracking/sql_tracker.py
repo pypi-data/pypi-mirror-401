@@ -1,0 +1,257 @@
+"""SQL-based implementation of the TransactionTracker."""
+import uuid
+from typing import Any, List, Optional, Tuple
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+from rpa_tracker.enums import TransactionState, ErrorType
+from rpa_tracker.models.tx_event import TxEvent
+from rpa_tracker.models.tx_process import TxProcess
+from rpa_tracker.models.tx_stage import TxStage
+from rpa_tracker.tracking.deduplication.registry import DeduplicationRegistry
+from rpa_tracker.tracking.transaction_tracker import TransactionTracker
+from datetime import datetime
+from sqlalchemy.exc import IntegrityError
+from rpa_tracker.constants import DEFAULT_STAGE
+from rpa_tracker.retry.registry import RetryPolicyRegistry
+
+
+class SqlTransactionTracker(TransactionTracker):
+
+    def __init__(self, session: Session):
+        self.session = session
+
+    def start_or_resume(self,
+                        process_code: str,
+                        payload: Any) -> Tuple[str, bool]:
+        """Returns (uuid, is_new_transaction)."""
+        dedup = DeduplicationRegistry.get(process_code)
+        fingerprint = dedup.calculate_fingerprint(payload)
+
+        existing = dedup.find_existing_uuid(fingerprint)
+        if existing:
+            return existing, False
+
+        uuid_tx = str(uuid.uuid4())
+        self.session.add(
+            TxProcess(
+                uuid=uuid_tx,
+                process_code=process_code,
+                state=TransactionState.PENDING.value,
+                created_at=datetime.now()
+            )
+        )
+
+        try:
+            dedup.persist_data(uuid_tx, payload)
+            self.session.commit()
+            return uuid_tx, True
+        except IntegrityError:
+            self.session.rollback()
+            return dedup.find_existing_uuid(fingerprint), False
+
+    def start_stage(self,
+                    uuid: str,
+                    system: str,
+                    stage: str = DEFAULT_STAGE) -> None:
+        """Registers the start of a stage for a transaction."""
+        existing = (
+            self.session.query(TxStage)
+            .filter_by(uuid=uuid, system=system, stage=stage)
+            .first()
+        )
+
+        if existing:
+            return
+
+        self.session.add(
+            TxStage(
+                uuid=uuid,
+                system=system,
+                stage=stage,
+                state=TransactionState.PENDING.value,
+                attempt=0,
+                last_attempt_at=None,
+                error_type=None,
+                error_description=None,
+            )
+        )
+        self.session.commit()
+
+    def log_event(
+        self,
+        uuid: str,
+        system: str,
+        error_code: int,
+        description: Optional[str],
+        stage: str = DEFAULT_STAGE
+    ) -> None:
+        """Logs an event for a transaction stage."""
+        stage_row = (
+            self.session.query(TxStage)
+            .filter_by(uuid=uuid, system=system, stage=stage)
+            .one()
+        )
+
+        attempt = stage_row.attempt + 1
+
+        self.session.add(
+            TxEvent(
+                uuid=uuid,
+                system=system,
+                stage=stage,
+                attempt=attempt,
+                error_code=error_code,
+                description=description,
+                event_at=datetime.now(),
+                processed_at=datetime.now(),
+            )
+        )
+
+        self.session.commit()
+
+    def finish_stage(
+        self,
+        uuid: str,
+        system: str,
+        state: TransactionState,
+        error_type: Optional[ErrorType] = None,
+        description: Optional[str] = None,
+        stage: str = DEFAULT_STAGE
+    ) -> None:
+        """Finish a stage and update process state accordingly.
+
+        Logic:
+        - COMPLETED stage -> Check if all stages completed -> Update process
+        - REJECTED stage -> Update process to REJECTED (stop flow)
+        - TERMINATED stage -> Update process to TERMINATED (retry later)
+        """
+        # Update stage
+        stage_obj = (
+            self.session.query(TxStage)
+            .filter_by(uuid=uuid, system=system, stage=stage)
+            .one()
+        )
+
+        stage_obj.state = state.value
+        stage_obj.error_type = error_type.value if error_type else None
+        stage_obj.error_description = description
+
+        # 👇 NUEVA LÓGICA: Actualizar proceso según estado del stage
+        self._update_process_state(uuid, state, error_type, description)
+
+        self.session.commit()
+
+    def _update_process_state(
+        self,
+        uuid: str,
+        stage_state: TransactionState,
+        error_type: Optional[ErrorType],
+        description: Optional[str],
+    ) -> None:
+        """Update process state based on stage completion.
+
+        Rules:
+        1. REJECTED stage -> Process becomes REJECTED (stop)
+        2. TERMINATED stage -> Process becomes TERMINATED (retry)
+        3. COMPLETED stage -> Check all stages:
+           - All completed -> Process COMPLETED
+           - Any pending -> Process stays IN_PROGRESS
+        """
+        process = self.session.query(TxProcess).filter_by(uuid=uuid).one()
+
+        if stage_state == TransactionState.REJECTED:
+            # Business error -> Stop process
+            process.state = TransactionState.REJECTED.value
+            process.error_type = error_type.value if error_type else None
+            process.error_description = description
+
+        elif stage_state == TransactionState.TERMINATED:
+            # System error -> Mark for retry (only if not already rejected)
+            if process.state != TransactionState.REJECTED.value:
+                process.state = TransactionState.TERMINATED.value
+                process.error_type = error_type.value if error_type else None
+                process.error_description = description
+
+        elif stage_state == TransactionState.COMPLETED:
+            # Check if all stages are completed
+            all_stages_completed = self._are_all_stages_completed(uuid)
+
+            if all_stages_completed:
+                # All stages completed -> Process completed
+                process.state = TransactionState.COMPLETED.value
+                process.error_type = None
+                process.error_description = None
+            else:
+                # Still has pending stages -> Keep as IN_PROGRESS
+                if process.state == TransactionState.PENDING.value:
+                    process.state = TransactionState.IN_PROGRESS.value
+
+    def _are_all_stages_completed(self, uuid: str) -> bool:
+        """Check if all stages for a transaction are completed."""
+        # Count pending stages
+        pending_count = (
+            self.session.query(func.count(TxStage.uuid))
+            .filter(
+                TxStage.uuid == uuid,
+                TxStage.state.in_([
+                    TransactionState.PENDING.value,
+                    TransactionState.IN_PROGRESS.value,
+                ])
+            )
+            .scalar()
+        )
+
+        return pending_count == 0
+
+    def get_executable_stages(self, uuid: str) -> List[TxStage]:
+        """Returns stages that can be executed (PENDING or REJECTED).
+
+        Unless the transaction is already REJECTED.
+        """
+        process = self.session.query(TxProcess).filter_by(uuid=uuid).one()
+
+        if process.state == TransactionState.REJECTED:
+            return []
+
+        return (
+            self.session.query(TxStage)
+            .filter(
+                TxStage.uuid == uuid,
+                TxStage.state.in_(
+                    [TransactionState.PENDING, TransactionState.REJECTED]
+                )
+            )
+            .all()
+        )
+
+    def get_pending_stages(self,
+                           system: str,
+                           stage: str = DEFAULT_STAGE) -> List[TxStage]:
+        """Returns stages that are eligible for execution for a given system.
+
+        Only stages in PENDING or TERMINATED state are returned, and only if the parent transaction is not REJECTED.
+
+        Args:
+            system: Platform system code
+            stage: Optional stage name to filter by specific stage
+        """
+        policy = RetryPolicyRegistry.get(system)
+        query = (
+            self.session.query(TxStage)
+            .join(TxProcess, TxStage.uuid == TxProcess.uuid)
+            .filter(
+                TxStage.system == system,
+                TxStage.stage == stage,
+                TxStage.state == TransactionState.PENDING.value,
+                TxProcess.state.in_([
+                    TransactionState.PENDING.value,
+                    TransactionState.IN_PROGRESS.value,
+                    TransactionState.TERMINATED.value,  # 👈 Include for retry
+                ])
+            )
+        )
+
+        if policy.max_attempts is not None:
+            query = query.filter(TxStage.attempt < policy.max_attempts)
+
+        return query.all()
