@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aikit-cli"
+version = "0.1.0"
+description = "A lightweight command-line tool for scaffolding minimal AI projects."
+readme = "README.md"
+authors = [
+  { name = "Ledjob", email = "djob93@hotmail.com" },
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "typer[all]>=0.9.0",  # Includes rich and shellingham for better UX
+    "questionary>=2.0.0",
+]
+
+[project.scripts]
+aikit-cli = "aikit_cli.cli:app"
+
+[project.urls]
+"Homepage" = "https://github.com/ledjob/aikit-cli"
+"Bug Tracker" = "https://github.com/ledjob/aikit-cli/issues"
