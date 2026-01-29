@@ -1,0 +1,189 @@
+"""Core processing logic for csvnorm."""
+
+import logging
+from pathlib import Path
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+
+from csvnorm.encoding import convert_to_utf8, detect_encoding, needs_conversion
+from csvnorm.utils import ensure_output_dir, to_snake_case, validate_delimiter
+from csvnorm.validation import normalize_csv, validate_csv
+
+logger = logging.getLogger("csvnorm")
+console = Console()
+
+
+def process_csv(
+    input_file: Path,
+    output_dir: Path,
+    force: bool = False,
+    keep_names: bool = False,
+    delimiter: str = ",",
+    verbose: bool = False,
+) -> int:
+    """Main CSV processing pipeline.
+
+    Args:
+        input_file: Path to input CSV file.
+        output_dir: Directory for output files.
+        force: If True, overwrite existing output files.
+        keep_names: If True, keep original column names.
+        delimiter: Output field delimiter.
+        verbose: If True, enable debug logging.
+
+    Returns:
+        Exit code: 0 for success, 1 for error.
+    """
+    # Validate inputs
+    if not input_file.exists():
+        console.print(Panel(
+            f"[bold red]Error:[/bold red] Input file not found\n{input_file}",
+            border_style="red"
+        ))
+        return 1
+
+    if not input_file.is_file():
+        console.print(Panel(
+            f"[bold red]Error:[/bold red] Not a file\n{input_file}",
+            border_style="red"
+        ))
+        return 1
+
+    try:
+        validate_delimiter(delimiter)
+    except ValueError as e:
+        console.print(Panel(
+            f"[bold red]Error:[/bold red] {e}",
+            border_style="red"
+        ))
+        return 1
+
+    # Setup paths
+    base_name = to_snake_case(input_file.name)
+    ensure_output_dir(output_dir)
+
+    output_file = output_dir / f"{base_name}.csv"
+    reject_file = output_dir / f"{base_name}_reject_errors.csv"
+    temp_utf8_file = output_dir / f"{base_name}_utf8.csv"
+
+    # Check if output exists
+    if output_file.exists() and not force:
+        console.print(Panel(
+            f"[bold yellow]Warning:[/bold yellow] Output file already exists\n\n"
+            f"{output_file}\n\n"
+            f"Use [bold]--force[/bold] to overwrite.",
+            border_style="yellow"
+        ))
+        return 1
+
+    # Clean up previous reject file
+    if reject_file.exists():
+        reject_file.unlink()
+
+    # Track files to clean up
+    temp_files: list[Path] = []
+
+    try:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+            transient=True
+        ) as progress:
+            # Step 1: Detect encoding
+            task = progress.add_task("[cyan]Detecting encoding...", total=None)
+            try:
+                encoding = detect_encoding(input_file)
+            except ValueError as e:
+                progress.stop()
+                console.print(Panel(
+                    f"[bold red]Error:[/bold red] {e}",
+                    border_style="red"
+                ))
+                return 1
+
+            logger.debug(f"Detected encoding: {encoding}")
+            progress.update(task, description=f"[green]✓[/green] Detected encoding: {encoding}")
+
+            # Step 2: Convert to UTF-8 if needed
+            working_file = input_file
+            if needs_conversion(encoding):
+                progress.update(task, description=f"[cyan]Converting from {encoding} to UTF-8...")
+                try:
+                    convert_to_utf8(input_file, temp_utf8_file, encoding)
+                    working_file = temp_utf8_file
+                    temp_files.append(temp_utf8_file)
+                    progress.update(task, description=f"[green]✓[/green] Converted to UTF-8")
+                except (UnicodeDecodeError, LookupError) as e:
+                    progress.stop()
+                    console.print(Panel(
+                        f"[bold red]Error:[/bold red] Encoding conversion failed\n{e}",
+                        border_style="red"
+                    ))
+                    return 1
+            else:
+                progress.update(task, description=f"[green]✓[/green] Encoding: {encoding} (no conversion needed)")
+
+            # Step 3: Validate CSV
+            progress.update(task, description="[cyan]Validating CSV...")
+            logger.debug("Validating CSV with DuckDB...")
+            is_valid = validate_csv(working_file, reject_file)
+
+            if not is_valid:
+                progress.stop()
+                console.print(Panel(
+                    "[bold red]Error:[/bold red] DuckDB encountered invalid rows\n\n"
+                    f"Details: [cyan]{reject_file}[/cyan]\n\n"
+                    "Please fix the issues and try again.",
+                    border_style="red"
+                ))
+                return 1
+
+            progress.update(task, description="[green]✓[/green] CSV validated")
+
+            # Step 4: Normalize and write output
+            progress.update(task, description="[cyan]Normalizing and writing output...")
+            logger.debug("Normalizing CSV...")
+            normalize_csv(
+                input_path=working_file,
+                output_path=output_file,
+                delimiter=delimiter,
+                normalize_names=not keep_names,
+            )
+
+            logger.debug(f"Output written to: {output_file}")
+            progress.update(task, description="[green]✓[/green] Complete")
+
+        # Success summary table
+        table = Table(show_header=False, box=None, padding=(0, 1))
+        table.add_row("[green]✓[/green] Success", "")
+        table.add_row("Input:", f"[cyan]{input_file}[/cyan]")
+        table.add_row("Output:", f"[cyan]{output_file}[/cyan]")
+        table.add_row("Encoding:", encoding)
+        if delimiter != ",":
+            table.add_row("Delimiter:", repr(delimiter))
+        if not keep_names:
+            table.add_row("Headers:", "normalized to snake_case")
+
+        console.print()
+        console.print(table)
+
+    finally:
+        # Cleanup temp files
+        for temp_file in temp_files:
+            if temp_file.exists():
+                logger.debug(f"Removing temp file: {temp_file}")
+                temp_file.unlink()
+
+        # Remove reject file if empty (only header)
+        if reject_file.exists():
+            with open(reject_file, "r") as f:
+                line_count = sum(1 for _ in f)
+            if line_count <= 1:
+                logger.debug(f"Removing empty reject file: {reject_file}")
+                reject_file.unlink()
+
+    return 0
