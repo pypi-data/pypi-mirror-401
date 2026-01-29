@@ -1,0 +1,13 @@
+duckdb:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "test.duckdb"
+      schema: test_schema
+      threads: 1
+    prod:
+      type: duckdb
+      path: "test.duckdb"
+      schema: staging
+      threads: 1
