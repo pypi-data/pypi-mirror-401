@@ -1,0 +1,50 @@
+import logging
+
+from ui_rl.task import TaskSpec
+from ui_rl.runtime import CUASessionRuntime
+from ui_rl.cua import Action, ActionType
+from ui_rl.models.uitars15 import UITARS15_Rollout
+
+
+logger = logging.getLogger(__name__)
+
+
+def run_cua_rollout(
+    task_spec: TaskSpec,
+    rollout: UITARS15_Rollout,
+    runtime: CUASessionRuntime,
+    max_steps: int = 10,
+):
+    """
+    Launches a session, awaits it ready, and executes a Computer Use agent in it.
+    """
+    session_id = task_spec.create_session(runtime)
+    try:
+        logger.info(f"({session_id}) Starting...")
+        runtime.session_ready(session_id)
+        logger.info(f"({session_id}) Ready")
+
+        # Start with getting the init state (e.g. take screenshot)
+        action  = Action(ActionType.Screenshot)
+        state = runtime.session_act(session_id, action)
+
+        for step_num in range(max_steps):
+            logger.info(f"({session_id}) Predicting action {step_num+1}")
+            action = rollout.predict_next_action(state)  # type: ignore
+            if action is None:
+                break
+
+            logger.info(f"({session_id}) Taking action: {action}")
+            state = runtime.session_act(session_id, action)
+
+        # Get final rollout progress
+        progress = runtime.get_session_progress(session_id)
+        rollout.progress = progress
+
+        logger.info(f"({session_id}) Finished successfully")
+        return rollout
+    except Exception as e:
+        logger.error(f"({session_id}): {str(e)}")
+        raise
+    finally:
+        runtime.teardown_session(session_id)
