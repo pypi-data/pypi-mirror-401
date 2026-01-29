@@ -1,0 +1,25 @@
+[project]
+name = "split-pdf-by-toc"
+version = "0.0.3"
+description = "Splits a PDF by its TOC."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pypdf>=6.6.0",
+]
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+split-pdf-by-toc = "split_pdf_by_toc.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
