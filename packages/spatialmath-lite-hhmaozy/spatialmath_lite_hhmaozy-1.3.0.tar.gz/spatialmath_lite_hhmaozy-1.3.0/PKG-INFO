@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: spatialmath-lite-hhmaozy
+Version: 1.3.0
+Summary: Ultra-lightweight spatial mathematics library with optimized negative number support
+Home-page: https://github.com/hh-dev/spatialmath-lite
+Author: Hh
+Author-email: HhMaozy <1345870646@qq.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/HhMaozy/spatialmath-lite
+Project-URL: Repository, https://github.com/HhMaozy/spatialmath-lite.git
+Project-URL: Issues, https://github.com/HhMaozy/spatialmath-lite/issues
+Project-URL: Changelog, https://github.com/HhMaozy/spatialmath-lite/releases
+Keywords: spatial,mathematics,3d,optimized,negative-numbers,edge-computing,embedded,lightweight,numpy
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: Typing :: Typed
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.21.0
+Provides-Extra: test
+Requires-Dist: pytest>=7.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0; extra == "test"
+Provides-Extra: dev
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: mypy>=1.0; extra == "dev"
+Requires-Dist: ruff>=0.1; extra == "dev"
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=7.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0; extra == "docs"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# spatialmath
+Lightweight spatial math library (NumPy only): 3D cube matrix conversion driven by spatial structure
+
+An ultra-lightweight spatial math library with optimized negative number support. Ideal for edge computing, embedded systems, and educational use cases.
+
+## Core Features
+- **Extreme Performance**: Core code is only 385 lines
+- **Minimal Dependencies**: Only relies on NumPy (≥1.21.0)
+- **Optimized Negative Numbers**: Optimized encoding logic with <5% extra overhead
+- **Production-Ready**: Complete type hints and comprehensive unit tests
+- **Edge Computing Optimization**: Manual cache management for memory-sensitive environments
+- **Version Compatibility**: Supports Python 3.8+ (compatible with older Python versions)
+
+## Installation
+### From Source (Recommended)
+```bash
+git clone https://github.com/HhMaozy/spatialmath.git
+cd spatialmath
+# Import directly without additional installation
