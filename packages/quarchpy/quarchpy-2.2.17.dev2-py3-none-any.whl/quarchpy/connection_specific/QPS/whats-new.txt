@@ -1,0 +1,27 @@
+*** What's New In Quarch Power Studio ***
+
+21st November 2025
+
+QPS version 1.50
+QIS version 1.52
+
+
+*** New Features ***
+
+Added expression editor for more customizable synthetic channels
+Two or more QPS instances can be open at the same time, and stream in parallel
+A CSV file can now be imported in full, to create a QPS analysis file
+Custom instrument profiles can be loaded from default locations quickly
+Cursors can now be positioned at a set time, or by right-click menu
+Statistics on main chart can be hidden, to focus on the key ones you need
+
+
+*** Major Fixes ***
+
+Upgraded to Java 25, partly due to memory leak in J24
+AC frequency now calculates to full resolution (was limited to integer)
+Synthetic channels all now round (some were trimming the final value)
+Incorrect 'host time' was shown after the first stream
+Inconsistent measurement points could be read (cursors Vs CSV, Vs summary data)
+Recording limit control was broken in the previous release, now fixed
+Apple menus were not consistent with best practice on other apps
