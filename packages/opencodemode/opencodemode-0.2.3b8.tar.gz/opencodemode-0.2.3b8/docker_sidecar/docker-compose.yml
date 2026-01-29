@@ -1,0 +1,104 @@
+# Codemode Executor Sidecar - Docker Compose Configuration
+#
+# This docker-compose file runs the codemode executor sidecar for secure code execution.
+#
+# Quick Start:
+#   docker-compose up -d
+#
+# With custom version:
+#   CODEMODE_VERSION=0.2.0 docker-compose up -d --build
+#
+# Documentation: https://github.com/mldlwizard/codemode
+
+version: "3.8"
+
+services:
+  executor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        CODEMODE_VERSION: ${CODEMODE_VERSION:-latest}
+    image: codemode-executor:${CODEMODE_VERSION:-latest}
+    container_name: codemode-executor
+
+    environment:
+      # Required: API key for authentication
+      - CODEMODE_API_KEY=${CODEMODE_API_KEY:-dev-secret-key}
+
+      # Main app callback target (for ToolService callbacks)
+      - CODEMODE_MAIN_APP_TARGET=${CODEMODE_MAIN_APP_TARGET:-host.docker.internal:50051}
+
+      # Sidecar service configuration
+      - CODEMODE_SIDECAR_PORT=${CODEMODE_SIDECAR_PORT:-8001}
+      - CODEMODE_SIDECAR_HOST=${CODEMODE_SIDECAR_HOST:-0.0.0.0}
+
+      # Execution limits
+      - CODEMODE_CODE_TIMEOUT=${CODEMODE_CODE_TIMEOUT:-30}
+      - CODEMODE_MAX_CODE_LENGTH=${CODEMODE_MAX_CODE_LENGTH:-10000}
+
+      # Security settings
+      - CODEMODE_ALLOW_DIRECT_EXECUTION=${CODEMODE_ALLOW_DIRECT_EXECUTION:-false}
+      - CODEMODE_ALLOWED_COMMANDS=${CODEMODE_ALLOWED_COMMANDS:-}
+
+      # Logging
+      - CODEMODE_LOG_LEVEL=${CODEMODE_LOG_LEVEL:-INFO}
+
+      # TLS configuration (optional)
+      - CODEMODE_TLS_ENABLED=${CODEMODE_TLS_ENABLED:-false}
+      - CODEMODE_TLS_MODE=${CODEMODE_TLS_MODE:-system}
+      - CODEMODE_TLS_CERT_FILE=${CODEMODE_TLS_CERT_FILE:-/certs/server.crt}
+      - CODEMODE_TLS_KEY_FILE=${CODEMODE_TLS_KEY_FILE:-/certs/server.key}
+      - CODEMODE_TLS_CA_FILE=${CODEMODE_TLS_CA_FILE:-/certs/ca.crt}
+      - CODEMODE_TLS_REQUIRE_CLIENT_AUTH=${CODEMODE_TLS_REQUIRE_CLIENT_AUTH:-false}
+
+      # Callback TLS (for connecting to main app)
+      - CODEMODE_CALLBACK_TLS_ENABLED=${CODEMODE_CALLBACK_TLS_ENABLED:-false}
+      - CODEMODE_CALLBACK_TLS_CA_FILE=${CODEMODE_CALLBACK_TLS_CA_FILE:-/certs/ca.crt}
+      - CODEMODE_CALLBACK_TLS_CLIENT_CERT=${CODEMODE_CALLBACK_TLS_CLIENT_CERT:-/certs/client.crt}
+      - CODEMODE_CALLBACK_TLS_CLIENT_KEY=${CODEMODE_CALLBACK_TLS_CLIENT_KEY:-/certs/client.key}
+
+    ports:
+      - "${CODEMODE_SIDECAR_PORT:-8001}:8001"
+
+    # Optional: mount configuration file
+    # volumes:
+    #   - ./codemode-sidecar.yaml:/app/codemode-sidecar.yaml:ro
+
+    # Optional: mount certificates for TLS
+    # volumes:
+    #   - ./certs:/certs:ro
+
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: false  # Some packages need to write to temp directories
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(5); s.connect(('localhost', 8001)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  default:
+    driver: bridge
