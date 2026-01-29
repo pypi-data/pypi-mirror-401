@@ -1,0 +1,35 @@
+{
+  "Stop": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "uvx contextfs memory save-session --label 'session-end' --quiet"
+        }
+      ]
+    }
+  ],
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "uvx contextfs index --quiet --background --require-init"
+        }
+      ]
+    }
+  ],
+  "PreCompact": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "uvx contextfs memory save-session --label 'auto-compact' --quiet"
+        }
+      ]
+    }
+  ]
+}
