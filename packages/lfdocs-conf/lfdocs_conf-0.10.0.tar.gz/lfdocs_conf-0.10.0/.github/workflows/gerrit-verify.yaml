@@ -1,0 +1,121 @@
+---
+name: Gerrit Verify
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+    inputs:
+      GERRIT_BRANCH:
+        description: "Branch that change is against"
+        required: true
+        type: string
+      GERRIT_CHANGE_ID:
+        description: "The ID for the change"
+        required: true
+        type: string
+      GERRIT_CHANGE_NUMBER:
+        description: "The Gerrit number"
+        required: true
+        type: string
+      GERRIT_CHANGE_URL:
+        description: "URL to the change"
+        required: true
+        type: string
+      GERRIT_EVENT_TYPE:
+        description: "Type of Gerrit event"
+        required: true
+        type: string
+      GERRIT_PATCHSET_NUMBER:
+        description: "The patch number for the change"
+        required: true
+        type: string
+      GERRIT_PATCHSET_REVISION:
+        description: "The revision sha"
+        required: true
+        type: string
+      GERRIT_PROJECT:
+        description: "Project in Gerrit"
+        required: true
+        type: string
+      GERRIT_REFSPEC:
+        description: "Gerrit refspec of change"
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.event.inputs.GERRIT_CHANGE_ID || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  clear-vote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear votes
+        uses: lfit/gerrit-review-action@v0.3
+        with:
+          host: ${{ vars.LFIT_GERRIT_SERVER }}
+          username: ${{ vars.LFIT_GERRIT_SSH_USER }}
+          key: ${{ secrets.LFIT_GERRIT_SSH_PRIVKEY_NP }}
+          known_hosts: ${{ vars.LFIT_GERRIT_KNOWN_HOSTS }}
+          gerrit-change-number: ${{ inputs.GERRIT_CHANGE_NUMBER }}
+          gerrit-patchset-number: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
+          vote-type: clear
+      - name: Allow replication
+        run: sleep 10s
+
+  lint:
+    needs: clear-vote
+    # yamllint disable-line rule:line-length
+    uses: lfit/releng-reusable-workflows/.github/workflows/compose-repo-linting.yaml@main
+    with:
+      GERRIT_BRANCH: ${{ inputs.GERRIT_BRANCH }}
+      GERRIT_CHANGE_ID: ${{ inputs.GERRIT_CHANGE_ID }}
+      GERRIT_CHANGE_NUMBER: ${{ inputs.GERRIT_CHANGE_NUMBER }}
+      GERRIT_CHANGE_URL: ${{ inputs.GERRIT_CHANGE_URL }}
+      GERRIT_EVENT_TYPE: ${{ inputs.GERRIT_EVENT_TYPE }}
+      GERRIT_PATCHSET_NUMBER: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
+      GERRIT_PATCHSET_REVISION: ${{ inputs.GERRIT_PATCHSET_REVISION }}
+      GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
+      GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
+
+  tox:
+    needs: clear-vote
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout change
+        # yamllint disable-line rule:line-length
+        uses: lfit/checkout-gerrit-change-action@54d751e8bd167bc91f7d665dabe33fae87aaaa63 # v0.9
+        with:
+          gerrit-refspec: ${{ inputs.GERRIT_REFSPEC }}
+          gerrit-url: ${{ vars.GERRIT_URL }}
+          delay: "0s"
+          fetch-depth: 0
+      - name: Setup Python
+        # yamllint disable-line rule:line-length
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        id: setup-python
+        with:
+          python-version: "3.11"
+      - name: Run tests
+        run: >-
+          TOX_SKIP_ENV=pre-commit pipx run tox
+
+  vote:
+    if: ${{ always() }}
+    needs: [clear-vote, lint, tox]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get workflow conclusion
+        # yamllint disable-line rule:line-length
+        uses: im-open/workflow-conclusion@e4f7c4980600fbe0818173e30931d3550801b992 # v2.2.3
+      - name: Set vote
+        # yamllint disable-line rule:line-length
+        uses: lfit/gerrit-review-action@9627b9a144f2a2cad70707ddfae87c87dce60729 # v0.8
+        with:
+          host: ${{ vars.LFIT_GERRIT_SERVER }}
+          username: ${{ vars.LFIT_GERRIT_SSH_USER }}
+          key: ${{ secrets.LFIT_GERRIT_SSH_PRIVKEY_NP }}
+          known_hosts: ${{ vars.LFIT_GERRIT_KNOWN_HOSTS }}
+          gerrit-change-number: ${{ inputs.GERRIT_CHANGE_NUMBER }}
+          gerrit-patchset-number: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
+          vote-type: ${{ env.WORKFLOW_CONCLUSION }}

@@ -1,0 +1,66 @@
+---
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 2c9f875913ee60ca25ce70243dc24d5b6415598c # frozen: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: no-commit-to-branch
+        args:
+          - --branch=master
+          - --branch=main
+
+  - repo: local
+    hooks:
+      - id: gitlint
+        name: gitlint
+        language: python
+        additional_dependencies:
+          - "gitlint-core >= 0.19.1"
+        entry: gitlint
+        args: [--staged, --msg-filename]
+        stages: [commit-msg]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: f12edd9c7be1c20cfa42420fd0e6df71e42b51ea # frozen: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        stages: [commit]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: f42857794802b6a77b0e66f08803575aa80d3c8f # frozen: v0.4.7
+    hooks:
+      - id: ruff
+        files: ^.+\.py$
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        files: ^.+\.py$
+
+  - repo: https://github.com/pycqa/bandit
+    rev: 22b4226078b041a16bf05163347a66ab4dbcf3a5 # frozen: 1.7.8
+    hooks:
+      - id: bandit
+        # Bandit does not need to run on test code
+        exclude: ^tests/
+
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 07f6707e2c5612960347f7c00125620457f490a7 # frozen: 6.3.0
+    hooks:
+      - id: pydocstyle
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: 81e9f98ffd059efe8aa9c1b1a42e5cce61b640c6 # frozen: v1.35.1
+    hooks:
+      - id: yamllint
+
+  - repo: https://github.com/btford/write-good
+    rev: ab66ce10136dfad5146e69e70f82a3efac8842c1 # frozen: v1.0.8
+    hooks:
+      - id: write-good
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: 62dc61a45fc95efe8c800af7a557ab0b9165d63b # frozen: v1.7.1
+    hooks:
+      - id: actionlint
