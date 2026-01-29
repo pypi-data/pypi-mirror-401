@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "Arguments": {
+      "additionalProperties": false,
+      "properties": {
+        "angle": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 0,
+          "description": "Angle of the pattern in degrees.",
+          "title": "angle"
+        },
+        "level": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1.0,
+          "description": "Amplitude of the periodic pattern.",
+          "title": "level"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 10,
+          "description": "Period of the periodic pattern in pixels.",
+          "title": "period"
+        },
+        "startwith": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 0,
+          "description": "1 to start with high level or 0 for 0.",
+          "title": "startwith"
+        },
+        "time_scale": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1.0,
+          "description": "Time scale of the photon flux, default is 1 second. 0.001 would be ms.",
+          "title": "time_scale"
+        }
+      },
+      "title": "Arguments",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "arguments": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Arguments"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Parameters"
+    },
+    "enabled": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": true,
+      "title": "Enabled"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "ModelStripePattern",
+  "type": "object"
+}

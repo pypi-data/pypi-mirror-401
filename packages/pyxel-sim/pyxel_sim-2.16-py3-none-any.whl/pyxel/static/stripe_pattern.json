@@ -1,0 +1,67 @@
+{
+      "additionalProperties": false,
+      "description": "Stripe pattern model.",
+      "properties": {
+        "arguments": {
+          "additionalProperties": false,
+          "default": {
+            "angle": 0,
+            "level": 1.0,
+            "period": 10,
+            "startwith": 0,
+            "time_scale": 1.0
+          },
+          "properties": {
+            "angle": {
+              "default": 0,
+              "description": "Angle of the pattern in degrees.",
+              "title": "angle",
+              "type": "integer"
+            },
+            "level": {
+              "default": 1.0,
+              "description": "Amplitude of the periodic pattern.",
+              "title": "level",
+              "type": "number"
+            },
+            "period": {
+              "default": 10,
+              "description": "Period of the periodic pattern in pixels.",
+              "title": "period",
+              "type": "integer"
+            },
+            "startwith": {
+              "default": 0,
+              "description": "1 to start with high level or 0 for 0.",
+              "title": "startwith",
+              "type": "integer"
+            },
+            "time_scale": {
+              "default": 1.0,
+              "description": "Time scale of the photon flux, default is 1 second. 0.001 would be ms.",
+              "title": "time_scale",
+              "type": "number"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "func": {
+          "const": "pyxel.models.photon_collection.stripe_pattern",
+          "default": "pyxel.models.photon_collection.stripe_pattern",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Model 'stripe_pattern'",
+      "type": "object"
+    }
