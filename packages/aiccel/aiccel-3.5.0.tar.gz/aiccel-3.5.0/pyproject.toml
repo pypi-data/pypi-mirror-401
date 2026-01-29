@@ -1,0 +1,99 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aiccel"
+version = "3.5.0"
+authors = [
+    { name = "AROMAL TR", email = "aromaltr2000@gmail.com" },
+]
+description = "AIccel is a versatile Python library for building lightweight AI agents with multiple LLM providers"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = [
+    "ai", 
+    "agents", 
+    "automation", 
+    "llm",
+    "openai",
+    "gemini",
+    "groq",
+    "multi-agent",
+    "agentic-ai",
+    "tools",
+    "rag"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "openai",
+    "chromadb",
+    "PyPDF2",
+    "requests",
+    "orjson",
+    "cachetools",
+    "tenacity",
+    "aiohttp",
+    "numpy",
+    "google-genai",
+    "textsplitter",
+    "FlagEmbedding",
+    "gliner",
+    "cryptography",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pandas>=2.0.0",
+]
+privacy = [
+    "gliner>=0.1.0",
+]
+all = [
+    "gliner>=0.1.0",
+    "transformers",
+    "torch",
+]
+safety = [
+    "transformers",
+    "torch",
+]
+execution = [
+    "fastapi",
+    "uvicorn",
+]
+
+[project.urls]
+Homepage = "https://github.com/AromalTR/aiccel"
+Repository = "https://github.com/AromalTR/aiccel.git"
+Documentation = "https://github.com/AromalTR/aiccel#readme"
+"Bug Tracker" = "https://github.com/AromalTR/aiccel/issues"
+
+[tool.setuptools]
+packages = {find = {include = ["aiccel*"]}}
+
+[tool.setuptools.package-data]
+aiccel = ["py.typed"]
+
+[project.scripts]
+aiccel = "aiccel.cli:main"
