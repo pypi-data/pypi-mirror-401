@@ -1,0 +1,436 @@
+Metadata-Version: 2.4
+Name: stateset-sandbox
+Version: 1.0.4
+Summary: Python SDK for the StateSet Sandbox API
+Project-URL: Homepage, https://github.com/stateset/sandbox-sdk-python
+Project-URL: Documentation, https://docs.stateset.io/sandbox
+Project-URL: Repository, https://github.com/stateset/sandbox-sdk-python
+Author-email: StateSet <support@stateset.io>
+License-Expression: MIT
+Keywords: ai,claude,code-execution,sandbox,stateset
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: pydantic>=2.0.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest-httpx>=0.22.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.1.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# StateSet Sandbox Python SDK
+
+A Python client library for the StateSet Sandbox API. Execute code securely in isolated cloud environments with full API access to checkpoints, artifacts, webhooks, and audit logs.
+
+## Installation
+
+```bash
+pip install stateset-sandbox
+```
+
+## Quick Start
+
+```python
+from stateset_sandbox import StateSetSandbox
+
+# Initialize the client
+client = StateSetSandbox(
+    base_url="https://api.sandbox.stateset.app",
+    auth_token="sk_test_xxx",  # Your API key
+    org_id="org_xxx"           # Your organization ID
+)
+
+# Create a sandbox
+sandbox = client.create()
+print(f"Created sandbox: {sandbox.sandbox_id}")
+
+# Execute a command
+result = client.execute(sandbox.sandbox_id, command=["echo", "Hello, World!"])
+print(result.stdout)  # Output: Hello, World!
+
+# Clean up
+client.stop(sandbox.sandbox_id)
+```
+
+## Features
+
+- **Sandbox Management**: Create, list, and manage isolated execution environments
+- **Command Execution**: Run commands with streaming output support
+- **File Operations**: Read and write files within sandboxes
+- **Checkpoints**: Save and restore sandbox state
+- **Artifacts**: Upload files to cloud storage (S3/GCS)
+- **Webhooks**: Receive notifications for sandbox events
+- **Audit Logs**: Track all operations for compliance
+- **Secrets**: Securely inject environment variables
+
+## API Reference
+
+### Client Initialization
+
+```python
+from stateset_sandbox import StateSetSandbox
+
+client = StateSetSandbox(
+    base_url="https://api.sandbox.stateset.app",
+    auth_token="sk_test_xxx",  # API key or JWT token
+    org_id="org_xxx",          # Required for API key auth
+    timeout=30000,             # Request timeout in ms (default: 30000)
+    api_version="v1"           # API version (default: v1)
+)
+```
+
+### Context Manager Support
+
+```python
+from stateset_sandbox import StateSetSandbox
+
+with StateSetSandbox(
+    base_url="https://api.sandbox.stateset.app",
+    auth_token="sk_test_xxx",
+    org_id="org_xxx"
+) as client:
+    sandbox = client.create()
+    result = client.execute(sandbox.sandbox_id, command=["python", "--version"])
+    print(result.stdout)
+    client.stop(sandbox.sandbox_id)
+# Client is automatically closed when exiting the context
+```
+
+### Sandbox Operations
+
+#### Create a Sandbox
+
+```python
+from stateset_sandbox import CreateSandboxOptions
+
+# Basic creation
+sandbox = client.create()
+
+# With options
+sandbox = client.create(CreateSandboxOptions(
+    cpus="500m",           # CPU limit
+    memory="512Mi",        # Memory limit
+    timeout_seconds=3600,  # Sandbox lifetime
+    env={"DEBUG": "true"}, # Environment variables
+    template="python-basic"
+))
+```
+
+#### Execute Commands
+
+```python
+# Simple command
+result = client.execute(sandbox.sandbox_id, command="echo hello")
+
+# Command with options
+result = client.execute(
+    sandbox.sandbox_id,
+    command=["python", "-c", "print('Hello')"],
+    timeout=60000,  # Command timeout in ms
+    env={"PYTHONPATH": "/app"},
+    cwd="/workspace"
+)
+
+print(result.exit_code)  # 0
+print(result.stdout)     # Hello
+print(result.stderr)     #
+```
+
+#### Streaming Execution
+
+```python
+client.execute_stream(
+    sandbox.sandbox_id,
+    command=["python", "long_running_script.py"],
+    on_stdout=lambda data: print(f"OUT: {data}"),
+    on_stderr=lambda data: print(f"ERR: {data}"),
+    on_exit=lambda code: print(f"Exit code: {code}"),
+    on_error=lambda err: print(f"Error: {err}")
+)
+```
+
+#### File Operations
+
+```python
+# Write a single file
+client.write_file(sandbox.sandbox_id, "/app/main.py", "print('Hello')")
+
+# Write multiple files
+client.write_files(sandbox.sandbox_id, [
+    {"path": "/app/main.py", "content": "print('Hello')"},
+    {"path": "/app/utils.py", "content": "def helper(): pass"}
+])
+
+# Read a file
+content = client.read_file(sandbox.sandbox_id, "/app/main.py")
+print(content)  # print('Hello')
+```
+
+### Checkpoints
+
+Save and restore sandbox state:
+
+```python
+from stateset_sandbox import CreateCheckpointOptions
+
+# Create a checkpoint
+checkpoint = client.create_checkpoint(
+    sandbox.sandbox_id,
+    CreateCheckpointOptions(
+        name="after-setup",
+        description="Initial environment setup complete",
+        include_paths=["/app", "/data"],
+        exclude_paths=["/app/node_modules"],
+        include_env=True
+    )
+)
+
+# List checkpoints
+checkpoints = client.list_checkpoints(sandbox_id=sandbox.sandbox_id)
+
+# Restore a checkpoint to a new sandbox
+new_sandbox = client.create()
+client.restore_checkpoint(
+    new_sandbox.sandbox_id,
+    checkpoint.id,
+    restore_files=True,
+    restore_env=True
+)
+
+# Clone a checkpoint
+cloned = client.clone_checkpoint(checkpoint.id, name="checkpoint-copy")
+
+# Delete a checkpoint
+client.delete_checkpoint(checkpoint.id)
+```
+
+### Artifacts
+
+Upload and manage files in cloud storage:
+
+```python
+from stateset_sandbox import UploadArtifactOptions
+
+# Upload an artifact
+artifact = client.upload_artifact(
+    sandbox.sandbox_id,
+    UploadArtifactOptions(
+        path="/app/output/report.pdf",
+        content_type="application/pdf",
+        expires_in=86400,  # 24 hours
+        metadata={"version": "1.0"}
+    )
+)
+
+# Get download URL
+url = client.get_artifact_url(artifact.id, expires_in=3600)
+
+# List artifacts
+artifacts = client.list_artifacts(sandbox_id=sandbox.sandbox_id)
+
+# Delete artifact
+client.delete_artifact(artifact.id)
+```
+
+### Webhooks
+
+Receive notifications for sandbox events:
+
+```python
+from stateset_sandbox import CreateWebhookOptions, WebhookEvent
+
+# Create a webhook
+webhook = client.create_webhook(CreateWebhookOptions(
+    url="https://your-server.com/webhook",
+    events=[WebhookEvent.SANDBOX_CREATED, WebhookEvent.SANDBOX_STOPPED],
+    secret="your-signing-secret",
+    headers={"X-Custom-Header": "value"}
+))
+
+# List webhooks
+webhooks = client.list_webhooks()
+
+# Test a webhook
+result = client.test_webhook(webhook.id)
+
+# View delivery history
+deliveries = client.get_webhook_deliveries(webhook.id, limit=50)
+
+# Delete webhook
+client.delete_webhook(webhook.id)
+```
+
+### Audit Logs
+
+Track all operations for compliance:
+
+```python
+# List audit events
+result = client.list_audit_events(
+    sandbox_id=sandbox.sandbox_id,
+    action="command.execute",
+    outcome="success",
+    limit=100
+)
+
+for event in result["events"]:
+    print(f"{event.timestamp}: {event.action} - {event.outcome}")
+
+# Get sandbox audit summary
+summary = client.get_sandbox_audit_summary(sandbox.sandbox_id)
+print(f"Commands executed: {summary.commands_executed}")
+print(f"Files written: {summary.files_written}")
+```
+
+### Secrets
+
+Securely manage and inject secrets:
+
+```python
+from stateset_sandbox import CreateSecretOptions
+
+# Create a secret
+secret = client.create_secret(CreateSecretOptions(
+    name="DATABASE_URL",
+    value="postgres://user:pass@host/db",
+    scope="sandbox"
+))
+
+# List secrets (values not included)
+secrets = client.list_secrets()
+
+# Inject secrets into a sandbox
+injected = client.inject_secrets(
+    sandbox.sandbox_id,
+    secrets=["DATABASE_URL", "API_KEY"]
+)
+# Or inject all secrets
+injected = client.inject_secrets(sandbox.sandbox_id, all_secrets=True)
+
+# Update a secret
+client.update_secret("DATABASE_URL", "postgres://new-url")
+
+# Delete a secret
+client.delete_secret("DATABASE_URL")
+```
+
+### API Keys
+
+Manage API keys programmatically:
+
+```python
+from stateset_sandbox import CreateApiKeyOptions
+
+# Create an API key
+response = client.create_api_key(CreateApiKeyOptions(
+    name="production-key",
+    expires_in_days=365,
+    scopes=["sandbox:create", "sandbox:execute"]
+))
+print(f"New API key: {response.key}")  # Only shown once!
+
+# List API keys
+keys = client.list_api_keys()
+
+# Revoke an API key
+client.revoke_api_key(key_id)
+```
+
+### Usage & Billing
+
+```python
+# Get current usage
+usage = client.get_current_usage()
+print(f"CPU hours: {usage.cpu_hours}")
+print(f"Estimated cost: ${usage.estimated_cost_cents / 100:.2f}")
+
+# Get usage history
+history = client.get_usage_history(
+    granularity="daily",
+    start_date="2025-01-01",
+    end_date="2025-01-15"
+)
+
+# Get subscription info
+subscription = client.get_subscription()
+print(f"Plan: {subscription.plan}")
+
+# Get Stripe billing portal URL
+portal_url = client.get_billing_portal(return_url="https://your-app.com/billing")
+
+# List invoices
+invoices = client.list_invoices(limit=10)
+```
+
+### Registration
+
+Register a new organization (no authentication required):
+
+```python
+from stateset_sandbox import register, RegistrationRequest
+
+response = register(
+    base_url="https://api.sandbox.stateset.app",
+    request=RegistrationRequest(
+        email="user@example.com",
+        organization_name="My Company",
+        first_name="John",
+        last_name="Doe",
+        use_case="AI agent development"
+    )
+)
+
+print(f"Organization ID: {response.organization.id}")
+print(f"API Key: {response.api_key.key}")
+```
+
+## Error Handling
+
+```python
+from stateset_sandbox import (
+    SandboxError,
+    SandboxApiError,
+    SandboxTimeoutError,
+    SandboxNetworkError,
+    SandboxNotFoundError,
+    SandboxAuthenticationError,
+    SandboxRateLimitError,
+)
+
+try:
+    result = client.execute(sandbox_id, command=["python", "script.py"])
+except SandboxNotFoundError as e:
+    print(f"Sandbox not found: {e.sandbox_id}")
+except SandboxAuthenticationError:
+    print("Invalid API key or token")
+except SandboxRateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after} seconds")
+except SandboxTimeoutError as e:
+    print(f"Request timed out after {e.timeout_ms}ms")
+except SandboxNetworkError as e:
+    print(f"Network error: {e.original_error}")
+except SandboxApiError as e:
+    print(f"API error [{e.code}]: {e.message}")
+    print(f"Request ID: {e.request_id}")
+```
+
+## Requirements
+
+- Python 3.8+
+- httpx >= 0.24.0
+- pydantic >= 2.0.0
+
+## License
+
+MIT
