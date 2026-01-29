@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "safeoutput"
+version = "3.0"
+description = "Tempfile wrapper to ensure output files are either complete, or empty. Also handles stdout, which gives no truncation guarantees."
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "andrew thomson", email = "athomsonguy@gmail.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Filesystems",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "http://github.com/andrewguy9/safeoutput"
+
+[project.scripts]
+safeoutput = "safeoutput:main"
+
+[project.optional-dependencies]
+test = ["pytest"]
+dev = ["mypy", "pytest"]
+
+[tool.setuptools]
+packages = ["safeoutput"]
+zip-safe = true
