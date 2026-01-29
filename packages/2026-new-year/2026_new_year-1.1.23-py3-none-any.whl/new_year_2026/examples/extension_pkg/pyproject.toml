@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "pybind11>=2.10"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hello-ext-demo"
+version = "1.0.1"
+description = "Minimal pybind11 extension demo package"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hello_ext = ["*.h"]
