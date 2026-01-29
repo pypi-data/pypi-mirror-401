@@ -1,0 +1,149 @@
+Metadata-Version: 2.4
+Name: decidalo_client
+Version: 0.0.1
+Summary: An async Python client for the decidalo V3 Import API
+Project-URL: Changelog, https://github.com/Hochfrequenz/decidalo_client.py/releases
+Project-URL: Homepage, https://github.com/Hochfrequenz/decidalo_client.py
+Author-email: Hochfrequenz Unternehmensberatung GmbH <info@hochfrequenz.de>
+License: MIT
+License-File: LICENSE
+Keywords: aiohttp,api,async,client,decidalo,pydantic
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Python: >=3.11
+Requires-Dist: aiohttp>=3.10
+Requires-Dist: pydantic>=2.5
+Provides-Extra: codegen
+Requires-Dist: datamodel-code-generator==0.53.0; extra == 'codegen'
+Provides-Extra: coverage
+Requires-Dist: coverage==7.13.1; extra == 'coverage'
+Provides-Extra: dev
+Requires-Dist: pip-tools; extra == 'dev'
+Provides-Extra: formatting
+Requires-Dist: black==25.12.0; extra == 'formatting'
+Requires-Dist: isort==7.0.0; extra == 'formatting'
+Provides-Extra: linting
+Requires-Dist: pylint==4.0.4; extra == 'linting'
+Provides-Extra: packaging
+Requires-Dist: build==1.4.0; extra == 'packaging'
+Requires-Dist: twine==6.2.0; extra == 'packaging'
+Provides-Extra: spell-check
+Requires-Dist: codespell==2.4.1; extra == 'spell-check'
+Provides-Extra: tests
+Requires-Dist: aioresponses==0.7.8; extra == 'tests'
+Requires-Dist: pytest-asyncio==0.25.0; extra == 'tests'
+Requires-Dist: pytest==8.3.5; extra == 'tests'
+Provides-Extra: type-check
+Requires-Dist: mypy==1.19.1; extra == 'type-check'
+Requires-Dist: mypy[pydantic]; extra == 'type-check'
+Description-Content-Type: text/markdown
+
+# decidalo_client.py
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Python Versions (officially) supported](https://img.shields.io/pypi/pyversions/decidalo_client.svg)
+![Pypi status badge](https://img.shields.io/pypi/v/decidalo_client)
+
+![Unittests status badge](https://github.com/Hochfrequenz/decidalo_client.py/workflows/Unittests/badge.svg)
+![Coverage status badge](https://github.com/Hochfrequenz/decidalo_client.py/workflows/Coverage/badge.svg)
+![Linting status badge](https://github.com/Hochfrequenz/decidalo_client.py/workflows/Linting/badge.svg)
+![Formatting status badge](https://github.com/Hochfrequenz/decidalo_client.py/workflows/Formatting/badge.svg)
+
+An async Python client for the [decidalo](https://decidalo.de/) V3 Import API.
+
+> [!IMPORTANT]
+> This is a community project and is not an official decidalo client.
+> It is not affiliated with or endorsed by decidalo GmbH.
+
+## Installation
+
+```bash
+pip install decidalo_client
+```
+
+## Usage
+
+```python
+import asyncio
+from decidalo_client import DecidaloClient, DecidaloAPIError, DecidaloAuthenticationError
+
+async def main() -> None:
+    async with DecidaloClient(api_key="your-api-key") as client:
+        # Get all users
+        users = await client.get_users()
+        for user in users:
+            print(f"{user.displayName} ({user.email})")
+
+        # Get all projects
+        projects = await client.get_all_projects()
+        for project in projects:
+            print(f"{project.properties.name.value}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Error Handling
+
+```python
+import asyncio
+from decidalo_client import DecidaloClient, DecidaloAPIError, DecidaloAuthenticationError
+
+async def main() -> None:
+    async with DecidaloClient(api_key="your-api-key") as client:
+        try:
+            users = await client.get_users()
+        except DecidaloAuthenticationError as e:
+            print(f"Authentication failed: {e.message}")
+        except DecidaloAPIError as e:
+            print(f"API error {e.status_code}: {e.message}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+## Features
+
+- Async HTTP client built on `aiohttp`
+- Type-safe request/response models using `pydantic`
+- All major API endpoints:
+  - **Users** - Get users, import users (sync/async), check import status
+  - **Teams** - Get teams, import teams (sync/async), check import status
+  - **Companies** - Get companies, import companies
+  - **Projects** - Get projects, get all projects, import projects, check existence
+  - **Bookings** - Get bookings, get bookings by project, import bookings
+  - **Absences** - Get absences, import absences
+  - **Resource Requests** - Get resource requests, import resource requests
+  - **Roles** - Import roles
+  - **Working Time Patterns** - Get working time patterns, import working time patterns
+
+## Development
+
+Clone the repository and install the development environment:
+
+```bash
+git clone https://github.com/Hochfrequenz/decidalo_client.py.git
+cd decidalo_client.py
+tox -e dev
+```
+
+To regenerate the Pydantic models from the OpenAPI spec:
+
+```bash
+tox -e codegen
+```
+
+For detailed information on the development setup (tox configuration, IDE setup, etc.), see the [Hochfrequenz Python Template Repository](https://github.com/Hochfrequenz/python_template_repository).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
