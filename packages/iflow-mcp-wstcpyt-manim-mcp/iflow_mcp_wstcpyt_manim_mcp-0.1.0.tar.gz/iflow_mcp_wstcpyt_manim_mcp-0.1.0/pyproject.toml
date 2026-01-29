@@ -1,0 +1,48 @@
+[project]
+name = "iflow-mcp-wstcpyt-manim-mcp"
+version = "0.1.0"
+description = "A Docker-based environment for creating mathematical animations with Manim, featuring MCP support"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "wstcpyt", email = "noreply@example.com"}
+]
+keywords = ["manim", "mcp", "fastapi", "animation", "math"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.6",
+    "fastapi-mcp>=0.3.0",
+]
+
+[project.scripts]
+manim-mcp = "mcp_server:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "httpx>=0.25.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*", "mcp_server.py"]
+
+[tool.setuptools.package-data]
+app = ["**/*.py"]
