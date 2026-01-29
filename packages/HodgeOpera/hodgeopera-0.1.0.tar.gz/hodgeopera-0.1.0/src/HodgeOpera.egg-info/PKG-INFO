@@ -1,0 +1,414 @@
+Metadata-Version: 2.4
+Name: HodgeOpera
+Version: 0.1.0
+Summary: Spectral Physics-Aware Neural Operators on Manifolds via Hodge Decomposition
+Author: HodgeOpera Team
+License: MIT
+Keywords: deep-learning,neural-operators,hodge-theory,manifolds,physics-informed
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Physics
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: torch>=2.0.0
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: toponetx>=0.0.2
+Provides-Extra: viz
+Requires-Dist: pyvista; extra == "viz"
+Requires-Dist: matplotlib; extra == "viz"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+
+# HodgeOpera 
+
+**Spectral Physics-Aware Neural Operators on Manifolds via Hodge Decomposition**
+
+HodgeOpera is a PyTorch library for building neural operators that respect the geometric and topological structure of manifold data. It implements the **Hodge Spectral Duality (HSD)** framework, leveraging discrete exterior calculus (DEC) to create physics-informed architectures for learning mappings between differential forms on triangulated surfaces.
+
+## Features
+
+- **Form-Agnostic API**: Simply specify input and output form types (0, 1, or 2) — the library handles all spectral lifting and reconstruction automatically.
+- **Hybrid Euler-Lagrangian Architecture**: Combines a topology-dominated **Base Space Branch** (spectral Hodge decomposition) with geometry-dominated **Fiber Branch** (ambient FNO residuals).
+- **Physics-Informed Inductive Bias**: Injects explicit spectral derivatives (gradient, divergence, curl) as learnable features to correct commutator errors.
+- **Topological Guarantee**: The residual branch output is constrained to the orthogonal complement of the spectral subspace, preserving global cohomological invariants (e.g., Betti numbers) by construction.
+- **Efficient**: Decouples heavy geometric computations (offline) from linear-complexity online inference.
+
+## Installation
+
+### From PyPI (Recommended)
+Users can install the latest stable version directly:
+```bash
+pip install HodgeOpera
+
+```
+
+Or install with visualization dependencies:
+
+```bash
+pip install -e ".[viz]"
+```
+
+### Requirements
+
+- Python >= 3.8
+- PyTorch >= 2.0.0
+- NumPy >= 1.20.0
+- SciPy >= 1.7.0
+- TopoNetX >= 0.0.2
+
+## Quick Start
+
+```python
+import numpy as np
+import torch
+from hodgeopera import HodgeContext, HodgeOperator
+
+# 1. Prepare mesh data
+points = np.load("vertices.npy")  # [N, 3] vertex coordinates
+faces = np.load("faces.npy")      # [M, 3] triangle indices
+
+# 2. Build spectral context (do once, can be cached)
+context = HodgeContext(points=points, faces=faces, k_modes=64)
+context.to('cuda')
+
+# 3. Create operator for scalar field prediction (0-form → 0-form)
+model = HodgeOperator(
+    context=context,
+    in_form=0,
+    out_form=0,
+    hidden_dim=64,
+    use_residual=True
+).to('cuda')
+
+# 4. Forward pass
+x = torch.randn(32, len(points), device='cuda')  # [B, N] batch of scalar fields
+y = model(x)                                      # [B, N] predicted scalar fields
+```
+
+## Core Concepts
+
+### Differential Forms
+
+HodgeOpera operates on discrete differential forms defined on triangulated manifolds:
+
+| Form | Rank | Domain | Physical Interpretation | Examples |
+|------|------|--------|------------------------|----------|
+| 0-form | 0 | Vertices | Scalar field | Temperature, pressure, concentration |
+| 1-form | 1 | Edges | Vector field / flux | Velocity, electric field, gradient |
+| 2-form | 2 | Faces | Pseudo-scalar | Vorticity, magnetic flux density |
+
+### Hodge Decomposition
+
+Any 1-form ω can be uniquely decomposed as:
+
+```
+ω = dα + δβ + γ
+```
+
+where:
+- `dα` is the **exact** component (gradient of a 0-form)
+- `δβ` is the **co-exact** component (co-differential of a 2-form)  
+- `γ` is the **harmonic** component (in the kernel of the Laplacian)
+
+HodgeOpera learns this decomposition in spectral space using eigenfunctions of the Hodge Laplacians.
+
+### Architecture Overview
+
+```
+Input (spatial) ──► Lift to Spectral ──► Spectral Core (gMLP) ──► Reconstruct ──► Output
+                          │                                            ▲
+                          │                                            │
+                          └──► FNO + Coupling MLP ──► Orthogonal Proj ─┘
+                                   (Residual Branch)
+```
+
+1. **Spectral Lifting**: Projects input data onto eigenfunctions Φ₀, Φ₁, Φ₂
+2. **Spectral Core**: gMLP layers with physics-encoded cross-form interactions
+3. **Residual Branch**: FNO captures local geometry; MLP models coupling errors
+4. **Orthogonal Projection**: Ensures residual lives in complement of spectral subspace
+
+## API Reference
+
+### HodgeContext
+
+Pre-computes and stores all geometric/topological operators for a mesh.
+
+```python
+context = HodgeContext(
+    points,      # np.ndarray [N, 3]: vertex coordinates
+    faces,       # np.ndarray [M, 3]: triangle vertex indices
+    k_modes=64   # int: number of eigenmodes per form (default: 64)
+)
+```
+
+**Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `to(device)` | Move all tensors to specified device |
+| `lift(data, form)` | Project spatial data to spectral coefficients (c0, c1, c2) |
+| `reconstruct(coeffs, form)` | Reconstruct spatial data from spectral coefficients |
+| `project_to_spectral(data, form)` | Direct projection without cross-form lifting |
+
+**Attributes:**
+
+| Attribute | Shape | Description |
+|-----------|-------|-------------|
+| `Phi0_t` | [N, k0] | 0-form eigenbasis |
+| `Phi1_t` | [E, k1] | 1-form eigenbasis |
+| `Phi2_t` | [F, k2] | 2-form eigenbasis |
+| `Md0_t` | [k1, k0] | Spectral gradient operator |
+| `Md1_t` | [k2, k1] | Spectral curl operator |
+| `n_nodes` | int | Number of vertices |
+| `n_edges` | int | Number of edges |
+| `n_faces` | int | Number of faces |
+
+### HodgeOperator
+
+Main neural operator model.
+
+```python
+model = HodgeOperator(
+    context,                  # HodgeContext: pre-computed geometric operators
+    in_form=0,                # int: input form type (0, 1, or 2)
+    out_form=0,               # int: output form type (0, 1, or 2)
+    hidden_dim=64,            # int: hidden dimension for spectral MLP
+    n_layers=3,               # int: number of gMLP layers
+    use_residual=True,        # bool: enable FNO residual branch
+    fno_modes=(4, 4, 4),      # tuple: FNO spectral modes per dimension
+    fno_hidden=16,            # int: FNO hidden channels
+    fno_layers=2,             # int: number of FNO layers
+    grid_res=16               # int: voxel grid resolution for FNO
+)
+```
+
+**Methods:**
+
+| Method | Input | Output | Description |
+|--------|-------|--------|-------------|
+| `forward(x)` | [B, N] or [B, E] or [B, F] | Same shape | Standard forward pass |
+| `forward_with_components(x)` | Same | (total, spectral, residual) | Returns decomposed outputs |
+
+**Attributes:**
+
+| Attribute | Description |
+|-----------|-------------|
+| `res_scale` | Learnable scalar for residual branch contribution |
+
+## Supported Form Mappings
+
+| in_form | out_form | Input Shape | Output Shape | Use Case |
+|---------|----------|-------------|--------------|----------|
+| 0 | 0 | [B, N] | [B, N] | Heat diffusion, advection-diffusion |
+| 1 | 1 | [B, E] | [B, E] | Fluid dynamics, electromagnetic waves |
+| 2 | 2 | [B, F] | [B, F] | Vorticity transport |
+| 0 | 1 | [B, N] | [B, E] | Learning gradient operator |
+| 1 | 0 | [B, E] | [B, N] | Learning divergence operator |
+| 1 | 2 | [B, E] | [B, F] | Learning curl operator |
+
+where N = number of vertices, E = number of edges, F = number of faces.
+
+## Examples
+
+### Scalar Field Evolution (0-form → 0-form)
+
+```python
+import torch
+from hodgeopera import HodgeContext, HodgeOperator
+
+# Setup
+context = HodgeContext(points, faces, k_modes=128)
+context.to('cuda')
+
+model = HodgeOperator(
+    context=context,
+    in_form=0,
+    out_form=0,
+    hidden_dim=128,
+    n_layers=4,
+    use_residual=True
+).to('cuda')
+
+# Training loop
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+
+for epoch in range(100):
+    for x_batch, y_batch in dataloader:
+        optimizer.zero_grad()
+        pred = model(x_batch)
+        loss = torch.nn.functional.mse_loss(pred, y_batch)
+        loss.backward()
+        optimizer.step()
+```
+
+### Flow Prediction (1-form → 1-form)
+
+```python
+# For vector field / flux prediction on edges
+model = HodgeOperator(
+    context=context,
+    in_form=1,
+    out_form=1,
+    hidden_dim=64
+).to('cuda')
+
+# Input: edge fluxes [B, n_edges]
+# Output: predicted edge fluxes [B, n_edges]
+flux_in = torch.randn(16, context.n_edges, device='cuda')
+flux_out = model(flux_in)
+```
+
+### Gradient Operator Learning (0-form → 1-form)
+
+```python
+# Learn the gradient: scalar field → edge flux
+model = HodgeOperator(
+    context=context,
+    in_form=0,
+    out_form=1,
+    hidden_dim=64,
+    use_residual=False  # Pure spectral for exact operators
+).to('cuda')
+
+scalar_field = torch.randn(16, context.n_nodes, device='cuda')
+gradient_flux = model(scalar_field)  # [16, n_edges]
+```
+
+### Inspecting Model Components
+
+```python
+# Get decomposed output
+total, spectral, residual = model.forward_with_components(x)
+
+print(f"Spectral contribution norm: {spectral.norm():.4f}")
+print(f"Residual contribution norm: {residual.norm():.4f}")
+print(f"Residual scale parameter: {model.res_scale.item():.4f}")
+```
+
+### Caching HodgeContext
+
+Building `HodgeContext` involves eigenvalue decomposition which can be slow for large meshes. Cache it for reuse:
+
+```python
+import pickle
+
+# Save
+with open('context.pkl', 'wb') as f:
+    pickle.dump({
+        'points': context.points,
+        'faces': context.faces,
+        'k_modes': context.k_modes,
+        'Phi0': context.Phi0,
+        'Phi1': context.Phi1,
+        'Phi2': context.Phi2,
+        'Md0': context.Md0,
+        'Md1': context.Md1,
+    }, f)
+
+# Load and rebuild (faster than recomputing eigenvectors)
+# ... custom loading logic
+```
+
+## Configuration Guidelines
+
+### Choosing `k_modes`
+
+| Mesh Size | Recommended k_modes | Notes |
+|-----------|---------------------|-------|
+| < 1,000 nodes | 32-64 | Full spectrum often computable |
+| 1,000-5,000 nodes | 64-128 | Good balance |
+| 5,000-20,000 nodes | 128-256 | May need iterative eigensolvers |
+| > 20,000 nodes | 256+ | Consider mesh decimation |
+
+### Choosing `hidden_dim` and `n_layers`
+
+| Task Complexity | hidden_dim | n_layers |
+|-----------------|------------|----------|
+| Simple (diffusion) | 32-64 | 2-3 |
+| Medium (advection-diffusion) | 64-128 | 3-4 |
+| Complex (turbulence) | 128-256 | 4-6 |
+
+### When to Use Residual Branch
+
+| Scenario | use_residual | Reason |
+|----------|--------------|--------|
+| Learning exact operators (grad, div, curl) | False | Spectral representation is sufficient |
+| PDE with smooth solutions | False or True | Spectral often enough |
+| PDE with sharp gradients/shocks | True | FNO captures local features |
+| Complex geometry effects | True | MLP models coupling errors |
+
+## Theoretical Background
+
+### Discrete Exterior Calculus
+
+HodgeOpera implements DEC on simplicial complexes:
+
+- **Boundary operators** B₁: edges → vertices, B₂: faces → edges
+- **Coboundary operators** d₀ = B₁ᵀ (gradient), d₁ = B₂ᵀ (curl)
+- **Hodge Laplacians** L₀ = B₁ᵀB₁, L₁ = B₁B₁ᵀ + B₂ᵀB₂, L₂ = B₂B₂ᵀ
+
+### Spectral Representation
+
+Eigenfunctions Φₖ of Hodge Laplacians form orthonormal bases:
+
+```
+LₖΦₖ = ΦₖΛₖ
+```
+
+Operators in spectral space:
+- Spectral gradient: M_{d0} = Φ₁ᵀ B₁ Φ₀
+- Spectral curl: M_{d1} = Φ₂ᵀ B₂ Φ₁
+
+### Physics-Informed Features
+
+The model computes explicit spectral derivatives as input features:
+
+```
+For 1-form input c₁:
+  - Divergence: δ₁(c₁) = M_{d0}ᵀ c₁  (maps to 0-form space)
+  - Curl: d₁(c₁) = M_{d1} c₁        (maps to 2-form space)
+```
+
+These provide the network with differential geometry context.
+
+## Troubleshooting
+
+### Out of Memory
+
+- Reduce `k_modes`
+- Reduce `grid_res` for FNO
+- Reduce batch size
+- Decimate mesh before building context
+
+### Slow Eigenvalue Computation
+
+- Reduce `k_modes`
+- Use mesh decimation for preprocessing
+- Cache `HodgeContext` after first computation
+
+### Poor Convergence
+
+- Normalize input/output data
+- Reduce learning rate
+- Increase `hidden_dim` or `n_layers`
+- Enable `use_residual=True` for complex geometries
+
+### NaN in Training
+
+- Check mesh quality (degenerate triangles)
+- Reduce learning rate
+- Add gradient clipping: `torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)`
+
+## License
+
+MIT License
