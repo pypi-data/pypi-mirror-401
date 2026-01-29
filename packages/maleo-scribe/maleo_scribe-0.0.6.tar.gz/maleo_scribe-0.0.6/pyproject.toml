@@ -1,0 +1,167 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maleo-scribe"
+version = "0.0.6"
+description = "MaleoScribe service package"
+authors = [
+    { name = "Agra Bima Yuda", email = "agra@nexmedis.com" }
+]
+license = { text = "Proprietary" }
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "annotated-doc>=0.0.4",
+    "annotated-types>=0.7.0",
+    "anyio>=4.12.1",
+    "bcrypt>=5.0.0",
+    "black>=25.12.0",
+    "cachetools>=6.2.4",
+    "certifi>=2026.1.4",
+    "cffi>=2.0.0",
+    "cfgv>=3.5.0",
+    "charset-normalizer>=3.4.4",
+    "click>=8.3.1",
+    "colorama>=0.4.6",
+    "cryptography>=46.0.3",
+    "distlib>=0.4.0",
+    "fastapi>=0.128.0",
+    "filelock>=3.20.3",
+    "google-api-core>=2.29.0",
+    "google-auth>=2.47.0",
+    "google-cloud-appengine-logging>=1.8.0",
+    "google-cloud-audit-log>=0.4.0",
+    "google-cloud-core>=2.5.0",
+    "google-cloud-logging>=3.13.0",
+    "google-cloud-pubsub>=2.34.0",
+    "googleapis-common-protos>=1.72.0",
+    "greenlet>=3.3.0",
+    "grpc-google-iam-v1>=0.14.3",
+    "grpcio>=1.76.0",
+    "grpcio-status>=1.76.0",
+    "h11>=0.16.0",
+    "httpcore>=1.0.9",
+    "httpx>=0.28.1",
+    "identify>=2.6.16",
+    "idna>=3.11",
+    "importlib_metadata>=8.7.1",
+    "iniconfig>=2.3.0",
+    "mypy_extensions>=1.1.0",
+    "nexo-crypto>=0.0.5",
+    "nexo-enums>=0.0.5",
+    "nexo-logging>=0.0.5",
+    "nexo-schemas>=0.0.19",
+    "nexo-types>=0.0.5",
+    "nexo-utils>=0.0.5",
+    "nodeenv>=1.10.0",
+    "opentelemetry-api>=1.39.1",
+    "opentelemetry-sdk>=1.39.1",
+    "opentelemetry-semantic-conventions>=0.60b1",
+    "packaging>=25.0",
+    "pathspec>=1.0.3",
+    "platformdirs>=4.5.1",
+    "pluggy>=1.6.0",
+    "pre_commit>=4.5.1",
+    "proto-plus>=1.27.0",
+    "protobuf>=6.33.4",
+    "pyasn1>=0.6.1",
+    "pyasn1_modules>=0.4.2",
+    "pycparser>=2.23",
+    "pycryptodome>=3.23.0",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.12.0",
+    "pydantic_core>=2.41.5",
+    "pydub>=0.25.1",
+    "Pygments>=2.19.2",
+    "PyJWT>=2.10.1",
+    "pytest>=9.0.2",
+    "python-dotenv>=1.2.1",
+    "pytokens>=0.3.0",
+    "PyYAML>=6.0.3",
+    "requests>=2.32.5",
+    "rsa>=4.9.1",
+    "sniffio>=1.3.1",
+    "SQLAlchemy>=2.0.45",
+    "starlette>=0.50.0",
+    "typing-inspection>=0.4.2",
+    "typing_extensions>=4.15.0",
+    "ua-parser>=1.0.1",
+    "ua-parser-builtins>=202601",
+    "urllib3>=2.6.3",
+    "user-agents>=2.2.0",
+    "virtualenv>=20.36.1",
+    "zipp>=3.23.0",
+]
+
+[tool.setuptools]
+packages = [
+    "maleo.scribe",
+    "maleo.scribe.common",
+    "maleo.scribe.common.mixins",
+    "maleo.scribe.common.mixins.soap",
+    "maleo.scribe.common.mixins.soap.objective",
+    "maleo.scribe.v1",
+    "maleo.scribe.v1.constants",
+    "maleo.scribe.v1.dtos",
+    "maleo.scribe.v1.enums",
+    "maleo.scribe.v1.mixins",
+    "maleo.scribe.v1.schemas",
+    "maleo.scribe.v1.types",
+    "maleo.scribe.v2",
+    "maleo.scribe.v2.constants",
+    "maleo.scribe.v2.dtos",
+    "maleo.scribe.v2.dtos.soap",
+    "maleo.scribe.v2.dtos.soap.objective",
+    "maleo.scribe.v2.enums",
+    "maleo.scribe.v2.mixins",
+    "maleo.scribe.v2.schemas",
+    "maleo.scribe.v2.types",
+]
+
+[tool.setuptools.package-data]
+"maleo.scribe" = ["*.json", "*.yaml"]
+"maleo.scribe.common" = ["*.json", "*.yaml"]
+"maleo.scribe.common.mixins" = ["*.json", "*.yaml"]
+"maleo.scribe.common.mixins.soap" = ["*.json", "*.yaml"]
+"maleo.scribe.common.mixins.soap.objective" = ["*.json", "*.yaml"]
+"maleo.scribe.v1" = ["*.json", "*.yaml"]
+"maleo.scribe.v1.constants" = ["*.json", "*.yaml"]
+"maleo.scribe.v1.dtos" = ["*.json", "*.yaml"]
+"maleo.scribe.v1.enums" = ["*.json", "*.yaml"]
+"maleo.scribe.v1.mixins" = ["*.json", "*.yaml"]
+"maleo.scribe.v1.schemas" = ["*.json", "*.yaml"]
+"maleo.scribe.v1.types" = ["*.json", "*.yaml"]
+"maleo.scribe.v2" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.constants" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.dtos" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.dtos.soap" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.dtos.objective" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.enums" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.mixins" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.schemas" = ["*.json", "*.yaml"]
+"maleo.scribe.v2.types" = ["*.json", "*.yaml"]
+
+[tool.setuptools.package-dir]
+"maleo.scribe" = "src"
+"maleo.scribe.common" = "src/common"
+"maleo.scribe.common.mixins" = "src/common/mixins"
+"maleo.scribe.common.mixins.soap" = "src/common/mixins/soap"
+"maleo.scribe.common.mixins.soap.objective" = "src/common/mixins/soap/objective"
+"maleo.scribe.v1" = "src/v1"
+"maleo.scribe.v1.constants" = "src/v1/constants"
+"maleo.scribe.v1.dtos" = "src/v1/dtos"
+"maleo.scribe.v1.enums" = "src/v1/enums"
+"maleo.scribe.v1.mixins" = "src/v1/mixins"
+"maleo.scribe.v1.schemas" = "src/v1/schemas"
+"maleo.scribe.v1.types" = "src/v1/types"
+"maleo.scribe.v2" = "src/v2"
+"maleo.scribe.v2.constants" = "src/v2/constants"
+"maleo.scribe.v2.dtos" = "src/v2/dtos"
+"maleo.scribe.v2.dtos.soap" = "src/v2/dtos/soap"
+"maleo.scribe.v2.dtos.objective" = "src/v2/dtos/soap/objective"
+"maleo.scribe.v2.enums" = "src/v2/enums"
+"maleo.scribe.v2.mixins" = "src/v2/mixins"
+"maleo.scribe.v2.schemas" = "src/v2/schemas"
+"maleo.scribe.v2.types" = "src/v2/types"
