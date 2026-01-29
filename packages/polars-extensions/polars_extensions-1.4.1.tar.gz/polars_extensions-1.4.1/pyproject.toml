@@ -1,0 +1,29 @@
+[project]
+name = "polars-extensions"
+
+dynamic = ["version"]
+description = "The Library of Polars Extensions"
+readme = "README.md"
+authors = [
+    {name = "Jayden Rasband", email = "jayden.rasband@gmail.com"}
+]
+license = {text = "MIT"}
+classifiers = []
+dependencies = [
+    "polars",
+    "defusedxml",
+    "pyodbc",
+    "tqdm"
+]
+
+
+[project.urls]
+"Source" = "https://github.com/jrasband-dev/polars-extensions"
+"Documentation" = "https://jrasband-dev.github.io/polars-extensions/"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+[tool.setuptools.dynamic]
+version = {attr = "polars_extensions.__version__"}
