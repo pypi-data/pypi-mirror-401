@@ -1,0 +1,7 @@
+from mangadownloadlib.downloaders.strategies.DownloadStrategy import DownloadStrategy
+from mangadownloadlib.downloaders.strategies.DeletePicturesStrategy import DeletePicturesStrategy
+from mangadownloadlib.downloaders.strategies.SavePSDStrategy import SavePSDStrategy
+from mangadownloadlib.downloaders.strategies.ArchiveStrategy import ArchiveStrategy
+from mangadownloadlib.downloaders.strategies.DeleteFolderStrategy import DeleteFolderStrategy
+from mangadownloadlib.downloaders.strategies.MergeFramesStrategy import MergeFramesStrategy
+from mangadownloadlib.downloaders.strategies.SavePDFStrategy import SavePDFStrategy
