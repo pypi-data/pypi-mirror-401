@@ -1,0 +1,247 @@
+Metadata-Version: 2.4
+Name: glee
+Version: 0.3.20
+Summary: The Conductor for Your AI Orchestra
+Requires-Python: >=3.11
+Requires-Dist: duckdb>=1.2.0
+Requires-Dist: fastembed>=0.7.4
+Requires-Dist: jsonschema>=4.26.0
+Requires-Dist: lancedb>=0.26.1
+Requires-Dist: langgraph>=1.0.5
+Requires-Dist: loguru>=0.7.0
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: pydantic>=2.12.5
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: rich>=14.0.0
+Requires-Dist: typer>=0.15.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.24.0; extra == 'dev'
+Requires-Dist: pytest>=8.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Glee
+
+> **Delegate work to save context.**
+
+Glee is an **MCP Agent Runtime** — a locally-running autonomous agent that LLM tools (Claude Code, Codex, Cursor) can delegate work to.
+
+## The Problem
+
+Coding agents have limited context windows. Complex tasks bloat context, causing the model to lose focus. When the session ends, context is gone.
+
+## The Solution
+
+Delegate work to Glee. Glee runs in its **own context** using another AI instance.
+
+```
+Claude Code (your main agent)
+    ↓ glee.job.submit("refactor the auth system")
+Glee Agent Runtime (separate context)
+    ↓ Uses Codex/Claude API internally
+    ↓ Runs autonomously with ReAct loop
+    ↓ Can use tools, read files, search code
+    ↓ Returns result when done
+Claude Code gets result (its context stayed clean)
+```
+
+> **Delegate work. Save context.**
+
+## Quick Start
+
+```bash
+# Install
+uv tool install glee --python 3.13
+# or: pipx install glee
+
+# Initialize project (registers MCP server)
+glee init claude
+
+# Authenticate with AI provider (for Glee's reasoning)
+glee oauth codex          # OAuth to Codex API
+# or
+glee auth claude <key>    # Claude API key
+```
+
+After restart, Claude Code can delegate work:
+
+```
+"Submit a job to Glee to refactor the authentication system"
+→ glee.job.submit(task="refactor the auth system", context=["src/auth/"])
+→ Returns job_id, Glee works autonomously
+→ glee.job.wait(job_id) to get result
+```
+
+## Features
+
+### MCP Tool Namespaces
+
+| Namespace | Purpose |
+|-----------|---------|
+| `glee.job.*` | Delegate autonomous work to Glee agent |
+| `glee.review` | Code review from another AI perspective |
+| `glee.rag.*` | Cross-project knowledge base (planned) |
+| `glee.memory.*` | Project memory (existing) |
+
+### Job API
+
+| Tool | Description |
+|------|-------------|
+| `glee.job.submit` | Submit a task, returns job_id |
+| `glee.job.get` | Get job status and progress |
+| `glee.job.wait` | Block until job completes |
+| `glee.job.result` | Get final result |
+| `glee.job.needs_input` | Check if human input needed |
+| `glee.job.provide_input` | Provide input to waiting job |
+
+### Code Review
+
+```bash
+glee review src/api/          # Review a directory
+glee review git:changes       # Review uncommitted changes
+```
+
+### Memory System
+
+| Tool | Description |
+|------|-------------|
+| `glee.memory.add` | Add memory entry |
+| `glee.memory.search` | Semantic search |
+| `glee.memory.overview` | Project overview |
+
+### Supporting Infrastructure
+
+| Component | Description |
+|-----------|-------------|
+| **agents** | Reusable workers (`.glee/agents/*.yml`) |
+| **tools** | Extensible capabilities (`.glee/tools/`) |
+| **workflows** | Orchestration of agents |
+
+## AI Provider Setup
+
+Glee needs an AI to power its reasoning. Configure one:
+
+```bash
+# OAuth flows (uses your existing subscription)
+glee oauth codex               # Codex API (PKCE flow)
+glee oauth copilot             # GitHub Copilot API (device flow)
+
+# API keys
+glee auth set claude <key>     # Claude API
+glee auth set gemini <key>     # Gemini API
+
+# Check status
+glee auth status
+
+# Remove credentials
+glee auth logout <provider>
+```
+
+**Priority order:** Codex API → Copilot API → Claude API → Gemini API → CLI fallback
+
+## CLI Commands
+
+```bash
+# Setup
+glee init <agent>              # Initialize project
+glee oauth codex               # OAuth to Codex
+glee oauth copilot             # OAuth to Copilot
+glee auth set <provider> <key> # Set API key
+glee auth status               # Show configured providers
+glee auth logout <provider>    # Remove credentials
+
+# Jobs
+glee status                   # Show project status
+
+# Review
+glee review <target>          # Run code review
+glee config set reviewer.primary codex
+
+# Memory
+glee memory overview          # Show project memory
+glee memory search <query>    # Search memory
+```
+
+## How It Works
+
+```
+glee init claude
+    ├── Creates .glee/ directory
+    ├── Creates .mcp.json (MCP server registration)
+    └── Creates .claude/settings.local.json (session hooks)
+
+claude (start in project)
+    └── Reads .mcp.json
+        └── Spawns `glee mcp` as MCP server
+            └── Claude now has glee.job.* tools
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Claude Code                              │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ MCP Protocol
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Glee MCP Server                             │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                   Glee Agent Runtime                      │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐   │   │
+│  │  │ ReAct Loop  │  │   Memory    │  │ Tool Executor   │   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────────┘   │   │
+│  └──────────────────────────┬───────────────────────────────┘   │
+└─────────────────────────────┼───────────────────────────────────┘
+                              │ AI Provider
+            ┌─────────────────┼─────────────────┐
+            ▼                 ▼                 ▼
+     ┌────────────┐    ┌────────────┐    ┌────────────┐
+     │ Codex API  │    │ Claude API │    │ CLI Fallback│
+     └────────────┘    └────────────┘    └────────────┘
+```
+
+## Configuration
+
+```yaml
+# .glee/config.yml
+project:
+  id: 550e8400-e29b-41d4-a716-446655440000
+  name: my-app
+
+reviewers:
+  primary: codex
+  secondary: gemini
+```
+
+```
+# ~/.glee/auth/
+codex-oauth.yml      # OAuth credentials for Codex
+claude-api-key.yml   # API key for Claude
+
+# codex-oauth.yml
+access_token: "..."
+refresh_token: "..."
+expires_at: 1736956800
+account_id: "org-xxx"
+
+# claude-api-key.yml
+api_key: "sk-ant-..."
+```
+
+## Documentation
+
+- [docs/PRD.md](docs/PRD.md) - Product requirements
+- [docs/VISION.md](docs/VISION.md) - Project vision
+
+## Development
+
+```bash
+git clone https://github.com/GleeCodeAI/Glee
+cd Glee
+uv sync
+uv run glee --help
+```
+
+---
+
+*Glee: Delegate work, save context, get results.*
