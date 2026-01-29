@@ -1,0 +1,65 @@
+{
+  "input_hash": "642542f597d323fdf892a108dbbe6ab8",
+  "tags": [
+    "markdown",
+    "documentation",
+    "user-guide",
+    "cli-reference",
+    "dataset-registry",
+    "s3-storage",
+    "ml-workflow"
+  ],
+  "summary": "This folder contains the official user documentation for WarpDatasets, focusing on the end-to-end lifecycle of machine learning datasets. It provides comprehensive guides for installation, dataset registration, S3 publishing, and cross-machine synchronization.",
+  "concepts": [
+    "dataset-versioning",
+    "lazy-loading",
+    "remote-streaming",
+    "artifact-mapping",
+    "manifest-management"
+  ],
+  "purpose": "docs",
+  "domain": "ml-data-management",
+  "tech_stack": [
+    "python",
+    "pandas",
+    "parquet",
+    "aws-s3"
+  ],
+  "patterns": [
+    "cli-tutorial",
+    "troubleshooting-guide",
+    "step-by-step-workflow"
+  ],
+  "key_abstractions": [
+    "warpdata register",
+    "warpdata publish",
+    "warpdata sync",
+    "wd.dataset",
+    "artifact-indexing"
+  ],
+  "responsibilities": [
+    "Onboarding new users via the Getting Started guide",
+    "Explaining the distinction between tabular-only and artifact-heavy datasets",
+    "Defining the required directory structure and manifest storage locations",
+    "Documenting the data loading modes (strict, hybrid, remote, local)",
+    "Providing a checklist for verifying dataset integrity after publishing",
+    "Listing common pitfalls such as absolute path usage in Parquet files"
+  ],
+  "entry_points": [
+    "getting-started.md"
+  ],
+  "internal_deps": [],
+  "external_deps": [
+    "pandas",
+    "pyarrow"
+  ],
+  "complexity": "simple",
+  "quality": {
+    "has_tests": false,
+    "has_types": false,
+    "has_docs": true,
+    "has_error_handling": false,
+    "test_coverage": "none",
+    "code_smells": []
+  }
+}

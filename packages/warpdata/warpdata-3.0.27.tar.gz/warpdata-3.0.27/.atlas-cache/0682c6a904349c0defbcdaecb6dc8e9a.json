@@ -1,0 +1,66 @@
+{
+  "input_hash": "0682c6a904349c0defbcdaecb6dc8e9a",
+  "tags": [
+    "python",
+    "duckdb-integration",
+    "data-streaming",
+    "data-sharding",
+    "distributed-training",
+    "apache-arrow",
+    "parquet-processing"
+  ],
+  "summary": "The streaming module provides a high-performance data access layer for distributed machine learning training, leveraging DuckDB to stream Arrow RecordBatches from remote Parquet files. It handles deterministic shard assignment across multiple workers and generates optimized SQL queries for efficient data retrieval.",
+  "concepts": [
+    "distributed data loading",
+    "zero-copy data streaming",
+    "deterministic sharding",
+    "lazy evaluation"
+  ],
+  "purpose": "feature",
+  "domain": "ml-training",
+  "tech_stack": [
+    "python-3",
+    "duckdb",
+    "pyarrow",
+    "dataclasses"
+  ],
+  "patterns": [
+    "round-robin-sharding",
+    "iterator-pattern",
+    "environment-based-configuration"
+  ],
+  "key_abstractions": [
+    "ShardConfig",
+    "stream_batches",
+    "assign_shards",
+    "build_batch_query",
+    "resolve_shard"
+  ],
+  "responsibilities": [
+    "Resolving worker rank and world size from environment variables (RANK, WORLD_SIZE).",
+    "Implementing deterministic round-robin shard assignment for distributed workers.",
+    "Generating SQL queries for DuckDB to read remote Parquet files with column selection and limits.",
+    "Streaming data as Arrow RecordBatches or Python dictionaries to minimize memory overhead.",
+    "Handling SQL identifier quoting to prevent injection and handle special characters."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "batching.py"
+  ],
+  "internal_deps": [
+    "warpdata"
+  ],
+  "external_deps": [
+    "duckdb",
+    "pyarrow"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

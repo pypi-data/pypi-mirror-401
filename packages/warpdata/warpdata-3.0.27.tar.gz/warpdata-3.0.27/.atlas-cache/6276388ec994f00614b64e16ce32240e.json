@@ -1,0 +1,73 @@
+{
+  "input_hash": "6276388ec994f00614b64e16ce32240e",
+  "tags": [
+    "python",
+    "pytest",
+    "unit-testing",
+    "code-generation",
+    "diagnostics",
+    "mocking",
+    "cli-tooling"
+  ],
+  "summary": "Unit test suite for the warpdata CLI and developer tools, specifically focusing on the 'doctor' diagnostic utility and the 'initgen' boilerplate generator. These tests ensure that environment diagnostics and dataset loader generation logic remain reliable and accurate.",
+  "concepts": [
+    "environment-validation",
+    "boilerplate-generation",
+    "manifest-introspection",
+    "diagnostic-reporting"
+  ],
+  "purpose": "test",
+  "domain": "developer-experience",
+  "tech_stack": [
+    "python-3",
+    "pytest-7",
+    "duckdb",
+    "pyarrow",
+    "unittest.mock"
+  ],
+  "patterns": [
+    "fixture-pattern",
+    "mocking-external-io",
+    "data-driven-testing",
+    "template-testing"
+  ],
+  "key_abstractions": [
+    "TestCheckResult",
+    "TestLoaderGenerator",
+    "TestAnalyzeManifest",
+    "TestRunAllChecks"
+  ],
+  "responsibilities": [
+    "Verify environment diagnostic checks for DuckDB, PyArrow, and AWS credentials.",
+    "Validate connectivity check logic for HTTP and S3 manifest bases.",
+    "Ensure the 'doctor' report formatting (JSON and CLI text) is correct.",
+    "Test the manifest analysis logic for identifying table bindings and artifacts.",
+    "Verify that the loader generator produces valid, compilable Python code for various dataset configurations.",
+    "Test naming utility functions for converting dataset IDs to valid Python module and function names."
+  ],
+  "entry_points": [
+    "test_doctor.py",
+    "test_initgen.py"
+  ],
+  "internal_deps": [
+    "warpdata.tools.doctor",
+    "warpdata.tools.initgen",
+    "warpdata.config.settings",
+    "warpdata.manifest.model"
+  ],
+  "external_deps": [
+    "pytest",
+    "duckdb",
+    "pyarrow",
+    "urllib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "high",
+    "code_smells": []
+  }
+}

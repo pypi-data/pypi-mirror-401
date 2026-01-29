@@ -1,0 +1,70 @@
+{
+  "input_hash": "ebf1e8943b296aec26e80cb214b58766",
+  "tags": [
+    "python",
+    "configuration-management",
+    "s3-storage",
+    "backblaze-b2",
+    "environment-variables",
+    "singleton-pattern",
+    "cloud-storage-backends",
+    "dataclasses"
+  ],
+  "summary": "Centralized configuration management for the warpdata ecosystem, handling environment-based settings and cloud storage backend initialization. It provides a unified interface for switching between local, hybrid, and remote data access modes while managing S3-compatible storage credentials.",
+  "concepts": [
+    "environment-driven-configuration",
+    "storage-abstraction",
+    "workspace-management",
+    "hybrid-caching-strategy"
+  ],
+  "purpose": "config",
+  "domain": "data-infrastructure",
+  "tech_stack": [
+    "python-3.10",
+    "dataclasses",
+    "pathlib",
+    "backblaze-b2",
+    "aws-s3"
+  ],
+  "patterns": [
+    "singleton-pattern",
+    "lazy-initialization",
+    "factory-method",
+    "adapter-pattern"
+  ],
+  "key_abstractions": [
+    "Settings",
+    "get_settings",
+    "configure",
+    "use_backblaze",
+    "use_s3"
+  ],
+  "responsibilities": [
+    "Loading and validating configuration from environment variables with a 'WARPDATASETS_' prefix.",
+    "Managing local workspace paths and cache directory resolution.",
+    "Providing convenience helpers to switch between Backblaze B2 and AWS S3 backends.",
+    "Defining data access modes (hybrid, strict, remote, local) that dictate how shards are fetched.",
+    "Handling legacy environment variable aliases for backwards compatibility.",
+    "Resolving 'local://' URIs to absolute filesystem paths."
+  ],
+  "entry_points": [
+    "settings.py",
+    "__init__.py"
+  ],
+  "internal_deps": [],
+  "external_deps": [
+    "os",
+    "pathlib",
+    "dataclasses",
+    "typing"
+  ],
+  "complexity": "simple",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

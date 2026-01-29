@@ -1,0 +1,90 @@
+{
+  "input_hash": "daab830ec25d332a6531a01b759e08ed",
+  "tags": [
+    "python",
+    "argparse",
+    "dataset-management",
+    "s3-sync",
+    "data-ingestion",
+    "cache-control",
+    "manifest-management",
+    "parquet-processing",
+    "vector-search"
+  ],
+  "summary": "This folder implements the command-line interface (CLI) for the WarpData ecosystem, providing a suite of tools for dataset lifecycle management. It enables users to register, ingest, sync, and inspect large-scale datasets with a focus on S3-backed storage and local caching.",
+  "concepts": [
+    "content-addressable-storage",
+    "dataset-versioning",
+    "manifest-driven-data-access",
+    "local-remote-synchronization",
+    "zero-copy-cloning"
+  ],
+  "purpose": "feature",
+  "domain": "cli-tooling",
+  "tech_stack": [
+    "python-3",
+    "boto3",
+    "pyarrow",
+    "duckdb",
+    "tqdm",
+    "pandas"
+  ],
+  "patterns": [
+    "command-pattern",
+    "subcommand-dispatch",
+    "pre-flight-checks",
+    "content-addressable-storage",
+    "dry-run-execution"
+  ],
+  "key_abstractions": [
+    "run(args: Namespace)",
+    "LoaderGenerator",
+    "ArtifactResolver",
+    "ManifestBuilder",
+    "BlobCache",
+    "CheckStatus"
+  ],
+  "responsibilities": [
+    "Orchestrating dataset ingestion from CSV, ImageNet-style folders, and paired data sources.",
+    "Managing local and remote manifest synchronization with S3/B2 buckets.",
+    "Providing diagnostic tools (doctor) to verify environment connectivity and data integrity.",
+    "Generating optimized Python loader scripts for specific dataset versions.",
+    "Handling cache maintenance including garbage collection and status reporting.",
+    "Facilitating the publication of local datasets to remote content-addressed storage.",
+    "Inspecting dataset schemas, metadata, and artifact bindings."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "publish.py",
+    "sync.py",
+    "ingest.py"
+  ],
+  "internal_deps": [
+    "warpdata.config",
+    "warpdata.manifest",
+    "warpdata.cache",
+    "warpdata.artifacts",
+    "warpdata.tools",
+    "warpdata.cli.ui"
+  ],
+  "external_deps": [
+    "argparse",
+    "boto3",
+    "pyarrow",
+    "json",
+    "pathlib",
+    "tqdm"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "medium",
+    "code_smells": [
+      "long-methods",
+      "duplicate-logic-in-sync-and-publish"
+    ]
+  }
+}

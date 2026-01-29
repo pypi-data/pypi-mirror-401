@@ -1,0 +1,69 @@
+{
+  "input_hash": "2a9cba58907ac8ca13d7e28b1e5227d1",
+  "tags": [
+    "python",
+    "code-generation",
+    "template-engine",
+    "data-streaming",
+    "manifest-analysis",
+    "scaffolding",
+    "ml-tooling"
+  ],
+  "summary": "This folder implements a code generation engine that produces runnable, boilerplate-free Python loaders for specific datasets. It analyzes dataset manifests to automatically scaffold data streaming logic and media decoding helpers (images, audio, files) tailored to the dataset's schema.",
+  "concepts": [
+    "dataset-scaffolding",
+    "media-decoding",
+    "boilerplate-reduction",
+    "schema-inference"
+  ],
+  "purpose": "feature",
+  "domain": "ml-workflow",
+  "tech_stack": [
+    "python-3.10",
+    "warpdata",
+    "jinja-like-templates"
+  ],
+  "patterns": [
+    "template-pattern",
+    "static-analysis",
+    "generator-pattern",
+    "data-transfer-object"
+  ],
+  "key_abstractions": [
+    "LoaderGenerator",
+    "ManifestAnalysis",
+    "TableAnalysis",
+    "BindingInfo",
+    "analyze_manifest",
+    "generate_loader"
+  ],
+  "responsibilities": [
+    "Analyze dataset manifests to extract table schemas and media bindings.",
+    "Map dataset identifiers and column names to valid Python module and function names.",
+    "Generate standalone Python scripts that include dataset loading and batch streaming logic.",
+    "Inject specialized decoding helpers for image, audio, and file reference types.",
+    "Provide a CLI-ready interface for the 'warpdata init' command functionality."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "generator.py",
+    "analyze.py"
+  ],
+  "internal_deps": [
+    "warpdata.manifest.model"
+  ],
+  "external_deps": [
+    "pathlib",
+    "re",
+    "dataclasses"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "none",
+    "code_smells": []
+  }
+}

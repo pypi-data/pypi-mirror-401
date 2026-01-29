@@ -1,0 +1,74 @@
+{
+  "input_hash": "4540ff3bc70f9f19e6e43d6f0250f3b8",
+  "tags": [
+    "python",
+    "argparse",
+    "cli-tooling",
+    "command-pattern",
+    "terminal-ui",
+    "dataset-ops",
+    "ml-workflow"
+  ],
+  "summary": "The 'cli' folder serves as the central command-line interface entry point for the WarpData library, orchestrating a wide array of dataset management tasks. It handles argument parsing, command routing, and provides a specialized UI output layer for enhanced terminal experiences.",
+  "concepts": [
+    "command-line-interface",
+    "dataset-lifecycle",
+    "terminal-rendering",
+    "environment-diagnostics"
+  ],
+  "purpose": "feature",
+  "domain": "ml-data-management",
+  "tech_stack": [
+    "python-3",
+    "argparse",
+    "duckdb",
+    "pyarrow",
+    "forgeterm"
+  ],
+  "patterns": [
+    "command-routing",
+    "subparser-orchestration",
+    "adapter-pattern",
+    "singleton-entrypoint"
+  ],
+  "key_abstractions": [
+    "create_parser",
+    "should_use_ui_format",
+    "output_ui",
+    "table_block",
+    "card_block"
+  ],
+  "responsibilities": [
+    "Defining the global CLI structure and help documentation for the warpdata command.",
+    "Routing user input to specific command implementations in the 'commands' subfolder.",
+    "Detecting package installation conflicts between 'warpdata' and 'warpdatasets'.",
+    "Providing a JSON-based UI output format for integration with ForgeTerm.",
+    "Managing global CLI flags such as versioning and output formatting (table, json, ui)."
+  ],
+  "entry_points": [
+    "main.py",
+    "ui.py"
+  ],
+  "internal_deps": [
+    "commands",
+    "ui"
+  ],
+  "external_deps": [
+    "argparse",
+    "typing",
+    "sys",
+    "json",
+    "importlib.metadata"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "none",
+    "code_smells": [
+      "long-methods"
+    ]
+  }
+}

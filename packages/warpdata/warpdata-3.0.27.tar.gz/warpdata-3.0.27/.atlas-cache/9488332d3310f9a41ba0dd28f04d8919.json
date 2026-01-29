@@ -1,0 +1,71 @@
+{
+  "input_hash": "9488332d3310f9a41ba0dd28f04d8919",
+  "tags": [
+    "python",
+    "tar-archives",
+    "parquet-processing",
+    "remote-data-access",
+    "indexing",
+    "data-sharding",
+    "artifact-resolution"
+  ],
+  "summary": "Provides utilities for reading and indexing sharded tar archives, supporting both local file systems and remote HTTP/HTTPS sources. It enables deterministic member lookup by building Parquet-based indices that map file references to specific shard offsets.",
+  "concepts": [
+    "shard-indexing",
+    "random-access-over-tar",
+    "remote-artifact-retrieval",
+    "parquet-metadata-storage"
+  ],
+  "purpose": "library",
+  "domain": "data-streaming",
+  "tech_stack": [
+    "python-3",
+    "pyarrow-parquet",
+    "tarfile",
+    "urllib"
+  ],
+  "patterns": [
+    "index-mapping",
+    "sequential-scan",
+    "context-manager",
+    "deterministic-sorting"
+  ],
+  "key_abstractions": [
+    "TarReader",
+    "TarMemberInfo",
+    "build_tar_index",
+    "write_index_parquet",
+    "load_index_parquet"
+  ],
+  "responsibilities": [
+    "Extracting specific members from tar shards via name-based lookup",
+    "Generating deterministic indices of tar contents stored across multiple shards",
+    "Serializing and deserializing shard indices using Apache Parquet",
+    "Handling URI-based access for both local files and HTTP/HTTPS endpoints",
+    "Calculating byte offsets and sizes for individual tar members"
+  ],
+  "entry_points": [
+    "__init__.py",
+    "reader.py",
+    "index_builder.py"
+  ],
+  "internal_deps": [
+    "util"
+  ],
+  "external_deps": [
+    "pyarrow",
+    "tarfile",
+    "urllib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "none",
+    "code_smells": [
+      "memory-inefficiency-in-http-read"
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "input_hash": "c4dadc1d9e6d6d9fffc520fb8a80b1ec",
+  "tags": [
+    "python",
+    "vector-embeddings",
+    "similarity-search",
+    "faiss-index",
+    "s3-storage",
+    "parquet-processing",
+    "duckdb-integration",
+    "data-publishing"
+  ],
+  "summary": "The 'addons' folder manages supplementary data layers for datasets, primarily focusing on vector embeddings and similarity search. It provides tools to compute embeddings via external providers (OpenAI, Sentence-Transformers), build FAISS indices, and publish these artifacts to S3 or local storage.",
+  "concepts": [
+    "vector-database-augmentation",
+    "ann-indexing",
+    "remote-artifact-publishing",
+    "semantic-search",
+    "dataset-versioning"
+  ],
+  "purpose": "feature",
+  "domain": "ml-workflow",
+  "tech_stack": [
+    "python-3.x",
+    "numpy",
+    "faiss-cpu",
+    "pyarrow",
+    "openai-api",
+    "sentence-transformers",
+    "boto3",
+    "duckdb",
+    "tqdm"
+  ],
+  "patterns": [
+    "builder-pattern",
+    "provider-pattern",
+    "lazy-loading",
+    "adapter-pattern",
+    "strategy-pattern"
+  ],
+  "key_abstractions": [
+    "EmbeddingSpace",
+    "EmbeddingBuilder",
+    "EmbeddingConfig",
+    "VectorsTable",
+    "S3Uploader",
+    "LocalUploader"
+  ],
+  "responsibilities": [
+    "Generating vector embeddings from dataset columns using local or remote models",
+    "Building and serializing FAISS indices for efficient Approximate Nearest Neighbor (ANN) search",
+    "Uploading addon artifacts (vectors, indices) to remote storage backends like S3",
+    "Providing a high-level API for similarity search and vector streaming",
+    "Updating dataset manifests with addon metadata and remote URIs",
+    "Handling deterministic ID generation for embedding spaces based on configuration"
+  ],
+  "entry_points": [
+    "__init__.py",
+    "builder.py",
+    "embedding_space.py"
+  ],
+  "internal_deps": [
+    "manifest",
+    "api",
+    "engines",
+    "cache",
+    "config",
+    "util",
+    "streaming"
+  ],
+  "external_deps": [
+    "numpy",
+    "faiss",
+    "pyarrow",
+    "openai",
+    "sentence_transformers",
+    "boto3",
+    "tqdm"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "none",
+    "code_smells": [
+      "conditional-complexity-in-uploaders",
+      "heavy-optional-imports"
+    ]
+  }
+}

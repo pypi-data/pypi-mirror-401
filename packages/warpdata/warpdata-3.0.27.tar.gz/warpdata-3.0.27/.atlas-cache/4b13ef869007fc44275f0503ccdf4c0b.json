@@ -1,0 +1,78 @@
+{
+  "input_hash": "4b13ef869007fc44275f0503ccdf4c0b",
+  "tags": [
+    "python",
+    "dataset-management",
+    "backward-compatibility",
+    "duckdb-integration",
+    "api-facade",
+    "ml-workflow",
+    "data-versioning"
+  ],
+  "summary": "The root package for WarpData v3, serving as the primary entry point for the library and providing a critical backward-compatibility layer for legacy API users. It orchestrates the public API by aggregating functionality from specialized sub-packages like dataset loading, ingestion, and cloud configuration.",
+  "concepts": [
+    "backward-compatibility",
+    "dataset-abstraction",
+    "lazy-data-loading",
+    "content-addressable-storage"
+  ],
+  "purpose": "root",
+  "domain": "ml-training",
+  "tech_stack": [
+    "python-3.x",
+    "duckdb",
+    "pandas",
+    "pillow",
+    "pathlib"
+  ],
+  "patterns": [
+    "facade-pattern",
+    "singleton-pattern",
+    "adapter-pattern",
+    "lazy-evaluation"
+  ],
+  "key_abstractions": [
+    "Dataset",
+    "dataset",
+    "from_manifest",
+    "wd",
+    "_CompatModule",
+    "load_images"
+  ],
+  "responsibilities": [
+    "Expose the primary public API for dataset resolution and configuration.",
+    "Provide a 'compat' module to support legacy WarpData API calls (load, head, list_datasets).",
+    "Manage a shared DuckDB connection for legacy-style lazy querying.",
+    "Handle image-specific dataset loading and PIL decoding.",
+    "Coordinate between modern manifest-based resolution and legacy file-system paths."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "compat.py"
+  ],
+  "internal_deps": [
+    "api",
+    "config",
+    "ingest",
+    "compat",
+    "manifest"
+  ],
+  "external_deps": [
+    "duckdb",
+    "pandas",
+    "PIL",
+    "json"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": [
+      "global-state-in-compat",
+      "subprocess-usage-in-registration"
+    ]
+  }
+}

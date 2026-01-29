@@ -1,0 +1,82 @@
+{
+  "input_hash": "32983e6696b1ebda5e4c3fd863758dc5",
+  "tags": [
+    "python",
+    "pytest",
+    "integration-testing",
+    "http-range-requests",
+    "parquet-streaming",
+    "duckdb-integration",
+    "artifact-resolution",
+    "e2e-workflow"
+  ],
+  "summary": "This folder contains end-to-end integration tests that verify the entire WarpData stack, focusing on remote HTTP access, manifest resolution, and artifact extraction. It ensures that components like DuckDB, the CatalogResolver, and ArtifactResolver work together to provide remote-first data access without unnecessary downloads.",
+  "concepts": [
+    "remote-first-data-access",
+    "content-addressable-storage",
+    "lazy-loading",
+    "distributed-sharding",
+    "workspace-isolation"
+  ],
+  "purpose": "test",
+  "domain": "data-infrastructure",
+  "tech_stack": [
+    "python-3",
+    "pytest",
+    "duckdb",
+    "pyarrow",
+    "pillow",
+    "socketserver"
+  ],
+  "patterns": [
+    "mock-server-pattern",
+    "fixture-based-testing",
+    "end-to-end-validation",
+    "remote-first-access"
+  ],
+  "key_abstractions": [
+    "RangeHTTPRequestHandler",
+    "QuietHandler",
+    "multi_shard_http_server",
+    "local_workspace",
+    "create_dataset_from_server"
+  ],
+  "responsibilities": [
+    "Verify end-to-end manifest resolution over HTTP protocols.",
+    "Ensure DuckDB can query remote Parquet files via httpfs without full downloads.",
+    "Validate HTTP Range-Read logic for extracting specific members from remote TAR archives.",
+    "Confirm path consistency between 'sync' operations and 'resolver' lookups.",
+    "Test local-first workflows including dataset registration and local URI resolution.",
+    "Verify deterministic version hash computation across different manifest instances."
+  ],
+  "entry_points": [
+    "test_remote_http_parquet.py",
+    "test_artifacts_http.py",
+    "test_sync_resolver_paths.py"
+  ],
+  "internal_deps": [
+    "warpdata.config",
+    "warpdata.catalog",
+    "warpdata.engines",
+    "warpdata.api",
+    "warpdata.artifacts",
+    "warpdata.manifest",
+    "warpdata.refs"
+  ],
+  "external_deps": [
+    "pytest",
+    "pyarrow",
+    "duckdb",
+    "PIL",
+    "http.server"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "high",
+    "code_smells": []
+  }
+}

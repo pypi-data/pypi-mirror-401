@@ -1,0 +1,87 @@
+{
+  "input_hash": "a313739bfb3d1421029362b0364f2c68",
+  "tags": [
+    "python",
+    "duckdb-integration",
+    "data-streaming",
+    "dataset-loading",
+    "manifest-management",
+    "lazy-evaluation",
+    "vector-embeddings",
+    "cloud-storage"
+  ],
+  "summary": "The primary user-facing entry point for the WarpData library, providing high-level abstractions for loading, querying, and streaming datasets. It manages the lifecycle of dataset resolution, manifest auto-refreshing, and data engine integration.",
+  "concepts": [
+    "portable-manifests",
+    "hybrid-access-modes",
+    "data-guardrails",
+    "auto-refreshing-catalogs",
+    "sharded-streaming"
+  ],
+  "purpose": "api",
+  "domain": "ml-training",
+  "tech_stack": [
+    "python-3.10",
+    "duckdb",
+    "pyarrow",
+    "pandas",
+    "boto3"
+  ],
+  "patterns": [
+    "facade-pattern",
+    "proxy-pattern",
+    "lazy-loading",
+    "retry-on-stale",
+    "chain-of-responsibility"
+  ],
+  "key_abstractions": [
+    "Dataset",
+    "Table",
+    "dataset()",
+    "from_manifest()",
+    "EmbeddingSpace"
+  ],
+  "responsibilities": [
+    "Resolving dataset identifiers and version hashes into actionable manifests.",
+    "Providing a high-level Pythonic API for DuckDB-backed SQL queries and data previews.",
+    "Managing data streaming with support for distributed training sharding (rank/world_size).",
+    "Handling automatic manifest refreshing when remote data shards are missing or rotated (404 handling).",
+    "Orchestrating artifact resolution for binary data like images and audio via typed references.",
+    "Providing convenience methods for building and accessing vector embedding addons."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "dataset.py"
+  ],
+  "internal_deps": [
+    "catalog",
+    "config",
+    "engines",
+    "manifest",
+    "streaming",
+    "util",
+    "cache",
+    "artifacts",
+    "addons",
+    "refs"
+  ],
+  "external_deps": [
+    "duckdb",
+    "pyarrow",
+    "pandas",
+    "urllib",
+    "pathlib"
+  ],
+  "complexity": "complex",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": [
+      "long-methods",
+      "heavy-imports-in-methods"
+    ]
+  }
+}

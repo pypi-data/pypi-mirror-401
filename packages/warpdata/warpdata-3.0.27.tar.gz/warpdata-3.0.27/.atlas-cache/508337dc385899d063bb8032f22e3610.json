@@ -1,0 +1,69 @@
+{
+  "input_hash": "508337dc385899d063bb8032f22e3610",
+  "tags": [
+    "python",
+    "content-addressing",
+    "data-versioning",
+    "serialization",
+    "validation-logic",
+    "dataset-metadata",
+    "portable-storage"
+  ],
+  "summary": "The manifest folder defines the core data model and serialization logic for dataset versioning, serving as the source of truth for dataset state. It implements content-addressable versioning through deterministic hashing and supports both legacy absolute URIs and modern portable relative keys.",
+  "concepts": [
+    "Content-addressable manifests",
+    "Canonical JSON serialization",
+    "Dataset portability",
+    "Immutable versioning",
+    "Multi-modal data binding"
+  ],
+  "purpose": "data-model",
+  "domain": "manifest-management",
+  "tech_stack": [
+    "python-3.10",
+    "dataclasses",
+    "hashlib",
+    "json-canonicalization"
+  ],
+  "patterns": [
+    "data-transfer-object",
+    "canonical-serialization",
+    "invariant-validation",
+    "content-addressable-storage"
+  ],
+  "key_abstractions": [
+    "Manifest",
+    "TableDescriptor",
+    "ArtifactDescriptor",
+    "Binding",
+    "ShardInfo",
+    "compute_version_hash",
+    "validate_manifest"
+  ],
+  "responsibilities": [
+    "Define the structural schema for dataset versions including tables, artifacts, and bindings.",
+    "Implement deterministic SHA-256 version hashing based on canonical JSON representation.",
+    "Enforce data integrity and portability invariants (e.g., forbidding machine-specific paths in published manifests).",
+    "Provide bidirectional serialization between Python dataclasses and JSON dictionaries.",
+    "Manage the transition from legacy absolute URIs to portable relative keys resolved against location hints."
+  ],
+  "entry_points": [
+    "model.py",
+    "__init__.py"
+  ],
+  "internal_deps": [],
+  "external_deps": [
+    "json",
+    "hashlib",
+    "urllib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

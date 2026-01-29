@@ -1,0 +1,78 @@
+{
+  "input_hash": "ddfca0b6a63fde893923d3ffbf2b0659",
+  "tags": [
+    "python",
+    "s3-storage",
+    "data-sharding",
+    "deterministic-hashing",
+    "concurrency",
+    "artifact-management",
+    "transactional-upload"
+  ],
+  "summary": "This folder implements the dataset publishing pipeline, responsible for transforming local Parquet files and directories into versioned, sharded, and indexed datasets on remote storage. It ensures reproducibility by using deterministic hashing for versioning and fixed metadata for tar-sharding artifacts.",
+  "concepts": [
+    "content-addressable-storage",
+    "dataset-immutability",
+    "reproducible-builds",
+    "remote-verification"
+  ],
+  "purpose": "feature",
+  "domain": "data-versioning",
+  "tech_stack": [
+    "python-3.10",
+    "boto3",
+    "pyarrow",
+    "duckdb",
+    "tarfile"
+  ],
+  "patterns": [
+    "builder-pattern",
+    "strategy-pattern",
+    "protocol-based-interfaces",
+    "idempotent-operations",
+    "parallel-execution"
+  ],
+  "key_abstractions": [
+    "ManifestBuilder",
+    "PublishPlan",
+    "Uploader",
+    "TarShard",
+    "S3Storage",
+    "FileStorage",
+    "VerifyResult"
+  ],
+  "responsibilities": [
+    "Constructing deterministic dataset manifests from local files and computing content-based version hashes.",
+    "Packing arbitrary directory structures into reproducible tar shards with fixed metadata (mtime, uid, gid).",
+    "Orchestrating parallel, idempotent uploads of data shards, manifests, and 'latest' pointers to S3 or local storage.",
+    "Generating searchable Parquet indices for tar-sharded artifacts to allow random access.",
+    "Verifying published datasets via DuckDB schema checks and remote API connectivity tests."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "builder.py",
+    "uploader.py"
+  ],
+  "internal_deps": [
+    "manifest",
+    "artifacts",
+    "api",
+    "config"
+  ],
+  "external_deps": [
+    "boto3",
+    "pyarrow",
+    "duckdb",
+    "pathlib",
+    "concurrent.futures"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

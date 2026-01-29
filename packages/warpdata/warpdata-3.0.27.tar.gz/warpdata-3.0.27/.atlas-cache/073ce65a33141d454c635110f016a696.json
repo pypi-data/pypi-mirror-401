@@ -1,0 +1,71 @@
+{
+  "input_hash": "073ce65a33141d454c635110f016a696",
+  "tags": [
+    "python",
+    "concurrency",
+    "background-tasks",
+    "cache-management",
+    "data-sharding",
+    "prefetching",
+    "fsspec",
+    "producer-consumer"
+  ],
+  "summary": "This folder implements a background prefetching system for distributed data streaming, designed to minimize latency by proactively downloading data shards into a local cache. It provides a thread-safe scheduling mechanism with customizable planning strategies for both table and artifact shards.",
+  "concepts": [
+    "Look-ahead prefetching",
+    "Bounded concurrency",
+    "Atomic cache insertion",
+    "Shard alignment"
+  ],
+  "purpose": "feature",
+  "domain": "data-streaming",
+  "tech_stack": [
+    "python-3.x",
+    "fsspec",
+    "threading",
+    "urllib"
+  ],
+  "patterns": [
+    "producer-consumer",
+    "strategy-pattern",
+    "worker-pool",
+    "deduplication-queue"
+  ],
+  "key_abstractions": [
+    "PrefetchScheduler",
+    "PrefetchQueue",
+    "TableShardPlanner",
+    "ArtifactShardPlanner",
+    "PrefetchItem"
+  ],
+  "responsibilities": [
+    "Managing background worker threads for concurrent data downloads.",
+    "Providing look-ahead planning logic to determine which shards to fetch next based on stream position.",
+    "Ensuring thread-safe task queuing with built-in deduplication to prevent redundant downloads.",
+    "Interfacing with BlobCache for atomic storage of prefetched content.",
+    "Handling multi-protocol downloads (HTTP, S3, GCS) via fsspec integration."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "scheduler.py"
+  ],
+  "internal_deps": [
+    "cache",
+    "config"
+  ],
+  "external_deps": [
+    "fsspec",
+    "urllib",
+    "threading",
+    "logging"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "none",
+    "code_smells": []
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "input_hash": "36e5f90badc56955702cc4a70e40a0b1",
+  "tags": [
+    "python",
+    "artifact-resolution",
+    "parquet-processing",
+    "s3-storage",
+    "data-sharding",
+    "caching-layer",
+    "uri-resolution",
+    "lazy-loading"
+  ],
+  "summary": "This folder implements the core artifact resolution engine for the WarpData ecosystem, enabling efficient access to sharded data. It provides a sophisticated layer that maps abstract artifact references to physical bytes using Parquet-based indices, supporting local, S3, and HTTP storage backends with integrated caching and hybrid-mode auto-downloading.",
+  "concepts": [
+    "content-addressable-storage",
+    "range-reads",
+    "portable-manifests",
+    "atomic-file-operations",
+    "data-locality"
+  ],
+  "purpose": "feature",
+  "domain": "artifact-resolution",
+  "tech_stack": [
+    "python-3.10",
+    "pyarrow-parquet",
+    "boto3",
+    "tqdm",
+    "urllib"
+  ],
+  "patterns": [
+    "resolver-pattern",
+    "caching-proxy",
+    "lazy-initialization",
+    "fallback-strategy",
+    "index-lookup"
+  ],
+  "key_abstractions": [
+    "ArtifactResolver",
+    "ArtifactIndex",
+    "IndexEntry"
+  ],
+  "responsibilities": [
+    "Resolving abstract artifact references to physical byte streams across multiple storage backends.",
+    "Managing O(1) lookups for tar members using Parquet-backed indices.",
+    "Implementing 'hybrid' and 'strict' data access modes for automatic local caching of remote shards.",
+    "Handling URI resolution for local://, file://, s3://, and http(s):// schemes.",
+    "Providing fallback mechanisms for scanning tar archives when indices are missing.",
+    "Managing atomic downloads and progress reporting for remote data shards."
+  ],
+  "entry_points": [
+    "resolver.py",
+    "index.py",
+    "__init__.py"
+  ],
+  "internal_deps": [
+    "artifacts/tar",
+    "util/errors",
+    "util/uris",
+    "cache/context",
+    "config/settings",
+    "manifest/model"
+  ],
+  "external_deps": [
+    "pyarrow",
+    "boto3",
+    "tqdm",
+    "urllib"
+  ],
+  "complexity": "complex",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "high",
+    "code_smells": []
+  }
+}

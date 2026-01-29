@@ -1,0 +1,63 @@
+{
+  "input_hash": "8b4a1f400604f8a802bd004685527bcf",
+  "tags": [
+    "python",
+    "uri-parsing",
+    "error-handling",
+    "path-resolution",
+    "cloud-storage-utils",
+    "developer-experience"
+  ],
+  "summary": "Core utility module providing standardized URI manipulation and a comprehensive hierarchy of domain-specific exceptions. It ensures consistent handling of local and remote data paths while providing actionable remediation hints for common data access failures.",
+  "concepts": [
+    "uri-normalization",
+    "actionable-errors",
+    "storage-abstraction",
+    "data-integrity-validation"
+  ],
+  "purpose": "library",
+  "domain": "data-infrastructure",
+  "tech_stack": [
+    "python-3.10",
+    "urllib",
+    "pathlib"
+  ],
+  "patterns": [
+    "custom-exception-hierarchy",
+    "utility-functions",
+    "remediation-pattern"
+  ],
+  "key_abstractions": [
+    "WarpDatasetsError",
+    "join_base_and_key",
+    "local_path_from_uri",
+    "normalize_local_uri",
+    "DatasetNotFoundError",
+    "StorageMisconfigurationError"
+  ],
+  "responsibilities": [
+    "Normalize and resolve URIs across local, S3, and B2 storage backends.",
+    "Provide a unified exception base class with user-facing remediation instructions.",
+    "Detect and categorize storage misconfigurations (e.g., B2 vs AWS endpoint mismatches).",
+    "Enforce safety thresholds for in-memory data loading via LargeDataError.",
+    "Handle path joining and scheme parsing for portable dataset manifests."
+  ],
+  "entry_points": [
+    "uris.py",
+    "errors.py"
+  ],
+  "internal_deps": [],
+  "external_deps": [
+    "urllib",
+    "pathlib"
+  ],
+  "complexity": "simple",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

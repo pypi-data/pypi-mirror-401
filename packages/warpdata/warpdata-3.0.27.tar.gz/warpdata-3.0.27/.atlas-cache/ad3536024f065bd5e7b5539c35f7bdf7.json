@@ -1,0 +1,68 @@
+{
+  "input_hash": "ad3536024f065bd5e7b5539c35f7bdf7",
+  "tags": [
+    "python",
+    "lazy-evaluation",
+    "media-processing",
+    "factory-pattern",
+    "protocol-abstraction",
+    "data-streaming",
+    "artifact-resolution"
+  ],
+  "summary": "The 'refs' folder implements a lazy, remote-first data access layer for large-scale datasets. It provides typed reference objects that abstract away the complexity of fetching raw bytes from remote artifacts (like S3-backed tarballs) until the data is explicitly requested by the user.",
+  "concepts": [
+    "lazy-data-loading",
+    "polymorphic-media-handling",
+    "remote-artifact-abstraction"
+  ],
+  "purpose": "library",
+  "domain": "remote-data-access",
+  "tech_stack": [
+    "python-3.10",
+    "numpy",
+    "pillow",
+    "soundfile"
+  ],
+  "patterns": [
+    "factory-pattern",
+    "protocol-pattern",
+    "lazy-loading",
+    "inheritance",
+    "dependency-injection"
+  ],
+  "key_abstractions": [
+    "FileRef",
+    "ImageRef",
+    "AudioRef",
+    "ArtifactResolver",
+    "create_ref"
+  ],
+  "responsibilities": [
+    "Provide a unified API for accessing remote file contents as bytes or streams.",
+    "Implement domain-specific data conversion for images (PIL/Numpy) and audio (Numpy).",
+    "Decouple data reference logic from the underlying storage/retrieval mechanism via the ArtifactResolver protocol.",
+    "Ensure lazy evaluation to prevent unnecessary network overhead during dataset iteration.",
+    "Dynamically instantiate the correct reference type based on media metadata."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "base.py",
+    "factory.py"
+  ],
+  "internal_deps": [],
+  "external_deps": [
+    "numpy",
+    "PIL",
+    "soundfile",
+    "io"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

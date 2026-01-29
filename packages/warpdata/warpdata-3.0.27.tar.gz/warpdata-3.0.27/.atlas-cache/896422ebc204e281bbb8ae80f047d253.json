@@ -1,0 +1,68 @@
+{
+  "input_hash": "896422ebc204e281bbb8ae80f047d253",
+  "tags": [
+    "python",
+    "pytest",
+    "test-suite",
+    "integration-testing",
+    "unit-testing",
+    "data-validation",
+    "remote-data-access"
+  ],
+  "summary": "The root test suite container for WarpDatasets, organizing both unit and integration tests to ensure the reliability of remote-first data access and artifact resolution. It serves as the centralized entry point for the pytest-based validation framework across the entire codebase.",
+  "concepts": [
+    "test-driven-development",
+    "regression-testing",
+    "remote-first-data-access",
+    "artifact-lifecycle-validation"
+  ],
+  "purpose": "test",
+  "domain": "ml-data-infrastructure",
+  "tech_stack": [
+    "python-3",
+    "pytest",
+    "duckdb",
+    "parquet"
+  ],
+  "patterns": [
+    "test-hierarchy",
+    "mocking",
+    "e2e-testing",
+    "integration-patterns"
+  ],
+  "key_abstractions": [
+    "Tests package",
+    "CatalogResolver tests",
+    "ArtifactResolver tests",
+    "Streaming mechanics tests"
+  ],
+  "responsibilities": [
+    "Organize the testing hierarchy into unit and integration sub-domains",
+    "Provide a package-level entry point for the pytest discovery mechanism",
+    "Ensure coverage for remote HTTP range requests and Parquet streaming",
+    "Validate deterministic versioning and cache safety invariants",
+    "Coordinate end-to-end workflow verification involving DuckDB and remote manifests"
+  ],
+  "entry_points": [
+    "unit/",
+    "integration/",
+    "__init__.py"
+  ],
+  "internal_deps": [
+    "unit",
+    "integration"
+  ],
+  "external_deps": [
+    "pytest",
+    "duckdb"
+  ],
+  "complexity": "simple",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "high",
+    "code_smells": []
+  }
+}

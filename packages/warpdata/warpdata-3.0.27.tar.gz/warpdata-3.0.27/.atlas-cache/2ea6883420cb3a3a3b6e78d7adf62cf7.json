@@ -1,0 +1,73 @@
+{
+  "input_hash": "2ea6883420cb3a3a3b6e78d7adf62cf7",
+  "tags": [
+    "python",
+    "manifest-management",
+    "caching-logic",
+    "strategy-pattern",
+    "data-versioning",
+    "conditional-requests",
+    "uri-migration"
+  ],
+  "summary": "The catalog folder manages the resolution, retrieval, and caching of dataset manifests. It acts as a middle layer that translates dataset identifiers and version aliases (like 'latest') into concrete, validated manifest objects while optimizing performance through conditional HTTP-style caching.",
+  "concepts": [
+    "content-addressable-storage",
+    "conditional-get",
+    "manifest-resolution",
+    "data-migration"
+  ],
+  "purpose": "library",
+  "domain": "dataset-registry",
+  "tech_stack": [
+    "python-3.10",
+    "hashlib",
+    "pathlib",
+    "dataclasses"
+  ],
+  "patterns": [
+    "abstract-base-class",
+    "strategy-pattern",
+    "conditional-fetch",
+    "metadata-sidecar",
+    "adapter-pattern"
+  ],
+  "key_abstractions": [
+    "CatalogResolver",
+    "ManifestStore",
+    "ManifestCache",
+    "FetchResult",
+    "CacheEntry"
+  ],
+  "responsibilities": [
+    "Resolving 'latest' version pointers to specific immutable version hashes.",
+    "Implementing a local filesystem cache for manifests with ETag and Last-Modified support.",
+    "Providing an abstract interface for manifest storage backends (S3, HTTP, Local).",
+    "Migrating legacy AWS S3 URIs to modern B2 storage locations during manifest parsing.",
+    "Validating manifest structure and content after retrieval.",
+    "Handling conditional requests to minimize bandwidth for unchanged manifests."
+  ],
+  "entry_points": [
+    "resolver.py",
+    "store.py"
+  ],
+  "internal_deps": [
+    "stores",
+    "manifest",
+    "util",
+    "config"
+  ],
+  "external_deps": [
+    "json",
+    "hashlib",
+    "pathlib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

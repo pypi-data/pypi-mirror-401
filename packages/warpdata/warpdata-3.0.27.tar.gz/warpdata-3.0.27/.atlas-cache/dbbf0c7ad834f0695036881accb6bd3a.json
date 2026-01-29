@@ -1,0 +1,58 @@
+{
+  "input_hash": "dbbf0c7ad834f0695036881accb6bd3a",
+  "tags": [
+    "python",
+    "cli-tooling",
+    "code-generation",
+    "environment-validation",
+    "facade-pattern",
+    "ux-tools",
+    "data-scaffolding"
+  ],
+  "summary": "The tools folder serves as the primary user-facing entry point for the warpdata CLI and utility suite, exposing high-level commands for environment diagnostics and dataset loader generation. It acts as a facade that aggregates specialized sub-tools into a unified API for developers and data scientists.",
+  "concepts": [
+    "developer-experience",
+    "automated-scaffolding",
+    "system-diagnostics"
+  ],
+  "purpose": "feature",
+  "domain": "ml-workflow",
+  "tech_stack": [
+    "python-3",
+    "warpdata"
+  ],
+  "patterns": [
+    "facade-pattern",
+    "module-aggregation",
+    "delegation"
+  ],
+  "key_abstractions": [
+    "initgen",
+    "doctor"
+  ],
+  "responsibilities": [
+    "Expose user-facing diagnostic tools for environment health checks",
+    "Provide automated code generation for dataset-specific Python loaders",
+    "Aggregate sub-tool functionality into a clean, public-facing API",
+    "Simplify the discovery of utility features within the warpdata ecosystem"
+  ],
+  "entry_points": [
+    "__init__.py"
+  ],
+  "internal_deps": [
+    "doctor",
+    "initgen"
+  ],
+  "external_deps": [
+    "warpdata"
+  ],
+  "complexity": "simple",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

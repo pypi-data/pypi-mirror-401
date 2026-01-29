@@ -1,0 +1,71 @@
+{
+  "input_hash": "b0dfd5354cbeb0b2be2746a1062ba21a",
+  "tags": [
+    "python",
+    "cache-management",
+    "content-addressable-storage",
+    "lru-eviction",
+    "prefetching",
+    "concurrency",
+    "data-sharding"
+  ],
+  "summary": "A content-addressed local caching system for table shards and artifacts, featuring LRU eviction and atomic file operations. It coordinates with a prefetcher to optimize data access by resolving remote URIs to local paths and managing background downloads.",
+  "concepts": [
+    "Content-Addressable Storage (CAS)",
+    "Least Recently Used (LRU) Eviction",
+    "Atomic File Operations",
+    "Look-ahead Prefetching"
+  ],
+  "purpose": "library",
+  "domain": "data-streaming",
+  "tech_stack": [
+    "python-3.10",
+    "pathlib",
+    "hashlib",
+    "dataclasses"
+  ],
+  "patterns": [
+    "singleton-context",
+    "atomic-writes",
+    "lazy-initialization",
+    "observer-pattern",
+    "strategy-pattern"
+  ],
+  "key_abstractions": [
+    "BlobCache",
+    "CacheContext",
+    "compute_cache_key",
+    "CacheStats",
+    "TableShardPlanner"
+  ],
+  "responsibilities": [
+    "Map remote URIs to unique 64-character content hashes for local storage.",
+    "Manage atomic file moves and metadata persistence for cached blobs.",
+    "Implement LRU (Least Recently Used) garbage collection based on file access times.",
+    "Coordinate background prefetching of upcoming data shards via a scheduler.",
+    "Provide a global context for resolving URIs across multiple data directories."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "context.py"
+  ],
+  "internal_deps": [
+    "config",
+    "prefetch"
+  ],
+  "external_deps": [
+    "shutil",
+    "threading",
+    "atexit",
+    "logging"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

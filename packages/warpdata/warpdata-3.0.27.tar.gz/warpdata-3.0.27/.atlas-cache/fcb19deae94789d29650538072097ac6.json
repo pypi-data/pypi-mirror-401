@@ -1,0 +1,74 @@
+{
+  "input_hash": "fcb19deae94789d29650538072097ac6",
+  "tags": [
+    "python",
+    "cli-tooling",
+    "environment-validation",
+    "cloud-storage",
+    "s3-connectivity",
+    "interactive-repair",
+    "health-check",
+    "configuration-management"
+  ],
+  "summary": "The 'doctor' tool is a diagnostic suite for the warpdata ecosystem, designed to validate environment configurations, cloud connectivity, and library dependencies. It provides interactive repair capabilities to guide users through fixing common storage misconfigurations, particularly for Backblaze B2 and AWS S3 backends.",
+  "concepts": [
+    "environment-drift-detection",
+    "automated-troubleshooting",
+    "storage-backend-validation",
+    "performance-benchmarking"
+  ],
+  "purpose": "feature",
+  "domain": "infrastructure-diagnostics",
+  "tech_stack": [
+    "python-3",
+    "boto3",
+    "duckdb",
+    "pyarrow",
+    "google-cloud-storage"
+  ],
+  "patterns": [
+    "diagnostic-suite",
+    "interactive-cli",
+    "result-object-pattern",
+    "colorized-terminal-output"
+  ],
+  "key_abstractions": [
+    "CheckResult",
+    "CheckStatus",
+    "run_all_checks",
+    "run_repair_mode",
+    "format_report",
+    "check_connectivity"
+  ],
+  "responsibilities": [
+    "Validate Python environment dependencies like DuckDB and PyArrow.",
+    "Verify cloud storage connectivity and detect bucket/endpoint mismatches (e.g., B2 vs AWS).",
+    "Provide interactive shell configuration updates to fix environment variables.",
+    "Measure dataset streaming performance and provide optimization suggestions.",
+    "Format diagnostic results into human-readable terminal reports or machine-readable JSON."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "checks.py"
+  ],
+  "internal_deps": [
+    "config",
+    "tools"
+  ],
+  "external_deps": [
+    "boto3",
+    "duckdb",
+    "pyarrow",
+    "google-cloud-storage",
+    "pathlib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "none",
+    "code_smells": []
+  }
+}

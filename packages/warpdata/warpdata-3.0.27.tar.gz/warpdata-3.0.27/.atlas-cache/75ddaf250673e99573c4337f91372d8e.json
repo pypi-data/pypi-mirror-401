@@ -1,0 +1,68 @@
+{
+  "input_hash": "75ddaf250673e99573c4337f91372d8e",
+  "tags": [
+    "python",
+    "s3-storage",
+    "http-client",
+    "manifest-management",
+    "strategy-pattern",
+    "local-first",
+    "caching-logic"
+  ],
+  "summary": "Implements various backend storage strategies for dataset manifests, enabling retrieval from local filesystems, HTTP servers, and AWS S3. It includes a chaining mechanism to support local-first workflows with automatic remote fallbacks.",
+  "concepts": [
+    "content-addressable-storage",
+    "conditional-fetching",
+    "fallback-mechanisms",
+    "storage-abstraction"
+  ],
+  "purpose": "library",
+  "domain": "dataset-registry",
+  "tech_stack": [
+    "python-3.10",
+    "boto3",
+    "urllib",
+    "pathlib"
+  ],
+  "patterns": [
+    "strategy-pattern",
+    "composite-pattern",
+    "lazy-loading",
+    "conditional-request-handling"
+  ],
+  "key_abstractions": [
+    "ChainManifestStore",
+    "HttpManifestStore",
+    "FileManifestStore",
+    "S3ManifestStore",
+    "FetchResult"
+  ],
+  "responsibilities": [
+    "Provide a unified interface for fetching dataset manifests across different protocols.",
+    "Implement conditional GET requests using ETags and Last-Modified headers to optimize bandwidth.",
+    "Manage local development permissions via environment variable checks (WARPDATASETS_SCOPE).",
+    "Handle protocol-specific error mapping (HTTP status codes, S3 ClientErrors) to a common FetchResult format.",
+    "Enable sequential store polling through the ChainManifestStore abstraction."
+  ],
+  "entry_points": [
+    "__init__.py",
+    "chain.py"
+  ],
+  "internal_deps": [
+    "warpdata.catalog.store"
+  ],
+  "external_deps": [
+    "boto3",
+    "botocore",
+    "urllib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": false,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "unknown",
+    "code_smells": []
+  }
+}

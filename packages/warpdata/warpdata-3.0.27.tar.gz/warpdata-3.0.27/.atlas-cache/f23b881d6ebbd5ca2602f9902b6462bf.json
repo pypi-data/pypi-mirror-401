@@ -1,0 +1,94 @@
+{
+  "input_hash": "f23b881d6ebbd5ca2602f9902b6462bf",
+  "tags": [
+    "python",
+    "pytest",
+    "unit-testing",
+    "mocking",
+    "data-streaming",
+    "cache-management",
+    "manifest-validation",
+    "artifact-resolution",
+    "parquet-processing"
+  ],
+  "summary": "This folder contains the comprehensive unit test suite for the WarpDatasets core library, ensuring the reliability of dataset manifests, streaming mechanics, and artifact resolution. It enforces critical invariants regarding deterministic versioning, cache safety, and non-blocking prefetch operations.",
+  "concepts": [
+    "deterministic-identity",
+    "lazy-loading",
+    "distributed-sharding",
+    "cache-atomicity",
+    "pushdown-projection",
+    "idempotent-publishing"
+  ],
+  "purpose": "test",
+  "domain": "ml-data-infrastructure",
+  "tech_stack": [
+    "python-3.x",
+    "pytest",
+    "pyarrow",
+    "duckdb",
+    "numpy",
+    "pillow",
+    "unittest.mock"
+  ],
+  "patterns": [
+    "invariant-testing",
+    "mock-object-pattern",
+    "lazy-evaluation",
+    "content-addressable-storage",
+    "deterministic-hashing",
+    "round-robin-sharding"
+  ],
+  "key_abstractions": [
+    "ArtifactIndex",
+    "BlobCache",
+    "PrefetchScheduler",
+    "ManifestBuilder",
+    "ArtifactResolver",
+    "ShardConfig",
+    "EmbeddingSpace",
+    "FileRef"
+  ],
+  "responsibilities": [
+    "Verifying deterministic dataset version hashing and manifest canonicalization.",
+    "Ensuring the blob cache correctly implements LRU eviction and atomic writes.",
+    "Validating that the prefetch scheduler and queue are non-blocking and bounded.",
+    "Testing the artifact resolver's ability to handle indexed and non-indexed (fallback) lookups.",
+    "Enforcing safety guardrails that prevent accidental materialization of multi-million row datasets.",
+    "Confirming that sharding logic is deterministic and non-overlapping across distributed workers.",
+    "Validating the addon system for vector embeddings and search indices."
+  ],
+  "entry_points": [
+    "test_manifest_canon.py",
+    "test_artifact_resolver_index_preferred.py",
+    "test_streaming_shard.py",
+    "test_cache_eviction.py"
+  ],
+  "internal_deps": [
+    "warpdata.api",
+    "warpdata.artifacts",
+    "warpdata.cache",
+    "warpdata.catalog",
+    "warpdata.manifest",
+    "warpdata.prefetch",
+    "warpdata.publish",
+    "warpdata.streaming"
+  ],
+  "external_deps": [
+    "pytest",
+    "pyarrow",
+    "numpy",
+    "PIL",
+    "tarfile",
+    "pathlib"
+  ],
+  "complexity": "medium",
+  "quality": {
+    "has_tests": true,
+    "has_types": true,
+    "has_docs": true,
+    "has_error_handling": true,
+    "test_coverage": "high",
+    "code_smells": []
+  }
+}
