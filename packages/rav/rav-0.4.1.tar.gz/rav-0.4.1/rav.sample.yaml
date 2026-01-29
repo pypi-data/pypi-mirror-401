@@ -1,0 +1,21 @@
+name: rav
+
+variables:
+  PROJECT_NAME: myproject
+  PORT: "8000"
+
+scripts:
+  server: python3 -m http.server ${{ vars.PORT }}
+  echo: echo "Project is ${{ vars.PROJECT_NAME }}"
+
+
+downloads:
+  staticfiles:
+    name: vendor
+    destination: temp/staticfiles/vendor
+    overwrite: true
+    files:
+      - name: flowbite.min.css
+        overwrite: false
+        destination: temp/staticfiles/vendor/css
+        url: https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.css 
