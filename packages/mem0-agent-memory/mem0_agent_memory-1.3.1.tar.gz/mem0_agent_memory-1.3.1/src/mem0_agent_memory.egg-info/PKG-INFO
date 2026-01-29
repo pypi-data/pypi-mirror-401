@@ -1,0 +1,439 @@
+Metadata-Version: 2.4
+Name: mem0-agent-memory
+Version: 1.3.1
+Summary: MCP server for Mem0 agent memory management with multi-backend support
+Author-email: Arunkumar Selvam <aruninfy123@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/arunkumars-mf/mem0-agent-memory
+Project-URL: Bug Reports, https://github.com/arunkumars-mf/mem0-agent-memory/issues
+Project-URL: Source, https://github.com/arunkumars-mf/mem0-agent-memory
+Project-URL: Citation, https://github.com/arunkumars-mf/mem0-agent-memory/blob/main/CITATION.cff
+Keywords: mem0,mcp,memory,ai,agent,vector-search,faiss,qdrant,opensearch
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=1.13.0
+Requires-Dist: fastmcp>=2.11.0
+Requires-Dist: mem0ai>=1.0.0
+Requires-Dist: boto3>=1.40.0
+Requires-Dist: opensearch-py>=3.0.0
+Requires-Dist: faiss-cpu>=1.12.0
+Requires-Dist: qdrant-client>=1.12.0
+Requires-Dist: kuzu>=0.8.0
+Requires-Dist: rank-bm25>=0.2.2
+Requires-Dist: ollama>=0.4.0
+Requires-Dist: llama-index>=0.12.0
+Requires-Dist: llama-index-core>=0.12.0
+Requires-Dist: pypdf>=5.1.0
+Requires-Dist: python-docx>=1.1.0
+Dynamic: license-file
+Dynamic: requires-python
+
+# Mem0 Agent Memory
+
+[![PyPI version](https://img.shields.io/pypi/v/mem0-agent-memory.svg)](https://pypi.org/project/mem0-agent-memory/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/mem0-agent-memory?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/mem0-agent-memory)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/mem0-agent-memory.svg?label=monthly%20downloads)](https://pypi.org/project/mem0-agent-memory/)
+[![Python versions](https://img.shields.io/pypi/pyversions/mem0-agent-memory.svg)](https://pypi.org/project/mem0-agent-memory/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A Model Context Protocol (MCP) server that provides persistent memory capabilities for AI agents using Mem0. Store, search, and manage contextual information across conversations with support for multiple backends and LLM providers.
+
+## Features
+
+**Core Capabilities:**
+- 🧠 **Persistent Memory**: Store and retrieve contextual information across sessions
+- 🔍 **Semantic Search**: Find relevant memories using natural language queries
+- 📚 **Document Ingestion**: Import PDFs, DOCX, Markdown, and text files as knowledge base
+- 🏷️ **Metadata Filtering**: Organize and filter memories by type, priority, status, and custom fields
+- 📊 **Memory Management**: Full CRUD operations with history tracking and bulk operations
+
+**Backend Support:**
+- **Vector Stores**: FAISS (local), Qdrant (embedded/server), OpenSearch (AWS), Mem0 Platform (cloud)
+- **LLM Providers**: AWS Bedrock (Claude, Titan), Ollama (local), LM Studio (local)
+- **Graph Store**: KuzuDB integration for relationship tracking (experimental)
+
+**Developer Experience:**
+- ⚡ **Auto-configuration**: Automatic user/agent detection from system context
+- 🎯 **Memory-First Workflows**: One-command setup for Kiro IDE integration
+- 🔧 **Performance Tuning**: Configurable inference, relevance filtering, and connection pooling
+- 📦 **Session Partitioning**: Isolate memories by run_id for multi-session management
+
+## Quick Start
+
+### Installation
+
+```bash
+pip install mem0-agent-memory
+```
+
+### Basic Setup
+
+Add to your MCP client configuration:
+
+**Kiro**: `.kiro/settings/mcp.json`
+**Amazon Q CLI**: `~/.aws/amazonq/mcp.json` or `.amazonq/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "mem0-agent-memory": {
+      "command": "uvx",
+      "args": ["mem0-agent-memory"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "your-key",
+        "AWS_SECRET_ACCESS_KEY": "your-secret",
+        "AWS_REGION": "us-west-2"
+      }
+    }
+  }
+}
+```
+
+### Enable Memory-First Workflows (Kiro Only)
+
+In your first chat session:
+```
+setup steering for memory
+```
+
+This configures the AI to automatically check memory before tasks and store important outcomes.
+
+## Configuration
+
+### LLM Providers
+
+Choose your LLM backend by setting the appropriate environment variables:
+
+<details>
+<summary><b>AWS Bedrock (Recommended)</b></summary>
+
+```bash
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_REGION="us-west-2"
+
+# Optional: Customize models
+export BEDROCK_LLM_MODEL="us.anthropic.claude-3-5-haiku-20241022-v1:0"
+export BEDROCK_EMBED_MODEL="amazon.titan-embed-text-v2:0"
+export BEDROCK_MAX_TOKENS="1500"  # Default: 1500
+```
+
+**Performance**: Built-in optimizations include connection pooling (50 connections), adaptive retries, and reduced latency settings.
+</details>
+
+<details>
+<summary><b>Ollama (Local)</b></summary>
+
+```bash
+export OLLAMA_HOST="http://localhost:11434"
+export OLLAMA_LLM_MODEL="llama3.2"           # Default
+export OLLAMA_EMBED_MODEL="nomic-embed-text" # Default
+
+# Pull models first:
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
+
+**Note**: For Nomic embeddings, set `NOMIC_USE_PREFIXES=true` for better search accuracy.
+</details>
+
+<details>
+<summary><b>LM Studio (Local)</b></summary>
+
+```bash
+export LMSTUDIO_HOST="http://localhost:1234"
+export LMSTUDIO_LLM_MODEL="llama-3.2-3b-instruct"
+export LMSTUDIO_EMBED_MODEL="text-embedding-nomic-embed-text-v1.5"
+```
+</details>
+
+### Vector Store Backends
+
+<details>
+<summary><b>FAISS (Default - Local)</b></summary>
+
+```bash
+export FAISS_PATH="/path/to/.mem0/memory"  # Optional, defaults to .mem0/memory
+```
+
+**Best for**: Development, small-medium datasets (<100k memories), single-user scenarios.
+</details>
+
+<details>
+<summary><b>Qdrant (Embedded or Server)</b></summary>
+
+**Embedded Mode (No Docker):**
+```bash
+export QDRANT_PATH=".mem0/qdrant"
+```
+
+**Server Mode (Production):**
+```bash
+export QDRANT_HOST="localhost"
+export QDRANT_PORT="6333"  # Optional
+```
+
+**Benefits**: Native metadata filtering, better performance for complex queries, production-ready clustering.
+See [Qdrant Setup Guide](docs/QDRANT_SETUP.md) for details.
+</details>
+
+<details>
+<summary><b>OpenSearch (AWS)</b></summary>
+
+```bash
+export OPENSEARCH_HOST="your-opensearch-endpoint"
+export AWS_REGION="us-west-2"
+```
+
+**Best for**: Large datasets (>100k memories), complex filtering, enterprise deployments.
+</details>
+
+<details>
+<summary><b>Mem0 Platform (Cloud)</b></summary>
+
+```bash
+export MEM0_API_KEY="your-api-key"
+```
+
+**Best for**: Managed service, no infrastructure management, built-in features.
+</details>
+
+### Additional Settings
+
+```bash
+# User/Agent ID (optional - auto-detected if not set)
+export MEM0_USER_ID="custom-user-id"      # Defaults to system username
+export MEM0_AGENT_ID="custom-agent-id"    # Defaults to workspace name
+export MEM0_RUN_ID="session-123"          # Optional: session partitioning
+
+# Performance
+export MEM0_INFER_DEFAULT="true"          # LLM inference for fact extraction
+export MEM0_MIN_RELEVANCE_SCORE="0.7"     # Search result threshold (0.0-1.0)
+
+# Response Optimization (v1.3.0+)
+export MEM0_VERBOSE="false"               # Compact responses (default) vs verbose
+export MEM0_MAX_RELATIONS="20"            # Max graph relations in compact mode
+
+# Nomic embeddings (Ollama only)
+export NOMIC_USE_PREFIXES="true"          # Improves search accuracy
+```
+
+**Response Modes (v1.3.0+):**
+- **Compact (default)**: Returns only essential fields (id, memory, metadata, score). Reduces token usage by ~55% per memory.
+- **Verbose**: Returns all fields including hash, timestamps, user_id, agent_id, etc.
+- **Graph relations**: Preserved in both modes, truncated to 20 in compact mode to prevent token bloat
+- Control per-call with `verbose` parameter or globally with `MEM0_VERBOSE` environment variable.
+
+## Available Tools
+
+### Core Operations
+| Tool | Description |
+|------|-------------|
+| `store_memory` | Store memory with optional metadata and inference control |
+| `search_memories` | Semantic search with relevance filtering |
+| `list_memories` | List all memories with pagination |
+| `get_memory` | Retrieve specific memory by ID |
+| `get_recent_memories` | Get recently added/updated memories |
+
+### Advanced Operations
+| Tool | Description |
+|------|-------------|
+| `update_memory` | Update existing memory directly (no LLM processing) |
+| `search_by_metadata` | Filter memories by metadata fields (type, priority, status) |
+| `get_memory_history` | View change history for a memory |
+| `get_memory_stats` | Get memory usage statistics |
+
+### Bulk Operations
+| Tool | Description |
+|------|-------------|
+| `delete_memory` | Delete single memory (permanent) |
+| `delete_all_memories` | Delete all memories for a scope (permanent) |
+| `bulk_delete_memories` | Delete multiple memories by filter (dry-run supported) |
+
+### Import/Export
+| Tool | Description |
+|------|-------------|
+| `export_memories` | Export to JSON or Markdown format |
+| `import_memories` | Import memories from JSON export |
+| `ingest_documents` | Ingest PDF, DOCX, MD, TXT files as knowledge base |
+
+### Utilities
+| Tool | Description |
+|------|-------------|
+| `health_check` | Verify backend connectivity |
+| `reset_memory` | Reset entire memory store (destructive) |
+| `setup_steering` | Create Kiro memory-first steering file |
+
+For detailed parameter documentation, see the tool descriptions in your MCP client.
+
+## Usage Examples
+
+### Basic Memory Operations
+
+```python
+# Store a memory
+store_memory(
+    content="User prefers React over Vue for frontend development",
+    metadata={"type": "preference", "priority": "high"}
+)
+
+# Search memories
+search_memories(query="React preferences", limit=5)
+
+# Get recent memories
+get_recent_memories(days=7, limit=10)
+
+# Filter by metadata
+search_by_metadata(type="preference", priority="high")
+```
+
+### Document Ingestion
+
+```python
+# Ingest single file
+ingest_documents(path="/path/to/manual.pdf")
+
+# Ingest directory recursively
+ingest_documents(
+    path="/path/to/docs",
+    recursive=True,
+    chunk_size=2048,
+    chunk_overlap=400,
+    file_metadata={"type": "documentation", "version": "2.0"}
+)
+
+# Search ingested documents
+search_memories(query="how to configure authentication")
+```
+
+### Session Partitioning
+
+```python
+# Store memory for specific session
+store_memory(
+    content="Current task: Implementing user authentication",
+    run_id="session-123",
+    metadata={"type": "task", "status": "in_progress"}
+)
+
+# Search within session
+search_memories(query="authentication", run_id="session-123")
+
+# Clean up session
+delete_all_memories(run_id="session-123")
+```
+
+### Performance Optimization
+
+```python
+# Fast storage (no LLM inference)
+store_memory(
+    content="Completed: API refactoring - 30% faster response times",
+    metadata={"type": "task_completion"},
+    infer=False  # 5-10x faster
+)
+
+# Smart storage (with deduplication)
+store_memory(
+    content="User mentioned they prefer TypeScript for type safety",
+    metadata={"type": "preference"},
+    infer=True  # Extracts facts, prevents duplicates
+)
+
+# Compact response (default - saves tokens)
+search_memories(query="React preferences", limit=5)
+# Returns: {"memories": [{"id": "...", "memory": "...", "metadata": {...}}], "count": 5}
+
+# Verbose response (full details)
+search_memories(query="React preferences", limit=5, verbose=True)
+# Returns: Full details including hash, timestamps, user_id, agent_id, etc.
+```
+
+## Performance Tips
+
+**Storage Speed:**
+- Use `infer=false` for 5-10x faster writes when you don't need deduplication
+- Use `infer=true` (default) for important information to prevent duplicates
+
+**Response Optimization:**
+- Use `verbose=false` (default) for 55% token reduction per memory
+- Compact mode returns only: id, memory, metadata, score
+- Graph relations preserved and truncated to 20 in compact mode
+- Verbose mode returns all fields including timestamps, hashes, etc.
+- Set `MEM0_VERBOSE=true` globally or use `verbose` parameter per-call
+- Configure relations limit with `MEM0_MAX_RELATIONS` (default: 20)
+
+**Search Optimization:**
+- FAISS uses L2 distance: lower scores = higher similarity
+- Adjust `MEM0_MIN_RELEVANCE_SCORE` to filter less relevant results
+- Use metadata filtering for precise queries
+
+**Backend Selection:**
+- **FAISS**: Best for <100k memories, single-user, development
+- **Qdrant**: Best for metadata-heavy queries, production deployments
+- **OpenSearch**: Best for >100k memories, enterprise scale
+
+**LLM Provider:**
+- **Bedrock**: Fastest with built-in optimizations, production-ready
+- **Ollama**: Good for local development, privacy-focused
+- **LM Studio**: Alternative local option with UI
+
+## Advanced Features
+
+### KuzuDB Graph Store (Experimental)
+
+Track relationships between entities (people, companies, technologies) alongside vector embeddings. See [docs/KUZU_GRAPH_STORE.md](docs/KUZU_GRAPH_STORE.md) for details.
+
+### Known Limitations
+
+- **Amazon Nova Models**: Now fully compatible via bedrock_patch.py
+- **Metadata Filtering**: mem0 v1.0.x only supports implicit AND operations (flat dictionary)
+- **Platform Features**: Some features (custom_categories, expiration_date) only available in Mem0 Platform
+
+For troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+
+## Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Documentation
+
+- [Qdrant Setup Guide](docs/QDRANT_SETUP.md) - Detailed Qdrant configuration
+- [KuzuDB Graph Store](docs/KUZU_GRAPH_STORE.md) - Relationship tracking (experimental)
+- [Nomic Embeddings](docs/NOMIC_PREFIXES.md) - Nomic model configuration
+- [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
+
+## Citation
+
+If you use this project in your research or work, please cite:
+
+```bibtex
+@software{selvam_mem0_agent_memory_2025,
+  author = {Selvam, Arunkumar},
+  title = {Mem0 Agent Memory - MCP Server},
+  url = {https://github.com/arunkumars-mf/mem0-agent-memory},
+  version = {1.3.0},
+  year = {2025}
+}
+```
+
+See [CITATION.cff](CITATION.cff) for more formats.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
