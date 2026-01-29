@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "htse"
+maintainers = [
+  { name = "Andrew Tarzia", email = "andrew.tarzia@gmail.com" },
+]
+dependencies = [
+    "mol-ellipsize",
+    "PoreMapper",
+    "pywindowx",
+    "stko",
+]
+requires-python = ">=3.11"
+dynamic = ["version"]
+readme = "README.rst"
+
+[project.optional-dependencies]
+dev = [
+  "ruff",
+  "mypy",
+  # TODO: Remove pin when https://github.com/TvoroG/pytest-lazy-fixture/issues/65 is resolved.
+  # pytest-lazy-fixture 0.6.0 is incompatible with pytest 8.0.0
+  "pytest<8",
+  "pytest-cov",
+  "sphinx",
+  "sphinx-copybutton",
+  "sphinx-rtd-theme",
+  "twine",
+]
+
+[project.urls]
+github = "https://github.com/andrewtarzia/HTSExclusion"
+
+
+[tool.setuptools_scm]
+write_to = "src/htse/_version.py"
+
+
+[tool.ruff]
+line-length = 79
+
+[too.ruff.lint]
+extend-select = ["I"]
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+python_functions = [
+  "test_*",
+]
+
+[tool.mypy]
+show_error_codes = true
+implicit_optional = false
+warn_no_return = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+    "stk.*",
+    "stko.*",
+    "scipy.*",
+    "spindry.*",
+    "pore_mapper.*",
+    "molellipsize.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "rdkit.*"
+ignore_missing_imports = true
+follow_imports = "skip"
+follow_imports_for_stubs = true

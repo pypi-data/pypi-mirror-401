@@ -1,0 +1,77 @@
+Metadata-Version: 2.4
+Name: htse
+Version: 2026.1.16.0
+Maintainer-email: Andrew Tarzia <andrew.tarzia@gmail.com>
+Project-URL: github, https://github.com/andrewtarzia/HTSExclusion
+Requires-Python: >=3.11
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: mol-ellipsize
+Requires-Dist: PoreMapper
+Requires-Dist: pywindowx
+Requires-Dist: stko
+Provides-Extra: dev
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: pytest<8; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: sphinx; extra == "dev"
+Requires-Dist: sphinx-copybutton; extra == "dev"
+Requires-Dist: sphinx-rtd-theme; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Dynamic: license-file
+
+:maintainers:
+  `andrewtarzia <https://github.com/andrewtarzia/>`_
+
+Overview
+========
+
+``htse`` is a Python library for evaluating molecular exclusion in a 
+high-throughput way.
+
+Installation
+============
+
+To get ``htse``, you can install it with pip:
+
+.. code-block:: bash
+
+  pip install htse
+
+
+Warning:
+
+  Very much underdevelopment. There are no tests currently!
+
+Developer Setup
+---------------
+
+1. Install `just`_.
+2. Install `uv`_.
+3. In the source directory, run:
+
+.. code-block:: bash
+
+  just setup
+
+3. Run code checks:
+
+.. code-block:: bash
+
+  just check
+
+
+.. _`just`: https://github.com/casey/just
+.. _`uv`: https://docs.astral.sh
+
+How To Cite
+===========
+
+If you use ``htse`` please cite
+
+  https://github.com/andrewtarzia/HTSExclusion
+
+
+Publications
+============
