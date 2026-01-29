@@ -1,0 +1,36 @@
+Metadata-Version: 2.4
+Name: kan_linear
+Version: 1.0.0
+Summary: A KANLinear layer implementation using PyTorch
+Author-email: Cross <cross@dill.moe>
+Project-URL: Homepage, https://github.com/dillfrescott/kan_linear
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch
+Dynamic: license-file
+
+# KANLinear
+
+A PyTorch implementation of the KANLinear layer.
+
+## Installation
+
+```bash
+pip install git+https://github.com/dillfrescott/kan_linear
+```
+
+## Usage
+
+```python
+from kan_linear import KANLinear
+import torch
+
+model = KANLinear(in_features=10, out_features=5)
+x = torch.randn(1, 10)
+output = model(x)
+print(output.shape)
+```
