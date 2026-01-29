@@ -1,0 +1,74 @@
+Metadata-Version: 2.4
+Name: safeoutput
+Version: 3.0
+Summary: Tempfile wrapper to ensure output files are either complete, or empty. Also handles stdout, which gives no truncation guarantees.
+Author-email: andrew thomson <athomsonguy@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, http://github.com/andrewguy9/safeoutput
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: System :: Filesystems
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Provides-Extra: dev
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Dynamic: license-file
+
+# safeoutput
+
+Safeoutput.open returns a file handle like object which can use used to write
+data to disk. It is meant to be used with python's with syntax.
+
+If an exception is thrown, safeoutput automatically deletes the file. This
+ensures partially rendered output is not left sitting around.
+
+If your handle leaves scope, without an exception being thrown, the file is
+atomically flipped into the desired location.
+
+Safeoutput uses temporary files to store writes, so your file contents do not
+have to fit in memory.
+
+## Usage
+
+### Python
+
+```python
+import sys
+import safeoutput
+
+def calc(line):
+  return line+1
+
+input_fname = sys.argv[1]
+output_fname = sys.argv[2]
+
+with open(input_fname, 'r') as input:
+  with safeoutput.open(output_fname) as output:
+    for line in input.xreadlines():
+      output.write(str(calc(int(line))))
+```
+
+### Command line
+
+```bash
+$ safeoutput
+usage: safeoutput [-h] [--binary] FILE
+```
+
+The example below ensures bar is not written until the pipe is closed.
+
+```bash
+(sleep 10; echo foo ${RANDOM} ) | \
+  safeoutput --binary bar
+
+cat bar
+```
