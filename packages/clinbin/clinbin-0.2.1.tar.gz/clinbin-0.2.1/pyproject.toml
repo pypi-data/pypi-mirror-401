@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "clinbin"
+version = "0.2.1"
+description = "Use cut-off points from medical guidelines to classify clinical variables."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+    {name = "H. C. Donker", email = "h.c.donker@umcg.nl"}
+]
+dependencies = [
+    "pandas>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/hylkedonker/clinbin"
+Repository = "https://gitlab.com/hylkedonker/clinbin.git"
+"Bug Tracker" = "https://gitlab.com/hylkedonker/clinbin/-/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/clinbin"]
