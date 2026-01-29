@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "2026-new-year"
+dynamic = ["version"]
+description = "TCP/TLS/HTTP/SSH learning scripts and demos."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{ name = "Tao Bo", email = "taobo@example.com" }]
+
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+new_year_2026 = [
+  "*.pem",
+  "examples/ctypes_shared/*",
+  "examples/ctypes_shared/*.so",
+  "examples/ctypes_shared/*.dylib",
+  "examples/ctypes_shared/*.dll",
+  "examples/extension_pkg/README.md",
+  "examples/extension_pkg/pyproject.toml",
+  "examples/extension_pkg/MANIFEST.in",
+  "examples/extension_pkg/setup.py",
+  "examples/extension_pkg/src/hello_ext/*.py",
+  "examples/extension_pkg/src/hello_ext/*.h",
+  "examples/extension_pkg/src/hello_ext/*.c",
+  "examples/extension_pkg/src/hello_ext/*.cpp",
+]
