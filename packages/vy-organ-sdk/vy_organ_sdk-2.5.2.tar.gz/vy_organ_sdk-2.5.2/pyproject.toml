@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vy-organ-sdk"
+dynamic = ["version"]
+description = "SDK for building VY-CNS organs"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [
+    {name = "VY-AGI Team"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["vy", "organs", "protocol", "zenoh", "microservices"]
+dependencies = [
+    "eclipse-zenoh>=1.7.2",
+    "msgpack>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/vinver-labs/vy-organ-sdk"
+Repository = "https://github.com/vinver-labs/vy-organ-sdk"
+Documentation = "https://github.com/vinver-labs/vy-organ-sdk#readme"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["vy_organ_sdk*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "vy_organ_sdk.__version__"}
