@@ -1,0 +1,494 @@
+# ============================================================================
+# Config file for LORA
+# ==========================================[ Sections for the users ]========
+#
+# One of input_directory, input_pattern and input_samples must be provided
+# If input_directory provided, use it otherwise if input_pattern provided,
+# use it, otherwise use input_samples.
+# ============================================================================
+sequana_wrappers: "v24.8.29"
+
+input_directory: ''
+input_pattern: '*.bam'
+input_csv: ''
+assembler: 'flye'
+reference_file: ''
+
+# apptainers links
+apptainers:
+    bandage: https://zenodo.org/record/13399042/files/bandage_0.8.1.img
+    blast: https://zenodo.org/record/7848524/files/blast_2.12.0.img
+    bwa: https://zenodo.org/record/7970243/files/bwa_0.7.17.img
+    busco: https://zenodo.org/record/7794877/files/busco_5.4.6.img
+    canu: https://zenodo.org/record/7866415/files/canu_2.1.1.img
+    checkm: https://zenodo.org/record/10040946/files/checkm_1.2.2.img
+    ccs: https://zenodo.org/record/7817325/files/ccs_6.4.0.img
+    circlator: https://zenodo.org/record/7821905/files/circlator_1.5.5.img
+    flye: https://zenodo.org/record/10409326/files/flye_2.9.3.img
+    fastp: https://zenodo.org/record/8036563/files/fastp_0.23.3.img
+    graphviz: https://zenodo.org/record/7928262/files/graphviz_7.0.5.img
+    hifiasm: https://zenodo.org/record/10610397/files/hifiasm_0.19.8.img
+    medaka: https://zenodo.org/record/7846295/files/medaka_1.7.3.img
+    miniasm: https://zenodo.org/record/13550867/files/miniasm_0.3.0.img
+    mosdepth: https://zenodo.org/record/12805460/files/mosdepth_0.3.8.img
+    multiqc: https://zenodo.org/record/17100751/files/multiqc_1.27.0-zenodo1.img
+    necat: https://zenodo.org/record/13907089/files/necat_0.0.1.img
+    pecat: https://zenodo.org/record/13942767/files/pecat_0.0.3.img
+    pbindex: https://zenodo.org/record/7817189/files/pbbam_2.3.0.img
+    minimap2: https://zenodo.org/record/7822910/files/samtools_1.17_minimap2_2.24.0.img
+    polypolish: https://zenodo.org/record/13732628/files/polypolish_0.6.0.img
+    prokka: https://zenodo.org/record/7848754/files/prokka_1.14.6.img
+    quast: https://zenodo.org/record/7848771/files/quast_5.2.0.img
+    ragtag: https://zenodo.org/record/13759601/files/ragtag_2.1.0.img
+    samtools: https://zenodo.org/record/7437898/files/samtools_1.16.1.img
+    seqkit: https://zenodo.org/record/7821924/files/seqkit_2.4.0.img
+    seqtk: https://zenodo.org/record/5729951/files/seqtk_1.3.0.img
+    sequana_coverage: https://zenodo.org/record/13946414/files/sequana_coverage_0.18.0.img
+    unicycler: https://zenodo.org/record/10469285/files/unicycler_0.5.0.img
+
+
+##############################################################################
+# CCS
+#
+# :Parameters:
+#
+# - min-rq: Minimum predicted accuracy in [0, 1].
+# - min-passes: Minimum number of full-length subreads required to generate CCS for a ZMW
+# - max-chunks: Determine maximum number of chunks.
+# - options: any options recognised by `ccs` cli
+# - threads: Number of threads to use
+# - resources: computing resources needed to run the job on a cluster
+ccs:
+    do: true
+    min-rq: 0.99
+    min-passes: 10
+    max-chunks: 10
+    options: ''
+    threads: 4
+    resources:
+        mem: 4G
+
+
+##############################################################################
+# Samtools merge
+#
+# :Parameters:
+#
+samtools_merge:
+    options: ''
+    threads: 4
+    resources:
+        mem: 4G
+
+
+##############################################################################
+# Bam to Fastq
+#
+# :Parameters:
+# - options: any options recognised by `samtools bam2fq` cli
+#
+bam_to_fastq:
+    options: ''
+    threads: 4
+    resources:
+        mem: 4G
+
+
+##############################################################################
+# Canu v2.1
+#
+# :Parameters:
+#
+# - genome_size: An estimate of the size of the genome. Common suffices are allowed, for example, 3.7m or 2.8g.
+# - preset: Any preset in this list: ['pacbio', 'pacbio-hifi', 'nanopore']
+# - use_grid: let canu run steps on cluster.
+# - options: any options recognised by `canu` cli
+# - threads: Number of threads to use
+canu:
+    genome_size: ''
+    preset: 'pacbio-hifi'
+    use_grid: true
+    options: ''
+    threads: 1
+    resources:
+        mem: 8G
+
+##############################################################################
+# Long read correction with canu.
+#
+# The canu correction step is used by hifiasm and flye. So if you use
+# canu, this section is not used at all.
+#
+# :Parameters:
+#
+# - do: if unchecked this rule is ignored.
+# - preset: Any preset in this list: ['pacbio', 'pacbio-hifi', 'nanopore']
+# - genome_size: An estimate of the size of the genome. Common suffices are allowed, for example, 3.7m or 2.8g.
+# - use_grid: let canu run steps on cluster.
+# - correction_options: any options recognised by `canu -correct` cli
+# - trimming_options: any options recognised by `canu -trim cli (do not add --corrected option)`
+# - threads: Number of threads to use
+canu_correction:
+    do: false
+    genome_size: '3.3m'
+    preset: 'pacbio-hifi'
+    use_grid: true
+    correction_options: ''
+    trimming_options: ''
+    threads: 1
+    resources:
+        mem: 1G
+
+##############################################################################
+# Hifiasm v0.15.1
+#
+# :Parameters:
+#
+# - options: any options recognised by `canu` cli
+# - threads: Number of threads to use
+hifiasm:
+    options: '-f0 -l0 --n-hap 1'
+    threads: 4
+    resources:
+        mem: 8G
+
+##############################################################################
+# necat
+#
+# :Parameters:
+#
+# - options: any options recognised by `necat` cli
+#
+necat:
+    options:
+    genome_size:
+    min_required_length: 1000
+    threads: 4
+    resources:
+        mem: 16G
+
+pecat:
+    options:
+    genome_size:
+    min_required_length: 1000
+    min_coverage: 80
+    threads: 4
+    resources:
+        mem: 16G
+
+##############################################################################
+# Flye
+#
+# :Parameters:
+#
+# - preset: Any preset in this list: ['pacbio-raw', 'pacbio-corr', 'pacbio-hifi', 'nano-raw', 'nano-corr', 'nano-hq']
+# - options: any options recognised by `flye` cli
+# - threads: Number of threads to use
+flye:
+    preset: 'pacbio-hifi'
+    genome_size: 
+    options: ''
+    threads: 4
+    resources:
+        mem: 16G
+
+##############################################################################
+# Medaka consensus
+#
+# Medaka dependencies mess up the environment used to run LORA.
+# We advice you to use an apptainer or the docker of medaka.
+#
+# :Parameters:
+#  
+# - do: if unchecked, this rule is ignored
+# - model: models that can be found by running `medaka tools list_models`
+# - options: any options recognised by `medaka_consensus` cli
+# - threads: Number of threads to use
+medaka_consensus:
+    do: false
+    model: "r941_min_fast_g303"
+    options:
+    threads: 4
+    resources:
+        mem: 16G
+        partition: gpu
+        qos: fast
+        gres: gpu:1,gmem:24G
+
+
+##############################################################################
+# Circlator
+#
+# :Parameters:
+#   
+# - do: if unchecked, this rule is ignored
+# - options: any options recognised by `circlator` cli
+# - threads: Number of threads to use
+# - data_type: pacbio-corrected, pacbio-raw
+circlator:
+    do: false
+    options: '--split_all_reads'
+    data_type: 'pacbio-corrected'
+    threads: 4
+    resources:
+        mem: 8G
+
+
+##############################################################################
+# Polypolish
+#   Paired-end illumina data are mandatory and illumina prefix name must be the same than
+#   your long reads files.
+#
+# :Parameters:
+#   
+# - do: if unchecked, this rule is ignored
+# - input_directory: path where your illumina data are
+# - input_pattern: pattern to retrieve your data
+# - input_readtag: explicit readtag to retrieve paired-end
+# - options: any options recognised by `polypolish` cli
+# - threads: Number of threads to use
+polypolish:
+    do: false
+    input_directory:
+    input_pattern: "*.fastq.gz"
+    input_readtag: "_R[12]"
+    options: 'polish'
+    resources:
+        mem: 4G
+
+# somehow this step requires up to 8G memory
+polypolish_filter:
+    resources:
+        mem: 8G
+
+##############################################################################
+# SeqKit Sort
+#
+# :Parameters:
+#
+# - threads: Number of threads to use
+seqkit_sort:
+    threads: 4
+    resources:
+        mem: 4G
+
+##############################################################################
+# Minimap2
+#
+# :Parameters:
+#
+# - preset: Preset for application.
+# - options: any options recognised by `minimap2` cli
+# - threads: Number of threads to use
+minimap2:
+    preset: 'map-pb'
+    options: ''
+    threads: 4
+    resources:
+        mem: 8G
+
+
+#############################################################################
+#
+# :Parameters:
+#
+# :param circular: is your genome circular or not ?
+# :param double_threshold: double threshold for clustering. Keep 0.5 if you do
+#     not know. Otherwise, checkout the online documentation on
+#     sequana.readthedocs.io
+# :param genbank_file: optional genbank
+# :param high_threshold:
+# :param low_threshold:
+# :param mixture_models: keep to 2.
+# :param reference_file: optional fasta file corresponding to you mapped
+#i  data. Used for GC plot only
+# :param window: the W parameter of the running median. Keep as long as twice
+#     the deleted/depleted/duplicated you want to identify or to avoid. short
+#     genome will be set to genome length divided by 5 automatically.
+# :param chunksize: for large genomes, split the data into chunks
+# :param binning: for large genomes, merge data into bins of this size. You will
+#     loose resolution: bins are merged and averaged indeed
+# :param cnv_clustering: further clustering to merge detected events whose
+#     distance is smaller than this parameter
+#
+sequana_coverage:
+    do: false
+    circular: true
+    window_size: 20001
+    chunksize: 5000000
+    double_threshold: 0.5
+    gc_window_size: 201
+    genbank_file: ''
+    high_threshold: 4.0
+    low_threshold: -4.0
+    mixture_models: 2
+    reference_file: ''
+    options: ""
+    resources:
+        mem: 8G
+
+bam2bed:
+    options: ''
+    threads: 4
+    resources:
+        mem: 8G
+
+
+
+
+##############################################################################
+# Quast
+#
+# :Parameters:
+#
+# - preset: Preset for application (pacbio/nanopore).
+# - options: any options recognised by `quast` cli
+# - threads: Number of threads to use
+quast:
+    preset: 'pacbio'
+    options: ' --rna-finding'
+    threads: 4
+    resources:
+        mem: 4G
+
+
+##############################################################################
+# Unicycler - De Novo Assembly
+#
+# :Parameters:
+#
+# - mode: any bridging mode in this list ["conservative", "normal", "bold"]
+# - options: any options recognised by unicycler.
+# - threads: number of threads to be used.
+# - resources: computing resources needed to run the job on a cluster
+#
+unicycler:
+    mode: "normal"
+    options: ""
+    threads: 8
+    resources:
+        mem: 16G
+
+##############################################################################
+# Busco
+#
+# :Parameters:
+#   
+# - do: if unchecked, this rule is ignored
+# - lineage: Specify the name of the BUSCO lineage to be used.
+# - options: any options recognised by `busco` cli.
+# - threads: Number of threads to use.
+busco:
+    do: false
+    lineage: ''
+    options: '--offline'
+    threads: 4
+    resources:
+        mem: 4G
+
+
+##############################################################################
+# Prokka
+#
+# :Parameters:
+#   
+# - do: if unchecked, this rule is ignored
+# - threads: Number of threads to use.
+# - options: any options recognised by `prokka` cli
+#            --centre X --compliant mean generate clean contig name
+prokka:
+    do: false
+    options: '--centre X --compliant'
+    threads: 4
+    resources:
+        mem: 4G
+
+##############################################################################
+# SeqKit Head
+#
+# :Parameters:
+#   
+# - n_first: Keep only n first contigs
+seqkit_head:
+    n_first: 100
+
+##############################################################################
+# Blast
+#
+# :Parameters:
+#   
+# - do: if unchecked, this rule is ignored
+# - db_dir: Path to BLAST databases.
+# - evalue: Expectation value (E) threshold for saving hits.
+# - options: any options recognised by `blastn` cli (except --outfmt)
+# - threads: Number of threads to use.
+#
+# for max_target_seqs see https://academic.oup.com/bioinformatics/article/35/9/1613/5106166
+blast:
+    do: false
+    blastdb: ''
+    evalue: '1e-10'
+    options: ' -max_target_seqs 100'
+    threads: 4
+    resources:
+        mem: 12G
+
+
+##############################################################################
+# checkm
+#
+# :Parameters:
+# 
+# - taxon_rank: one of genus, species, etc  (see sequana_lora --help)
+# - taxon_name: try (sequana_lora --checkm-rank genus --checkm-name DUMMY) 
+checkm:
+    do: false
+    taxon_rank: genus
+    taxon_name:
+    threads: 4
+    resources:
+        mem: 4G
+
+
+##############################################################################
+# fastp
+#
+# :Parameters:
+#
+# - min_required_length: all reads below that value are removed.
+#
+fastp:
+    do: true
+    options:
+    min_length_required: 1000
+    threads: 4
+    resources:
+        mem: 8G
+
+
+
+#############################################################################
+##   MultiQC aggregates results from bioinformatics analyses across many
+##   samples into a single report.
+##
+## :Parameters:
+##
+## - options: any options recognised by multiqc
+## - config_file: by default, we use sequana RNA-seq multiqc_config file.
+##       If you want your own multiqc, fill this entry
+multiqc:
+    options: -p -f
+    modules: busco quast sequana_coverage prokka fastp
+    input_directory: .
+    config_file: multiqc_config.yaml
+    resources:
+        mem: 8G
+
+
+
+#################################################################################
+ragtag_scaffold:
+    options:
+    threads: 1
+    resources:
+        mem: 8G
