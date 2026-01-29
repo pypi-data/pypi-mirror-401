@@ -1,0 +1,25 @@
+[project]
+name = "gindex"
+version = "0.3.0"
+description = "Google Drive index builder"
+readme = "README.md"
+authors = [
+    { name = "Rémi Duraffort", email = "remi.duraffort@linaro.org" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "gdown>=5.2.1",
+]
+
+[project.scripts]
+gindex = "gindex:main"
+
+[build-system]
+requires = ["uv_build>=0.9.9,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "black>=25.12.0",
+    "isort>=7.0.0",
+]
