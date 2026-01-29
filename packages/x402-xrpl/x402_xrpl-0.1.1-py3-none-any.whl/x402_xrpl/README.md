@@ -1,0 +1,133 @@
+# x402-xrpl: Python SDK for XRPL x402 Payments
+
+This package provides a spec‑aligned SDK for implementing **x402** (HTTP 402 Payment Required) flows on the **XRP Ledger (XRPL)**. It supports:
+
+*   **Service Providers (Servers)**: Middleware to protect FastAPI/Starlette routes with 402 requirements.
+*   **Buyer Clients**: `requests` wrappers that automatically handle 402 responses, sign payments, and retry with `X-PAYMENT`.
+*   **Facilitator Integration**: Helpers to verify and settle payments via an x402 Facilitator.
+
+**Scheme**: This SDK implements the **presigned Payment transaction** scheme (scheme: `exact` on XRPL).
+
+---
+
+## Installation
+
+```bash
+pip install x402-xrpl
+```
+
+---
+
+## Quickstart: Protecting an API (Service Provider)
+
+Use the `require_payment` middleware to protect a route. When a client accesses it without payment, the middleware returns `402 Payment Required`. When they return with a valid `X-PAYMENT` header, it verifies/settles via a facilitator and allows the request.
+
+```python
+import os
+from fastapi import FastAPI
+from x402_xrpl.server import require_payment
+
+app = FastAPI()
+
+# 1. Configure your payment details
+#    (In production, load these from env vars)
+PAY_TO_ADDRESS = "r..."       # Your XRPL wallet address
+FACILITATOR_URL = os.getenv("XRPL_FACILITATOR_URL", "https://xrpl-facilitator-testnet.t54.ai")
+PRICE_DROPS = "1000"          # Price in drops (1000 drops = 0.001 XRP)
+
+# 2. Add middleware to protect specific paths
+app.middleware("http")(
+    require_payment(
+        path="/ai-news",      # Protect this route
+        price=PRICE_DROPS,
+        pay_to_address=PAY_TO_ADDRESS,
+        network="xrpl-testnet",
+        facilitator_url=FACILITATOR_URL,
+        asset="XRP",
+        description="Premium AI News Feed",
+    )
+)
+
+@app.get("/ai-news")
+def get_news():
+    return {"message": "Here is your paid content!"}
+```
+
+---
+
+## Quickstart: Consuming an API (Buyer Client)
+
+Use the `x402_requests` session wrapper. It works just like `requests`, but automatically handles the `402 -> Sign Payment -> Retry` flow.
+
+```python
+import os
+from xrpl.wallet import Wallet
+from x402_xrpl.clients import x402_requests
+
+# 1. Setup your wallet (Buyer)
+#    (Never hardcode seeds in production!)
+SEED = os.getenv("XRPL_BUYER_SEED", "s...") 
+wallet = Wallet.from_seed(SEED)
+
+# 2. Create an x402-aware session
+session = x402_requests(
+    wallet=wallet,
+    rpc_url="https://s.altnet.rippletest.net:51234/",
+    network_filter="xrpl-testnet",
+)
+
+# 3. Request the protected resource
+#    The session will automatically negotiate the payment.
+response = session.get("http://localhost:8000/ai-news")
+
+print(f"Status: {response.status_code}")
+print(f"Content: {response.json()}")
+
+# 4. (Optional) Check the settlement receipt
+if "X-PAYMENT-RESPONSE" in response.headers:
+    print("Payment settled!", response.headers["X-PAYMENT-RESPONSE"])
+```
+
+---
+
+## Key Concepts
+
+### 1. The Flow
+1.  **Client** requests `GET /resource`.
+2.  **Server** checks for `X-PAYMENT`. If missing, returns `402 Payment Required` with payment details (Pay to whom? How much? Which asset?).
+3.  **Client** reads details, signs an XRPL `Payment` transaction (offline), and creates a "Presigned Payment" blob.
+4.  **Client** retries `GET /resource` with `X-PAYMENT: <blob>`.
+5.  **Server** sends the blob to a **Facilitator** to verify (is the signature valid?) and settle (submit to XRPL).
+6.  **Facilitator** returns success/failure.
+7.  **Server** serves the resource.
+
+### 2. Environment Variables (Common)
+*   `XRPL_FACILITATOR_URL`: URL of the facilitator service (e.g., `http://localhost:8011` or a hosted instance).
+*   `XRPL_TESTNET_RPC_URL`: XRPL node for the client to look up fees/sequence numbers.
+
+---
+
+## Advanced Usage
+
+### Custom Assets (IOUs)
+To charge in a non-XRP asset (e.g., RLUSD), specify the `asset` code and `issuer`:
+
+```python
+require_payment(
+    # ...
+    asset="RLUSD",
+    issuer="r...", # Issuer address
+    price="1.0",   # Amount string
+    # ...
+)
+```
+
+### Manual Payment Construction
+If you don't want to use the `x402_requests` wrapper, you can use `XRPLPresignedPaymentPayer` to manually generate headers:
+
+```python
+from x402_xrpl.client import XRPLPresignedPaymentPayer, XRPLPresignedPaymentPayerOptions
+
+payer = XRPLPresignedPaymentPayer(options=...)
+header = payer.create_payment_header(requirements)
+```
