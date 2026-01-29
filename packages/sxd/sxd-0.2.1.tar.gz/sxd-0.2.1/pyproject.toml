@@ -1,0 +1,135 @@
+[project]
+name = "sxd"
+version = "0.2.1"
+description = "SentientX Data Platform"
+requires-python = ">=3.12"
+dependencies = [
+    "sxd-core",
+    "sxd-master",
+    "sxd-sdk",
+    "python-dotenv>=1.0.0",
+    "clickhouse-connect>=0.7.0",
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "ansible>=13.1.0",
+    "tqdm>=4.67.1",
+    "pyyaml>=6.0",
+]
+
+[tool.uv]
+
+[tool.uv.workspace]
+members = [
+    "packages/sxd-core",
+ "packages/sxd-master",
+ "packages/sxd-sdk",
+ "scratch",
+]
+
+[tool.uv.sources]
+sxd-core = { workspace = true }
+sxd-master = { workspace = true }
+sxd-sdk = { workspace = true }
+
+[project.scripts]
+sxd = "sxd:main"
+
+[tool.setuptools]
+py-modules = ["sxd"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.2.0",
+    "pydantic>=2.0.0",
+    "hypothesis>=6.0.0",
+    "black>=24.0.0",
+    "mypy>=1.8.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = [
+    "tests",
+    "packages/sxd-core/tests",
+    "packages/sxd-master/tests",
+    "packages/sxd-sdk/tests",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests (fast, no external dependencies)",
+    "simulation: Workflow simulation tests (no Temporal server)",
+    "integration: Integration tests (require services like Temporal)",
+    "slow: Slow tests (>10s execution time)",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]
+
+[tool.ruff.lint]
+ignore = ["E741"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+# Disable noisy error codes for dynamic code patterns
+disable_error_code = ["no-any-return", "empty-body"]
+
+# Packages without type stubs - ignore missing imports only
+[[tool.mypy.overrides]]
+module = [
+    "temporalio.*",
+    "rich.*",
+    "pyarrow.*",
+    "clickhouse_connect.*",
+    "upath.*",
+    "httpx.*",
+    "huggingface_hub.*",
+    "pytest.*",
+    "yaml.*",
+    "tqdm.*",
+    "requests.*",
+    "dotenv.*",
+    "numpy.*",
+    "cv2.*",
+    "torch.*",
+    "torchvision.*",
+    "PIL.*",
+    "lancedb.*",
+    "pandas.*",
+]
+ignore_missing_imports = true
+
+
+
+# Complex generic code - mypy struggles with dynamic typing patterns
+[[tool.mypy.overrides]]
+module = [
+    "sxd_core.validation",
+    "sxd_core.resilience",
+    "sxd_core.decorators",
+    "sxd_core.testing.workflow_simulator",
+    "sxd_core.ops.submit",
+    "sxd_core.ops.node_metrics",
+    "sxd_core.ingest.activities",
+    "sxd_core.docs",
+]
+disable_error_code = ["arg-type", "attr-defined", "misc", "return-value", "union-attr", "truthy-function", "index"]
+
+[tool.coverage.run]
+omit = ["packages/sxd-core/sxd_core/tui/*"]
