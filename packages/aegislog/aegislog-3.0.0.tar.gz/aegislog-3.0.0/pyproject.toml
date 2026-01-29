@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegislog"
+version = "3.0.0"
+description = "Fire-and-Forget Evidence Logging for EU AI Act Compliance with Time Machine Defense"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Prolixo Defense", email = "engineering@prolixo.dev"}
+]
+keywords = ["ai", "compliance", "eu-ai-act", "logging", "evidence", "audit", "article-12", "article-14", "traceability"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Logging",
+]
+
+[project.optional-dependencies]
+async = ["aiohttp>=3.8.0"]
+dev = ["pytest", "pytest-asyncio", "aiohttp"]
+
+[project.urls]
+Homepage = "https://github.com/prolixo-defense/aegislog"
+Documentation = "https://docs.prolixo.dev/aegislog"
+Repository = "https://github.com/prolixo-defense/aegislog"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aegislog*"]
