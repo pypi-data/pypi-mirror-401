@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "py-netatmo-truetemp"
+dynamic = ["version"]
+description = "Netatmo's missing true temperature API - set real room temps programmatically"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "P4uLT", email = "P4uLT@users.noreply.github.com"},
+]
+maintainers = [
+    {name = "P4uLT", email = "P4uLT@users.noreply.github.com"},
+]
+keywords = [
+    "truetemp",
+    "true-temperature",
+    "temperature-control",
+    "netatmo",
+    "thermostat",
+    "smart-home",
+    "home-automation",
+    "api-client",
+    "python-library",
+    "sdk",
+    "iot",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Home Automation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "platformdirs>=4.0.0",
+    "requests==2.32.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/py-netatmo-unofficial/py-netatmo-truetemp"
+Repository = "https://github.com/py-netatmo-unofficial/py-netatmo-truetemp"
+Issues = "https://github.com/py-netatmo-unofficial/py-netatmo-truetemp/issues"
+Changelog = "https://github.com/py-netatmo-unofficial/py-netatmo-truetemp/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/py-netatmo-unofficial/py-netatmo-truetemp#readme"
+
+[dependency-groups]
+dev = [
+    "bandit[toml]>=1.8.0",
+    "mypy>=1.18.2",
+    "pre-commit>=4.0.0",
+    "pylint>=4.0.3",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.15.1",
+    "pytest>=9.0.2",
+    "ruff>=0.14.5",
+    "twine>=6.0.0",
+    "types-requests>=2.32.4.20250913",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/py_netatmo_truetemp"]
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/py_netatmo_truetemp/_version.py"
+
+[tool.ruff]
+extend-exclude = ["src/py_netatmo_truetemp/_version.py"]
