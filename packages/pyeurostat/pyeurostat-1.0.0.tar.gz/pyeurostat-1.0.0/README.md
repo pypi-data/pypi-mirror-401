@@ -1,0 +1,312 @@
+# pyeurostat
+
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI](https://img.shields.io/badge/PyPI-pyeurostat-blue)](https://pypi.org/project/pyeurostat/)
+
+**Modern Python client for EuroStat data** - Clean SDMX API implementation that fixes the flags bug in the original library.
+
+## Features
+
+- **Standalone Implementation**: Direct SDMX 2.1 API client (no buggy eurostat dependency)
+- **Fixes Critical Bug**: Proper flag handling - no more "column mismatch" errors
+- **Simple API**: Easy-to-use EuroStatExplorer class for data access
+- **Loop Downloads**: Built-in support for downloading multiple parameter values
+- **Tested**: Comprehensive test suite with 100% passing tests
+
+## Installation
+
+### From PyPI (recommended):
+```bash
+pip install pyeurostat
+```
+
+### From source:
+```bash
+git clone https://github.com/Onerafaz/pyeurostat.git
+cd pyeurostat
+pip install -e .
+```
+
+### Dependencies:
+- pandas >= 1.3.0
+- plotly >= 5.0.0
+- requests >= 2.25.0
+
+## Quick Start
+
+```python
+from pyeurostat import EuroStatExplorer
+
+# Initialize the explorer
+es = EuroStatExplorer()
+
+# Download unemployment data for Portugal
+df = es.client.get_data_df(
+    "une_rt_a",  # Unemployment dataset
+    filter_pars={
+        'geo': 'PT',
+        'age': 'TOTAL',
+        'sex': 'T',
+        'unit': 'PC_ACT',
+        'startPeriod': '2020',
+        'endPeriod': '2023'
+    },
+    flags=True,  # Now works correctly!
+    verbose=True
+)
+
+print(f"Downloaded: {df.shape}")
+print(df.head())
+
+# Download multiple countries using loop
+df = es.download_with_filters(
+    "une_rt_a",
+    filter_pars={
+        'age': 'TOTAL',
+        'sex': 'T',
+        'unit': 'PC_ACT',
+        'startPeriod': '2020',
+        'endPeriod': '2023'
+    },
+    loop_param='geo',
+    loop_values=['PT', 'ES', 'IT', 'FR', 'DE'],
+    flags=True
+)
+```
+
+## The Flags Bug Fix
+
+The original `eurostat` library has a critical bug where `flags=True` causes:
+```
+ValueError: 270 columns passed, passed data had 269 columns
+```
+
+This happens because the library creates headers with `_value` and `_flag` suffixes but the data rows don't always include flag values, causing a column mismatch.
+
+**pyeurostat fixes this by:**
+1. Direct SDMX API implementation (no dependency on buggy library)
+2. Proper row padding to match header length
+3. Correct TSV parsing with flag handling
+
+### Comparison
+
+**Original library (FAILS):**
+```python
+import eurostat
+df = eurostat.get_data_df("une_rt_a", flags=True, filter_pars={...})
+# Error: 270 columns passed, passed data had 269 columns
+```
+
+**pyeurostat (WORKS):**
+```python
+from pyeurostat import EuroStatExplorer
+es = EuroStatExplorer()
+df = es.download_with_filters("une_rt_a", flags=True, ...)
+# Success: Proper flag handling built-in
+```
+
+## API Reference
+
+### EuroStatExplorer
+
+Main class for interacting with EuroStat data.
+
+```python
+from pyeurostat import EuroStatExplorer
+es = EuroStatExplorer()
+```
+
+#### Methods
+
+**`download_with_filters(dataset_code, filter_pars, loop_param=None, loop_values=None, flags=False, verbose=True)`**
+
+Download dataset with custom filters and optional looping.
+
+Parameters:
+- `dataset_code` (str): EuroStat dataset code (e.g., 'une_rt_a')
+- `filter_pars` (dict): Filter parameters (e.g., `{'geo': 'PT', 'startPeriod': '2020'}`)
+- `loop_param` (str, optional): Parameter to loop through (e.g., 'geo')
+- `loop_values` (list, optional): Values to loop (e.g., `['PT', 'ES', 'IT']`)
+- `flags` (bool): Include data quality flags (default: False)
+- `verbose` (bool): Print progress messages (default: True)
+
+Returns: pandas DataFrame
+
+**`get_available_filters()`**
+
+Get all available filter options for the loaded dataset.
+
+```python
+filters = es.get_available_filters()
+print(filters)
+```
+
+**`unpivot_data(df, time_pattern=r'^\d{4}')`**
+
+Convert wide-format data to long format (unpivot/melt).
+
+### SDMXClient (Low-level)
+
+Direct SDMX API client for advanced usage.
+
+```python
+from pyeurostat.sdmx_client import SDMXClient
+
+client = SDMXClient()
+data = client.get_data("une_rt_a", filter_pars={...}, flags=True)
+df = client.get_data_df("une_rt_a", filter_pars={...})
+```
+
+## Examples
+
+### Example 1: Simple Download
+```python
+from pyeurostat import EuroStatExplorer
+
+es = EuroStatExplorer()
+df = es.client.get_data_df(
+    "une_rt_a",
+    filter_pars={
+        'geo': 'PT',
+        'age': 'TOTAL',
+        'startPeriod': '2023'
+    }
+)
+```
+
+### Example 2: Download with Flags
+```python
+df = es.client.get_data_df(
+    "une_rt_a",
+    filter_pars={'geo': 'PT'},
+    flags=True  # Get data quality flags
+)
+
+# Check flags
+print(df[[col for col in df.columns if '_flag' in col]])
+```
+
+### Example 3: Loop Through Multiple Values
+```python
+df = es.download_with_filters(
+    "une_rt_a",
+    filter_pars={
+        'age': 'TOTAL',
+        'sex': 'T',
+        'unit': 'PC_ACT'
+    },
+    loop_param='geo',
+    loop_values=['PT', 'ES', 'IT', 'FR', 'DE']
+)
+```
+
+### Example 4: Time Period Formats
+```python
+# Annual data (use year format)
+df = es.client.get_data_df("une_rt_a", filter_pars={'startPeriod': '2020', 'endPeriod': '2023'})
+
+# Monthly data (use YYYY-MM format)
+df = es.client.get_data_df("monthly_dataset", filter_pars={'startPeriod': '2020-01', 'endPeriod': '2020-12'})
+
+# Quarterly data (use YYYY-Q# format)
+df = es.client.get_data_df("quarterly_dataset", filter_pars={'startPeriod': '2020-Q1', 'endPeriod': '2020-Q4'})
+```
+
+## Migration from Original Library
+
+Replace this:
+```python
+import eurostat
+df = eurostat.get_data_df("une_rt_a", flags=True)
+```
+
+With this:
+```python
+from pyeurostat import EuroStatExplorer
+es = EuroStatExplorer()
+df = es.client.get_data_df("une_rt_a", flags=True)
+```
+
+## Testing
+
+The package includes a comprehensive test suite:
+
+```bash
+python test_comprehensive.py
+```
+
+Test coverage:
+- Package initialization
+- Simple dataset download
+- Download with flags (the critical bug fix!)
+- Loop downloads (multiple parameter values)
+- Parameter retrieval
+- Filter extraction
+
+## Contributing
+
+Contributions are welcome! This package aims to provide a more robust and maintained alternative to the original eurostat library.
+
+### Development Setup
+
+```bash
+git clone https://github.com/Onerafaz/pyeurostat.git
+cd pyeurostat
+pip install -e ".[dev]"
+```
+
+### Reporting Issues
+
+Found a bug or have a feature request? Please open an issue on [GitHub](https://github.com/Onerafaz/pyeurostat/issues).
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Inspired by the original `eurostat` library
+- Built on EuroStat's SDMX 2.1 API
+- Thanks to the open-source community
+
+## Resources
+
+- [EuroStat Website](https://ec.europa.eu/eurostat)
+- [EuroStat Data Browser](https://ec.europa.eu/eurostat/data/database)
+- [SDMX Standards](https://sdmx.org/)
+- [Original eurostat library](https://github.com/CIRED/eurostat) (for reference)
+
+## Important Notes
+
+### Dataset Codes
+Find dataset codes at the [EuroStat Data Browser](https://ec.europa.eu/eurostat/data/database):
+- `une_rt_a` - Unemployment rates (annual)
+- `nama_10_gdp` - GDP and main components
+- `DS-059341` - International trade data
+
+### Time Period Formats
+Use appropriate time formats based on data frequency:
+- **Annual**: `"2023"` or `"2020"`
+- **Monthly**: `"2023-01"` or `"2020-12"`
+- **Quarterly**: `"2023-Q1"` or `"2020-Q4"`
+
+### Flag Values
+Common flag values in EuroStat data:
+- `None` or empty: Normal value
+- `p`: Provisional
+- `e`: Estimated
+- `b`: Break in time series
+- `u`: Low reliability
+- `c`: Confidential
+
+## Roadmap
+
+- [x] Direct SDMX API implementation
+- [x] Fix flags bug
+- [x] Comprehensive testing
+- [x] PyPI publication
+- [ ] Async download support
+- [ ] Caching mechanism
+- [ ] More visualization methods
+- [ ] Documentation website
