@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install pytest pytest-asyncio pytest-cov coverage-badge
+
+    - name: Run tests with coverage
+      run: |
+        pytest tests/ -v --cov=src/cr_agent --cov-report=xml --cov-report=term
+
+    - name: Generate Coverage Badge
+      run: |
+        coverage-badge -o coverage.svg -f
+        mkdir -p badges_output
+        mv coverage.svg badges_output/
+
+    - name: Deploy Badge
+      if: github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./badges_output
+        publish_branch: badges
+        keep_files: false
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        force_orphan: true
