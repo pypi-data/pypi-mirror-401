@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161822888-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-161822888-1');
+    </script>
+
+    <title>Oculus example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+		import { VRButton } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/webxr/VRButton.js';        
+        import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js';
+        import { XRControllerModelFactory } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/webxr/XRControllerModelFactory.js';   
+
+var camera, scene, renderer;
+var geometry, material, mesh;
+var controller1, controller2;
+var controllerGrip1, controllerGrip2;
+var controls;
+
+var points;     
+var movingSpeed = 0.0;
+
+var cursor = new THREE.Vector3();
+
+var nodes = new Array();
+var bboxnodes = new Array();
+var linesList = new Array();
+        
+var realcont1;
+var realcont1connected = false;
+var realcont2;
+var realcont2connected = false;
+        
+var colorBuffer;
+        
+var user = new THREE.Group();     
+
+var showAxes = getQueryVariable('showAxes', false);
+var autoRotate = getQueryVariable('autoRotate', false);
+        
+// Start functions        
+init();
+animate();   
+
+
+// Option 1 (legacy?): pass the name variable to download that specific file from S3        
+var filename = getQueryVariable('name', null);
+
+// Option 2: get a base64 encoded json from the header...
+var json_base64 = getQueryVariable('jsonb64', null);
+
+// Option 3: get a base64 encoded pointcloud
+var base64_str = getQueryVariable('base64', null);
+        
+if(filename){
+    var url = "https://pointcloudvisualization.s3.eu-central-1.amazonaws.com/"+filename;
+
+    if(url.endsWith("xyzi")){
+        startLoadingData(url, "XYZI");
+    }
+    else{
+        startLoadingData(url, "XYZRGB");
+    }
+}
+else if(base64_str){
+    var tempPoints = getPointsFromBase64String(base64_str, "XYZI");
+    scene.add(tempPoints);
+}
+else if(json_base64){
+    var decodedData = JSON.parse(atob(json_base64));            
+    // Parse the JSON 
+    if("points" in decodedData){
+        // Currently multiple point clouds are not fully supported, but I'll give it a try: 
+        for (var i = 0; i < decodedData["points"].length; i++) {
+            var pointToLoad = decodedData["points"][i];
+
+            var pointSize = 0.04
+            if('pointSize' in pointToLoad){
+                pointSize = pointToLoad['pointSize'];
+                console.log('adjusting size');
+            }
+            if(pointToLoad['source'] == 'url'){
+                
+                startLoadingData(pointToLoad['url'], pointToLoad["type"], pointSize);
+            }
+            else if(pointToLoad['source'] == 'base64'){
+                var tempPoints = getPointsFromBase64String(pointToLoad["base64"], pointToLoad["type"]);
+                scene.add(tempPoints);
+            }
+        }
+    }
+    if("lines" in decodedData){
+        console.log("found some lines")
+        var pointToLoad = decodedData["lines"][0];
+
+        if(pointToLoad['source'] == 'url'){
+            startLoadingLines(pointToLoad['url']);
+        }        
+    }
+    if("bboxes" in decodedData){
+        var boxesToLoad = decodedData["bboxes"][0];
+        if(boxesToLoad['source'] == 'url'){
+            startLoadingBoxes(boxesToLoad['url']);
+        }
+    }
+    if("objects" in decodedData){
+        var objectsToLoad = decodedData['objects']; 
+        startLoadingObjects(objectsToLoad); 
+    }
+}
+else{
+    // For now: always load something just because it's cool... 
+    var url = "https://pointcloudvisualization.s3.eu-central-1.amazonaws.com/cars3.npy";
+    startLoadingData(url, "XYZI");
+}        
+
+
+  
+/*
+Example JSON: 
+{
+    "points": [
+        {
+            "source": "url",
+            "url": https://pointcloudvisualization.s3.eu-central-1.amazonaws.com/e2652aab-4ace-4a09-86f4-374b23cb677b.xyzi",
+            "type": "XYZI",
+        },
+        {
+            "source": "base64",
+            "base64": "Pttmyz4gkd8/BK5QPwvLhz3XReU9+osQPpbxoD9Yolw+tjy9PwRGQD8KfRU9YXGEP1TPlD9AG2M/M/e+Pv8/8j7JjBE/TdywPsiFpz9x8sg=",
+            "type": "XYZRGB"
+        }
+    ]
+    "bboxes": [
+        {
+            "source": "url",
+            "url": "https://pointcloudvisualization.s3.eu-central-1.amazonaws.com/test1.bbox"
+        },
+        {
+            "source": "base64",
+            "base64": "SDFLksf459fjssfhwDHFFhfs+fsfh=",
+        }
+    ]
+    "lines": [
+        {
+            "source": "url",
+            "url": "https://pointcloudvisualization.s3.eu-central-1.amazonaws.com/test1.lines"
+        },
+    ]
+    "objects": [
+        {
+            "source": "url", 
+            "url": "https://pointcloudvisualization.s3.eu-central-1.amazonaws.com/test1.glb", 
+            "position": [1.0, 2.0, 3.0], 
+            "rotation": [1.0, 1.1, 1.2], 
+            "scale": [1.0, 1.0, 1.0], 
+        }
+    ]
+}
+*/        
+
+/* 
+For the points you can have either XYZI points, or XYZRGB points. 
+This means you either have input as a float32 array with 4 columns, or 6 columns (encoding the RGB colours). 
+For the XYZI points the intensity part is encoded as Hue (between 0 and 1) as a float32
+*/ 
+   
+/* 
+For the lines you give an array with X1, Y1, Z1, X2, Y2, Z2. It draws lines between the start end the end point. 
+*/ 
+        
+/*
+For the boxes this goes: 
+Center X (forwards) float32
+Center Y (upwards) float32
+Center Z (left) float32
+Size X float32
+Size Y float32
+Size Z float32
+Rotation around X float32
+Rotation around Y float32
+Rotation around Z float32
+Red (between 0 and 1) float32
+Green (between 0 and 1) float32
+Blue (between 0 and 1) float32
+Opacity (between 0 and 1) float32
+*/
+
+        
+function get_bbox_vehicle(posx, posy, posz, sizex, sizey, sizez, rotationx, rotationy, rotationz, red, green, blue, opacity){
+    var geometry = new THREE.BoxGeometry( sizex, sizey, sizez);
+
+    var material = new THREE.MeshPhongMaterial({
+      color: new THREE.Color(red, green, blue),
+      opacity: opacity,
+      transparent: true,
+    });
+
+    // parent
+    parent = new THREE.Object3D();
+    parent.rotation.x = rotationx;
+    parent.rotation.y = rotationy;
+    parent.rotation.z = rotationz;
+
+    parent.position.x = posx;
+    parent.position.y = posy;
+    parent.position.z = posz;
+
+    // mesh
+    var mesh1 = new THREE.Mesh( geometry, material );
+    
+    parent.add( mesh1 );
+    return parent;
+}
+        
+
+function loadObject(object){
+    const loader = new GLTFLoader();
+    loader.load( object['url'], function ( gltf ) {
+        gltf.scene.traverse( function ( child ) {
+            if ( child.isMesh ) { 
+                child.material.opacity = 0.5;
+                child.material.transparent = true;
+             }
+        }  );
+
+        gltf.scene.scale.x = object['scale'][0];
+        gltf.scene.scale.y = object['scale'][1];
+        gltf.scene.scale.z = object['scale'][2];
+
+        gltf.scene.rotation.x = object['rotation'][0];
+        gltf.scene.rotation.y = object['rotation'][1];
+        gltf.scene.rotation.z = object['rotation'][2];
+
+        gltf.scene.position.x = object['position'][0];
+        gltf.scene.position.y = object['position'][1];
+        gltf.scene.position.z = object['position'][2];
+
+        scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+        console.error( error );
+    } );
+    
+}
+
+function startLoadingObjects(objectsToLoad){
+    for(var index in objectsToLoad){
+        var object = objectsToLoad[index];  
+        loadObject(object);
+    }
+}
+        
+function startLoadingBoxes(url){
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4){
+            // everything is good, the response is received
+            if ((httpRequest.status == 200) || (httpRequest.status == 0)){
+                var buffer = httpRequest.response;
+                 var dataview = new DataView(buffer);
+                var points_per_row = 13;  
+                
+                // Note: divide by 4 because of float32 has 4 bytes
+                var ints = dataViewToFloat32Array(dataview, buffer.byteLength / 4)
+                
+                for(var row=0; row < ints.length; row=row+points_per_row) {
+                    
+                    bboxnodes[row/points_per_row] = new Array();
+                    for(var p=0; p < points_per_row; p++){ //xyz...
+                        bboxnodes[row/points_per_row][p] = ints[row+p] 
+                    }
+                }
+                
+            console.log("Loaded num bboxes " + bboxnodes.length)
+
+            var particles = bboxnodes.length;
+            var geometry = new THREE.BufferGeometry();
+            var positions = [];
+            var colors = [];
+            var color = new THREE.Color();
+
+            for ( var i = 0; i < particles; i ++ ) {
+                var temp = get_bbox_vehicle(bboxnodes[i][0], bboxnodes[i][1], bboxnodes[i][2], bboxnodes[i][3], bboxnodes[i][4], bboxnodes[i][5], bboxnodes[i][6], bboxnodes[i][7], bboxnodes[i][8], bboxnodes[i][9], bboxnodes[i][10], bboxnodes[i][11], bboxnodes[i][12]);
+                scene.add(temp);
+        }}}}
+
+    
+    // Send the request
+    console.log("Getting url for boxes", url)
+    httpRequest.open("GET", url, true);
+    httpRequest.responseType = "arraybuffer";
+
+    httpRequest.send();
+}
+        
+        
+        
+function startLoadingLines(url)
+{
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4){
+            // everything is good, the response is received
+            if ((httpRequest.status == 200) || (httpRequest.status == 0)){
+                var buffer = httpRequest.response;
+                var dataview = new DataView(buffer);
+
+                console.log('got them lines')
+
+                // Note: divide by 4 because of float32 has 4 bytes
+                var ints = dataViewToFloat32Array(dataview, buffer.byteLength / 4)
+
+                /*
+                This is actually a bit counter intuitive. 
+                We are assuming the input is X1, Y1, Z1, X2, Y2, Z2. 
+                However, we load each point separately, which gives us a points per row of 3. 
+                */                
+                var points_per_row = 3 ;                 
+                
+                for(var row=0; row < ints.length; row=row+points_per_row) {
+                    linesList[row/points_per_row] = new THREE.Vector3(ints[row+0], ints[row+1] , ints[row+2] );
+                }
+
+                var idx = new Array(); 
+                for(var i=0; i < linesList.length; i=i+2){
+                    idx.push(i);
+                    idx.push(i+1);
+                }
+                console.log("Loaded num lines " + linesList.length + " with ppr: " + points_per_row)    
+              
+                const bg = new THREE.BufferGeometry().setFromPoints(linesList);
+                bg.setIndex(idx);
+
+
+                var geometry = bg;
+ 	            var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+                var line = new THREE.LineSegments( geometry, material );
+
+                scene.add( line );
+        }}}
+
+    
+    // Send the request
+    httpRequest.open("GET", url, true);
+    httpRequest.responseType = "arraybuffer";
+
+    httpRequest.send();
+}
+    
+
+// Takes the text in the address-bar in the browser, and parses what's behind the ampersend (&) character. 
+// You can query a variable, and if the string contains variable=value it returns the value. 
+// If not found it will return the elsevalue supplied by whoever calls the function
+function getQueryVariable(variable, elsevalue) {
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) == variable) {
+            return decodeURIComponent(pair[1]);
+        }
+    }
+    return elsevalue;
+}
+
+function _base64ToArrayBuffer(base64) {
+    var binary_string = window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+// Given a so-called dataviwe object (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView)
+// and the length of the array this function will return a new filled array from the dataview
+// given that the dataview contains float32 values. 
+function dataViewToFloat32Array(dataview, lengthArray){
+     var ints = new Float32Array(lengthArray);
+     for (var i = 0; i < ints.length; i++) {
+         ints[i] = dataview.getFloat32(i * 4);
+     }
+    return ints;
+}
+    
+        
+function fillNodes(nodes, ints, pointsPerRow){
+    for(var row=0; row < ints.length; row=row+pointsPerRow) {
+        nodes[row/pointsPerRow] = new Array();
+        for(var p=0; p < pointsPerRow; p++){ //xyz...
+            nodes[row/pointsPerRow][p] = ints[row+p] 
+        }
+    }
+}
+        
+function getPointsFromBase64String(buffer, pointType){
+    buffer = _base64ToArrayBuffer(buffer);
+    var dataview = new DataView(buffer);
+    
+    // Note: divide by 4 because of float32 has 4 bytes
+    var ints = dataViewToFloat32Array(dataview, buffer.byteLength / 4)
+
+    var tempNodes = new Array();
+    var points_per_row = get_points_per_row(pointType);
+    fillNodes(tempNodes, ints, points_per_row);
+    console.log("Loaded num points " + tempNodes.length)
+    var temp = getPositionsAndColors(tempNodes, pointType);
+
+    var geometry = new THREE.BufferGeometry();
+    geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( temp.positions, 3 ) );
+    colorBuffer = new THREE.Float32BufferAttribute( temp.colors, 3 );
+
+    geometry.setAttribute( 'color', colorBuffer );
+    geometry.computeBoundingSphere();
+    
+    var material = new THREE.PointsMaterial( { size: 0.04, vertexColors: THREE.VertexColors, sizeAttenuation: true } );
+    var tempPoints = new THREE.Points( geometry, material );
+    
+    return tempPoints;
+}        
+
+function get_points_per_row(pointType){
+    if(pointType == "XYZ"){
+        return 3;
+    }
+    else if(pointType == "XYZI"){
+        return 4;
+    }
+    else if(pointType == "XYZRGB"){
+        return 6;
+    }
+}
+
+function getPositionsAndColors(nodes, pointType){
+    var positions = [];
+    var colors = [];
+    var color = new THREE.Color();
+
+    for ( var i = 0; i < nodes.length; i ++ ) {
+        // positions
+        var x = nodes[i][0];
+        var y = nodes[i][1];
+        var z = nodes[i][2];
+        positions.push( x, y, z );
+
+        if(pointType == "XYZI"){
+            color.setHSL(nodes[i][3], 1.0, 0.5);
+            colors.push( color.r, color.g, color.b );
+        }
+        else if(pointType == "XYZRGB"){
+            colors.push( nodes[i][3], nodes[i][4], nodes[i][5] );
+        }
+    }
+    return {
+        positions: positions,
+        colors: colors
+    };
+}        
+
+function startLoadingData(url, pointType, pointSize=1.5)
+{
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4){
+            // everything is good, the response is received
+            if ((httpRequest.status == 200) || (httpRequest.status == 0)){
+                var buffer = httpRequest.response;
+                var dataview = new DataView(buffer);
+
+
+                // Note: divide by 4 because of float32 has 4 bytes
+                var ints = dataViewToFloat32Array(dataview, buffer.byteLength / 4)
+
+                var points_per_row = get_points_per_row(pointType);
+                fillNodes(nodes, ints, points_per_row);
+
+                console.log("Loaded num points " + nodes.length + " of point type " + pointType + " with ppr: " + points_per_row)
+
+                var particles = nodes.length;
+                var geometry = new THREE.BufferGeometry();
+                
+                var temp = getPositionsAndColors(nodes, pointType);
+                
+                geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( temp.positions, 3 ) );
+                colorBuffer = new THREE.Float32BufferAttribute( temp.colors, 3 );
+
+                geometry.setAttribute( 'color', colorBuffer );
+                geometry.computeBoundingSphere();
+                //
+                var material = new THREE.PointsMaterial( { size: 0.04, vertexColors: THREE.VertexColors, sizeAttenuation: true } );
+                points = new THREE.Points( geometry, material );
+                //points.frustumCulled = false;
+                scene.add( points );
+            
+
+        }}}
+
+    
+    // Send the request
+    httpRequest.open("GET", url, true);
+    httpRequest.responseType = "arraybuffer";
+
+    httpRequest.send();
+}
+      
+ function onSelectStart(){
+    movingSpeed = 1.0 * points.scale.x;
+     
+ }
+ function onSelectEnd(){
+    movingSpeed = 0.0;
+ }
+        
+function onSelectStartRight(){
+    movingSpeed = -1.0 * points.scale.x;
+     
+ }
+ function onSelectEndRight(){
+    movingSpeed = 0.0;
+ }
+        
+function init() {
+    camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    camera.position.z = 20;
+    user.add( camera );
+    
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0x2d4aa8 );
+    scene.add( user );
+
+    
+    
+    renderer = new THREE.WebGLRenderer();
+    
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.xr.enabled = true;
+
+    // Controller model factory for rendering actual controller models
+    const controllerModelFactory = new XRControllerModelFactory();
+
+    // Add the events to the first found controller and add it to the scene. 
+    controller1 = renderer.xr.getController( 0 );
+    controller1.addEventListener( 'selectstart', onSelectStart );
+    controller1.addEventListener( 'selectend', onSelectEnd );
+    controller1.addEventListener( 'connected', function ( event ) {
+        console.log("Controller 1 connected");
+        realcont1 = event.data;
+        realcont1connected = true;
+    } );
+    controller1.addEventListener( 'disconnected', function ( event ) {
+        console.log("Controller 1 disconnected");
+        realcont1connected = false;
+    } );
+    user.add( controller1 );
+
+    // Add controller grip with actual controller model
+    controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+    controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+    user.add( controllerGrip1 );
+
+    // Add the events to the second found controller and add it to the scene. 
+    controller2 = renderer.xr.getController( 1 );
+    controller2.addEventListener( 'selectstart', onSelectStartRight );
+    controller2.addEventListener( 'selectend', onSelectEndRight );
+    controller2.addEventListener( 'connected', function ( event ) {
+        console.log("Controller 2 connected");
+        realcont2 = event.data;
+        realcont2connected = true;
+    } );
+    controller2.addEventListener( 'disconnected', function ( event ) {
+        console.log("Controller 2 disconnected");
+        realcont2connected = false;
+    } );
+    user.add( controller2 );
+
+    // Add controller grip with actual controller model
+    controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+    controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+    user.add( controllerGrip2 );
+
+    // Add the render to the website
+    document.body.appendChild( renderer.domElement );
+    
+    // Add controls so you can also use your mouse and keyboard to look at the scene. 
+    controls = new OrbitControls( camera, renderer.domElement );
+    controls.autoRotate=autoRotate;
+    controls.target.set( 0, 0, 0 );
+    controls.keyPanSpeed = 28.0;
+    controls.update();
+    
+
+    // Add the virtual reality button to the site. 
+    document.body.appendChild( VRButton.createButton( renderer ) );
+    
+    // Add a white light so controller models are visible
+    var light = new THREE.AmbientLight( 0xffffff, 0.5 );
+    scene.add( light );
+    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    directionalLight.position.set( 0, 1, 1 );
+    scene.add( directionalLight );
+    
+    // Possibly add an axis helper to the scene. 
+    if(showAxes){
+        var axesHelper = new THREE.AxesHelper( 5 );
+        scene.add( axesHelper );
+    }
+    
+    window.addEventListener( 'resize', onWindowResize, false );
+}
+        
+
+function onWindowResize(){
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}        
+    
+function animate() {
+    renderer.setAnimationLoop( function () {
+        controls.update();
+
+        // Get camera direction for movement
+        let xrCamera = renderer.xr.getCamera(camera);
+        let e = xrCamera.matrixWorld.elements;
+        
+        // Forward/backward direction (where camera is looking)
+        let forward = new THREE.Vector3(-e[8], -e[9], -e[10]).normalize();
+        // Right direction (perpendicular to forward)
+        let right = new THREE.Vector3(e[0], e[1], e[2]).normalize();
+
+        // Trigger movement (forward/backward based on which trigger)
+        if (movingSpeed != 0.0){
+            let direction = forward.clone().multiplyScalar(movingSpeed * 0.05);
+            user.position.add(direction);
+        }
+        
+        // Joystick movement from left controller
+        if (realcont1connected && realcont1.gamepad) {
+            let gamepad = realcont1.gamepad;
+            let axes = gamepad.axes;
+            if (axes.length >= 4) {
+                // Left stick: axes[2] = left/right, axes[3] = forward/backward
+                let moveX = axes[2];  // left/right
+                let moveZ = axes[3];  // forward/backward
+                
+                // Apply deadzone
+                if (Math.abs(moveX) > 0.1 || Math.abs(moveZ) > 0.1) {
+                    let movement = new THREE.Vector3();
+                    movement.add(right.clone().multiplyScalar(moveX * 0.03));
+                    movement.add(forward.clone().multiplyScalar(-moveZ * 0.03));
+                    user.position.add(movement);
+                }
+            }
+        }
+        
+        // Right controller joystick rotates the view
+        if (realcont2connected && realcont2.gamepad) {
+            let gamepad = realcont2.gamepad;
+            let axes = gamepad.axes;
+            if (axes.length >= 4) {
+                // Right stick: axes[2] = rotate left/right
+                let rotateY = axes[2];
+                
+                // Apply deadzone
+                if (Math.abs(rotateY) > 0.1) {
+                    user.rotation.y -= rotateY * 0.03;
+                }
+            }
+        }
+        
+        renderer.render( scene, camera );
+    } );
+}
+
+
+  </script>
+</body></html>

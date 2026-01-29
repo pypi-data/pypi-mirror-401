@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+
+<head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161822888-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-161822888-1');
+
+    </script>
+
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <style>
+        .jumbotron {
+            background-image: url("images/immersivepoints_jumbotron.png");
+            background-size: cover;
+            /*            min-height: 550px;*/
+        }
+
+        .jumbotron h1 {
+            color: #fff;
+        }
+
+        .jumbotron p {
+            color: #fff;
+        }
+
+
+
+        body {
+            padding-bottom: 2rem;
+        }
+
+        h3 {
+            margin-top: 2rem;
+        }
+
+    </style>
+    <title>Immersive Pointcloud</title>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">
+                <img src="images/immersive_points_logo/logo_cutout.png" height="40" class="d-inline-block align-top" alt="">
+            </a>
+
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="/index.html">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" href="/upload.html">Your files</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="jumbotron">
+        <div class="container">
+
+            <h1 class="display-3">ImmersivePoints</h1>
+            <p>Explore your data in virtual reality</p>
+            <p><a class="btn btn-primary btn-lg" href="/upload.html" role="button">📂 Host your own files</a></p>
+        </div>
+    </div>
+
+    <main role="main" class="container">
+
+        <div id="main_content_wrap" class="container-fluid">
+            <section id="main_content" class="container-fluid">
+
+                <h3>What is ImmersivePoints? 🧐</h3>
+                ImmersivePoints is an application which displays your 3D data in virtual reality. <br>
+                It is supported by virtual reality headers for your PC, and stand-alone headsets such as the oculus quest.<br>
+                You can either visualise data on your own server, or upload data to my server on the <a href="/upload.html">upload page</a>.<br>
+                Getting started with your own data is easy: take a look at <a href="https://github.com/rmeertens/ImmersivePoints/blob/master/examples/">these programming examples</a>.
+                <h3>View examples of virtual reality data</h3>
+                <div class="container">
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card mb-4 shadow-sm">
+                                <img class="card-img-top" src="images/aev3.gif" alt="Card image">
+
+                                <div class="card-body">
+                                    <p class="card-text">What a self-driving car sees with it's LiDAR scanner. This frame is taken from the <a href="https://www.audi-electronics-venture.de/aev/web/de/driving-dataset.html">A2D2 dataset</a></p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"><a href="/oculus.html?name=e2652aab-4ace-4a09-86f4-374b23cb677b.xyzi">View</a>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4 shadow-sm">
+                                <img class="card-img-top" src="images/braintje.gif" alt="Card image">
+                                <div class="card-body">
+                                    <p class="card-text">A brain with some information of a clustering algorithm </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"><a href="/oculus.html?name=77b04781-5d7c-445f-9e6a-65956758d644.xyzi">View</a>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4 shadow-sm">
+                                <img class="card-img-top" src="images/notredame.gif" alt="Card image">
+                                <div class="card-body">
+                                    <p class="card-text">The notre dame. Taken from <a href="https://sketchfab.com/3d-models/notre-dame-spire-reconstruction-2-newpalmyra-bcfc98fad3f24c4f959087c379af2666">this point scan</a> </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"><a href="/oculus.html?name=d6263c4a-7121-432f-8712-b0de530a78ff.xyzrgb">View</a>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+                <h3>How can I upload my own pointclouds?</h3>
+                <a href="/upload.html">You can host your own points - see how here.</a> On that page it is described in what format your data should be. <br>
+                Exporting your own data is quite easy. Want to see some examples on how to export pointclouds? Take a look at:
+                <ul>
+                    <li><a href="https://github.com/rmeertens/ImmersivePoints/blob/master/examples/export_subsample.ipynb">An example on how to subsample a numpy array</a></li>
+                    <li><a href="https://github.com/rmeertens/ImmersivePoints/blob/master/examples/export_csv.ipynb">This example to export a CSV file.</a>,</li>
+                    <li><a href="https://github.com/rmeertens/ImmersivePoints/blob/master/examples/export_ply.ipynb">This export of a PLY file</a>,</li>
+                    <li><a href="https://github.com/rmeertens/ImmersivePoints/blob/master/examples/export_embeddings.ipynb">This export of a neural network embedding</a>,</li>
+                    <li><a href="https://github.com/rmeertens/ImmersivePoints/blob/master/examples/export_AEV_data.ipynb">Export data from a self-driving car</a>.</li>
+                </ul>
+
+                <h3>Why was this created?</h3>
+                About <s>5</s> 10 years ago I was working on an algorithm to cluster 3D brain data. It was hard to know whether the topological ordering made sense. The existing tools at the time were slow and uninformative, so I learned JavaScript to use a 3D visualisation library. That year <a href="https://www.youtube.com/watch?v"=wZXjoMMigJU>Google launched the google-cardboard</a> which allowed me to look around in my visualisation. <br>
+                Although this was impressive, you still could not move around freely. This year Facebook launched the <a href="https://www.youtube.com/watch?v=yYxrJ2L8Xl4">Oculus Quest</a>, which is an untethered virtual reality headset! I bought it and adjusted my old code to finally be able to walk around in the data like I wanted <s>5</s> 10 years ago!<br>
+                After a lot of positive feedback from others I made this into a website, so you can look at your own data as well. Enjoy!
+
+                <h3>More information:</h3>
+                <p class='noTop'>In case you have any questions, feel free to reach out to me. My e-mail addres is: rolandmeertens@gmail.com </p>
+            </section>
+        </div>
+    </main>
+
+</body>
+
+</html>
