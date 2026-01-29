@@ -1,0 +1,278 @@
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field, DirectoryPath, field_validator
+import dotenv
+import os
+from pathlib import Path
+
+dotenv.load_dotenv()
+
+
+class DockerConfig(BaseModel):
+    """Docker-specific configuration options"""
+
+    host: str = Field(
+        default="unix:///var/run/docker.sock", description="Docker host URL"
+    )
+    network: Optional[str] = Field(default=None, description="Docker network to use")
+    extra_mounts: List[str] = Field(
+        default_factory=list, description="Additional volume mounts"
+    )
+    extra_env: Dict[str, str] = Field(
+        default_factory=dict, description="Additional environment variables"
+    )
+
+
+class MCPServerConfig(BaseModel):
+    """Configuration for a single MCP server"""
+
+    command: str = Field(..., description="Command to run the server")
+    args: List[str] = Field(default_factory=list, description="Command arguments")
+    env: Dict[str, str] = Field(
+        default_factory=dict, description="Environment variables"
+    )
+    inputs: Dict[str, Any] = Field(
+        default_factory=dict, description="Inputs for the server configuration"
+    )
+    working_dir: Optional[DirectoryPath] = Field(
+        default=None, description="Working directory"
+    )
+    docker: Optional[DockerConfig] = Field(
+        default=None, description="Docker-specific configuration"
+    )
+    enabled: bool = Field(default=True, description="Whether this server is enabled")
+
+    # Reliability configuration
+    timeout_seconds: float = Field(
+        default=30.0, ge=1.0, description="Timeout for server operations in seconds"
+    )
+    max_retries: int = Field(
+        default=3, ge=0, description="Maximum retry attempts for failed operations"
+    )
+    retry_delay_seconds: float = Field(
+        default=1.0, ge=0.1, description="Base delay between retries (uses exponential backoff)"
+    )
+    health_check_interval_seconds: float = Field(
+        default=60.0, ge=5.0, description="Interval for health checks (0 to disable)"
+    )
+    circuit_breaker_threshold: int = Field(
+        default=5, ge=1, description="Consecutive failures before circuit breaker opens"
+    )
+    circuit_breaker_reset_seconds: float = Field(
+        default=60.0, ge=5.0, description="Time before attempting to reset circuit breaker"
+    )
+
+    @field_validator("working_dir", mode="before")
+    @classmethod
+    def validate_working_dir(cls, v):
+        if v:
+            # Support environment variable expansion
+            return os.path.expandvars(str(v))
+        return v
+
+
+class MCPConfig(BaseModel):
+    """Root configuration for all MCP servers"""
+
+    mcpServers: dict[str, MCPServerConfig] = Field(
+        default_factory=dict, description="Map of server names to their configurations"
+    )
+    default_docker_config: Optional[DockerConfig] = Field(
+        default=None,
+        description="Default Docker configuration for all Docker-based servers",
+    )
+
+    @classmethod
+    def create_from_dict(cls, config_dict: Dict[str, Any]) -> "MCPConfig":
+        """Create an MCPConfig instance from a dictionary with validation"""
+        servers_dict = {}
+        for server_name, server_info in config_dict.get("mcpServers", {}).items():
+            # Handle Docker configuration if present
+            docker_config = None
+            if "docker" in server_info:
+                docker_config = DockerConfig(**server_info["docker"])
+
+            # Create server configuration with validation
+            servers_dict[server_name] = MCPServerConfig(
+                command=server_info["command"],
+                args=server_info.get("args", []),
+                env=server_info.get("env", {}),
+                working_dir=server_info.get("working_dir"),
+                docker=docker_config,
+                enabled=server_info.get("enabled", True),
+            )
+
+        return cls(mcpServers=servers_dict)
+
+    def merge_config(self, other_config: "MCPConfig") -> "MCPConfig":
+        """Merge another config into this one, with the other config taking precedence"""
+        merged_servers = {**self.mcpServers}
+
+        for name, server in other_config.mcpServers.items():
+            if name in merged_servers:
+                # Update existing server with new values, preserving existing ones if not specified
+                current_dict = merged_servers[name].model_dump()
+                update_dict = server.model_dump()
+                merged_dict = {**current_dict, **update_dict}
+                merged_servers[name] = MCPServerConfig(**merged_dict)
+            else:
+                # Add new server configuration
+                merged_servers[name] = server
+
+        return MCPConfig(
+            mcpServers=merged_servers,
+            default_docker_config=other_config.default_docker_config
+            or self.default_docker_config,
+        )
+
+    # @validator("servers")
+    # def validate_server_names(cls, servers):
+    #     """Validate server names and configurations"""
+    #     for name, config in servers.items():
+    #         if not name.isidentifier():
+    #             raise ValueError(
+    #                 f"Server name '{name}' must be a valid Python identifier"
+    #             )
+
+    #         if config.command == "docker" and not config.docker:
+    #             raise ValueError(
+    #                 f"Server '{name}' uses docker command but has no docker configuration"
+    #             )
+
+    #     return servers
+
+
+def load_server_config(
+    config_paths: Optional[List[str]] = None,
+    env_configs: Optional[Dict[str, str]] = None,
+) -> MCPConfig:
+    """
+    Load server configuration with support for multiple sources and environment variables
+
+    Args:
+        config_paths: List of paths to configuration files to load and merge
+        env_configs: Dictionary of environment variable names and their corresponding config paths
+    """
+    # Start with base configuration
+    config = MCPConfig(
+        mcpServers={
+            "local": MCPServerConfig(
+                command="python",
+                args=["./agent_mcp/servers/server.py"],
+                working_dir=Path.cwd(),
+            ),
+            "time": MCPServerConfig(
+                command="docker",
+                args=["run", "--name", "mcp-time", "-i", "--rm", "mcp/time"],
+                docker=DockerConfig(),
+            ),
+            "filesystem": MCPServerConfig(
+                command="docker",
+                args=[
+                    "run",
+                    "-i",
+                    "--rm",
+                    "--mount",
+                    f"type=bind,src={os.path.expandvars('$PWD')},dst=/projects",
+                    "--workdir",
+                    "/projects",
+                    "mcp/filesystem",
+                    "/projects",
+                ],
+                docker=DockerConfig(),
+            ),
+            "sqlite": MCPServerConfig(
+                command="docker",
+                args=[
+                    "run",
+                    "--rm",
+                    "-i",
+                    "-v",
+                    f"{os.path.expandvars('$PWD')}/reactive_agents/agent_mcp:/mcp",
+                    "mcp/sqlite",
+                    "--db-path",
+                    "/mcp/agent.db",
+                ],
+                docker=DockerConfig(),
+            ),
+            "playwright": MCPServerConfig(
+                command="npx",
+                args=["-y", "@executeautomation/playwright-mcp-server"],
+            ),
+            "brave-search": MCPServerConfig(
+                command="docker",
+                args=[
+                    "run",
+                    "-i",
+                    "--rm",
+                    "-e",
+                    "BRAVE_API_KEY",
+                    "mcp/brave-search",
+                ],
+                env={"BRAVE_API_KEY": os.environ.get("BRAVE_API_KEY", "")},
+                docker=DockerConfig(),
+            ),
+            "duckduckgo": MCPServerConfig(
+                command="docker",
+                args=[
+                    "run",
+                    "-i",
+                    "--rm",
+                    "mcp/duckduckgo",
+                ],
+                docker=DockerConfig(),
+            ),
+        }
+    )
+
+    # Load configurations from provided paths
+    if config_paths:
+        for path in config_paths:
+            if os.path.exists(path):
+                try:
+                    import json
+
+                    with open(path) as f:
+                        custom_config = MCPConfig.create_from_dict(json.load(f))
+                        config = config.merge_config(custom_config)
+                except Exception as e:
+                    print(f"Error loading config from {path}: {str(e)}")
+
+    # Load configurations from environment variables
+    if env_configs:
+        for env_var, default_path in env_configs.items():
+            config_path = os.environ.get(env_var, default_path)
+            if config_path and os.path.exists(config_path):
+                try:
+                    import json
+
+                    with open(config_path) as f:
+                        custom_config = MCPConfig.create_from_dict(json.load(f))
+                        config = config.merge_config(custom_config)
+                except Exception as e:
+                    print(
+                        f"Error loading config from {env_var} ({config_path}): {str(e)}"
+                    )
+
+    return config
+
+
+def get_mcp_servers(filter: Optional[List[str]] = None) -> Dict[str, Any]:
+    """Get filtered server configurations in legacy format for backward compatibility
+
+    Args:
+        filter: Optional list of server names to include. If None, returns all servers.
+    """
+    config = load_server_config()
+
+    if filter:
+        return {
+            name: server
+            for name, server in config.mcpServers.items()
+            if server.enabled and name in filter
+        }
+
+    return {
+        name: server
+        for name, server in config.mcpServers.items()
+        if server.enabled
+    }
