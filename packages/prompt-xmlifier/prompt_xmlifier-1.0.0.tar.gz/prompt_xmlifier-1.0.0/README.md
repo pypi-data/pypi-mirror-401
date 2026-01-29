@@ -1,0 +1,141 @@
+# Claude Tagger (ctag)
+
+**Enterprise-grade prompt structuring tool for Claude AI**
+
+Convert plain text prompts into XML-tagged prompts following [Anthropic's official best practices](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags).
+
+## Installation
+
+```bash
+pip install prompt-xmlifier
+```
+
+## Quick Start
+
+```bash
+# Basic conversion
+ctag "Help me write a Python function that calculates fibonacci"
+
+# With labeled sections
+ctag "Task: Create a REST API Context: Using FastAPI Do Not: Hardcode credentials"
+
+# From file
+ctag --file prompt.txt --output result.xml
+
+# Interactive mode
+ctag --interactive
+```
+
+## Features
+
+- **Intelligent Parsing**: Automatically detects sections and assigns appropriate XML tags
+- **Platform Optimization**: Optimized outputs for Claude Web, Code CLI, and VS Code
+- **Bilingual Support**: Works with English and Spanish labels
+- **22 Standard Tags**: Full coverage of Anthropic's recommended XML tags
+- **Templates**: Pre-built templates for common tasks (code review, debugging, etc.)
+
+## Supported Platforms
+
+| Platform | Command |
+|----------|---------|
+| Claude.ai Web | `ctag -p claude_web "..."` |
+| Claude Code Web | `ctag -p claude_code_web "..."` |
+| Claude Code CLI | `ctag -p claude_code_cli "..."` |
+| VS Code Extension | `ctag -p claude_code_vscode "..."` |
+
+## Available Tags
+
+**Directive**: `<task>`, `<instructions>`, `<do>`, `<do_not>`
+
+**Context**: `<context>`, `<background>`
+
+**Input**: `<input>`, `<code>`, `<document>`, `<data>`
+
+**Output**: `<output>`, `<format>`
+
+**Constraints**: `<constraints>`, `<rules>`
+
+**Persona**: `<role>`, `<tone>`, `<audience>`
+
+**Learning**: `<example>`, `<examples>`
+
+**Reasoning**: `<thinking>`, `<analysis>`
+
+## Example
+
+**Input:**
+```
+Task: Create a REST API for authentication
+Context: FastAPI with PostgreSQL backend
+Do Not: Hardcode credentials
+Output: Complete Python code
+```
+
+**Output:**
+```xml
+<task>
+  Create a REST API for authentication
+</task>
+
+<context>
+  FastAPI with PostgreSQL backend
+</context>
+
+<do_not>
+  Hardcode credentials
+</do_not>
+
+<output>
+  Complete Python code
+</output>
+```
+
+## Command Reference
+
+```
+ctag [OPTIONS] [PROMPT]
+
+Input Options:
+  PROMPT              Plain text prompt to convert
+  -f, --file FILE     Read prompt from file
+  -i, --interactive   Enter prompt interactively
+
+Platform Options:
+  -p, --platform      Target platform (default: claude_code_cli)
+  -t, --template      Use a pre-built template
+  --tips              Include platform tips
+
+Output Options:
+  -o, --output FILE   Write to file
+  --format            Output format: xml, json, both
+  --wrap              Wrap in <prompt> tags
+
+Information:
+  --list-tags         Show available XML tags
+  --list-platforms    Show supported platforms
+  --list-templates    Show available templates
+  --help              Show help message
+```
+
+## Python API
+
+```python
+from prompt_xmlifier import PromptXMLifier
+
+xmlifier = PromptXMLifier()
+result = xmlifier.convert("Your prompt here")
+print(result.to_xml())
+```
+
+## License
+
+MIT License
+
+## Author
+
+Fuad Oñate - Senior Data Engineer
+
+## Links
+
+- [Anthropic XML Tags Documentation](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags)
+- [PyPI Package](https://pypi.org/project/prompt-xmlifier/)

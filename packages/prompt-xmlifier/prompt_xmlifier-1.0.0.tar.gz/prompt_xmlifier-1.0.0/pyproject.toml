@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prompt-xmlifier"
+version = "1.0.0"
+description = "Enterprise-grade prompt structuring tool for Claude - converts plain text prompts to XML-tagged format"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Fuad Oñate", email = "fu.onate@duocuc.cl"}
+]
+keywords = [
+    "claude",
+    "anthropic",
+    "prompt-engineering",
+    "xml",
+    "llm",
+    "ai"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup :: XML",
+]
+
+[project.urls]
+Documentation = "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/use-xml-tags"
+
+[project.scripts]
+prompt-xmlifier = "prompt_xmlifier.cli:main"
+ctag = "prompt_xmlifier.cli:main"
+claude-tagger = "prompt_xmlifier.cli:main"
+xmlify = "prompt_xmlifier.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+strict = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "D", "UP", "B", "C4", "SIM"]
+ignore = ["D100", "D104"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=prompt_xmlifier --cov-report=term-missing"
