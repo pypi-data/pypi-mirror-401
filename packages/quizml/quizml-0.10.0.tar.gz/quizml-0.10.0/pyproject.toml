@@ -1,0 +1,77 @@
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quizml"
+version = "0.10.0"
+dependencies = [
+  "pillow",
+  "ruamel.yaml>=0.17",
+  "jsonschema>=4.0",
+  "bs4",
+  "rich>=14.0.0",
+  "rich-argparse",
+  "jinja2",
+  "colorama",
+  "watchdog",
+  "mistletoe==1.3.0",
+  "css_inline",
+  "latex2mathml",
+  "appdirs",
+  "docxtpl"
+]
+requires-python = ">=3.8"
+authors = [
+  {name = "Francois Pitie", email = "francois.pitie@gmail.com"}
+]
+description = """
+  Tool for converting a list of questions in yaml/markdown to a\
+  BlackBoard test or to a Latex exam source file"""
+readme = "README.md"
+license = {text = "GPLv3"}
+keywords = ["BlackBoard", "exam", "test", "quiz", "MCQ",  "YAML", "Markdown", "Latex"]
+
+[project.urls]
+Repository = "https://github.com/frcs/quizml.git"
+Homepage = "https://frcs.github.io/quizml"
+
+[project.scripts]
+quizml="quizml.cli.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+# 
+# RUFF Setup, matching Black default's
+# 
+
+[tool.ruff]
+# Set the maximum line length (88 is the Black default)
+line-length = 88
+
+# Target a specific Python version
+target-version = "py310"
+
+[tool.ruff.lint]
+# Enable specific rule sets
+# E/F are default (Pycodestyle/Pyflakes), I is isort (import sorting)
+select = ["E", "F", "I", "B", "UP"]
+
+# Rules to ignore (e.g., E501 is line-too-long)
+ignore = ["E501", "B905"]
+
+# Allow fixable violations to be automatically fixed
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Configure the formatter to act like 'Black'
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+
+
