@@ -1,0 +1,176 @@
+"""Utilities for using :doc:`Pooch <pooch:about>`."""
+
+import logging
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any
+
+import click
+import pooch
+
+from .context import Context
+from .zipfile import extract_if_newer
+
+log = logging.getLogger(__name__)
+
+
+class Extract:
+    """Similar to :class:`pooch.Unzip`, streamlined using :mod:`pathlib`.
+
+    This version supports:
+
+    - Absolute or relative paths for the `extract_dir` parameter.
+    - :file:`.zip` or :file:`.tar.xz` archives.
+    """
+
+    def __init__(self, members=None, extract_dir=None):
+        self.members = members
+        self.extract_dir = Path(extract_dir or ".")
+
+    def __call__(self, fname, action, pooch):
+        return extract_if_newer(Path(fname), self.extract_dir, self.members)
+
+
+class UnpackSnapshot:
+    """Pooch processor that calls :func:`.snapshot.unpack`."""
+
+    def __call__(self, fname, action, pooch):
+        from message_ix_models.model.snapshot import unpack
+
+        path = Path(fname)
+        unpack(path)
+
+        return path
+
+
+#: Base URL portion for files stored in the message-ix-models GitHub repository.
+GH_MAIN = "https://github.com/iiasa/message-ix-models/raw/main/message_ix_models/data"
+
+#: Supported remote sources of data.
+SOURCE: Mapping[str, Mapping[str, Any]] = {
+    "CEPII_BACI": dict(
+        pooch_args=dict(
+            base_url="https://www.cepii.fr/DATA_DOWNLOAD/baci/data/",
+            registry={
+                "BACI_HS92_V202501.zip": (
+                    "sha256:9b36cd9529d6dae0df3fc42ac42af2daecd1f4cd6fb9c281ee66187974f"
+                    "a025c"
+                ),
+            },
+        ),
+        processor=Extract(extract_dir="cepii-baci"),
+    ),
+    "PRIMAP": dict(
+        pooch_args=dict(
+            base_url="ftp://datapub.gfz-potsdam.de/download/10.5880.PIK.2019.001/",
+            registry={
+                "PRIMAP-hist_v2.0_11-Dec-2018.zip": (
+                    "md5:f28d58abef4ecfc36fc8ce3e9eef2871"
+                ),
+            },
+        ),
+        processor=Extract(members=["PRIMAP-hist_v2.0_11-Dec-2018.csv"]),
+    ),
+    "MESSAGEix-Nexus": dict(
+        pooch_args=dict(
+            base_url=f"{GH_MAIN}/water/",
+            registry={"water.tar.xz": "sha1:ec9e0655af90ca844c0158968bb03a194b8fa6c6"},
+        ),
+        processor=Extract(extract_dir="water"),
+    ),
+    "MESSAGEix-Materials": dict(
+        pooch_args=dict(
+            base_url=f"{GH_MAIN}/material/",
+            registry={
+                "material.tar.gz": "sha1:b93f4390cb00749c2316fcdddf901a0eab896774"
+            },
+        ),
+        processor=Extract(extract_dir="material"),
+    ),
+    "snapshot-0": dict(
+        pooch_args=dict(
+            base_url="doi:10.5281/zenodo.5793870",
+            registry={
+                "MESSAGEix-GLOBIOM_1.1_R11_no-policy_baseline.xlsx": (
+                    "md5:222193405c25c3c29cc21cbae5e035f4"
+                ),
+            },
+        ),
+        processor=UnpackSnapshot(),
+    ),
+    "snapshot-1": dict(
+        pooch_args=dict(
+            base_url="doi:10.5281/zenodo.10514052",
+            registry={
+                "MESSAGEix-GLOBIOM_1.1_R11_no-policy_baseline.xlsx": (
+                    "md5:e7c0c562843e85c643ad9d84fecef979"
+                ),
+            },
+        ),
+    ),
+}
+
+
+def fetch(
+    pooch_args: dict,
+    *,
+    extra_cache_path: str | None = None,
+    verbose: bool = False,
+    **fetch_kwargs,
+) -> tuple[Path, ...]:
+    """Create a :class:`~pooch.Pooch` instance and fetch a single file.
+
+    Files are stored under the directory identified by :meth:`.Context.get_cache_path`,
+    unless `args` provides another location.
+
+    Parameters
+    ----------
+    args
+        Passed to :func:`pooch.create`.
+    kwargs
+        Passed to :meth:`pooch.Pooch.fetch`.
+
+    Returns
+    -------
+    Path
+        Path to the fetched file.
+
+    See also
+    --------
+    :func:`.snapshot.load`
+    """
+    pooch_args.setdefault(
+        "path", Context.get_instance(-1).get_cache_path(extra_cache_path or "")
+    )
+
+    p = pooch.create(**pooch_args)
+
+    if len(p.registry) > 1:  # pragma: no cover
+        raise NotImplementedError("fetch() with registries with >1 files")
+
+    filenames = p.fetch(next(iter(p.registry.keys())), **fetch_kwargs)
+
+    if isinstance(filenames, (str, Path)):
+        filenames = [filenames]
+
+    # Convert to pathlib.Path
+    paths = tuple(map(Path, filenames))
+
+    if len(paths) == 1:
+        log.info(f"Fetched {paths[0]}")
+    else:
+        log.info(f"Fetched {len(paths)} files")
+        for p in paths if verbose else ():
+            log.debug(str(p))
+
+    return paths
+
+
+@click.command("fetch")
+@click.argument("source", metavar="SOURCE", type=click.Choice(list(SOURCE.keys())))
+@click.pass_obj
+def cli(context, source):
+    """Retrieve data from primary sources."""
+    from message_ix_models.util import pooch
+
+    pooch.fetch(**SOURCE[source], progressbar=True)
