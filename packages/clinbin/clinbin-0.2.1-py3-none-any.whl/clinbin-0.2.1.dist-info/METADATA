@@ -1,0 +1,60 @@
+Metadata-Version: 2.4
+Name: clinbin
+Version: 0.2.1
+Summary: Use cut-off points from medical guidelines to classify clinical variables.
+Project-URL: Homepage, https://gitlab.com/hylkedonker/clinbin
+Project-URL: Repository, https://gitlab.com/hylkedonker/clinbin.git
+Project-URL: Bug Tracker, https://gitlab.com/hylkedonker/clinbin/-/issues
+Author-email: "H. C. Donker" <h.c.donker@umcg.nl>
+License-Expression: MIT
+License-File: LICENSE
+Requires-Python: >=3.12
+Requires-Dist: pandas>=2.0.0
+Description-Content-Type: text/markdown
+
+# Clinbin
+[**Quickstart**](#quickstart) | [**Reference docs**](https://hylkedonker.gitlab.io/clinbin) | [![coverage report](https://gitlab.com/hylkedonker/clinbin/badges/main/coverage.svg)](https://gitlab.com/hylkedonker/clinbin/-/commits/main) | [![pipeline status](https://gitlab.com/hylkedonker/clinbin/badges/main/pipeline.svg)](https://gitlab.com/hylkedonker/clinbin/-/commits/main)
+
+
+
+Discretize clinical variables according to clinical guidelines in Python.
+
+For example, classify blood pressures according to the European Society of Cardiology guidelines or classify body-mass index according to the World Health Organization.
+
+
+## Installation
+```
+pip3 install git+https://gitlab.com/hylkedonker/clinbin.git
+```
+
+## Quickstart
+Here is an example for blood pressure. See the [clinbin docs](https://hylkedonker.gitlab.io/clinbin) for more.
+```python
+In [1]: from clinbin import classify_blood_pressure
+   ...: import pandas as pd
+   ...:
+   ...: systolic = pd.Series([80, 120,   50], index=['alice', 'bob', 'charlie'])
+   ...: diastolic = pd.Series([60, 60, 100], index=['alice', 'bob', 'charlie'])
+   ...: classify_blood_pressure(systolic, diastolic)
+Out[1]:
+alice            normal
+bob            elevated
+charlie    hypertension
+dtype: category
+Categories (3, object): ['normal' < 'elevated' < 'hypertension']
+```
+
+## Support
+Open a [New issue](https://gitlab.com/hylkedonker/clinbin/-/issues/new) in the issue tracker.
+
+## Contributing
+We welcome updates and new contributions. New contributions must preferably be de facto
+standards in the field, e.g., coming from professional societies or authoritative
+organizations in the field. Code must be black formatted and new contributions are to be
+accompanied by a unit test.
+
+## Authors and acknowledgment
+H. C. Donker
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
