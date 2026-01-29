@@ -1,0 +1,31 @@
+[package]
+name = "coniferest"
+version = "0.1.3"
+edition = "2024"
+
+[lib]
+name = "calc_trees"
+crate-type = ["cdylib"]
+
+# We'd like to build fast code with `pip install -e '.[dev]'`
+[profile.dev]
+opt-level = 3
+
+# Makes linking slower, but the resulting extension module is faster
+[profile.release]
+lto = true
+codegen-units = 1
+
+[features]
+default = ["pyo3/abi3-py310"]
+
+[dependencies]
+enum_dispatch = "0.3"
+itertools = "0.14"
+pyo3 = { version = "0.27", features = ["extension-module"] }
+# Needs to be consistent with ndarray dependency in numpy
+ndarray = { version = "0.17", features = ["rayon"] }
+num-traits = "0.2"
+numpy = "0.27.1"
+# Needs to be consistent with rayon dependency in ndarray
+rayon = "1.11"
