@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "CTlessPET"
+version = "0.2.4"
+authors = [
+    { name="Claes Ladefoged", email="claes.noehr.ladefoged@regionh.dk" },
+]
+description = "CTlessPET for synthetic CT from NAC PET data"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Unix",
+]
+
+dependencies = [
+    "torch >= 2.5.0",
+    "numpy",
+    "torchio",
+    "pydicom == 2.4.4",
+    "dicom2nifti == 2.4.9",
+    "nibabel"
+]
+
+[project.optional-dependencies]
+gdcm = ["python-gdcm >= 3.0.22"]
+
+[project.urls]
+Homepage = "https://github.com/depict-rh/CTlessPET"
+Issues = "https://github.com/depict-rh/CTlessPET/issues"
+
+[project.scripts]
+CTlessPET = "CTlessPET.main:convert_NAC_to_sCT"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/CTlessPET/*.py",
+]
+exclude = [
+    "/models",
+    "/artifacts",
+    "/tests",
+    "/dist",
+    "src/CTlessPET/__pycache__",
+]
