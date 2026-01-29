@@ -1,0 +1,106 @@
+# ============================================================================
+# MANIFEST.in - Controls what files are included in source distribution (sdist)
+# For wheel (.whl) package data, see [tool.setuptools.package-data] in pyproject.toml
+# ============================================================================
+
+# Include documentation and metadata
+include README.md
+include LICENSE
+include SECURITY.md
+include pyproject.toml
+include MANIFEST.in
+
+# Include Alembic migration files
+include aidiscuss/alembic.ini
+recursive-include aidiscuss/alembic *.py
+recursive-include aidiscuss/alembic *.mako
+exclude aidiscuss/alembic/versions/*.pyc
+
+# Include frontend build artifacts (compiled assets only)
+recursive-include aidiscuss/dist *
+graft aidiscuss/dist
+
+# ============================================================================
+# EXCLUSIONS - Do NOT include these in source distribution
+# ============================================================================
+
+# Exclude frontend source code (only include compiled dist/)
+recursive-exclude frontend *
+
+# Exclude development and testing files
+recursive-exclude tests *
+recursive-exclude docs *
+recursive-exclude scripts *
+exclude .github
+recursive-exclude .github *
+exclude v1
+recursive-exclude v1 *
+
+# Exclude environment and secrets
+global-exclude .env
+global-exclude .env.*
+global-exclude *.pem
+global-exclude *.key
+global-exclude *_secret*
+global-exclude *credentials*
+
+# Exclude Python cache and bytecode
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.dll
+
+# Exclude build artifacts
+global-exclude *.egg
+global-exclude *.egg-info
+recursive-exclude * *.egg-info
+exclude build
+recursive-exclude build *
+exclude dist
+recursive-exclude dist *.whl
+recursive-exclude dist *.tar.gz
+
+# Exclude database files (users create their own at runtime)
+global-exclude *.db
+global-exclude *.db-journal
+global-exclude *.db-wal
+global-exclude *.db-shm
+global-exclude *.sqlite
+global-exclude *.sqlite3
+
+# Exclude logs and user data
+global-exclude *.log
+recursive-exclude logs *
+
+# Exclude version control and IDE files
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude Thumbs.db
+global-exclude .vscode
+global-exclude .idea
+global-exclude *.swp
+global-exclude *.swo
+global-exclude *~
+
+# Exclude node/npm artifacts
+global-exclude node_modules
+global-exclude package-lock.json
+global-exclude pnpm-lock.yaml
+global-exclude yarn.lock
+
+# Exclude temporary and cache files
+global-exclude *.tmp
+global-exclude *.temp
+global-exclude *.cache
+global-exclude .pytest_cache
+global-exclude .mypy_cache
+global-exclude .ruff_cache
+
+# Exclude CI/CD and deployment configs (not needed in package)
+exclude .gitignore
+exclude .dockerignore
+exclude Dockerfile
+exclude docker-compose.yml
+exclude .pre-commit-config.yaml
