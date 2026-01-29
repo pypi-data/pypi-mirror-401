@@ -1,0 +1,24 @@
+# Include package metadata
+include LICENSE
+include README.md
+include pyproject.toml
+
+# Include py.typed marker for PEP 561
+recursive-include torchguard py.typed
+
+# Include source files
+recursive-include torchguard *.py
+
+# Exclude pycache and other build artifacts
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.pyo
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude *.dylib
+global-exclude .git*
+global-exclude .coverage
+global-exclude *.egg-info
+
+# Exclude test files from distribution (optional - include if you want tests)
+# recursive-exclude torchguard/tests *
