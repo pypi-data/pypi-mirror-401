@@ -1,0 +1,577 @@
+# Nginx Proxy Manager MCP Server
+
+[![PyPI version](https://img.shields.io/pypi/v/npm-mcp.svg)](https://pypi.org/project/npm-mcp/)
+[![Python versions](https://img.shields.io/pypi/pyversions/npm-mcp.svg)](https://pypi.org/project/npm-mcp/)
+[![License](https://img.shields.io/github/license/wadew/npm-mcp.svg)](https://github.com/wadew/npm-mcp/blob/main/LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](https://github.com/wadew/npm-mcp)
+[![Tests](https://img.shields.io/badge/tests-809%20passing-brightgreen.svg)](https://github.com/wadew/npm-mcp)
+
+A production-ready Model Context Protocol (MCP) server that enables Large Language Models to manage Nginx Proxy Manager instances through natural language interactions.
+
+## Quick Links
+
+- 📋 [Product Requirements Document](./docs/PRD.md)
+- 🔧 [Tool Catalog](./docs/TOOL_CATALOG.md) - All 28 tools documented
+- 📚 [Installation Guide](./docs/INSTALLATION.md)
+- ⚙️ [Configuration Guide](./docs/CONFIGURATION.md)
+- 📖 [Usage Guide](./docs/USAGE_GUIDE.md)
+- 🔬 [Research Summary](./docs/RESEARCH_SUMMARY.md)
+- 📝 [Changelog](./CHANGELOG.md)
+
+## Overview
+
+This MCP server provides comprehensive access to Nginx Proxy Manager's API, enabling AI assistants like Claude to manage your reverse proxy infrastructure through natural language. With 28 semantic tools covering the entire NPM lifecycle, you can configure, monitor, and maintain your proxy infrastructure conversationally.
+
+### Key Capabilities
+
+- ✅ **Complete NPM Management**: All 28 tools covering 100% of NPM API functionality
+- ✅ **Multi-Instance Support**: Manage unlimited NPM instances simultaneously
+- ✅ **Bulk Operations**: Concurrent processing with advanced filtering and dry-run mode
+- ✅ **Production Security**: JWT authentication, encrypted credentials, secure token caching
+- ✅ **Configuration Management**: Export/import configurations in JSON or YAML
+- ✅ **Advanced Features**: Automatic certificate renewal, concurrent operations, comprehensive logging
+- ✅ **Type Safety**: Complete Pydantic validation for all operations
+- ✅ **Production Ready**: 85% test coverage, 809 passing tests, zero critical issues
+
+## Quick Start
+
+### Option 1: Install via pip (Recommended)
+
+```bash
+# Install from PyPI
+pip install npm-mcp
+
+# Run the server (default: stdio transport)
+npm-mcp
+
+# Or run directly with Python
+python -m npm_mcp
+```
+
+### Option 2: Docker
+
+```bash
+# Pull from Docker Hub
+docker pull wadewoolwine/npm-mcp-server:latest
+
+# Run with configuration
+docker run -i \
+  -v ~/.npm-mcp:/config \
+  -e NPM_MCP_CONFIG=/config/instances.yaml \
+  wadewoolwine/npm-mcp-server:latest
+```
+
+### Option 3: From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/wadew/npm-mcp.git
+cd npm-mcp
+
+# Install with uv (recommended)
+uv sync
+
+# Or with pip
+pip install -e .
+
+# Run the server
+python -m npm_mcp
+```
+
+### Configuration
+
+1. Create configuration directory:
+
+```bash
+mkdir -p ~/.npm-mcp
+```
+
+2. Create your instance configuration (`~/.npm-mcp/instances.yaml`):
+
+```yaml
+instances:
+  - name: production
+    host: npm.example.com
+    port: 81
+    use_https: true
+    username: admin
+    password: ${NPM_PASSWORD}  # Use environment variable for security
+    default: true
+
+  - name: staging
+    host: npm-staging.example.com
+    port: 81
+    use_https: true
+    username: admin
+    password: ${NPM_STAGING_PASSWORD}
+
+settings:
+  timeout: 30
+  retry_attempts: 3
+  log_level: INFO
+  cache_tokens: true
+```
+
+3. Set environment variables:
+
+```bash
+export NPM_PASSWORD="your-production-password"
+export NPM_STAGING_PASSWORD="your-staging-password"
+```
+
+For detailed configuration options, see [CONFIGURATION.md](./docs/CONFIGURATION.md).
+
+### Integration with Claude Desktop
+
+Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "npm-mcp": {
+      "command": "npm-mcp"
+    }
+  }
+}
+```
+
+**Or with uv:**
+
+```json
+{
+  "mcpServers": {
+    "npm-mcp": {
+      "command": "uv",
+      "args": ["run", "npm-mcp"],
+      "cwd": "/path/to/npm_mcp"
+    }
+  }
+}
+```
+
+**Or with Docker:**
+
+```json
+{
+  "mcpServers": {
+    "npm-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "${HOME}/.npm-mcp:/config",
+        "-e",
+        "NPM_MCP_CONFIG=/config/instances.yaml",
+        "wadewoolwine/npm-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+Restart Claude Desktop to load the MCP server.
+
+For detailed integration instructions, see [INSTALLATION.md](./docs/INSTALLATION.md).
+
+### Transport Options
+
+The server supports multiple MCP transport protocols (MCP 2025-03-26 specification):
+
+| Transport | Description | Use Case |
+|-----------|-------------|----------|
+| `stdio` | Standard input/output (default) | CLI tools, Claude Desktop |
+| `sse` | Server-Sent Events | Real-time streaming, web clients |
+| `streamable-http` | Modern HTTP transport | Web services, HTTP clients |
+
+**Command-line usage:**
+
+```bash
+# Default: stdio transport
+npm-mcp
+
+# SSE transport on default port (8000)
+npm-mcp --transport sse
+
+# Streamable HTTP on custom host/port
+npm-mcp --transport streamable-http --host 0.0.0.0 --port 9000
+
+# Load all tools at startup (instead of lazy loading)
+npm-mcp --all-tools
+```
+
+**Environment variables:**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NPM_MCP_TRANSPORT` | Transport protocol | `stdio` |
+| `NPM_MCP_HOST` | Host for HTTP transports | `127.0.0.1` |
+| `NPM_MCP_PORT` | Port for HTTP transports | `8000` |
+| `NPM_MCP_ALL_TOOLS` | Load all tools at startup | `false` |
+
+**Example with environment variables:**
+
+```bash
+NPM_MCP_TRANSPORT=streamable-http NPM_MCP_PORT=8080 npm-mcp
+```
+
+**HTTP endpoint (when using sse or streamable-http):**
+
+```bash
+# Test endpoint availability
+curl http://localhost:8000/mcp
+```
+
+## Features
+
+### 28 Semantic Tools (100% PRD Coverage)
+
+The server provides 28 comprehensive tools across 9 functional categories:
+
+#### 1. Instance Management (7 tools)
+- `npm_manage_instance` - Create, update, delete, or test NPM instances
+- `npm_get_instance` - Get detailed instance information
+- `npm_list_instances` - List all configured instances with filtering
+- `npm_select_instance` - Set the active instance for operations
+- `npm_update_instance_credentials` - Update credentials securely
+- `npm_validate_instance_config` - Pre-flight configuration validation
+- `npm_set_default_instance` - Change the default instance
+
+#### 2. Proxy Host Management (3 tools)
+- `npm_manage_proxy_host` - Full CRUD operations for proxy hosts
+- `npm_list_proxy_hosts` - List with advanced filtering
+- `npm_get_proxy_host` - Detailed proxy host information
+
+#### 3. Certificate Management (3 tools)
+- `npm_list_certificates` - List with expiration tracking
+- `npm_manage_certificate` - Create, renew, delete certificates
+  - Let's Encrypt (HTTP-01, DNS-01 challenges)
+  - Custom certificate uploads
+- `npm_validate_certificate` - Pre-flight validation
+
+#### 4. Access Control (2 tools)
+- `npm_list_access_lists` - List access control lists
+- `npm_manage_access_list` - IP-based access control with HTTP auth
+
+#### 5. Stream Management (2 tools)
+- `npm_list_streams` - List TCP/UDP stream configurations
+- `npm_manage_stream` - Create, update, delete streams
+
+#### 6. Redirection & Dead Hosts (4 tools)
+- `npm_list_redirections` - List URL redirections
+- `npm_manage_redirection` - Create, update, delete redirections
+- `npm_list_dead_hosts` - List dead host configurations
+- `npm_manage_dead_host` - Create, update, delete dead hosts
+
+#### 7. User Management (2 tools)
+- `npm_list_users` - List NPM users with role filtering
+- `npm_manage_user` - Create, update, delete users
+
+#### 8. System & Reporting (4 tools)
+- `npm_get_settings` - Get NPM system settings
+- `npm_update_settings` - Update system configuration
+- `npm_get_audit_log` - Retrieve audit logs with filtering
+- `npm_get_status_report` - Comprehensive system status
+
+#### 9. Bulk Operations (1 unified tool, 5 operations)
+- `npm_bulk_operations` - Advanced batch processing
+  - `renew_certificates` - Concurrent certificate renewal
+  - `toggle_hosts` - Bulk enable/disable proxy hosts
+  - `delete_resources` - Bulk deletion with validation
+  - `export_config` - Configuration backup (JSON/YAML)
+  - `import_config` - Configuration restore (merge/replace)
+
+**Advanced Bulk Features:**
+- Concurrent processing with configurable batch sizes (1-50)
+- Error resilience with continue-on-error mode
+- Dry-run mode for safe previews
+- Advanced filtering (domain patterns, expiration windows)
+- Multi-format support (JSON and YAML)
+
+### Production-Ready Features
+
+- **Comprehensive Testing**: 85% code coverage, 809 passing tests
+- **Security Hardening**: JWT authentication, encrypted credentials, secure token caching
+- **Performance Optimized**: Async I/O, connection pooling, concurrent operations
+- **Multiple Transports**: stdio, SSE, and Streamable HTTP (MCP 2025-03-26 spec)
+- **Robust Error Handling**: Retry logic, graceful degradation, detailed error messages
+- **Structured Logging**: Comprehensive logging with structlog for debugging
+- **Type Safety**: Complete type hints and Pydantic validation
+- **Docker Support**: Production-ready Docker image (181MB)
+- **CI/CD Ready**: GitLab CI/CD pipeline with automated testing
+
+## Usage Examples
+
+### Managing Proxy Hosts
+
+```
+Create a proxy host for api.example.com pointing to localhost:3000
+with Let's Encrypt SSL and force HTTPS
+```
+
+The MCP server will:
+1. Create the proxy host configuration
+2. Request Let's Encrypt SSL certificate
+3. Configure force HTTPS redirection
+4. Return the complete configuration
+
+### Certificate Renewal
+
+```
+Show me all SSL certificates expiring in the next 30 days and renew them
+```
+
+The server will:
+1. Query certificates with expiration filtering
+2. Display expiring certificates
+3. Renew all certificates concurrently
+4. Report renewal status for each
+
+### Bulk Operations
+
+```
+Export the complete configuration from the production instance to a backup file
+```
+
+The server will:
+1. Export all proxy hosts, certificates, access lists, etc.
+2. Save to JSON or YAML format
+3. Provide backup file location
+
+### Multi-Instance Management
+
+```
+Switch to staging instance and list all proxy hosts
+```
+
+The server will:
+1. Change active instance to staging
+2. Query proxy hosts from staging environment
+3. Display results with instance context
+
+For comprehensive usage examples, see [USAGE_GUIDE.md](./docs/USAGE_GUIDE.md).
+
+## Documentation
+
+Complete documentation is available in the [`docs/`](./docs/) directory:
+
+| Document | Description |
+|----------|-------------|
+| [INSTALLATION.md](./docs/INSTALLATION.md) | Detailed installation instructions (pip, Docker, source) |
+| [CONFIGURATION.md](./docs/CONFIGURATION.md) | Complete configuration reference |
+| [USAGE_GUIDE.md](./docs/USAGE_GUIDE.md) | Comprehensive usage guide with examples |
+| [TOOL_CATALOG.md](./docs/TOOL_CATALOG.md) | All 28 tools with full specifications |
+| [PRD.md](./docs/PRD.md) | Product Requirements Document (67 pages) |
+| [RESEARCH_SUMMARY.md](./docs/RESEARCH_SUMMARY.md) | Research findings and API analysis |
+| [CONTRIBUTING.md](./docs/CONTRIBUTING.md) | Development and contribution guidelines |
+| [CHANGELOG.md](./CHANGELOG.md) | Version history and release notes |
+
+## Architecture
+
+```
+┌─────────────────────────────────────┐
+│         LLM Client (Claude)         │
+│     Natural Language Interface      │
+└─────────────┬───────────────────────┘
+              │ MCP Protocol
+              │ (stdio | sse | streamable-http)
+              │
+┌─────────────▼───────────────────────┐
+│       NPM MCP Server (Python)       │
+│  ┌───────────────────────────────┐  │
+│  │    28 Semantic Tools           │  │
+│  │  • Instance Management         │  │
+│  │  • Proxy Hosts                 │  │
+│  │  • Certificates                │  │
+│  │  • Access Lists                │  │
+│  │  • Bulk Operations             │  │
+│  │  • System & Reporting          │  │
+│  └───────────────────────────────┘  │
+│  ┌───────────────────────────────┐  │
+│  │  Core Services                 │  │
+│  │  • Multi-Instance Manager      │  │
+│  │  • JWT Authentication          │  │
+│  │  • Connection Pooling          │  │
+│  │  • Pydantic Validation         │  │
+│  │  • Structured Logging          │  │
+│  └───────────────────────────────┘  │
+└─────────────┬───────────────────────┘
+              │ HTTPS/REST API
+              │
+┌─────────────▼───────────────────────┐
+│    NPM Instance(s) API (Port 81)    │
+│  • Production                       │
+│  • Staging                          │
+│  • Development                      │
+└─────────────────────────────────────┘
+```
+
+## Technology Stack
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| Language | Python | >= 3.11 |
+| MCP SDK | mcp | >= 1.25.0 |
+| HTTP Client | httpx | >= 0.28.0 |
+| Validation | pydantic | >= 2.12.0 |
+| Configuration | PyYAML | >= 6.0.3 |
+| Security | cryptography | >= 46.0.0 |
+| Credentials | keyring | >= 25.6.0 |
+| Logging | structlog | >= 25.4.0 |
+| Retry Logic | tenacity | >= 9.1.0 |
+
+**Development Tools:**
+- Testing: pytest, pytest-asyncio, pytest-cov
+- Linting: ruff, mypy
+- Build: setuptools, uv
+
+## Development
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/wadew/npm-mcp.git
+cd npm-mcp
+
+# Install with development dependencies
+uv sync
+
+# Or with pip
+pip install -e ".[dev]"
+```
+
+### Testing
+
+```bash
+# Run full test suite
+uv run pytest
+
+# Run with coverage
+uv run pytest --cov=src/npm_mcp --cov-report=html
+
+# Run specific test file
+uv run pytest tests/unit/test_server.py
+
+# Run with verbose output
+uv run pytest -v
+```
+
+### Code Quality
+
+```bash
+# Run linter
+uv run ruff check .
+
+# Run formatter
+uv run ruff format .
+
+# Run type checker
+uv run mypy src/
+
+# Run all checks
+uv run ruff check . && uv run ruff format --check . && uv run mypy src/
+```
+
+### Building
+
+```bash
+# Build Python package
+python -m build
+
+# Build Docker image
+docker build -t npm-mcp-server:local .
+
+# Check Docker image size
+docker images npm-mcp-server:local --format "{{.Size}}"
+```
+
+For detailed development guidelines, see [CONTRIBUTING.md](./docs/CONTRIBUTING.md).
+
+## Project Status
+
+### Phase 5: Production Ready ✅
+
+All development phases complete:
+
+- ✅ **Phase 1**: Foundation (Configuration, Authentication, HTTP Client, Models)
+- ✅ **Phase 2**: MCP Server & Core Tools (15 tools)
+- ✅ **Phase 3**: Extended Features (12 tools)
+- ✅ **Phase 4**: Bulk Operations & Advanced Features (1 tool, 5 operations)
+- ✅ **Phase 5**: Release Preparation (CI/CD, Docker, Documentation)
+
+**Total**: 28 semantic tools (100% PRD specification)
+
+### Quality Metrics
+
+| Metric | Value |
+|--------|-------|
+| Test Coverage | 85.44% |
+| Tests Passing | 809/809 |
+| Lines of Code | ~15,000 |
+| Documentation | ~10,000 lines |
+| Docker Image Size | 181MB |
+
+### Roadmap
+
+**Version 1.0.0** (Current)
+- 28 semantic tools (100% PRD coverage)
+- Multi-instance management
+- Bulk operations with concurrent processing
+- Production-ready security and performance
+
+**Future Enhancements**
+- Additional NPM features as they're released
+- Performance optimizations
+- UI/web interface (optional)
+- Kubernetes Helm chart (optional)
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for:
+
+- Development environment setup
+- Code style guidelines
+- Testing requirements
+- Pull request process
+- Commit conventions
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/wadew/npm-mcp/issues)
+- **Documentation**: [docs/](./docs/)
+- **Discussions**: [GitHub Discussions](https://github.com/wadew/npm-mcp/discussions)
+
+## License
+
+MIT License - See [LICENSE](./LICENSE) file for details.
+
+## Acknowledgments
+
+- [Nginx Proxy Manager](https://nginxproxymanager.com/) - Excellent reverse proxy manager
+- [Anthropic MCP](https://modelcontextprotocol.io/) - Model Context Protocol specification
+- [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) - Official Python implementation
+- [FastMCP](https://github.com/jlowin/fastmcp) - FastMCP framework for rapid MCP development
+
+## Citation
+
+If you use this project in your research or production environment, please cite:
+
+```bibtex
+@software{npm_mcp_server,
+  title = {NPM MCP Server: AI-Powered Nginx Proxy Manager Management},
+  author = {Woolwine, Wade},
+  year = {2025},
+  url = {https://github.com/wadew/npm-mcp},
+  version = {1.0.0}
+}
+```
+
+---
+
+**Version**: 1.0.0-rc1
+**Last Updated**: 2025-01-28
+**Maintainer**: Wade Woolwine <<wade.woolwine@gmail.com>>
+**License**: MIT
+**Status**: 🚀 Production Ready
