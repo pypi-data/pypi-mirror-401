@@ -1,0 +1,169 @@
+Metadata-Version: 2.4
+Name: django-ai-admin-chat
+Version: 0.1.0
+Summary: Django app that adds AI-powered chat to Django admin interface
+Author: Patryk Maruda
+License: MIT
+Keywords: django,admin,ai,chat,langchain,openai
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 4.2
+Classifier: Framework :: Django :: 5.0
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Django>=4.2
+Requires-Dist: langchain>=0.1.0
+Requires-Dist: langchain-community
+Requires-Dist: langchain-experimental
+Requires-Dist: langchain-openai>=0.0.5
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: SQLAlchemy
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-django>=4.5; extra == "dev"
+Dynamic: license-file
+
+# Django AI Admin Chat
+
+A Django app that adds AI-powered chat functionality to Django admin interface. The chat assistant can answer questions about your Django models and database using natural language queries.
+
+## Features
+
+- 🤖 **AI-powered chat interface** integrated into Django admin
+- 🔍 **Database search** using SQL database chain
+- 💾 **Chat history tracking** with session management
+- 📊 **Token usage monitoring** for cost tracking
+- 🎯 **Model filtering** - control which models are accessible to the AI
+- 📝 **SQL query logging** - see generated SQL queries when using SQLDatabaseChain
+- 🚀 **Streaming responses** via Server-Sent Events (SSE)
+
+## Installation
+
+### Development Installation
+
+To install the package in development mode (editable):
+
+```bash
+pip install -e .
+```
+
+### Production Installation
+
+```bash
+pip install django-ai-admin-chat
+```
+
+## Configuration
+
+### 1. Add to INSTALLED_APPS
+
+Add `django_ai_admin_chat` to your `INSTALLED_APPS` in Django settings:
+
+```python
+INSTALLED_APPS = [
+    # ... other apps
+    'django_ai_admin_chat',
+]
+```
+
+### 2. Include URLs
+
+Include the app URLs in your main `urls.py`:
+
+```python
+from django.urls import include, path
+
+urlpatterns = [
+    # ... other URL patterns
+    path('', include('django_ai_admin_chat.urls')),
+]
+```
+
+### 3. Run Migrations
+
+Create and apply database migrations:
+
+```bash
+python manage.py migrate
+```
+
+### 4. AI Configuration
+
+Configure the admin chat integration in your Django settings:
+
+```python
+# Required: AI Provider Configuration
+DJANGO_AI_ADMIN_CHAT_PROVIDER = "openai"
+DJANGO_AI_ADMIN_CHAT_API_KEY = "your-openai-api-key"
+DJANGO_AI_ADMIN_CHAT_MODEL = "gpt-3.5-turbo"  # or "gpt-4", "gpt-4-turbo", etc.
+DJANGO_AI_ADMIN_CHAT_TEMPERATURE = 0.7
+DJANGO_AI_ADMIN_CHAT_MAX_TOKENS = 500
+
+# Search Configuration
+DJANGO_AI_ADMIN_CHAT_SEARCH_TYPE = "sql_database_chain"
+DJANGO_AI_ADMIN_CHAT_MAX_SEARCH_RESULTS = 10
+
+# Optional: Model Filtering
+DJANGO_AI_ADMIN_CHAT_ALLOWED_MODELS = []  # Empty list = all models allowed (except excluded)
+DJANGO_AI_ADMIN_CHAT_EXCLUDED_MODELS = []  # Models to exclude from search
+```
+
+### Search Types
+
+The app uses a single search strategy:
+
+- **`sql_database_chain`** (default) - Uses LangChain SQLDatabaseChain to generate SQL queries and return database results directly in context. Best for complex queries and data analysis.
+
+## Usage
+
+### Admin Interface
+
+Once configured, a chat button (💬) will appear in the bottom-right corner of your Django admin interface. Click it to open the chat panel and start asking questions about your data.
+
+### Chat History
+
+All chat interactions are stored in the `ChatHistory` model, accessible via Django admin. Each entry includes:
+- User query and AI response
+- Search type used
+- Search results and context
+- Token usage (prompt, completion, total)
+- Generated SQL query (if using SQLDatabaseChain)
+- Session ID for conversation tracking
+
+## API Endpoints
+
+The app provides the following endpoints (all require staff member authentication):
+
+- `POST /admin-chat/echo/` - Send a message and get a complete response
+- `GET /admin-chat/history/` - Get chat history for current session
+- `GET|POST /admin-chat/stream/` - Stream chat response via Server-Sent Events
+- `POST /admin-chat/clear/` - Clear chat history and start a new session
+
+## Requirements
+
+- Python >= 3.10
+- Django >= 4.2
+- langchain >= 0.1.0
+- langchain-community
+- langchain-experimental
+- langchain-openai >= 0.0.5
+- openai >= 1.0.0
+- SQLAlchemy
+
+See `pyproject.toml` for complete dependency list.
+
+## Development
+
+This package is currently in early development. Contributions are welcome!
+
+## License
+
+MIT License
