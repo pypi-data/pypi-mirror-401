@@ -1,0 +1,65 @@
+Metadata-Version: 2.4
+Name: qmetro
+Version: 1.1.1
+Summary: A package that provides a set of tools for identifying optimal estimation protocols that maximize quantum Fisher information (QFI).
+Home-page: https://github.com/pdulian/qmetro
+Author: Piotr Dulian and Stanisław Kurdziałek
+Author-email: p.dulian@cent.uw.edu.pl
+License: GPLv3
+Project-URL: Documentation, https://qmetro.readthedocs.io/en/latest/
+Project-URL: Source, https://github.com/pdulian/qmetro
+Project-URL: Article, https://arxiv.org/abs/2506.16524
+Keywords: quantum metrology optimization physics
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.26.4
+Requires-Dist: scipy>=1.14.1
+Requires-Dist: cvxpy>=1.6.0
+Requires-Dist: matplotlib>=3.10.0
+Requires-Dist: networkx>=3.3
+Requires-Dist: ncon
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# QMetro++
+## Python optimization package for large scale quantum metrology with customized strategy structures
+QMetro++ is a Python package that
+provides a set of tools for identifying optimal estimation protocols that
+maximize quantum Fisher information (QFI). Optimization can be performed
+for arbitrary configurations of input states, parameter-encoding channels,
+noise correlations, control operations, and measurements. The use of tensor
+networks and an iterative see-saw algorithm allows for an efficient
+optimization even in the regime of a large number of channel uses.
+
+Additionally, the package includes implementations of the recently
+developed methods for computing fundamental upper bounds on QFI,
+which serve as benchmarks for assessing the optimality of numerical
+optimization results. All functionalities are wrapped up in a user-friendly
+interface which enables the definition of strategies at various levels of
+detail.
+
+See detailed description in [our article](https://arxiv.org/abs/2506.16524) and [documentation](https://qmetro.readthedocs.io/en/latest/).
+
+## Installation
+To install QMetro++:
+
+```
+pip install qmetro
+```
+
+First import may take a couple seconds (circa 1,86s) because QMetro++ loads
+CVXPY and numerical backends.
+
+## Contact
+For more information please contact: p.dulian@cent.uw.edu.pl
