@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "playvideo-python"
+version = "1.0.0"
+description = "Official PlayVideo SDK for Python - Video hosting for developers"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    { name = "PlayVideo", email = "support@playvideo.dev" }
+]
+keywords = [
+    "playvideo",
+    "video",
+    "streaming",
+    "hls",
+    "transcoding",
+    "video-hosting",
+    "api",
+    "sdk"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-httpx>=0.22.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://playvideo.dev"
+Documentation = "https://playvideo.dev/docs"
+Repository = "https://github.com/PlayVideo-dev/playvideo-python"
+Issues = "https://github.com/PlayVideo-dev/playvideo-python/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["playvideo"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["SIM117"]  # Allow nested with statements for readability
+
+[tool.ruff.lint.isort]
+known-first-party = ["playvideo"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
