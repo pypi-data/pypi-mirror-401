@@ -1,0 +1,44 @@
+Metadata-Version: 2.4
+Name: edna2
+Version: 2.1.0
+Summary: Framework for tasks
+Author-email: ESRF <dau-pydev@esrf.fr>
+Project-URL: Homepage, https://gitlab.esrf.fr/sb/edna2/
+Project-URL: Documentation, https://edna2.readthedocs.io/
+Project-URL: Repository, https://gitlab.esrf.fr/sb/edna2/
+Project-URL: Issues, https://gitlab.esrf.fr/sb/edna2/issues
+Project-URL: Changelog, https://gitlab.esrf.fr/sb/edna2/-/blob/main/CHANGELOG.md
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: matplotlib>=3.2
+Requires-Dist: suds>=1.1
+Requires-Dist: xmltodict>=0.12
+Requires-Dist: jsonschema>=3.2
+Requires-Dist: graypy>=2.1
+Requires-Dist: h5py>=2.10
+Requires-Dist: numpy>=1.19
+Requires-Dist: fabio>=0.11
+Requires-Dist: requests>=2.22
+Requires-Dist: distro>=1.5
+Requires-Dist: scipy>=1.5
+Requires-Dist: billiard
+Requires-Dist: hdf5plugin
+Requires-Dist: pyicat_plus
+Requires-Dist: pyyaml
+Provides-Extra: test
+Requires-Dist: pytest>=7; extra == "test"
+Requires-Dist: matplotlib>=3; extra == "test"
+Provides-Extra: dev
+Requires-Dist: edna2[test]; extra == "dev"
+Requires-Dist: black>=22; extra == "dev"
+Requires-Dist: flake8>=4; extra == "dev"
+Provides-Extra: doc
+Requires-Dist: edna2[test]; extra == "doc"
+Requires-Dist: sphinx>=4.5; extra == "doc"
+Requires-Dist: sphinxcontrib-mermaid>=0.7; extra == "doc"
+Requires-Dist: pydata-sphinx-theme; extra == "doc"
+Dynamic: license-file

@@ -1,0 +1,55 @@
+CCP4:
+  modules: ["ccp4"]
+
+XDS:
+  modules: ["xds", "dectris-neggia"]
+  LIB: dectris-neggia.so
+
+ExecDozor:
+  modules: ["dozor"]
+  site_prefix: esrf_
+  executable: dozor
+  enable_coredumps: true
+  slurm_partition: mx-fast
+  slurm_no_cores: 10
+  library_cbf: xds-zcbf.so
+  library_hdf5: dectris-neggia.so
+
+AutoPROCWrapper:
+  modules: ["autoPROC"]
+
+Best:
+  modules: ["best"]
+
+ControlDozor:
+  gnuplot: gnuplot
+
+DistlSignalStrengthTask:
+  modules: ["phenix"]
+
+DozorM2:
+  modules: ["dozorm2"]
+
+DozorRD:
+  modules: ["dozorrd"]
+
+H5ToCBFTask:
+  modules: ["eiger2cbf"]
+  
+MosflmIndexingTask:
+  modules: ["ccp4"]
+
+MosflmGeneratePredictionTask:
+  modules: ["ccp4"]
+
+Raddose:
+  modules: ["raddose"]
+
+Gnuplot:
+  modules: ["gnuplot"]
+
+Logging:
+  level: DEBUG
+
+Test:
+  test_path: /data/scisoft/edna2/$USER

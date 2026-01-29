@@ -1,0 +1,70 @@
+DIALS (2018) Acta Cryst. D74, 85-97. https://doi.org/10.1107/S2059798317017235
+DIALS 3.23.0-g7aff524e7-release
+The following parameters have been modified:
+
+per_image_statistics = True
+input {
+  experiments = imported.expt
+}
+
+Setting spotfinder.filter.min_spot_size=3
+Configuring spot finder from input parameters
+--------------------------------------------------------------------------------
+Finding strong spots in imageset 0
+--------------------------------------------------------------------------------
+
+Finding spots in image 1 to 10...
+Setting nproc=16
+Setting chunksize=1
+Extracting strong pixels from images
+ Using multiprocessing with 10 parallel job(s)
+
+Found 10 strong pixels on image 1
+Found 10 strong pixels on image 2
+Found 13 strong pixels on image 3
+Found 15 strong pixels on image 4
+Found 21 strong pixels on image 5
+Found 15 strong pixels on image 6
+Found 14 strong pixels on image 7
+Found 12 strong pixels on image 8
+Found 17 strong pixels on image 9
+Found 89 strong pixels on image 10
+
+Extracted 65 spots
+Removed 36 spots with size < 3 pixels
+Removed 0 spots with size > 1000 pixels
+Calculated 29 spot centroids
+Calculated 29 spot intensities
+Filtered 26 of 29 spots by peak-centroid distance
+
+Histogram of per-image spot count for imageset 0:
+26 spots found on 8 images (max 15 / bin)
+       *
+       *
+       *
+       *
+       *
+       *
+       *
+  *    *
+  *    *
+***** **
+3     10
+
+--------------------------------------------------------------------------------
+Saved 26 reflections to strong.refl
+Number of centroids per image for imageset 0:
++---------+----------+-----------------+-------------------+
+|   image |   #spots |   #spots_no_ice |   total_intensity |
+|---------+----------+-----------------+-------------------|
+|       1 |        0 |               0 |                 0 |
+|       2 |        0 |               0 |                 0 |
+|       3 |        1 |               1 |                48 |
+|       4 |        2 |               2 |              1366 |
+|       5 |        3 |               2 |               711 |
+|       6 |        3 |               2 |            108070 |
+|       7 |        1 |               1 |                48 |
+|       8 |        0 |               0 |                 0 |
+|       9 |        3 |               2 |              1250 |
+|      10 |       13 |               5 |               288 |
++---------+----------+-----------------+-------------------+
