@@ -1,0 +1,58 @@
+Metadata-Version: 2.4
+Name: policelibrary
+Version: 0.1.0
+Summary: PoliceLibrary
+Author-email: Felix Fu <alanmathisonturing@163.com>
+Maintainer-email: Felix Fu <alanmathisonturing@163.com>
+License: AGPL-3.0
+Keywords: private
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Image Recognition
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: aiohttp>=3.13.3
+Requires-Dist: loguru>=0.7.3
+Requires-Dist: numpy>=2.2.6
+Requires-Dist: openai>=2.15.0
+Requires-Dist: opencv-python>=4.11.0.86
+
+# PoliceLibrary
+
+## 安装
+首先安装库
+```
+pip install policelibrary
+```
+
+然后设置环境变量, 值从火山引擎上获取
+```
+export ARK_API_KEY=
+export ASR_APP_KEY=
+export ASR_ACCESS_KEY=
+```
+
+## 使用
+### 聊天
+```
+python tests/test_chat.py
+```
+### 音频识别
+```
+python tests/test_asr.py
+```
