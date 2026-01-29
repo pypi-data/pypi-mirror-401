@@ -1,0 +1,109 @@
+{#-
+  Custom header override with grid layout:
+  Row 1: EKGF logo | centered website title | OMG logo
+  Controls are hidden and moved to the tabs row via JS in main.html
+-#}
+{% set class = "md-header" %}
+{% if "navigation.tabs.sticky" in features %}
+  {% set class = class ~ " md-header--shadow md-header--lifted" %}
+{% elif "navigation.tabs" not in features %}
+  {% set class = class ~ " md-header--shadow" %}
+{% endif %}
+<header class="{{ class }}" data-md-component="header">
+  <div class="md-header__inner md-grid">
+    <div class="md-header__row md-header__row--top">
+      {# Column 1: EKGF logo #}
+      <div class="md-header__col md-header__col--logo">
+        <div class="md-header__nav-items">
+          <label class="md-header__button md-icon" for="__drawer">
+            {% set icon = config.theme.icon.menu or "material/menu" %}
+            {% include ".icons/" ~ icon ~ ".svg" %}
+          </label>
+        </div>
+        {% include "partials/ekgf-logo.html" %}
+      </div>
+
+      {# Column 2: Centered website title #}
+      <div class="md-header__col md-header__col--title">
+        <div class="md-header__title" data-md-component="header-title">
+          <div class="md-header__ellipsis">
+            <div class="md-header__topic">
+              <span class="md-ellipsis">
+                {{ config.site_name }}
+              </span>
+            </div>
+            <div class="md-header__topic" data-md-component="header-topic">
+              <span class="md-ellipsis">
+                {% if page.meta and page.meta.title %}
+                  {{ page.meta.title }}
+                {% else %}
+                  {{ page.title }}
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Column 3: OMG logo #}
+      <div class="md-header__col md-header__col--omg">
+        {% include "partials/omg-logo.html" %}
+      </div>
+    </div>
+
+    {# Components for JS to relocate - palette is now in tabs.html directly #}
+    <div class="ekgf-header-hidden-components">
+      {% if config.extra.alternate %}
+        {% include "partials/alternate.html" %}
+      {% endif %}
+      {% if config.repo_url %}
+        <div class="md-header__source">
+          {% include "partials/source.html" %}
+        </div>
+      {% endif %}
+    </div>
+
+    {# Material search modal - must be visible for search to work #}
+    {% if "search" in config.plugins or "material/search" in config.plugins %}
+      {% include "partials/search.html" %}
+    {% endif %}
+  </div>
+  {% if "navigation.tabs.sticky" in features %}
+    {% if "navigation.tabs" in features %}
+      {% include "partials/tabs.html" %}
+    {% endif %}
+  {% endif %}
+  {#- Palette initialization - runs after tabs.html renders the palette inputs -#}
+  {% if config.theme.palette %}
+    {% if not config.theme.palette is mapping %}
+      {% include "partials/javascripts/palette.html" %}
+      <script>
+      (function() {
+        var palette = __md_get("__palette");
+        if (!palette) {
+          // First visit: check radio based on system preference
+          var prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+          var mediaQuery = prefersDark
+            ? "(prefers-color-scheme: dark)"
+            : "(prefers-color-scheme: light)";
+          var input = document.querySelector(
+            'input[name="__palette"][data-md-color-media="' + mediaQuery + '"]'
+          );
+          if (input) {
+            input.checked = true;
+          }
+        } else {
+          // Returning visit: check radio matching saved scheme
+          var scheme = palette.color && palette.color.scheme;
+          if (scheme) {
+            var input = document.querySelector(
+              'input[name="__palette"][data-md-color-scheme="' + scheme + '"]'
+            );
+            if (input) input.checked = true;
+          }
+        }
+      })();
+      </script>
+    {% endif %}
+  {% endif %}
+</header>
