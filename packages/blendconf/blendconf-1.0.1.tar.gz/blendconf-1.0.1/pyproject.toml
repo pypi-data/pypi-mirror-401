@@ -1,0 +1,22 @@
+[project]
+name = "blendconf"
+version = "1.0.1"
+description = "Helper to merge multiple configuration files into one file."
+readme = "README.md"
+authors = [{ name = "Olaf Gladis", email = "hwmrocker@gladis.org" }]
+requires-python = ">=3.12"
+dependencies = [
+    "python-dotenv>=1.2.1",
+    "pyyaml>=6.0.3",
+    "tomli>=2.3.0",
+    "tomli-w>=1.2.0",
+    "typer>=0.21.1",
+]
+scripts = { blendconf = "blendconf.cli:entry_point" }
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=9.0.2", "pytest-watcher>=0.6.2"]
