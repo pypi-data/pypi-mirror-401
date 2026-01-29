@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "valthos-sdk"
+version = "0.1.1"
+description = "Python SDK for Valthos API"
+authors = [
+    {name = "Valthos", email = "support@valthos.com"},
+]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "requests>=2.25.0",
+    "pydantic>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://valthos.com"
+Documentation = "https://docs.valthos.com"
+Repository = "https://github.com/valthos/valthos-sdk"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

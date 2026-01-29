@@ -1,0 +1,155 @@
+# Valthos Python SDK
+
+Python SDK for the Valthos bioinformatics platform.
+
+## Installation
+
+```bash
+pip install valthos-sdk
+```
+
+
+## Quick Start
+
+### Authentication
+
+First, authenticate with your Valthos account:
+
+```python
+import valthos_sdk
+
+# Interactive login (prompts for credentials)
+session = valthos_sdk.login()
+
+# Or provide credentials directly
+session = valthos_sdk.login(root_domain="valthos.com", token="your-personal-access-token")
+```
+
+Credentials are stored securely in `~/.valthos/credentials`.
+
+### Working with Workspaces
+
+```python
+# List your workspaces
+workspaces = session.list_workspaces()
+for ws in workspaces:
+    print(f"{ws.name}: {ws.status}")
+
+# Get a specific workspace
+workspace = session.workspace(name="My Project")
+
+# Create a new workspace
+workspace = session.create_workspace(name="New Analysis", description="My analysis project")
+```
+
+### File Operations
+
+```python
+# Upload a file
+workspace.add('/local/path/data.csv', 'data/input.csv')
+
+# List workspace contents
+files = workspace.list()
+for f in files:
+    print(f"{f.path} - {f.size} bytes")
+
+# Create folders
+workspace.create_folder('results')
+
+# Copy, rename, delete
+workspace.copy('data.csv', 'backup/data.csv')
+workspace.rename('old_name.txt', 'new_name.txt')
+workspace.delete('temporary_file.txt')
+```
+
+### Analysis Tools
+
+Run bioinformatics analyses through the tools interface:
+
+```python
+# Fitness analysis
+fitness = workspace.tools.Fitness(
+    input_path='proteins.parquet',
+    output_path='results/fitness.parquet'
+)
+
+# Validate inputs
+validation = fitness.validate()
+if validation['status'] == 'valid':
+    # Get runtime estimate
+    estimate = fitness.estimate()
+    print(f"Estimated time: {estimate['estimated_time_minutes']} minutes")
+
+    # Run the analysis
+    result = fitness.run()
+    print(f"Job ID: {result['job_id']}")
+
+# Sequence profiling
+profiler = workspace.tools.SequenceProfiling(
+    input='protein.fasta',
+    output='results/profile.json',
+    methods=["world"]
+)
+
+# Genome profiling
+genome_profiler = workspace.tools.GenomeProfiling(
+    input='genome.fasta',
+    output='results/genome_profile.json',
+    min_orf_length=90
+)
+```
+
+## API Reference
+
+### Session Methods
+
+- `session.list_workspaces(status=None, limit=None, offset=None)` - List workspaces
+- `session.workspace(name=None, rid=None)` - Get a workspace by name or ID
+- `session.create_workspace(name, description=None)` - Create a new workspace
+- `session.archive_workspace(name=None, rid=None)` - Archive a workspace
+
+### Workspace Methods
+
+- `workspace.add(local_path, workspace_path=None)` - Upload a file
+- `workspace.list(path=None, offset=None, limit=None)` - List contents
+- `workspace.create_folder(path)` - Create a folder
+- `workspace.rename(old_path, new_path)` - Rename/move a file or folder
+- `workspace.copy(source_path, dest_path)` - Copy a file
+- `workspace.delete(path)` - Delete a file or folder
+
+### Available Tools
+
+- `Fitness` - Protein fitness inference using ESM2-based models
+- `SequenceProfiling` - Multi-method analysis of protein sequences
+- `GenomeProfiling` - ORF detection and protein profiling from genomes
+- `SequenceSearch` - MMseqs2-based protein similarity search
+
+## Error Handling
+
+```python
+from valthos import (
+    ValthosError,
+    AuthenticationError,
+    TokenExpiredError,
+    APIError,
+    WorkspaceNotFoundError,
+    FileUploadError
+)
+
+try:
+    workspace = session.workspace(name="NonExistent")
+except WorkspaceNotFoundError:
+    print("Workspace not found")
+except AuthenticationError:
+    print("Please login again")
+```
+
+## Requirements
+
+- Python 3.8+
+- requests
+- pydantic
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
