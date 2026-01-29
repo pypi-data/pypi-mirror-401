@@ -1,0 +1,32 @@
+
+import threading
+from fastapi import FastAPI
+from agent1c_metrics.api import settings_api, metrics
+from agent1c_metrics import __version__, settings
+from agent1c_metrics.core.utils import upgrade_and_restart
+
+app = FastAPI(title="1C-agent metrics")
+app.include_router(settings_api.router)
+app.include_router(metrics.router)
+app.version = __version__
+
+from agent1c_metrics.reader import get_data
+from agent1c_metrics import settings
+
+@app.get("/")
+async def root():
+
+    result = get_data()
+    
+    return result
+
+@app.post("/upgrade")
+async def admin_upgrade():
+    # Запускаем в отдельном потоке, чтобы успеть ответить пользователю "OK"
+    threading.Thread(target=upgrade_and_restart).start()
+    return {"status": "upgrading"}
+
+if __name__ == "__main__":
+    print('Run __main__.py module instead.')
+else:
+    print(settings)
