@@ -1,0 +1,126 @@
+Metadata-Version: 2.4
+Name: bmdb
+Version: 1.0
+Summary: BM Database Framework - A lightweight database framework
+Home-page: https://github.com/BM-Framework/bmdb
+Author: Marouan Bouchettoy
+Author-email: Marouan Bouchettoy <marouanbouchettoy@gmail.com>
+Project-URL: Homepage, https://github.com/BM-Framework/bmdb
+Project-URL: Repository, https://github.com/BM-Framework/bmdb.git
+Project-URL: Bug Tracker, https://github.com/BM-Framework/bmdb/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Database :: Database Engines/Servers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: click==8.3.1
+Requires-Dist: colorama==0.4.6
+Requires-Dist: greenlet==3.3.0
+Requires-Dist: python-dotenv==1.2.1
+Requires-Dist: PyYAML==6.0.3
+Requires-Dist: setuptools==80.9.0
+Requires-Dist: SQLAlchemy==2.0.45
+Requires-Dist: typing_extensions==4.15.0
+Requires-Dist: psycopg2==2.9.11
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: flake8>=6.0; extra == "dev"
+Provides-Extra: mysql
+Requires-Dist: mysql-connector-python>=8.0; extra == "mysql"
+Requires-Dist: pymysql>=1.0; extra == "mysql"
+Provides-Extra: postgresql
+Requires-Dist: psycopg2-binary>=2.9; extra == "postgresql"
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# BMDB - Minimal Schema Manager
+
+A lightweight SQLAlchemy schema manager with YAML-based model definitions.
+
+## Installation
+
+### From GitHub
+
+```bash
+pip install git+https://github.com/BM-Framework/bmdb.git
+```
+
+### From source (development)
+
+```bash
+git clone https://github.com/BM-Framework/bmdb.git
+cd bmdb
+pip install -e .
+```
+
+## Usage
+
+```bash
+# Create a model
+bmdb create-model User
+
+# Add fields
+bmdb add-fields User name String email String age Int
+
+# Generate models
+bmdb generate
+
+# Run migration
+bmdb migrate
+```
+
+## Requirements
+
+- Python 3.7+
+- SQLAlchemy
+- PostgreSQL (or other supported database)
+
+## Configuration
+
+Create a `.env` file:
+
+```.env
+DB_CONNECTION="postgresql://user:password@localhost:5433/dbname"
+```
+
+## License
+
+MIT License
+
+## 5. Add `.gitignore`
+
+```.gitignore
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# BMDB specific
+models.bmdb
+.env
+bmdb/models/generated/*.py
+!bmdb/models/generated/__init__.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Distribution
+dist/
+build/
+*.egg-info/
+```
