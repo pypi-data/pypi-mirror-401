@@ -1,0 +1,66 @@
+[project]
+name = "requestly"
+description = "服务器接口本地代理工具"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+
+authors = [{ name = "Seven", email = "1162584980@qq.com" }]
+maintainers = [{ name = "Seven", email = "1162584980@qq.com" }]
+
+keywords = ["requestly", "mitmproxy", "cli", "proxy"]
+
+dynamic = ["version", "dependencies"]
+
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+
+    "Topic :: Utilities",
+]
+
+[project.optional-dependencies]
+dev = ["build", "twine", "pytest", "ruff", "black"]
+
+[project.scripts]
+requestly = "requestly.proxy:cli"
+
+
+# =========================
+# Build system
+# =========================
+
+[build-system]
+requires = ["setuptools>=77.0.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+# =========================
+# setuptools / scm
+# =========================
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["requestly*"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.package-data]
+"requestly" = ["templates/*", "static/**/*"]
+
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
+
+# =========================
+# Tooling
+# =========================
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
