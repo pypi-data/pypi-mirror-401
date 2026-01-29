@@ -1,0 +1,332 @@
+{
+  "description": "CuTe MoE FP8 kernel configs optimized for H100 (SM90)",
+  "up": {
+    "1": {
+      "block_m": 16,
+      "block_n": 128,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 7,
+      "kernel_type": "warp",
+      "time_us": 23.4
+    },
+    "2": {
+      "block_m": 16,
+      "block_n": 128,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 2,
+      "kernel_type": "warp",
+      "time_us": 36.3
+    },
+    "4": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 1,
+      "kernel_type": "warp",
+      "time_us": 57.4
+    },
+    "8": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 2,
+      "num_stages": 2,
+      "kernel_type": "warp",
+      "time_us": 76.9
+    },
+    "16": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 8,
+      "kernel_type": "warp",
+      "time_us": 95.6
+    },
+    "24": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 8,
+      "kernel_type": "warp",
+      "time_us": 105.6
+    },
+    "32": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 8,
+      "kernel_type": "warp",
+      "time_us": 108.8
+    },
+    "48": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 8,
+      "kernel_type": "warp",
+      "time_us": 111.0
+    },
+    "64": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 8,
+      "kernel_type": "warp",
+      "time_us": 111.6
+    },
+    "96": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 7,
+      "kernel_type": "warp",
+      "time_us": 114.3
+    },
+    "128": {
+      "block_m": 16,
+      "block_n": 128,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 6,
+      "kernel_type": "warp",
+      "time_us": 116.5
+    },
+    "256": {
+      "block_m": 64,
+      "block_n": 256,
+      "block_k": 256,
+      "num_warps": 4,
+      "num_stages": 2,
+      "kernel_type": "wgmma",
+      "time_us": 115.8
+    },
+    "512": {
+      "block_m": 64,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 5,
+      "kernel_type": "wgmma",
+      "time_us": 126.5
+    },
+    "1024": {
+      "block_m": 192,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 12,
+      "num_stages": 3,
+      "kernel_type": "wgmma",
+      "time_us": 160.8
+    },
+    "1536": {
+      "block_m": 128,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 8,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 183.8
+    },
+    "2048": {
+      "block_m": 128,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 8,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 208.7
+    },
+    "3072": {
+      "block_m": 128,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 8,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 276.2
+    },
+    "4096": {
+      "block_m": 192,
+      "block_n": 256,
+      "block_k": 64,
+      "num_warps": 12,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 288.5
+    }
+  },
+  "down": {
+    "1": {
+      "block_m": 16,
+      "block_n": 128,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 7,
+      "kernel_type": "warp",
+      "time_us": 17.0
+    },
+    "2": {
+      "block_m": 16,
+      "block_n": 128,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 6,
+      "kernel_type": "warp",
+      "time_us": 19.6
+    },
+    "4": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 1,
+      "kernel_type": "warp",
+      "time_us": 35.1
+    },
+    "8": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 2,
+      "num_stages": 2,
+      "kernel_type": "warp",
+      "time_us": 44.8
+    },
+    "16": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 5,
+      "kernel_type": "warp",
+      "time_us": 55.0
+    },
+    "24": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 7,
+      "kernel_type": "warp",
+      "time_us": 60.3
+    },
+    "32": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 7,
+      "kernel_type": "warp",
+      "time_us": 62.1
+    },
+    "48": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 5,
+      "kernel_type": "warp",
+      "time_us": 63.7
+    },
+    "64": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 5,
+      "kernel_type": "warp",
+      "time_us": 64.2
+    },
+    "96": {
+      "block_m": 16,
+      "block_n": 64,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 5,
+      "kernel_type": "warp",
+      "time_us": 65.2
+    },
+    "128": {
+      "block_m": 16,
+      "block_n": 128,
+      "block_k": 128,
+      "num_warps": 4,
+      "num_stages": 6,
+      "kernel_type": "warp",
+      "time_us": 66.7
+    },
+    "256": {
+      "block_m": 64,
+      "block_n": 256,
+      "block_k": 256,
+      "num_warps": 4,
+      "num_stages": 2,
+      "kernel_type": "wgmma",
+      "time_us": 69.2
+    },
+    "512": {
+      "block_m": 64,
+      "block_n": 256,
+      "block_k": 256,
+      "num_warps": 4,
+      "num_stages": 1,
+      "kernel_type": "wgmma",
+      "time_us": 78.7
+    },
+    "1024": {
+      "block_m": 192,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 12,
+      "num_stages": 3,
+      "kernel_type": "wgmma",
+      "time_us": 108.5
+    },
+    "1536": {
+      "block_m": 128,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 8,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 127.0
+    },
+    "2048": {
+      "block_m": 128,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 8,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 138.6
+    },
+    "3072": {
+      "block_m": 128,
+      "block_n": 256,
+      "block_k": 128,
+      "num_warps": 8,
+      "num_stages": 4,
+      "kernel_type": "wgmma",
+      "time_us": 179.9
+    },
+    "4096": {
+      "block_m": 192,
+      "block_n": 256,
+      "block_k": 64,
+      "num_warps": 12,
+      "num_stages": 5,
+      "kernel_type": "wgmma",
+      "time_us": 193.4
+    }
+  },
+  "generated": "2026-01-08"
+}
