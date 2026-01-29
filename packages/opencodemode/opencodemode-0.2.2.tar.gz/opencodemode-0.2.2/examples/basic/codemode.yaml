@@ -1,0 +1,70 @@
+project:
+  name: basic-example
+  version: 1.0.0
+
+framework:
+  type: crewai
+  auto_discover: false
+
+# Optional: TLS/mTLS configuration for secure gRPC communication
+# grpc:
+#   tls:
+#     enabled: true
+#     mode: custom  # Options: 'system' or 'custom'
+#     cert_file: ./certs/server.crt
+#     key_file: ./certs/server.key
+#     ca_file: ./certs/ca.crt
+#     # Optional: For mutual TLS (mTLS)
+#     client_cert_file: ./certs/client.crt
+#     client_key_file: ./certs/client.key
+
+executor:
+  url: http://executor:8001  # Use https:// when TLS is enabled
+  api_key: ${CODEMODE_API_KEY}
+  timeout: 35
+
+  limits:
+    code_timeout: 30
+    max_code_length: 10000
+    memory_limit: 512Mi
+
+  # Hybrid execution: direct commands + proxied tools
+  execution:
+    allow_direct_execution: true
+    allowed_commands:
+      - grep
+      - cat
+      - ls
+      - find
+      - wc
+      - head
+      - tail
+      - bash
+
+  # Filesystem access control
+  filesystem:
+    workspace:
+      mount: ./project_files
+      readonly: true
+    sandbox:
+      mount: /sandbox
+      readonly: false
+      max_size: 1GB
+    outputs:
+      mount: ./outputs
+      readonly: false
+
+  # Network access control
+  network:
+    mode: none  # Executor has no network access
+    # For restricted mode, uncomment:
+    # mode: restricted
+    # allowed_domains:
+    #   - "*.github.com"
+    #   - "api.openai.com"
+
+config:
+  environment: development
+
+logging:
+  level: INFO

@@ -1,0 +1,41 @@
+project:
+  name: tls-example
+  version: 1.0.0
+
+framework:
+  type: crewai
+  auto_discover: true
+
+# gRPC TLS Configuration
+grpc:
+  tls:
+    enabled: true
+    mode: custom  # Options: 'system' or 'custom'
+    cert_file: ./certs/server.crt
+    key_file: ./certs/server.key
+    ca_file: ./certs/ca.crt
+    # Optional: For mutual TLS (mTLS) client authentication
+    client_cert_file: ./certs/client.crt
+    client_key_file: ./certs/client.key
+
+# Executor service configuration
+executor:
+  url: https://localhost:8001  # Use https when TLS is enabled
+  api_key: ${CODEMODE_API_KEY}
+  timeout: 35
+
+  limits:
+    code_timeout: 30
+    max_code_length: 10000
+    memory_limit: "512Mi"
+
+  # Network access control
+  network:
+    mode: none  # Executor has no network access
+
+# Additional configuration
+config:
+  environment: development
+
+logging:
+  level: INFO

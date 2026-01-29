@@ -1,0 +1,29 @@
+FROM python:3.11-slim
+
+# Install minimal system tools for direct execution
+RUN apt-get update && apt-get install -y \
+    grep \
+    findutils \
+    coreutils \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy source and install dependencies from pyproject.toml
+COPY pyproject.toml ./
+COPY codemode/ /app/codemode/
+RUN pip install --no-cache-dir -e .
+
+# Create necessary directories
+RUN mkdir -p /workspace /sandbox /outputs /tmp
+
+# Create non-root user
+RUN useradd -m -u 1000 executor && \
+    chown -R executor:executor /app /sandbox /outputs /tmp
+
+# Switch to non-root user
+USER executor
+
+EXPOSE 8001
+
+CMD ["python", "-m", "codemode.executor.service"]

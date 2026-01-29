@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Main application (orchestrator)
+  main-app:
+    build:
+      context: ../..
+      dockerfile: examples/basic/Dockerfile.main
+    ports:
+      - "8000:8000"
+      - "50051:50051"
+    environment:
+      - CODEMODE_API_KEY=${CODEMODE_API_KEY:-dev-secret-key}
+      - EXECUTOR_URL=http://executor:8001
+    volumes:
+      - ./:/app
+      - ./outputs:/outputs:rw
+    networks:
+      - codemode
+    command: python app.py
+
+  # Executor service (isolated code execution)
+  executor:
+    build:
+      context: ../..
+      dockerfile: docker_sidecar/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - CODEMODE_API_KEY=${CODEMODE_API_KEY:-dev-secret-key}
+      - MAIN_APP_GRPC_TARGET=main-app:50051
+    volumes:
+      # Workspace: read-only access to project files
+      - ./project_files:/workspace:ro
+      # Sandbox: read-write scratch space with size limit
+      - executor-sandbox:/sandbox:rw
+      # Outputs: read-write for results
+      - ./outputs:/outputs:rw
+    networks:
+      - codemode
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    read_only: false  # Allow writes to sandbox and outputs
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    command: python -m codemode.executor.service
+
+networks:
+  codemode:
+    driver: bridge
+
+volumes:
+  executor-sandbox:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=1024m
