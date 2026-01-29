@@ -1,0 +1,58 @@
+@startuml
+autonumber
+actor User
+participant "MCP Server\n(server.py)" as Server
+participant "Tool Handler\n(tool_handlers.py)" as ToolHandler
+participant "RAG Handler\n(rag_handler.py)" as RagHandler
+participant "RAG Service\n(rag_service.py)" as RagService
+participant "Vector Store\n(vector_store.py)" as VectorStore
+participant "OpenAI Embeddings API" as OpenAIEmb
+participant "OpenAI LLM API" as OpenAILLM
+database "FAISS Vector DB" as FAISS
+
+User -> Server: Send rag_query_code (question, index_name, mode)
+Server -> ToolHandler: route_tool_call("rag_query_code", ...)
+ToolHandler -> RagHandler: handle_rag_query_code(question, index_name, mode)
+
+RagHandler -> RagHandler: _initialize_rag_components()
+note right: Initialize RAG Service\nwith specified mode
+
+RagHandler -> RagService: search_code(question, index_name)
+RagService -> VectorStore: search(index_name, question, top_k=5)
+
+VectorStore -> VectorStore: load_vectorstore(index_name)
+VectorStore -> FAISS: Load FAISS index from disk
+FAISS --> VectorStore: Return loaded index
+
+VectorStore -> OpenAIEmb: Embed question to vector
+OpenAIEmb --> VectorStore: Return question embedding
+
+VectorStore -> FAISS: Similarity search (cosine distance)
+FAISS --> VectorStore: Return top K similar chunks
+
+VectorStore --> RagService: Return relevant documents
+RagService --> RagHandler: Return documents
+
+alt mode == "full_rag"
+    note right of RagHandler: OpenAI generates answer
+    RagHandler -> RagService: generate_answer(question, documents)
+    RagService -> RagService: Build prompt with context
+    RagService -> OpenAILLM: Send prompt:\n- System: "You are a code expert..."\n- User: question + context
+    OpenAILLM --> RagService: Return generated answer
+    RagService --> RagHandler: Return answer with sources
+    RagHandler -> RagHandler: Format response:\n- Answer text\n- Source files list
+    RagHandler --> ToolHandler: Return complete answer
+    ToolHandler --> Server: Return complete answer
+    Server --> User: Return answer (with sources)
+else mode == "retrieval_only"
+    note right of RagHandler: Copilot Chat generates answer
+    RagHandler -> RagService: format_context_for_copilot(documents, question)
+    RagService -> RagService: Format context:\n- Code snippets\n- File paths\n- Instructions for Copilot
+    RagService --> RagHandler: Return formatted context
+    RagHandler -> RagHandler: Add instruction:\n"Please analyze the above code..."
+    RagHandler --> ToolHandler: Return context only
+    ToolHandler --> Server: Return context
+    Server --> User: Return context\n(Copilot Chat generates answer)
+end
+
+@enduml
