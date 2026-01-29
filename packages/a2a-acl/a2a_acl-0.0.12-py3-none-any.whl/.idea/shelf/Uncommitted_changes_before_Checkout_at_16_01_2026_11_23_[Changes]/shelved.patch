@@ -1,0 +1,17 @@
+Index: whatsnew.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>v 0.0.12\n* spawn_send_acl_message take a callback as parameter called on error.\n* New illocution 'upload' to allow transfer of data without parsing by the firewall.\n\nv 0.0.11\n* Support for A2A streaming mode.\n\nv 0.0.10\n* Agents can handle additional illocutions (in addition to tell, achieve and ask).\n* Interfaces (in *.asi files) use illocutions (tell, ask, achieve, propose) to declare skills instead of old keywords (input, belief, action).\n* The firewall checks the entry-point with respect to the illocution.\n* Special entry-point * for nl (natural language) codec.\n* Special arity * for nl (natural language) codec.\n* Examples of agents using a LLM, with Mistral API or LiteLLM API.
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/whatsnew.txt b/whatsnew.txt
+--- a/whatsnew.txt	(revision 30f0442fdaebf6b94d8a18d04a211cf820942075)
++++ b/whatsnew.txt	(date 1768559015953)
+@@ -1,5 +1,5 @@
+ v 0.0.12
+-* spawn_send_acl_message take a callback as parameter called on error.
++* spawn_send_acl_message takes a callback as parameter called on error.
+ * New illocution 'upload' to allow transfer of data without parsing by the firewall.
+ 
+ v 0.0.11
