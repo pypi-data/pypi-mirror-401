@@ -1,0 +1,36 @@
+[project]
+name = "hazelbean"
+description = "Collection of geospatial algorithms, parallel computation utilities and project management tools."
+readme = "README.md"
+requires-python = ">=3.10"  # Python 3.9 dropped due to NumPy 2.0 compatibility issues; 3.9 EOL October 2025
+license = { file = "LICENSE" }
+authors = [
+        {name = "Justin Andrew Johnson"}
+]
+maintainers = [
+        {name = "Justin Andrew Johnson"}
+]
+keywords = ["gis", "geospatial", "economics", "land use"]
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "Programming Language :: Cython",
+        "Programming Language :: Python :: 3",
+]
+dynamic = ["version", "dependencies"]
+
+[project.urls]
+homepage = "https://github.com/jandrewjohnson/hazelbean_dev"
+
+[build-system]
+requires = [
+        "setuptools>=61", "wheel", "cython>3",
+        'numpy>=2',  # Requires Python 3.10+ which all support NumPy 2.0
+        'setuptools_scm>=8',
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+
