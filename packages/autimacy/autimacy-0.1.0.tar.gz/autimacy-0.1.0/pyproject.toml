@@ -1,0 +1,32 @@
+[project]
+name = "autimacy"
+version = "0.1.0"
+description = "logging with to much information"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+]
+dependencies = [
+    "parlancy>=0.1.1",
+    "langchain>=1.2.4",
+]
+
+[groups.dependencies]
+dev = [
+    "autilities>=0.1.0",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+]
+
+[project.scripts]
+watch-autimacy = "autimacy.__devel__:watch"
+publish-autimacy = "autimacy.__devel__:publish"
+
+[build-system]
+requires=["uv_build"]
+build-backend="uv_build"
