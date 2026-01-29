@@ -1,0 +1,78 @@
+[project]
+name = "boringpy"
+version = "0.1.2"
+description = "Modern Python scaffolding framework inspired by NestJS CLI - scaffold FastAPI projects with Docker, Alembic, and production-ready structure"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "BoringPy Contributors"}
+]
+keywords = [
+    "scaffolding",
+    "cli",
+    "fastapi",
+    "generator",
+    "boilerplate",
+    "nestjs",
+    "python",
+    "docker",
+    "alembic",
+    "code-generator"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "jinja2>=3.1.6",
+    "rich>=14.2.0",
+    "typer>=0.21.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/gverdugo-g14/boringpy14"
+Repository = "https://github.com/gverdugo-g14/boringpy14"
+Issues = "https://github.com/gverdugo-g14/boringpy14/issues"
+Documentation = "https://github.com/gverdugo-g14/boringpy14#readme"
+
+# CLI entry point - this makes 'boringpy' command available
+[project.scripts]
+boringpy = "boringpy.cli.__main__:app"
+
+# Package building configuration
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/boringpy"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.13",
+    "ty>=0.0.12",
+    "build>=1.0.0",
+]
+
+# Keep workspace config but only include libs (not test apps)
+[tool.uv.workspace]
+members = ["src/libs/lib_boring_logger"]
+
+[tool.ruff]
+exclude = ["src/boringpy/templates/", "src/apps/", "dist/", "build/"]
+
+[tool.pytest.ini_options]
+testpaths = ["src"]
+python_files = ["test_*.py", "*_test.py"]
+exclude_dirs = ["src/boringpy/templates", "src/apps"]

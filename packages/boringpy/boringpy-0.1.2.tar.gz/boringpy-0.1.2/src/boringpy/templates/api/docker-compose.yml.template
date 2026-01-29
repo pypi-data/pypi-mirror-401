@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: {{package_name}}_api
+    ports:
+      - "{{port}}:{{port}}"
+    environment:
+      - DATABASE_URL={{docker_database_url}}
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - LOG_LEVEL=INFO
+    {% if db_type != 'sqlite' %}
+    depends_on:
+      {% if db_type == 'postgresql' %}
+      postgres:
+        condition: service_healthy
+      {% elif db_type == 'mysql' %}
+      mysql:
+        condition: service_healthy
+      {% endif %}
+    {% endif %}
+    volumes:
+      - ./app:/app/app  # Hot reload for development
+      {% if db_type == 'sqlite' %}
+      - sqlite_data:/app/data
+      {% endif %}
+    networks:
+      - {{package_name}}_network
+    restart: unless-stopped
+
+{% if db_type == 'postgresql' %}
+  postgres:
+    image: postgres:16-alpine
+    container_name: {{package_name}}_db
+    environment:
+      POSTGRES_USER: {{package_name}}
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: {{package_name}}_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - {{package_name}}_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{package_name}}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+{% elif db_type == 'mysql' %}
+  mysql:
+    image: mysql:8.0
+    container_name: {{package_name}}_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: {{package_name}}_db
+      MYSQL_USER: {{package_name}}
+      MYSQL_PASSWORD: devpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - {{package_name}}_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u{{package_name}}", "-pdevpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+{% endif %}
+networks:
+  {{package_name}}_network:
+    driver: bridge
+
+{% if db_type == 'postgresql' %}
+volumes:
+  postgres_data:
+{% elif db_type == 'mysql' %}
+volumes:
+  mysql_data:
+{% elif db_type == 'sqlite' %}
+volumes:
+  sqlite_data:
+{% endif %}

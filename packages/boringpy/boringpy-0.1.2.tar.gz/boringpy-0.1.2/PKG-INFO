@@ -1,0 +1,403 @@
+Metadata-Version: 2.4
+Name: boringpy
+Version: 0.1.2
+Summary: Modern Python scaffolding framework inspired by NestJS CLI - scaffold FastAPI projects with Docker, Alembic, and production-ready structure
+Project-URL: Homepage, https://github.com/gverdugo-g14/boringpy14
+Project-URL: Repository, https://github.com/gverdugo-g14/boringpy14
+Project-URL: Issues, https://github.com/gverdugo-g14/boringpy14/issues
+Project-URL: Documentation, https://github.com/gverdugo-g14/boringpy14#readme
+Author: BoringPy Contributors
+License: MIT
+License-File: LICENSE
+Keywords: alembic,boilerplate,cli,code-generator,docker,fastapi,generator,nestjs,python,scaffolding
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Requires-Python: >=3.13
+Requires-Dist: jinja2>=3.1.6
+Requires-Dist: rich>=14.2.0
+Requires-Dist: typer>=0.21.1
+Description-Content-Type: text/markdown
+
+# BoringPy
+
+[![PyPI version](https://img.shields.io/pypi/v/boringpy.svg)](https://pypi.org/project/boringpy/)
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> Modern Python scaffolding framework inspired by NestJS CLI - scaffold production-ready FastAPI projects in seconds.
+
+## ✨ Features
+
+- 🚀 **Instant FastAPI Projects** - Generate complete APIs with Docker, Alembic, and tests
+- 🗄️ **Database Ready** - PostgreSQL, MySQL, or SQLite with SQLModel ORM
+- 🐳 **Docker First** - Full docker-compose setup with hot reload
+- 📦 **UV Powered** - Lightning-fast package management with [uv](https://github.com/astral-sh/uv)
+- 🎯 **Type Safe** - Full type annotations and strict type checking
+- 🏗️ **Monorepo Ready** - Workspace support for multiple APIs and shared libraries
+- 🧪 **Test Infrastructure** - pytest with coverage reporting
+- 📝 **Professional Makefile** - 30+ commands for development workflow
+
+## 📦 Installation
+
+### Requirements
+
+- **Python 3.13+**
+- **[uv](https://github.com/astral-sh/uv)** package manager
+
+Install uv if you haven't already:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Install BoringPy
+
+```bash
+pip install boringpy
+```
+
+Or with uv:
+
+```bash
+uv tool install boringpy
+```
+
+## 🚀 Quick Start
+
+### 1. Create a Workspace
+
+```bash
+boringpy init my-workspace
+cd my-workspace
+```
+
+This creates:
+
+```
+my-workspace/
+├── src/
+│   ├── apps/       # Generated APIs
+│   ├── libs/       # Shared libraries
+│   └── scripts/    # Utility scripts
+├── boringpy.json   # Workspace config
+├── pyproject.toml  # UV workspace
+└── README.md
+```
+
+### 2. Generate Your First API
+
+```bash
+boringpy generate api my_blog --port 8000 --db postgresql
+```
+
+This creates a complete FastAPI application with:
+- ✅ FastAPI with async/await
+- ✅ SQLModel ORM + Alembic migrations
+- ✅ Docker & docker-compose
+- ✅ Environment-based configuration
+- ✅ Structured logging
+- ✅ pytest test suite
+- ✅ Professional Makefile
+- ✅ Health check endpoints
+- ✅ API documentation (Swagger/ReDoc)
+
+### 3. Run Your API
+
+```bash
+cd src/apps/my_blog
+
+# Copy environment file
+cp .env.example .env
+
+# Start with Docker (recommended)
+make docker-up
+
+# Run migrations
+make db-upgrade
+
+# View logs
+make docker-logs
+
+# Stop containers
+make docker-down
+```
+
+Your API is now running at `http://localhost:8000`!
+
+- API Docs: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Health: http://localhost:8000/health
+
+## 📖 Usage
+
+### Commands
+
+```bash
+# Show version
+boringpy --version
+
+# Show help
+boringpy --help
+
+# Initialize workspace
+boringpy init <workspace-name>
+
+# Generate FastAPI application
+boringpy generate api <name> [OPTIONS]
+  --port INTEGER       API port (default: 8000)
+  --db TEXT           Database type: postgresql, mysql, sqlite (default: postgresql)
+
+# Coming soon
+boringpy generate lib <name>      # Generate shared library
+boringpy generate model <name>    # Generate SQLModel
+```
+
+### Database Options
+
+**PostgreSQL** (default):
+```bash
+boringpy generate api my_api --db postgresql
+```
+
+**MySQL**:
+```bash
+boringpy generate api my_api --db mysql
+```
+
+**SQLite** (no container needed):
+```bash
+boringpy generate api my_api --db sqlite
+```
+
+### Generated API Makefile Commands
+
+Every generated API includes a comprehensive Makefile:
+
+```bash
+# Development
+make dev                    # Run API locally
+make dev-reload             # Run with auto-reload
+make test                   # Run tests
+make test-cov               # Run tests with coverage
+
+# Code Quality
+make format                 # Format code with ruff
+make lint                   # Lint code
+make typecheck              # Type check with ty
+make check                  # Run all checks
+
+# Docker
+make docker-build           # Build Docker image
+make docker-up              # Start containers
+make docker-down            # Stop containers
+make docker-logs            # View logs
+make docker-shell           # Shell into container
+
+# Database
+make db-upgrade             # Run migrations
+make db-downgrade           # Rollback migration
+make db-create-migration MSG="description"  # Create migration
+make db-history             # View migration history
+make db-shell               # Database shell
+```
+
+## 🗂️ Project Structure
+
+Generated APIs follow this structure:
+
+```
+my_api/
+├── app/
+│   ├── core/
+│   │   ├── config.py       # Settings & configuration
+│   │   ├── database.py     # Database connection
+│   │   ├── logger.py       # Logging setup
+│   │   └── lifespan.py     # App lifecycle
+│   ├── models/
+│   │   ├── base.py         # Base SQLModel
+│   │   └── example.py      # Example model
+│   ├── api/
+│   │   ├── deps.py         # Dependencies
+│   │   └── v1/
+│   │       └── endpoints/
+│   │           └── health.py
+│   ├── services/           # Business logic
+│   └── main.py             # FastAPI app
+├── migrations/             # Alembic migrations
+├── tests/                  # pytest tests
+├── docker-compose.yml      # Multi-container setup
+├── Dockerfile              # Multi-stage build
+├── Makefile                # Development commands
+├── .env.example            # Environment template
+├── alembic.ini             # Migration config
+└── README.md               # API documentation
+```
+
+## 🔧 Configuration
+
+### Workspace Config (`boringpy.json`)
+
+```json
+{
+  "version": "0.1.0",
+  "type": "workspace",
+  "defaults": {
+    "api": {
+      "db_type": "postgresql",
+      "port": 8000
+    }
+  },
+  "workspace_members": [
+    "src/apps/my_api"
+  ]
+}
+```
+
+### API Environment (`.env`)
+
+```bash
+# Application
+APP_NAME=my_api
+APP_VERSION=0.1.0
+DEBUG=true
+
+# Server
+HOST=0.0.0.0
+PORT=8000
+
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/db
+DB_ECHO=false
+DB_POOL_SIZE=5
+DB_MAX_OVERFLOW=10
+
+# Logging
+LOG_LEVEL=INFO
+```
+
+## 🎯 Use Cases
+
+### Single API Project
+
+```bash
+boringpy init my-project
+cd my-project
+boringpy generate api backend --port 8000
+```
+
+### Microservices Monorepo
+
+```bash
+boringpy init my-company
+cd my-company
+boringpy generate api users_service --port 8001
+boringpy generate api orders_service --port 8002
+boringpy generate api payments_service --port 8003
+```
+
+### API + Shared Libraries
+
+```bash
+boringpy init my-platform
+cd my-platform
+boringpy generate api web_api --port 8000
+boringpy generate lib auth_utils     # Coming soon
+boringpy generate lib database_models # Coming soon
+```
+
+## 🛠️ Technology Stack
+
+Generated projects use:
+
+- **[FastAPI](https://fastapi.tiangolo.com/)** - Modern async web framework
+- **[SQLModel](https://sqlmodel.tiangolo.com/)** - SQL databases with Python types
+- **[Alembic](https://alembic.sqlalchemy.org/)** - Database migrations
+- **[Pydantic](https://docs.pydantic.dev/)** - Data validation
+- **[uvicorn](https://www.uvicorn.org/)** - ASGI server
+- **[pytest](https://pytest.org/)** - Testing framework
+- **[ruff](https://github.com/astral-sh/ruff)** - Linting & formatting
+- **[Docker](https://www.docker.com/)** - Containerization
+- **[uv](https://github.com/astral-sh/uv)** - Package management
+
+## 📚 Examples
+
+### Minimal Example
+
+```bash
+# Create and run an API in 4 commands
+boringpy init blog
+cd blog
+boringpy generate api api --db sqlite
+cd src/apps/api && make dev
+```
+
+### Production Example
+
+```bash
+# Full production setup with PostgreSQL
+boringpy init production-app
+cd production-app
+boringpy generate api api --port 8000 --db postgresql
+
+cd src/apps/api
+cp .env.example .env
+# Edit .env with production values
+
+make docker-build
+make docker-up
+make db-upgrade
+```
+
+## 🤔 Why BoringPy?
+
+**BoringPy** takes the "boring" out of project setup. No more:
+- ❌ Manual FastAPI boilerplate
+- ❌ Copying docker-compose files
+- ❌ Setting up Alembic from scratch
+- ❌ Writing Makefiles
+- ❌ Configuring logging
+
+Just run `boringpy generate api` and **start building features immediately**.
+
+Inspired by **NestJS CLI** - but for Python and FastAPI.
+
+## 🗺️ Roadmap
+
+- [x] Workspace initialization
+- [x] FastAPI API generation
+- [x] Multi-database support
+- [x] Docker setup
+- [x] Alembic migrations
+- [ ] Library generation
+- [ ] SQLModel generator
+- [ ] CRUD endpoint generator
+- [ ] Authentication templates
+- [ ] AWS/GCP deployment helpers
+- [ ] Plugin system
+
+## 🤝 Contributing
+
+Contributions welcome! Please check out our [contributing guidelines](CONTRIBUTING.md).
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by [NestJS CLI](https://docs.nestjs.com/cli/overview)
+- Powered by [Astral](https://astral.sh) tooling (uv, ruff)
+- Built with [Typer](https://typer.tiangolo.com/) and [Rich](https://rich.readthedocs.io/)
+
+---
+
+**Built with ❤️ for the Python community**
+
+[⭐ Star us on GitHub](https://github.com/gverdugo-g14/boringpy14) | [📦 PyPI Package](https://pypi.org/project/boringpy/) | [📖 Documentation](https://github.com/gverdugo-g14/boringpy14#readme)
