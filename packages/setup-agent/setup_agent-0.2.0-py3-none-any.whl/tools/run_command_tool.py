@@ -1,0 +1,41 @@
+from typing import Optional
+from uuid import UUID
+
+from langchain_core.tools import tool
+from langgraph.prebuilt import InjectedState
+from typing_extensions import Annotated
+
+from agents.base_react_agent import CustomAgentState
+from shell import BaseShell, ShellRegistry, StreamToShellOutput
+from utils.logger import LoggerFactory
+
+
+@tool(parse_docstring=True)
+def run_command_tool(
+    command: str, state: Annotated[CustomAgentState, InjectedState]
+) -> StreamToShellOutput:
+    """
+    Run a shell command in the persistent interactive shell.
+
+    This tool executes the given `command` in a persistent shell.
+    It should NOT be used for sensitive data such as passwords.
+
+    Args:
+        command (str): The shell command to execute.
+        state (CustomAgentState): The agent's current state, injected automatically.
+
+    Returns:
+        StreamToShellOutput: Structured output from the executed command, containing:
+            - needs_action (bool): True if agent/user action is required (e.g., password prompt).
+            - reason (Optional[str]): Description of the required action if applicable.
+            - output (str): Full cleaned output of the executed command.
+    """
+    shell_registry = ShellRegistry.get()
+    shell_id: Optional[UUID] = state["shell_id"]
+    shell: BaseShell = shell_registry.get_shell(shell_id)
+    name = state.get("agent_name")
+    logger = LoggerFactory.get_logger(name=name)
+
+    logger.info(f"run_command_tool called with args: {command}.")
+    result = shell.run_command(command)
+    return result
