@@ -1,0 +1,558 @@
+@use 'sass:map';
+
+@use "variable";
+@use "size";
+
+.sphinxsidebar {
+    width: 0;
+}
+
+.sphinxsidebarwrapper {
+    box-sizing: content-box;
+    overflow-y: auto;
+    height: calc(100vh - 3.5rem);
+}
+
+@media (max-width: variable.$screen-1) {
+    .sphinxsidebar .repotoc-tree {
+        display: contents;
+    }
+}
+
+@media (min-width: variable.$screen-1) {
+    .sphinxsidebar .repotoc-tree {
+        display: none;
+    }
+}
+
+@media (max-width: variable.$screen-3) {
+    .sphinxsidebar {
+        transition: .125s ease opacity, .25s ease margin;
+        pointer-events: none;
+        margin-left: -5rem;
+        opacity: 0;
+    }
+
+    .sphinxsidebarwrapper {
+        backdrop-filter: blur(1em);
+        background: var(--bg-color1-faded2);
+        box-shadow: variable.$box-shadow-left-sidebar;
+        width: 18rem;
+    }
+
+    #input-show-toc:checked ~ .sphinxsidebar {
+        pointer-events: initial;
+        margin-left: 0;
+        opacity: 1;
+    }
+
+    .sphinxsidebar .toctree {
+        margin: 1em auto 0;
+    }
+
+
+}
+
+@media (max-width: variable.$screen-1) {
+    .sphinxsidebar #logo, .sphinxsidebar #no-logo {
+        display: none !important;
+    }
+}
+
+.sphinxsidebar #logo, .sphinxsidebar #no-logo {
+    display: block;
+    font-size: 1.5em;
+    max-width: 13rem;
+    margin: 1rem 1rem 0 1rem;
+}
+
+@media (min-width: variable.$screen-0) and (max-width: variable.$screen-3) {
+    .sphinxsidebar {
+        width: 18em;
+        left: -19em;
+    }
+
+    #input-show-toc:checked ~ .sphinxsidebar {
+        box-shadow: variable.$box-shadow-left-sidebar;
+    }
+}
+
+#input-show-localtoc:checked ~ #cancel-area-show-localtoc {
+    z-index: 3;
+}
+
+#input-show-localtoc:checked ~ .localtoc {
+    z-index: 4;
+}
+
+#input-show-toc:checked ~ #cancel-area-show-toc {
+    z-index: 5;
+}
+
+#input-show-toc:checked ~ .sphinxsidebar {
+    z-index: 6;
+}
+
+@media (max-width: variable.$screen-0) {
+    .sphinxsidebar {
+        width: 100vw;
+        left: -100vw;
+    }
+}
+
+.sphinxsidebar ul {
+    list-style-type: none;
+    padding: 0 0 0 .5em;
+}
+
+.sphinxsidebar .caption-text {
+    color: var(--text-color2);
+}
+
+.toctree-collapse {
+    display: none;
+}
+
+@media (min-width: variable.$screen-3) {
+    button#show-sidebar {
+      display: none;
+    }
+
+    .sphinxsidebar {
+        z-index: 6;
+    }
+    .sphinxsidebarwrapper {
+        height: calc(100vh - 3.5rem);
+	width: calc(5vw + 15rem);
+    }
+
+    body:not(.overflow-hidden) .sphinxsidebarwrapper {
+        border-right: variable.$border-panel2;
+    }
+}
+
+@media (min-width: variable.$screen-3) {
+    .sphinxsidebarwrapper .toc-tree, .sphinxsidebarwrapper .repotoc-tree {
+        padding: 1em 1vw;
+    }
+    .sphinxsidebar #logo, .sphinxsidebar #no-logo {
+        margin: 1vw 1vw 0 1vw;
+    }
+}
+
+@media (max-width: variable.$screen-3) {
+    .sphinxsidebarwrapper .toc-tree, .sphinxsidebarwrapper .repotoc-tree {
+        padding: 1em;
+    }
+}
+
+.toc-tree, .sphinxsidebar .repotoc-tree {
+    margin-bottom: 10em;
+
+    p.caption {
+        margin: 1em 0 .5em 0;
+    }
+
+    > ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    label {
+        cursor: pointer;
+        display: block;
+        padding: .5em .3em .2em .5em;
+        height: 1em;
+        width: 1em;
+    }
+
+    .toctree-collapse ~ ul {
+        display: none;
+    }
+
+    .toctree-collapse:checked ~ ul {
+        display: block;
+    }
+
+    .collapse {
+        display: flex;
+    }
+
+    a {
+        scroll-margin-bottom: 10em;
+        display: flex;
+        align-items: stretch;
+        line-height: 1.5em;
+        width: 100%;
+        padding: .25em .5em .25em 0;
+        margin-left: -.75em;
+        border-radius: variable.$border-radius;
+        font-size: .9em;
+
+        &:before {
+            width: .25em;
+            margin: 0 .25em;
+            content: '⠀';
+            border-radius: variable.$border-radius;
+            display: block;
+        }
+    }
+
+    a:hover {
+        color: var(--accent-color);
+    }
+
+    a.current {
+        color: var(--accent-color);
+
+        &:before {
+            background: var(--accent-color);
+        }
+    }
+
+    label:hover .icon {
+        border-color: var(--accent-color) !important;
+    }
+
+    label:hover,
+    a:hover {
+        background-color: var(--bg-color2);
+    }
+
+    .collapse label .icon {
+        border: 1px solid var(--text-color1);
+        border-width: 0 1px 1px 0;
+        display: block;
+        transition: transform ease .125s, margin ease .125s;
+        width: .5em;
+        height: .5em;
+        transform: rotate(-45deg);
+        margin-top: 1px;
+        margin-left: -1px;
+    }
+
+    .toctree-collapse:checked ~ .collapse .icon {
+        transform: rotate(45deg);
+        margin-top: -1px;
+        margin-left: 1px;
+    }
+
+    label {
+        border-radius: variable.$border-radius-extra;
+    }
+}
+
+@media screen {
+    .localtoc {
+        right: auto;
+        left: 100vw;
+        height: 0;
+        width: 0;
+
+    }
+
+    .tocwrapper {
+        background: var(--bg-color1);
+        height: calc(100vh - 4.5rem);
+        overflow-y: auto;
+
+        > *:last-child {
+            margin-bottom: 10em;
+        }
+
+        .group, nav {
+            border-left: variable.$border-panel2;
+            max-width: 20rem;
+            padding-right: .5em;
+            color: var(--text-color2);
+        }
+    }
+
+    body:not(.singlehtml) {
+        .tocwrapper nav > ul > li:first-child > a {
+          display: none;
+        }
+    }
+
+    .sphinxsidebar, .localtoc {
+        position: sticky;
+        top: 3.5rem;
+        height: 0;
+    }
+}
+
+.localtoc {
+
+    .caption-text {
+        font-weight: bold;
+        color: var(--text-color2);
+    }
+
+    .tocwrapper {
+        transition: ease opacity .2s;
+    }
+}
+
+.localtoc .tocwrapper.fetch {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+}
+
+
+
+@media screen {
+    .tocwrapper ul {
+        padding: 0 0 0 .5em;
+    }
+}
+
+@media print {
+    .tocwrapper nav {
+        padding-top: 1em;
+        margin-left: -1em;
+    }
+
+    .tocwrapper ul {
+        padding: 0 0 0 1em;
+    }
+}
+
+@media screen {
+    a:not(.current) {
+      letter-spacing: .005em;
+    }
+
+    a.current {
+      color: var(--accent-color);
+      font-weight: bold;
+      letter-spacing: -.008em;
+    }
+}
+
+.tocwrapper {
+    box-sizing: content-box;
+    padding-top: 1rem;
+    font-size: 0.9em;
+
+    .caption-text {
+        padding-left: 1em;
+    }
+
+    ul {
+        list-style-type: none;
+    }
+
+    a {
+        display: inline-block;
+        padding: .25em 0;
+    }
+
+    .header {
+        user-select: none;
+        color: var(--text-color3);
+    }
+
+    .localtoc-header {
+        display: flex;
+        align-items: center;
+    }
+
+    #scroll-up {
+      cursor: pointer;
+      filter: invert(var(--is-dark-theme));
+      margin-left: .25rem;
+      opacity: 0.75
+    }
+
+    #scroll-up:before {
+        content: '';
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin: .25rem;
+        background: url('./icons.svg');
+    }
+
+    #scroll-up:before {
+        background-position: left calc(-1.5rem*3) top;
+    }
+}
+
+@media screen {
+    .localtoc .header {
+        padding-left: 1rem;
+        margin-bottom: 1em;
+    }
+
+    .localtoc .sub-header {
+        padding-left: .5rem;
+        color: var(--text-color3);
+        font-weight: bold;
+        margin: 1em 0 -.25em 0;
+    }
+
+    .localtoc-header:before {
+        content: "On this page"
+    }
+}
+
+@media print {
+    .localtoc .header {
+        font-size: 1.5em;
+    }
+
+    .localtoc-header:before {
+        content: "Table of contents"
+    }
+}
+
+@media (min-width: variable.$screen-1) {
+    .sphinxsidebar {
+        #show-repotoc, #show-toc {
+            display: none;
+        }
+    }
+}
+
+.sphinxsidebar {
+    #show-repotoc, #show-toc {
+        cursor: pointer;
+        user-select: none;
+        align-items: center;
+        background: var(--bg-color2);
+    }
+
+    #show-repotoc {
+        padding: 1.5rem 0.5rem 0.5rem 0.5em;
+    }
+
+    #show-toc {
+        padding: 1.5rem 0.5rem 0.5rem 1em;
+    }
+
+    #show-repotoc:before, #show-toc:after {
+        content: '';
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: url('./icons.svg');
+        filter: invert(var(--is-dark-theme));
+    }
+
+    #show-repotoc:before {
+        background-position: left calc(-1.5rem*5) bottom;
+    }
+
+    #show-toc:after {
+        background-position: left calc(-1.5rem*5) top;
+    }
+}
+
+@media (max-width: variable.$screen-1) {
+    #input-switch-toc:checked ~ .repotoc-tree {
+        display: block;
+    }
+
+    #input-switch-toc:checked ~ .toc-tree {
+        display: none;
+    }
+
+    #show-toc {
+        display: none;
+    }
+
+    #show-repotoc,
+    #input-switch-toc:checked ~ #show-toc {
+        display: flex;
+        justify-content: start;
+    }
+
+    #input-switch-toc:checked ~ #show-repotoc {
+        display: none;
+    }
+}
+
+.sphinxsidebar .repotoc-tree {
+    display: none;
+}
+
+@media screen and (max-width: variable.$screen-1) {
+    .localtoc {
+        transition: .125s ease opacity;
+        pointer-events: none;
+        opacity: 0;
+        direction: rtl;
+
+        .tocwrapper {
+            direction: ltr;
+            transition: .25s ease width;
+            box-shadow: variable.$box-shadow-right-sidebar;
+            overflow-x: hidden;
+            width: 15rem;
+        }
+
+        .tocwrapper > div, .tocwrapper > nav {
+            width: 20rem;
+        }
+    }
+
+    #input-show-localtoc:checked ~ .localtoc {
+        pointer-events: initial;
+        opacity: 1;
+    }
+
+    #input-show-localtoc:checked ~ .localtoc .tocwrapper {
+        width: 20rem;
+    }
+}
+
+@media screen and (max-width: variable.$screen-1) {
+    #input-show-localtoc:checked ~ #cancel-area-show-localtoc {
+        position: fixed;
+        background: rgba(0, 0, 0, .05);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+@media screen and (max-width: variable.$screen-3) {
+    .sphinxsidebar, .localtoc {
+        z-index: 2;
+    }
+
+    #input-show-toc:checked ~ #cancel-area-show-toc {
+        position: fixed;
+        background: rgba(0, 0, 0, .05);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+#input-show-toc,
+#input-show-localtoc,
+#input-show-repotoc,
+#input-switch-toc {
+    display: none
+}
+
+@media (min-width: variable.$screen-1) and (max-width: variable.$screen-3) {
+    @include size.localtoc-position(
+        map.get(map.get(size.$bodywrapper-sizes, screen-1-3), rem),
+        map.get(map.get(size.$bodywrapper-sizes, screen-1-3), vw),
+        map.get(map.get(size.$bodywrapper-sizes, screen-1-3), offset)
+    );
+}
+
+@media (min-width: variable.$screen-3) {
+    @include size.localtoc-position(
+        map.get(map.get(size.$bodywrapper-sizes, screen-3), rem),
+        map.get(map.get(size.$bodywrapper-sizes, screen-3), vw),
+        -2vw
+    );
+}
+
