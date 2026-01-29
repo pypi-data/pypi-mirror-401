@@ -1,0 +1,50 @@
+[project]
+name = "blindfold"
+version = "1.0.0"
+description = "Library for working with encrypted data within nilDB queries and replies."
+license = "MIT"
+readme = "README.rst"
+requires-python = ">=3.9"
+dependencies = [
+    "parts~=4.0",
+    "hkdfs~=0.1",
+    "bcl~=3.0",
+    "shamirs~=4.0",
+    "pailliers>=0.3.1,<2.0.0"
+]
+
+[project.urls]
+Repository = "https://github.com/nillionnetwork/blindfold-py"
+Documentation = "https://blindfold.readthedocs.io"
+
+[project.optional-dependencies]
+docs = [
+    "toml~=0.10.2",
+    "sphinx~=7.4",
+    "sphinx-rtd-theme~=3.0",
+    "sphinx-autodoc-typehints~=2.3",
+    "pytest~=8.4"
+]
+test = [
+    "pytest~=8.4",
+    "pytest-cov~=7.0"
+]
+lint = [
+    "pylint~=3.3"
+]
+coveralls = [
+    "coveralls~=4.0"
+]
+publish = [
+    "build~=1.3",
+    "twine~=4.0"
+]
+
+[build-system]
+requires = [
+    "setuptools>=77.0"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --ignore=docs --cov=blindfold --cov-report term-missing"
