@@ -1,0 +1,46 @@
+Metadata-Version: 2.1
+Name: sermetric
+Version: 0.2.4
+Summary: metrics for evaluate how easy-to-read a text is.
+Home-page: 
+Author: Mirari San Martín
+Author-email: miren.san-martin@unirioja.es
+Keywords: easy-to-read
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Description-Content-Type: text/x-rst
+License-File: LICENSE.txt
+
+SERMetric:
+
+SERMetric is an open-source library for evaluating how easy-to-read a text is. It supports a wide variety of indexes and allows the user to easily combine them.
+
+To evaluate readability, different types of indexes can be considered. Orthographic indexes measure writing aspects such as the number of puntuacion marks. Syllabic indexes focus on the syllabic structure of words. Lexical indexes analyse vocabulary-related properties, including lexical richness and the frequency of common or rare words. Syntactic indexes capture the complexity of grammatical structures. Moreover, the Fernández-Huerta formula estimate the overall difficulty of a text. Here, there is the name of each function as well as its description:
+
+* pointsIndex: It is the number of point in the text divided by the number of words. The closer to one, the more readable, as shorter sentences are involved.
+
+* newParagraphIndex: It is the number of paragraphs in the text divided by the number of words. The closer the number of paragraphs to the point index, the more readable it is, as it involves shorter paragraphs.
+
+* CommaIndex: It is the number of commas in the text divided by the number of words. The closer to zero, the more readable.
+
+* extensionIndex: It is the ratio between the number of syllables of lexical words and the number of lexical words, lexical words being understood as nouns, verbs, adjectives, and adverbs. As it is an average, it implies that results between one and two mean a predominance of words between one and two syllables, so it will be more readable.
+
+* triPoliIndex: It is the ratio between the number of trisyllabic and polysyllabic words and the number of lexical words. The closer to zero, the more readable.
+
+* lexicTriPoliIndex: It is the ratio between the number of trisyllabic and polysyllabic lexical words and the number of lexical words. The closer to zero, the more readable.
+
+* diversityIndex: It is the ratio between the number of different words in the text and the total number of words. A number close to zero implies excessive redundancy of the same terms, which makes the text tedious; while a number close to one means high diversity, which makes it less readable.
+
+* lexicalFreqIndex: It is the ratio between the number of low-frequency lexical words and the number of lexical words (references: The “Corpus de la Real Academia Española” (CREA) and the “Gran diccionario del uso del español actual”). The closer to zero, the more readable.
+
+* wordForPhraseIndex: It is the quotient resulting from the division between the number of words in the text and the number of sentences. For a text to be easy to read, the length of the sentences must be between 15 and 20 words maximum.
+
+* sentenceComplexityIndex: It is the result of dividing the number of sentences by the number of propositions. The minimum value is one, and the maximum is infinite, although above five it is difficult to maintain coherence and clarity of expression.
+
+* complexityIndex: It is the quotient between the number of low frequency syllables and the total number of syllables (reference: “Diccionario de frecuencias de las unidades lingüísticas del castellano”). The closer to zero, the more readable.
+
+* fernandezHuerta: It is the result of 206.84-0.6P-1.02F, where P represents the average number of syllables per 100 words and F represents the average number of sentences per 100 words. Higher scores indicate greater readability, whereas lower scores correspond to more complex texts.
