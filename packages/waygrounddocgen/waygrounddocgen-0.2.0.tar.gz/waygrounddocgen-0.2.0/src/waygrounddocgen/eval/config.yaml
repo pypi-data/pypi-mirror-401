@@ -1,0 +1,62 @@
+# Documentation Evaluation Configuration
+# ======================================
+
+# Coverage Check Settings
+coverage:
+  # Minimum coverage scores (0.0 to 1.0)
+  min_entry_point_coverage: 0.8   # 80% of entry points must be documented
+  min_endpoint_coverage: 0.9      # 90% of API endpoints must be documented
+  min_struct_coverage: 0.7        # 70% of structs must be mentioned
+  min_kafka_coverage: 0.8         # 80% of Kafka topics must be documented
+  min_overall_score: 0.8          # Overall weighted score threshold
+
+# Structure Check Settings
+structure:
+  # Required sections (must be present in documentation)
+  required_sections:
+    - Overview
+    - Architecture
+    - API Endpoints
+    - Data Models
+    - Dependencies
+
+  # Format requirements
+  require_mermaid: false          # Require Mermaid diagrams
+  require_tables: false           # Require markdown tables
+  require_code_blocks: true       # Require code examples
+
+  # Quality thresholds
+  min_word_count: 200             # Minimum words (excluding code)
+  min_section_coverage: 0.8       # 80% of required sections
+  min_overall_score: 0.75         # Overall structure score threshold
+
+# Freshness Check Settings
+freshness:
+  max_stale_days: 30              # Warn if doc older than 30 days
+  max_commits_behind: 10          # Warn if >10 commits since doc update
+  min_overall_score: 0.7          # Freshness score threshold
+
+# LLM Judge Settings
+llm_judge:
+  model: "claude-sonnet-4-20250514"    # Model to use
+  max_tokens: 2048                # Max response tokens
+
+  # Score thresholds (1-5 scale)
+  min_accuracy_score: 4           # Minimum accuracy (very important)
+  min_completeness_score: 3       # Minimum completeness
+  min_clarity_score: 3            # Minimum clarity
+
+# Retry Settings
+retry:
+  max_retries: 2                  # Maximum regeneration attempts
+  model: "claude-sonnet-4-20250514"    # Model for regeneration
+
+# Global Settings
+require_llm_pass: true            # Require LLM evaluation to pass
+skip_freshness: false             # Skip freshness checks
+
+# CI/CD Settings
+ci_cd:
+  fail_on_any_error: true         # Exit 1 if any module fails
+  generate_report: true           # Always generate report
+  report_format: "json"           # Report format (json or markdown)
