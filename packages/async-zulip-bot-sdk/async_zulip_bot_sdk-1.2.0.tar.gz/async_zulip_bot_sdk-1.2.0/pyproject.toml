@@ -1,0 +1,21 @@
+[project]
+name = "async-zulip-bot-sdk"
+version = "1.2.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiosqlite>=0.20.0",
+    "alembic>=1.13.0",
+    "distro>=1.9.0",
+    "httpx>=0.28.1",
+    "loguru>=0.7.3",
+    "pydantic>=2.12.5",
+    "sqlalchemy>=2.0.0",
+    "ruamel-yaml>=0.19.1",
+    "rich>=14.2.0",
+    "prompt-toolkit>=3.0.52",
+]
+
+[project.scripts]
+async-zulip-bot = "bot_sdk.cli:main"
