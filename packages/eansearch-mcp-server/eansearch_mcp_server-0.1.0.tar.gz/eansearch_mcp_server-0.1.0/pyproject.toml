@@ -1,0 +1,29 @@
+[project]
+name = "eansearch-mcp-server"
+version = "0.1.0"
+authors = [
+  { name="Jan Willamowius", email="info@relaxedcommunications.com" },
+]
+description = "A local MCP server for EAN-Search.org"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "eansearch>=1.8.3",
+    "mcp[cli]>=1.9.3",
+	"pydantic>=1.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://github.com/eansearch/eansearch-mcp-server"
+Issues = "https://github.com/eansearch/eansearch-mcp-server/issues"
+
