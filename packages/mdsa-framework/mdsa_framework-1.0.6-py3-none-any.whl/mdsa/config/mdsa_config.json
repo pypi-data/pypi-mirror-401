@@ -1,0 +1,97 @@
+{
+  "version": "1.0.4",
+  "last_updated": "2026-01-13T00:00:00Z",
+  "description": "MDSA Framework default configuration. Domains are dynamically loaded from registered applications.",
+  "orchestration": {
+    "orchestrator_model": "google/bert_uncased_L-2_H-128_A-2",
+    "reasoning_model": "microsoft/phi-2",
+    "complexity_threshold": 0.2,
+    "enable_reasoning": true
+  },
+  "models": {
+    "reasoning_model": {
+      "name": "microsoft/phi-2",
+      "type": "huggingface",
+      "device": "cpu",
+      "description": "Reasoning model for complex queries",
+      "enabled": true
+    },
+    "ollama_models": {
+      "llama3.2:3b": {
+        "enabled": true,
+        "description": "Default lightweight model",
+        "provider": "ollama"
+      },
+      "mistral:7b": {
+        "enabled": true,
+        "description": "General purpose model",
+        "provider": "ollama"
+      },
+      "llama2:latest": {
+        "enabled": true,
+        "description": "Llama 2 model",
+        "provider": "ollama"
+      }
+    }
+  },
+  "domains": [
+    {
+      "domain_id": "general",
+      "name": "General Assistant",
+      "description": "Default domain for general queries when no specific domain matches",
+      "model": "ollama://llama3.2:3b",
+      "keywords": [
+        "help",
+        "question",
+        "explain",
+        "what",
+        "how",
+        "why",
+        "information",
+        "general"
+      ],
+      "enabled": true,
+      "rag_enabled": true
+    }
+  ],
+  "tools": [
+    {
+      "tool_id": "weather_api",
+      "name": "Weather API",
+      "description": "Get current weather data for any city using OpenWeather API",
+      "endpoint": "https://api.openweathermap.org/data/2.5/weather",
+      "method": "GET",
+      "enabled": false,
+      "requires_api_key": true,
+      "api_key_env_var": "OPENWEATHER_API_KEY",
+      "params": {
+        "units": "metric"
+      },
+      "test_params": {
+        "q": "London"
+      }
+    },
+    {
+      "tool_id": "web_search",
+      "name": "Web Search",
+      "description": "Search the web for current information",
+      "endpoint": "https://api.example.com/search",
+      "method": "GET",
+      "enabled": false,
+      "requires_api_key": true,
+      "api_key_env_var": "WEB_SEARCH_API_KEY"
+    }
+  ],
+  "settings": {
+    "reasoning_threshold": 0.3,
+    "max_reasoning_depth": 3,
+    "enable_hybrid_reasoning": true,
+    "default_top_k": 5,
+    "auto_register_domains": true,
+    "auto_discover_app_domains": true,
+    "log_level": "INFO",
+    "chromadb_persist": true,
+    "knowledge_base_path": "auto"
+  },
+  "domain_models": {}
+}
