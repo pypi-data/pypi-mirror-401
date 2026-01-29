@@ -1,0 +1,135 @@
+[build-system]
+requires = ["uv_build>=0.9.23,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
+name = "lukedrew-seeds"
+version = "0.1.0"
+dependencies = []
+requires-python = ">=3.6"
+authors = [
+    { name = "Lukasz A. Kadlubowski", email = "lk@gmail.com" },
+]
+maintainers = [
+    { name = "Lukasz A. Kadlubowski", email = "lk@gmail.com" },
+]
+description = ""
+# readme = "README.md"
+license = "MIT"
+# license-files = ["LICEN[CS]E*"]
+keywords = []
+classifiers = []
+
+[project.optional-dependencies]
+
+[project.scripts]
+
+[project.gui-scripts]
+
+# [project.urls]
+# homepage = ""
+# source = ""
+# documentation = ""
+
+# [project.entry-points."spam.magical"]
+# tomatoes = "spam:main_tomatoes"
+
+[dependency-groups]
+dev = [
+    { include-group = "python-test" },
+]
+python-test = [
+    # "pytest>=9.0.2",
+    # "pytest-datadir>=1.8.0",
+    # "pytest-xdist>=3.8.0",
+]
+
+[tool.uv]
+# default-groups = "all"
+# override-dependencies = []
+# package = true
+
+[tool.uv.build-backend]
+# data = {} default-excludes = true
+#
+module-name = ["lukedrew_seeds", "lukedrew_seeds_2"]
+module-root = "src"
+#
+# namespace = false
+# source-exclude = [
+#   # TODO not tested
+#   # "**/__pycache__",
+#   # "**/.ipynb_checkpoints",
+#   # "src/gitignored",
+# ]
+# source-include = []
+# wheel-include = []
+
+# [tool.uv.sources]
+
+# -------------------------------------------------------------------------- #
+# ruff
+# -------------------------------------------------------------------------- #
+[tool.ruff]
+# extend-exclude = [
+#   "src/experimental/**",
+#   "src/gitignored/**",
+#   "tests/test_experimental/**",
+#   "tests/test_gitignored/**",
+# ]
+extend-include = ["*.ipynb"]
+line-length = 79
+
+[tool.ruff.lint]
+extend-select = ["I"]
+# extend-select = ["UP", "D", "I"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = [
+    "lukedrew_seeds",
+    # "experimental",
+    # "gitignored",
+]
+# force_grid_wrap=2  # TODO from .isort.cfg settings, no counterpart in ruff?
+
+# [tool.ruff.lint.pydocstyle]
+# convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+# -------------------------------------------------------------------------- #
+# pyright
+# -------------------------------------------------------------------------- #
+[tool.pyright]
+include = [
+    "src/lukedrew_seeds",
+    "tests/test_lukedrew_seeds",
+    # "tools",
+    # "exported_notebooks",
+]
+exclude = ["venv**", "**/node_modules", "**/__pycache__", "**/.*"]
+# ignore = ["venv**", "src/lukedrew_seeds/interactive"]
+strict = []
+defineConstant = { DEBUG = true }
+# stubPath = "src/stubs"
+# venvPath = "."
+# venv = "venv"
+verboseOutput = false
+extraPaths = []
+typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
+
+# -------------------------------------------------------------------------- #
+# pytest
+# -------------------------------------------------------------------------- #
+[tool.pytest.ini_options]
+# addopts = "-n 4" # run tests in parallel
+# filterwarnings = [
+#   # "ignore::UserWarning",
+# ]
+testpaths = [
+    "tests/test_lukedrew_seeds",
+    "tests/test_lukedrew_seeds_2",
+]
