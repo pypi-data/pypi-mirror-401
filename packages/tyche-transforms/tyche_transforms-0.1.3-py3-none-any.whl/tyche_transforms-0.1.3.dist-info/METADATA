@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: tyche-transforms
+Version: 0.1.3
+Summary: Transformation functions for Tyche market data pipelines
+License: MIT
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.26
+Requires-Dist: pandas>=2.2
+Requires-Dist: xarray>=2024.1
+Provides-Extra: test
+Requires-Dist: pytest>=8.0; extra == "test"
+
+# Tyche Transforms
+
+This package provides the transformation functions defined in `MARKETS_INFO.md` for Tyche market data pipelines,
+operating on xarray DataArray inputs.
+The intent is to keep the same implementations between local development and the Chainlink adapter.
+
+## Install
+```bash
+uv pip install tyche-transforms
+```
+
+For development:
+```bash
+uv pip install -e ".[test]"
+```
+
+## Usage
+```python
+import pandas as pd
+import xarray as xr
+from tyche_transforms.transforms import daily_average, hdd, runlen_lt
+
+times = pd.date_range("2024-01-01", periods=3)
+data = xr.DataArray([15.0, 10.0, 8.0], dims="time", coords={"time": times})
+print(daily_average(data))
+print(hdd(data))
+print(runlen_lt(data, threshold=9.0))
+```
+
+## GitHub Actions
+This repo includes a workflow that runs tests on every push/PR and publishes to PyPI when you push a tag
+matching `v*` (for example `v0.2.0`). To enable publishing:
+
+1) Add a repository secret named `PYPI_API_TOKEN` containing your PyPI token.
+2) Push a version tag:
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+## Transform list
+- `CONVERT_M_TO_MM`: convert meters to millimeters.
+- `KELVIN_TO_CELSIUS`: convert Kelvin to Celsius.
+- `CUMULATIVE_TO_INCREMENT`: convert cumulative totals to daily increments.
+- `DAILY_AVERAGE`, `DAILY_SUM`, `DAILY_MAX`, `DAILY_MIN`: daily resampling functions.
+- `HDD`, `CDD`: heating/cooling degree days (base 18 C).
+- `SUM`, `AVG`, `MAX`, `MIN`: aggregations to scalars.
+- `DATE_MAX`, `DATE_FIRST`: timestamp utilities.
+- `RUNLEN_LT`, `RUNLEN_GTE`: longest run length below or at/above a threshold.
+- `ABS`, `SUBTRACT_V`, `SUBTRACT`: scalar transforms.
