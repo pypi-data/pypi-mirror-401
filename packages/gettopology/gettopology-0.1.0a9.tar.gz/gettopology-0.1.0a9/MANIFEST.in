@@ -1,0 +1,35 @@
+# Include necessary files
+include README.md
+include LICENSE
+include pyproject.toml
+
+# Exclude directories that shouldn't be packaged
+global-exclude tests/
+global-exclude docs/
+global-exclude scripts/
+global-exclude test_output_synthetic/
+global-exclude ajtest/
+global-exclude exclude/
+global-exclude featuretest/
+global-exclude *.pyc
+global-exclude __pycache__/
+global-exclude *.py[co]
+global-exclude .git/
+global-exclude .gitignore
+global-exclude .env
+global-exclude .env.*
+global-exclude *.drawio
+global-exclude *.png
+global-exclude *.svg
+global-exclude *.pdf
+global-exclude .DS_Store
+global-exclude Thumbs.db
+
+# Recursive excludes
+recursive-exclude tests *
+recursive-exclude docs *
+recursive-exclude scripts *
+recursive-exclude ajtest *
+recursive-exclude exclude *
+recursive-exclude featuretest *
+
