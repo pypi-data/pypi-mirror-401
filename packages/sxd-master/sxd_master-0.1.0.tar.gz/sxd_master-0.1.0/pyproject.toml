@@ -1,0 +1,20 @@
+[project]
+name = "sxd-master"
+version = "0.1.0"
+description = "SXD Master Service for builds and triggers"
+dependencies = [
+    "sxd-core",
+    "fastapi>=0.95.0",
+    "uvicorn>=0.22.0",
+    "docker>=6.1.0",
+    "httpx>=0.23.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.6",
+]
+
+[project.scripts]
+sxd-master = "sxd_master.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
