@@ -1,0 +1,27 @@
+[package]
+name = "iceoryx2-bb-container"
+description = "iceoryx2: IPC shared memory compatible containers"
+categories = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[dependencies]
+iceoryx2-bb-derive-macros = { workspace = true }
+iceoryx2-bb-elementary = { workspace = true }
+iceoryx2-bb-elementary-traits = { workspace = true }
+iceoryx2-log = { workspace = true }
+iceoryx2-bb-concurrency = { workspace = true }
+
+serde = { workspace = true }
+
+[dev-dependencies]
+generic-tests = { workspace = true }
+iceoryx2-bb-testing = { workspace = true }
+iceoryx2-pal-testing = { workspace = true }
+serde_test = { workspace = true }
+iceoryx2-loggers = { workspace = true }
