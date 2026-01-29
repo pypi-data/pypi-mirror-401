@@ -1,0 +1,21 @@
+[project]
+name = "bright-cli"
+version = "0.1.0"
+description = "Thin wrapper around Bright Data Web Unlocker HTTP API"
+readme = "README.md"
+authors = [
+    { name = "Benjamin Anderson", email = "andersonbcdefg@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp>=3.9.0",
+    "pandas>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+bright = "bright_cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"
