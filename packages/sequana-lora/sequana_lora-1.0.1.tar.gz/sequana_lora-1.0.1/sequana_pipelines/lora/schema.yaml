@@ -1,0 +1,554 @@
+type: map
+mapping:
+    "input_directory":
+        type: str
+        required: true
+
+    "input_pattern":
+        type: str
+        required: true
+
+    "input_csv":
+        type: str
+        required: true
+
+    "assembler":
+        type: str
+        required: true
+        enum: ['canu', 'hifiasm', 'flye', 'unicycler', 'necat', 'pecat']
+
+    "apptainers":
+        type: any
+
+    "sequana_wrappers":
+        type: str
+
+    "reference_file":
+        type: str
+        required: true
+
+    "ccs":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "max-chunks":
+                type: int
+                required: true
+            "min-rq":
+                type: number
+                required: true
+            "min-passes":
+                type: int
+                required: true
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "samtools_merge":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "bam_to_fastq":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "bam2bed":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+
+    "canu":
+        type: map
+        mapping:
+            "genome_size":
+                type: str
+                required: true
+            "preset":
+                type: str
+                required: true
+                # canu 1.6 used pacbio-raw pacbio-corrected nanaopore-raw and nanopore-corrected
+                # canu 1.9 added pacbio-hifi
+                # canu 2.1 uses only -pacbio -nanopore and -pacbio-hifi
+                enum: ['pacbio', 'pacbio-hifi', 'nanopore']
+            "use_grid":
+                type: bool
+                required: true
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "canu_correction":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "genome_size":
+                type: str
+                required: true
+            "preset":
+                type: str
+                required: true
+                enum: ['pacbio', 'pacbio-hifi', 'nanopore']
+            "use_grid":
+                type: bool
+                required: true
+            "correction_options":
+                type: text
+                required: false
+            "trimming_options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "hifiasm":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "pecat":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: false
+            "genome_size":
+                type: int
+                required: true
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+            "min_required_length":
+                type: int
+                required: true
+            "min_coverage":
+                type: int
+                required: true
+
+    "necat":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: false
+            "genome_size":
+                type: int
+                required: true
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+            "min_required_length":
+                type: int
+                required: true
+
+    "flye":
+        type: map
+        mapping:
+            "preset":
+                type: str
+                required: true
+                enum: ['pacbio-raw', 'pacbio-corr', 'pacbio-hifi', 'nano-raw', 'nano-corr', 'nano-hq']
+            "options":
+                type: text
+                required: false
+            "genome_size":
+                type: str
+                required: true
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "multiqc":
+        type: map
+        mapping:
+            "options":
+                type: str
+            "modules":
+                type: str
+            "config_file":
+                type: str
+            "input_directory":
+                type: str
+            "resources":
+                 type: map
+                 mapping:
+                     "mem":
+                        type: str
+
+
+    "medaka_consensus":
+        type: map
+        func: ext_map_optional
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "model":
+                type: str
+                required: true
+                nullable: false
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "circlator":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+            "data_type":
+                type: any
+                required: true
+                enum: ['pacbio-corrected', 'pacbio-raw']
+
+    "polypolish":
+        type: map
+        func: ext_map_optional
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "input_directory":
+                type: str
+                required: true
+            "input_pattern":
+                type: str
+                required: true
+            "input_readtag":
+                type: str
+                required: true
+            "options":
+                type: text
+                required: false
+            "resources":
+                type: any
+                required: true
+
+    "polypolish_filter":
+        type: map
+        mapping:
+            "resources":
+                type: any
+                required: true
+
+    "fastp":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "options":
+                type: text
+                required: false
+            "min_length_required":
+                type: int
+                required: false
+            "resources":
+                type: any
+                required: true
+            "threads":
+                type: int
+                required: true
+
+    "checkm":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+            "taxon_rank":
+                type: str
+                required: true
+                enum: ['domain', 'phylum', 'class', 'order', 'family', 'genus', 'species']
+            "taxon_name":
+                type: str
+                required: true
+
+    "unicycler":
+        type: map
+        mapping:
+            "mode":
+                type: text
+                required: false
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+
+    "seqkit_sort":
+        type: map
+        mapping:
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "minimap2":
+        type: map
+        mapping:
+            "preset":
+                type: str
+                required: true
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+
+    "sequana_coverage":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                default: False
+                required: True
+            "circular":
+                type: bool
+                default: True
+                required: True
+            "double_threshold":
+                type: float
+                range: { min: 0, max: 1}
+                required: False
+                default: 0.5
+            "genbank_file":
+                type: str
+                required: False
+            "high_threshold":
+                type: float
+                range: { min: 2 }
+            "low_threshold":
+                type: float
+                range: { max: -2 }
+            "mixture_models":
+                type: int
+                required: True
+                range: { min: 1, max: 3 }
+            "reference_file":
+                type: str
+                required: False
+            "chunksize":
+                type: int
+                required: False
+                default: 5000000
+            "window_size":
+                default: 20001
+                type: int
+                range: { min: 3 }
+            "binning":
+                type: int
+                range: { min: -1 }
+            "cnv_clustering":
+                type: int
+                range: { min: -1 }
+            "gc_window_size":
+                type: int
+                range: { min: 2}
+            "options":
+              type: str
+            "resources":
+                 type: any
+                 required: true
+
+
+    "quast":
+        type: map
+        mapping:
+            "preset":
+                type: str
+                enum: ['pacbio', 'nanopore']
+                required: true
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "busco":
+        type: map
+        func: ext_map_optional
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "lineage":
+                type: str
+                required: true
+                nullable: false
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "prokka":
+        type: map
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "options":
+                type: text
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "ragtag_scaffold":
+        type: map
+        mapping:
+            "options":
+                type: text
+                required: true
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+    "seqkit_head":
+        type: map
+        mapping:
+            "n_first":
+                type: int
+                required: true
+
+    "blast":
+        type: map
+        func: ext_map_optional
+        mapping:
+            "do":
+                type: bool
+                required: true
+            "blastdb":
+                type: str
+                required: false
+                nullable: false
+            "evalue":
+                type: str
+                required: true
+            "options":
+                type: str
+                required: false
+            "threads":
+                type: int
+                required: true
+            "resources":
+                type: any
+                required: true
+
+
+    "onsuccess":
+        type: map
+        mapping:
+            "toclean":
+                type: text
+                required: true
