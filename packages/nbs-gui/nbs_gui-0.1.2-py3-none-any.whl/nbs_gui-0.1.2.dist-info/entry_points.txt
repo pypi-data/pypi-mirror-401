@@ -1,0 +1,29 @@
+[console_scripts]
+nbs-edit-xas = nbs_gui.widgets.xasPlanEditor:main
+nbs-gui = nbs_gui.main:main
+nbs-gui-test = nbs_gui.testScaffolding:main
+nbs-minimal-gui = nbs_gui.main:minimal
+
+[nbs_gui.plan_loaders]
+nbs-gui-xas = nbs_gui.plans.planLoaders:XASPlanLoader
+
+[nbs_gui.plans]
+nbs-gui-flyscan = nbs_gui.plans.flyscanPlan:FlyscanWidget
+nbs-gui-move = nbs_gui.plans.movePlan:MovePlanWidget
+nbs-gui-samplemove = nbs_gui.plans.sampleMovePlan:SampleMovePlan
+nbs-gui-scan = nbs_gui.plans.scanPlan:ScanPlanWidget
+nbs-gui-timescan = nbs_gui.plans.scanPlan:TimescanWidget
+nbs-gui-varscan = nbs_gui.plans.variableStepPlan:VariableStepWidget
+nbs-gui-xas = nbs_gui.plans.xasPlan:XASPlanWidget
+
+[nbs_gui.tabs]
+nbs-gui-console = nbs_gui.tabs.consoleTab:IPythonConsoleTab
+nbs-gui-monitor = nbs_gui.tabs.monitorTab:MonitorTab
+nbs-gui-motors = nbs_gui.tabs.motorTab:MotorTab
+nbs-gui-plans = nbs_gui.tabs.planTab:PlanTabWidget
+nbs-gui-queue = nbs_gui.tabs.queueControlTab:QueueControlTab
+nbs-gui-samples = nbs_gui.tabs.sampleTab:SampleTab
+
+[nbs_gui.widgets]
+nbs-gui-header = nbs_gui.widgets.header:Header
+nbs-gui-minimal-header = nbs_gui.widgets.header:MinimalHeader

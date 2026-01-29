@@ -1,0 +1,62 @@
+Metadata-Version: 2.4
+Name: nbs-gui
+Version: 0.1.2
+Summary: NBS GUI Module
+Project-URL: homepage, https://github.com/xraygui/nbs-gui
+Author-email: Charles Titus <ctitus@bnl.gov>
+License-File: LICENSE
+Keywords: bluesky,gui,nsls-ii
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: Public Domain
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.8
+Requires-Dist: bluesky-queueserver-api
+Requires-Dist: bluesky-widgets<0.0.18,>=0.0.17
+Requires-Dist: nbs-bl>=0.2
+Requires-Dist: nbs-core>=0.1
+Requires-Dist: ophyd
+Requires-Dist: qtpy
+Requires-Dist: tomli-w
+Requires-Dist: tomli; python_version < '3.11'
+Description-Content-Type: text/markdown
+
+# NSLS-II Beamline GUI Framework
+
+A flexible and extensible Qt-based GUI framework for beamline control and monitoring at NSLS-II.
+
+## Features
+
+- Modular tab-based interface
+- Real-time device monitoring
+- Sample management system
+- Plan execution interface
+- Mode-based device management
+- Redis-based state synchronization
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/xraygui/nbs-gui.git
+cd nbs-gui
+
+# Install in development mode
+pip install -e .
+```
+
+## Dependencies
+
+- Python 3.8+
+- Qt (via qtpy)
+- Redis
+- Bluesky
+- Ophyd
+
+## Documentation
+
+Documentation is available at [https://xraygui.github.io/nbs-gui](https://xraygui.github.io/nbs-gui)
+
+## License
+
+This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details. 

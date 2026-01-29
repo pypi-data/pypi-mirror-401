@@ -1,0 +1,65 @@
+import IPython
+from os.path import join
+
+
+def get_ipython_startup_dir(profile_name="default", ipython_dir=None):
+    """
+    Get the directory of an IPython profile.
+
+    Parameters
+    ----------
+    profile_name : str, optional
+        The name of the IPython profile. Defaults to 'default'.
+
+    Returns
+    -------
+    str
+        The path to the specified IPython profile startup directory.
+    """
+    # Load the IPython application to access its configuration
+    if ipython_dir is not None:
+        return join(ipython_dir, f"profile_{profile_name}", "startup")
+
+    ipython_app = IPython.get_ipython()
+    if ipython_app is None:
+        # If called outside of an IPython environment, create an application instance
+        return join(IPython.paths.locate_profile(profile_name), "startup")
+    if not ipython_app.initialized():
+        ipython_app.initialize(argv=[])
+
+    # Access the profile directory through the application's configuration
+    startup_dir = join(
+        ipython_app.profile_dir.location, f"profile_{profile_name}", "startup"
+    )
+
+    return startup_dir
+
+
+class Settings:
+    http_server_uri = None
+    http_server_api_key = None
+    zmq_re_manager_control_addr = None
+    zmq_re_manager_info_addr = None
+    object_config = None
+    object_config_file = None
+    gui_config = None
+    gui_config_file = None
+
+
+SETTINGS = Settings()
+
+_top_level_model = None
+
+
+def set_top_level_model(model):
+    """
+    Set the top-level beamline model for global access.
+    """
+    global _top_level_model
+    _top_level_model = model
+    print("Top level model set to: ", model)
+
+
+def get_top_level_model():
+    """Get the top-level beamline model."""
+    return _top_level_model
