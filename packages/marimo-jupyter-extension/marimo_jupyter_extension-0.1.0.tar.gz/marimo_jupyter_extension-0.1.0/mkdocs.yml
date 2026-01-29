@@ -1,0 +1,41 @@
+site_name: marimo-jupyter-extension
+site_description: Jupyter extension to proxy marimo with JupyterLab integration
+site_url: https://marimo-team.github.io/marimo-jupyter-extension/
+repo_url: https://github.com/marimo-team/marimo-jupyter-extension
+repo_name: marimo-team/marimo-jupyter-extension
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Configuration: configuration.md
+  - JupyterHub: jupyterhub.md
+  - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
