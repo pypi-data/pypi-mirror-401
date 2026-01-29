@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package codemode;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+
+// Request from main app to executor sidecar to run code.
+message ExecutionRequest {
+  string code = 1;
+  repeated string available_tools = 2;
+  google.protobuf.Struct config = 3;
+  int32 timeout = 4;
+  google.protobuf.Struct context = 5;
+  string correlation_id = 6;  // Optional correlation ID for tracing
+}
+
+// Result of code execution.
+message ExecutionResponse {
+  bool success = 1;
+  string result = 2;
+  string stdout = 3;
+  string stderr = 4;
+  string error = 5;
+  string correlation_id = 6;  // Echo back correlation ID
+  string error_type = 7;      // Error classification (SecurityViolation, Timeout, etc.)
+  float duration_ms = 8;      // Execution duration in milliseconds
+}
+
+// Basic health response.
+message HealthResponse {
+  string status = 1;
+  string version = 2;
+  string main_app_target = 3;
+}
+
+// Tool execution request from executor to main app.
+message ToolCallRequest {
+  string tool_name = 1;
+  google.protobuf.Struct arguments = 2;
+  google.protobuf.Struct context = 3;
+  string correlation_id = 4;  // Optional correlation ID for tracing
+}
+
+// Tool execution response.
+message ToolCallResponse {
+  bool success = 1;
+  string error = 2;
+  google.protobuf.Struct result = 3;
+  string correlation_id = 4;  // Echo back correlation ID
+}
+
+// Tool schema information (JSON Schema as string for full fidelity)
+message ToolSchema {
+  string json_schema = 1;  // Full JSON Schema as string (supports nested objects)
+}
+
+// Tool metadata for matched proxy generation
+message ToolInfo {
+  string name = 1;
+  bool is_async = 2;            // True if tool.run() is async
+  bool has_context = 3;         // True if tool has run_with_context()
+  string description = 4;       // Description for agents
+  ToolSchema input_schema = 5;  // Input parameters schema (JSON Schema)
+  ToolSchema output_schema = 6; // Return type schema (JSON Schema)
+}
+
+message ListToolsResponse {
+  repeated ToolInfo tools = 1;  // Rich metadata for all tools
+}
+
+// Request for single tool schema (progressive discovery)
+message GetToolSchemaRequest {
+  string tool_name = 1;
+}
+
+// Response with detailed tool schema
+message GetToolSchemaResponse {
+  string tool_name = 1;
+  ToolSchema input_schema = 2;
+  ToolSchema output_schema = 3;
+  string description = 4;
+  bool is_async = 5;
+  bool has_context = 6;
+}
+
+service ExecutorService {
+  rpc Execute(ExecutionRequest) returns (ExecutionResponse);
+  rpc Health(google.protobuf.Empty) returns (HealthResponse);
+  rpc Ready(google.protobuf.Empty) returns (HealthResponse);
+}
+
+service ToolService {
+  rpc CallTool(ToolCallRequest) returns (ToolCallResponse);
+  rpc ListTools(google.protobuf.Empty) returns (ListToolsResponse);
+  rpc GetToolSchema(GetToolSchemaRequest) returns (GetToolSchemaResponse);
+}
