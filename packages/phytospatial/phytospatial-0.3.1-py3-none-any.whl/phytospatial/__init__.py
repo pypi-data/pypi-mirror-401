@@ -1,0 +1,10 @@
+# src/phytospatial/__init__.py
+#
+# Copyright (c) The phytospatial project contributors
+# This software is dual-licensed under the MIT and Apache-2.0 licenses.
+# See the NOTICE file for more information
+
+import logging
+
+logger = logging.getLogger("phytospatial")
+logger.addHandler(logging.NullHandler())# prevents errors if end user doesn't configure logging
