@@ -1,0 +1,1 @@
+"""fbnconfig server application module."""
