@@ -1,0 +1,1001 @@
+r'''
+# `aws_emr_managed_scaling_policy`
+
+Refer to the Terraform Registry for docs: [`aws_emr_managed_scaling_policy`](https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy).
+'''
+from pkgutil import extend_path
+__path__ = extend_path(__path__, __name__)
+
+import abc
+import builtins
+import datetime
+import enum
+import typing
+
+import jsii
+import publication
+import typing_extensions
+
+import typeguard
+from importlib.metadata import version as _metadata_package_version
+TYPEGUARD_MAJOR_VERSION = int(_metadata_package_version('typeguard').split('.')[0])
+
+def check_type(argname: str, value: object, expected_type: typing.Any) -> typing.Any:
+    if TYPEGUARD_MAJOR_VERSION <= 2:
+        return typeguard.check_type(argname=argname, value=value, expected_type=expected_type) # type:ignore
+    else:
+        if isinstance(value, jsii._reference_map.InterfaceDynamicProxy): # pyright: ignore [reportAttributeAccessIssue]
+           pass
+        else:
+            if TYPEGUARD_MAJOR_VERSION == 3:
+                typeguard.config.collection_check_strategy = typeguard.CollectionCheckStrategy.ALL_ITEMS # type:ignore
+                typeguard.check_type(value=value, expected_type=expected_type) # type:ignore
+            else:
+                typeguard.check_type(value=value, expected_type=expected_type, collection_check_strategy=typeguard.CollectionCheckStrategy.ALL_ITEMS) # type:ignore
+
+from .._jsii import *
+
+import cdktf as _cdktf_9a9027ec
+import constructs as _constructs_77d1e7e8
+
+
+class EmrManagedScalingPolicy(
+    _cdktf_9a9027ec.TerraformResource,
+    metaclass=jsii.JSIIMeta,
+    jsii_type="@cdktn/provider-aws.emrManagedScalingPolicy.EmrManagedScalingPolicy",
+):
+    '''Represents a {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy aws_emr_managed_scaling_policy}.'''
+
+    def __init__(
+        self,
+        scope: _constructs_77d1e7e8.Construct,
+        id_: builtins.str,
+        *,
+        cluster_id: builtins.str,
+        compute_limits: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union["EmrManagedScalingPolicyComputeLimits", typing.Dict[builtins.str, typing.Any]]]],
+        id: typing.Optional[builtins.str] = None,
+        region: typing.Optional[builtins.str] = None,
+        scaling_strategy: typing.Optional[builtins.str] = None,
+        utilization_performance_index: typing.Optional[jsii.Number] = None,
+        connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+        count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+        depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+        for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+        lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+        provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+        provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+    ) -> None:
+        '''Create a new {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy aws_emr_managed_scaling_policy} Resource.
+
+        :param scope: The scope in which to define this construct.
+        :param id_: The scoped construct ID. Must be unique amongst siblings in the same scope
+        :param cluster_id: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#cluster_id EmrManagedScalingPolicy#cluster_id}.
+        :param compute_limits: compute_limits block. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#compute_limits EmrManagedScalingPolicy#compute_limits}
+        :param id: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#id EmrManagedScalingPolicy#id}. Please be aware that the id field is automatically added to all resources in Terraform providers using a Terraform provider SDK version below 2. If you experience problems setting this value it might not be settable. Please take a look at the provider documentation to ensure it should be settable.
+        :param region: Region where this resource will be `managed <https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints>`_. Defaults to the Region set in the `provider configuration <https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference>`_. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#region EmrManagedScalingPolicy#region}
+        :param scaling_strategy: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#scaling_strategy EmrManagedScalingPolicy#scaling_strategy}.
+        :param utilization_performance_index: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#utilization_performance_index EmrManagedScalingPolicy#utilization_performance_index}.
+        :param connection: 
+        :param count: 
+        :param depends_on: 
+        :param for_each: 
+        :param lifecycle: 
+        :param provider: 
+        :param provisioners: 
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__fcd99ed619e8df42e6dbd464ceb7a24935cb305e0a89530dccf22f458930887e)
+            check_type(argname="argument scope", value=scope, expected_type=type_hints["scope"])
+            check_type(argname="argument id_", value=id_, expected_type=type_hints["id_"])
+        config = EmrManagedScalingPolicyConfig(
+            cluster_id=cluster_id,
+            compute_limits=compute_limits,
+            id=id,
+            region=region,
+            scaling_strategy=scaling_strategy,
+            utilization_performance_index=utilization_performance_index,
+            connection=connection,
+            count=count,
+            depends_on=depends_on,
+            for_each=for_each,
+            lifecycle=lifecycle,
+            provider=provider,
+            provisioners=provisioners,
+        )
+
+        jsii.create(self.__class__, self, [scope, id_, config])
+
+    @jsii.member(jsii_name="generateConfigForImport")
+    @builtins.classmethod
+    def generate_config_for_import(
+        cls,
+        scope: _constructs_77d1e7e8.Construct,
+        import_to_id: builtins.str,
+        import_from_id: builtins.str,
+        provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+    ) -> _cdktf_9a9027ec.ImportableResource:
+        '''Generates CDKTF code for importing a EmrManagedScalingPolicy resource upon running "cdktf plan ".
+
+        :param scope: The scope in which to define this construct.
+        :param import_to_id: The construct id used in the generated config for the EmrManagedScalingPolicy to import.
+        :param import_from_id: The id of the existing EmrManagedScalingPolicy that should be imported. Refer to the {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#import import section} in the documentation of this resource for the id to use
+        :param provider: ? Optional instance of the provider where the EmrManagedScalingPolicy to import is found.
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__542fbfbe997eed989571062ef4474922247aaf015618da60c59afdc54a5dee50)
+            check_type(argname="argument scope", value=scope, expected_type=type_hints["scope"])
+            check_type(argname="argument import_to_id", value=import_to_id, expected_type=type_hints["import_to_id"])
+            check_type(argname="argument import_from_id", value=import_from_id, expected_type=type_hints["import_from_id"])
+            check_type(argname="argument provider", value=provider, expected_type=type_hints["provider"])
+        return typing.cast(_cdktf_9a9027ec.ImportableResource, jsii.sinvoke(cls, "generateConfigForImport", [scope, import_to_id, import_from_id, provider]))
+
+    @jsii.member(jsii_name="putComputeLimits")
+    def put_compute_limits(
+        self,
+        value: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union["EmrManagedScalingPolicyComputeLimits", typing.Dict[builtins.str, typing.Any]]]],
+    ) -> None:
+        '''
+        :param value: -
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__489891ac0f22f89a3d7311899706ab6fa65b920fa594c533d54c09db98eb7cec)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        return typing.cast(None, jsii.invoke(self, "putComputeLimits", [value]))
+
+    @jsii.member(jsii_name="resetId")
+    def reset_id(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetId", []))
+
+    @jsii.member(jsii_name="resetRegion")
+    def reset_region(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetRegion", []))
+
+    @jsii.member(jsii_name="resetScalingStrategy")
+    def reset_scaling_strategy(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetScalingStrategy", []))
+
+    @jsii.member(jsii_name="resetUtilizationPerformanceIndex")
+    def reset_utilization_performance_index(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetUtilizationPerformanceIndex", []))
+
+    @jsii.member(jsii_name="synthesizeAttributes")
+    def _synthesize_attributes(self) -> typing.Mapping[builtins.str, typing.Any]:
+        return typing.cast(typing.Mapping[builtins.str, typing.Any], jsii.invoke(self, "synthesizeAttributes", []))
+
+    @jsii.member(jsii_name="synthesizeHclAttributes")
+    def _synthesize_hcl_attributes(self) -> typing.Mapping[builtins.str, typing.Any]:
+        return typing.cast(typing.Mapping[builtins.str, typing.Any], jsii.invoke(self, "synthesizeHclAttributes", []))
+
+    @jsii.python.classproperty
+    @jsii.member(jsii_name="tfResourceType")
+    def TF_RESOURCE_TYPE(cls) -> builtins.str:
+        return typing.cast(builtins.str, jsii.sget(cls, "tfResourceType"))
+
+    @builtins.property
+    @jsii.member(jsii_name="computeLimits")
+    def compute_limits(self) -> "EmrManagedScalingPolicyComputeLimitsList":
+        return typing.cast("EmrManagedScalingPolicyComputeLimitsList", jsii.get(self, "computeLimits"))
+
+    @builtins.property
+    @jsii.member(jsii_name="clusterIdInput")
+    def cluster_id_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "clusterIdInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="computeLimitsInput")
+    def compute_limits_input(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List["EmrManagedScalingPolicyComputeLimits"]]]:
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List["EmrManagedScalingPolicyComputeLimits"]]], jsii.get(self, "computeLimitsInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="idInput")
+    def id_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "idInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="regionInput")
+    def region_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "regionInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="scalingStrategyInput")
+    def scaling_strategy_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "scalingStrategyInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="utilizationPerformanceIndexInput")
+    def utilization_performance_index_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "utilizationPerformanceIndexInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="clusterId")
+    def cluster_id(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "clusterId"))
+
+    @cluster_id.setter
+    def cluster_id(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__18f96f605ede987cb6f09190604f76ac272b78cbfc14f3cb6a7ba4bfbad9b7b3)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "clusterId", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="id")
+    def id(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "id"))
+
+    @id.setter
+    def id(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__93ff9e8fa903be455c60e4b96f4dd4e74a277a11b9c18f74ccb86f3f144bb051)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "id", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="region")
+    def region(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "region"))
+
+    @region.setter
+    def region(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__b8e5202793fcfddf3c2ad891004824bc9f3d6a0888568576828a47c256254e34)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "region", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="scalingStrategy")
+    def scaling_strategy(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "scalingStrategy"))
+
+    @scaling_strategy.setter
+    def scaling_strategy(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__3a2b42eaf4c37e2277a9097d731371f87b473433b5efe9d3fda61a7fc0c850d8)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "scalingStrategy", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="utilizationPerformanceIndex")
+    def utilization_performance_index(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "utilizationPerformanceIndex"))
+
+    @utilization_performance_index.setter
+    def utilization_performance_index(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__013f0c604755a61c4ac52328afb1bc59f267681a63e2c68ac6ff0874aeed685c)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "utilizationPerformanceIndex", value) # pyright: ignore[reportArgumentType]
+
+
+@jsii.data_type(
+    jsii_type="@cdktn/provider-aws.emrManagedScalingPolicy.EmrManagedScalingPolicyComputeLimits",
+    jsii_struct_bases=[],
+    name_mapping={
+        "maximum_capacity_units": "maximumCapacityUnits",
+        "minimum_capacity_units": "minimumCapacityUnits",
+        "unit_type": "unitType",
+        "maximum_core_capacity_units": "maximumCoreCapacityUnits",
+        "maximum_ondemand_capacity_units": "maximumOndemandCapacityUnits",
+    },
+)
+class EmrManagedScalingPolicyComputeLimits:
+    def __init__(
+        self,
+        *,
+        maximum_capacity_units: jsii.Number,
+        minimum_capacity_units: jsii.Number,
+        unit_type: builtins.str,
+        maximum_core_capacity_units: typing.Optional[jsii.Number] = None,
+        maximum_ondemand_capacity_units: typing.Optional[jsii.Number] = None,
+    ) -> None:
+        '''
+        :param maximum_capacity_units: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#maximum_capacity_units EmrManagedScalingPolicy#maximum_capacity_units}.
+        :param minimum_capacity_units: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#minimum_capacity_units EmrManagedScalingPolicy#minimum_capacity_units}.
+        :param unit_type: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#unit_type EmrManagedScalingPolicy#unit_type}.
+        :param maximum_core_capacity_units: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#maximum_core_capacity_units EmrManagedScalingPolicy#maximum_core_capacity_units}.
+        :param maximum_ondemand_capacity_units: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#maximum_ondemand_capacity_units EmrManagedScalingPolicy#maximum_ondemand_capacity_units}.
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__724e9ee40639b8c681861190ade4bd9206913cf4ad2dbd923e77242580f623c8)
+            check_type(argname="argument maximum_capacity_units", value=maximum_capacity_units, expected_type=type_hints["maximum_capacity_units"])
+            check_type(argname="argument minimum_capacity_units", value=minimum_capacity_units, expected_type=type_hints["minimum_capacity_units"])
+            check_type(argname="argument unit_type", value=unit_type, expected_type=type_hints["unit_type"])
+            check_type(argname="argument maximum_core_capacity_units", value=maximum_core_capacity_units, expected_type=type_hints["maximum_core_capacity_units"])
+            check_type(argname="argument maximum_ondemand_capacity_units", value=maximum_ondemand_capacity_units, expected_type=type_hints["maximum_ondemand_capacity_units"])
+        self._values: typing.Dict[builtins.str, typing.Any] = {
+            "maximum_capacity_units": maximum_capacity_units,
+            "minimum_capacity_units": minimum_capacity_units,
+            "unit_type": unit_type,
+        }
+        if maximum_core_capacity_units is not None:
+            self._values["maximum_core_capacity_units"] = maximum_core_capacity_units
+        if maximum_ondemand_capacity_units is not None:
+            self._values["maximum_ondemand_capacity_units"] = maximum_ondemand_capacity_units
+
+    @builtins.property
+    def maximum_capacity_units(self) -> jsii.Number:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#maximum_capacity_units EmrManagedScalingPolicy#maximum_capacity_units}.'''
+        result = self._values.get("maximum_capacity_units")
+        assert result is not None, "Required property 'maximum_capacity_units' is missing"
+        return typing.cast(jsii.Number, result)
+
+    @builtins.property
+    def minimum_capacity_units(self) -> jsii.Number:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#minimum_capacity_units EmrManagedScalingPolicy#minimum_capacity_units}.'''
+        result = self._values.get("minimum_capacity_units")
+        assert result is not None, "Required property 'minimum_capacity_units' is missing"
+        return typing.cast(jsii.Number, result)
+
+    @builtins.property
+    def unit_type(self) -> builtins.str:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#unit_type EmrManagedScalingPolicy#unit_type}.'''
+        result = self._values.get("unit_type")
+        assert result is not None, "Required property 'unit_type' is missing"
+        return typing.cast(builtins.str, result)
+
+    @builtins.property
+    def maximum_core_capacity_units(self) -> typing.Optional[jsii.Number]:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#maximum_core_capacity_units EmrManagedScalingPolicy#maximum_core_capacity_units}.'''
+        result = self._values.get("maximum_core_capacity_units")
+        return typing.cast(typing.Optional[jsii.Number], result)
+
+    @builtins.property
+    def maximum_ondemand_capacity_units(self) -> typing.Optional[jsii.Number]:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#maximum_ondemand_capacity_units EmrManagedScalingPolicy#maximum_ondemand_capacity_units}.'''
+        result = self._values.get("maximum_ondemand_capacity_units")
+        return typing.cast(typing.Optional[jsii.Number], result)
+
+    def __eq__(self, rhs: typing.Any) -> builtins.bool:
+        return isinstance(rhs, self.__class__) and rhs._values == self._values
+
+    def __ne__(self, rhs: typing.Any) -> builtins.bool:
+        return not (rhs == self)
+
+    def __repr__(self) -> str:
+        return "EmrManagedScalingPolicyComputeLimits(%s)" % ", ".join(
+            k + "=" + repr(v) for k, v in self._values.items()
+        )
+
+
+class EmrManagedScalingPolicyComputeLimitsList(
+    _cdktf_9a9027ec.ComplexList,
+    metaclass=jsii.JSIIMeta,
+    jsii_type="@cdktn/provider-aws.emrManagedScalingPolicy.EmrManagedScalingPolicyComputeLimitsList",
+):
+    def __init__(
+        self,
+        terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+        terraform_attribute: builtins.str,
+        wraps_set: builtins.bool,
+    ) -> None:
+        '''
+        :param terraform_resource: The parent resource.
+        :param terraform_attribute: The attribute on the parent resource this class is referencing.
+        :param wraps_set: whether the list is wrapping a set (will add tolist() to be able to access an item via an index).
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__ff3be60b967779be09cfc29b76a96045658f281c4a82a990afb7a55f9cde6182)
+            check_type(argname="argument terraform_resource", value=terraform_resource, expected_type=type_hints["terraform_resource"])
+            check_type(argname="argument terraform_attribute", value=terraform_attribute, expected_type=type_hints["terraform_attribute"])
+            check_type(argname="argument wraps_set", value=wraps_set, expected_type=type_hints["wraps_set"])
+        jsii.create(self.__class__, self, [terraform_resource, terraform_attribute, wraps_set])
+
+    @jsii.member(jsii_name="get")
+    def get(
+        self,
+        index: jsii.Number,
+    ) -> "EmrManagedScalingPolicyComputeLimitsOutputReference":
+        '''
+        :param index: the index of the item to return.
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__3c6575150d24e1bea3b2445af91eacbdb114eaeb24b91d139a2e851f23bf3722)
+            check_type(argname="argument index", value=index, expected_type=type_hints["index"])
+        return typing.cast("EmrManagedScalingPolicyComputeLimitsOutputReference", jsii.invoke(self, "get", [index]))
+
+    @builtins.property
+    @jsii.member(jsii_name="terraformAttribute")
+    def _terraform_attribute(self) -> builtins.str:
+        '''The attribute on the parent resource this class is referencing.'''
+        return typing.cast(builtins.str, jsii.get(self, "terraformAttribute"))
+
+    @_terraform_attribute.setter
+    def _terraform_attribute(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__4008fbec9fee3f1f346678f9331daa2635b79a3cf424754579ff48d208f9625b)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "terraformAttribute", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="terraformResource")
+    def _terraform_resource(self) -> _cdktf_9a9027ec.IInterpolatingParent:
+        '''The parent resource.'''
+        return typing.cast(_cdktf_9a9027ec.IInterpolatingParent, jsii.get(self, "terraformResource"))
+
+    @_terraform_resource.setter
+    def _terraform_resource(self, value: _cdktf_9a9027ec.IInterpolatingParent) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__25910a25f77c9936695192fef246696221d776bae949e6623c5bba84c07a1409)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "terraformResource", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="wrapsSet")
+    def _wraps_set(self) -> builtins.bool:
+        '''whether the list is wrapping a set (will add tolist() to be able to access an item via an index).'''
+        return typing.cast(builtins.bool, jsii.get(self, "wrapsSet"))
+
+    @_wraps_set.setter
+    def _wraps_set(self, value: builtins.bool) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__17464e2d186c72a62ed0bcdf45b3e8168cd91a734ff7c256f15f56186222bd4f)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "wrapsSet", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="internalValue")
+    def internal_value(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[EmrManagedScalingPolicyComputeLimits]]]:
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[EmrManagedScalingPolicyComputeLimits]]], jsii.get(self, "internalValue"))
+
+    @internal_value.setter
+    def internal_value(
+        self,
+        value: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[EmrManagedScalingPolicyComputeLimits]]],
+    ) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__bab424d3eb1c9a8e13355ff92f0c4548ed70da6be97e12f139f86a24c3b39f2c)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "internalValue", value) # pyright: ignore[reportArgumentType]
+
+
+class EmrManagedScalingPolicyComputeLimitsOutputReference(
+    _cdktf_9a9027ec.ComplexObject,
+    metaclass=jsii.JSIIMeta,
+    jsii_type="@cdktn/provider-aws.emrManagedScalingPolicy.EmrManagedScalingPolicyComputeLimitsOutputReference",
+):
+    def __init__(
+        self,
+        terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+        terraform_attribute: builtins.str,
+        complex_object_index: jsii.Number,
+        complex_object_is_from_set: builtins.bool,
+    ) -> None:
+        '''
+        :param terraform_resource: The parent resource.
+        :param terraform_attribute: The attribute on the parent resource this class is referencing.
+        :param complex_object_index: the index of this item in the list.
+        :param complex_object_is_from_set: whether the list is wrapping a set (will add tolist() to be able to access an item via an index).
+        '''
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__275786a9e93e0bd0d247a7a3af01060d3ee6ed6334346d2ac7432a2a35a2de51)
+            check_type(argname="argument terraform_resource", value=terraform_resource, expected_type=type_hints["terraform_resource"])
+            check_type(argname="argument terraform_attribute", value=terraform_attribute, expected_type=type_hints["terraform_attribute"])
+            check_type(argname="argument complex_object_index", value=complex_object_index, expected_type=type_hints["complex_object_index"])
+            check_type(argname="argument complex_object_is_from_set", value=complex_object_is_from_set, expected_type=type_hints["complex_object_is_from_set"])
+        jsii.create(self.__class__, self, [terraform_resource, terraform_attribute, complex_object_index, complex_object_is_from_set])
+
+    @jsii.member(jsii_name="resetMaximumCoreCapacityUnits")
+    def reset_maximum_core_capacity_units(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetMaximumCoreCapacityUnits", []))
+
+    @jsii.member(jsii_name="resetMaximumOndemandCapacityUnits")
+    def reset_maximum_ondemand_capacity_units(self) -> None:
+        return typing.cast(None, jsii.invoke(self, "resetMaximumOndemandCapacityUnits", []))
+
+    @builtins.property
+    @jsii.member(jsii_name="maximumCapacityUnitsInput")
+    def maximum_capacity_units_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "maximumCapacityUnitsInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="maximumCoreCapacityUnitsInput")
+    def maximum_core_capacity_units_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "maximumCoreCapacityUnitsInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="maximumOndemandCapacityUnitsInput")
+    def maximum_ondemand_capacity_units_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "maximumOndemandCapacityUnitsInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="minimumCapacityUnitsInput")
+    def minimum_capacity_units_input(self) -> typing.Optional[jsii.Number]:
+        return typing.cast(typing.Optional[jsii.Number], jsii.get(self, "minimumCapacityUnitsInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="unitTypeInput")
+    def unit_type_input(self) -> typing.Optional[builtins.str]:
+        return typing.cast(typing.Optional[builtins.str], jsii.get(self, "unitTypeInput"))
+
+    @builtins.property
+    @jsii.member(jsii_name="maximumCapacityUnits")
+    def maximum_capacity_units(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "maximumCapacityUnits"))
+
+    @maximum_capacity_units.setter
+    def maximum_capacity_units(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__4bab0237de5db9d1a3a6aefa9b404494c7a354ad4de85bd2efe2c509f495e5d7)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "maximumCapacityUnits", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="maximumCoreCapacityUnits")
+    def maximum_core_capacity_units(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "maximumCoreCapacityUnits"))
+
+    @maximum_core_capacity_units.setter
+    def maximum_core_capacity_units(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__b251cb6e44ebea76b842589ad1f5216d552f34a93d3dc99933ebbb0a726ee497)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "maximumCoreCapacityUnits", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="maximumOndemandCapacityUnits")
+    def maximum_ondemand_capacity_units(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "maximumOndemandCapacityUnits"))
+
+    @maximum_ondemand_capacity_units.setter
+    def maximum_ondemand_capacity_units(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__0b9cd0117c0e3bb0faca385f8942b83381c7f47f30feaad72b4347a2da4f6e25)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "maximumOndemandCapacityUnits", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="minimumCapacityUnits")
+    def minimum_capacity_units(self) -> jsii.Number:
+        return typing.cast(jsii.Number, jsii.get(self, "minimumCapacityUnits"))
+
+    @minimum_capacity_units.setter
+    def minimum_capacity_units(self, value: jsii.Number) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__54fb9f46d295bf2910f168394e8b34153657a13a0fe2ba476e6bfefe38f92c1c)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "minimumCapacityUnits", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="unitType")
+    def unit_type(self) -> builtins.str:
+        return typing.cast(builtins.str, jsii.get(self, "unitType"))
+
+    @unit_type.setter
+    def unit_type(self, value: builtins.str) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__373012071af6e8fde2bb42d4a1b728fa7f0aa485d1cf2a72861e2a5d9547759a)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "unitType", value) # pyright: ignore[reportArgumentType]
+
+    @builtins.property
+    @jsii.member(jsii_name="internalValue")
+    def internal_value(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, EmrManagedScalingPolicyComputeLimits]]:
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, EmrManagedScalingPolicyComputeLimits]], jsii.get(self, "internalValue"))
+
+    @internal_value.setter
+    def internal_value(
+        self,
+        value: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, EmrManagedScalingPolicyComputeLimits]],
+    ) -> None:
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__fafff85c51f24e6830f05821222f359f3e397059baf853cb9c30540cea4fd240)
+            check_type(argname="argument value", value=value, expected_type=type_hints["value"])
+        jsii.set(self, "internalValue", value) # pyright: ignore[reportArgumentType]
+
+
+@jsii.data_type(
+    jsii_type="@cdktn/provider-aws.emrManagedScalingPolicy.EmrManagedScalingPolicyConfig",
+    jsii_struct_bases=[_cdktf_9a9027ec.TerraformMetaArguments],
+    name_mapping={
+        "connection": "connection",
+        "count": "count",
+        "depends_on": "dependsOn",
+        "for_each": "forEach",
+        "lifecycle": "lifecycle",
+        "provider": "provider",
+        "provisioners": "provisioners",
+        "cluster_id": "clusterId",
+        "compute_limits": "computeLimits",
+        "id": "id",
+        "region": "region",
+        "scaling_strategy": "scalingStrategy",
+        "utilization_performance_index": "utilizationPerformanceIndex",
+    },
+)
+class EmrManagedScalingPolicyConfig(_cdktf_9a9027ec.TerraformMetaArguments):
+    def __init__(
+        self,
+        *,
+        connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+        count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+        depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+        for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+        lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+        provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+        provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+        cluster_id: builtins.str,
+        compute_limits: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[EmrManagedScalingPolicyComputeLimits, typing.Dict[builtins.str, typing.Any]]]],
+        id: typing.Optional[builtins.str] = None,
+        region: typing.Optional[builtins.str] = None,
+        scaling_strategy: typing.Optional[builtins.str] = None,
+        utilization_performance_index: typing.Optional[jsii.Number] = None,
+    ) -> None:
+        '''
+        :param connection: 
+        :param count: 
+        :param depends_on: 
+        :param for_each: 
+        :param lifecycle: 
+        :param provider: 
+        :param provisioners: 
+        :param cluster_id: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#cluster_id EmrManagedScalingPolicy#cluster_id}.
+        :param compute_limits: compute_limits block. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#compute_limits EmrManagedScalingPolicy#compute_limits}
+        :param id: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#id EmrManagedScalingPolicy#id}. Please be aware that the id field is automatically added to all resources in Terraform providers using a Terraform provider SDK version below 2. If you experience problems setting this value it might not be settable. Please take a look at the provider documentation to ensure it should be settable.
+        :param region: Region where this resource will be `managed <https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints>`_. Defaults to the Region set in the `provider configuration <https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference>`_. Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#region EmrManagedScalingPolicy#region}
+        :param scaling_strategy: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#scaling_strategy EmrManagedScalingPolicy#scaling_strategy}.
+        :param utilization_performance_index: Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#utilization_performance_index EmrManagedScalingPolicy#utilization_performance_index}.
+        '''
+        if isinstance(lifecycle, dict):
+            lifecycle = _cdktf_9a9027ec.TerraformResourceLifecycle(**lifecycle)
+        if __debug__:
+            type_hints = typing.get_type_hints(_typecheckingstub__be2cbb6e3cef795db887fda14e395a711e7b1a4043a670e8c6c02938d14b1903)
+            check_type(argname="argument connection", value=connection, expected_type=type_hints["connection"])
+            check_type(argname="argument count", value=count, expected_type=type_hints["count"])
+            check_type(argname="argument depends_on", value=depends_on, expected_type=type_hints["depends_on"])
+            check_type(argname="argument for_each", value=for_each, expected_type=type_hints["for_each"])
+            check_type(argname="argument lifecycle", value=lifecycle, expected_type=type_hints["lifecycle"])
+            check_type(argname="argument provider", value=provider, expected_type=type_hints["provider"])
+            check_type(argname="argument provisioners", value=provisioners, expected_type=type_hints["provisioners"])
+            check_type(argname="argument cluster_id", value=cluster_id, expected_type=type_hints["cluster_id"])
+            check_type(argname="argument compute_limits", value=compute_limits, expected_type=type_hints["compute_limits"])
+            check_type(argname="argument id", value=id, expected_type=type_hints["id"])
+            check_type(argname="argument region", value=region, expected_type=type_hints["region"])
+            check_type(argname="argument scaling_strategy", value=scaling_strategy, expected_type=type_hints["scaling_strategy"])
+            check_type(argname="argument utilization_performance_index", value=utilization_performance_index, expected_type=type_hints["utilization_performance_index"])
+        self._values: typing.Dict[builtins.str, typing.Any] = {
+            "cluster_id": cluster_id,
+            "compute_limits": compute_limits,
+        }
+        if connection is not None:
+            self._values["connection"] = connection
+        if count is not None:
+            self._values["count"] = count
+        if depends_on is not None:
+            self._values["depends_on"] = depends_on
+        if for_each is not None:
+            self._values["for_each"] = for_each
+        if lifecycle is not None:
+            self._values["lifecycle"] = lifecycle
+        if provider is not None:
+            self._values["provider"] = provider
+        if provisioners is not None:
+            self._values["provisioners"] = provisioners
+        if id is not None:
+            self._values["id"] = id
+        if region is not None:
+            self._values["region"] = region
+        if scaling_strategy is not None:
+            self._values["scaling_strategy"] = scaling_strategy
+        if utilization_performance_index is not None:
+            self._values["utilization_performance_index"] = utilization_performance_index
+
+    @builtins.property
+    def connection(
+        self,
+    ) -> typing.Optional[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, _cdktf_9a9027ec.WinrmProvisionerConnection]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("connection")
+        return typing.cast(typing.Optional[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, _cdktf_9a9027ec.WinrmProvisionerConnection]], result)
+
+    @builtins.property
+    def count(
+        self,
+    ) -> typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("count")
+        return typing.cast(typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]], result)
+
+    @builtins.property
+    def depends_on(
+        self,
+    ) -> typing.Optional[typing.List[_cdktf_9a9027ec.ITerraformDependable]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("depends_on")
+        return typing.cast(typing.Optional[typing.List[_cdktf_9a9027ec.ITerraformDependable]], result)
+
+    @builtins.property
+    def for_each(self) -> typing.Optional[_cdktf_9a9027ec.ITerraformIterator]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("for_each")
+        return typing.cast(typing.Optional[_cdktf_9a9027ec.ITerraformIterator], result)
+
+    @builtins.property
+    def lifecycle(self) -> typing.Optional[_cdktf_9a9027ec.TerraformResourceLifecycle]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("lifecycle")
+        return typing.cast(typing.Optional[_cdktf_9a9027ec.TerraformResourceLifecycle], result)
+
+    @builtins.property
+    def provider(self) -> typing.Optional[_cdktf_9a9027ec.TerraformProvider]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("provider")
+        return typing.cast(typing.Optional[_cdktf_9a9027ec.TerraformProvider], result)
+
+    @builtins.property
+    def provisioners(
+        self,
+    ) -> typing.Optional[typing.List[typing.Union[_cdktf_9a9027ec.FileProvisioner, _cdktf_9a9027ec.LocalExecProvisioner, _cdktf_9a9027ec.RemoteExecProvisioner]]]:
+        '''
+        :stability: experimental
+        '''
+        result = self._values.get("provisioners")
+        return typing.cast(typing.Optional[typing.List[typing.Union[_cdktf_9a9027ec.FileProvisioner, _cdktf_9a9027ec.LocalExecProvisioner, _cdktf_9a9027ec.RemoteExecProvisioner]]], result)
+
+    @builtins.property
+    def cluster_id(self) -> builtins.str:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#cluster_id EmrManagedScalingPolicy#cluster_id}.'''
+        result = self._values.get("cluster_id")
+        assert result is not None, "Required property 'cluster_id' is missing"
+        return typing.cast(builtins.str, result)
+
+    @builtins.property
+    def compute_limits(
+        self,
+    ) -> typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[EmrManagedScalingPolicyComputeLimits]]:
+        '''compute_limits block.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#compute_limits EmrManagedScalingPolicy#compute_limits}
+        '''
+        result = self._values.get("compute_limits")
+        assert result is not None, "Required property 'compute_limits' is missing"
+        return typing.cast(typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[EmrManagedScalingPolicyComputeLimits]], result)
+
+    @builtins.property
+    def id(self) -> typing.Optional[builtins.str]:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#id EmrManagedScalingPolicy#id}.
+
+        Please be aware that the id field is automatically added to all resources in Terraform providers using a Terraform provider SDK version below 2.
+        If you experience problems setting this value it might not be settable. Please take a look at the provider documentation to ensure it should be settable.
+        '''
+        result = self._values.get("id")
+        return typing.cast(typing.Optional[builtins.str], result)
+
+    @builtins.property
+    def region(self) -> typing.Optional[builtins.str]:
+        '''Region where this resource will be `managed <https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints>`_. Defaults to the Region set in the `provider configuration <https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference>`_.
+
+        Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#region EmrManagedScalingPolicy#region}
+        '''
+        result = self._values.get("region")
+        return typing.cast(typing.Optional[builtins.str], result)
+
+    @builtins.property
+    def scaling_strategy(self) -> typing.Optional[builtins.str]:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#scaling_strategy EmrManagedScalingPolicy#scaling_strategy}.'''
+        result = self._values.get("scaling_strategy")
+        return typing.cast(typing.Optional[builtins.str], result)
+
+    @builtins.property
+    def utilization_performance_index(self) -> typing.Optional[jsii.Number]:
+        '''Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/aws/6.28.0/docs/resources/emr_managed_scaling_policy#utilization_performance_index EmrManagedScalingPolicy#utilization_performance_index}.'''
+        result = self._values.get("utilization_performance_index")
+        return typing.cast(typing.Optional[jsii.Number], result)
+
+    def __eq__(self, rhs: typing.Any) -> builtins.bool:
+        return isinstance(rhs, self.__class__) and rhs._values == self._values
+
+    def __ne__(self, rhs: typing.Any) -> builtins.bool:
+        return not (rhs == self)
+
+    def __repr__(self) -> str:
+        return "EmrManagedScalingPolicyConfig(%s)" % ", ".join(
+            k + "=" + repr(v) for k, v in self._values.items()
+        )
+
+
+__all__ = [
+    "EmrManagedScalingPolicy",
+    "EmrManagedScalingPolicyComputeLimits",
+    "EmrManagedScalingPolicyComputeLimitsList",
+    "EmrManagedScalingPolicyComputeLimitsOutputReference",
+    "EmrManagedScalingPolicyConfig",
+]
+
+publication.publish()
+
+def _typecheckingstub__fcd99ed619e8df42e6dbd464ceb7a24935cb305e0a89530dccf22f458930887e(
+    scope: _constructs_77d1e7e8.Construct,
+    id_: builtins.str,
+    *,
+    cluster_id: builtins.str,
+    compute_limits: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[EmrManagedScalingPolicyComputeLimits, typing.Dict[builtins.str, typing.Any]]]],
+    id: typing.Optional[builtins.str] = None,
+    region: typing.Optional[builtins.str] = None,
+    scaling_strategy: typing.Optional[builtins.str] = None,
+    utilization_performance_index: typing.Optional[jsii.Number] = None,
+    connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+    count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+    depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+    for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+    lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+    provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+    provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__542fbfbe997eed989571062ef4474922247aaf015618da60c59afdc54a5dee50(
+    scope: _constructs_77d1e7e8.Construct,
+    import_to_id: builtins.str,
+    import_from_id: builtins.str,
+    provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__489891ac0f22f89a3d7311899706ab6fa65b920fa594c533d54c09db98eb7cec(
+    value: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[EmrManagedScalingPolicyComputeLimits, typing.Dict[builtins.str, typing.Any]]]],
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__18f96f605ede987cb6f09190604f76ac272b78cbfc14f3cb6a7ba4bfbad9b7b3(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__93ff9e8fa903be455c60e4b96f4dd4e74a277a11b9c18f74ccb86f3f144bb051(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__b8e5202793fcfddf3c2ad891004824bc9f3d6a0888568576828a47c256254e34(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__3a2b42eaf4c37e2277a9097d731371f87b473433b5efe9d3fda61a7fc0c850d8(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__013f0c604755a61c4ac52328afb1bc59f267681a63e2c68ac6ff0874aeed685c(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__724e9ee40639b8c681861190ade4bd9206913cf4ad2dbd923e77242580f623c8(
+    *,
+    maximum_capacity_units: jsii.Number,
+    minimum_capacity_units: jsii.Number,
+    unit_type: builtins.str,
+    maximum_core_capacity_units: typing.Optional[jsii.Number] = None,
+    maximum_ondemand_capacity_units: typing.Optional[jsii.Number] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__ff3be60b967779be09cfc29b76a96045658f281c4a82a990afb7a55f9cde6182(
+    terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+    terraform_attribute: builtins.str,
+    wraps_set: builtins.bool,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__3c6575150d24e1bea3b2445af91eacbdb114eaeb24b91d139a2e851f23bf3722(
+    index: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__4008fbec9fee3f1f346678f9331daa2635b79a3cf424754579ff48d208f9625b(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__25910a25f77c9936695192fef246696221d776bae949e6623c5bba84c07a1409(
+    value: _cdktf_9a9027ec.IInterpolatingParent,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__17464e2d186c72a62ed0bcdf45b3e8168cd91a734ff7c256f15f56186222bd4f(
+    value: builtins.bool,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__bab424d3eb1c9a8e13355ff92f0c4548ed70da6be97e12f139f86a24c3b39f2c(
+    value: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, typing.List[EmrManagedScalingPolicyComputeLimits]]],
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__275786a9e93e0bd0d247a7a3af01060d3ee6ed6334346d2ac7432a2a35a2de51(
+    terraform_resource: _cdktf_9a9027ec.IInterpolatingParent,
+    terraform_attribute: builtins.str,
+    complex_object_index: jsii.Number,
+    complex_object_is_from_set: builtins.bool,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__4bab0237de5db9d1a3a6aefa9b404494c7a354ad4de85bd2efe2c509f495e5d7(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__b251cb6e44ebea76b842589ad1f5216d552f34a93d3dc99933ebbb0a726ee497(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__0b9cd0117c0e3bb0faca385f8942b83381c7f47f30feaad72b4347a2da4f6e25(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__54fb9f46d295bf2910f168394e8b34153657a13a0fe2ba476e6bfefe38f92c1c(
+    value: jsii.Number,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__373012071af6e8fde2bb42d4a1b728fa7f0aa485d1cf2a72861e2a5d9547759a(
+    value: builtins.str,
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__fafff85c51f24e6830f05821222f359f3e397059baf853cb9c30540cea4fd240(
+    value: typing.Optional[typing.Union[_cdktf_9a9027ec.IResolvable, EmrManagedScalingPolicyComputeLimits]],
+) -> None:
+    """Type checking stubs"""
+    pass
+
+def _typecheckingstub__be2cbb6e3cef795db887fda14e395a711e7b1a4043a670e8c6c02938d14b1903(
+    *,
+    connection: typing.Optional[typing.Union[typing.Union[_cdktf_9a9027ec.SSHProvisionerConnection, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.WinrmProvisionerConnection, typing.Dict[builtins.str, typing.Any]]]] = None,
+    count: typing.Optional[typing.Union[jsii.Number, _cdktf_9a9027ec.TerraformCount]] = None,
+    depends_on: typing.Optional[typing.Sequence[_cdktf_9a9027ec.ITerraformDependable]] = None,
+    for_each: typing.Optional[_cdktf_9a9027ec.ITerraformIterator] = None,
+    lifecycle: typing.Optional[typing.Union[_cdktf_9a9027ec.TerraformResourceLifecycle, typing.Dict[builtins.str, typing.Any]]] = None,
+    provider: typing.Optional[_cdktf_9a9027ec.TerraformProvider] = None,
+    provisioners: typing.Optional[typing.Sequence[typing.Union[typing.Union[_cdktf_9a9027ec.FileProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.LocalExecProvisioner, typing.Dict[builtins.str, typing.Any]], typing.Union[_cdktf_9a9027ec.RemoteExecProvisioner, typing.Dict[builtins.str, typing.Any]]]]] = None,
+    cluster_id: builtins.str,
+    compute_limits: typing.Union[_cdktf_9a9027ec.IResolvable, typing.Sequence[typing.Union[EmrManagedScalingPolicyComputeLimits, typing.Dict[builtins.str, typing.Any]]]],
+    id: typing.Optional[builtins.str] = None,
+    region: typing.Optional[builtins.str] = None,
+    scaling_strategy: typing.Optional[builtins.str] = None,
+    utilization_performance_index: typing.Optional[jsii.Number] = None,
+) -> None:
+    """Type checking stubs"""
+    pass
