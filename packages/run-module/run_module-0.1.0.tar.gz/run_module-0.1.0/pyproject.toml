@@ -1,0 +1,17 @@
+[project]
+name = "run-module"
+version = "0.1.0"
+description = "A thin wrapper around runpy.run_module for use with uvx, pipx, etc."
+readme = "README.md"
+authors = [
+    { name = "Mike Clark", email = "mevanlc@gmail.com" }
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+run-module = "run_module:main"
+
+[build-system]
+requires = ["uv_build>=0.9.5"]
+build-backend = "uv_build"
