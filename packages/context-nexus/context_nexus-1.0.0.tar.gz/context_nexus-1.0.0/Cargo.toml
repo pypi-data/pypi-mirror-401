@@ -1,0 +1,15 @@
+[package]
+name = "context-nexus"
+version = "1.0.0"
+edition = "2021"
+license = "MIT"
+readme = "README.md"
+ 
+[lib]
+name = "_core"
+crate-type = ["cdylib"]
+path = "crates/nexus-core/src/lib.rs"
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
+rayon = "1.8"
