@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arbiter-engine"
+version = "0.5.1"
+description = "Actual Intelligence. Semantic coherence engine. 72-dimensional disambiguation. 26MB. Deterministic."
+authors = [{ name = "Joel David Trout II", email = "founder@traut.ai" }]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "TRAUT Applied Research Proprietary License" }
+
+keywords = [
+    "disambiguation",
+    "semantic",
+    "rag",
+    "vector-search",
+    "nlp",
+    "embeddings",
+    "coherence",
+    "reranking",
+    "polysemy",
+    "word-sense",
+    "semantic-search",
+    "deterministic",
+    "air-gapped",
+    "actual-intelligence"
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: Other/Proprietary License",
+]
+
+dependencies = [
+    "requests>=2.25.0",
+    "numpy>=1.20.0",
+    "scipy>=1.7.0"
+]
+
+[project.urls]
+Homepage = "https://getarbiter.dev"
+Documentation = "https://api.arbiter.traut.ai/docs"
+
+
+[project.scripts]
+arb = "arbiter_engine.cli:main"
+
+[tool.setuptools]
+packages = ["arbiter_engine"]
