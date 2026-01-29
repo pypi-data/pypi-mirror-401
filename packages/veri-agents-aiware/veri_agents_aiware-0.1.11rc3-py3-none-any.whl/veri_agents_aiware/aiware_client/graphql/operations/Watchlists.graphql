@@ -1,0 +1,29 @@
+query GetWatchlists(
+  $id: ID,
+  $limit: Int = 100,
+  $offset: Int = 0,
+) {
+  watchlists(
+    id: $id,
+    limit: $limit,
+    offset: $offset,
+  ) {
+    count
+    records {
+      name
+      startDateTime
+      stopDateTime
+      createdDateTime
+      details
+      isDisabled
+      watchlistType
+      advertiser
+      brand
+      mentions {
+        records {
+          id
+        }
+      }
+    }
+  }
+}
