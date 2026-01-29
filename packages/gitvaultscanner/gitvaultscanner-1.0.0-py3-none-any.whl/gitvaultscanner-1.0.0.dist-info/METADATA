@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: gitvaultscanner
+Version: 1.0.0
+Summary: Advanced secrets scanner for GitHub repositories and local directories
+Home-page: https://github.com/yourusername/GitVaultScanner
+Author: AlexandrGonin
+Author-email: alexandrgonin000@gmal.com
+Project-URL: Bug Tracker, https://github.com/yourusername/GitVaultScanner/issues
+Project-URL: Source Code, https://github.com/yourusername/GitVaultScanner
+Keywords: security,scanner,secrets,github,security-audit,devsecops
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Security
+Classifier: Topic :: Software Development :: Quality Assurance
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.28.0
+Requires-Dist: colorama>=0.4.6
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# GitVault Scanner 🔍
+
+Advanced secrets scanner for GitHub repositories and local directories. 
+Detects hardcoded credentials, API keys, tokens, and other security vulnerabilities.
+
+## 🚀 Quick Start
+
+### Installation from PyPI (recommended)
+```bash
+pip install gitvault-scanner
+```
+
+### Installation from source:
+```bash
+git clone https://github.com/yourusername/GitVaultScanner.git
+cd GitVaultScanner
+pip install -e .
+```
+
+### Usage
+
+Scan GitHub repository: gitvault --repo https://github.com/user/repository
+Scan local directory: gitvault --dir /path/to/your/code
+Scan with specific file extensions: gitvault --dir . --extensions .py .json .yaml
+Save report to file: gitvault --repo https://github.com/user/repo --output scan_report.txt
+
+### Available Options
+
+--repo, -r      GitHub repository URL
+--dir, -d       Local directory path
+--output, -o    Save report to file
+--extensions, -e File extensions to scan (default: all)
+--no-clone-cleanup Keep cloned repository after scan
+--help          Show help message
+
+### Example Output
+
+══════════════════════════════════════════════════════════════════
+📊 SCAN RESULTS (GitHub Repository Scan)
+══════════════════════════════════════════════════════════════════
+
+📁 Target: example-repo
+📈 Summary:
+   ├─ Total findings: 5
+   ├─ 🔴 High risk: 2
+   └─ 🟡 Medium risk: 3
+...
+
+### Requirements
+
+Python 3.7+
+Git (for GitHub repository scanning)
+Internet connection (for GitHub repository scanning)
