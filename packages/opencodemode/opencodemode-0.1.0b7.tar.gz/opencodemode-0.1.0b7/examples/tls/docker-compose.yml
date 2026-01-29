@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Your main application
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - CODEMODE_API_KEY=${CODEMODE_API_KEY}
+      - CODEMODE_TLS_ENABLED=true
+      - CODEMODE_TLS_CERT_FILE=/certs/server.crt
+      - CODEMODE_TLS_KEY_FILE=/certs/server.key
+      - CODEMODE_TLS_CA_FILE=/certs/ca.crt
+    volumes:
+      - ./certs:/certs:ro
+      - ./codemode.yaml:/app/codemode.yaml:ro
+    depends_on:
+      - executor
+    networks:
+      - executor-network
+
+  # Executor sidecar (no external network!)
+  executor:
+    image: python:3.11-slim
+    command: >
+      sh -c "
+        pip install --no-cache-dir opencodemode[crewai] &&
+        python -m codemode.executor.service
+      "
+    environment:
+      - CODEMODE_API_KEY=${CODEMODE_API_KEY}
+      - MAIN_APP_GRPC_TARGET=app:50051
+      # TLS configuration
+      - CODEMODE_GRPC_TLS_ENABLED=true
+      - CODEMODE_GRPC_TLS_MODE=custom
+      - CODEMODE_GRPC_TLS_CERT_FILE=/certs/executor.crt
+      - CODEMODE_GRPC_TLS_KEY_FILE=/certs/executor.key
+      - CODEMODE_GRPC_TLS_CA_FILE=/certs/ca.crt
+      # Optional: Enable mTLS
+      # - CODEMODE_GRPC_TLS_CLIENT_CERT_FILE=/certs/client.crt
+      # - CODEMODE_GRPC_TLS_CLIENT_KEY_FILE=/certs/client.key
+      # - CODEMODE_GRPC_TLS_REQUIRE_CLIENT_AUTH=true
+    volumes:
+      - ./certs:/certs:ro
+      - ./codemode.yaml:/app/codemode.yaml:ro
+    networks:
+      - executor-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=100m
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+networks:
+  # Isolated network (no external access)
+  executor-network:
+    driver: bridge
+    internal: true
