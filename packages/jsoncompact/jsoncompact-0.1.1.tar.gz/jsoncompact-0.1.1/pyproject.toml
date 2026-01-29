@@ -1,0 +1,69 @@
+[project]
+name = "jsoncompact"
+version = "0.1.1"
+description = "JSON Schema serializer/deserializer"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    { name = "Lorenzo Curcio", email = "lorenzocurcio2@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+ormsgpack = [
+    "ormsgpack>=1.12.1",
+]
+orjson = [
+    "orjson>=3.11.5",
+]
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[pytest]
+addopts = ["--import-mode=importlib"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "C","E","F","UP","B", "SIM","I","N","W","A", "INT", "RSE", "TC",
+	"RET", "YTT", "ANN", "ASYNC", "S", "C4", "DTZ","LOG", "ICN", "TID", "PL",
+	"G","PIE","ARG","PTH","R","PERF","FURB","RUF", "PYI", "FLY", "TRY"
+]
+ignore = ["RET501", "S101", "PLR2004"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+skip-magic-trailing-comma = true
+
+[tool.pyright]
+pythonVersion = "3.10"
+pythonPlatform = "all"
+typeCheckingMode = "normal"
+strictListInference = true
+strictDictionaryInference = true
+strictSetInference = true
+deprecateTypingAliases = true
+enableReachabilityAnalysis = true
+
+[dependency-groups]
+dev = [
+    "orjson>=3.11.5",
+    "ormsgpack>=1.12.1",
+    "pytest>=9.0.2",
+]
