@@ -1,0 +1,317 @@
+# Nacos配置中心SDK
+
+一个轻量级的Python SDK，用于监听Nacos配置中心的配置变更，并自动同步到本地配置。
+
+## 特性
+
+- 🚀 **低侵入性** - 几乎不需要修改现有代码
+- 🔄 **实时同步** - 配置变更后自动更新本地配置
+- 📦 **多格式支持** - 支持 properties、yaml、json 格式
+- 🎯 **精确监听** - 可指定要监听的配置项
+- 🔗 **灵活映射** - 支持配置键名映射
+
+## 安装
+
+### 通过pip安装（推荐）
+
+```bash
+pip install ra-nacos-sdk
+```
+
+如果需要YAML配置格式支持：
+
+```bash
+pip install ra-nacos-sdk[yaml]
+```
+
+### 从源码安装
+
+```bash
+git clone https://github.com/your-org/ra-common-sdk.git
+cd ra-common-sdk/nacos/python
+pip install -e .
+```
+
+### 开发环境安装
+
+```bash
+pip install -e ".[dev]"
+```
+
+## 快速开始
+
+### 初始化Nacos配置管理器
+
+```python
+from nacos_sdk import NacosConfigManager
+
+manager = NacosConfigManager(
+    server_addresses="127.0.0.1:8848",
+    namespace="public",
+    data_id="your-app-config",
+    group="DEFAULT_GROUP",
+    config_format="properties",  # 支持 properties, yaml, json
+)
+```
+
+## 配置监听方式
+
+根据项目中配置的使用方式，SDK提供了两种低侵入性的监听方案：
+
+---
+
+### 方式1：监听 pydantic_settings 的 Settings 类
+
+适用于使用 `pydantic_settings` 管理配置的项目。
+
+#### 原有代码
+
+```python
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    EXCLUDED_BUSINESS_STATUS_ENDPOINTS: str = "/ping,/health,/metric"
+    APP_NAME: str = "data_llm_service"
+    APP_VERSION: str = "1.0.0"
+    API_PREFIX: str = "/api"
+    DEBUG: bool = False
+    
+    class Config:
+        validate_assignment = True  # 允许运行时修改
+
+settings = Settings()
+```
+
+#### 集成Nacos监听
+
+只需在应用启动时添加以下代码：
+
+```python
+from nacos_sdk import NacosConfigManager
+
+def setup_nacos():
+    manager = NacosConfigManager(
+        server_addresses="127.0.0.1:8848",
+        namespace="public",
+        data_id="app-config",
+        group="DEFAULT_GROUP",
+    )
+    
+    # 注册监听 - 指定要监听的配置项
+    manager.watch_settings(
+        settings,
+        keys=["APP_NAME", "APP_VERSION", "DEBUG"],
+        # 可选：配置键名映射
+        key_mapping={
+            "app.name": "APP_NAME",      # Nacos中的app.name -> Settings.APP_NAME
+            "app.version": "APP_VERSION",
+            "app.debug": "DEBUG",
+        }
+    )
+    
+    manager.start()
+    return manager
+
+# 在应用启动时调用
+nacos_manager = setup_nacos()
+```
+
+当Nacos中的配置发生变更时，`settings` 实例中对应的字段会自动更新。
+
+---
+
+### 方式2：监听模块级变量
+
+适用于使用模块级变量管理配置的项目。
+
+#### 原有代码
+
+```python
+# config.py
+EXCLUDED_BUSINESS_STATUS_ENDPOINTS = "/ping,/health,/metric"
+APP_NAME = "data_llm_service"
+APP_VERSION = "1.0.0"
+API_PREFIX = "/api"
+DEBUG = False
+```
+
+#### 集成Nacos监听
+
+```python
+# 在应用启动模块中
+import config
+from nacos_sdk import NacosConfigManager
+
+def setup_nacos():
+    manager = NacosConfigManager(
+        server_addresses="127.0.0.1:8848",
+        namespace="public",
+        data_id="app-config",
+        group="DEFAULT_GROUP",
+    )
+    
+    # 监听模块变量
+    manager.watch_module(
+        config,
+        keys=["APP_NAME", "APP_VERSION", "DEBUG"],
+        # 可选：配置键名映射
+        key_mapping={
+            "app.name": "APP_NAME",
+            "app.debug": "DEBUG",
+        }
+    )
+    
+    manager.start()
+    return manager
+
+nacos_manager = setup_nacos()
+```
+
+> ⚠️ **注意**：使用模块变量时，推荐用 `import config` 然后 `config.APP_NAME` 的方式访问配置。
+> 如果使用 `from config import APP_NAME`，变量在导入时被复制，后续更新不会反映到导入的变量中。
+
+---
+
+## 高级用法
+
+### 添加配置变更回调
+
+```python
+@manager.add_callback
+def on_config_change(config: dict):
+    """配置变更时的回调"""
+    print(f"配置已更新: {config}")
+    # 可以在这里重新初始化某些组件
+```
+
+### 使用装饰器方式
+
+```python
+from nacos_sdk import NacosConfigManager, ConfigWatcher
+
+manager = NacosConfigManager(...)
+watcher = ConfigWatcher(manager)
+
+# 装饰Settings类
+@watcher.settings(keys=["APP_NAME", "DEBUG"])
+class Settings(BaseSettings):
+    APP_NAME: str = "myapp"
+    DEBUG: bool = False
+
+# 装饰回调函数
+@watcher.on_change
+def handle_change(config: dict):
+    print(f"配置变更: {config}")
+```
+
+### 使用上下文管理器
+
+```python
+with NacosConfigManager(...) as manager:
+    manager.watch_settings(settings, keys=["APP_NAME"])
+    # 应用运行...
+# 自动停止监听
+```
+
+### 支持的配置格式
+
+#### Properties格式
+
+```properties
+app.name=myapp
+app.debug=true
+app.version=1.0.0
+```
+
+#### YAML格式
+
+```yaml
+app:
+  name: myapp
+  debug: true
+  version: 1.0.0
+```
+
+配置会被展平为：`app.name`, `app.debug`, `app.version`
+
+#### JSON格式
+
+```json
+{
+  "app": {
+    "name": "myapp",
+    "debug": true,
+    "version": "1.0.0"
+  }
+}
+```
+
+同样会被展平为点号分隔的键名。
+
+---
+
+## API参考
+
+### NacosConfigManager
+
+主要的配置管理类。
+
+```python
+NacosConfigManager(
+    server_addresses: str,        # Nacos服务地址
+    namespace: str = "public",    # 命名空间
+    data_id: str = "",            # 配置的data_id
+    group: str = "DEFAULT_GROUP", # 配置分组
+    username: str = None,         # 用户名
+    password: str = None,         # 密码
+    config_format: str = "properties",  # 配置格式
+    ak: str = None,               # 阿里云AK（使用MSE时）
+    sk: str = None,               # 阿里云SK（使用MSE时）
+)
+```
+
+#### 方法
+
+| 方法 | 说明 |
+|------|------|
+| `watch_settings(settings, keys, key_mapping)` | 监听pydantic Settings实例 |
+| `watch_module(module, keys, key_mapping)` | 监听模块变量 |
+| `add_callback(func)` | 添加配置变更回调 |
+| `start()` | 启动配置监听 |
+| `stop()` | 停止配置监听 |
+| `get_config()` | 获取原始配置内容 |
+| `get_config_parsed()` | 获取解析后的配置字典 |
+
+### key_mapping 参数说明
+
+当Nacos中的配置键名与本地配置名不一致时，可以使用 `key_mapping` 进行映射：
+
+```python
+key_mapping = {
+    "nacos.config.key": "LOCAL_CONFIG_NAME",
+    "app.name": "APP_NAME",
+}
+```
+
+---
+
+## 项目结构
+
+```
+nacos/python/
+├── README.md
+├── requirements.txt
+├── nacos_sdk/
+│   ├── __init__.py      # SDK入口
+│   ├── client.py        # Nacos配置管理器
+│   ├── adapters.py      # Settings和Module适配器
+│   ├── parsers.py       # 配置解析器
+│   └── watcher.py       # 装饰器接口
+└── examples/
+    ├── example_settings.py  # pydantic_settings示例
+    └── example_module.py    # 模块变量示例
+```
+
+## License
+
+MIT
