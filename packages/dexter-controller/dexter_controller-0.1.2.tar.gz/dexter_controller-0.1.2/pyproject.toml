@@ -1,0 +1,20 @@
+[project]
+name = "dexter-controller"
+version = "0.1.2"
+description = "Dexter Controller for the HARP Load Cells"
+readme = "README.md"
+authors = [
+    { name = "Hardware and Software Platform, Champalimaud Foundation", email = "software@research.fchampalimaud.org" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "harp-loadcells>=0.1.0a3",
+]
+
+[project.urls]
+Repository = "https://github.com/fchampalimaud/dexter-controller/"
+"Bug Tracker" = "https://github.com/fchampalimaud/dexter-controller/issues"
+
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
