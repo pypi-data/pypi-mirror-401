@@ -1,0 +1,68 @@
+{
+  "additionalProperties": false,
+  "description": "Generate charge from dark current process based on the Rule07 model.",
+  "properties": {
+    "arguments": {
+      "additionalProperties": false,
+      "default": {
+        "cutoff_wavelength": 2.5,
+        "seed": null,
+        "spatial_noise_factor": null,
+        "temporal_noise": true
+      },
+      "properties": {
+        "cutoff_wavelength": {
+          "default": 2.5,
+          "description": "The wavelength cut-off for the detector (default is 2.5 \u00b5m). Unit: \u00b5m",
+          "maximum": 15.0,
+          "minimum": 1.7,
+          "title": "cutoff_wavelength",
+          "type": "number"
+        },
+        "seed": {
+          "default": null,
+          "description": "Seed for random number generation to allow reproducibility of noise patterns.",
+          "title": "seed",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "spatial_noise_factor": {
+          "default": null,
+          "description": "Factor for introducing spatial noise (fixed pattern noise) in the dark current.",
+          "title": "spatial_noise_factor",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "temporal_noise": {
+          "default": true,
+          "description": "If True, shot noise (Poisson noise) is added to the dark current.",
+          "title": "temporal_noise",
+          "type": "boolean"
+        }
+      },
+      "title": "Parameters",
+      "type": "object"
+    },
+    "enabled": {
+      "default": true,
+      "type": "boolean"
+    },
+    "func": {
+      "const": "pyxel.models.charge_generation.dark_current_rule07",
+      "default": "pyxel.models.charge_generation.dark_current_rule07",
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Model 'dark_current_rule07'",
+  "type": "object"
+}

@@ -1,0 +1,25 @@
+#  Copyright (c) European Space Agency, 2020.
+#
+#  This file is subject to the terms and conditions defined in file 'LICENCE.txt', which
+#  is part of this Pyxel package. No part of the package, including
+#  this file, may be copied, modified, propagated, or distributed except according to
+#  the terms contained in the file ‘LICENCE.txt’.
+
+"""The detector attribute and data structure subpackage."""
+
+# flake8: noqa
+# Warning: Import order matters
+from .reference_pixels import ReferenceGeometry
+from .channels import Channels, Matrix, ReadoutPosition
+from .reference_pixels import ReferenceGeometry
+from .readout_properties import ReadoutProperties
+from .environment import Environment, WavelengthHandling
+from .charge_to_volt_settings import ChargeToVoltSettings
+from .detector import Detector
+from .geometry import Geometry
+from .characteristics import Characteristics
+from .ccd import CCDGeometry, CCD
+from .mkid import MKID, MKIDGeometry
+from .cmos import CMOSGeometry, CMOS
+from .apd import APD, APDCharacteristics, APDGeometry
+from .optics import Optics

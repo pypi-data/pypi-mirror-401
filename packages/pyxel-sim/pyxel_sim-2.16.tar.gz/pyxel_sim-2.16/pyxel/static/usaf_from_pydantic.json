@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "Align": {
+      "enum": [
+        "center",
+        "top_left",
+        "top_right",
+        "bottom_left",
+        "bottom_right"
+      ],
+      "title": "Align",
+      "type": "string"
+    },
+    "Arguments": {
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Align"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Keyword to align the image to detector. Can be any from: (\"center\", \"top_left\", \"top_right\", \"bottom_left\", \"bottom_right\")",
+          "title": "align"
+        },
+        "convert_to_photons": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": false,
+          "description": "If ``True``, the model converts the values of loaded image array from ADU to photon numbers for each pixel using the Photon Transfer Function: :math:`\\mathit{PTF} = \\mathit{quantum\\_efficiency} \\cdot \\mathit{charge\\_to\\_voltage\\_conversion} \\cdot \\mathit{pre\\_amplification} \\cdot \\mathit{adc\\_factor}`.",
+          "title": "convert_to_photons"
+        },
+        "multiplier": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1.0,
+          "description": "Multiply photon array level with a custom number.",
+          "title": "multiplier"
+        },
+        "time_scale": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1.0,
+          "description": "Time scale of the photon flux, default is 1 second. 0.001 would be ms.",
+          "title": "time_scale"
+        },
+        "bit_resolution": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "XX",
+          "title": "Bit Resolution"
+        },
+        "position": {
+          "default": [
+            0,
+            0
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        }
+      },
+      "title": "Arguments",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "arguments": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Arguments"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parameters"
+    },
+    "enabled": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": true,
+      "title": "Enabled"
+    },
+    "func": {
+      "const": "pyxel.models.photon_collection.usaf_illumination",
+      "default": "pyxel.models.photon_collection.usaf_illumination",
+      "title": "Func",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "ModelUsafIllumination",
+  "type": "object"
+}

@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "description": "Apply USAF-1951 illumination pattern.",
+  "properties": {
+    "arguments": {
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "description": "Keyword to align the image to detector. Can be any from: (\"center\", \"top_left\", \"top_right\", \"bottom_left\", \"bottom_right\")",
+          "enum": [
+            "center",
+            "top_left",
+            "top_right",
+            "bottom_left",
+            "bottom_right"
+          ],
+          "title": "align",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "convert_to_photons": {
+          "default": false,
+          "description": "If ``True``, the model converts the values of loaded image array from ADU to photon numbers for each pixel using the Photon Transfer Function: :math:`\\mathit{PTF} = \\mathit{quantum\\_efficiency} \\cdot \\mathit{charge\\_to\\_voltage\\_conversion} \\cdot \\mathit{pre\\_amplification} \\cdot \\mathit{adc\\_factor}`.",
+          "title": "convert_to_photons",
+          "type": "boolean"
+        },
+        "multiplier": {
+          "default": 1.0,
+          "description": "Multiply photon array level with a custom number.",
+          "exclusiveMinimum": 0.0,
+          "title": "multiplier",
+          "type": "number"
+        },
+        "time_scale": {
+          "default": 1.0,
+          "description": "Time scale of the photon flux, default is 1 second. 0.001 would be ms.",
+          "exclusiveMinimum": 0.0,
+          "title": "time_scale",
+          "type": "number"
+        }
+      },
+      "title": "Parameters",
+      "type": "object"
+    },
+    "enabled": {
+      "default": true,
+      "type": "boolean"
+    },
+    "func": {
+      "const": "pyxel.models.photon_collection.usaf_illumination",
+      "default": "pyxel.models.photon_collection.usaf_illumination",
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Model 'usaf_illumination'",
+  "type": "object"
+}

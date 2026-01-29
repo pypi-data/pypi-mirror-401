@@ -1,0 +1,30 @@
+#  Copyright (c) European Space Agency, 2020.
+#
+#  This file is subject to the terms and conditions defined in file 'LICENCE.txt', which
+#  is part of this Pyxel package. No part of the package, including
+#  this file, may be copied, modified, propagated, or distributed except according to
+#  the terms contained in the file ‘LICENCE.txt’.
+
+"""TBW."""
+
+from pyxel.detectors import CMOSGeometry
+
+
+class APDGeometry(CMOSGeometry):
+    """Geometrical attributes of a :term:`APD`-based detector.
+
+    Parameters
+    ----------
+    row : int
+        Number of pixel rows.
+    col : int
+        Number of pixel columns.
+    total_thickness : float
+        Thickness of detector. Unit: um
+    pixel_vert_size : float
+        Vertical dimension of pixel. Unit: um
+    pixel_horz_size : float
+        Horizontal dimension of pixel. Unit: um
+    reference_pixels : ReferenceGeometry
+    masked_pixels : ReferenceGeometry
+    """
