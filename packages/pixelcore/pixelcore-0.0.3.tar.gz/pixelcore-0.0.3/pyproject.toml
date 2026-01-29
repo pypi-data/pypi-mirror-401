@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# ======================
+# Project metadata
+# ======================
+
+[project]
+name = "pixelcore"
+version = "0.0.3"
+description = "Core image and video processing primitives"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+
+authors = [
+    { name = "Rishabh Sethi" }
+]
+
+# Runtime dependencies (keep empty for now, be explicit)
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.0",
+    "isort>=5.13",
+    "ruff>=0.4",
+    "pre-commit>=3.6",
+    "build>=1.0",
+    "twine>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/cruvdev/pixelcore"
+Repository = "https://github.com/cruvdev/pixelcore"
+
+# ======================
+# Packaging
+# ======================
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ======================
+# Formatting & Linting
+# ======================
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # import sorting
+    "B",   # bugbear (real bugs)
+]
+
+ignore = []
