@@ -1,0 +1,449 @@
+import html
+import importlib.resources
+import os
+import shutil
+import string
+import subprocess
+import textwrap
+import time
+from pathlib import Path
+
+import cherrypy
+import mistletoe
+
+
+nifki_root = Path("/nonexistent")
+
+
+def template(filename, **kwargs):
+    """A simple templating mechanism to keep big bits of HTML out of the code."""
+    with open(nifki_root / "templates" / f"{filename}.html") as fh:
+        html = fh.read()
+    return string.Template(html).substitute(kwargs)
+
+
+def group(items, groupSize, pad):
+    """Appends copies of 'pad' to 'items' until its length is a multiple of 'groupSize'.
+
+    Then groups the items 'groupSize' at a time and returns a list of groups.
+    """
+    while len(items) % groupSize != 0:
+        items.append(pad)
+    g = iter(items)
+    return [[next(g) for _ in range(groupSize)] for _ in range(len(items) // groupSize)]
+
+
+def httpError(code, message):
+    """Returns an error page containing 'message' with HTTP response code 'code'."""
+    cherrypy.response.headers["Status"] = code
+    return template("error", message=message)
+
+
+def parseProperties(properties):
+    """Parses a file of the form of "properties.txt" and returns its contents as a dict.
+
+    This is used, for example, to retrieve the width and height of a game for inclusion
+    in the applet tag.
+    """
+    ans = dict(name="", width="256", height="256", msPerFrame="40", debug="false")
+    for line in properties.split("\n"):
+        hash = line.find("#")
+        if hash >= 0:
+            line = line[:hash]
+        line = line.strip()
+        if line:
+            colon = line.find(":")
+            if colon == -1:
+                raise ValueError("Colon missing from '" + line + "'")
+            ans[line[:colon]] = line[colon + 1 :].strip()
+    return ans
+
+
+def makeProperties(properties):
+    """Takes a dict and returns a file of the form of "properties.txt"."""
+    return "".join([f"{k}: {v}\n" for (k, v) in properties])
+
+
+def isValidPageName(pagename: str) -> bool:
+    """Check whether a page name is valid.
+
+    Page names must start with a letter, must contain only letters and digits,
+    must not be entirely capital letters, and must have at least three
+    characters and at most twenty.
+    """
+    return (
+        3 <= len(pagename) <= 20
+        and pagename[0].isalpha()
+        and pagename.isalnum()
+        and not pagename.isupper()
+    )
+
+
+class Wiki:
+    """Handles the root URL of the wiki."""
+
+    @cherrypy.expose
+    def index(self):
+        return template("welcome-to-nifki")
+
+    @cherrypy.expose
+    def tutorial(self):
+        with open(nifki_root / "tutorial.md") as fh:
+            text = fh.read()
+        return mistletoe.markdown(text)
+
+
+class Pages:
+    """Handles everything in the /pages/ URL-space.
+
+    Most things are accessed as /pages/<pagename>/<action>/, which CherryPy
+    will pass to the 'default()' method.
+    """
+
+    @cherrypy.expose
+    def index(self):
+        pagenames = [
+            page
+            for page in os.listdir(nifki_root / "wiki")
+            if page != "nifki-out" and not page.startswith(".")
+        ]
+        pagenames.sort()
+        pagenames = [
+            f'   <li><a href="/pages/{page}/play/">{page}</a></li>'
+            for page in pagenames
+        ]
+        return template(
+            "list-of-all-pages",
+            pagenames="\n".join(pagenames),
+        )
+
+    @cherrypy.expose
+    def default(self, pagename, action=None, *path, **params):
+        if not isValidPageName(pagename):
+            return httpError(404, f"Bad page name '{html.escape(pagename)}'")
+        if action is None:
+            raise cherrypy.HTTPRedirect(f"/pages/{pagename}/play/")
+        if action.endswith(".jar"):
+            return self.jar(pagename)
+        if action == "play":
+            return self.play(pagename)
+        if action == "edit":
+            return self.edit(pagename)
+        if action == "save":
+            return self.save(pagename, **params)
+        if action == "res":
+            return self.res(pagename, path[0])
+        return httpError(404, f"Unknown action: {action}")
+
+    def jar(self, pagename):
+        """Returns the jar file for this page."""
+        with open(nifki_root / "wiki" / "nifki-out" / f"{pagename}.jar", "rb") as fh:
+            jar = fh.read()
+        cherrypy.response.headers["Content-Type"] = "application/java-archive"
+        cherrypy.response.headers["Last-Modified"] = cherrypy.response.headers["Date"]
+        return jar
+
+    def play(self, pagename):
+        """Play the game.
+
+        Returns the page with the applet tag on it, if the game compiled
+        successfully, otherwise returns a page showing the compiler output.
+        """
+        errfile = nifki_root / "wiki" / "nifki-out" / f"{pagename}.err"
+        if (nifki_root / "wiki" / "nifki-out" / f"{pagename}.jar").exists():
+            with open(nifki_root / "wiki" / pagename / "properties.txt") as fh:
+                props = parseProperties(fh.read())
+            return template(
+                "playing",
+                pagename=pagename,
+                width=int(props["width"]),
+                height=int(props["height"]),
+                msPerFrame=int(props["msPerFrame"]),
+                random=int(time.time()),
+                name=props["name"],
+            )
+        elif errfile.exists():
+            with open(errfile) as fh:
+                err = fh.read()
+            lines = []
+            for line in err.split("\n"):
+                for shortline in textwrap.wrap(line, width=80):
+                    lines.append(shortline)
+            err = "\n".join(lines)
+            return template("compiler-output", pagename=pagename, err=html.escape(err))
+        else:
+            raise cherrypy.HTTPRedirect(f"/pages/{pagename}/edit/")
+
+    def edit(self, pagename):
+        if not (nifki_root / "wiki" / pagename).is_dir():
+            return template("no-such-page", pagename=pagename)
+        # Load "source.sss" file.
+        with open(nifki_root / "wiki" / pagename / "source.sss") as fh:
+            source = fh.read()
+        # Load "properties.txt" file.
+        with open(nifki_root / "wiki" / pagename / "properties.txt") as fh:
+            props = parseProperties(fh.read())
+        # Return an editing page.
+        return self.editPage(
+            pagename,
+            None,
+            source,
+            props["width"],
+            props["height"],
+            props["msPerFrame"],
+            props["name"],
+            props["debug"] != "false",
+            pagename,
+        )
+
+    def editPage(
+        self,
+        pagename,
+        errormessage,
+        source,
+        width,
+        height,
+        msPerFrame,
+        name,
+        showDebug,
+        newpage,
+    ):
+        """Returns an edit page populated with the specified data.
+
+        All fields are strings except 'showDebug' which is a boolean.
+        'errormessage' can be 'None'. This method compiles the table of images itself.
+        """
+        # Wrap up 'errormessage' in an HTML paragraph.
+        if errormessage:
+            errormessage = (
+                f'<p class="error" align="center">{html.escape(errormessage)}</p>'
+            )
+        else:
+            errormessage = ""
+        # Compile a list of the images attached to the page.
+        res_dir = nifki_root / "wiki" / pagename / "res"
+        os.makedirs(res_dir, exist_ok=True)
+        imagelist = os.listdir(res_dir)
+        imagelist.sort()
+        imagelist = [
+            template("fragments/editing-image", pagename=pagename, image=image)
+            for image in imagelist
+        ]
+        imagelist = [
+            "    <tr>\n" + "\n".join(row) + "\n    </tr>"
+            for row in group(imagelist, 5, "     <td></td>")
+        ]
+        if imagelist == []:
+            imagelist = '   <p align="center">No pictures</p>'
+        else:
+            imagelist = (
+                f"""   <table cols="5" rows="{len(imagelist)}" align="center">\n"""
+                + "\n".join(imagelist)
+                + "\n   </table>"
+            )
+        return template(
+            "editing",
+            pagename=pagename,
+            errormessage=errormessage,
+            source=html.escape(source),
+            width=html.escape(width),
+            height=html.escape(height),
+            msPerFrame=html.escape(msPerFrame),
+            name=html.escape(name),
+            debugChecked=["", "checked"][showDebug],
+            imagelist=imagelist,
+            newpage=html.escape(newpage),
+            uploadedImage="",
+        )
+
+    def save(
+        self,
+        pagename,
+        source,
+        width,
+        height,
+        msPerFrame,
+        name,
+        newpage,
+        uploadedImage=None,
+        debug=None,
+        upload=None,
+        save=None,  # passed but not used
+    ):
+        if upload:
+            return self.uploadImage(
+                pagename,
+                source,
+                width,
+                height,
+                msPerFrame,
+                name,
+                newpage,
+                uploadedImage,
+                debug,
+            )
+        errormessage = None
+        if newpage == pagename:
+            pass  # Unchanged.
+        elif not isValidPageName(newpage):
+            errormessage = (
+                f"Your changes have not been saved because '{newpage}' is "
+                "not allowed as a page name. Page names must start with a "
+                "letter, must contain only letters and digits, must not be "
+                "entirely capital letters, and must have at least three "
+                "characters and at most twenty."
+            )
+        elif (nifki_root / "wiki" / newpage).is_dir():
+            errormessage = (
+                "Your changes have not been saved because a page called "
+                f"'{newpage}' already exists."
+            )
+        else:
+            # New page.
+            shutil.copytree(
+                nifki_root / "wiki" / pagename,
+                nifki_root / "wiki" / newpage,
+            )
+        # Check that width, height and msPerFrame are integers.
+        try:
+            int(width)
+            int(height)
+            int(msPerFrame)
+        except ValueError:
+            errormessage = "The width, height and frame rate must all be integers."
+        # Either save or return to the editing page with an error message.
+        if errormessage:
+            return self.editPage(
+                pagename,
+                errormessage,
+                source,
+                width,
+                height,
+                msPerFrame,
+                name,
+                debug is not None,
+                newpage,
+            )
+        else:
+            return self.savePage(
+                newpage, source, width, height, msPerFrame, name, debug is not None
+            )
+
+    def uploadImage(
+        self,
+        pagename,
+        source,
+        width,
+        height,
+        msPerFrame,
+        name,
+        newpage,
+        uploadedImage,
+        debug,
+    ):
+        errormessage = None
+        magic = uploadedImage.file.read(4)
+        if not magic:
+            errormessage = "Image file not found."
+        elif magic[1:4] != "PNG" and magic[:2] != "\xff\xd8":
+            errormessage = "Images must be in PNG or JPEG format."
+        else:
+            imageData = magic + uploadedImage.file.read(102400 - len(magic))
+            if uploadedImage.file.read(1):
+                errormessage = "Image files must be smaller than 100K."
+            if not errormessage:
+                fname = uploadedImage.filename
+                fname = os.path.basename(fname)
+                if (
+                    fname.lower().endswith(".png")
+                    or fname.lower().endswith(".jpg")
+                    or fname.lower().endswith(".jpeg")
+                ):
+                    fname = fname[: fname.rfind(".")]
+                allowed = string.ascii_letters + string.digits
+                fname = "".join([x for x in fname if x in allowed])
+                if not isValidPageName(fname):
+                    fname = "image"
+                existingNames = os.listdir(nifki_root / "wiki" / pagename / "res")
+                if fname in existingNames:
+                    count = 1
+                    while True:
+                        proposedName = f"{fname}{count}"
+                        if proposedName not in existingNames:
+                            break
+                        count += 1
+                    fname = proposedName
+                with open(nifki_root / "wiki" / pagename / "res" / fname, "wb") as fh:
+                    fh.write(imageData)
+        return self.editPage(
+            pagename,
+            errormessage,
+            source,
+            width,
+            height,
+            msPerFrame,
+            name,
+            debug is not None,
+            newpage,
+        )
+
+    def savePage(self, pagename, source, width, height, msPerFrame, name, showDebug):
+        """Saves changes to 'pagename'.
+
+        Runs the compiler. Returns a redirect to the 'play' page. All parameters are
+        strings except 'showDebug' which is a boolean.
+        """
+        # Save the source file, 'source.sss'.
+        with open(nifki_root / "wiki" / pagename / "source.sss", "w") as fh:
+            fh.write(source)
+        # Save the properties file, 'properties.txt'.
+        props = makeProperties(
+            [
+                ("name", name),
+                ("width", int(width)),
+                ("height", int(height)),
+                ("msPerFrame", int(msPerFrame)),
+                ("debug", ["false", "true"][showDebug]),
+            ]
+        )
+        with open(nifki_root / "wiki" / pagename / "properties.txt", "w") as fh:
+            fh.write(props)
+        # Run the compiler.
+        errcode = subprocess.call(["java", "-jar", "compiler.jar", "wiki", pagename])
+        if errcode != 0:
+            cherrypy.response.headers["Status"] = 500
+            return template("compiler-error")
+        else:
+            raise cherrypy.HTTPRedirect(f"/pages/{pagename}/play/")
+
+    def res(self, pagename, imagename):
+        with open(nifki_root / "wiki" / pagename / "res" / imagename, "rb") as fh:
+            image = fh.read()
+        cherrypy.response.headers["Content-Type"] = "image/png"
+        return image
+
+
+def main():
+    with importlib.resources.as_file(importlib.resources.files()) as fspath:
+        global nifki_root
+        nifki_root = Path(fspath) / "resources"
+        conf = {
+            "/static": {
+                "tools.staticdir.on": True,
+                "tools.staticdir.dir": "static",
+            },
+            "/favicon.ico": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": "static/favicon.ico",
+            },
+        }
+        cherrypy.config.update(
+            {
+                "tools.staticdir.root": nifki_root,
+                "tools.staticfile.root": nifki_root,
+            }
+        )
+        cherrypy.tree.mount(Wiki(), "/", conf)
+        cherrypy.tree.mount(Pages(), "/pages", conf)
+        cherrypy.engine.start()
+        cherrypy.engine.block()
