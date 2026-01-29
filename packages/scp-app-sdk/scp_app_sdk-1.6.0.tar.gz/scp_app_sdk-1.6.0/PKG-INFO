@@ -1,0 +1,282 @@
+Metadata-Version: 2.4
+Name: scp-app-sdk
+Version: 1.6.0
+Summary: SCP APP SDK
+Author: Dstny
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: marshmallow==3.*
+Requires-Dist: marshmallow-oneofschema==3.*
+Requires-Dist: click==8.*
+Requires-Dist: jinja2==3.*
+Requires-Dist: requests==2.*
+Requires-Dist: PyYAML==6.*
+Requires-Dist: kubernetes==34.*
+Requires-Dist: pathspec==0.12.1
+Provides-Extra: test
+Requires-Dist: mypy==1.18.2; extra == "test"
+Requires-Dist: mypy-baseline==0.7.3; extra == "test"
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-cov; extra == "test"
+Requires-Dist: types-PyYAML; extra == "test"
+Requires-Dist: types-requests; extra == "test"
+Requires-Dist: kubernetes-typed; extra == "test"
+Requires-Dist: types-setuptools; extra == "test"
+Dynamic: author
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# SCP APP SDK
+
+[![Coverage](https://code.internal.destiny.be/escaux/scp/csfe/dev/scp-app-sdk/badges/develop/coverage.svg)](https://code.internal.destiny.be/escaux/scp/csfe/dev/scp-app-sdk/-/graphs/develop/charts)
+
+Software Development Kit for the SCP APP store. It provides schemas, functions, documentation and the CLI for the APP store.
+
+You can find more documentation here: https://doc.chefhub.smartflowagent.net
+
+## Install SCP-APP SDK via pipx
+
+### install pipx
+```
+# debian/ubuntu
+sudo apt install pipx # debian/ubuntu
+
+# arch linux
+sudo pacman -S python-pipx
+
+# fedora
+sudo dnf install python3-pipx
+
+# alpine
+sudo apk add py3-pipx
+
+# macos
+brew install pipx
+pipx ensurepath
+
+# windows
+python -m pip install --user pipx
+python -m pipx ensurepath
+```
+
+### Install the package
+```
+pipx install scp.app.sdk
+```
+
+## Use the scp-app cli tool
+
+### Discover the scp-app cli tool
+When the package is installed, just type 'scp-app' to get the help menu of the CLI.
+
+```
+Usage: scp-app [OPTIONS] COMMAND [ARGS]...
+
+  🚀 SCP APP CLI – Your assistant to create, build, test, and publish SCP Apps.
+
+  Configure SCP APP CLI:
+      scp-app configure               → Configure default value to use.
+
+  Typical workflow:
+      scp-app create                  → Start a new SCP App project.
+      scp-app validate                → Verify your app meets SCP standards.
+      scp-app run                     → Run your app locally for testing.
+      scp-app build /your/app/dir     → Compile & bundle your app.
+      scp-app publish /dir/app.sap    → Release your app to the SCP store.
+
+  Get help:
+      scp-app create help             → Get help on creating an app.
+      scp-app validate help           → Get help on validating an app.
+      scp-app build help              → Get help on building an app.
+      scp-app run help                → Get help on running an app.
+      scp-app publish help            → Get help on publishing an app.
+
+  For more information, you can refer to the documentation at:
+  👉 https://doc.chefhub.smartflowagent.net/apps/cli
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  build      Build the SCP APP
+  configure  Interactive configuration for SCP App.
+  create     Create a new SCP APP
+  publish    Publish your SCP APP build
+  run        Execute and run apt script
+  validate   Check if the SCP APP is valid
+```
+
+### Configure the CLI 
+
+##### Create your application
+Follow the prompts from the tool in order to create your app.
+
+```
+scp-app create
+```
+
+Your app will be generated in your chosen directory.
+
+##### Validate your application
+You can check if your app structure is valid by using the validate command and the path of your app.
+
+```
+scp-app validate /tmp/test
+```
+
+
+### Run your application
+You can check your app scripts are valid by using the run command.
+
+```
+# To run the install script
+scp-app run install /tmp/test
+
+# To run the uninstall script
+scp-app run uninstall /tmp/test
+
+# To run the migrate script
+scp-app run migrate /tmp/test
+```
+
+##### Build your application
+Once your application is validated and the scripts run without errors, you can create the build.
+
+```
+scp-app validate /tmp/test
+```
+
+It will build a '.sap' file in your app directory.
+For example, for /tmp/test directory, it will be something like: /tmp/test/build/test-0.1.0.sap
+
+#### Exclude files from the build
+When you create an app, an `.appignore` file is created in the root of your app. It works similarly to a `.gitignore` file.
+The default comes with some commonly ignored files, but feel free to edit and customize it to your needs.
+
+Example of `.appignore` file:
+```
+# Exclude all .log files
+*.log
+# Exclude the temp directory
+temp/
+# Include a specific file (always add those at the end)
+!important.log
+```
+
+### Publish your application
+Once your application is built into a .sap file, you can publish the build on the SCP Appstore.
+
+```
+scp-app publish /tmp/test/build/test-0.1.0.sap
+```
+
+
+### How to use the SDK in your scripts ? 
+You can check in the configuration.py and the user.py to use the built-in function of the SDK.
+
+Get the input of app config:
+
+```
+#!/usr/local/bin/python3
+from scp.app.sdk.configuration import get_inputs
+
+# Get input of app config
+inputs = get_inputs()
+print(f"Inputs={inputs}")
+```
+
+Use the userId:
+```
+# Get the userId 
+from scp.app.sdk.scripts.user import get_user_id
+x = get_user_id()
+print(x)
+
+```
+note: the userId is the uepId, you can find it in SAM UI in the "ID" column in the users table.
+
+Use the ISS:
+```
+# Get the ISS 
+from scp.app.sdk.scripts.user import get_iss
+x = get_iss()
+print(x)
+```
+
+# Changelog
+
+All notable changes to this project will be documented here.
+
+## [1.6.0] - 2026-01-16
+### Improved
+- Abstract studio API calls via the APP SDK (SFD-312)
+- Move extract config, update json config marker (SFD-242)
+- Allow to use ISS in scripts (SFD-179)
+- Allow to use input in uninstall scripts (SFD-200)
+- Allow to rollback in case you leave interactive app creation (SFD-172)
+- Add more documentation (SFD-172) 
+- Allow to see in the cli why yaml is invalid (SFD-248)
+- Replace (windows) line endings in application scripts (SFD-449)
+- Support for `.appignore` file to exclude specified files and directories from app packaging. By default, all files are included unless listed in `.appignore`. (SFD-405)
+- Make sure pipx pythonpath is found (SFD-438)
+- Support locate service without port suffix
+
+## [1.5.0] - 2025-09-17
+### Improved
+- SDK CLI: prompt user to upgrade software
+- app upgrade: provide version information to/during migration
+- SFD-204 fix stacktrace if timeout
+- SFD-203 allow self signed cert
+- FMG-3975 add schema ui plugin, remove prompt for version upgrade in dev
+
+## [1.4.0] - 2025-09-02
+### Improved
+- Split library into scp-app-lib and scp-app-sdk, keeping only the SDK in this package (SFD-102)
+- Improved SDK CLI code (SFD-99)
+
+## [1.3.0] - 2025-08-05
+### Added
+- Support for UI plugins.
+
+## [1.2.1] - 2025-07-09
+### Fixed
+- Script could not be executed (FMG-3876).
+
+## [1.2.0] - 2025-05-07
+### Improved
+- Document the route that updates app configuration (FMG-3675).
+
+## [1.1.0] - 2025-04-18
+### Added
+- `env` parameter in `create` CLI command (FMG-3376).
+- Ability to set app version in manifest.
+- Ability to add library in the app.
+
+### Improved
+- Review source code of build rendering.
+- Review manifest generation issue with CLI.
+- Improve docs for non-Python developers.
+- Update README with detailed app creation/configuration instructions.
+- Add input parameter to `run_uninstall` function.
+
+### Fixed
+- Issue retrieving template in CLI.
+- Packaging issue with templating.
+- API key not sent when publishing a new app.
+- Git version check.
+- Uninstall script execution by adding input parameter.
+
+## [1.0.0] - 2025-02-05
+### Added
+- Validation schema for apps, builds, user apps, and app manifests (Marshmallow).
+- API documentation of APP store (Tornado).
+- CLI to manage apps — create, validate, build, and publish.
+- Library to manage APP manifest.
+- Library to manage CSFE.
+- Library to validate manifest, apps, and runners.
+- Library to manage builds.
+- Icon support.
