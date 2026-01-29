@@ -1,0 +1,140 @@
+Metadata-Version: 2.4
+Name: termq
+Version: 0.1.0
+Summary: A minimal GPT chat client in the terminal
+Author-email: Tommy <i@tjtl.io>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/termq
+Project-URL: Repository, https://github.com/yourusername/termq
+Project-URL: Bug Tracker, https://github.com/yourusername/termq/issues
+Keywords: openai,gpt,chat,terminal,cli
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: openai==0.27.8
+Requires-Dist: termcolor>=2.3.0
+Requires-Dist: rich>=13.4.2
+Requires-Dist: PyMuPDF>=1.22.3
+Requires-Dist: ocrmypdf>=13.7.0
+Requires-Dist: pyperclip==1.8.2
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: black>=22.0; extra == "dev"
+Requires-Dist: flake8>=4.0; extra == "dev"
+Dynamic: license-file
+
+# TermQ
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
+
+A minimal GPT chat client in the terminal. A toy experiment with OpenAI's GPT API.
+
+> All code have only tested on macOS, not guaranteed to work on other platforms.
+
+## Prerequisites
+
+```bash
+export OPENAI_API_KEY=<your key>
+```
+
+```bash
+python -m termq-venv
+source termq-venv/bin/activate
+pip install -r requirements.txt
+```
+
+```bash
+# Optional, for PDF OCR if you want multi-language support
+# Read more here: https://github.com/ocrmypdf/OCRmyPDF#languages
+brew install tesseract-lang
+```
+
+## Running
+
+```bash
+Usage: python script.py [OPTIONS]
+
+Options:
+  -c, --load-character FILE     Specify a character file location.
+  --stream                      Enable streaming mode.
+  -e, --load-engine TYPE        Specify an engine type, default is `gpt-3.5-turbo`.
+  --tts                         Enable text-to-speech.
+  -q, --question                Ask a question to the chatbot and get an answer directly.
+  --help                        Show this message and exit.
+```
+
+### Chat with GPT
+
+#### Default Assistant
+
+```bash
+python chat.py
+```
+
+<details>
+  <summary> 🎬 Example usage </summary>
+
+https://github.com/tommyjtl/termchat/assets/1622557/fb5d111b-42fb-4899-aeb6-c97202847a6f
+
+</details>
+
+#### Specifiy a personality
+
+```bash
+python chat.py -c <character>
+```
+
+<details>
+  <summary> 🎬 Example usage </summary>
+
+https://github.com/tommyjtl/termchat/assets/1622557/9d4ae7d7-d62b-4e28-b428-6b676d3780aa
+
+</details>
+
+### On-demand Terminal Q&A
+
+```bash
+python chat.py -q
+```
+
+<details>
+  <summary> 🎬 Example usage </summary>
+
+https://github.com/tommyjtl/termchat/assets/1622557/8b25b39f-3145-4ad8-886e-a39e3d165b9f
+
+</details>
+
+### Chat with PDF
+
+```bash
+# Normal usage
+python pdf.py -f <file>
+
+# Add --ocr if your PDF doesn't have text layer, default OCR language is English
+python pdf.py -f <file> --ocr
+
+# Add --ocr-lang to specify OCR language
+# For <lang>, use 3-digit ISO 639-2 Code, see more here: https://github.com/tesseract-ocr/tessdata
+python pdf.py -f <file> --ocr --ocr-lang <lang>
+```
+
+<details>
+  <summary> 🎬 Example usage </summary>
+
+https://github.com/tommyjtl/termchat/assets/1622557/40162508-3263-406b-bb7e-27558ae8d618
+
+</details>
+
+## Acknowledgments
+
+- [QueryGPT](https://github.com/tsensei/QueryGPT)
