@@ -1,0 +1,58 @@
+from abc import abstractmethod
+from typing import Optional, Sequence, Type, TypeVar
+from uuid import UUID
+
+from langchain.agents import AgentState, create_agent
+from langchain.tools import BaseTool
+from pydantic import BaseModel
+
+from graph_state import GraphState
+from middlewares import ParallelToolCallsMiddleware, PersonalInformationMiddleware
+from nodes.base_llm_node import BaseLLMNode
+
+
+class CustomAgentState(AgentState):
+    agent_name: str
+    shell_id: Optional[UUID]
+
+
+T = TypeVar("T", bound=BaseModel)
+K = TypeVar("K", bound=CustomAgentState)
+
+
+class BaseReactAgent(BaseLLMNode[GraphState]):
+    """
+    Abstract base class for all agents.
+    Provides shared interface and utility methods.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        prompt: str,
+        tools: Sequence[BaseTool] = [],
+        parallel_tool_calls: bool = False,
+        state_schema: Optional[Type[K]] = CustomAgentState,
+        response_format: Optional[Type[T]] = None,
+    ) -> None:
+        super().__init__(name=name)
+        self.agent = create_agent(
+            model=self._llm.raw_llm,
+            tools=tools,
+            name=name,
+            system_prompt=prompt,
+            state_schema=state_schema,
+            response_format=response_format,
+            middleware=[
+                ParallelToolCallsMiddleware(parallel_tool_calls=parallel_tool_calls),
+                PersonalInformationMiddleware(),
+            ],
+        )
+
+    @abstractmethod
+    def invoke(self, state: GraphState) -> GraphState:
+        """
+        Abstract method that must be implemented by subclasses.
+        Executes the agent logic using the provided GraphState and returns the updated GraphState.
+        """
+        pass
