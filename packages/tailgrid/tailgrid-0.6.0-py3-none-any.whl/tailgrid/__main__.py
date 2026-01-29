@@ -1,0 +1,461 @@
+#!/usr/bin/env python3
+"""tailgrid - Multi-tile tail viewer. Controls: Enter scroll | arrows nav | r refresh | q quit"""
+
+import curses, glob, json, os, readline, select, sys, termios, time, tty
+from pathlib import Path
+
+LAYOUTS = {'1': (1, 1), '2': (2, 1), '3': (1, 2), '4': (2, 2), '5': (3, 3), '9': (3, 3)}
+MAX_SESSIONS, CONFIG_DIR = 10, Path.home() / ".config" / "tailgrid"
+SESSIONS_FILE, CONFIG_FILE = CONFIG_DIR / "sessions.json", CONFIG_DIR / "config.json"
+DEFAULT_EXTENSIONS = ['.txt', '.log', '.out', '.err']
+
+DEFAULT_CLAUDE_PROMPT = """Return absolute paths to FILES (max 9) for the most relevant log files to monitor.
+No directories, only files. Consider: your current session, recent experiments, active projects, subagent activity.
+If multiple projects exist, prioritize the most recent or currently running ones.
+Return ONLY existing file paths with a brief description for each.
+The description should be high-level: what project/experiment, what kind of output, why useful to watch.
+Format (one per line):
+/path/to/file.log | Project X - training logs for GPT experiment, shows loss curves
+/path/to/debug.log | Tailgrid dev - debug output from current Claude Code session"""
+
+DEFAULT_CONFIG = {'extensions': DEFAULT_EXTENSIONS, 'show_full_path': False, 'claude_prompt': DEFAULT_CLAUDE_PROMPT}
+
+def load_config():
+    try:
+        if CONFIG_FILE.exists():
+            cfg = json.loads(CONFIG_FILE.read_text())
+            return {**DEFAULT_CONFIG, **cfg}
+    except (OSError, json.JSONDecodeError): pass
+    return DEFAULT_CONFIG.copy()
+
+def _getch():
+    fd, old = sys.stdin.fileno(), termios.tcgetattr(sys.stdin.fileno())
+    try:
+        tty.setraw(fd); ch = sys.stdin.read(1)
+        if ch == '\x03': raise KeyboardInterrupt
+        while select.select([sys.stdin], [], [], 0.05)[0]:
+            if sys.stdin.read(1) == '\x03': raise KeyboardInterrupt
+        return ch
+    finally: termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+def _setup_readline():
+    def completer(text, state):
+        text = os.path.expanduser(text) if text.startswith('~') else text
+        matches = [m + '/' if os.path.isdir(m) else m for m in glob.glob(text + '*')]
+        return matches[state] if state < len(matches) else None
+    readline.set_completer(completer); readline.set_completer_delims(' \t\n;'); readline.parse_and_bind('tab: complete')
+
+def read_last_n_lines(filepath: str, n: int) -> list[str]:
+    try:
+        with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+            return [line.rstrip('\n\r') for line in f.readlines()][-n:]
+    except OSError: return []
+
+def clamp(val, lo, hi): return max(lo, min(val, hi))
+
+def save_session(paths, layout, lines):
+    try:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        sessions = [s for s in load_sessions() if s["paths"] != paths]
+        sessions.insert(0, {"paths": paths, "layout": list(layout), "lines": lines})
+        SESSIONS_FILE.write_text(json.dumps(sessions[:MAX_SESSIONS], indent=2))
+    except OSError: pass
+
+def load_sessions():
+    try: return json.loads(SESSIONS_FILE.read_text()) if SESSIONS_FILE.exists() else []
+    except (OSError, json.JSONDecodeError): return []
+
+def load_session(idx=0):
+    s = load_sessions()
+    return (s[idx]["paths"], tuple(s[idx]["layout"]), s[idx]["lines"]) if idx < len(s) else None
+
+def file_picker(directory):
+    directory = os.path.expanduser(directory)
+    if not os.path.isdir(directory): print(f"  Not a directory: {directory}"); return None
+    files = sorted([f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))])
+    if not files: print(f"  No files found in: {directory}"); return None
+    selected, cursor, scroll = set(), 0, 0
+    def picker(stdscr):
+        nonlocal cursor, scroll, selected
+        curses.curs_set(0); curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE); curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        while True:
+            stdscr.clear(); h, w = stdscr.getmaxyx(); max_disp = h - 4
+            stdscr.addstr(0, 0, f" Select files from: {directory} "[:w-1], curses.A_BOLD)
+            stdscr.addstr(1, 0, " " + "─" * (w - 2), curses.A_DIM)
+            if cursor < scroll: scroll = cursor
+            elif cursor >= scroll + max_disp: scroll = cursor - max_disp + 1
+            for i, fname in enumerate(files[scroll:scroll + max_disp]):
+                idx, y = scroll + i, i + 2
+                if y >= h - 2: break
+                line = f" [{'x' if idx in selected else ' '}] {fname}"
+                attr = curses.color_pair(1) if idx == cursor else (curses.color_pair(2) | curses.A_BOLD if idx in selected else 0)
+                stdscr.addstr(y, 0, line[:w-1].ljust(w-1) if idx == cursor else line[:w-1], attr)
+            try: stdscr.addstr(h-1, 0, f" {len(selected)}/9 selected │ ↑↓/jk nav │ SPACE sel │ a all │ ENTER ok │ q quit "[:w-1].ljust(w-1), curses.A_REVERSE)
+            except curses.error: pass
+            stdscr.refresh(); key = stdscr.getch()
+            if key == ord('q'): return None
+            elif key in (ord('\n'), curses.KEY_ENTER): return sorted([os.path.join(directory, files[i]) for i in selected]) if selected else None
+            elif key in (curses.KEY_UP, ord('k')): cursor = max(0, cursor - 1)
+            elif key in (curses.KEY_DOWN, ord('j')): cursor = min(len(files) - 1, cursor + 1)
+            elif key == ord(' '): selected.symmetric_difference_update({cursor}); cursor = min(len(files) - 1, cursor + 1)
+            elif key == ord('a'): selected = set() if len(selected) == len(files) else set(range(len(files)))
+    return curses.wrapper(picker)
+
+def auto_layout(n): return (1, 1) if n <= 1 else None if n == 2 else (2, 2) if n <= 4 else (3, 3)
+
+class TailTile:
+    def __init__(self, filepath, lines=10):
+        self.filepath, self.lines, self._content, self._last_stat = filepath, lines, [], (0.0, 0)
+        self.frozen, self.scroll_offset, self._frozen_content = False, 0, []
+        self.h_scroll, self.wrap = 0, False  # Horizontal scroll offset and wrap toggle
+    def update(self):
+        if self.frozen: return False
+        try: stat = os.stat(self.filepath); current = (stat.st_mtime, stat.st_size)
+        except OSError:
+            if self._content: self._content = []; return True
+            return False
+        if current != self._last_stat: self._last_stat, self._content = current, read_last_n_lines(self.filepath, self.lines); return True
+        return False
+    def get_content(self):
+        if self.frozen:
+            end = len(self._frozen_content) - self.scroll_offset
+            start = max(0, end - self.lines)
+            return self._frozen_content[start:end]
+        return self._content.copy()
+    def freeze(self):
+        self.frozen, self.scroll_offset = True, 0
+        self._frozen_content = read_last_n_lines(self.filepath, 1000)
+    def unfreeze(self): self.frozen, self.scroll_offset, self._last_stat = False, 0, (0, 0)
+    def scroll(self, delta):
+        if self.frozen:
+            max_offset = max(0, len(self._frozen_content) - self.lines)
+            self.scroll_offset = clamp(self.scroll_offset + delta, 0, max_offset)
+    def scroll_top(self):
+        if self.frozen: self.scroll_offset = max(0, len(self._frozen_content) - self.lines)
+    def scroll_bottom(self):
+        if self.frozen: self.scroll_offset = 0
+    def total_lines(self):
+        try:
+            with open(self.filepath, 'r', encoding='utf-8', errors='replace') as f:
+                return sum(1 for _ in f)
+        except OSError: return 0
+
+class TileRenderer:
+    def __init__(self, stdscr, tiles, layout, show_full_path=False, reasons=None):
+        self.stdscr, self.tiles, self.rows, self.cols = stdscr, tiles, layout[0], layout[1]
+        self.focused, self.show_full_path, self.reasons = 0, show_full_path, reasons or {}
+    def render(self):
+        self.stdscr.clear(); h, w = self.stdscr.getmaxyx()
+        ft = self.tiles[self.focused] if self.focused < len(self.tiles) else None
+        focused_reason = self.reasons.get(ft.filepath) if ft else None
+        footer_lines = 2 if focused_reason else 1
+        tile_h, tile_w = (h - footer_lines) // self.rows, w // self.cols
+        content_h = tile_h - 2
+        for tile in self.tiles:
+            if tile.lines != content_h: tile.lines, tile._last_stat = content_h, (0, 0)
+        curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(6, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+        for i, tile in enumerate(self.tiles): self._draw_tile(tile, (i // self.cols) * tile_h, (i % self.cols) * tile_w, tile_h, tile_w, i)
+        hscroll_str = f" +{ft.h_scroll}" if ft and ft.h_scroll > 0 else ""
+        if ft and ft.frozen:
+            pos = len(ft._frozen_content) - ft.scroll_offset
+            status = f" SCROLL [{self.focused+1}] line {pos}/{len(ft._frozen_content)}{hscroll_str} │ ↑↓: Scroll │ ←→: Pan │ w: Wrap │ Enter: Exit │ q: Quit "
+        else:
+            total = ft.total_lines() if ft else 0
+            status = f" [{self.focused+1}] {total} lines{hscroll_str} │ w: Wrap │ </>: Pan │ Enter: Scroll │ ←→↑↓: Nav │ q: Quit "
+        try:
+            if focused_reason:
+                reason_line = f" Claude: {focused_reason}"
+                self.stdscr.addstr(h - 2, 0, reason_line[:w-1].ljust(w-1), curses.color_pair(4))
+            self.stdscr.addstr(h - 1, 0, status[:w-1].ljust(w-1), curses.A_REVERSE)
+        except curses.error: pass
+        self.stdscr.refresh()
+    def _draw_tile(self, tile, y, x, h, w, idx):
+        try:
+            is_focused = idx == self.focused
+            if tile.frozen:
+                border_attr = curses.color_pair(5) | curses.A_BOLD
+            elif is_focused:
+                border_attr = curses.color_pair(4) | curses.A_BOLD
+            else:
+                border_attr = curses.A_DIM
+            frozen_mark = " ❄" if tile.frozen else ""
+            wrap_mark = " ↩" if tile.wrap else ""
+            name = tile.filepath if self.show_full_path else os.path.basename(tile.filepath)
+            max_len = w - 11
+            name = "..." + name[-(max_len-3):] if len(name) > max_len else name
+            header = f"┌─ {idx+1}:{name}{frozen_mark}{wrap_mark} " + "─" * (w - len(name) - len(frozen_mark) - len(wrap_mark) - 8) + "┐"
+            self.stdscr.addstr(y, x, header[:w], border_attr)
+            content = tile.get_content()
+            content_w = w - 3  # Width available for content (minus borders and padding)
+            # Build display lines (with wrapping or horizontal scroll)
+            display_lines = []
+            for line in content:
+                if tile.wrap:
+                    # Wrap long lines
+                    if len(line) <= content_w:
+                        display_lines.append(line)
+                    else:
+                        for i in range(0, len(line), content_w):
+                            display_lines.append(line[i:i+content_w])
+                else:
+                    # Apply horizontal scroll
+                    display_lines.append(line[tile.h_scroll:] if tile.h_scroll < len(line) else "")
+            # Take last N lines that fit
+            display_lines = display_lines[-(h-2):]
+            for row in range(h - 2):
+                if y + 1 + row >= y + h - 1: break
+                self.stdscr.addstr(y + 1 + row, x, "│", border_attr)
+                if row < len(display_lines): self.stdscr.addstr(y + 1 + row, x + 1, f" {display_lines[row]}"[:w-3])
+                self.stdscr.addstr(y + 1 + row, x + w - 1, "│", border_attr)
+            self.stdscr.addstr(y + h - 1, x, "└" + "─" * (w - 2) + "┘", border_attr)
+        except curses.error: pass
+
+def run_viewer(filepaths, layout, initial_lines, show_full_path=None, reasons=None):
+    save_session(filepaths, layout, initial_lines)
+    config = load_config()
+    full_path = show_full_path if show_full_path is not None else config.get('show_full_path', False)
+    def viewer(stdscr):
+        curses.curs_set(0); stdscr.timeout(100)
+        tiles = [TailTile(fp, initial_lines) for fp in filepaths]
+        renderer, redraw, last_size = TileRenderer(stdscr, tiles, layout, full_path, reasons), True, os.get_terminal_size()
+        last_key, last_key_time = None, 0
+        for tile in tiles: tile.update()
+        while True:
+            try:
+                sz = os.get_terminal_size()
+                if sz != last_size: last_size = sz; curses.resizeterm(sz.lines, sz.columns); stdscr.clear(); redraw = True
+            except OSError: pass
+            for tile in tiles:
+                if tile.update(): redraw = True
+            key = stdscr.getch()
+            ft = tiles[renderer.focused]
+            if key == ord('q'): break
+            elif key == ord('r'):
+                for tile in tiles: tile._last_stat = (0, 0); tile.update()
+                redraw = True
+            elif key in (ord('\n'), curses.KEY_ENTER, 10):
+                if ft.frozen: ft.unfreeze()
+                else: ft.freeze()
+                redraw = True
+            elif key == ord('\t'):
+                renderer.focused = (renderer.focused + 1) % len(tiles); redraw = True
+            elif key == curses.KEY_UP:
+                if ft.frozen: ft.scroll(1)
+                else: renderer.focused = (renderer.focused - renderer.cols) % len(tiles)
+                redraw = True
+            elif key == curses.KEY_DOWN:
+                if ft.frozen: ft.scroll(-1)
+                else: renderer.focused = (renderer.focused + renderer.cols) % len(tiles)
+                redraw = True
+            elif key == curses.KEY_LEFT:
+                if ft.frozen: ft.h_scroll = max(0, ft.h_scroll - 10)
+                else: renderer.focused = (renderer.focused - 1) % len(tiles)
+                redraw = True
+            elif key == curses.KEY_RIGHT:
+                if ft.frozen: ft.h_scroll += 10
+                else: renderer.focused = (renderer.focused + 1) % len(tiles)
+                redraw = True
+            elif key == ord('j'): ft.scroll(-1); redraw = True
+            elif key == ord('k'): ft.scroll(1); redraw = True
+            elif key in (ord('u'), curses.KEY_PPAGE): ft.scroll(10); redraw = True
+            elif key in (ord('d'), curses.KEY_NPAGE): ft.scroll(-10); redraw = True
+            elif key == ord('g'):
+                now = time.time()
+                if last_key == ord('g') and now - last_key_time < 0.5: ft.scroll_top(); redraw = True
+                last_key, last_key_time = key, now
+            elif key == ord('G'): ft.scroll_bottom(); redraw = True
+            elif key == ord('w'): ft.wrap = not ft.wrap; ft.h_scroll = 0; redraw = True
+            elif key in (ord('<'), ord(',')): ft.h_scroll = max(0, ft.h_scroll - 10); redraw = True
+            elif key in (ord('>'), ord('.')): ft.h_scroll += 10; redraw = True
+            elif key in range(ord('1'), ord('1') + len(tiles)):
+                renderer.focused = key - ord('1'); redraw = True
+            elif key == curses.KEY_RESIZE: curses.update_lines_cols(); stdscr.erase(); redraw = True
+            if key != -1: last_key, last_key_time = key, time.time()
+            if redraw: renderer.render(); redraw = False
+    try: curses.wrapper(viewer)
+    except KeyboardInterrupt: pass
+
+def _input(prompt):
+    _setup_readline()
+    try:
+        val = input(prompt).strip()
+        return None if val.lower() == 'q' else "" if val.lower() == 'b' or not val else val
+    except (EOFError, KeyboardInterrupt): return None
+
+def _browse_directory():
+    while True:
+        try:
+            directory = _input("\n  Directory path (b=back, q=quit): ")
+            if directory is None: return None
+            if not directory: return "back"
+            paths = file_picker(directory.strip())
+            if not paths: continue
+            if len(paths) > 9: print(f"\n  Selected {len(paths)} files, using first 9."); paths = paths[:9]
+            layout = auto_layout(len(paths))
+            if layout is None:
+                print("\n  2 files: v=vertical, h=horizontal (b=back, q=quit): ", end='', flush=True)
+                ch = _getch().lower(); print(ch)
+                if ch == 'q': return None
+                if ch == 'b': continue
+                layout = (1, 2) if ch == 'h' else (2, 1)
+            print(f"\n  {len(paths)} file(s) → {['Single','Vertical','Horizontal','2x2 Grid','3x3 Grid'][[1,2,2,4,9].index(layout[0]*layout[1])]}")
+            for p in paths: print(f"    • {p}")
+            print("\n  Starting..."); time.sleep(0.3); return paths, layout, 10
+        except (EOFError, KeyboardInterrupt): print(); return None
+
+LAYOUT_ART = """    1) Single        2) Vertical      3) Horizontal    4) 2x2 Grid     5) 3x3 Grid
+       ┌─────┐          ┌──┬──┐          ┌─────┐          ┌──┬──┐         ┌──┬──┬──┐
+       │  1  │          │ 1│ 2│          │  1  │          │ 1│ 2│         │ 1│ 2│ 3│
+       └─────┘          └──┴──┘          ├─────┤          ├──┼──┤         ├──┼──┼──┤
+                                         │  2  │          │ 3│ 4│         │ 4│ 5│ 6│
+                                         └─────┘          └──┴──┘         ├──┼──┼──┤
+                                                                          │ 7│ 8│ 9│
+                                                                          └──┴──┴──┘"""
+
+def _add_paths_manually():
+    while True:
+        print(f"\n  Select layout:\n\n{LAYOUT_ART}\n")
+        print("  Layout 1-5 (b=back, q=quit): ", end='', flush=True)
+        try:
+            choice = _getch(); print(choice)
+            if choice.lower() == 'q': return None
+            if choice.lower() == 'b': return "back"
+            layout = LAYOUTS.get(choice, LAYOUTS['1']); max_files = layout[0] * layout[1]
+            print(f"\n  Enter {max_files} file path(s) (b=back, q=quit):\n"); paths = []
+            for i in range(max_files):
+                path = _input(f"    [{i+1}] ")
+                if path is None: return None
+                if not path:
+                    if not paths: break
+                    break
+                paths.append(os.path.expanduser(path))
+                if not os.path.exists(path): print("        ↳ will show when created")
+            if not paths: continue
+            print(f"\n  Starting with {len(paths)} file(s)..."); time.sleep(0.3); return paths, layout, 10
+        except (EOFError, KeyboardInterrupt): print(); return None
+
+def _resume_session():
+    sessions = load_sessions()
+    if not sessions: print("\n  No saved sessions."); time.sleep(0.5); return "back"
+    print("\n  Recent sessions:\n")
+    for i, s in enumerate(sessions):
+        print(f"    {i}) {len(s['paths'])} file(s), {s['lines']} lines")
+        for p in s['paths']: print(f"       • {p}")
+    print(f"  Select 0-{len(sessions)-1} (b=back, q=quit): ", end='', flush=True)
+    try:
+        choice = _getch(); print(choice)
+        if choice.lower() == 'q': return None
+        if choice.lower() == 'b': return "back"
+        if choice.isdigit() and 0 <= int(choice) < len(sessions):
+            print("\n  Restoring session..."); time.sleep(0.3); return load_session(int(choice))
+        return "back"
+    except (EOFError, KeyboardInterrupt): print(); return None
+
+LOGO = """
+ ┌──────┬──────┬──────┐   ████████╗ █████╗ ██╗██╗      ██████╗ ██████╗ ██╗██████╗
+ │ tail │ tail │ tail │   ╚══██╔══╝██╔══██╗██║██║     ██╔════╝ ██╔══██╗██║██╔══██╗
+ ├──────┼──────┼──────┤      ██║   ███████║██║██║     ██║  ███╗██████╔╝██║██║  ██║
+ │ tail │ tail │ tail │      ██║   ██╔══██║██║██║     ██║   ██║██╔══██╗██║██║  ██║
+ ├──────┼──────┼──────┤      ██║   ██║  ██║██║███████╗╚██████╔╝██║  ██║██║██████╔╝
+ │ tail │ tail │ tail │      ╚═╝   ╚═╝  ╚═╝╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝
+ └──────┴──────┴──────┘
+                          watch multiple files · grid-view · one terminal · zero deps
+"""
+
+def prompt_setup():
+    first = True
+    while True:
+        if first: print(LOGO); first = False
+        print("    1) Browse directory\n    2) Add paths manually\n    3) Resume session\n")
+        print("  Select 1-3 (q=quit): ", end='', flush=True)
+        try:
+            choice = _getch(); print(choice)
+            result = _browse_directory() if choice == '1' else _add_paths_manually() if choice == '2' else _resume_session() if choice == '3' else None if choice.lower() == 'q' else "back"
+            if result is None: return None
+            if result != "back": return result
+        except (EOFError, KeyboardInterrupt): print(); return None
+
+def quick_start(directory, count=9):
+    """Auto-select log files from directory (newest first). Extensions from config.json."""
+    directory = os.path.expanduser(directory)
+    if not os.path.isdir(directory): print(f"  Not a directory: {directory}"); return None
+    extensions = tuple(load_config().get('extensions', DEFAULT_EXTENSIONS))
+    files = [os.path.join(directory, f) for f in os.listdir(directory)
+             if f.endswith(extensions) and os.path.isfile(os.path.join(directory, f))]
+    if not files: print(f"  No {'/'.join(extensions)} files in: {directory}"); return None
+    files.sort(key=lambda f: os.path.getmtime(f), reverse=True)
+    paths = files[:min(count, 9)]
+    layout = auto_layout(len(paths)) or (2, 1)
+    print(LOGO)
+    print(f"  Found {len(paths)} file(s) in {directory}\n")
+    for p in paths: print(f"    • {os.path.basename(p)}")
+    print("\n  Starting..."); time.sleep(0.3)
+    return paths, layout, 10
+
+def claude_discover_paths():
+    """Ask Claude CLI to return relevant session log paths with per-file reasoning."""
+    import subprocess
+    config = load_config()
+    prompt = config.get('claude_prompt', DEFAULT_CLAUDE_PROMPT)
+    try:
+        result = subprocess.run(['claude', '-p', prompt], capture_output=True, text=True, timeout=60)
+        output = result.stdout.strip()
+        paths, reasons = [], {}
+        for line in output.split('\n'):
+            line = line.strip()
+            if not line or line.startswith('<') or line.startswith('#'):
+                continue
+            if '|' in line:
+                path, reason = line.split('|', 1)
+                path, reason = path.strip(), reason.strip()
+            else:
+                path, reason = line, None
+            if path and os.path.isfile(path):
+                paths.append(path)
+                if reason:
+                    reasons[path] = reason
+        return paths[:9], reasons
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return [], {}
+
+def main():
+    if '--claude' in sys.argv:
+        print("  Asking Claude for recent & relevant log paths to show with tailgrid...")
+        paths, reasons = claude_discover_paths()
+        if not paths:
+            print("  No relevant log files found")
+            return 1
+        layout = auto_layout(len(paths)) or (2, 1)
+        print(LOGO)
+        print(f"  Found {len(paths)} log file(s):\n")
+        for p in paths: print(f"    • {p}")
+        print("\n  Starting..."); time.sleep(0.3)
+        run_viewer(paths, layout, 10, show_full_path=True, reasons=reasons)
+        return 0
+    elif len(sys.argv) > 1:
+        first_arg = os.path.expanduser(sys.argv[1])
+        if os.path.isdir(first_arg):
+            # Directory mode - existing behavior
+            count = int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2].isdigit() else 9
+            result = quick_start(sys.argv[1], count)
+        else:
+            # Multiple file paths mode
+            paths = [os.path.expanduser(arg) for arg in sys.argv[1:] if os.path.exists(os.path.expanduser(arg))][:9]
+            if not paths:
+                print("  No valid files provided")
+                return 1
+            layout = auto_layout(len(paths)) or (2, 1)
+            print(LOGO)
+            print(f"  Opening {len(paths)} file(s):\n")
+            for p in paths: print(f"    • {p}")
+            print("\n  Starting..."); time.sleep(0.3)
+            result = (paths, layout, 10)
+    else:
+        result = prompt_setup()
+    if result: run_viewer(*result); return 0
+    return 1
+
+if __name__ == "__main__": sys.exit(main())
