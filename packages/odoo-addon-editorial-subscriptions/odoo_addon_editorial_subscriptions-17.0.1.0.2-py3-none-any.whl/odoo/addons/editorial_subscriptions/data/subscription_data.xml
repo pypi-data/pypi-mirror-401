@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="product_category_subscription" model="product.category">
+            <field name="name">Suscripción</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+
+        <!-- Pricelist for "Suscripciones"-->
+        <record id="product_pricelist_subscriptions" model="product.pricelist">
+            <field name="name">Suscripciones</field>
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+            <field name="route_id" ref="gestion_editorial.route_direct_sales"/>
+        </record>
+
+        <record id="stock_location_subscription" model="stock.location">
+            <field name="name">Suscripción</field>
+            <field name="location_id" ref="stock.stock_location_locations_partner"/>
+            <field name="usage">inventory</field>
+            <field name="company_id"></field>
+        </record>
+
+        <record id="stock_picking_type_subscription" model="stock.picking.type">
+            <field name="name">Libros a suscripción</field>
+            <field name="sequence_code">LIB_SUSCR</field>
+            <field name="code">outgoing</field>
+            <field name="show_operations">False</field>
+            <field name="use_existing_lots">False</field>
+            <field name="warehouse_id">1</field>
+            <field name="default_location_src_id" ref="stock.stock_location_stock"/>
+            <field name="default_location_dest_id" ref="stock_location_subscription"/>
+        </record>
+    </data>
+</odoo>

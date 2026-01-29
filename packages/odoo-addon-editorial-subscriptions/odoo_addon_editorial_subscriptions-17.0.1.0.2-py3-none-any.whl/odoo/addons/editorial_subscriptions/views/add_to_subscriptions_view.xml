@@ -1,0 +1,61 @@
+<odoo>
+
+    <record id="view" model="ir.ui.view">
+        <field name="model">subscriptions.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div>
+                    <label for="subscription_templates"/>
+                    <field name="subscription_templates" class="oe_inline mx-4" widget="many2many_tags" options="{'no_create': True, 'no_create_edit':True}"/>
+                </div>
+
+                <div class="mb-4">
+                    <label for="subscriber"/>
+                    <field name="subscriber" class="oe_inline mx-4" widget="many2many_tags" options="{'no_create': True, 'no_create_edit':True}"/>
+                </div>
+
+                <field name="subscriptions" readonly="1">
+                    <tree>
+                        <field name="name" string="Identificador"/>
+                        <field name="partner_id" string="Nombre"/>
+                        <field name="code"/>
+                        <field name="template_id"/>
+                    </tree>
+                </field>
+
+                <div class="alert alert-warning" role="alert">
+                    Pulsando "Confirmar" se añadirá este producto a las suscripciones mostradas y se creará una órden de entrega para cada suscripción.
+                </div>
+
+                <footer>
+                    <button string="Confirmar" type="object" name="add_product_to_subscription" class="oe_highlight" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="add_to_suscriptions_action" model="ir.actions.act_window">
+        <field name="name">Añadir a suscripciones</field>
+        <field name="res_model">subscriptions.wizard</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view"/>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_product': active_id}</field>
+    </record>
+
+
+    <record id="add_to_subscriptions_button" model="ir.ui.view">
+        <field name="name">add.to.subscriptions.button</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <header>
+                <button name="%(add_to_suscriptions_action)d"
+                    string="Añadir a suscripciones"
+                    context="{'default_product_id': active_id}"
+                    type="action"
+                    class="btn-primary"/>
+            </header>
+        </field>
+    </record>
+</odoo>

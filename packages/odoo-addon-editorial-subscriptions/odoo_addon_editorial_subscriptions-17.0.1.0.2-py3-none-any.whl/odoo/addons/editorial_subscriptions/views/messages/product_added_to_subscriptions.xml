@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="product_added_to_subscriptions">
+            <p t-if="product">
+                <a href="#" t-att-data-oe-model="product._name" t-att-data-oe-id="product.id">
+                    <t t-esc="product.display_name"/>
+                </a> se ha añadido a la suscripción.
+
+                Se ha creado el traslado
+                <a href="#" t-att-data-oe-model="move._name" t-att-data-oe-id="move.id">
+                    <t t-esc="move.display_name"/>
+                </a>
+            </p>
+
+            <p t-if="subscriptions">
+                Producto añadido a las suscripciones:
+                <ul>
+                    <t t-foreach="subscriptions" t-as="subscription">
+                        <li>
+                            <a href="#" t-att-data-oe-model="subscription._name" t-att-data-oe-id="subscription.id">
+                                <t t-esc="subscription.display_name"/>
+                            </a>
+                        </li>
+                    </t>
+                </ul>
+            </p>
+        </template>
+    </data>
+</odoo>
