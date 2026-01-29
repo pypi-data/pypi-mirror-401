@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pdc-struct"
+version = "1.0.0"
+authors = [
+  { name="Jonathan Baker", email="jon@boxcake.net" },
+]
+description = "A Pydantic extension for struct-compatible serialization"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+    "Topic :: Software Development :: Code Generators",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["struct", "binary", "serialization", "pydantic", "c-interop", "networking", "bytes", "pack", "unpack"]
+dependencies = [
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.24",
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+docs = [
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.24",
+    "mkdocs-git-revision-date-localized-plugin>=1.2",
+]
+security = [
+    "bandit>=1.7",
+    "pip-audit>=2.6",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/boxcake/pdc_struct"
+"Documentation" = "https://boxcake.github.io/pdc_struct"
+"Bug Tracker" = "https://github.com/boxcake/pdc_struct/issues"
+"Repository" = "https://github.com/boxcake/pdc_struct"
