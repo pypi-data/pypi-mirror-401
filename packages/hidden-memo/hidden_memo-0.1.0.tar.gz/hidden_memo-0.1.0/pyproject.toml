@@ -1,0 +1,33 @@
+[project]
+name = "hidden-memo"
+version = "0.1.0"
+description = "A hidden NoSQL MCP server for unstructured data."
+readme = "README.md"
+authors = [{ name = "choi_hyk", email = "blindlchoil@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0.0",
+    "tinydb>=4.8.0",
+    "typer>=0.21.1",
+]
+
+[project.scripts]
+hidden-memo = "hidden_memo.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["ruff>=0.14.11"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"] # E(Error), F(Pyflakes), I(Isort)
+fixable = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
