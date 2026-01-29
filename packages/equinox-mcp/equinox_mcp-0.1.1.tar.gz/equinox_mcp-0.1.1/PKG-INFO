@@ -1,0 +1,99 @@
+Metadata-Version: 2.4
+Name: equinox-mcp
+Version: 0.1.1
+Summary: MCP server for Equinox documentation
+Author: s27183
+License: MIT
+Keywords: documentation,equinox,jax,llm,mcp
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.23; extra == 'dev'
+Requires-Dist: pytest>=8.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# equinox-mcp
+
+MCP (Model Context Protocol) server for [Equinox](https://github.com/patrick-kidger/equinox) documentation.
+
+Enables LLMs to access up-to-date Equinox documentation and validate generated code.
+
+## Installation
+
+```bash
+pip install equinox-mcp
+```
+
+Or run without installing:
+
+```bash
+uvx equinox-mcp
+```
+
+## Usage with Claude Code
+
+```bash
+# Add as MCP server
+claude mcp add -t stdio -s user equinox -- python -m equinox_mcp
+
+# Or with uvx
+claude mcp add -t stdio -s user equinox -- uvx equinox-mcp
+```
+
+## Configuration
+
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `EQUINOX_DOCS_PATH` | (none) | Path to local Equinox docs directory (offline mode) |
+| `EQUINOX_MCP_CACHE_DIR` | `~/.cache/equinox-mcp` | Cache directory for online mode |
+| `EQUINOX_MCP_CACHE_TTL` | `24` | Cache TTL in hours |
+| `EQUINOX_MCP_NO_CACHE` | `0` | Set to `1` to disable caching |
+
+### Offline Mode
+
+Point to a local Equinox clone for offline access:
+
+```bash
+export EQUINOX_DOCS_PATH=/path/to/equinox/docs
+python -m equinox_mcp
+```
+
+### Online Mode (Default)
+
+Fetches docs from GitHub with local caching:
+
+```bash
+python -m equinox_mcp
+# Fetches from: raw.githubusercontent.com/patrick-kidger/equinox/main/docs/
+```
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `list-sections` | List all available documentation sections |
+| `get-documentation` | Fetch specific documentation content |
+| `equinox-checker` | Validate Equinox module code |
+
+## Development
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+```
+
+## License
+
+MIT
