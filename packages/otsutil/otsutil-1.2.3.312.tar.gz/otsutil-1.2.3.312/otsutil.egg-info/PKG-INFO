@@ -1,0 +1,92 @@
+Metadata-Version: 2.4
+Name: otsutil
+Version: 1.2.3.312
+Summary: A general-purpose utility package using Python 3.12+ features.
+Author-email: Otsuhachi <agequodagis.tufuiegoeris@gmail.com>
+License: MIT License
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Dynamic: license-file
+
+# otsutil
+
+よく使う関数やクラスを纏めたライブラリです。
+
+このライブラリは以下の環境で作成・最適化されています。
+`Windows10/11`, `Python 3.12.0+`
+
+## インストール
+
+インストール
+`pip install otsutil`
+
+アップデート
+`pip install -U otsutil`
+
+アンインストール
+`pip uninstall otsutil`
+
+## モジュール
+
+以下のモジュールが存在します。
+
+| モジュール名 | 概要 |
+| :---: | :--- |
+| [classes](#classesモジュール) | スレッドセーフなコンテナやタイマーなどのクラス定義 |
+| [funcs](#funcsモジュール) | ファイル操作や型判定などの便利な関数定義 |
+| [types](#typesモジュール) | パッケージ全体で共通利用する型ヒント・ジェネリクス定義 |
+
+---
+
+### classesモジュール
+
+classesモジュールでは以下のクラスが定義されています。
+
+| クラス名 | 概要 |
+| :---: | :--- |
+| **LockableDict** | 要素の操作時に `threading.Lock` を使用するスレッドセーフな `dict` クラス。 |
+| **LockableList** | 要素の操作時に `threading.Lock` を使用するスレッドセーフな `list` クラス。 |
+| **ObjectSaver** | オブジェクトを `pickle` + `base64` でシリアライズし、ファイルに永続化するクラス。<br>カスタムクラスを保存する場合、そのクラスに `__reduce__` を実装することでリスト内の要素なども含め高度な変換・復元が可能です。 |
+| **OtsuNone** | `None` を返す可能性のある辞書の `get` デフォルト値などに使用するセンチネルオブジェクト。<br>`bool()` 判定では `False` を返します。 |
+| **Timer** | 指定時間の経過判定および待機を行うタイマー。<br>秒単位でのブロック待機や、`for` 文で残り時間を `yield` しながら処理を行うイテレータ機能を持ちます。 |
+
+---
+
+### funcsモジュール
+
+funcsモジュールでは以下の関数が定義されています。
+
+| 関数名 | 概要 |
+| :---: | :--- |
+| **deduplicate** | シーケンスから重複を取り除き、順序を保持したまま元の型（`list`/`tuple`）で返す。 |
+| **get_value** | 階層構造を持つ辞書などから、キーのリストを指定して安全に値を取得する。 |
+| **is_all_type** | 反復可能オブジェクトの全ての要素が、指定した型であるか判定する。 |
+| **is_type** | オブジェクトが指定した型であるか判定する（`None` 許容判定などを含む）。 |
+| **load_json** | `JSON` ファイルを読み込む。親ディレクトリがない場合は作成し、ファイルがない場合はデフォルト値を返します。 |
+| **read_lines** | ファイルを1行ずつ読み出すジェネレータ。改行コードの自動除去やエンコーディング指定が可能です。 |
+| **same_path** | 2つのパスが（相対/絶対に関わらず）物理的に同じ場所を指しているか判定する。 |
+| **save_json** | オブジェクトを `JSON` 形式で保存する。 |
+| **setup_path** | パスを `Path` オブジェクトとして整備し、必要に応じて親ディレクトリを生成して利用可能な状態にする。 |
+| **str_to_path** | 文字列を `pathlib.Path` に変換する。 |
+| **write_lines** | 反復可能な文字列データを1行ずつファイルに書き出す。 |
+
+---
+
+### typesモジュール
+
+typesモジュールでは、Python 3.12 のジェネリクス構文に対応した以下の型定義がされています。
+
+| 名称 | 形式 | 概要 |
+| :---: | :---: | :--- |
+| **FLOAT_INT** | TypeVar | `float` または `int` に限定した数値型変数。 |
+| **K / V** | TypeVar | 辞書のキー(Key)や値(Value)を想定した型変数。 |
+| **P** | ParamSpec | 関数の引数仕様（Parameter Specification）を表す型変数。 |
+| **R** | TypeVar | 関数の戻り値（Return Value）を表す型変数。 |
+| **T** | TypeVar | 制約のない汎用的な型変数。 |
+| **hmsValue** | Alias | `(時, 分, 秒)` のタプル。型は `(int, int, float)`。 |
+| **pathLike** | Alias | `pathlib.Path` または `str`。 |
