@@ -1,0 +1,68 @@
+Metadata-Version: 2.4
+Name: pyskel2graph
+Version: 0.1.0
+Summary: Convert the Skeleton to a Graph using Python.
+Home-page: https://https://github.com/SummerColdWind
+Author: Qincheng Qiao
+Author-email: jugking6688@gmail.com
+Classifier: Development Status :: 1 - Planning
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: matplotlib
+Requires-Dist: numpy<2.0.0
+Requires-Dist: scikit-image
+Requires-Dist: networkx
+Requires-Dist: scipy
+Requires-Dist: opencv-python
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# PySkel2Graph
+
+### Convert the Skeleton to a Graph using Python.
+
+---
+
+## Install
+
+```shell
+pip install pyskel2graph
+```
+
+## Use
+
+```python
+from pyskel2graph.io import imread, imwrite
+from pyskel2graph import skel2graph
+from pyskel2graph.vis import vis_graph, vis_graph_plt
+
+img = imread('assets/test.jpg')
+skel = imread('assets/skeleton.png')
+graph = skel2graph(skel, pruning_threshold=5)
+vis_graph_plt(graph, img=img)
+imwrite(vis_graph(graph, skel.shape), 'assets/pruning_skel.png')
+```
+
+### Image
+![img](assets/test.jpg)
+
+### Skeleton (Obtain through certain methods)
+![skeleton](assets/skeleton.png)
+
+### Skeleton (pruning_threshold=5)
+![sp](assets/pruning_skel.png)
+
+### Graph
+![graph](assets/graph_plt.png)
+
