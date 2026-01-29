@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_file = "psrecord/_version.py"
+tag_regex = '^(?:test/)?v(?P<version>[^\\+]+)(?:\\+.*)?$'
+
+[project]
+name = "psrecord-io"
+dynamic = [
+    "version"
+]
+authors = [
+    { name = "Thomas Robitaille", email = "thomas.robitaille@gmail.com" },
+    { name = "Rui Xue", email = "rx.astro@gmail.com" },
+]
+maintainers = [
+    { name = "Rui Xue", email = "rx.astro@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+]
+keywords = ["psrecord", "fork", "io", "data-processing"]
+description = "Python package to record activity from processes"
+readme = "README.rst"
+dependencies = [
+    "psutil>=5.6",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+]
+plot = [
+    "matplotlib",
+]
+
+[project.scripts]
+psrecord = "psrecord.main:main"
+
+[project.license]
+text = "Simplified BSD License"
+
+[project.urls]
+"Repository" = "https://github.com/r-xue/psrecord"
+"Original Project" = "https://github.com/astrofrog/psrecord"
+
+[tool.setuptools]
+zip-safe = true
+provides = [
+    "psrecord",
+]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.ruff]
+lint.select = ["F", "E", "W", "I", "UP"]
+line-length = 100
+
+[tool.black]
+line-length = 100
