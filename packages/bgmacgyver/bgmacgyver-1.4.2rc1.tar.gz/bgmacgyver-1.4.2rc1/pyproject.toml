@@ -1,0 +1,34 @@
+[project]
+name = "bgmacgyver"
+version = "1.4.2rc1"
+description = ""
+authors = [
+    { name = "Jordi Deu-Pons", email = "jordi.deu@irbbarcelona.org" }
+]
+maintainers = [
+    { name = "Federica Brando", email = "federica.brando@irbbarcelona.com" },
+    { name = "Miguel Grau", email = "miguel.grau@irbbarcelona.org" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "netifaces",
+    "setuptools>=80.9.0",
+]
+
+[project.scripts]
+bgmacgyver = "bgmacgyver.indicator:cmdline"
+
+[tool.uv]
+package = true
+
+[tool.hatch.build]
+include = ["bgmacgyver/*.svg", "bgmacgyver/*.template", "bgmacgyver"]
+
+
+[build-system]
+requires = ["hatchling>=1.0.0"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["bgmacgyver"]
