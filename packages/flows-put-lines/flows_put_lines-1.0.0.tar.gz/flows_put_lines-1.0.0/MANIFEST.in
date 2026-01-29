@@ -1,0 +1,10 @@
+# Manifest for including data files in package distribution
+include README.md
+include LICENSE
+include requirements.txt
+include config.yaml
+recursive-include src *.py
+recursive-include claude_skill *.py *.md
+recursive-include docs *.md
+exclude data/*
+exclude .gitignore

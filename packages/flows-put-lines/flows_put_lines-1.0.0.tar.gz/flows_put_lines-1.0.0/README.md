@@ -1,0 +1,253 @@
+# Flows-put-lines
+A Python service that downloads a static GTFS feed and provisions Expected Travel Time KPIs on PTV FLOWS per entire line — one KPI per GTFS direction (`direction_id` 0/1). Lines are selected via `route_short_name`. Alerts use UNUSUAL thresholds with offset `timetostart: 0`.
+
+## Installation
+
+### As a Standalone CLI Tool
+
+Install dependencies and run directly:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### As a Package (for use in other projects)
+
+Install the package in editable mode:
+
+```bash
+pip install -e .
+```
+
+Or install from the repository:
+
+```bash
+pip install git+https://github.com/lucapaone-ptvgroup/Flows-put-lines.git
+```
+
+After installation, you can use it programmatically:
+
+```python
+from src.gtfs_extractor import download_gtfs, extract_lines_with_shapes
+from src.flows_kpi import create_kpi, get_all_kpis
+from src.config import load_config
+
+# Load configuration
+config = load_config("config.yaml")
+
+# Use the package functions
+# ... (see Claude Skill section for examples)
+```
+
+Or use the command-line tool:
+
+```bash
+flows-put-lines --config config.yaml --apply
+```
+
+## Configure
+- Edit [config.yaml](config.yaml):
+	- `gtfs.url`: your GTFS feed URL (http/https)
+	- `gtfs.route_short_names`: list of route short names or leave empty for all
+	- `gtfs.max_routes`: limit processing to a small set (e.g., 5)
+	- `kpi.thresholds.warning_minutes` and `critical_minutes`
+	- Set environment variable `PTV_API_KEY` for PTV Flows access
+	- Set `kpi.apply: true` to call the API (default is dry-run)
+
+## Run
+- **Dry-run** (prints payloads without calling API):
+
+```bash
+python -m src.main --config config.yaml
+```
+
+- **Apply** (create KPI instances):
+
+```bash
+PTV_API_KEY=your_key_here \
+python -m src.main --config config.yaml --apply
+```
+
+- **Delete all existing KPIs** (cleanup before re-running):
+
+```bash
+PTV_API_KEY=your_key_here \
+python -m src.main --config config.yaml --delete-all-kpis
+```
+
+### CLI Options
+- `--config <path>`: Path to YAML configuration file (default: `config.yaml`)
+- `--apply`: Force API calls to create KPIs (overrides `kpi.apply: false` in config)
+- `--delete-all-kpis`: Fetch all running KPIs and delete them; exits after completion (useful for cleanup before re-provisioning)
+
+## Notes
+- One KPI is created per GTFS direction (`direction_id` 0/1) using the canonical shape direction (first → last stop).
+- Endpoints per direction are derived via majority first/last stops across trips (`direction_id` 0/1).
+- Very long corridors may need segmentation if the API rejects large PATHs; start with dry-run and adjust as needed.
+
+### Corridor Entities Requirement (Apply mode)
+- Creating KPIs with locationType `PATH` requires Flows corridor entities (`location.entities`) — OpenLR-encoded street segments along the path. The API does not persist shape-only locations.
+- If your API key does not include Flows Map/Network access, the server cannot map-match your WKT to entities and KPI creation fails with `GENERAL_VALIDATION_ERROR` and `Entity list is empty`.
+- To proceed:
+	- Request Flows Map/Network API access to enable server-side map-matching of paths to entities, or
+	- Provide an existing `locationId` referencing a precomputed corridor, or
+	- Supply OpenLR codes per corridor segment in the `entities` field.
+- References: OpenLR concept and KPI API samples include `entities` on creation; see the official docs.
+
+## Caching & Stats
+- The GTFS download uses basic HTTP caching (`ETag`/`Last-Modified`) to avoid re-downloading when the feed hasn’t changed. A metadata file is stored in `data/gtfs_meta.json`.
+- For this use case, you can restrict processing to a few lines via `gtfs.max_routes` and `gtfs.route_short_names`. Updating the GTFS file is only needed when lines or their shapes change; otherwise the cached file is reused.
+- The CLI prints a summary with counts of routes processed, directions with shape, and KPI payloads built.
+## Map Visualization
+After creating KPIs in apply mode, the tool automatically generates an interactive HTML map showing all KPI shapes using **original GTFS shapes** (complete, not trimmed or modified by Route Matcher).
+
+**Map location:** `data/shapes/kpi_map.html`
+
+**Features:**
+- 🗺️ Interactive OpenStreetMap base layer with pan and zoom
+- 🎨 Color-coded lines by direction:
+  - **Blue** (#3388ff) = Direction 0
+  - **Orange** (#ff6633) = Direction 1
+- 👆 Click any line to see KPI details popup (name, route, direction, KPI ID, status)
+- 📊 Info box displays selected KPI information
+- 📍 Legend showing direction color coding
+- 🔍 Auto-zoom to fit all KPI shapes in view
+- ✅ Full GTFS shapes preserved (not trimmed to Route Matcher entities)
+
+**Metadata export:** `data/shapes/shapes_metadata.json` contains all KPI details in JSON format for programmatic access.
+
+**Usage:** Simply open `data/shapes/kpi_map.html` in your browser after running `--apply` to visualize all provisioned KPIs on the map.
+
+**Example test results:**
+- Successfully tested with Rome GTFS feed (routes 211, C2, 62)
+- 6 KPIs created (3 routes × 2 directions)
+- All shapes render completely with no trimming
+
+## Claude Skill / Programmatic Usage
+
+This package includes a **Claude Skill** that allows AI assistants and other Python projects to use the flows-put-lines functionality programmatically.
+
+### Quick Start with Claude Skill
+
+1. **Install the package:**
+   ```bash
+   pip install -e .
+   ```
+
+2. **Set your API key:**
+   ```bash
+   export PTV_API_KEY="your_api_key_here"
+   ```
+
+3. **Use the skill in Python** (prompts for missing `PTV_API_KEY` and GTFS URL):
+   ```python
+   from claude_skill.flows_put_lines_skill import FlowsPutLinesSkill
+
+   # Initialize the skill
+   skill = FlowsPutLinesSkill("config.yaml")
+
+   # List existing KPIs
+   kpis = skill.list_kpis()
+   print(f"Found {len(kpis)} KPIs")
+
+     # Provision new KPIs from GTFS (if gtfs_url is missing, will prompt)
+     results = skill.provision_kpis_from_gtfs(
+       gtfs_url="",
+       route_short_names=["1", "2", "3"],
+       max_routes=3,
+       apply=True  # Set False for dry-run
+   )
+
+   print(f"Created {results['kpis_created']} KPIs")
+   print(f"Map: {results['map_path']}")
+
+   # Delete all KPIs
+   deleted = skill.delete_all_kpis()
+   print(f"Deleted {deleted} KPIs")
+   ```
+
+### Claude Skill API
+
+The `FlowsPutLinesSkill` class provides these methods:
+
+- **`list_kpis()`** - Returns list of all existing KPIs
+- **`delete_all_kpis()`** - Deletes all KPIs, returns count deleted
+- **`provision_kpis_from_gtfs(gtfs_url, route_short_names, max_routes, apply)`** - Downloads GTFS and creates KPIs
+  - Returns: `{routes_processed, directions_with_shape, kpis_created, kpi_details, map_path}`
+- **`get_kpi_details(kpi_id)`** - Gets detailed status for a specific KPI
+
+### Complete Example
+
+```python
+from claude_skill.flows_put_lines_skill import FlowsPutLinesSkill
+
+# Initialize
+skill = FlowsPutLinesSkill("config.yaml")
+
+# Clean up old KPIs
+deleted = skill.delete_all_kpis()
+print(f"✓ Cleaned up {deleted} old KPIs")
+
+# Create new KPIs from Rome GTFS
+results = skill.provision_kpis_from_gtfs(
+    gtfs_url="https://dati.comune.roma.it/.../rome_static_gtfs.zip",
+    route_short_names=["211", "C2", "62"],
+    max_routes=3,
+    apply=True
+)
+
+print(f"✓ Processed {results['routes_processed']} routes")
+print(f"✓ Created {results['kpis_created']} KPIs")
+print(f"✓ Map: {results['map_path']}")
+
+# Check individual KPI status
+for kpi in results['kpi_details']:
+    details = skill.get_kpi_details(kpi['kpi_id'])
+    print(f"  {kpi['name']}: {details.get('statusCode')}")
+```
+
+**Full documentation:** See [claude_skill/README.md](claude_skill/README.md) for complete API reference and examples.
+
+## Package Structure
+
+```
+Flows-put-lines/
+├── skills/
+│   └── flows-put-lines-skill/
+│       ├── SKILL.md              # AgentSkills-compliant skill definition
+│       └── scripts/provision.py  # Script entry to run the skill
+├── src/
+│   ├── __init__.py          # Package exports
+│   ├── main.py              # CLI entrypoint
+│   ├── config.py            # Configuration loader
+│   ├── gtfs_extractor.py    # GTFS processing
+│   ├── flows_kpi.py         # PTV Flows KPI API client
+│   ├── route_matcher.py     # Route matching for entities
+│   └── map_generator.py     # HTML map visualization
+├── claude_skill/
+│   ├── __init__.py
+│   ├── flows_put_lines_skill.py  # Claude skill implementation
+│   └── README.md            # Skill documentation
+├── pyproject.toml           # Package configuration
+├── config.yaml              # Runtime configuration
+└── README.md                # This file
+```
+
+### AgentSkills Skill
+- Skill directory: [skills/flows-put-lines-skill/SKILL.md](skills/flows-put-lines-skill/SKILL.md)
+- Quick run via script:
+
+```bash
+PTV_API_KEY=your_key \
+FPL_GTFS_URL=https://example.com/gtfs.zip \
+FPL_ROUTES=211,C2,62 \
+FPL_MAX_ROUTES=3 \
+FPL_APPLY=true \
+python skills/flows-put-lines-skill/scripts/provision.py
+```
+
+The SKILL.md follows the AgentSkills specification (name, description, optional metadata,
+progressive disclosure, and references). Use this when integrating with agent platforms
+that support the AgentSkills format.
+## Secrets
+- Keep your PTV API key in the environment (`PTV_API_KEY`) or as a GitHub repository secret for CI/CD; do not commit keys to source control.

@@ -1,0 +1,22 @@
+# Configuration for Flows-put-lines service
+
+ptv_api:
+  base_url: "https://api.ptvgroup.tech/kpieng/v1"
+  api_key_env: "PTV_API_KEY"  # Reads API key from environment by default
+  route_matcher_base_url: "https://api.ptvgroup.tech/flows/routematcher/v1"
+
+gtfs:
+  url: "https://dati.comune.roma.it/catalog/dataset/a7dadb4a-66ae-4eff-8ded-a102064702ba/resource/266d82e1-ba53-4510-8a81-370880c4678f/download/rome_static_gtfs.zip"  # GTFS feed URL
+  route_short_names: []  # e.g., ["1", "2", "A"]; empty means all routes
+  max_routes: 3  # limit processing to a small bunch of lines (quick apply run)
+
+kpi:
+  name_prefix: "GTFS Line"
+  thresholds:
+    warning_minutes: 15
+    critical_minutes: 30
+  timetostart_seconds: 0  # offset 0 for immediate computation
+  apply: false  # dry-run by default; set true to call PTV Flows API
+
+runtime:
+  data_dir: "data"
