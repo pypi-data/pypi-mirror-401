@@ -1,0 +1,1 @@
+from mangadownloadlib.mangadownloadlib.enums.DownloadMode import DownloadMode

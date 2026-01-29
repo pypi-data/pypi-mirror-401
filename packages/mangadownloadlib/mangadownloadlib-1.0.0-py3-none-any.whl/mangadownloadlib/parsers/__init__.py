@@ -1,0 +1,4 @@
+from mangadownloadlib.mangadownloadlib.parsers.BatoToParser import BatoToParser
+from mangadownloadlib.mangadownloadlib.parsers.XBatoParser import XBatoParser
+from mangadownloadlib.mangadownloadlib.parsers.MangaParserInterface import MangaParserInterface
+from mangadownloadlib.mangadownloadlib.parsers.KaoruHanaWarinToSakuParser import KaoruHanaWarinToSakuParser

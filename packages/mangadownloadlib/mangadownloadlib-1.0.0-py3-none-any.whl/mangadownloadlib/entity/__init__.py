@@ -1,0 +1,2 @@
+from mangadownloadlib.mangadownloadlib.entity.MangaChapter import MangaChapter
+from mangadownloadlib.mangadownloadlib.entity.DownloaderData import DownloaderData
